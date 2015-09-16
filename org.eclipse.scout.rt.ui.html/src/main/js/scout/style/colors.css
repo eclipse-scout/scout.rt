@@ -129,4 +129,4 @@
 @view-button-tab-color: @palette-gray-7;
 @view-button-tab-active-background-color: @navigation-background-color;
 @view-button-tab-active-color: @active-inverted-color;
-
+@checkbox-disabled-color: @palette-gray-5;

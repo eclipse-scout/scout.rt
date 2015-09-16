@@ -31,6 +31,12 @@ scout.KeyStroke = function() {
    * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
    */
   this.invokeAcceptInputOnActiveValueField = false;
+
+  /**
+   * Indicates whether to prevent the invoke of 'acceptInput' on a currently focused value field prior handling the keystroke,
+   * either triggered by previous property or by KeyStrokeContext
+   */
+  this.preventInvokeAcceptInputOnActiveValueField = false;
 };
 
 /**

@@ -272,7 +272,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     else {
       // No client session for the requested ID was found, so create one
       clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
-      LOG.info("Created new client session [clientSessionId=" + clientSession.getId() + "]");
+      LOG.info("Created new client session [clientSessionId=" + clientSession.getId() + ", userAgent=" + clientSession.getUserAgent() + "]");
       // Ensure session is active
       if (!clientSession.isActive()) {
         throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + clientSession.getId() + "]");

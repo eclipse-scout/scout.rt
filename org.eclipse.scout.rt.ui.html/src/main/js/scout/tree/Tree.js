@@ -20,6 +20,7 @@ scout.Tree = function() {
   this._animationNodeLimit = 25;
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._$animationWrapper; // used by _renderExpansion()
 
   // Flag (0 = false, > 0 = true) to indicate whether child nodes should be added to the tree lazily if
   // they request it.  Default is false, which has the consequences that most UI actions show all nodes.
@@ -137,6 +138,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('mouseup', '.tree-node', this._onNodeMouseUp.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
+    .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
 
   scout.scrollbars.install(this.$data, this.session, {
@@ -395,8 +397,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
   animate = scout.helpers.nvl(animate, true);
 
-  var $wrapper,
-    $node = node.$node,
+  var $node = node.$node,
     expanded = node.expanded;
 
   // Only render if node is rendered to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
@@ -413,6 +414,15 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
     return true;
   }
 
+  // If there is already an animation is already going on for this node, stop it immediately
+  if (this._$animationWrapper) {
+    // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
+    // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
+    // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
+    // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
+    this._$animationWrapper.stop(false, true);
+  }
+
   if (expanded) {
     this._addNodes(node.childNodes, $node, $predecessor);
     this._updateItemPath();
@@ -427,13 +437,11 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
       if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
         var $newNodes = scout.Tree.collectSubtree($node, false);
         if (animate && $newNodes.length) {
-          $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
-          var h = $wrapper.outerHeight();
-          var removeContainer = function() {
-            $(this).replaceWith($(this).contents());
-          };
-          $wrapper.css('height', 0)
-            .animateAVCSD('height', h, removeContainer, this.revalidateLayoutTree.bind(this), 200);
+          this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
+          var h = this._$animationWrapper.outerHeight();
+          this._$animationWrapper
+            .css('height', 0)
+            .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
         }
       }
     }
@@ -454,14 +462,26 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
           }
         });
         if (animate) {
-          $wrapper = $existingNodes.wrapAll('<div class="animationWrapper">)').parent();
-          $wrapper.animateAVCSD('height', 0, $.removeThis, this.revalidateLayoutTree.bind(this), 200);
+          this._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
+          this._$animationWrapper
+            .animateAVCSD('height', 0, onAnimationComplete.bind(this, false), this.revalidateLayoutTree.bind(this), 200);
         } else {
           $existingNodes.remove();
           this.invalidateLayoutTree();
         }
       }
     }
+  }
+
+  // ----- Helper functions -----
+
+  function onAnimationComplete(expanding) {
+    if (expanding) {
+      this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
+    } else {
+      this._$animationWrapper.remove();
+    }
+    this._$animationWrapper = null;
   }
 };
 
@@ -479,7 +499,7 @@ scout.Tree.prototype.clearSelection = function() {
   this.selectNodes([]);
 };
 
-scout.Tree.prototype.selectNodes = function(nodes, notifyServer) {
+scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.helpers.nvl(notifyServer, true);
   if (scout.arrays.equalsIgnoreOrder(nodes, this.selectedNodes)) {
@@ -492,9 +512,17 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer) {
 
   this.selectedNodes = nodes;
   if (notifyServer) {
-    this.remoteHandler(this.id, 'nodesSelected', {
+    var event = new scout.Event(this.id, 'nodesSelected', {
       nodeIds: this._nodesToIds(nodes)
     });
+
+    // Only send the latest selection changed event for a field
+    event.coalesce = function(previous) {
+      return this.id === previous.id && this.type === previous.type;
+    };
+
+    // send delayed to avoid a lot of requests while selecting
+    this.session.sendEvent(event, debounceSend ? 250 : 0);
   }
 
   if (this.rendered) {
@@ -591,9 +619,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
   }
 };
 
-scout.Tree.prototype._updateChildNodeIndex = function(parentNode, startIndex) {
-  for (var i = startIndex; i < parentNode.childNodes.length; i++) {
-    parentNode.childNodes[i].childNodeIndex = i;
+scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
+  for (var i = scout.helpers.nvl(startIndex, 0); i < nodes.length; i++) {
+    nodes[i].childNodeIndex = i;
   }
 };
 
@@ -617,10 +645,9 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   if (parentNode) {
     if (parentNode.childNodes && parentNode.childNodes.length > 0) {
       nodes.forEach(function(entry) {
-        var nodeIndex = entry.childNodeIndex ? entry.childNodeIndex : 0;
-        scout.arrays.insert(parentNode.childNodes, entry, nodeIndex);
+        scout.arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex);
       }.bind(this));
-      this._updateChildNodeIndex(parentNode, nodes[0].childNodeIndex);
+      this._updateChildNodeIndex(parentNode.childNodes, nodes[0].childNodeIndex);
     } else {
       scout.arrays.pushAll(parentNode.childNodes, nodes);
     }
@@ -645,8 +672,10 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   } else {
     if (this.nodes && this.nodes.length > 0) {
       nodes.forEach(function(entry) {
-        scout.arrays.insert(this.nodes, entry, entry.childNodeIndex ? entry.childNodeIndex : 0);
+        scout.arrays.insert(this.nodes, entry, entry.childNodeIndex);
       }.bind(this));
+      this._updateChildNodeIndex(this.nodes, nodes[0].childNodeIndex);
+
       if (nodes[0].childNodeIndex !== 0) {
         $predecessor = calcPredecessor(this.nodes[nodes[0].childNodeIndex - 1]);
       }
@@ -996,9 +1025,10 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
+  // FIXME BSH Check "htmlEnabled" flag
   $node.empty()
-    .append(preservedChildren)
-    .append(node.text);
+    .html(node.text)
+    .prepend(preservedChildren);
 
   scout.helpers.legacyStyle(node, $node);
 
@@ -1239,7 +1269,14 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   this.selectNodes(node);
   this.setNodeExpanded(node, expanded, expansionOpts);
 
-  // prevent immediately reopening
+  // prevent bubbling to _onNodeMouseDown()
+  $.suppressEvent(event);
+  // ...but return true, so Outline.js can override this method and check if selection has been changed or not
+  return true;
+};
+
+scout.Tree.prototype._onNodeControlMouseUp = function(event) {
+  // prevent bubbling to _onNodeMouseUp()
   return false;
 };
 
@@ -1311,7 +1348,7 @@ scout.Tree.prototype._updateItemPath = function() {
   $node = $selectedNodes.next();
   level = parseFloat($selectedNodes.attr('data-level'));
   while ($node.length > 0) {
-    if ($node.hasClass('animationWrapper')) {
+    if ($node.hasClass('animation-wrapper')) {
       $node = $node.children().first();
     }
     var l = parseFloat($node.attr('data-level'));
@@ -1320,7 +1357,7 @@ scout.Tree.prototype._updateItemPath = function() {
     } else if (l === level) {
       break;
     }
-    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
+    if ($node.next().length === 0 && $node.parent().hasClass('animation-wrapper')) {
       // If there is no next node but we are inside an animationWrapper, step out the wrapper
       $node = $node.parent();
     }
@@ -1329,7 +1366,7 @@ scout.Tree.prototype._updateItemPath = function() {
 
   // find parents
   var $ultimate;
-  if ($selectedNodes.parent().hasClass('animationWrapper')) {
+  if ($selectedNodes.parent().hasClass('animation-wrapper')) {
     //If node expansion animation is in progress, the nodes are wrapped by a div
     $node = $selectedNodes.parent().prev();
   } else {
@@ -1347,7 +1384,7 @@ scout.Tree.prototype._updateItemPath = function() {
       level = k;
       $ultimate = $node;
     }
-    if ($node.parent().hasClass('animationWrapper')) {
+    if ($node.parent().hasClass('animation-wrapper')) {
       $node = $node.parent();
     }
     $node = $node.prev();
@@ -1359,12 +1396,12 @@ scout.Tree.prototype._updateItemPath = function() {
   level = $node.attr('data-level');
   while ($node.length > 0) {
     $node.addClass('group');
-    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
+    if ($node.next().length === 0 && $node.parent().hasClass('animation-wrapper')) {
       // If there is no next node but we are inside an animationWrapper, step out the wrapper
       $node = $node.parent();
     }
     $node = $node.next();
-    if ($node.hasClass('animationWrapper')) {
+    if ($node.hasClass('animation-wrapper')) {
       $node = $node.children().first();
     }
 

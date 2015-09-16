@@ -56,6 +56,13 @@ scout.Outline.prototype._render = function($parent) {
   }
 };
 
+scout.Outline.prototype.handleOutlineContentDebounced = function(bringToFront) {
+  clearTimeout(this._handleOutlineTimeout);
+  this._handleOutlineTimeout = setTimeout(function() {
+    this.handleOutlineContent(bringToFront);
+  }.bind(this), 300);
+};
+
 scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
   // Outline does not support multi selection -> [0]
   var node = this.selectedNodes[0];
@@ -152,8 +159,8 @@ scout.Outline.prototype._linkNodeWithRow = function(row) {
 scout.Outline.prototype._decorateNode = function(node) {
   scout.Outline.parent.prototype._decorateNode.call(this, node);
   if (node.$node) {
-    node.$node.toggleAttr('data-modelclass', !!node.modelClass, node.modelClass);
-    node.$node.toggleAttr('data-classid', !!node.classId, node.classId);
+    node.$node.toggleAttr('data-modelclass', !! node.modelClass, node.modelClass);
+    node.$node.toggleAttr('data-classid', !! node.classId, node.classId);
   }
 };
 
@@ -192,8 +199,8 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
   }
 };
 
-scout.Outline.prototype.selectNodes = function(nodes, notifyServer) {
-  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer);
+scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
+  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
   if (this.navigateUpInProgress) {
     this.navigateUpInProgress = false;
   } else {
@@ -211,7 +218,7 @@ scout.Outline.prototype._showDefaultDetailForm = function() {
   }
 };
 
-/*
+/**
  * @override Tree.js
  */
 scout.Outline.prototype._onNodeMouseDown = function(event) {
@@ -220,8 +227,17 @@ scout.Outline.prototype._onNodeMouseDown = function(event) {
   }
 };
 
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._onNodeControlMouseDown = function(event) {
+  if (scout.Outline.parent.prototype._onNodeControlMouseDown.call(this, event)) {
+    this.handleOutlineContent(true);
+  }
+};
+
 scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
-  bringToFront = bringToFront || true;
+  scout.helpers.nvl(bringToFront, true);
   if (!node) {
     throw new Error('called _updateOutlineNode without node');
   }
@@ -336,6 +352,11 @@ scout.Outline.prototype._onPageChanged = function(event) {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
     this._showDefaultDetailForm();
   }
+};
+
+scout.Outline.prototype._onNodesSelected = function(nodeIds) {
+  scout.Outline.parent.prototype._onNodesSelected.call(this, nodeIds);
+  this.handleOutlineContent(this.inFront());
 };
 
 scout.Outline.prototype.onModelAction = function(event) {

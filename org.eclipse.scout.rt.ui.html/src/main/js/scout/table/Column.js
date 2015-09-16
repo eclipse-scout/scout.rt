@@ -30,6 +30,16 @@ scout.Column.prototype.initCell = function(cell) {
       text: cell
     };
   }
+  // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
+  if (cell.value === undefined){
+    // Cell.value may be undefined for other column types -> use table.cellValue to access the value.
+    // The only reason is to save some memory (may get obsolete in the future)
+    if (this.type === 'number') {
+      if (cell.text) { // Number('') would generate 0 -> don't set in that case
+        cell.value = Number(cell.text);
+      }
+    }
+  }
   scout.defaultValues.applyTo(cell, 'Cell');
   return cell;
 };

@@ -14,10 +14,17 @@
    * see a component with a style like this, but technically it is not set to 'not visible').
    */
   function elemVisible(elem) {
-    var style = window.getComputedStyle(elem);
-    return !(
-        'none' === style.display ||
-        'hidden' === style.visibility);
+    // Check if element itself is hidden by its own style attribute
+    if (_isHidden(elem.style)) {
+      return false;
+    }
+    // Check if element itself is hidden by external style-sheet
+    return !_isHidden(window.getComputedStyle(elem));
+
+    function _isHidden(style) {
+      return 'none' === style.display ||
+             'hidden' === style.visibility;
+    }
   }
 
   // === $ extensions ===

@@ -259,6 +259,7 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
+    this._sendTimeoutId = null;
     if (this.areRequestsPending()) {
       // do not send if there are any requests pending because the order matters -> prevents race conditions
       return;
@@ -423,7 +424,10 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
     }
 
     // If there already is a another request pending, send it now
-    this._sendNow();
+    // But only if it should not be sent delayed
+    if (!this._sendTimeoutId) {
+      this._sendNow();
+    }
 
     // Throw previously catched error
     if (jsError) {
@@ -828,7 +832,7 @@ scout.Session.prototype._renderBusy = function() {
       return; // No busy indicator without desktop (e.g. during shutdown)
     }
     this._busyIndicator = new scout.BusyIndicator(this);
-    this._busyIndicator.on('clickCancel', this._onCancelProcessing.bind(this));
+    this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
     this._busyIndicator.render(this.$entryPoint);
   }.bind(this), 500);
 };
@@ -850,7 +854,7 @@ scout.Session.prototype._onCancelProcessing = function(event) {
   if (!busyIndicator) {
     return; // removed in the mean time
   }
-  busyIndicator.off('clickCancel');
+  busyIndicator.off('cancel');
 
   // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
   setTimeout(function() {
@@ -865,6 +869,18 @@ scout.Session.prototype._onCancelProcessing = function(event) {
   this._sendRequest({
     uiSessionId: this.uiSessionId,
     cancel: true
+  });
+};
+
+/**
+ * Sends a request containing the error message for logging purpose.
+ * The request is sent immediately (does not await pending requests)
+ */
+scout.Session.prototype.sendLogRequest = function(message) {
+  this._sendRequest({
+    uiSessionId: this.uiSessionId,
+    log: true,
+    message: message
   });
 };
 

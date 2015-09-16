@@ -1,5 +1,5 @@
-@scrollbar-size: 10px;
-@scrollbar-thumb-size: 8px;
+@scrollbar-size: 8px;
+@scrollbar-thumb-size: @scrollbar-size;
 @scrollbar-margin: 8px;
 @scrollbar-side-margin: 3px;
 
@@ -14,9 +14,8 @@
     margin: @scrollbar-margin @scrollbar-side-margin;
 
     &.borderless {
-      right: -2px;
-      margin-top: 0;
-      margin-bottom: 0;
+      margin-left: 0;
+      margin-right: 0;
     }
   }
 
@@ -24,6 +23,11 @@
     width: calc(~'100%' - 2 * @scrollbar-margin);
     height: @scrollbar-size;
     margin: @scrollbar-side-margin @scrollbar-margin;
+
+    &.borderless {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
 }
 

@@ -368,7 +368,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     if (filter.selectedValues.length > 0) {
       table.addFilter(filter);
     } else {
-      table.removeFilter(column.id);
+      table.removeFilterByKey(column.id);
     }
 
     // callback to table

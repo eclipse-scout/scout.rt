@@ -134,7 +134,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
       };
       that.table.addFilter(filter);
     } else {
-      that.table.removeFilter(scout.MapTableControl.FILTER_KEY);
+      that.table.removeFilterByKey(scout.MapTableControl.FILTER_KEY);
     }
 
     that.table.filter();

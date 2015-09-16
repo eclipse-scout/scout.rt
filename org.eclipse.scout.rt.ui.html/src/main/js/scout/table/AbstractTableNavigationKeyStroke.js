@@ -106,7 +106,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._applyRowSelection = function(t
     rows.push($(this).data('row'));
   });
 
-  table.selectRows(rows, true);
+  table.selectRows(rows, true, true);
 
   // scroll selection into view (if not visible)
   table.scrollTo(directionDown ? scout.arrays.last(rows) : scout.arrays.first(rows));

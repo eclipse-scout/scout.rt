@@ -3,6 +3,7 @@
  */
 scout.BasicField = function() {
   scout.BasicField.parent.call(this);
+  this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
   this._keyUpListener;
 };
 scout.inherits(scout.BasicField, scout.ValueField);
@@ -20,20 +21,20 @@ scout.BasicField.prototype._renderEnabled = function() {
   this._renderDisabledOverlay();
 };
 
-/**
- * "Update display-text on modify" does not really belong to ValueField, but is available here
- * as a convenience for all subclasses that want to support it.
- */
 scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
   if (this.updateDisplayTextOnModify) {
-    this._keyUpListener = this._onFieldKeyUp.bind(this);
-    this.$field.on('keyup', this._keyUpListener);
+    this.$field.on('input', this._onDisplayTextModifiedHandler);
   } else {
-    this.$field.off('keyup', this._keyUpListener);
+    this.$field.off('input', this._onDisplayTextModifiedHandler);
   }
 };
 
-scout.BasicField.prototype._onFieldKeyUp = function() {
+/**
+ * Called when the property 'updateDisplayTextOnModified' is TRUE and the display text (field's input
+ * value) has been modified by a user action, e.g. a key or paste event. If the property is FALSE, this
+ * method is _never_ called.
+ */
+scout.BasicField.prototype._onDisplayTextModified = function() {
   this.acceptInput(true);
 };
 

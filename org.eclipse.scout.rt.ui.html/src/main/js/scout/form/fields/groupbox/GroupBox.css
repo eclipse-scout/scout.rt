@@ -14,6 +14,13 @@
   border-bottom: 3px solid @border-color;
 }
 
+.root-group-box > .group-box-body {
+  & > .scrollbar.y-axis {
+    /* override margin reset from group-box-body (see below) */
+    margin-right: @scrollbar-side-margin;
+  }
+}
+
 .group-box {
   & > .menubar {
     margin-left: @mandatory-indicator-width;
@@ -105,5 +112,11 @@
 
   .collapsed > & {
     display: none;
+  }
+
+  /* position scrollbar as right as possible to prevent overlapping field parts. */
+  & > .scrollbar.y-axis {
+    margin-left: 0;
+    margin-right: 0;
   }
 }

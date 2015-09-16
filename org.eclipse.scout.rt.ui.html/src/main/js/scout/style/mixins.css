@@ -160,7 +160,7 @@
   }
 
   .checkbox-before-disabled() {
-    color: @palette-gray-5;
+    color: @checkbox-disabled-color;
     background-color: @control-disabled-background-color;
   }
 
@@ -174,6 +174,10 @@
     position: absolute;
     top: -7px;
     left: 5px;
+  }
+
+  .checkbox-after-children-checked-disabled() {
+    background-color: @checkbox-disabled-color;
   }
 
   .overflow-ellipsis() {

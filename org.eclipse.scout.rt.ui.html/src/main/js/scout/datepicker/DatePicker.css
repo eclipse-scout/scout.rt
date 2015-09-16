@@ -82,7 +82,7 @@
     font-weight: bold;
   }
 
-  &.date-picker-preselected {
+  &.date-picker-preselected:not(:hover) {
     border-color:  @item-selection-border-color;
     border-style: dashed;
 

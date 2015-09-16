@@ -141,6 +141,87 @@ describe('Session', function() {
       expect(requestData).toContainEvents([event1, event3, event4, event5]);
     });
 
+    it('sends requests consecutively', function() {
+      var session = createSession();
+
+      // send first request
+      session.send(1, 'nodeSelected');
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // trigger sending (response not received yet)
+      jasmine.clock().tick(0);
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+
+      session.send(1, 'nodeClicked');
+
+      // trigger sending of second request
+      jasmine.clock().tick(0);
+
+      // second request must not be sent because first is still pending
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(true);
+      expect(session._asyncEvents[0].type).toBe('nodeClicked');
+
+      // receive response for nodeSelected -> request for nodeClicked gets sent
+      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areRequestsPending()).toBe(true);
+
+      // receive response for nodeClicked
+      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areRequestsPending()).toBe(false);
+    });
+
+    it('sends requests consecutively and respects delay', function() {
+      var session = createSession();
+
+      // send first request
+      session.send(1, 'nodeSelected');
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // trigger sending (response not received yet)
+      jasmine.clock().tick(0);
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+
+      // send second request delayed
+      session.send(1, 'nodeClicked', '', 300);
+
+      // trigger sending of second request
+      jasmine.clock().tick(0);
+
+      // second request must not be sent because first is still pending
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(true);
+      expect(session._asyncEvents[0].type).toBe('nodeClicked');
+
+      // receive response for nodeSelected -> request for nodeClicked does not get sent because it should be sent delayed
+      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(true);
+      expect(session._asyncEvents[0].type).toBe('nodeClicked');
+
+      // trigger sending of second request
+      jasmine.clock().tick(300);
+
+      // now second request is sent because the time elapsed
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areRequestsPending()).toBe(true);
+
+      // receive response for nodeClicked
+      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areRequestsPending()).toBe(false);
+    });
   });
 
   describe('init', function() {

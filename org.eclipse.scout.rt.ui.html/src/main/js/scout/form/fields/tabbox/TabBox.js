@@ -118,21 +118,23 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
     this.tabItems[oldSelectedTab].setTabActive(false);
     this.tabItems[this.selectedTab].setTabActive(true);
 
-    // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
-    if (this.rendered && !this.tabItems[this.selectedTab]._tabRendered) {
-      scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
+    if (this.rendered) {
+      // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
+      if (!this.tabItems[this.selectedTab]._tabRendered) {
+        scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
+      }
+
+      this.tabItems[this.selectedTab].focusTab();
+
+      var $tabContent = this._$tabContent.children().first();
+      if ($tabContent.length > 0) {
+        this.session.detachHelper.beforeDetach($tabContent, {storeFocus: false});
+        $tabContent.detach();
+        this._$tabContentCache[oldSelectedTab] = $tabContent;
+      }
+
+      this._renderTabContent();
     }
-
-    this.tabItems[this.selectedTab].focusTab();
-
-    var $tabContent = this._$tabContent.children().first();
-    if ($tabContent.length > 0) {
-      this.session.detachHelper.beforeDetach($tabContent, {storeFocus: false});
-      $tabContent.detach();
-      this._$tabContentCache[oldSelectedTab] = $tabContent;
-    }
-
-    this._renderTabContent();
   }
 };
 

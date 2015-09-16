@@ -381,19 +381,29 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
 scout.ChartTableControlMatrix.prototype.columnCount = function() {
   var colCount = [];
 
+  var count = 0;
   for (var c = 0; c < this._columns.length; c++) {
     var column = this._columns[c];
+    if (column.type === 'key' || column.type === 'number' ) {
+      continue;
+    }
+
+    if (column.text === null || column.text === undefined ||  column.text === '') {
+      continue;
+    }
     colCount.push([column, []]);
+
 
     for (var r = 0; r < this._rows.length; r++) {
       var row = this._rows[r];
       var v = this._table.cellValue(column, row);
-      if (colCount[c][1].indexOf(v) === -1) {
-        colCount[c][1].push(v);
+      if (colCount[count][1].indexOf(v) === -1) {
+        colCount[count][1].push(v);
       }
     }
 
-    colCount[c][1] = colCount[c][1].length;
+    colCount[count][1] = colCount[count][1].length;
+    count++;
   }
   return colCount;
 };

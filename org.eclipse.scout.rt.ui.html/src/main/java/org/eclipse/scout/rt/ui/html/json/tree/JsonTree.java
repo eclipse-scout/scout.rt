@@ -684,6 +684,33 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     json.put("font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
   }
 
+  /**
+   * If the given node has a parent node, the value for the property "childNodeIndex" is calculated and added to the
+   * given JSON object.
+   * <p>
+   * Note that the calculated value may differ from the model's {@link ITreeNode#getChildNodeIndex()} value! This is
+   * because not all model nodes are sent to the UI. The calculated value only counts nodes sent to the UI, e.g. a node
+   * with childNodeIndex=50 may result in "childNodeIndex: 3" if 47 of the preceding nodes are filtered.
+   */
+  protected void putChildNodeIndex(JSONObject json, ITreeNode node) {
+    if (node.getParentNode() != null && node.getParentNode().getChildNodeCount() > 0) {
+      int childNodeIndex = 0;
+      // Find the node in the parents childNodes list (skipping non-accepted nodes)
+      for (ITreeNode childNode : node.getParentNode().getChildNodes()) {
+        childNode = TreeUtility.unwrapResolvedNode(childNode);
+        // Only count accepted nodes
+        if (isNodeAccepted(childNode)) {
+          if (childNode == node) {
+            // We have found our node!
+            break;
+          }
+          childNodeIndex++;
+        }
+      }
+      putProperty(json, "childNodeIndex", childNodeIndex);
+    }
+  }
+
   protected JSONObject treeNodeToJson(ITreeNode node) {
     // Virtual and resolved nodes are equal in maps, but they don't behave the same. For example, a
     // a virtual node does not return child nodes, while the resolved node does. Therefore, we
@@ -696,7 +723,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());
-    putProperty(json, "childNodeIndex", node.getChildNodeIndex());
+    putChildNodeIndex(json, node);
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {

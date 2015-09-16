@@ -32,7 +32,7 @@ describe("Table", function() {
 
       it("accepts rows with cells", function() {
         var model = helper.createModelFixture(3, 1);
-        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '' , '0']);
+        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0']);
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
@@ -45,7 +45,7 @@ describe("Table", function() {
 
       it("accepts rows with text only", function() {
         var model = helper.createModelFixture(3, 1);
-        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '' , '0'], true);
+        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0'], true);
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
@@ -64,8 +64,8 @@ describe("Table", function() {
 
     function findCheckedRows(rows) {
       var checkedRows = [];
-      for (var i = 0; i < rows.length; i++){
-        if (rows[i].checked){
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].checked) {
           checkedRows.push(rows[i]);
         }
       }
@@ -92,14 +92,13 @@ describe("Table", function() {
       table.checkRow(rows[4], false, true);
 
       checkedRows = [];
-      for (var z = 0; z < rows.length; z++){
-        if (rows[z].checked){
+      for (var z = 0; z < rows.length; z++) {
+        if (rows[z].checked) {
           checkedRows.push(rows[z]);
         }
       }
       expect(checkedRows.length).toBe(1);
     });
-
 
     it("unchecks other rows if multiCheck is set to false", function() {
       var model = helper.createModelFixture(2, 5);
@@ -580,16 +579,16 @@ describe("Table", function() {
       });
 
       it("sorts number columns", function() {
-        var model = helper.createModelSingleColumnByValues([11, 1, 8], 'number');
+        var model = helper.createModelSingleColumnByValues([100, 90, 300], 'number');
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
 
         table.sort(column0, 'desc');
-        helper.assertValuesInCells(table.rows, 0, [11, 8, 1]);
+        helper.assertValuesInCells(table.rows, 0, [300, 100, 90]);
 
         table.sort(column0, 'asc');
-        helper.assertValuesInCells(table.rows, 0, [1, 8, 11]);
+        helper.assertValuesInCells(table.rows, 0, [90, 100, 300]);
       });
 
       it("sorts date columns", function() {
@@ -605,7 +604,6 @@ describe("Table", function() {
         helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
       });
 
-
     });
 
   });
@@ -616,7 +614,8 @@ describe("Table", function() {
 
     function prepareTable() {
       columns = [helper.createModelColumn(null, 'col1'),
-                 helper.createModelColumn(null, 'col2', 'number')];
+        helper.createModelColumn(null, 'col2', 'number')
+      ];
       columns[0].index = 0;
       columns[1].index = 1;
       rows = helper.createModelRows(2, 3);
@@ -849,8 +848,12 @@ describe("Table", function() {
 
     beforeEach(function() {
       var model = helper.createModelFixture(2, 2);
-      singleSelMenu = helper.menuHelper.createMenu({menuTypes: ['Table.SingleSelection']});
-      multiSelMenu = helper.menuHelper.createMenu({menuTypes: ['Table.MultiSelection']});
+      singleSelMenu = helper.menuHelper.createMenu({
+        menuTypes: ['Table.SingleSelection']
+      });
+      multiSelMenu = helper.menuHelper.createMenu({
+        menuTypes: ['Table.MultiSelection']
+      });
       table = helper.createTable(model);
       table.menus = [singleSelMenu, multiSelMenu];
     });
@@ -874,7 +877,9 @@ describe("Table", function() {
     });
 
     it("returns menus with both types set if one or more rows are selected", function() {
-      bothSelMenu = helper.menuHelper.createMenu({menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']});
+      bothSelMenu = helper.menuHelper.createMenu({
+        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+      });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
       var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
@@ -1042,14 +1047,11 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       // first selection event for first row, second selection event for remaining rows (including first row)
-      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'rowsSelected']);
+      expect(requestData).toContainEventTypesExactly(['rowsSelected']);
 
       var event = [new scout.Event(table.id, 'rowsSelected', {
-          rowIds: [model.rows[0].id]
-        }),
-        new scout.Event(table.id, 'rowsSelected', {
-          rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
-        })];
+        rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
+      })];
       expect(requestData).toContainEvents(event);
     });
 
@@ -1073,8 +1075,8 @@ describe("Table", function() {
       expect(requestData).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
 
       var event = [new scout.Event(table.id, 'rowsSelected', {
-          rowIds: [model.rows[0].id]
-        })];
+        rowIds: [model.rows[0].id]
+      })];
       expect(requestData).toContainEvents(event);
     });
 
@@ -1110,8 +1112,7 @@ describe("Table", function() {
       for (var i = 0; i < $rows.length; i++) {
         if (i === expectedSelectedRowIndex) {
           expect($rows.eq(i)).toHaveClass('selected');
-        }
-        else {
+        } else {
           expect($rows.eq(i)).not.toHaveClass('selected');
         }
       }
@@ -1396,7 +1397,7 @@ describe("Table", function() {
           var $row = $(this);
           var oldTop = $row.data('old-top');
           var rowId = $row.attr('data-rowid');
-          if (rowId  === newRows[0].id || rowId === newRows[1].id) {
+          if (rowId === newRows[0].id || rowId === newRows[1].id) {
             expect(oldTop).toBeUndefined();
           } else {
             expect(oldTop).toBeDefined();
@@ -1461,7 +1462,6 @@ describe("Table", function() {
         expect($cells0.eq(0).text()).toBe('newCellText0');
         expect($cells0.eq(1).text()).toBe('newCellText1');
       });
-
 
       it("does not destroy selection", function() {
         table.selectedRows = [table.rows[0]];
@@ -1590,7 +1590,7 @@ describe("Table", function() {
         expect($cells1.eq(2).text()).toBe('2');
 
         var message = {
-            events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
+          events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
         };
         session._processSuccessResponse(message);
 
@@ -1614,25 +1614,25 @@ describe("Table", function() {
       });
 
       //TODO CGU fails because css is not applied -> include css files in SpecRunner
-//      it("moves the table header menu if it is open", function() {
-//        table.render(session.$entryPoint);
-//
-//        var $colHeaders = table.header.findHeaderItems();
-//
-//        var $clickedHeader = $colHeaders.eq(0);
-//        $clickedHeader.triggerClick();
-//
-//        var tableHeaderMenu = table.header._tableHeaderMenu;
-//        var menuLeftPosition = tableHeaderMenu.$headerMenu.position().left;
-//        expect(tableHeaderMenu.isOpen()).toBe(true);
-//
-//        var message = {
-//            events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
-//        };
-//        session._processSuccessResponse(message);
-//
-//        expect(tableHeaderMenu.$headerMenu.position().left > menuLeftPosition).toBe(true);
-//      });
+      //      it("moves the table header menu if it is open", function() {
+      //        table.render(session.$entryPoint);
+      //
+      //        var $colHeaders = table.header.findHeaderItems();
+      //
+      //        var $clickedHeader = $colHeaders.eq(0);
+      //        $clickedHeader.triggerClick();
+      //
+      //        var tableHeaderMenu = table.header._tableHeaderMenu;
+      //        var menuLeftPosition = tableHeaderMenu.$headerMenu.position().left;
+      //        expect(tableHeaderMenu.isOpen()).toBe(true);
+      //
+      //        var message = {
+      //            events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
+      //        };
+      //        session._processSuccessResponse(message);
+      //
+      //        expect(tableHeaderMenu.$headerMenu.position().left > menuLeftPosition).toBe(true);
+      //      });
 
     });
 
@@ -1764,8 +1764,10 @@ describe("Table", function() {
         var menu2 = helper.createMenuModel();
 
         var message = {
-          adapterData : createAdapterData([menu1, menu2]),
-          events: [createPropertyChangeEvent(table, {menus: [menu1.id, menu2.id]})]
+          adapterData: createAdapterData([menu1, menu2]),
+          events: [createPropertyChangeEvent(table, {
+            menus: [menu1.id, menu2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -1780,8 +1782,10 @@ describe("Table", function() {
         var menu2 = helper.createMenuModel();
 
         var message = {
-          adapterData : createAdapterData([menu1, menu2]),
-          events: [createPropertyChangeEvent(table, {menus: [menu1.id, menu2.id]})]
+          adapterData: createAdapterData([menu1, menu2]),
+          events: [createPropertyChangeEvent(table, {
+            menus: [menu1.id, menu2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -1789,7 +1793,9 @@ describe("Table", function() {
         expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
 
         message = {
-          events: [createPropertyChangeEvent(table, {menus: [menu2.id]})]
+          events: [createPropertyChangeEvent(table, {
+            menus: [menu2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -1806,8 +1812,10 @@ describe("Table", function() {
         var menu3 = helper.createMenuModel();
 
         var message = {
-          adapterData : createAdapterData([menu1, menu2]),
-          events: [createPropertyChangeEvent(table, {menus: [menu1.id, menu2.id]})]
+          adapterData: createAdapterData([menu1, menu2]),
+          events: [createPropertyChangeEvent(table, {
+            menus: [menu1.id, menu2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -1815,8 +1823,10 @@ describe("Table", function() {
         expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
 
         message = {
-          adapterData : createAdapterData(menu3),
-          events: [createPropertyChangeEvent(table, {menus: [menu2.id, menu3.id]})]
+          adapterData: createAdapterData(menu3),
+          events: [createPropertyChangeEvent(table, {
+            menus: [menu2.id, menu3.id]
+          })]
         };
         session._processSuccessResponse(message);
 

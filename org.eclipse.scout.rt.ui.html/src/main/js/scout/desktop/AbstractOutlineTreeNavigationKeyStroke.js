@@ -26,9 +26,9 @@ scout.AbstractOutlineTreeNavigationKeyStroke.prototype._accept = function(event)
 scout.AbstractOutlineTreeNavigationKeyStroke.prototype.handle = function(event) {
   var newNodeSelection = this._handleInternal(event._$treeCurrentNode, event._treeCurrentNode);
   if (newNodeSelection) {
-    this.field.selectNodes(newNodeSelection);
+    this.field.selectNodes(newNodeSelection, true, true);
     this.field.scrollTo(newNodeSelection);
-    this.field.handleOutlineContent(true);
+    this.field.handleOutlineContentDebounced(true);
   }
 };
 

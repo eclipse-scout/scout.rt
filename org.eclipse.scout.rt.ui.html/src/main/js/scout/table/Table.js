@@ -23,6 +23,7 @@ scout.Table = function() {
   this._filteredRowsDirty = true;
   this.tooltips = [];
   this._animationRowLimit = 25;
+  this._blockLoadThreshold = 100;
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
@@ -63,7 +64,9 @@ scout.Table.prototype._initRow = function(row) {
   scout.defaultValues.applyTo(row, 'TableRow');
   this._initCells(row);
   this.rowsMap[row.id] = row;
-  this.trigger('rowInitialized', {row: row});
+  this.trigger('rowInitialized', {
+    row: row
+  });
 };
 
 scout.Table.prototype._initColumns = function() {
@@ -692,7 +695,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     // Build $rows (as string instead of jQuery objects for efficiency reasons)
     var previousRowSelected = false,
       followingRowSelected = false;
-    for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + 100); r++) {
+    for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + this._blockLoadThreshold); r++) {
       var row = rows[r],
         rowSelected = this.selectedRows.indexOf(row) > -1;
 
@@ -701,7 +704,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       } else {
         previousRowSelected = this.selectedRows.indexOf(rows[r - 1]) > -1;
       }
-      if (r < Math.min(rows.length, startRowIndex + 100) - 1) {
+      if (r < Math.min(rows.length, startRowIndex + this._blockLoadThreshold) - 1) {
         followingRowSelected = this.selectedRows.indexOf(rows[r + 1]) > -1;
       } else {
         followingRowSelected = false;
@@ -747,7 +750,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
   if (rows.length > numRowsLoaded) {
     this._renderRowsInProgress = true;
     setTimeout(function() {
-      that._renderRows(rows, startRowIndex + 100, lastRowOfBlockSelected);
+      that._renderRows(rows, startRowIndex + that._blockLoadThreshold, lastRowOfBlockSelected);
       // Manual validation necessary due to set timeout
       that.validateLayoutTree();
     }, 0);
@@ -835,7 +838,7 @@ scout.Table.prototype._columnAtX = function(x) {
   columnOffsetLeft -= scrollLeft;
   return scout.arrays.find(this.columns, function(column) {
     columnOffsetRight = columnOffsetLeft + column.width;
-    if (columnOffsetLeft >= 0 && x >= columnOffsetLeft && x < columnOffsetRight) {
+    if (x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
     }
     columnOffsetLeft = columnOffsetRight;
@@ -984,22 +987,35 @@ scout.Table.prototype._sendRowsChecked = function(rows) {
   this.remoteHandler(this.id, 'rowsChecked', data);
 };
 
-scout.Table.prototype._sendRowsSelected = function(rowIds) {
-  this.remoteHandler(this.id, 'rowsSelected', {
+scout.Table.prototype._sendRowsSelected = function(rowIds, debounceSend) {
+  var event = new scout.Event(this.id, 'rowsSelected', {
     rowIds: rowIds
   });
+
+  // Only send the latest selection changed event for a field
+  event.coalesce = function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  };
+
+  // send delayed to avoid a lot of requests while selecting
+  this.session.sendEvent(event, debounceSend ? 250 : 0);
 };
 
 scout.Table.prototype._sendRowsFiltered = function(rowIds) {
+  var event = new scout.Event(this.id, 'rowsFiltered');
+
+  // only send last event
+  event.coalesce = function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  };
+
   if (rowIds.length === this.rows.length) {
-    this.remoteHandler(this.id, 'rowsFiltered', {
-      remove: true
-    });
+    event.remove = true;
   } else {
-    this.remoteHandler(this.id, 'rowsFiltered', {
-      rowIds: rowIds
-    });
+    event.rowIds = rowIds;
   }
+  // send with timeout, mainly for incremental load of a large table
+  this.session.sendEvent(event, 250);
 };
 
 scout.Table.prototype._sendRowAction = function($row, columnId) {
@@ -1177,7 +1193,6 @@ scout.Table.prototype._group = function(update) {
     }, that.updateScrollbars.bind(that));
   }
 
-
   if (!this.grouped && !groupColumn) {
     return;
   }
@@ -1196,7 +1211,7 @@ scout.Table.prototype._group = function(update) {
       value = this.cellValue(column, row);
 
       if (column.type === 'number') {
-        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : Number(value));
+        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
       }
     }
 
@@ -1432,7 +1447,7 @@ scout.Table.prototype._deleteRows = function(rows) {
     }
     delete this.rowsMap[row.id];
 
-    if(this.selectionHandler.lastActionRow===row){
+    if (this.selectionHandler.lastActionRow === row) {
       this.selectionHandler.clearLastSelectedRowMarker();
     }
 
@@ -1460,7 +1475,8 @@ scout.Table.prototype._deleteRows = function(rows) {
 };
 
 scout.Table.prototype._updateRows = function(rows) {
-  var filterChanged, newInvisibleRows = [], $updatedRows = $();
+  var filterChanged, newInvisibleRows = [],
+    $updatedRows = $();
 
   // Update model
   for (var i = 0; i < rows.length; i++) {
@@ -1473,8 +1489,8 @@ scout.Table.prototype._updateRows = function(rows) {
 
     // Replace old row
     this._initRow(updatedRow);
-    if(this.selectionHandler.lastActionRow===oldRow){
-      this.selectionHandler.lastActionRow=updatedRow;
+    if (this.selectionHandler.lastActionRow === oldRow) {
+      this.selectionHandler.lastActionRow = updatedRow;
     }
     var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
@@ -1501,7 +1517,7 @@ scout.Table.prototype._updateRows = function(rows) {
       // Apply row filter
       updatedRow.filterAccepted = oldRow.filterAccepted;
       if (this._filterCount() > 0) {
-        if (this._applyFiltersForRow(updatedRow)){
+        if (this._applyFiltersForRow(updatedRow)) {
           filterChanged = true;
           if (!updatedRow.filterAccepted) {
             newInvisibleRows.push(updatedRow);
@@ -1665,15 +1681,15 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   }
 };
 
-scout.Table.prototype.selectRows = function(rows, notifyServer) {
+scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualsRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
   if (!selectedEqualsRows) {
-    this.clearSelection(!notifyServer);
+    //never fire clear selection because of notification thru select row
+    this.clearSelection(true);
     this.selectedRows = rows;
-    // FIXME CGU send delayed in case of key navigation
     if (notifyServer) {
-      this._sendRowsSelected(this._rowsToIds(rows));
+      this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
     }
   }
 
@@ -1692,6 +1708,10 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
       this.revealSelection();
     }
     this._updateMenuBar();
+
+    if (this.groupedSelection) {
+      this._group(true);
+    }
   }
 };
 
@@ -1723,7 +1743,8 @@ scout.Table.prototype.filteredRows = function() {
   if (this._filteredRowsDirty) {
     this._filteredRows = [];
     this.rows.forEach(function(row) {
-      if (row.filterAccepted) {
+      // row.$row check is necessary because filterAccepted state is only correct for rendered rows (_applyFilters is only called for rendered rows)
+      if (row.$row && row.filterAccepted) {
         this._filteredRows.push(row);
       }
     }, this);
@@ -1822,7 +1843,7 @@ scout.Table.prototype.filter = function() {
         rowsToShow.push(row);
       }
     } else {
-       if (!$row.hasClass('invisible')) {
+      if (!$row.hasClass('invisible')) {
         rowsToHide.push(row);
       }
     }
@@ -1940,7 +1961,7 @@ scout.Table.prototype.filteredBy = function() {
 scout.Table.prototype.resetFilter = function() {
   // remove filters
   for (var key in this._filterMap) {
-    this.removeFilter(key);
+    this.removeFilterByKey(key);
   }
   this._filterMap = {};
 
@@ -1963,11 +1984,16 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
   }
-  this.trigger('addFilter', {filter: filter});
+  this.trigger('addFilter', {
+    filter: filter
+  });
 };
 
-//TODO CGU use filter as param or rename to removeFilterByKey
-scout.Table.prototype.removeFilter = function(key, notifyServer) {
+scout.Table.prototype.removeFilter = function(filter, notifyServer) {
+  this.removeFilterByKey(filter.createKey(), notifyServer);
+};
+
+scout.Table.prototype.removeFilterByKey = function(key, notifyServer) {
   notifyServer = notifyServer !== undefined ? notifyServer : true;
   if (!key) {
     throw new Error('key has to be defined');
@@ -1981,7 +2007,9 @@ scout.Table.prototype.removeFilter = function(key, notifyServer) {
   if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
   }
-  this.trigger('removeFilter', {filter: filter});
+  this.trigger('removeFilter', {
+    filter: filter
+  });
 };
 
 scout.Table.prototype.getFilter = function(key) {
@@ -2173,7 +2201,6 @@ scout.Table.prototype._triggerRowsSelected = function() {
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
-  //FIXME CGU create all rows filtered event
   this.events.trigger(scout.Table.GUI_EVENT_ROWS_FILTERED);
 };
 
@@ -2236,7 +2263,7 @@ scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
 
 scout.Table.prototype._syncFilters = function(filters) {
   for (var key in this._filterMap) {
-    this.removeFilter(key, false);
+    this.removeFilterByKey(key, false);
   }
   if (filters) {
     filters.forEach(function(filterData) {
