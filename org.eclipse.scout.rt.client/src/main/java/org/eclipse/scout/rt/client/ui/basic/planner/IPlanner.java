@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 
 /**
  * The activity map is a specialized model which contains a set of {@link Activity}s that are grouped by resource.
@@ -82,12 +82,13 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
    */
   String PROP_SELECTED_ACTIVITY = "selectedActivity";
   /**
-   * {@link Object} Container of this map, {@link IPlannerFieldOld} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * {@link Object} Container of this planner, {@link IPlannerField}
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    */
   String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
 
-  //FIXME CGU same as for calendar, merge?
+  // these constants should correspond with those from the calendar
   int DISPLAY_MODE_INTRADAY = 0;
   int DISPLAY_MODE_DAY = 1;
   int DISPLAY_MODE_WEEK = 2;

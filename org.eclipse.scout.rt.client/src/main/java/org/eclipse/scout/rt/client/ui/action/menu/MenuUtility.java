@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
@@ -92,15 +91,6 @@ public final class MenuUtility {
       consolidatedMenus.removeLast();
     }
     return consolidatedMenus;
-  }
-
-  public static Set<ActivityMapMenuType> getMenuTypesForActivityMapSelection(ActivityCell<?, ?> selectedCell) {
-    if (selectedCell == null) {
-      return CollectionUtility.hashSet(ActivityMapMenuType.Selection);
-    }
-    else {
-      return CollectionUtility.hashSet(ActivityMapMenuType.Activity);
-    }
   }
 
   public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(List<? extends Resource<?>> selectedResources, Activity<?, ?> selectedActivity, Range<Date> selectionRange) {

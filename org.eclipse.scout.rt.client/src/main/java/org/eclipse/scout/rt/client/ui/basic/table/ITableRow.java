@@ -66,7 +66,9 @@ public interface ITableRow {
   boolean isFilterAccepted();
 
   /**
-   * FIXME CGU javadoc
+   * Indicates whether {@link #isFilterAccepted()} returns false because the row has been filtered by the user.
+   * 
+   * @return true if @link IUserFilter is the only filter not accepting the row.
    */
   boolean isRejectedByUser();
 

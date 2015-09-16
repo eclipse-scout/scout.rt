@@ -187,7 +187,9 @@ public interface ITreeNode {
   void resetFilterCache();
 
   /**
-   * FIXME CGU javadoc
+   * Indicates whether {@link #isFilterAccepted()} returns false because the node has been filtered by the user.
+   * 
+   * @return true if @link IUserFilter is the only filter not accepting the node.
    */
   boolean isRejectedByUser();
 

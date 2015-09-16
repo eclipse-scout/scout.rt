@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
 /**
- * FIXME CGU javadoc
- * 
+ * This marker interface indicates that the filtering happens in the ui by the user. This is mainly necessary to decide
+ * whether an object (table row, tree node) is allowed to be sent to the ui or not. Objects filtered by a regular (not
+ * user) filter are never sent to the ui.
+ *
  * @since 5.1
  */
 public interface IUserFilter {

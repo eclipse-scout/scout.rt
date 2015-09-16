@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -69,7 +68,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu>implements I
         TableMenuType.SingleSelection,
         TreeMenuType.SingleSelection,
         ValueFieldMenuType.NotNull,
-        ActivityMapMenuType.Activity,
         CalendarMenuType.CalendarComponent,
         PlannerMenuType.Activity);
   }

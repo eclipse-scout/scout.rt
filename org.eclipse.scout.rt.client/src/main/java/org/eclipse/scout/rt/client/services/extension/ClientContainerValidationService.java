@@ -17,13 +17,12 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
+import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -47,7 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.AbstractPlannerFieldOld;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
@@ -69,7 +68,6 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     // contributions
     addPossibleContributionForContainer(IFormHandler.class, AbstractForm.class);
     addPossibleContributionForContainer(IActionNode.class, AbstractActionNode.class);
-    addPossibleContributionForContainer(IMenu.class, AbstractActivityMap.class);
     addPossibleContributionForContainer(IMenu.class, AbstractPlanner.class);
     addPossibleContributionForContainer(ICalendarItemProvider.class, AbstractCalendar.class);
     addPossibleContributionForContainer(IMenu.class, AbstractCalendar.class);
@@ -95,8 +93,7 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(IMenu.class, AbstractImageField.class);
     addPossibleContributionForContainer(IFormField.class, AbstractListBox.class);
     addPossibleContributionForContainer(ITable.class, AbstractListBox.class);
-    addPossibleContributionForContainer(IActivityMap.class, AbstractPlannerFieldOld.class);
-    addPossibleContributionForContainer(ITable.class, AbstractPlannerFieldOld.class);
+    addPossibleContributionForContainer(IPlanner.class, AbstractPlannerField.class);
     addPossibleContributionForContainer(IFormField.class, AbstractRadioButtonGroup.class);
     addPossibleContributionForContainer(ITable.class, AbstractTableField.class);
     addPossibleContributionForContainer(IFormField.class, AbstractTreeBox.class);

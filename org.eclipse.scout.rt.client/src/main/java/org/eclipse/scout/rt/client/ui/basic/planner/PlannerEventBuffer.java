@@ -31,8 +31,6 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     removeEmptyEvents(events);
     removeIdenticalEvents(events);
     coalesceSameType(events);
-    //FIXME CGU implement resource order changed
-//    applyResourceOrderChangedToResourcesInserted(events);
     return events;
   }
 

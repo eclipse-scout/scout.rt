@@ -393,7 +393,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (childPage != null) {
       node.setResolvedNode(childPage);
       ICell tableCell = getTable().getSummaryCell(row);
-      childPage.setFilterAccepted(row.isFilterAccepted()); //FIXME CGU sollte das nicht von node kommen?
+      childPage.setFilterAccepted(row.isFilterAccepted());
       childPage.setEnabledInternal(row.isEnabled());
       childPage.getCellForUpdate().updateFrom(tableCell);
       linkTableRowWithPage(row, childPage);
