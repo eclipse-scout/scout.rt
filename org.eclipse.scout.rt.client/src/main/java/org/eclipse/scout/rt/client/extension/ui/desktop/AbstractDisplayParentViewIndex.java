@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  *
  * @since 5.1
  */
-public abstract class DisplayParentViewIndex implements IIndex<IDisplayParent, IForm> {
+public abstract class AbstractDisplayParentViewIndex implements IIndex<IDisplayParent, IForm> {
 
   private final Map<IDisplayParent, List<IForm>> m_mapByIndex = new HashMap<>();
   private final Map<IForm, IDisplayParent> m_mapByElement = new LinkedHashMap<>(); // LinkedHashMap to preserve insertion-order.
@@ -49,7 +49,7 @@ public abstract class DisplayParentViewIndex implements IIndex<IDisplayParent, I
 
   /**
    * returns position where element should be inserted in form list.
-   * 
+   *
    * @param element
    *          element to calculate position.
    * @return
