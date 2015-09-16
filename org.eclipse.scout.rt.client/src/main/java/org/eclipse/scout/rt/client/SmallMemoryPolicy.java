@@ -10,20 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
- * dont cache table page search form contents, releaseUnusedPages before every page reload and force gc to free memory
+ * Don't cache table page search form contents, releaseUnusedPages before every page reload
  */
 public class SmallMemoryPolicy extends AbstractMemoryPolicy {
 
@@ -40,14 +35,6 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
       }
     }
     desktop.releaseUnusedPages();
-    System.gc();
-
-    String gcJobId = getClass().getName();
-
-    // Cancel already running GC job
-    Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().andMatchNameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")).andMatchCurrentSession(), true);
-    // Schedule new GC job
-    ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName(gcJobId + ":release memory"));
 
     if (page.getTable() != null) {
       page.getTable().discardAllRows();

@@ -488,6 +488,9 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
     @Override
     public void setImageTransformFromUI(AffineTransformSpec t) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
       setImageTransform(t);
     }
 
@@ -505,6 +508,10 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
     @Override
     public void fireDropActionFromUi(TransferObject scoutTransferable) {
+      if (!isEnabled() || !isVisible()) {
+        //can not drop anything into field if its disabled.
+        return;
+      }
       try {
         interceptDropRequest(scoutTransferable);
       }

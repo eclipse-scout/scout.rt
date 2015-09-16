@@ -2798,6 +2798,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
     @Override
     public void setNodesCheckedFromUI(List<ITreeNode> nodes, boolean checked) {
+      if (!isEnabled()) {
+        return;
+      }
       try {
         pushUIProcessor();
         try {

@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
-import org.eclipse.scout.rt.client.extension.ui.desktop.DisplayParentViewIndex;
+import org.eclipse.scout.rt.client.extension.ui.desktop.AbstractDisplayParentViewIndex;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -131,7 +131,7 @@ public class FormStore extends IndexedStore<IForm> {
     }
   }
 
-  private class P_DisplayParentViewIndex extends DisplayParentViewIndex {
+  private class P_DisplayParentViewIndex extends AbstractDisplayParentViewIndex {
 
     @Override
     protected IDisplayParent calculateIndexFor(final IForm form) {

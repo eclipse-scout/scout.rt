@@ -176,11 +176,17 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
     @Override
     public void parseAndSetValueFromUI(String value) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
       parseAndSetValue(value);
     }
 
     @Override
     public void startFileChooserFromUI() {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
       try {
         IFileChooser fileChooser = getFileChooser();
         List<BinaryResource> result = fileChooser.startChooser();

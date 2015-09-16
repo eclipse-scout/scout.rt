@@ -35,17 +35,24 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   public class P_UIFacade implements IBasicFieldUIFacade {
     @Override
     public void setDisplayTextFromUI(String text) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
       setDisplayText(text);
     }
 
     @Override
     public void parseAndSetValueFromUI(String value) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
       if (value == null) {
         value = "";
       }
       // parse always, validity might change even if text is same
       parseAndSetValue(value);
     }
+
   }
 
   protected AbstractBasicField(boolean callInitializer) {

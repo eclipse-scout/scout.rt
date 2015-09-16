@@ -3059,9 +3059,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         ((InternalTableRow) changedRows[i - min]).setRowIndex(i);
       }
       fireRowOrderChanged();
-      // rebuild selection
+      // rebuild selection and checked rows
       selectRows(getSelectedRows(), false);
-      //FIXME CGU rebuild checked rows as well
+      sortCheckedRows();
     }
   }
 
@@ -4363,6 +4363,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked) {
+      if (!isEnabled()) {
+        return;
+      }
       try {
         pushUIProcessor();
         checkRows(rows, checked, true);
@@ -4464,6 +4467,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public IFormField prepareCellEditFromUI(ITableRow row, IColumn<?> col) {
+      if (!isEnabled()) {
+        return null;
+      }
       try {
         pushUIProcessor();
         //
@@ -4493,6 +4499,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public void completeCellEditFromUI() {
+      if (!isEnabled()) {
+        return;
+      }
       try {
         pushUIProcessor();
         //

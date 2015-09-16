@@ -250,6 +250,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String>implem
 
     @Override
     public void parseAndSetValueFromUI(String htmlText) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
       if (isHtmlEditor()) {
         if (htmlText != null && htmlText.length() == 0) {
           htmlText = null;
