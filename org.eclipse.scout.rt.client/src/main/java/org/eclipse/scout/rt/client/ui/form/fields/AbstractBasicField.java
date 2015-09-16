@@ -35,7 +35,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   public class P_UIFacade implements IBasicFieldUIFacade {
     @Override
     public void setDisplayTextFromUI(String text) {
-      if (!isSettableByUI()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       setDisplayText(text);
@@ -43,7 +43,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
     @Override
     public void parseAndSetValueFromUI(String value) {
-      if (!isSettableByUI()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       if (value == null) {
@@ -53,10 +53,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
       parseAndSetValue(value);
     }
 
-    @Override
-    public boolean isSettableByUI() {
-      return AbstractBasicField.this.isEnabled() && AbstractBasicField.this.isVisible();
-    }
   }
 
   protected AbstractBasicField(boolean callInitializer) {

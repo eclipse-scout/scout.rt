@@ -2798,7 +2798,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
     @Override
     public void setNodesCheckedFromUI(List<ITreeNode> nodes, boolean checked) {
-      if (!AbstractTree.this.isEnabled()) {
+      if (!isEnabled()) {
         return;
       }
       try {
@@ -3041,9 +3041,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      if (!AbstractTree.this.isEnabled()) {
-        return;
-      }
       try {
         pushUIProcessor();
         doAppLinkAction(ref);

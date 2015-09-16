@@ -34,11 +34,4 @@ public interface IBasicFieldUIFacade {
    */
   void setDisplayTextFromUI(String text);
 
-  /**
-   * Is checked in basic field to value by parseAndSetValueFromUI or parseAndSetValueFromUI
-   * 
-   * @return
-   */
-  boolean isSettableByUI();
-
 }

@@ -176,7 +176,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
     @Override
     public void parseAndSetValueFromUI(String value) {
-      if (!AbstractFileChooserField.this.isEnabled() || !AbstractFileChooserField.this.isVisible()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       parseAndSetValue(value);
@@ -184,7 +184,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
     @Override
     public void startFileChooserFromUI() {
-      if (!AbstractFileChooserField.this.isEnabled() || !AbstractFileChooserField.this.isVisible()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       try {

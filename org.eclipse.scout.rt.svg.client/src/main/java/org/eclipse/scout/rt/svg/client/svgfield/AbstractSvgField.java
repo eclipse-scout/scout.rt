@@ -209,15 +209,12 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   private class P_UIFacade implements ISvgFieldUIFacade {
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      if (!AbstractSvgField.this.isEnabled() || !AbstractSvgField.this.isVisible()) {
-        return;
-      }
       doAppLinkAction(ref);
     }
 
     @Override
     public void fireClickFromUI(SVGPoint point) {
-      if (!AbstractSvgField.this.isEnabled() || !AbstractSvgField.this.isVisible()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       setSelection(point);

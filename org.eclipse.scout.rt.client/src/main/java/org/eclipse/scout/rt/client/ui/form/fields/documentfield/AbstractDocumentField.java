@@ -197,7 +197,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
     @Override
     public void setDocumentFromUI(RemoteFile remoteFile) {
-      if (!AbstractDocumentField.this.isEnabled() || !AbstractDocumentField.this.isVisible()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       try {
@@ -211,7 +211,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
     @Override
     public void fireComReadyFromUI(boolean comReady) {
-      if (!AbstractDocumentField.this.isEnabled() || !AbstractDocumentField.this.isVisible()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       try {

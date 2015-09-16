@@ -482,7 +482,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date>implemen
 
     @Override
     public void setDateTimeFromUI(Date date) {
-      if (!isSettableByUI()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       try {
@@ -495,7 +495,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date>implemen
 
     @Override
     public void fireDateShiftActionFromUI(int level, int value) {
-      if (!isSettableByUI() || !isHasDate()) {
+      if (!isEnabled() || !isVisible() || !isHasDate()) {
         return;
       }
       try {
@@ -508,7 +508,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date>implemen
 
     @Override
     public void fireTimeShiftActionFromUI(int level, int value) {
-      if (!isSettableByUI() || !isHasTime()) {
+      if (!isEnabled() || !isVisible() || !isHasTime()) {
         return;
       }
       try {

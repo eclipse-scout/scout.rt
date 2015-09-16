@@ -4363,7 +4363,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked) {
-      if (!AbstractTable.this.isEnabled()) {
+      if (!isEnabled()) {
         return;
       }
       try {
@@ -4437,9 +4437,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      if (!AbstractTable.this.isEnabled()) {
-        return;
-      }
       try {
         pushUIProcessor();
         //
@@ -4470,7 +4467,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public IFormField prepareCellEditFromUI(ITableRow row, IColumn<?> col) {
-      if (!AbstractTable.this.isEnabled()) {
+      if (!isEnabled()) {
         return null;
       }
       try {
@@ -4502,7 +4499,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public void completeCellEditFromUI() {
-      if (!AbstractTable.this.isEnabled()) {
+      if (!isEnabled()) {
         return;
       }
       try {

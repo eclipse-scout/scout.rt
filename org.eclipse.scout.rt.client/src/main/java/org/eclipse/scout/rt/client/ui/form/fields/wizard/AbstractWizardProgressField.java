@@ -160,7 +160,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
 
     @Override
     public void wizardStepActionFromUI(int stepIndex) {
-      if (!AbstractWizardProgressField.this.isEnabled() || !AbstractWizardProgressField.this.isVisible()) {
+      if (!isEnabled() || !isVisible()) {
         return;
       }
       try {

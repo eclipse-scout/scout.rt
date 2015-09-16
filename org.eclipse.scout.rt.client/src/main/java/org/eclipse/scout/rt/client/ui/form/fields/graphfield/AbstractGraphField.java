@@ -65,9 +65,6 @@ public class AbstractGraphField extends AbstractValueField<GraphModel>implements
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      if (!AbstractGraphField.this.isEnabled() || !AbstractGraphField.this.isVisible()) {
-        return;
-      }
       try {
         doAppLinkAction(ref);
       }

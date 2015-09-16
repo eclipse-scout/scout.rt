@@ -84,9 +84,6 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE>implement
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      if (!AbstractBeanField.this.isEnabled() || !AbstractBeanField.this.isVisible()) {
-        return;
-      }
       try {
         doAppLinkAction(ref);
       }
