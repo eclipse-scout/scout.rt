@@ -151,7 +151,7 @@ describe("StringField", function() {
       field.updateDisplayTextOnModify = true;
       field.render(session.$entryPoint);
       field.$field.val('Test1');
-      field.$field.triggerKeyUp(scout.keys.A);
+      field.$field.trigger('input');
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1', whileTyping: true
@@ -169,7 +169,7 @@ describe("StringField", function() {
       field.updateDisplayTextOnModify = false;
       field.render(session.$entryPoint);
       field.$field.val('Test2');
-      field.$field.triggerKeyUp(scout.keys.A);
+      field.$field.trigger('input');
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test2', whileTyping: true
@@ -187,7 +187,7 @@ describe("StringField", function() {
       field.updateDisplayTextOnModify = true;
       field.render(session.$entryPoint);
       field.$field.val('Test3');
-      field.$field.triggerKeyUp(scout.keys.A);
+      field.$field.trigger('input');
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test3', whileTyping: true
@@ -210,7 +210,7 @@ describe("StringField", function() {
       field.render(session.$entryPoint);
       field.displayText = 'Test4'; // fake previous display text
       field.$field.val('Test4');
-      field.$field.triggerKeyUp(scout.keys.A);
+      field.$field.trigger('input');
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test4', whileTyping: true
@@ -229,7 +229,7 @@ describe("StringField", function() {
       field.render(session.$entryPoint);
       field.displayText = 'Test5'; // fake previous display text
       field.$field.val('Test5');
-      field.$field.triggerKeyUp(scout.keys.A);
+      field.$field.trigger('input');
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test5', whileTyping: true
