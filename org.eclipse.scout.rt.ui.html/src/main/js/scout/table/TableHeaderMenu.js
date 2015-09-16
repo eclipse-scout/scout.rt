@@ -54,38 +54,40 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this.$container.attr('tabindex', -1);
   }
 
-  // create buttons in command for sorting
-  var $commandSort = $menuHeader.appendDiv('header-group');
-  $commandSort.appendDiv('header-text')
-    .data('label', session.text('ColumnSorting'));
+  if (table.sortEnabled) {
+    // create buttons in command for sorting
+    var $commandSort = $menuHeader.appendDiv('header-group');
+    $commandSort.appendDiv('header-text')
+      .data('label', session.text('ColumnSorting'));
 
-  var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
-    .data('label', session.text('ui.ascending'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      sort('asc', false, $(this).hasClass('selected'));
-    });
-  var $sortDesc = $commandSort.appendDiv('header-command sort-desc')
-    .data('label', session.text('ui.descending'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      sort('desc', false, $(this).hasClass('selected'));
-    });
+    var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
+      .data('label', session.text('ui.ascending'))
+      .click(this.remove.bind(this))
+      .click(function() {
+        sort('asc', false, $(this).hasClass('selected'));
+      });
+    var $sortDesc = $commandSort.appendDiv('header-command sort-desc')
+      .data('label', session.text('ui.descending'))
+      .click(this.remove.bind(this))
+      .click(function() {
+        sort('desc', false, $(this).hasClass('selected'));
+      });
 
-  var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
-    .data('label', session.text('ui.ascendingAdditionally'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      sort('asc', true, $(this).hasClass('selected'));
-    });
-  var $sortDescAdd = $commandSort.appendDiv('header-command sort-desc-add')
-    .data('label', session.text('ui.descendingAdditionally'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      sort('desc', true, $(this).hasClass('selected'));
-    });
+    var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
+      .data('label', session.text('ui.ascendingAdditionally'))
+      .click(this.remove.bind(this))
+      .click(function() {
+        sort('asc', true, $(this).hasClass('selected'));
+      });
+    var $sortDescAdd = $commandSort.appendDiv('header-command sort-desc-add')
+      .data('label', session.text('ui.descendingAdditionally'))
+      .click(this.remove.bind(this))
+      .click(function() {
+        sort('desc', true, $(this).hasClass('selected'));
+      });
 
-  sortSelect();
+    sortSelect();
+  }
 
   // create buttons in command for grouping, if there is at least one number column
   var containsNumberColumn = scout.arrays.find(table.columns, function(column) {
@@ -251,6 +253,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   function sortSelect() {
+    if (!table.sortEnabled) {
+      return;
+    }
+
     var addIcon = '\uF067',
       sortCount = getSortColumnCount();
 

@@ -67,7 +67,8 @@ TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
     id: id || scout.createUniqueId(),
     text: text,
     type: type,
-    objectType: 'Column'
+    objectType: 'Column',
+    uiSortPossible: true
   };
   scout.defaultValues.applyTo(column, 'Column');
   return column;

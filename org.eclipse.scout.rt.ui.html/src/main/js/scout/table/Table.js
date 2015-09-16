@@ -329,6 +329,9 @@ scout.Table.prototype._renderTableControls = function(dummy) {
   this._renderTableFooter();
 };
 
+scout.Table.prototype._renderSortEnabled = function(dummy) {
+};
+
 scout.Table.prototype._syncTableControls = function(controls) {
   var i;
   for (i = 0; i < this.tableControls.length; i++) {

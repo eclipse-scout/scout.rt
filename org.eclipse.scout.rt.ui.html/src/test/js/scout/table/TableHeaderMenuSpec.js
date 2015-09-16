@@ -211,5 +211,33 @@ describe("TableHeaderMenu", function() {
       });
 
     });
+
+    describe("sort enabled", function() {
+
+      it("option enabled shows sort options in table header menu", function() {
+        var table = createSingleColumnTableByTexts(['First', 'Second']);
+        var column = table.columns[0];
+        table.sortEnabled = true;
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var $menu = table.header._tableHeaderMenu.$container;
+        expect($menu.find('.header-command.sort-asc').length).toBe(1);
+        expect($menu.find('.header-command.sort-desc').length).toBe(1);
+        table.header.closeTableHeaderMenu();
+      });
+
+      it("option disabled does not show sort options in table header menu", function() {
+        var table = createSingleColumnTableByTexts(['First', 'Second']);
+        var column = table.columns[0];
+        table.sortEnabled = false;
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var $menu = table.header._tableHeaderMenu.$container;
+        expect($menu.find('.header-command.sort-asc').length).toBe(0);
+        expect($menu.find('.header-command.sort-desc').length).toBe(0);
+        table.header.closeTableHeaderMenu();
+      });
+
+    });
   });
 });
