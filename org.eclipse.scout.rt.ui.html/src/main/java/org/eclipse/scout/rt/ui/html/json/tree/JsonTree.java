@@ -682,6 +682,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     json.put("foregroundColor", cell.getForegroundColor());
     json.put("backgroundColor", cell.getBackgroundColor());
     json.put("font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
+    json.put("htmlEnabled", cell.isHtmlEnabled());
   }
 
   /**

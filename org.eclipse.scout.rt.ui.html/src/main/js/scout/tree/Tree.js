@@ -1025,10 +1025,13 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
-  // FIXME BSH Check "htmlEnabled" flag
-  $node.empty()
-    .html(node.text)
-    .prepend(preservedChildren);
+  $node.empty();
+  if (node.htmlEnabled) {
+    $node.html(node.text);
+  } else {
+    $node.textOrNbsp(node.text);
+  }
+  $node.prepend(preservedChildren);
 
   scout.helpers.legacyStyle(node, $node);
 

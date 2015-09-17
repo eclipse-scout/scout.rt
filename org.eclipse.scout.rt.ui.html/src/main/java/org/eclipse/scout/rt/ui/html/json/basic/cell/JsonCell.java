@@ -69,8 +69,6 @@ public class JsonCell implements IJsonObject {
     //TODO CGU maybe only send if it differs from column, same for horizontal alignment. Could be difficult, depends on event order (update before column_structure_changed is bad. maybe solve in model?
     json.put("editable", m_cell.isEditable());
     json.put("htmlEnabled", m_cell.isHtmlEnabled());
-    // TODO BSH Table | Add property "errorStatus"
-    // TODO BSH Table | Add generic "cssStyle" property
     return json;
   }
 
