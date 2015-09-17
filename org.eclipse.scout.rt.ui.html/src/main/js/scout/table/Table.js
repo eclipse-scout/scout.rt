@@ -496,7 +496,7 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
   for (var c = 0; c < sortColumns.length; c++) {
     column = sortColumns[c];
 
-    if (!column.uiSortPossible) {
+    if (!column || !column.uiSortPossible) {
       return false;
     }
 

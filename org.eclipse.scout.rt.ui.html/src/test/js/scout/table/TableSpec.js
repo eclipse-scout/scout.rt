@@ -525,6 +525,16 @@ describe("Table", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
+    it("does not try client sorting if invisible/unknow sort columns are available", function() {
+      prepareTable();
+      render(table);
+
+      var sortColumns = [];
+      sortColumns[1] = {};
+
+      expect(table._prepareColumnsForSorting(sortColumns)).toBe(false);
+    });
+
     it("sorts the data", function() {
       prepareTable();
       render(table);
