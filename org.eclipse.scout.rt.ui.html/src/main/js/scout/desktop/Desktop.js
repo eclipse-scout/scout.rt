@@ -116,6 +116,9 @@ scout.Desktop.prototype._findActiveSelectablePart = function(form) {
  * Installs the keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
  */
 scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
+  if (!this._hasBench()) {
+    return;
+  }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
@@ -284,12 +287,17 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   }
 };
 
+//TODO maybe better change to actual properties and set on server?
 scout.Desktop.prototype._hasNavigation = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
 
 scout.Desktop.prototype._hasTaskBar = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
+};
+
+scout.Desktop.prototype._hasBench = function() {
+  return true;
 };
 
 scout.Desktop.prototype.onResize = function(event) {
@@ -603,8 +611,12 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
  */
 scout.Desktop.prototype.navigationWidthUpdated = function(navigationWidth) {
   if (this._hasNavigation()) {
-    this._$taskBar.css('left', navigationWidth);
-    this.$bench.css('left', navigationWidth);
+    if (this._hasTaskBar()) {
+      this._$taskBar.css('left', navigationWidth);
+    }
+    if (this._hasBench()) {
+      this.$bench.css('left', navigationWidth);
+    }
   }
 };
 
@@ -619,7 +631,7 @@ scout.Desktop.prototype._sendNavigationToBack = function() {
 };
 
 scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
-  if (this._hasNavigation()) {
+  if (this._hasNavigation() && this._hasBench()) {
     this.$bench.toggleClass('drop-shadow', showShadow);
   }
 };

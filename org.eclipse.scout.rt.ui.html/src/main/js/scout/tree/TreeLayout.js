@@ -9,7 +9,7 @@ scout.TreeLayout.prototype.layout = function($container) {
     menuBar = this.tree.menuBar,
     $data = this.tree.$data,
     height = 0,
-    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    htmlMenuBar = menuBar.htmlComp,
     htmlContainer = this.tree.htmlComp,
     containerSize = htmlContainer.getAvailableSize()
       .subtract(htmlContainer.getInsets());

@@ -17,8 +17,8 @@ __include("scout/util/DetachHelper.js");
 __include("scout/util/Device.js");
 __include("scout/util/DoubleClickSupport.js");
 __include("scout/util/dragAndDrop.js");
-__include("scout/util/fonts.js");
 __include("scout/util/EventSupport.js");
+__include("scout/util/fonts.js");
 __include("scout/util/helpers.js");
 __include("scout/util/icons.js");
 __include("scout/util/FocusManager.js");
@@ -120,6 +120,7 @@ __include("scout/table/Column.js");
 __include("scout/table/BeanColumn.js"); // requires Column.js
 __include("scout/table/CheckBoxColumn.js"); // requires Column.js
 __include("scout/table/DateColumn.js"); // requires Column.js
+__include("scout/table/IconColumn.js"); //requires Column.js
 __include("scout/table/control/TableControl.js");
 __include("scout/table/control/AnalysisTableControl.js"); // requires TableControl.js
 __include("scout/table/control/ChartTableControl.js"); // requires TableControl.js
@@ -174,8 +175,8 @@ __include("scout/desktop/DesktopViewTab.js");
 __include("scout/desktop/ViewMenuOpenKeyStroke.js");
 __include("scout/desktop/ViewMenuPopup.js");
 __include("scout/desktop/ViewMenuTab.js");
+__include("scout/desktop/ViewTabSelectKeyStroke.js");
 __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
-__include("scout/desktop/ViewTabPreventDefaultKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/NullDesktopNavigation.js");
 __include("scout/desktop/FormToolButton.js");
@@ -188,6 +189,7 @@ __include("scout/desktop/OutlineTreeCollapseAllKeyStroke.js");
 __include("scout/desktop/OutlineTreeCollapseOrDrillUpKeyStroke.js");
 __include("scout/desktop/OutlineTreeExpandOrDrillDownKeyStroke.js");
 __include("scout/desktop/OutlineTreeNavigationDownKeyStroke.js");
+__include("scout/desktop/DetailTableTreeFilter.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/OutlineViewButton.js");

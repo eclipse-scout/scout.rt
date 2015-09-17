@@ -6,7 +6,7 @@ scout.Device = function(userAgent) {
   this.userAgent = userAgent;
   this.system;
   this.features = {};
-  this.device;
+  this.type;
   this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
   this.browserVersion = 0;
 
@@ -28,7 +28,10 @@ scout.Device.SupportedBrowsers = {
   SAFARI: 'Safari'
 };
 
-scout.Device.SYSTEM_IOS = 'IOS';
+scout.Device.System = {
+  IOS: 'IOS',
+  ANDROID: 'ANDROID'
+};
 
 /**
  * Called by index.html. Precalculates the value of some attributes to store them
@@ -66,17 +69,26 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
   if (!userAgent) {
     return;
   }
-  // check for IOS devices
+  this._parseSystem(userAgent);
+  this._parseBrowser(userAgent);
+};
+
+scout.Device.prototype._parseSystem = function(userAgent) {
   var i, device, iosDevices = ['iPad', 'iPhone'];
   for (i = 0; i < iosDevices.length; i++) {
     device = iosDevices[i];
     if (this.contains(userAgent, device)) {
-      this.device = device;
-      this.system = scout.Device.SYSTEM_IOS;
-      break;
+      this.type = device;
+      this.system = scout.Device.System.IOS;
+      return;
     }
   }
-  // check for browser
+  if (this.contains(userAgent, "Android")) {
+    this.system = scout.Device.System.ANDROID;
+  }
+};
+
+scout.Device.prototype._parseBrowser = function(userAgent) {
   if (this.contains(userAgent, 'Firefox')) {
     this.browser = scout.Device.SupportedBrowsers.FIREFOX;
   } else if (this.contains(userAgent, 'MSIE') || this.contains(userAgent, 'Trident')) {
@@ -133,8 +145,10 @@ scout.Device.prototype.hasPrettyScrollbars = function() {
   return this.supportsFeature('_prettyScrollbars', check.bind(this));
 
   function check(property) {
-    // FIXME CGU check for android, osx, or just exclude windows?
-    return scout.Device.SYSTEM_IOS === this.system;
+    var SYSTEM = scout.Device.System;
+    // TODO CGU add windows phone, what about desktop windows with touch support? Maybe add touch support to scrollbars?
+    return SYSTEM.IOS === this.system ||
+    SYSTEM.ANDROID === this.system;
   }
 };
 

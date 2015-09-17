@@ -1,6 +1,6 @@
 scout.MobileOutline = function() {
   scout.MobileOutline.parent.call(this);
-  this._breadcrumb = true;
+  this._breadcrumbEnabled = true;
   this._currentDetailForm = null;
 };
 scout.inherits(scout.MobileOutline, scout.Outline);
@@ -15,22 +15,25 @@ scout.MobileOutline.prototype._showDefaultDetailForm = function() {
 
 };
 
-scout.MobileOutline.prototype._updateOutlineTab = function(node) {
+/**
+ * @override
+ */
+scout.MobileOutline.prototype._updateOutlineNode = function(node, bringToFront) {
   //FIXME CGU same code as in Outline.js, merge, rename updateOutlineTab
+  scout.helpers.nvl(bringToFront, true);
   if (!node) {
-    throw new Error('called updateOutlineTab without node, should call showDefaultDetailForm instead?');
-  }
-  if (this.session.desktop.outline !== this) {
-    throw new Error('called updateOutlineTab but event affects another outline');
+    throw new Error('called _updateOutlineNode without node');
   }
 
-  // Unlink detail form if it was closed.
-  // May happen in the following case:
-  // The form gets closed on execPageDeactivated.
-  // No pageChanged event will be fired because the deactivated page is not selected anymore
-  var prefSize;
+  // Unlink detail form if it was closed. May happen in the following case:
+  // The form gets closed on execPageDeactivated. No pageChanged event will
+  // be fired because the deactivated page is not selected anymore.
   if (node.detailForm && node.detailForm.destroyed) {
     node.detailForm = null;
+  }
+
+  if (this.session.desktop.outline !== this || !scout.helpers.isOneOf(node, this.selectedNodes)) {
+    return;
   }
 
   if (this._currentDetailForm) {
@@ -38,6 +41,7 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
     this._currentDetailForm = null;
   }
 
+  var prefSize;
   if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     node.detailForm.render(node.$node);
     node.detailForm.htmlComp.pixelBasedSizing = true;
