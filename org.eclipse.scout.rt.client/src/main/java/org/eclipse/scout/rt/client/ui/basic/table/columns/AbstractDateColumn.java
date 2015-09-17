@@ -102,6 +102,11 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date>implements 
   }
 
   @Override
+  protected boolean getConfiguredUiSortPossible() {
+    return true;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     setFormat(getConfiguredFormat());

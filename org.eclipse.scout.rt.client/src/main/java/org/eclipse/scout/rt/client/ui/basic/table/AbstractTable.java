@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -954,7 +956,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
 
-    // add Convenience observer for drag & drop callbacks and event history
+    // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
       @Override
       public void tableChanged(TableEvent e) {
@@ -1017,6 +1019,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             catch (ProcessingException ex) {
               BEANS.get(ExceptionHandler.class).handle(ex);
             }
+            break;
+          case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
+          case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+            checkIfColumnPreventsUiSortForTable();
             break;
         }
       }
@@ -1117,6 +1123,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (getConfiguredCheckableColumn() != null) {
       AbstractBooleanColumn checkableColumn = getColumnSet().getColumnByClass(getConfiguredCheckableColumn());
       setCheckableColumn(checkableColumn);
+    }
+
+    // add listener to disable ui sort possible property if needed
+    PropertyChangeListener columnListener = new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        checkIfColumnPreventsUiSortForTable();
+      }
+    };
+    for (IColumn column : m_columnSet.getColumns()) {
+      column.addPropertyChangeListener(IColumn.PROP_VISIBLE, columnListener);
     }
   }
 
@@ -3354,6 +3372,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public boolean isUiSortPossible() {
+    return propertySupport.getPropertyBool(PROP_UI_SORT_POSSIBLE);
+  }
+
+  @Override
+  public void setUiSortPossible(boolean b) {
+    propertySupport.setPropertyBool(PROP_UI_SORT_POSSIBLE, b);
+  }
+
+  @Override
   public void sort() {
     try {
       if (isSortEnabled()) {
@@ -4233,6 +4261,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setTableStatus(IStatus status) {
     propertySupport.setProperty(PROP_TABLE_STATUS, status);
+  }
+
+  /**
+   * Check if this column would prevent an ui sort for table. If it prevents an ui sort,
+   * {@link ITable#setUiSortPossible(boolean)} is set to <code>false</code> for all columns of the table.
+   */
+  protected void checkIfColumnPreventsUiSortForTable() {
+    for (IColumn<?> column : m_columnSet.getColumns()) {
+      if (!column.isVisible() && column.getSortIndex() != -1) {
+        setUiSortPossible(false);
+        return;
+      }
+    }
+    setUiSortPossible(true);
   }
 
   /*

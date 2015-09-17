@@ -166,6 +166,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_SORT_ENABLED = "sortEnabled";
 
+  /**
+   * type boolean
+   *
+   * @since 5.2.0
+   */
+  String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
+
   void initTable() throws ProcessingException;
 
   void disposeTable();
@@ -818,6 +825,24 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   boolean isSortEnabled();
 
   void setSortEnabled(boolean b);
+
+  /**
+   * Is a simplified ui sorting possible? If enabled, ui (e.g. web browser, presentation layer itself) may sort without
+   * computing the order on a client server (e.g. application server). The ui uses a very simplified sort rule set, e.g.
+   * alphabetical or numerical sorting is possible, more advanced sort rules are not implemented. Which rules to use are
+   * determined by the client. To use advanced sort rules return <code>false</code>.
+   * <p>
+   * If set to <code>false</code> this property overrides any {@link IColumn#isUiSortPossible()} setting. If set to
+   * <code>true</code> this property may be overridden by setting at least one {@link IColumn#isUiSortPossible()} to
+   * <code>false</code>.
+   * <p>
+   * This property is currently also used for internal purposes after certain column property changes (e.g. visibility)
+   * the value of this property may be changed. To adjust this behavior, see
+   * {@link AbstractTable#checkIfColumnPreventsUiSortForTable(IColumn)}.
+   */
+  boolean isUiSortPossible();
+
+  void setUiSortPossible(boolean uiSortPossible);
 
   TableUserFilterManager getUserFilterManager();
 
