@@ -877,11 +877,15 @@ scout.Session.prototype._onCancelProcessing = function(event) {
  * The request is sent immediately (does not await pending requests)
  */
 scout.Session.prototype.sendLogRequest = function(message) {
-  this._sendRequest({
+  var request = {
     uiSessionId: this.uiSessionId,
     log: true,
     message: message
-  });
+  };
+
+  // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
+  var ajaxOptions = this.defaultAjaxOptions(request);
+  $.ajax(ajaxOptions);
 };
 
 scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
