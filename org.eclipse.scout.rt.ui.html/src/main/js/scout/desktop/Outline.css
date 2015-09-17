@@ -1,3 +1,6 @@
+@breadcrumb-element-padding: 12px 2px 12px 2px !important;
+@breadcrumb-border-color: @outline-selection-background-color;
+
 /* we have to combine this with .outline, otherwise the definition would not be specific enough */
 .outline.tree {
   & .scrollbar-thumb {
@@ -12,6 +15,15 @@
   &.in-background .tree-node.selected {
     background-color: @palette-blue-4;
     color: @palette-white;
+  }
+
+  .navigation-breadcrumb & > .outline-title {
+    cursor: pointer;
+    #scout.font-text-large();
+    #scout.overflow-ellipsis-nowrap();
+    text-align: center;
+    padding: @breadcrumb-element-padding;
+    border-bottom: 1px solid @breadcrumb-border-color;
   }
 }
 
@@ -77,10 +89,10 @@
     text-align: center;
 
     display: none;
-    border-bottom: 1px solid @outline-selection-background-color;
+    border-bottom: 1px solid @breadcrumb-border-color;
 
     /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-    padding: 12px 2px 12px 2px !important;
+    padding: @breadcrumb-element-padding !important;
 
     &.parent,
     &.children,

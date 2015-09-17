@@ -21,6 +21,7 @@ scout.Outline.prototype._init = function(model, session) {
   this.messageBoxController = new scout.MessageBoxController(this, session);
   this.fileChooserController = new scout.FileChooserController(this, session);
   this.addFilter(new scout.DetailTableTreeFilter());
+  this.titleVisible = this._breadcrumbEnabled;
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -53,6 +54,50 @@ scout.Outline.prototype._render = function($parent) {
 
   if (this.selectedNodes.length === 0) {
     this._showDefaultDetailForm();
+  }
+  this._renderTitleVisible();
+};
+
+/**
+ * @override
+ */
+scout.Outline.prototype._remove = function() {
+  scout.Outline.parent.prototype._remove.call(this);
+  this._removeTitle();
+};
+
+scout.Outline.prototype._renderTitle = function() {
+  if (!this.$title) {
+    this.$title = this.$container.prependDiv('outline-title');
+  }
+  this.$title.text(this.title)
+    .on('click', this._onTitleClick.bind(this));
+};
+
+scout.Outline.prototype._removeTitle = function() {
+  if (this.$title) {
+    this.$title.remove();
+    this.$title = null;
+  }
+};
+
+scout.Outline.prototype.setBreadcrumbEnabled = function(enabled) {
+  scout.Outline.parent.prototype.setBreadcrumbEnabled.call(this, enabled);
+  this.setTitleVisible(enabled);
+};
+
+scout.Outline.prototype.setTitleVisible = function(visible) {
+  this.titleVisible = visible;
+  if (this.rendered) {
+    this._renderTitleVisible();
+  }
+};
+
+scout.Outline.prototype._renderTitleVisible = function() {
+  if (this.titleVisible) {
+    this._renderTitle();
+  } else {
+    this._removeTitle();
   }
 };
 
@@ -188,6 +233,11 @@ scout.Outline.prototype._getMenu = function(menus, menuClass) {
 
 scout.Outline.prototype._hasMenu = function(menus, menuClass) {
   return this._getMenu(menus, menuClass) !== null;
+};
+
+scout.Outline.prototype._onTitleClick = function(event) {
+  this.collapseAll();
+  this.clearSelection();
 };
 
 scout.Outline.prototype._onNodeDeleted = function(node) {

@@ -67,7 +67,7 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
 
 scout.ViewMenuTab.prototype._renderText = function() {
   if (this._breadcrumbEnabled) {
-    this.$title.css('display', ''); // reset to CSS default ('none')
+    this.$title.css('display', 'none'); // reset to CSS default ('none')
   } else {
     this.$title.css('display', 'inline-block');
     this.$title.text(this.selected ? this.text : '');
@@ -90,7 +90,7 @@ scout.ViewMenuTab.prototype._renderIconId = function() {
 };
 
 scout.ViewMenuTab.prototype._updateMenuButtonVisibility = function() {
-  this.$menuButton.setVisible(this.selected && !this._inBackground && !this._breadcrumbEnabled);
+  this.$menuButton.setVisible(this.selected && !this._inBackground);
 };
 
 /**
