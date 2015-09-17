@@ -262,6 +262,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         return getModel().isSortEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_UI_SORT_POSSIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isUiSortPossible();
+      }
+    });
   }
 
   @Override

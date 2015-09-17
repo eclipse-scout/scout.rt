@@ -25,6 +25,9 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
   private COLUMN m_column;
   private int m_indexOffset;
 
+  private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
+  private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
+
   public JsonColumn(COLUMN model) {
     m_column = model;
   }
@@ -79,6 +82,8 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
       json.put("classId", getColumn().classId());
     }
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
+    json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());
+    json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, getColumn().isInitialAlwaysIncludeSortAtEnd());
     return json;
   }
 

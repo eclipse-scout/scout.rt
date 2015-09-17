@@ -8,7 +8,8 @@ TableSpecHelper.prototype.createModel = function(columns, rows) {
   var model = createSimpleModel('Table');
   $.extend(model, {
     "headerVisible": true,
-    "multiSelect": true
+    "multiSelect": true,
+    "uiSortPossible": true
   });
 
   //Server will never send undefined -> don't create model with undefined properties.

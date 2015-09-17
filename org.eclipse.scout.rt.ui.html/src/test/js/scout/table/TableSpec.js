@@ -464,6 +464,102 @@ describe("Table", function() {
         expect(table.columns[1].sortIndex).toBe(0);
       });
 
+      it("does not remove sortIndex for columns always included at begin", function() {
+        prepareTable();
+        column1.initialAlwaysIncludeSortAtBegin = true;
+        column1.sortActive = true;
+        column1.sortIndex = 1;
+        column2.initialAlwaysIncludeSortAtBegin = true;
+        column2.sortActive = true;
+        column2.sortIndex = 0;
+        table._onColumnStructureChanged(table.columns); // (re)initialize columns, have been initialised already during init
+        render(table);
+
+        table.sort(table.columns[0], 'desc');
+        expect(table.columns[0].sortIndex).toBe(2);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[1], 'desc');
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[1], 'desc', true, true);
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[2], 'desc', false, true);
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+      });
+
+      it("does not remove sortIndex for columns always included at end", function() {
+        prepareTable();
+        column1.initialAlwaysIncludeSortAtEnd = true;
+        column1.sortActive = true;
+        column1.sortIndex = 1;
+        column2.initialAlwaysIncludeSortAtEnd = true;
+        column2.sortActive = true;
+        column2.sortIndex = 0;
+        table._onColumnStructureChanged(table.columns); // (re)initialize columns, have been initialised already during init
+        render(table);
+
+        table.sort(table.columns[0], 'desc');
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBe(2);
+        expect(table.columns[2].sortIndex).toBe(1);
+
+        table.sort(table.columns[1], 'desc');
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[2], 'desc', true, true);
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[1], 'desc', false, true);
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+      });
+
+      it("does not remove sortIndex for columns always included at begin and end (combination)", function() {
+        prepareTable();
+        column1.initialAlwaysIncludeSortAtEnd = true;
+        column1.sortActive = true;
+        column1.sortIndex = 1;
+        column2.initialAlwaysIncludeSortAtBegin = true;
+        column2.sortActive = true;
+        column2.sortIndex = 0;
+        table._onColumnStructureChanged(table.columns); // (re)initialize columns, have been initialised already during init
+        render(table);
+
+        table.sort(table.columns[0], 'desc');
+        expect(table.columns[0].sortIndex).toBe(1);
+        expect(table.columns[1].sortIndex).toBe(2);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[1], 'desc');
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[2], 'desc', true, true);
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        table.sort(table.columns[1], 'desc', false, true);
+        expect(table.columns[0].sortIndex).toBe(-1);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(0);
+      });
+
       it("removes column from sort columns", function() {
         prepareTable();
         render(table);
@@ -523,16 +619,6 @@ describe("Table", function() {
         sortAscending: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
-    });
-
-    it("does not try client sorting if invisible/unknow sort columns are available", function() {
-      prepareTable();
-      render(table);
-
-      var sortColumns = [];
-      sortColumns[1] = {};
-
-      expect(table._prepareColumnsForSorting(sortColumns)).toBe(false);
     });
 
     it("sorts the data", function() {

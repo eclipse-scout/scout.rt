@@ -224,6 +224,14 @@ scout.arrays = {
     return scout.arrays.format(arr, delimiter, true);
   },
 
+  max: function(arr) {
+    return Math.max.apply(Math, arr);
+  },
+
+  min: function(arr) {
+    return Math.min.apply(Math, arr);
+  },
+
   //
   // Use these methods if you have an array of jquery objects.
   // Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.

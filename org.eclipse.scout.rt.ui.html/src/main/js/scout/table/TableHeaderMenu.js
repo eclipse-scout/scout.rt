@@ -60,7 +60,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     $commandSort.appendDiv('header-text')
       .data('label', session.text('ColumnSorting'));
 
-    var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
+    if (!table.hasPermanentHeadOrTailSortColumns()) {
+      var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
       .data('label', session.text('ui.ascending'))
       .click(this.remove.bind(this))
       .click(function() {
@@ -72,6 +73,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       .click(function() {
         sort('desc', false, $(this).hasClass('selected'));
       });
+    }
 
     var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
       .data('label', session.text('ui.ascendingAdditionally'))
@@ -262,7 +264,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
     $('.header-command', $commandSort).removeClass('selected');
 
-    if (sortCount === 1) {
+    if (sortCount === 1 && !table.hasPermanentHeadOrTailSortColumns()) {
       if ($headerItem.hasClass('sort-asc')) {
         $sortAsc.addClass('selected');
         addIcon = null;
@@ -270,7 +272,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
         $sortDesc.addClass('selected');
         addIcon = null;
       }
-    } else if (sortCount > 1) {
+    } else if (sortCount > 1 || table.hasPermanentHeadOrTailSortColumns()) {
       if ($headerItem.hasClass('sort-asc')) {
         $sortAscAdd.addClass('selected');
         addIcon = column.sortIndex + 1;
@@ -286,8 +288,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       $sortAscAdd.show().attr('data-icon', addIcon);
       $sortDescAdd.show().attr('data-icon', addIcon);
     } else {
-      $sortAscAdd.hide();
-      $sortDescAdd.hide();
+      if (!table.hasPermanentHeadOrTailSortColumns()) {
+        $sortAscAdd.hide();
+        $sortDescAdd.hide();
+      }
     }
   }
 

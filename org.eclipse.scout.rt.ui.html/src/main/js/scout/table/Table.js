@@ -29,6 +29,9 @@ scout.Table = function() {
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
 
+  this._permanentHeadSortColumns = [];
+  this._permanentTailSortColumns = [];
+
   this.attached = false; // Indicates whether this table is currently visible to the user.
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
@@ -88,6 +91,9 @@ scout.Table.prototype._initColumns = function() {
   }
   this._syncCheckable(this.checkable);
   this._updateRowWidth();
+
+  // Sync head and tail sort columns
+  this._syncHeadAndTailSortColumns();
 };
 
 /**
@@ -332,6 +338,9 @@ scout.Table.prototype._renderTableControls = function(dummy) {
 scout.Table.prototype._renderSortEnabled = function(dummy) {
 };
 
+scout.Table.prototype._renderUiSortPossible = function(dummy) {
+};
+
 scout.Table.prototype._syncTableControls = function(controls) {
   var i;
   for (i = 0; i < this.tableControls.length; i++) {
@@ -446,7 +455,7 @@ scout.Table.prototype._sort = function() {
   }
 
   // Initialize comparators
-  var clientSideSortingPossible = this._prepareColumnsForSorting(sortColumns);
+  var clientSideSortingPossible = this.uiSortPossible && this._prepareColumnsForSorting(sortColumns);
   if (!clientSideSortingPossible) {
     return false;
   }
@@ -496,7 +505,7 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
   for (var c = 0; c < sortColumns.length; c++) {
     column = sortColumns[c];
 
-    if (!column || !column.uiSortPossible) {
+    if (!column.uiSortPossible) {
       return false;
     }
 
@@ -606,40 +615,51 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
 };
 
 scout.Table.prototype._updateSortColumns = function(column, direction, multiSort, remove) {
-  var sortIndex, maxIndex = -1;
+  var sortIndex = -1, deviation;
 
   if (remove) {
-    column.sortActive = false;
+    if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
+      column.sortActive = false;
 
-    // Adjust sibling columns with higher index
-    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-      if (siblingColumn.sortIndex > column.sortIndex) {
-        siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
-      }
-    });
-    column.sortIndex = -1;
+      // Adjust sibling columns with higher index
+      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        if (siblingColumn.sortIndex > column.sortIndex) {
+          siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
+        }
+      });
+      column.sortIndex = -1;
+    }
     return;
   }
 
-  if (multiSort) {
-    // If not already sorted set the appropriate sort index
-    if (!column.sortActive) {
-      for (var i = 0; i < this.columns.length; i++) {
-        sortIndex = this.columns[i].sortIndex;
-        if (sortIndex >= 0) {
-          maxIndex = Math.max(sortIndex, maxIndex);
-        }
+  if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
+    // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
+    if (multiSort) {
+      // if not already sorted set the appropriate sort index
+      if (!column.sortActive) {
+        sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) { return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex; })));
+        column.sortIndex = sortIndex + 1;
+
+        // increase sortIndex for all permanent tail columns (a column has been added in front of them)
+        this._permanentTailSortColumns.forEach(function(c) { c.sortIndex++; });
       }
-      column.sortIndex = maxIndex + 1;
+    } else {
+      column.sortIndex = this._permanentHeadSortColumns.length;
     }
-  } else {
+  }
+
+  if (!multiSort) {
+    // remove sort index for siblings (ignore permanent head/tail columns, only if not multi sort)
     scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-      if (siblingColumn.sortActive) {
+      if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd)) {
         siblingColumn.sortIndex = -1;
         siblingColumn.sortActive = false;
       }
     });
-    column.sortIndex = 0;
+
+    // set correct sort index for all permanent tail sort columns
+    deviation = (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) ? 0 : 1;
+    this._permanentTailSortColumns.forEach(function(c, index) { c.sortIndex = this._permanentHeadSortColumns.length + deviation + index; }, this);
   }
 
   column.sortAscending = direction === 'asc' ? true : false;
@@ -2237,6 +2257,27 @@ scout.Table.prototype._syncCheckable = function(checkable, oldValue) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
   }
+};
+
+scout.Table.prototype.hasPermanentHeadOrTailSortColumns = function() {
+  return this._permanentHeadSortColumns.length !== 0 || this._permanentTailSortColumns.length !== 0;
+};
+
+scout.Table.prototype._syncHeadAndTailSortColumns = function() {
+  // find all sort columns (head and tail sort columns should always be included)
+  var sortColumns = this.columns.filter(function(c) { return c.sortIndex >= 0; });
+  sortColumns.sort(function(a, b) { return a.sortIndex - b.sortIndex; });
+
+  this._permanentHeadSortColumns = [];
+  this._permanentTailSortColumns = [];
+
+  sortColumns.forEach(function(c) {
+    if (c.initialAlwaysIncludeSortAtBegin) {
+      this._permanentHeadSortColumns.push(c);
+    } else if (c.initialAlwaysIncludeSortAtEnd) {
+      this._permanentTailSortColumns.push(c);
+    }
+  }, this);
 };
 
 scout.Table.prototype._syncRowIconVisible = function(rowIconVisible, oldValue) {
