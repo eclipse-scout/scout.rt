@@ -101,6 +101,20 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date>implements 
     return null;
   }
 
+  /**
+   * Configures the format used to group this column. See the {@link DateFormat} class for more information about the
+   * expected format.
+   * <p>
+   * Subclasses can override this method. Default is YYYY (for full year only).
+   *
+   * @return Format for grouping this column.
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(153)
+  protected String getConfiguredGroupFormat() {
+    return "YYYY";
+  }
+
   @Override
   protected boolean getConfiguredUiSortPossible() {
     return true;
@@ -113,6 +127,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date>implements 
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
     setAutoDate(getConfiguredAutoDate());
+    setGroupFormat(getConfiguredGroupFormat());
   }
 
   /*
@@ -159,6 +174,16 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date>implements 
   @Override
   public void setAutoDate(Date autoDate) {
     m_autoDate = autoDate;
+  }
+
+  @Override
+  public String getGroupFormat() {
+    return propertySupport.getPropertyString(PROP_GROUP_FORMAT);
+  }
+
+  @Override
+  public void setGroupFormat(String groupFormat) {
+    propertySupport.setPropertyString(PROP_GROUP_FORMAT, groupFormat);
   }
 
   @Override

@@ -15,6 +15,8 @@ import java.util.Date;
 public interface IDateColumn extends IColumn<Date> {
   double MILLIS_PER_DAY = 1000.0 * 3600.0 * 24.0;
 
+  String PROP_GROUP_FORMAT = "groupFormat";
+
   void setFormat(String s);
 
   String getFormat();
@@ -30,4 +32,8 @@ public interface IDateColumn extends IColumn<Date> {
   void setAutoDate(Date autoDate);
 
   Date getAutoDate();
+
+  void setGroupFormat(String groupFormat);
+
+  String getGroupFormat();
 }
