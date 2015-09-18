@@ -1,0 +1,10 @@
+target "_eclipse-rap.target" with source
+
+location rap_2.3 "http://download.eclipse.org/rt/rap/2.3/SR2-20150128-1013/" {
+  org.eclipse.rap.feature.feature.group lazy
+  org.eclipse.rap.equinox.target.feature.feature.group lazy
+}
+
+location rap_incubator_file_2.3 "http://download.eclipse.org/rt/rap/incubator/2.3/fileupload/" {
+  org.eclipse.rap.fileupload.feature.feature.group lazy
+}
