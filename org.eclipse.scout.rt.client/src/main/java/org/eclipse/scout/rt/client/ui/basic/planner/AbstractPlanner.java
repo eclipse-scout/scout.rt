@@ -35,8 +35,12 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.IPlannerExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisplayModeChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisposePlannerChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerInitPlannerChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerResourcesSelectedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerSelectionRangeChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerViewRangeChangedChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -245,7 +249,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @ConfigOperation
   @Order(60)
-  protected void execSelectionRangeChanged(Range<Date> viewRange) throws ProcessingException {
+  protected void execSelectionRangeChanged(Range<Date> selectionRange) throws ProcessingException {
   }
 
   /**
@@ -1113,23 +1117,50 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       getOwner().execInitPlanner();
     }
 
+    @Override
+    public void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> plannerResourcesSelectedChain, List<Resource<RI>> resources) throws ProcessingException {
+      getOwner().execResourcesSelected(resources);
+    }
+
+    @Override
+    public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> plannerSelectionRangeChangedChain, Range<Date> selectionRange) throws ProcessingException {
+      getOwner().execSelectionRangeChanged(selectionRange);
+    }
+
+    @Override
+    public void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> plannerViewRangeChangedChain, Range<Date> viewRange) throws ProcessingException {
+      getOwner().execViewRangeChanged(viewRange);
+    }
+
+    @Override
+    public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> plannerDisplayModeChangedChain, int displayMode) throws ProcessingException {
+      getOwner().execDisplayModeChanged(displayMode);
+    }
+
   }
 
-  //FIXME CGU add interceptors
   protected final void interceptResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
-    execResourcesSelected(resources);
+    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
+    PlannerResourcesSelectedChain<RI, AI> chain = new PlannerResourcesSelectedChain<RI, AI>(extensions);
+    chain.execResourcesSelected(resources);
   }
 
   protected final void interceptSelectionRangeChanged(Range<Date> selectionRange) throws ProcessingException {
-    execSelectionRangeChanged(selectionRange);
+    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
+    PlannerSelectionRangeChangedChain<RI, AI> chain = new PlannerSelectionRangeChangedChain<RI, AI>(extensions);
+    chain.execSelectionRangeChanged(selectionRange);
   }
 
   protected final void interceptViewRangeChanged(Range<Date> viewRange) throws ProcessingException {
-    execViewRangeChanged(viewRange);
+    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
+    PlannerViewRangeChangedChain<RI, AI> chain = new PlannerViewRangeChangedChain<RI, AI>(extensions);
+    chain.execViewRangeChanged(viewRange);
   }
 
   protected void interceptDisplayModeChanged(int displayMode) throws ProcessingException {
-    execDisplayModeChanged(displayMode);
+    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
+    PlannerDisplayModeChangedChain<RI, AI> chain = new PlannerDisplayModeChangedChain<RI, AI>(extensions);
+    chain.execDisplayModeChanged(displayMode);
   }
 
   protected final void interceptActivitySelected(Activity<RI, AI> cell) throws ProcessingException {

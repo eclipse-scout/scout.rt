@@ -1,10 +1,13 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.planner;
 
+import java.util.Date;
 import java.util.List;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
+import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class PlannerChains {
@@ -16,6 +19,86 @@ public final class PlannerChains {
 
     public AbstractPlannerChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
       super(extensions, IPlannerExtension.class);
+    }
+  }
+
+  public static class PlannerResourcesSelectedChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
+
+    public PlannerResourcesSelectedChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
+      super(extensions);
+    }
+
+    public void execResourcesSelected(final List<Resource<RI>> resources) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+          next.execResourcesSelected(PlannerResourcesSelectedChain.this, resources);
+        }
+      };
+      callChain(methodInvocation, resources);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+    }
+  }
+
+  public static class PlannerSelectionRangeChangedChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
+
+    public PlannerSelectionRangeChangedChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
+      super(extensions);
+    }
+
+    public void execSelectionRangeChanged(final Range<Date> selectionRange) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+          next.execSelectionRangeChanged(PlannerSelectionRangeChangedChain.this, selectionRange);
+        }
+      };
+      callChain(methodInvocation, selectionRange);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+    }
+  }
+
+  public static class PlannerViewRangeChangedChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
+
+    public PlannerViewRangeChangedChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
+      super(extensions);
+    }
+
+    public void execViewRangeChanged(final Range<Date> viewRange) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+          next.execViewRangeChanged(PlannerViewRangeChangedChain.this, viewRange);
+        }
+      };
+      callChain(methodInvocation, viewRange);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+    }
+  }
+
+  public static class PlannerDisplayModeChangedChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
+
+    public PlannerDisplayModeChangedChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
+      super(extensions);
+    }
+
+    public void execDisplayModeChanged(final int displayMode) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+          next.execDisplayModeChanged(PlannerDisplayModeChangedChain.this, displayMode);
+        }
+      };
+      callChain(methodInvocation, displayMode);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
     }
   }
 

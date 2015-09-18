@@ -16,10 +16,26 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.AbstractPlannerExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisplayModeChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisposePlannerChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerInitPlannerChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerResourcesSelectedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerSelectionRangeChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerViewRangeChangedChain;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -136,6 +152,173 @@ public class PlannerTest {
     return new Activity<Resource<Integer>, Integer>(resource, id);
   }
 
+  @Test
+  public void testInterceptorExecActivitySelected() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.ActivitySelected, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptActivitySelected(null);
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecDecorateActivityCell() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.DecorateActivityCell, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptDecorateActivity(null);
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecDisplayModeChanged() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.DisplayModeChanged, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptDisplayModeChanged(0);
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecDisposePlanner() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.DisposePlanner, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptDisposePlanner();
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecInitPlanner() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.InitPlanner, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptInitPlanner();
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecResourcesSelected() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.ResourcesSelected, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptResourcesSelected(null);
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecSelectionRangeChanged() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.SelectionRangeChanged, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptSelectionRangeChanged(null);
+      }
+    });
+  }
+
+  @Test
+  public void testInterceptorExecViewRangeChanged() throws ProcessingException {
+    callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.ViewRangeChanged, new P_InterceptorCaller() {
+      @Override
+      public void run(P_Planner p) throws ProcessingException {
+        p.interceptViewRangeChanged(null);
+      }
+    });
+  }
+
+  private void callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod expectedExtensionMethodCalled, P_InterceptorCaller callPlannerInterceptor) throws ProcessingException {
+    P_PlannerExtension.reset();
+    try {
+      BEANS.get(IExtensionRegistry.class).register(P_PlannerExtension.class);
+      P_Planner planner = new P_Planner();
+      callPlannerInterceptor.run(planner);
+      assertEquals(1, P_PlannerExtension.getCalledInterceptors().size());
+      assertTrue(P_PlannerExtension.getCalledInterceptors().contains(expectedExtensionMethodCalled));
+    }
+    finally {
+      BEANS.get(IExtensionRegistry.class).deregister(P_PlannerExtension.class);
+    }
+  }
+
+  private abstract class P_InterceptorCaller {
+    abstract public void run(P_Planner p) throws ProcessingException;
+  }
+
+  public enum ExtensionMethod {
+    ActivitySelected,
+    DecorateActivityCell,
+    DisplayModeChanged,
+    DisposePlanner,
+    InitPlanner,
+    ResourcesSelected,
+    SelectionRangeChanged,
+    ViewRangeChanged
+  }
+
+  public static class P_PlannerExtension extends AbstractPlannerExtension<Integer, Integer, P_Planner> {
+
+    public P_PlannerExtension(P_Planner owner) {
+      super(owner);
+    }
+
+    private static Set<ExtensionMethod> calledInterceptors = new HashSet<ExtensionMethod>();
+
+    public static Set<ExtensionMethod> getCalledInterceptors() {
+      return Collections.unmodifiableSet(calledInterceptors);
+    }
+
+    @Override
+    public void execActivitySelected(PlannerActivitySelectedChain<Integer, Integer> chain, Activity<Integer, Integer> cell) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.ActivitySelected);
+    }
+
+    @Override
+    public void execDisposePlanner(PlannerDisposePlannerChain<Integer, Integer> chain) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.DisposePlanner);
+    }
+
+    @Override
+    public void execDecorateActivityCell(PlannerDecorateActivityChain<Integer, Integer> chain, Activity<Integer, Integer> cell) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.DecorateActivityCell);
+    }
+
+    @Override
+    public void execInitPlanner(PlannerInitPlannerChain<Integer, Integer> chain) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.InitPlanner);
+    }
+
+    @Override
+    public void execResourcesSelected(PlannerResourcesSelectedChain<Integer, Integer> chain, List<Resource<Integer>> resources) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.ResourcesSelected);
+    }
+
+    @Override
+    public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<Integer, Integer> chain, Range<Date> selectionRange) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.SelectionRangeChanged);
+    }
+
+    @Override
+    public void execViewRangeChanged(PlannerViewRangeChangedChain<Integer, Integer> chain, Range<Date> viewRange) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.ViewRangeChanged);
+    }
+
+    @Override
+    public void execDisplayModeChanged(PlannerDisplayModeChangedChain<Integer, Integer> chain, int displayMode) throws ProcessingException {
+      calledInterceptors.add(ExtensionMethod.DisplayModeChanged);
+    }
+
+    public static void reset() {
+      calledInterceptors.clear();
+    }
+
+  }
+
   class CapturingPlannerAdapter extends PlannerAdapter {
     private List<PlannerEvent> m_events = new ArrayList<>();
 
@@ -151,4 +334,5 @@ public class PlannerTest {
 
   public static class P_Planner extends AbstractPlanner<Integer, Integer> {
   }
+
 }
