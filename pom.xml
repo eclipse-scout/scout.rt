@@ -12,20 +12,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <prerequisites>
-    <maven>3.2.2</maven>
-  </prerequisites>
-
   <parent>
     <groupId>org.eclipse.scout</groupId>
-    <artifactId>scout-parent</artifactId>
-    <version>1.2</version>
+    <artifactId>maven_rt_plugin_config-master</artifactId>
+    <version>1.3-SNAPSHOT</version>
   </parent>
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
   <version>5.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <prerequisites>
+    <maven>3.2.2</maven>
+  </prerequisites>
 
   <modules>
     <module>org.eclipse.scout.commons</module>
@@ -56,6 +56,11 @@
 
   <properties>
     <scout.base.version>5.2.0</scout.base.version>
+    <org.eclipse.scout.rt.version>5.2.0-SNAPSHOT</org.eclipse.scout.rt.version>
+    <jetty.version>9.2.13.v20150730</jetty.version>
+
+    <!-- Sonar properties -->
+    <sonar.branch>releases_5.2.x</sonar.branch>
   </properties>
 
   <dependencyManagement>
@@ -170,6 +175,18 @@
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.jaxws.apt</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.dev.jetty</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.eclipse.swt.win32.win32</groupId>
         <artifactId>x86</artifactId>
         <version>3.3.0-v3346</version>
@@ -228,24 +245,25 @@
         <artifactId>commons-math</artifactId>
         <version>2.2</version>
       </dependency>
+
+      <!-- Dev Dependencies -->
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-webapp</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-annotations</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-plus</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.cbi.maven.plugins</groupId>
-        <artifactId>eclipse-cbi-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate-api-build-xml</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
   <licenses>
     <license>
@@ -271,8 +289,8 @@
 
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</connection>
+    <tag>releases/5.2.x</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
-    <tag>develop</tag>
   </scm>
 
   <issueManagement>
@@ -290,7 +308,7 @@
       <url>https://repo.eclipse.org/content/groups/releases/</url>
     </repository>
     <repository>
-      <snapshots />
+      <snapshots></snapshots>
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
@@ -307,193 +325,10 @@
       <url>https://repo.eclipse.org/content/groups/releases/</url>
     </pluginRepository>
     <pluginRepository>
-      <snapshots />
+      <snapshots></snapshots>
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </pluginRepository>
   </pluginRepositories>
-
-  <profiles>
-    <profile>
-      <id>release.setversion</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <properties>
-        <milestone.version>I</milestone.version>
-        <newVersion>${scout.base.version}.${maven.build.timestamp}-${milestone.version}</newVersion>
-      </properties>
-      <build>
-        <defaultGoal>org.codehaus.mojo:versions-maven-plugin:set</defaultGoal>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>versions-maven-plugin</artifactId>
-            <configuration>
-              <newVersion>${newVersion}</newVersion>
-              <generateBackupPoms>false</generateBackupPoms>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>release.updatechilds</id>
-      <build>
-        <defaultGoal>org.codehaus.mojo:versions-maven-plugin:update-child-modules</defaultGoal>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>versions-maven-plugin</artifactId>
-            <configuration>
-              <generateBackupPoms>false</generateBackupPoms>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>eclipse-sign</id>
-      <build>
-        <plugins>
-          <!-- <plugin> -->
-          <!-- <groupId>org.eclipse.tycho</groupId> -->
-          <!-- <artifactId>target-platform-configuration</artifactId> -->
-          <!-- <version>${tycho.version}</version> -->
-          <!-- <configuration> -->
-          <!-- <includePackedArtifacts>false</includePackedArtifacts> -->
-          <!-- </configuration> -->
-          <!-- </plugin> -->
-
-          <plugin>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-pack200a-plugin</artifactId>
-            <version>${tycho-extras.version}</version>
-            <executions>
-              <execution>
-                <id>pack200-normalize</id>
-                <goals>
-                  <goal>normalize</goal>
-                </goals>
-                <phase>verify</phase>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.eclipse.cbi.maven.plugins</groupId>
-            <artifactId>eclipse-jarsigner-plugin</artifactId>
-            <version>${jarsigner.version}</version>
-            <executions>
-              <execution>
-                <id>sign</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <phase>verify</phase>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-pack200b-plugin</artifactId>
-            <version>${tycho-extras.version}</version>
-            <executions>
-              <execution>
-                <id>pack200-pack</id>
-                <goals>
-                  <goal>pack</goal>
-                </goals>
-                <phase>verify</phase>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- <plugin> -->
-          <!-- <groupId>org.eclipse.tycho</groupId> -->
-          <!-- <artifactId>tycho-p2-plugin</artifactId> -->
-          <!-- <version>${tycho.version}</version> -->
-          <!-- <executions> -->
-          <!-- <execution> -->
-          <!-- <id>p2-metadata</id> -->
-          <!-- <goals> -->
-          <!-- <goal>p2-metadata</goal> -->
-          <!-- </goals> -->
-          <!-- <phase>verify</phase> -->
-          <!-- </execution> -->
-          <!-- </executions> -->
-          <!-- <configuration> -->
-          <!-- <defaultP2Metadata>false</defaultP2Metadata> -->
-          <!-- </configuration> -->
-          <!-- </plugin> -->
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>eclipse-pack</id>
-      <build>
-        <plugins>
-          <!-- <plugin> -->
-          <!-- <groupId>org.eclipse.tycho</groupId> -->
-          <!-- <artifactId>target-platform-configuration</artifactId> -->
-          <!-- <version>${tycho.version}</version> -->
-          <!-- <configuration> -->
-          <!-- <includePackedArtifacts>true</includePackedArtifacts> -->
-          <!-- </configuration> -->
-          <!-- </plugin> -->
-
-          <plugin>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-pack200a-plugin</artifactId>
-            <version>${tycho-extras.version}</version>
-            <executions>
-              <execution>
-                <id>pack200-normalize</id>
-                <goals>
-                  <goal>normalize</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-pack200b-plugin</artifactId>
-            <version>${tycho-extras.version}</version>
-            <executions>
-              <execution>
-                <id>pack200-pack</id>
-                <goals>
-                  <goal>pack</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- <plugin> -->
-          <!-- <groupId>org.eclipse.tycho</groupId> -->
-          <!-- <artifactId>tycho-p2-plugin</artifactId> -->
-          <!-- <version>${tycho.version}</version> -->
-          <!-- <executions> -->
-          <!-- <execution> -->
-          <!-- <id>p2-metadata</id> -->
-          <!-- <goals> -->
-          <!-- <goal>p2-metadata</goal> -->
-          <!-- </goals> -->
-          <!-- <phase>package</phase> -->
-          <!-- </execution> -->
-          <!-- </executions> -->
-          <!-- <configuration> -->
-          <!-- <defaultP2Metadata>false</defaultP2Metadata> -->
-          <!-- </configuration> -->
-          <!-- </plugin> -->
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
