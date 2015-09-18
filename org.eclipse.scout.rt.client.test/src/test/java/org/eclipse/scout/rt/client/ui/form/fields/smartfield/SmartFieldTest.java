@@ -11,7 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +32,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.TestForm.MainBox.StyleField;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -298,4 +304,66 @@ public class SmartFieldTest {
     String actualStyle = f.getTooltipText() + ", " + f.getBackgroundColor() + ", " + f.getForegroundColor() + ", " + (f.getFont() != null ? f.getFont().toPattern() : null);
     assertEquals(expectedStyle, actualStyle);
   }
+
+  /**
+   * @param bc
+   * @return
+   */
+  protected PropertyChangeListener getUnblockOnSearchResultListener(final IBlockingCondition bc) {
+    PropertyChangeListener bcListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
+          bc.setBlocking(false);
+        }
+      }
+    };
+    return bcListener;
+  }
+
+  @Test
+  public void testDefaultSelectionWithOnlyOneResult() throws Exception {
+    IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+
+    PropertyChangeListener bcListener = getUnblockOnSearchResultListener(bc);
+    m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(bcListener);
+    m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);
+    bc.waitFor();
+
+    bc.setBlocking(true);
+    m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(bcListener);
+    m_form.getStyleField().getUIFacade().proposalTypedFromUI("Y");
+    bc.waitFor();
+
+    // verifies one (and only, unique) result is available and selected
+    assertTrue(m_form.getStyleField().isProposalChooserRegistered());
+    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_form.getStyleField().getProposalChooser();
+    IContentAssistFieldTable<?> resultTable = tableProposalChooser.getModel();
+    assertEquals(1, resultTable.getSelectedRowCount());
+    assertEquals(1, resultTable.getRowCount());
+    ILookupRow<?> expectedLookupRow = resultTable.getSelectedLookupRow();
+    tableProposalChooser.execResultTableRowClicked(resultTable.getRow(0));
+
+    assertEquals("Yellow", m_form.getStyleField().getDisplayText());
+    assertEquals(Long.valueOf(20L), m_form.getStyleField().getValue());
+    assertNotNull(m_form.getStyleField().getCurrentLookupRow());
+    assertEquals(expectedLookupRow, m_form.getStyleField().getCurrentLookupRow());
+  }
+
+  @Test
+  public void testNoDefaultSelectionWithMoreThanOneResult() throws Exception {
+    IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+
+    m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(getUnblockOnSearchResultListener(bc));
+    m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);
+    bc.waitFor();
+
+    // select a proposal from the proposal chooser table
+    assertTrue(m_form.getStyleField().isProposalChooserRegistered());
+    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_form.getStyleField().getProposalChooser();
+    IContentAssistFieldTable<?> resultTable = tableProposalChooser.getModel();
+    assertEquals(0, resultTable.getSelectedRowCount());
+    assertTrue(resultTable.getRowCount() > 1);
+  }
+
 }

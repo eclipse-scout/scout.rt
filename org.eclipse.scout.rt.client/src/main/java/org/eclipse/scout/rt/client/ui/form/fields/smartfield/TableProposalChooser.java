@@ -128,7 +128,8 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
         }
         else if (rows.size() == 1
             && !isAllowCustomText()
-            && !isBrowseAll()) {
+            && result != null
+            && !m_contentAssistField.getWildcard().equals(searchText)) {
           // select first
           keyToSelect = CollectionUtility.firstElement(rows).getKey();
         }
