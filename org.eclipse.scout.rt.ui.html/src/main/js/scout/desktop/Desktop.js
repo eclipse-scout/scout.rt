@@ -24,7 +24,7 @@ scout.Desktop = function() {
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
-
+  this.benchVisible = true;
   this.suppressSetActiveForm = false;
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
@@ -64,11 +64,11 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.navigation = hasNavigation ? new scout.DesktopNavigation(this) : scout.NullDesktopNavigation;
   this.navigation.render($parent);
-  this._renderTaskBar($parent);
+  //TODO maybe better move to desktop navigation?
+  this._installKeyStrokeContextForDesktopViewButtonBar();
 
-  this.$bench = this.$container.appendDiv('desktop-bench');
-  this.$bench.toggleClass('has-taskbar', hasTaskBar);
-  new scout.HtmlComponent(this.$bench, this.session);
+  this._renderTaskBar($parent);
+  this._renderBench();
   this._createSplitter($parent);
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
@@ -89,11 +89,6 @@ scout.Desktop.prototype._render = function($parent) {
       event.preventDefault();
     }
   });
-
-  // Installs global keystrokes on dekstop
-  this._installKeyStrokeContextForDesktopBench();
-  this._installKeyStrokeContextForDesktopViewButtonBar();
-  this._installKeyStrokeContextForDesktopTaskBar();
 };
 
 /**
@@ -225,6 +220,33 @@ scout.Desktop.prototype._renderToolMenus = function() {
   }
 };
 
+scout.Desktop.prototype._renderBench = function() {
+  if (!this._hasBench()) {
+    return;
+  }
+  this.$bench = this.$container.appendDiv('desktop-bench');
+  this.$bench.toggleClass('has-taskbar', this._hasTaskBar());
+  new scout.HtmlComponent(this.$bench, this.session);
+
+  this._installKeyStrokeContextForDesktopBench();
+};
+
+scout.Desktop.prototype._removeBench = function() {
+  if (!this.$bench) {
+    return;
+  }
+  this.$bench.remove();
+  this.$bench = null;
+};
+
+scout.Desktop.prototype._renderBenchVisible = function() {
+  if (this.benchVisible) {
+    this._renderBench();
+  } else {
+    this._removeBench();
+  }
+};
+
 scout.Desktop.prototype._renderTaskBar = function($parent) {
   if (!this._hasTaskBar()) {
     return;
@@ -237,6 +259,8 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
   }
   this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
   this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
+
+  this._installKeyStrokeContextForDesktopTaskBar();
 };
 
 scout.Desktop.prototype._setupDragAndDrop = function() {
@@ -297,7 +321,7 @@ scout.Desktop.prototype._hasTaskBar = function() {
 };
 
 scout.Desktop.prototype._hasBench = function() {
-  return true;
+  return this.benchVisible;
 };
 
 scout.Desktop.prototype.onResize = function(event) {
@@ -420,6 +444,13 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
 scout.Desktop.prototype.setOutline = function(outline, bringToFront) {
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline, bringToFront);
+};
+
+scout.Desktop.prototype.setBenchVisible = function(visible) {
+  this.benchVisible = visible;
+  if (this.rendered) {
+    this._renderBenchVisible();
+  }
 };
 
 scout.Desktop.prototype._onModelFormShow = function(event) {

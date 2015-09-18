@@ -16,7 +16,7 @@
     }
   }
 
-  & .menubar {
+  & > .menubar {
     padding: 0 8px;
   }
 }

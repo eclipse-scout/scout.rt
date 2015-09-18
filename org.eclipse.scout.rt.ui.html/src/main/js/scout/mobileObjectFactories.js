@@ -8,13 +8,6 @@ scout.mobileObjectFactories = scout.mobileObjectFactories.concat( [
   deviceType: scout.UserAgent.DEVICE_TYPE_MOBILE
 },
 {
-  objectType : 'Outline',
-  create : function() {
-    return new scout.MobileOutline();
-  },
-  deviceType: scout.UserAgent.DEVICE_TYPE_MOBILE
-},
-{
   objectType : 'Table',
   create : function() {
     return new scout.MobileTable();

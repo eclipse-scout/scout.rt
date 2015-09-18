@@ -33,7 +33,7 @@ scout.Tree.prototype._init = function(model, session) {
   scout.Tree.parent.prototype._init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
-  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
+  var menuSorter = new scout.MenuItemsOrder(this.session, 'Tree');
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
   this.addChild(this.menuBar);

@@ -76,7 +76,7 @@ scout.Planner.prototype._init = function(model, session) {
     arrowPosition: 50
   });
 
-  var menuOrder = new scout.PlannerMenuItemsOrder(this.session, this.objectType);
+  var menuOrder = new scout.PlannerMenuItemsOrder(this.session, 'Planner');
   this.menuBar = new scout.MenuBar(this.session, menuOrder);
   this.menuBar.bottom();
   this.addChild(this.menuBar);

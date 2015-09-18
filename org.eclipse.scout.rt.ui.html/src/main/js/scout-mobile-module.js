@@ -279,5 +279,4 @@ __include("scout/desktop/NavigateUpButton.js");
 __include("scout/mobileObjectFactories.js");
 __include("scout/table/MobileTable.js");
 __include("scout/desktop/MobileDesktop.js");
-__include("scout/desktop/MobileOutline.js");
 }(window.scout = window.scout || {}, jQuery));

@@ -54,7 +54,7 @@ scout.Table.prototype._init = function(model, session) {
     this._initRow(row);
   }, this);
 
-  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
+  var menuSorter = new scout.MenuItemsOrder(this.session, 'Table');
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
   this.addChild(this.menuBar);

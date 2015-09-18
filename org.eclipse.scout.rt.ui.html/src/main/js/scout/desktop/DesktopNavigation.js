@@ -103,10 +103,10 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
   this.$navigation.width(newWidth);
   this.htmlViewButtons.revalidateLayout();
   this.desktop.navigationWidthUpdated(newWidth);
-  this._setBreadcrumbEnabled(newWidth <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH);
+  this.setBreadcrumbEnabled(newWidth <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH);
 };
 
-scout.DesktopNavigation.prototype._setBreadcrumbEnabled = function(enabled) {
+scout.DesktopNavigation.prototype.setBreadcrumbEnabled = function(enabled) {
   var oldBreadcrumbEnabled = this._breadcrumbEnabled;
   if (oldBreadcrumbEnabled !== enabled) {
     this._breadcrumbEnabled = enabled;
