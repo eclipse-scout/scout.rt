@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2014 BSI Business Systems Integration AG.
+  Copyright (c) 2014,2015 BSI Business Systems Integration AG.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
   http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+  BSI Business Systems Integration AG - initial API and implementation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -57,59 +60,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>add-resource</id>
-            <goals>
-              <goal>add-resource</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>src/main/js</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>add-test-resource</id>
-            <goals>
-              <goal>add-resource</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>src/test/js</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <!-- Loads phantomjs executable, necessary for jasmine plugin -->
         <groupId>com.github.klieber</groupId>
         <artifactId>phantomjs-maven-plugin</artifactId>
-        <version>0.2.1</version>
-        <configuration>
-          <version>1.9.2</version>
-        </configuration>
         <executions>
           <execution>
             <goals>
@@ -123,29 +76,6 @@
       <plugin>
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
-        <version>1.3.1.4</version>
-        <configuration>
-          <!-- AWE: do not break build when Jasmine tests fail -->
-          <haltOnFailure>false</haltOnFailure>
-          <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
-          <jsTestSrcDir>${project.basedir}/src/test/js</jsTestSrcDir>
-          <customRunnerTemplate>${project.basedir}/src/test/js/SpecRunnerMaven.html</customRunnerTemplate>
-          <sourceExcludes>
-            <!-- jasmine files are explicitly included in SpecRunnerMaven.html
-              because the need to be before actual sources -->
-            <sourceExclude>**/jasmine/*.js</sourceExclude>
-            <!-- for tests, scout namespace is defined in boot.ext.js -->
-            <sourceExclude>scout-4.0.1-module.js</sourceExclude>
-          </sourceExcludes>
-          <!-- HtmlUnitDriver does not work with jQuery 2.1.0, throws exception -->
-          <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
-          <webDriverCapabilities>
-            <capability>
-              <name>phantomjs.binary.path</name>
-              <value>${phantomjs.binary}</value>
-            </capability>
-          </webDriverCapabilities>
-        </configuration>
         <executions>
           <execution>
             <goals>
