@@ -1553,6 +1553,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public void addDesktopListenerAtExecutionEnd(DesktopListener l) {
+    m_listenerList.insertAtFront(DesktopListener.class, l);
+  }
+
+  @Override
   public void removeDesktopListener(DesktopListener l) {
     m_listenerList.remove(DesktopListener.class, l);
   }

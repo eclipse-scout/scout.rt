@@ -417,6 +417,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   void addDesktopListener(DesktopListener l);
 
+  /**
+   * add Model Observer as last informed listener.
+   */
+  void addDesktopListenerAtExecutionEnd(DesktopListener l);
+
   void removeDesktopListener(DesktopListener l);
 
   /**
@@ -682,8 +687,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /**
    * Activates a {@link Bookmark} on this desktop.
    * <p />
-   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated, afterwards every page from the
-   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated, afterwards every page from
+   * the {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
@@ -693,8 +698,9 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /**
    * Activates a {@link Bookmark} on this desktop.
    * <p />
-   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and, if activateOutline is true, activated. Afterwards every page from the
-   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and, if activateOutline is true, activated.
+   * Afterwards every page from the {@link Bookmark#getPath()} will be selected (respecting the
+   * {@link AbstractPageState}).
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
