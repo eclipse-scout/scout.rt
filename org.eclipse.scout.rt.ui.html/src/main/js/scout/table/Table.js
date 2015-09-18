@@ -1202,7 +1202,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 };
 
 scout.Table.prototype._group = function(update) {
-  var column, alignment, rows, sum, row, value, nextRow, useRow, skip,
+  var column, alignment, rows, sum, row, value, nextRow, useRow, skip, hasCellTextForGroupingFunction,
     that = this,
     groupColumn = this._groupColumn();
 
@@ -1243,8 +1243,9 @@ scout.Table.prototype._group = function(update) {
 
     // test if group is finished
     skip = (r === rows.length - 1);
-    skip = skip || (groupColumn && groupColumn.type !== 'date' && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
-    skip = skip || (groupColumn && groupColumn.type === 'date' && !this.grouped && this.cellValue(groupColumn, row).getFullYear() !== this.cellValue(groupColumn, nextRow).getFullYear());
+    hasCellTextForGroupingFunction = groupColumn && groupColumn.cellTextForGrouping && typeof groupColumn.cellTextForGrouping === 'function';
+    skip = skip || (hasCellTextForGroupingFunction && !this.grouped && groupColumn.cellTextForGrouping(row) !== groupColumn.cellTextForGrouping(nextRow));
+    skip = skip || (!hasCellTextForGroupingFunction && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
 
     // if group is finished: add group row
     if (sum.length > 0 && skip) {
@@ -1283,8 +1284,8 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
       $cell = $.makeDiv('table-cell', sumValue)
         .css('text-align', alignment);
     } else if (!all && column === groupColumn) {
-      if (column.type === 'date') {
-        $cell = $.makeDiv('table-cell', this.cellValue(groupColumn, row).getFullYear())
+      if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
+        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row))
           .css('text-align', alignment);
       } else {
         $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
