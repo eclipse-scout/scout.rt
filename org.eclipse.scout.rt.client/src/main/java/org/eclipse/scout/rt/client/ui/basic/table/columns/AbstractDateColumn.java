@@ -112,7 +112,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date>implements 
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(153)
   protected String getConfiguredGroupFormat() {
-    return "YYYY";
+    return "yyyy";
   }
 
   @Override
