@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -113,18 +114,17 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     if (jsonContextMenu != null) {
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
       json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
-      json.put(PROP_CURRENT_MENU_TYPES, currentMenuTypesSetToStringArray(getModel().getContextMenu().getCurrentMenuTypes()));
+      json.put(PROP_CURRENT_MENU_TYPES, menuTypesToJson(getModel().getContextMenu().getCurrentMenuTypes()));
     }
     return json;
   }
 
-  public String[] currentMenuTypesSetToStringArray(Set<? extends IMenuType> menuTypes) {
-    IMenuType[] array0 = menuTypes.toArray(new IMenuType[0]);
-    String[] ret = new String[array0.length];
-    for (int i = 0; i < array0.length; i++) {
-      ret[i] = array0[i] != null ? array0[i].toString() : null;
+  protected JSONArray menuTypesToJson(Set<? extends IMenuType> menuTypes) {
+    JSONArray array = new JSONArray();
+    for (IMenuType menuType : menuTypes) {
+      array.put(menuType.toString());
     }
-    return ret;
+    return array;
   }
 
   @Override
@@ -137,7 +137,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   }
 
   protected void handleModelContextMenuCurrentMenuTypesChanged(Set<? extends IMenuType> currentMenuTypes) {
-    addPropertyChangeEvent(PROP_CURRENT_MENU_TYPES, currentMenuTypesSetToStringArray(currentMenuTypes));
+    addPropertyChangeEvent(PROP_CURRENT_MENU_TYPES, menuTypesToJson(currentMenuTypes));
   }
 
   @Override
