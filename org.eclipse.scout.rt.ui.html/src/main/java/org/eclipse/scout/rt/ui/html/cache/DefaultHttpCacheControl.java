@@ -101,7 +101,9 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     String etag = obj.createETag();
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     if (notModified(ifNoneMatch, etag)) {
-      LOG.info("Use http cached object (etag): " + req.getPathInfo());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Use http cached object (etag): " + req.getPathInfo());
+      }
       resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
@@ -109,7 +111,9 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
-        LOG.info("Use http cached object (ifModifiedSince): " + req.getPathInfo());
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Use http cached object (ifModifiedSince): " + req.getPathInfo());
+        }
         resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return true;
       }
