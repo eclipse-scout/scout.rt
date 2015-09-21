@@ -1153,7 +1153,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setNodeExpanded(ITreeNode node, boolean b) {
-    setNodeExpanded(node, b, false);
+    setNodeExpanded(node, b, node.isLazyExpandingEnabled());
   }
 
   @Override
@@ -1164,7 +1164,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         try {
           if (b) {
             node.ensureChildrenLoaded();
-            ensureParentExpanded(node.getParentNode(), lazy);
+            ensureParentExpanded(node.getParentNode());
           }
           node.setExpandedInternal(b);
           node.setExpandedLazyInternal(lazy);
@@ -1423,11 +1423,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
-  private void ensureParentExpanded(ITreeNode parent, boolean lazy) {
+  private void ensureParentExpanded(ITreeNode parent) {
     if (parent != null) {
-      ensureParentExpanded(parent.getParentNode(), lazy);
+      ensureParentExpanded(parent.getParentNode());
       if (!parent.isExpanded()) {
-        setNodeExpanded(parent, true, lazy);
+        setNodeExpanded(parent, true);
       }
     }
   }

@@ -167,21 +167,4 @@ public final class PageChains {
     }
   }
 
-  public static class PageCalculateLazyAddChildPagesToOutlineChain extends AbstractPageChain {
-
-    public PageCalculateLazyAddChildPagesToOutlineChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
-      super(extensions);
-    }
-
-    public boolean execCalculateLazyAddChildPagesToOutline() {
-      MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
-        @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
-          setReturnValue(next.execCalculateLazyAddChildPagesToOutline(PageCalculateLazyAddChildPagesToOutlineChain.this));
-        }
-      };
-      callChain(methodInvocation);
-      return methodInvocation.getReturnValue();
-    }
-  }
 }

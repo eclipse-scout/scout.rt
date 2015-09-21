@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateLazyAddChildPagesToOutlineChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
@@ -53,8 +52,4 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
     chain.execInitDetailForm();
   }
 
-  @Override
-  public boolean execCalculateLazyAddChildPagesToOutline(PageCalculateLazyAddChildPagesToOutlineChain chain) {
-    return chain.execCalculateLazyAddChildPagesToOutline();
-  }
 }

@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateLazyAddChildPagesToOutlineChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
@@ -78,7 +77,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private final String m_userPreferenceContext;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
-  private boolean m_lazyAddChildPagesToOutline; // local value (configured or manually set value)
 
   @Override
   public T getTable() {
@@ -256,18 +254,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Configures whether child pages should be added lazily to the outline tree (i.e. if not all child nodes should be
-   * shown immediately, but a "show all" dummy node should be inserted instead).
-   * <p>
-   * Subclasses can override this method. Default is {@code true} for table pages, {@code false} for all other pages.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(100)
-  protected boolean getConfiguredLazyAddChildPagesToOutline() {
-    return false;
-  }
-
-  /**
    * Called after this page has been added to the outline tree. This method may set a detail form or check some
    * parameters.
    * <p>
@@ -421,8 +407,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     m_table = initTable();
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
-    setLazyAddChildPagesToOutline(getConfiguredLazyAddChildPagesToOutline());
-    setExpandedLazyInternal(isLazyAddChildPagesToOutlineInternal());
   }
 
   /*
@@ -840,32 +824,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return null;
   }
 
-  @Override
-  public boolean isLazyAddChildPagesToOutline() {
-    return interceptCalculateLazyAddChildPagesToOutline();
-  }
-
-  @Override
-  public void setLazyAddChildPagesToOutline(boolean lazyAddChildPagesToOutline) {
-    m_lazyAddChildPagesToOutline = lazyAddChildPagesToOutline;
-  }
-
-  /**
-   * @return value of the static "lazy add child pages to outline" value (without dynamic calculation).
-   */
-  protected boolean isLazyAddChildPagesToOutlineInternal() {
-    return m_lazyAddChildPagesToOutline;
-  }
-
-  /**
-   * @return dynamic "lazy add child pages to outline" value. By default,
-   *         {@link #isLazyAddChildPagesToOutlineInternal()} is returned, but subclasses may add their own additional
-   *         calculations here.
-   */
-  protected boolean execCalculateLazyAddChildPagesToOutline() {
-    return isLazyAddChildPagesToOutlineInternal();
-  }
-
   protected final void interceptPageDataLoaded() throws ProcessingException {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageDataLoadedChain chain = new PagePageDataLoadedChain(extensions);
@@ -908,12 +866,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     chain.execInitDetailForm();
   }
 
-  protected boolean interceptCalculateLazyAddChildPagesToOutline() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageCalculateLazyAddChildPagesToOutlineChain chain = new PageCalculateLazyAddChildPagesToOutlineChain(extensions);
-    return chain.execCalculateLazyAddChildPagesToOutline();
-  }
-
   protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER>implements IPageExtension<OWNER> {
 
     public LocalPageExtension(OWNER owner) {
@@ -953,11 +905,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     @Override
     public void execInitDetailForm(PageInitDetailFormChain chain) throws ProcessingException {
       getOwner().execInitDetailForm();
-    }
-
-    @Override
-    public boolean execCalculateLazyAddChildPagesToOutline(PageCalculateLazyAddChildPagesToOutlineChain chain) {
-      return getOwner().execCalculateLazyAddChildPagesToOutline();
     }
   }
 

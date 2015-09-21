@@ -158,17 +158,4 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   ITableRow getTableRowFor(ITreeNode treeNode);
 
   List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> treeNodes);
-
-  /**
-   * @return <code>true</code> if child pages should be added lazily to the outline tree, i.e. only after the user
-   *         explicitly requests them with the "show all" function. <code>false</code> otherwise. Please note that this
-   *         method does not return a static boolean value, but performs some calculations.
-   */
-  boolean isLazyAddChildPagesToOutline();
-
-  /**
-   * Explicitly set the "lazy add child pages to outline" value. The default implementation returns this value when
-   * {@link #isLazyAddChildPagesToOutline()} is called, but subclasses may choose to ignore this value.
-   */
-  void setLazyAddChildPagesToOutline(boolean lazyAddChildPagesToOutline);
 }

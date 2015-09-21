@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateLazyAddChildPagesToOutlineChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
@@ -27,6 +26,4 @@ public interface IPageExtension<OWNER extends AbstractPage> extends ITreeNodeExt
   void execPageDeactivated(PagePageDeactivatedChain chain) throws ProcessingException;
 
   void execDisposePage(PageDisposePageChain chain) throws ProcessingException;
-
-  boolean execCalculateLazyAddChildPagesToOutline(PageCalculateLazyAddChildPagesToOutlineChain chain);
 }

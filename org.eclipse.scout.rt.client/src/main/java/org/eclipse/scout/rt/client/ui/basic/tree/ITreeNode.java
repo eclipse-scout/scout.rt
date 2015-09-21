@@ -242,14 +242,22 @@ public interface ITreeNode {
   boolean isExpanded();
 
   /**
-   * Defines whether all nodes or only some nodes are shown if the node is expanded. This flag depends on
-   * {@link #isExpanded()} and is only considered if the node is expanded.
+   * Returns the current expanding state. This flag depends on {@link #isExpanded()} and is only considered if the node
+   * is expanded.
    *
-   * @return true if the node is in lazy expansion state.
+   * @return true if the node is in lazy expanding state.
    */
   boolean isExpandedLazy();
 
   void setExpandedLazyInternal(boolean expandedLazy);
+
+  /**
+   * @return <code>true</code> if nodes should be shown lazily when a parent node gets expanded, i.e. only after the
+   *         user explicitly requests them with the "show all" function. <code>false</code> otherwise.
+   */
+  boolean isLazyExpandingEnabled();
+
+  void setLazyExpandingEnabled(boolean lazyExpandingEnabled);
 
   List<IMenu> getMenus();
 

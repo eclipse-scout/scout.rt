@@ -62,8 +62,4 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
   boolean isShowEmptySpaceMenus();
 
   void setShowEmptySpaceMenus(boolean showEmptySpaceMenus);
-
-  int getLazyAddChildPagesToOutlineThreshold();
-
-  void setLazyAddChildPagesToOutlineThreshold(int lazyAddChildPagesToOutlineThreshold);
 }

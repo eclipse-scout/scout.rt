@@ -214,6 +214,15 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
+  public boolean isLazyExpandingEnabled() {
+    return false;
+  }
+
+  @Override
+  public void setLazyExpandingEnabled(boolean lazyExpandingEnabled) {
+  }
+
+  @Override
   public boolean isInitialExpanded() {
     return false;
   }

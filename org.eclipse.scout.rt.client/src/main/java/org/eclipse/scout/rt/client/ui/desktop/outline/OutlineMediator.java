@@ -131,14 +131,7 @@ public class OutlineMediator {
       e.consume();
       ITree tree = page.getTree();
       if (tree != null) {
-        tree.setTreeChanging(true);
-        try {
-          tree.setNodeExpanded(page, true, page.isLazyAddChildPagesToOutline());
-          tree.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
-        }
-        finally {
-          tree.setTreeChanging(false);
-        }
+        tree.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
       }
     }
   }

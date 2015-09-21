@@ -69,6 +69,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_defaultExpanded;
   private boolean m_expanded;
   private boolean m_expandedLazy;
+  private boolean m_lazyExpandingEnabled;
   private boolean m_childrenVolatile;
   private boolean m_childrenDirty;
   private boolean m_filterAccepted;
@@ -152,6 +153,20 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     return false;
   }
 
+  /**
+   * Configures whether child nodes should be added lazily to the tree when expanding the node.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   *
+   * @see ITreeNode#isLazyExpandingEnabled()
+   * @see ITreeNode#isExpandedLazy()
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredLazyExpandingEnabled() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
   protected boolean getConfiguredEnabled() {
@@ -193,6 +208,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     setLeafInternal(getConfiguredLeaf());
     setEnabledInternal(getConfiguredEnabled());
     setExpandedInternal(getConfiguredExpanded());
+    setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
+    setExpandedLazyInternal(isLazyExpandingEnabled());
     m_defaultExpanded = getConfiguredExpanded();
     m_contributionHolder = new ContributionComposite(this);
     // menus
@@ -539,6 +556,25 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public void setExpandedLazyInternal(boolean expandedLazy) {
     m_expandedLazy = expandedLazy;
+  }
+
+  @Override
+  public boolean isLazyExpandingEnabled() {
+    return m_lazyExpandingEnabled;
+  }
+
+  @Override
+  public void setLazyExpandingEnabled(boolean lazyExpandingEnabled) {
+    m_lazyExpandingEnabled = lazyExpandingEnabled;
+
+    // Also set state of expandedLazy as well -> if lazy expanding gets disabled, it is not expected that expandedLazy is still set to true
+    // See also Tree.js _applyUpdatedNodeProperties
+    m_expandedLazy = lazyExpandingEnabled;
+
+    boolean changed = lazyExpandingEnabled != m_lazyExpandingEnabled;
+    if (changed && getTree() != null) {
+      getTree().fireNodeChanged(this);
+    }
   }
 
   @Override
