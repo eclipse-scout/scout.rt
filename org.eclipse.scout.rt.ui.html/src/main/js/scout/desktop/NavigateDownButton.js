@@ -51,30 +51,25 @@ scout.NavigateDownButton.prototype._drill = function() {
   }
   if (drillNode) {
     $.log.debug('drill down to node ' + drillNode);
-    this.outline.lazyAddChildNodesToTree(true);
-    try {
-      // Collapse other expanded child nodes
-      var parentNode = drillNode.parentNode;
-      if (parentNode) {
-        parentNode.childNodes.forEach(function(childNode) {
-          if (childNode.expanded && childNode !== drillNode) {
-            this.outline.collapseNode(childNode, {animateExpansion: false});
-          }
-        }.bind(this));
-      }
-
-      // Select the target node
-      this.outline.selectNodes(drillNode); // this also expands the parent node, if required
-      this.outline.handleOutlineContent(true);
-
-      // If the parent node is a table page node, expand the drillNode
-      // --> Same logic as in OutlineMediator.mediateTableRowAction()
-      if (parentNode && parentNode.nodeType === 'table') {
-        this.outline.expandNode(drillNode);
-      }
+    // Collapse other expanded child nodes
+    var parentNode = drillNode.parentNode;
+    if (parentNode) {
+      parentNode.childNodes.forEach(function(childNode) {
+        if (childNode.expanded && childNode !== drillNode) {
+          this.outline.collapseNode(childNode, {animateExpansion: false});
+        }
+      }.bind(this));
     }
-    finally {
-      this.outline.lazyAddChildNodesToTree(false);
+
+    // Select the target node
+    this.outline.expandNode(parentNode, {lazy: parentNode.lazyAddToTree});
+    this.outline.selectNodes(drillNode); // this also expands the parent node, if required
+    this.outline.handleOutlineContent(true);
+
+    // If the parent node is a table page node, expand the drillNode
+    // --> Same logic as in OutlineMediator.mediateTableRowAction()
+    if (parentNode && parentNode.nodeType === 'table') {
+      this.outline.expandNode(drillNode);
     }
   }
 };

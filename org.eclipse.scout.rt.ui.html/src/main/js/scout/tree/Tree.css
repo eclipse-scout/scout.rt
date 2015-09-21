@@ -138,7 +138,7 @@
       content: '';
     }
 
-    .tree-node.show-all > & {
+    .tree-node.lazy > & {
       #scout.font-text-normal();
       content: '+';
       /* Move to left because '+' sign is not as wide as 'arrow-down' */

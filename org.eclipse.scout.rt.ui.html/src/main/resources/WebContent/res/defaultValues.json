@@ -200,6 +200,7 @@
       "checked": false,
       "enabled": true,
       "expanded": false,
+      "expandedLazy": false,
       "leaf": false,
       "childNodes": [],
       "filterAccepted": true

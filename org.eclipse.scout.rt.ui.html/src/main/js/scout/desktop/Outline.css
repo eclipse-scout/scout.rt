@@ -150,7 +150,7 @@
       display: none;
     }
 
-    &.show-all::before {
+    &.lazy::before {
       content: '+';
       padding-right: 5px;
     }

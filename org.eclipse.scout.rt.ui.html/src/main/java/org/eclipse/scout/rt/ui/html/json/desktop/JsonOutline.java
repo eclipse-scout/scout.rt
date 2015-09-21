@@ -123,9 +123,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject json = super.treeNodeToJson(node);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
-    if (page.getParentPage() != null) {
-      putProperty(json, "lazyAddToTree", page.getParentPage().isLazyAddChildPagesToOutline());
-    }
+    putProperty(json, "lazyAddToTree", page.isLazyAddChildPagesToOutline());
     if (getUiSession().isInspectorHint()) {
       putProperty(json, "modelClass", page.getClass().getName());
       putProperty(json, "classId", page.classId());

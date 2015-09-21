@@ -21,11 +21,6 @@ scout.Tree = function() {
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
-
-  // Flag (0 = false, > 0 = true) to indicate whether child nodes should be added to the tree lazily if
-  // they request it.  Default is false, which has the consequences that most UI actions show all nodes.
-  // However, certain actions may set this flag (temporarily) to true.
-  this._lazyAddChildNodesToTree = 0;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -163,14 +158,7 @@ scout.Tree.prototype._render = function($parent) {
     }.bind(this));
   this.dragAndDropHandler.install(this.$data);
 
-  // When nodes are rendered initially, lazy nodes should not be added to the tree.
-  this.lazyAddChildNodesToTree(true);
-  try {
-    this._addNodes(this.nodes);
-  } finally {
-    this.lazyAddChildNodesToTree(false);
-  }
-
+  this._addNodes(this.nodes);
   if (this.selectedNodes.length > 0) {
     this._renderSelection();
   }
@@ -365,6 +353,8 @@ scout.Tree.prototype.collapseAll = function() {
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
+  var lazy = scout.helpers.nvl(opts.lazy, false);
+  var notifyServer = scout.helpers.nvl(opts.notifyServer, true);
 
   // Optionally collapse all children (recursively)
   if (opts.collapseChildNodes) {
@@ -380,13 +370,17 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   }
 
   // Set expansion state
-  if (node.expanded !== expanded) {
+  if (node.expanded !== expanded || node.expandedLazy !== lazy) {
     node.expanded = expanded;
+    node.expandedLazy = lazy;
 
-    this.remoteHandler(this.id, 'nodeExpanded', {
-      nodeId: node.id,
-      expanded: expanded
-    });
+    if (notifyServer) {
+      this.remoteHandler(this.id, 'nodeExpanded', {
+        nodeId: node.id,
+        expanded: expanded,
+        expandedLazy: lazy
+      });
+    }
   }
 
   // Render expansion
@@ -406,7 +400,16 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
     return;
   }
 
+  // Render lazy expansion
+  if (expanded && $node.hasClass('expanded') &&
+      !node.expandedLazy && $node.hasClass('lazy')) {
+    // If node is already expanded but only lazy -> expand completely
+    this._showAllNodes(node);
+  }
+  $node.toggleClass('lazy', expanded && node.expandedLazy);
+
   if (expanded === $node.hasClass('expanded')) {
+    // Expansion state has not changed -> return
     return;
   }
 
@@ -425,6 +428,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
   }
 
   if (expanded) {
+    $node.addClass('expanded');
     this._addNodes(node.childNodes, $node, $predecessor);
     this._updateItemPath();
 
@@ -441,10 +445,8 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
           .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
       }
     }
-    $node.addClass('expanded');
   } else {
     $node.removeClass('expanded');
-    $node.removeClass('show-all');
 
     // animate closing
     if (this.rendered) { // don't animate while rendering (not necessary, or may even lead to timing issues)
@@ -794,30 +796,23 @@ scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this.selectNodes(nodes, false);
 };
 
-scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded, recursive) {
-  var node = this.nodesMap[nodeId];
-  expandNodeInternal.call(this, node);
+scout.Tree.prototype._onNodeExpanded = function(nodeId, event) {
+  var node = this.nodesMap[nodeId],
+    expanded = event.expanded,
+    recursive = event.recursive,
+    lazy = event.expandedLazy;
+
+  this.setNodeExpanded(node, expanded, {
+    notifyServer: false,
+    lazy: lazy
+  });
   if (recursive) {
     this._visitNodes(node.childNodes, function(childNode) {
-      expandNodeInternal.call(this, childNode);
+      this.setNodeExpanded(childNode, expanded, {
+        notifyServer: false,
+        lazy: lazy
+      });
     }.bind(this));
-  }
-
-  // --- Helper functions ---
-
-  function expandNodeInternal(node) {
-    node.expanded = expanded;
-    if (this.rendered) {
-      // When the model chooses to expand a node, respect the child node's "lazyAddToTree" property.
-      // This has the effect that a double click on a table row does not expand all child nodes of
-      // the table page's node.
-      this.lazyAddChildNodesToTree(true);
-      try {
-        this._renderExpansion(node);
-      } finally {
-        this.lazyAddChildNodesToTree(false);
-      }
-    }
   }
 };
 
@@ -923,7 +918,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
     var childNodesOfParent = parentNode.childNodes;
     if (!childNodesOfParent || childNodesOfParent.length === 0) {
       $parentNode.removeClass('expanded');
-      $parentNode.removeClass('show-all');
+      $parentNode.removeClass('lazy');
     }
   }
 
@@ -944,11 +939,10 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
 
     var $node = this._$buildNode(node, $parent);
 
-    // If node wants to be lazy added to the tree, and the tree has the flag _lazyAddChildNodesToTree
-    // set (may change dynamically, depending on the current state), hide the DOM element, except
+    // If parent node wants its children to be lazy added to the tree, hide the DOM element, except
     // the node is expanded, in which case we never hide it. (The last check provides a cheap
     // way to retain most of the state when the page is reloaded).
-    if (parentNode && this._lazyAddChildNodesToTree && node.lazyAddToTree && !node.expanded) {
+    if (!node.expanded && parentNode && parentNode.expandedLazy) {
       $node.addClass('hidden');
       hasHiddenNodes = true;
     }
@@ -965,11 +959,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     } else {
       $predecessor = $node;
     }
-  }
-
-  // Set the 'show-all' state on the parent node when not all child nodes are visible.
-  if (parentNode) {
-    parentNode.$node.toggleClass('show-all', hasHiddenNodes && parentNode.expanded);
   }
 
   this.invalidateLayoutTree();
@@ -1015,6 +1004,7 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.addClass(node.cssClass);
   $node.toggleClass('leaf', !! node.leaf);
   $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
+  $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
   $node.setEnabled( !! node.enabled);
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
@@ -1048,8 +1038,8 @@ scout.Tree.prototype._decorateNode = function(node) {
   // iconId
   // tooltipText
 
-  // If parent node is marked as 'show-all', check if any hidden child nodes remain.
-  if (node.parentNode && node.parentNode.$node.hasClass('show-all')) {
+  // If parent node is marked as 'lazy', check if any hidden child nodes remain.
+  if (node.parentNode && node.parentNode.$node.hasClass('lazy')) {
     var hasHiddenNodes = node.parentNode.childNodes.some(function(childNode) {
       if (!childNode.$node || childNode.$node.hasClass('hidden')) {
         return true;
@@ -1057,8 +1047,8 @@ scout.Tree.prototype._decorateNode = function(node) {
       return false;
     });
     if (!hasHiddenNodes) {
-      // Remove 'show-all' from parent
-      node.parentNode.$node.removeClass('show-all');
+      // Remove 'lazy' from parent
+      node.parentNode.$node.removeClass('lazy');
     }
   }
 };
@@ -1251,14 +1241,14 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   var expansionOpts = {};
 
   // Click on "show all" control shows all nodes
-  if ($node.hasClass('show-all')) {
+  if ($node.hasClass('lazy')) {
     if (event.ctrlKey || event.shiftKey) {
       // Collapse
       expanded = false;
       expansionOpts.collapseChildNodes = true;
     } else {
       // Show all nodes
-      this._showAllNodes(node);
+      this.expandNode(node, {lazy: false});
       return false;
     }
   }
@@ -1283,8 +1273,6 @@ scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
 };
 
 scout.Tree.prototype._showAllNodes = function(parentNode) {
-  parentNode.$node.removeClass('show-all');
-
   var updateFunc = function() {
     this.revalidateLayoutTree();
     this.revealSelection();
@@ -1608,10 +1596,6 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   return propertiesChanged;
 };
 
-scout.Tree.prototype.lazyAddChildNodesToTree = function(lazyAddChildNodesToTree) {
-  this._lazyAddChildNodesToTree += (lazyAddChildNodesToTree ? 1 : -1);
-};
-
 scout.Tree.prototype.onModelAction = function(event) {
   if (event.type === 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
@@ -1624,7 +1608,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodesSelected') {
     this._onNodesSelected(event.nodeIds);
   } else if (event.type === 'nodeExpanded') {
-    this._onNodeExpanded(event.nodeId, event.expanded, event.recursive);
+    this._onNodeExpanded(event.nodeId, event);
   } else if (event.type === 'nodeChanged') {
     this._onNodeChanged(event.nodeId, event);
   } else if (event.type === 'nodesChecked') {

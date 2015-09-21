@@ -65,6 +65,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public static final String PROP_NODE = "node";
   public static final String PROP_NODES = "nodes";
   public static final String PROP_EXPANDED = "expanded";
+  public static final String PROP_EXPANDED_LAZY = "expandedLazy";
   public static final String PROP_SELECTED_NODES = "selectedNodes";
 
   private TreeListener m_treeListener;
@@ -393,6 +394,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, nodeId);
     putProperty(jsonEvent, PROP_EXPANDED, modelNode.isExpanded());
+    putProperty(jsonEvent, PROP_EXPANDED_LAZY, modelNode.isExpandedLazy());
     putProperty(jsonEvent, "recursive", recursive);
     addActionEvent(EVENT_NODE_EXPANDED, jsonEvent);
   }
@@ -721,6 +723,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "id", getOrCreateNodeId(node));
     putProperty(json, "expanded", node.isExpanded());
+    putProperty(json, "expandedLazy", node.isExpandedLazy());
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());
@@ -840,9 +843,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       return;
     }
     boolean expanded = event.getData().getBoolean(PROP_EXPANDED);
+    boolean lazy = event.getData().getBoolean(PROP_EXPANDED_LAZY);
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
-    getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
+    getModel().getUIFacade().setNodeExpandedFromUI(node, expanded, lazy);
   }
 
   /**
