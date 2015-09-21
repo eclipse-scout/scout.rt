@@ -6,6 +6,12 @@ scout.SearchOutline = function() {
 };
 scout.inherits(scout.SearchOutline, scout.Outline);
 
+scout.SearchOutline.prototype._init = function(model, session) {
+  scout.SearchOutline.parent.prototype._init.call(this, model, session);
+
+  this.titleVisible = false;
+};
+
 /**
  * @override Tree.js
  */

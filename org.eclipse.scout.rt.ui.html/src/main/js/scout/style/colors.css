@@ -111,6 +111,7 @@
 @outline-selection-color: @text-color;
 @outline-selection-background-color: @background-color;
 @outline-group-background-color: @palette-blue-6;
+@outline-control-button-background-color: @palette-blue-6;
 @panel-background-color: @palette-gray-2;
 @popup-border-color: @palette-blue-6;
 @table-header-menu-background-color: @control-background-color;

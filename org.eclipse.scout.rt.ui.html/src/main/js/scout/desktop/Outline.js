@@ -21,7 +21,7 @@ scout.Outline.prototype._init = function(model, session) {
   this.messageBoxController = new scout.MessageBoxController(this, session);
   this.fileChooserController = new scout.FileChooserController(this, session);
   this.addFilter(new scout.DetailTableTreeFilter());
-  this.titleVisible = this._breadcrumbEnabled;
+  this.titleVisible = true;
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -79,11 +79,6 @@ scout.Outline.prototype._removeTitle = function() {
     this.$title.remove();
     this.$title = null;
   }
-};
-
-scout.Outline.prototype.setBreadcrumbEnabled = function(enabled) {
-  scout.Outline.parent.prototype.setBreadcrumbEnabled.call(this, enabled);
-  this.setTitleVisible(enabled);
 };
 
 scout.Outline.prototype.setTitleVisible = function(visible) {
@@ -237,7 +232,14 @@ scout.Outline.prototype._hasMenu = function(menus, menuClass) {
 
 scout.Outline.prototype._onTitleClick = function(event) {
   this.collapseAll();
-  this.clearSelection();
+  if(this.defaultDetailForm){
+    this.clearSelection();
+    this._showDefaultDetailForm();this._showDefaultDetailForm();
+  } else {
+    this.selectNodes(this.$nodes().first().data('node'), true, true);
+  }
+
+  this.handleOutlineContentDebounced(true);
 };
 
 scout.Outline.prototype._onNodeDeleted = function(node) {

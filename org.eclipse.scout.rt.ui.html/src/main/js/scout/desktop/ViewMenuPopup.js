@@ -46,7 +46,6 @@ scout.ViewMenuPopup.prototype._renderHead = function() {
   this._copyCssClassToHead('view-button-tab');
   this._copyCssClassToHead('unfocusable');
   this.$head.removeClass('popup-head'); // FIXME AWE: use CSS class?
-  this.$head.css('text-align', 'left');
   this.$head.css('background-color', 'white');
   this.$head.css('color', '#006c86');
 };
@@ -63,25 +62,12 @@ scout.ViewMenuPopup.prototype._modifyBody = function() {
  * @override PopupWithHead.js
  */
 scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
-  var $blueprintTitle = this.$tab.find('.view-button-tab-title');
-
   var $icon = this.$head.find('.icon'),
-    $title = this.$head.find('.view-button-tab-title'),
     $viewMenuButton = this.$head.find('.view-menu-button');
 
   $icon.css('font-size', 20);
   $icon.css('display', 'inline-block');
 
-  var titleVisible = !this._breadcrumbEnabled;
-  if (titleVisible) {
-    $title.setVisible(true);
-    $title.css('display', 'inline-block');
-    $title.css('text-align', 'left');
-    $title.css('margin-left', '8px');
-    scout.graphics.setSize($title, scout.graphics.getSize($blueprintTitle));
-  }
-
-  $viewMenuButton.css('display', (titleVisible ? 'inline-block' : 'none'));
   $viewMenuButton.addClass('menu-open');
 };
 

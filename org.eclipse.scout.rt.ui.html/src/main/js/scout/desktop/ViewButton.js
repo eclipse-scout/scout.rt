@@ -47,9 +47,7 @@ scout.ViewButton.prototype._renderText = function(text) {
   if (this._isMenu()) {
     scout.ViewButton.parent.prototype._renderText.call(this, text);
   } else {
-    this.$title.css('display', this._breadcrumbEnabled ? 'none' : '');
-    this.$container.css('text-align', this._breadcrumbEnabled ? 'center' : '');
-    this.$title.text(this.selected ? text : '');
+    this.$title.css('display', this._breadcrumbEnabled || this._isTab() ? 'none' : '');
   }
 };
 
@@ -59,15 +57,10 @@ scout.ViewButton.prototype._renderText = function(text) {
 scout.ViewButton.prototype._renderSelected = function(selected) {
   scout.ViewButton.parent.prototype._renderSelected.call(this, selected);
   if (this._isTab()) {
-    this.$title.text(this.selected ? this.text : '');
-    if (this.selected && !this._breadcrumbEnabled) {
-      scout.tooltips.uninstall(this.$container);
-    } else {
       scout.tooltips.install(this.$container, this.session, {
         text: this.text
       });
     }
-  }
 };
 
 /**

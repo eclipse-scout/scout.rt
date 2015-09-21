@@ -4,6 +4,8 @@ scout.icons = {
   ANGLE_UP: 'font:\uF106',
   OUTLINE: 'font:\uE043',
   ELLIPSIS_V: 'font:\uE040',
+  COLLAPSE: 'font:\uE600',
+  HOME: 'font:\uE601',
 
   /**
    * Returns an Icon object with structured info contained in the iconId string.

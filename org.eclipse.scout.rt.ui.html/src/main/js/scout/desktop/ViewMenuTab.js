@@ -66,7 +66,7 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
 };
 
 scout.ViewMenuTab.prototype._renderText = function() {
-  if (this._breadcrumbEnabled) {
+  if (this._breadcrumbEnabled || this.selected) {
     this.$title.css('display', 'none'); // reset to CSS default ('none')
   } else {
     this.$title.css('display', 'inline-block');

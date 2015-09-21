@@ -3,7 +3,7 @@ scout.OutlineTreeCollapseAllKeyStroke = function(tree) {
   this.which = [scout.keys.HOME];
   this.renderingHints.hAlign = scout.hAlign.LEFT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$data;
+    return this.field.$title || this.field.$data;
   }.bind(this);
 };
 scout.inherits(scout.OutlineTreeCollapseAllKeyStroke, scout.AbstractOutlineTreeNavigationKeyStroke);

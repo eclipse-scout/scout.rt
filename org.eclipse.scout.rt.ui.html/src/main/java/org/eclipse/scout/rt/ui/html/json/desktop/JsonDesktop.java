@@ -160,7 +160,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       throw new IllegalStateException();
     }
     m_desktopListener = new P_DesktopListener();
-    getModel().addDesktopListener(m_desktopListener);
+    getModel().addDesktopListenerAtExecutionEnd(m_desktopListener);
   }
 
   @Override

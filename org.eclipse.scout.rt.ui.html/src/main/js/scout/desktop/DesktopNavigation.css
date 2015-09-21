@@ -36,6 +36,7 @@
   min-width: 50px;
   position: relative;
   vertical-align: top;
+  text-align: center;
 
   & > .key-box {
     bottom: 4px;
@@ -70,9 +71,6 @@
     }
   }
 
-  &:not(.selected) {
-    text-align: center;
-  }
 
   & > .icon {
     display: inline-block;

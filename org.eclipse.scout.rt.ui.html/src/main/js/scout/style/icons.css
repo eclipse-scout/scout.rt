@@ -26,6 +26,7 @@
 @icon-person: '\E034'; /* FIXME CGU change to E12*/
 @icon-ellipsis-v: '\E040';
 @icon-list-ul: '\E041 ';
+@icon-collapse: '\E600 ';
 
 /* scoutIcons: awesome icons */
 @icon-search: '\E042';
@@ -62,3 +63,4 @@
 @icon-long-arrow-right: '\F178';
 @icon-file: '\F15B';
 @icon-arrow-right: '\F061';
+@icon-home: '\E601';
