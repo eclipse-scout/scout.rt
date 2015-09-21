@@ -333,17 +333,19 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
   }
 
   if (this.selectedNodes.length > 0) {
-    var nodeId = this.selectedNodes[0].id,
-      expanded = this.selectedNodes[0].expanded,
-      node = this.nodesMap[nodeId];
-
-    if (!expanded) {
-      this.remoteHandler(this.id, 'nodeAction', {
-        nodeId: nodeId
-      });
-      this.setNodeExpanded(node, true);
+    var selectedNode = this.selectedNodes[0];
+    if (!selectedNode.expanded) {
+      this.expandNode(selectedNode);
     }
   }
+};
+
+scout.Tree.prototype.expandNode = function(node, opts) {
+  this.setNodeExpanded(node, true, opts);
+};
+
+scout.Tree.prototype.collapseNode = function(node, opts) {
+  this.setNodeExpanded(node, false, opts);
 };
 
 scout.Tree.prototype.collapseAll = function() {
@@ -352,14 +354,13 @@ scout.Tree.prototype.collapseAll = function() {
   // Collapse root nodes
   this.$data.find('[data-level="0"]').each(function() {
     var $node = $(this);
-    that.setNodeExpanded($node.data('node'), false);
+    that.collapseNode($node.data('node'));
   });
 
   // Collapse all expanded child nodes (only model)
   this._visitNodes(this.nodes, function(node) {
-    this.setNodeExpanded(node, false);
+    this.collapseNode(node);
   }.bind(this));
-
 };
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
@@ -373,7 +374,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 
     node.childNodes.forEach(function(childNode) {
       if (childNode.expanded) {
-        this.setNodeExpanded(childNode, false, childOpts);
+        this.collapseNode(childNode, childOpts);
       }
     }.bind(this));
   }
@@ -427,22 +428,17 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
     this._addNodes(node.childNodes, $node, $predecessor);
     this._updateItemPath();
 
-    if (this._breadcrumbEnabled) {
-      $node.addClass('expanded');
-      return;
-    }
-
-    // animated opening
-    if (!$node.hasClass('leaf') && !$node.hasClass('expanded')) { // can expand
-      if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
-        var $newNodes = scout.Tree.collectSubtree($node, false);
-        if (animate && $newNodes.length) {
-          this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
-          var h = this._$animationWrapper.outerHeight();
-          this._$animationWrapper
-            .css('height', 0)
-            .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
-        }
+    // animate opening
+    animate = animate && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
+    animate = animate && !$node.hasClass('leaf') && !$node.hasClass('expanded') && !this._breadcrumbEnabled;
+    if (animate) {
+      var $newNodes = scout.Tree.collectSubtree($node, false);
+      if ($newNodes.length) {
+        this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
+        var h = this._$animationWrapper.outerHeight();
+        this._$animationWrapper
+          .css('height', 0)
+          .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
       }
     }
     $node.addClass('expanded');
@@ -450,8 +446,8 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
     $node.removeClass('expanded');
     $node.removeClass('show-all');
 
-    // animated closing
-    if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
+    // animate closing
+    if (this.rendered) { // don't animate while rendering (not necessary, or may even lead to timing issues)
       var $existingNodes = scout.Tree.collectSubtree($node, false);
       if ($existingNodes.length) {
         $existingNodes.each(function() {
@@ -525,6 +521,11 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this.session.sendEvent(event, debounceSend ? 250 : 0);
   }
 
+  // In breadcrumb mode selected node has to expanded
+  if (this._breadcrumbEnabled && this.selectedNodes.length > 0 && !this.selectedNodes[0].expanded) {
+    this.expandNode(this.selectedNodes[0]);
+  }
+
   if (this.rendered) {
     this._renderSelection();
     this._renderMenus();
@@ -564,13 +565,6 @@ scout.Tree.prototype._renderSelection = function() {
     $node.select(true);
     // If node was previously hidden, show it!
     $node.removeClass('hidden');
-
-    // in case of breadcrumb, expand
-    if (this._breadcrumbEnabled) {
-      this.setNodeExpanded($nodes[i].data('node'), true, {
-        renderExpansion: true
-      }); // force render expansion
-    }
   }
 
   this._updateItemPath();
@@ -612,7 +606,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       if (!$parentNode) {
         throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
-      this.setNodeExpanded(parentNodes[i], true, {
+      this.expandNode(parentNodes[i], {
         renderExpansion: true
       }); // force render expansion
     }

@@ -74,17 +74,17 @@ describe("NavigateUpButton", function() {
 
     beforeEach(function() {
       outline.selectNodes = function(node) {};
-      outline.setNodeExpanded = function(node, expanded) {};
+      outline.collapseNode = function(node) {};
     });
 
     it("drills up to parent node, sets the selection on the tree", function() {
       node.parentNode = {};
       spyOn(outline, 'selectNodes');
-      spyOn(outline, 'setNodeExpanded');
+      spyOn(outline, 'collapseNode');
       menu._drill();
       expect(outline.navigateUpInProgress).toBe(true);
       expect(outline.selectNodes).toHaveBeenCalledWith(node.parentNode);
-      expect(outline.setNodeExpanded).toHaveBeenCalledWith(node.parentNode, false, {collapseChildNodes: true});
+      expect(outline.collapseNode).toHaveBeenCalledWith(node.parentNode, {collapseChildNodes: true});
     });
 
     it("shows default detail-form by removing selection from tree", function() {

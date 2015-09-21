@@ -93,10 +93,8 @@ describe("NavigateDownButton", function() {
       '123': drillNode
     };
     outline.selectNodes = function(node) {};
-    outline.setNodeExpanded = function(node, expanded) {};
 
     spyOn(outline, 'selectNodes');
-    spyOn(outline, 'setNodeExpanded');
     menu._drill();
     expect(outline.selectNodes).toHaveBeenCalledWith(drillNode);
   });

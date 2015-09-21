@@ -666,7 +666,7 @@ describe("Tree", function() {
       expect(tree.nodes[0].childNodes[0].$node).toBeFalsy();
       expect(tree.nodes[0].childNodes[1].$node).toBeFalsy();
 
-      tree.setNodeExpanded(tree.nodes[0], true);
+      tree.expandNode(tree.nodes[0]);
       expect(tree.nodes[0].$node.isVisible()).toBe(true);
       expect(tree.nodes[1].$node.isVisible()).toBe(false);
       expect(tree.nodes[0].childNodes[0].$node.isVisible()).toBe(true);

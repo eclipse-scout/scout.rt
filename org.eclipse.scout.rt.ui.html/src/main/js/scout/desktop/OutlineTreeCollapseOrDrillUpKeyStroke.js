@@ -15,7 +15,7 @@ scout.OutlineTreeCollapseOrDrillUpKeyStroke.prototype._accept = function(event) 
 
 scout.OutlineTreeCollapseOrDrillUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
   if (currentNode.expanded) {
-    this.field.setNodeExpanded(currentNode, false);
+    this.field.collapseNode(currentNode);
     return null;
   } else if (currentNode.parentNode) {
     return currentNode.parentNode;
