@@ -62,7 +62,6 @@ scout.NavigateDownButton.prototype._drill = function() {
     }
 
     // Select the target node
-    this.outline.expandNode(parentNode, {lazy: parentNode.lazyAddToTree});
     this.outline.selectNodes(drillNode); // this also expands the parent node, if required
     this.outline.handleOutlineContent(true);
 

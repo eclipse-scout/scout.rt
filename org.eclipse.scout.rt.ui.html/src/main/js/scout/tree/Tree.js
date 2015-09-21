@@ -353,8 +353,13 @@ scout.Tree.prototype.collapseAll = function() {
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
-  var lazy = scout.helpers.nvl(opts.lazy, false);
+  var lazy = scout.helpers.nvl(opts.lazy, node.lazyExpandingEnabled);
   var notifyServer = scout.helpers.nvl(opts.notifyServer, true);
+
+  if (this._breadcrumbEnabled) {
+    // Never use lazy expanding in bread crumb mode
+    lazy = false;
+  }
 
   // Optionally collapse all children (recursively)
   if (opts.collapseChildNodes) {
@@ -400,9 +405,13 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
     return;
   }
 
+  // Only expand / collapse if there are child nodes
+  if (node.childNodes.length === 0) {
+    return true;
+  }
+
   // Render lazy expansion
-  if (expanded && $node.hasClass('expanded') &&
-      !node.expandedLazy && $node.hasClass('lazy')) {
+  if (expanded && $node.hasClass('expanded') && !node.expandedLazy && $node.hasClass('lazy')) {
     // If node is already expanded but only lazy -> expand completely
     this._showAllNodes(node);
   }
@@ -411,11 +420,6 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
   if (expanded === $node.hasClass('expanded')) {
     // Expansion state has not changed -> return
     return;
-  }
-
-  // Only expand / collapse if there are child nodes
-  if (node.childNodes.length === 0) {
-    return true;
   }
 
   // If there is already an animation is already going on for this node, stop it immediately
@@ -936,7 +940,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
 
   for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
-
     var $node = this._$buildNode(node, $parent);
 
     // If parent node wants its children to be lazy added to the tree, hide the DOM element, except
@@ -959,6 +962,10 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     } else {
       $predecessor = $node;
     }
+  }
+  // Set the 'show-all' state on the parent node when not all child nodes are visible.
+  if (parentNode) {
+    parentNode.$node.toggleClass('show-all', hasHiddenNodes && parentNode.expanded);
   }
 
   this.invalidateLayoutTree();
@@ -1225,7 +1232,9 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     nodeId: node.id
   });
 
-  this.setNodeExpanded(node, expanded);
+  this.setNodeExpanded(node, expanded, {
+    lazy: false // always show all nodes on node double click
+  });
 };
 
 scout.Tree.prototype._onNodeControlMouseDown = function(event) {
@@ -1238,7 +1247,9 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   var $node = $(event.currentTarget).parent();
   var node = $node.data('node');
   var expanded = !$node.hasClass('expanded');
-  var expansionOpts = {};
+  var expansionOpts = {
+    lazy: false // always show all nodes when the control gets clicked
+  };
 
   // Click on "show all" control shows all nodes
   if ($node.hasClass('lazy')) {
@@ -1248,7 +1259,7 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
       expansionOpts.collapseChildNodes = true;
     } else {
       // Show all nodes
-      this.expandNode(node, {lazy: false});
+      this.expandNode(node, expansionOpts);
       return false;
     }
   }
@@ -1591,6 +1602,12 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
     oldNode.$node.children('.tree-node-checkbox')
       .children('.check-box')
       .toggleClass('disabled', !(this.enabled && oldNode.enabled));
+    propertiesChanged = true;
+  }
+  if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {
+    oldNode.lazyExpandingEnabled = updatedNode.lazyExpandingEnabled;
+    // Also make sure expandedLazy is resetted (same code as in AbstractTreeNode.setLazyExpandingEnabled)
+    oldNode.expandedLazy = updatedNode.lazyExpandingEnabled;
     propertiesChanged = true;
   }
   return propertiesChanged;

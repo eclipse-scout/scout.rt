@@ -1128,11 +1128,13 @@ describe("Tree", function() {
 
         var event0 = new scout.Event(tree.id, 'nodeExpanded', {
           nodeId: node0.id,
-          expanded: true
+          expanded: true,
+          expandedLazy: false
         });
         var event1 = new scout.Event(tree.id, 'nodeExpanded', {
           nodeId: child0.id,
-          expanded: true
+          expanded: true,
+          expandedLazy: false
         });
         expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);
       });

@@ -201,6 +201,7 @@
       "enabled": true,
       "expanded": false,
       "expandedLazy": false,
+      "lazyExpandingEnabled": false,
       "leaf": false,
       "childNodes": [],
       "filterAccepted": true

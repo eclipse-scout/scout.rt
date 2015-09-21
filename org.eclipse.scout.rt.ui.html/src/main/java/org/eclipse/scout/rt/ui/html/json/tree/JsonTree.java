@@ -433,6 +433,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       // --> See also: Tree.js/_onNodesUpdated()
       putProperty(jsonNode, "leaf", node.isLeaf());
       putProperty(jsonNode, "enabled", node.isEnabled());
+      putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
 
       // Check for virtual nodes that were replaces with real nodes (this will have triggered an NODES_UPDATED event).
       // This would not really be necessary, as both nodes are considered "equal" (see implementation of VirtualTreeNode),
@@ -724,6 +725,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putProperty(json, "id", getOrCreateNodeId(node));
     putProperty(json, "expanded", node.isExpanded());
     putProperty(json, "expandedLazy", node.isExpandedLazy());
+    putProperty(json, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());
