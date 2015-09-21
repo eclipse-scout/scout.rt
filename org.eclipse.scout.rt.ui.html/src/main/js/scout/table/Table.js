@@ -335,8 +335,7 @@ scout.Table.prototype._renderTableControls = function(dummy) {
   this._renderTableFooter();
 };
 
-scout.Table.prototype._renderSortEnabled = function(dummy) {
-};
+scout.Table.prototype._renderSortEnabled = function(dummy) {};
 
 scout.Table.prototype._renderUiSortPossible = function(dummy) {
 };
@@ -1211,8 +1210,8 @@ scout.Table.prototype._group = function(update) {
     this.$sumRows().remove();
   } else {
     this.$sumRows().animateAVCSD('height', 0, function() {
-        $.removeThis.call(this);
-        that.renderSelection();
+      $.removeThis.call(this);
+      that.renderSelection();
     }, that.updateScrollbars.bind(that));
   }
 
@@ -1592,6 +1591,7 @@ scout.Table.prototype._deleteAllRows = function() {
       this.cellEditorPopup.cancelEdit();
     }
 
+    this.selectionHandler.clearLastSelectedRowMarker();
     this._removeRows();
     this.invalidateLayoutTree();
   }
@@ -1655,10 +1655,10 @@ scout.Table.prototype.renderSelection = function(rows) {
       followingIndex = filteredRows.indexOf(row) + 1,
       followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1,
       classChanged = addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1, 'selected') +
-          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && followingRowSelected, 'select-top') +
-          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && !followingRowSelected, 'select-bottom') +
-          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && !followingRowSelected, 'select-single') +
-          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && followingRowSelected, 'select-middle');
+        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && followingRowSelected, 'select-top') +
+        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && !followingRowSelected, 'select-bottom') +
+        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && !followingRowSelected, 'select-single') +
+        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && followingRowSelected, 'select-middle');
 
     if (classChanged && previousRowSelected && rows.indexOf(filteredRows[previousIndex]) == -1) {
       rows.push(filteredRows[previousIndex]);
