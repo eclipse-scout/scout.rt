@@ -24,6 +24,7 @@
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
+    <sonar.sources>src/main,pom.xml</sonar.sources>
   </properties>
 
   <dependencies>
