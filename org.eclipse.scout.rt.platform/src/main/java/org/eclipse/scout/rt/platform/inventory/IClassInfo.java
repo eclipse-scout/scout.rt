@@ -15,29 +15,41 @@ import java.lang.annotation.Inherited;
 import java.lang.reflect.Modifier;
 
 /**
+ * Information about a {@link Class}. This information may be available, before the class is loaded.
+ *
  * @since 5.1
  */
 public interface IClassInfo {
 
   /** Declared public; may be accessed from outside its package. */
-  public static final int ACC_PUBLIC = Modifier.PUBLIC;
+  int ACC_PUBLIC = Modifier.PUBLIC;
   /** Declared final; no subclasses allowed. */
-  public static final int ACC_FINAL = Modifier.FINAL;
+  int ACC_FINAL = Modifier.FINAL;
   /** Is an interface, not a class. */
-  public static final int ACC_INTERFACE = Modifier.INTERFACE;
+  int ACC_INTERFACE = Modifier.INTERFACE;
   /** Declared abstract; must not be instantiated. */
-  public static final int ACC_ABSTRACT = Modifier.ABSTRACT;
+  int ACC_ABSTRACT = Modifier.ABSTRACT;
   /** Declared synthetic; not present in the source code. */
-  public static final int ACC_SYNTHETIC = 0x1000;
+  int ACC_SYNTHETIC = 0x1000;
   /** Declared as an annotation type. */
-  public static final int ACC_ANNOTATION = 0x2000;
+  int ACC_ANNOTATION = 0x2000;
   /** Declared as an enum type. */
-  public static final int ACC_ENUM = 0x4000;
+  int ACC_ENUM = 0x4000;
 
+  /**
+   * @return class name
+   */
   String name();
 
+  /**
+   * @return class flags composed of {@link #ACC_PUBLIC},{@link #ACC_FINAL},{@link #ACC_INTERFACE},
+   *         {@link #ACC_ABSTRACT},{@link #ACC_SYNTHETIC},{@link #ACC_ANNOTATION},{@link #ACC_ENUM}
+   */
   int flags();
 
+  /**
+   * @return <code>true</code>, if the class has a constructor without any arguments.
+   */
   boolean hasNoArgsConstructor();
 
   /**
@@ -49,6 +61,11 @@ public interface IClassInfo {
    */
   boolean hasAnnotation(Class<? extends Annotation> annotationType);
 
+  /**
+   * Loads the class, if necessary and returns it.
+   *
+   * @return loaded class
+   */
   Class<?> resolveClass();
 
   /**
@@ -56,17 +73,38 @@ public interface IClassInfo {
    */
   boolean isInstanciable();
 
+  /**
+   * @return <code>true</code>, if declared public, <code>false</code> otherwise
+   */
   boolean isPublic();
 
+  /**
+   * @return <code>true</code>, if declared final, <code>false</code> otherwise
+   */
   boolean isFinal();
 
+  /**
+   * @return <code>true</code>, it is an interface (not a class), <code>false</code> otherwise
+   */
   boolean isInterface();
 
+  /**
+   * @return <code>true</code>, it is an abstract, <code>false</code> otherwise
+   */
   boolean isAbstract();
 
+  /**
+   * @return <code>true</code>, if declared synthetic; not present in the source code, <code>false</code> otherwise
+   */
   boolean isSynthetic();
 
+  /**
+   * @return <code>true</code>, if declared as an annotation type, <code>false</code> otherwise
+   */
   boolean isAnnotation();
 
+  /**
+   * @return <code>true</code>, if declared as an enum type, <code>false</code> otherwise
+   */
   boolean isEnum();
 }
