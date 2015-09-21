@@ -1153,15 +1153,21 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setNodeExpanded(ITreeNode node, boolean b) {
+    setNodeExpanded(node, b, false);
+  }
+
+  @Override
+  public void setNodeExpanded(ITreeNode node, boolean b, boolean lazy) {
     node = resolveNode(node);
     if (node != null) {
-      if (node.isExpanded() != b) {
+      if (node.isExpanded() != b || node.isExpandedLazy() != lazy) {
         try {
           if (b) {
             node.ensureChildrenLoaded();
-            ensureParentExpanded(node.getParentNode());
+            ensureParentExpanded(node.getParentNode(), lazy);
           }
           node.setExpandedInternal(b);
+          node.setExpandedLazyInternal(lazy);
           fireNodeExpanded(node, b);
         }
         catch (ProcessingException e) {
@@ -1417,11 +1423,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
-  private void ensureParentExpanded(ITreeNode parent) {
+  private void ensureParentExpanded(ITreeNode parent, boolean lazy) {
     if (parent != null) {
-      ensureParentExpanded(parent.getParentNode());
+      ensureParentExpanded(parent.getParentNode(), lazy);
       if (!parent.isExpanded()) {
-        setNodeExpanded(parent, true);
+        setNodeExpanded(parent, true, lazy);
       }
     }
   }
@@ -2832,7 +2838,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void setNodeExpandedFromUI(ITreeNode node, boolean on) {
+    public void setNodeExpandedFromUI(ITreeNode node, boolean on, boolean lazy) {
       try {
         pushUIProcessor();
         try {
@@ -2841,13 +2847,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           node = resolveNode(node);
           node = resolveVirtualNode(node);
           if (node != null) {
-            if (node.isExpanded() != on) {
+            if (node.isExpanded() != on || node.isExpandedLazy() != lazy) {
               if (on) {
                 if (node.isChildrenDirty() || node.isChildrenVolatile()) {
                   node.loadChildren();
                 }
               }
-              setNodeExpanded(node, on);
+              setNodeExpanded(node, on, lazy);
             }
           }
         }

@@ -21,7 +21,7 @@ public interface ITreeUIFacade {
 
   void setNodesCheckedFromUI(List<ITreeNode> nodes, boolean on);
 
-  void setNodeExpandedFromUI(ITreeNode node, boolean on);
+  void setNodeExpandedFromUI(ITreeNode node, boolean on, boolean lazy);
 
   void setNodeSelectedAndExpandedFromUI(ITreeNode node);
 

@@ -403,10 +403,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   protected boolean execCalculateLazyAddChildPagesToOutline() {
-    if (isLazyAddChildPagesToOutlineInternal()) {
-      return getChildNodeCount() > getLazyAddChildPagesToOutlineThreshold();
-    }
-    return false;
+    return true;
   }
 
   private Class<? extends ITable> getConfiguredTable() {

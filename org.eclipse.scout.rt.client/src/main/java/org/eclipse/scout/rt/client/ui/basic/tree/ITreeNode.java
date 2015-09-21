@@ -188,7 +188,7 @@ public interface ITreeNode {
 
   /**
    * Indicates whether {@link #isFilterAccepted()} returns false because the node has been filtered by the user.
-   * 
+   *
    * @return true if @link IUserFilter is the only filter not accepting the node.
    */
   boolean isRejectedByUser();
@@ -240,6 +240,16 @@ public interface ITreeNode {
   void setInitialExpanded(boolean b);
 
   boolean isExpanded();
+
+  /**
+   * Defines whether all nodes or only some nodes are shown if the node is expanded. This flag depends on
+   * {@link #isExpanded()} and is only considered if the node is expanded.
+   *
+   * @return true if the node is in lazy expansion state.
+   */
+  boolean isExpandedLazy();
+
+  void setExpandedLazyInternal(boolean expandedLazy);
 
   List<IMenu> getMenus();
 

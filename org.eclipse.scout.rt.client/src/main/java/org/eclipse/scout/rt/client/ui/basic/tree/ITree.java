@@ -376,7 +376,16 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
 
   boolean isNodeExpanded(ITreeNode node);
 
-  void setNodeExpanded(ITreeNode node, boolean b);
+  void setNodeExpanded(ITreeNode node, boolean expanded);
+
+  /**
+   * @param node
+   * @param expanded
+   * @param lazy
+   *          true to expand the node lazily, false if not. Only has an effect if the expanded is set to true, see also
+   *          {@link ITreeNode#isExpandedLazy()}
+   */
+  void setNodeExpanded(ITreeNode node, boolean expanded, boolean lazy);
 
   void setNodeEnabledPermission(ITreeNode node, Permission p);
 

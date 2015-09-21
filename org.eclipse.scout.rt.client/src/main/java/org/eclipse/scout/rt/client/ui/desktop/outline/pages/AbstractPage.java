@@ -422,6 +422,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
     setLazyAddChildPagesToOutline(getConfiguredLazyAddChildPagesToOutline());
+    setExpandedLazyInternal(isLazyAddChildPagesToOutlineInternal());
   }
 
   /*

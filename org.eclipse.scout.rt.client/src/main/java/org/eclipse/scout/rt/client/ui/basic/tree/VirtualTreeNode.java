@@ -205,6 +205,15 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
+  public boolean isExpandedLazy() {
+    return false;
+  }
+
+  @Override
+  public void setExpandedLazyInternal(boolean expandedLazy) {
+  }
+
+  @Override
   public boolean isInitialExpanded() {
     return false;
   }

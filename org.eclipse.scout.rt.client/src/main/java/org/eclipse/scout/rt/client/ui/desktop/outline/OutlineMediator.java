@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -128,8 +129,16 @@ public class OutlineMediator {
     ITreeNode node = page.getTreeNodeFor(e.getFirstRow());
     if (node != null) {
       e.consume();
-      if (page.getTree() != null) {
-        page.getTree().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
+      ITree tree = page.getTree();
+      if (tree != null) {
+        tree.setTreeChanging(true);
+        try {
+          tree.setNodeExpanded(page, true, page.isLazyAddChildPagesToOutline());
+          tree.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
+        }
+        finally {
+          tree.setTreeChanging(false);
+        }
       }
     }
   }

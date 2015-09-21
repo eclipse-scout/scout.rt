@@ -68,6 +68,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_leaf;
   private boolean m_defaultExpanded;
   private boolean m_expanded;
+  private boolean m_expandedLazy;
   private boolean m_childrenVolatile;
   private boolean m_childrenDirty;
   private boolean m_filterAccepted;
@@ -528,6 +529,16 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     else {
       setExpandedInternal(b);
     }
+  }
+
+  @Override
+  public boolean isExpandedLazy() {
+    return m_expandedLazy;
+  }
+
+  @Override
+  public void setExpandedLazyInternal(boolean expandedLazy) {
+    m_expandedLazy = expandedLazy;
   }
 
   @Override
