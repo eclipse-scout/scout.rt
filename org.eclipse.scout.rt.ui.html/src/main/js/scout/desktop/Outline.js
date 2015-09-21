@@ -287,7 +287,7 @@ scout.Outline.prototype._onNodeControlMouseDown = function(event) {
 };
 
 scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
-  scout.helpers.nvl(bringToFront, true);
+  bringToFront = scout.helpers.nvl(bringToFront, true);
   if (!node) {
     throw new Error('called _updateOutlineNode without node');
   }
