@@ -198,12 +198,14 @@ scout.Widget.prototype._addEventSupport = function() {
  **/
 scout.Widget.prototype._addKeyStrokeContextSupport = function() {
   this.keyStrokeContext = this._createKeyStrokeContext();
-  this.keyStrokeContext.$scopeTarget = function() {
-    return this.$container;
-  }.bind(this);
-  this.keyStrokeContext.$bindTarget = function() {
-    return this.$container;
-  }.bind(this);
+  if (this.keyStrokeContext) {
+    this.keyStrokeContext.$scopeTarget = function() {
+      return this.$container;
+    }.bind(this);
+    this.keyStrokeContext.$bindTarget = function() {
+      return this.$container;
+    }.bind(this);
+  }
 };
 
 /**

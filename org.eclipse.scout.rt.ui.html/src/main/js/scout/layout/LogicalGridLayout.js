@@ -56,7 +56,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);
 
   // Set bounds of components
-  var r1, r2, r, d, $comp, i, htmlComp, data, delta;
+  var r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
   for (i = 0; i < this.m_info.$components.length; i++) {
     $comp = this.m_info.$components[i];
     htmlComp = scout.HtmlComponent.get($comp);
@@ -68,6 +68,9 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
       r.y += data.topInset;
       r.height -= data.topInset;
     }
+    margins = htmlComp.getMargins();
+    r.width -= (margins.left + margins.right);
+    r.height -= (margins.top + margins.bottom);
     if (data.fillHorizontal && data.fillVertical) {
       // ok
     } else {

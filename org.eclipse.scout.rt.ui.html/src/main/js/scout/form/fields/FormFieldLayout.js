@@ -18,17 +18,20 @@ scout.FormFieldLayout = function(formField) {
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
 scout.FormFieldLayout.prototype.layout = function($container) {
-  var containerSize, fieldSize, fieldBounds, htmlField, labelPositionLeft, labelHasFieldWidth,
+  var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
     htmlContainer = scout.HtmlComponent.get($container),
     formField = this.formField,
     labelWidth = this.labelWidth,
-    statusWidth = this.statusWidth,
-    left = 0,
-    right = 0,
-    top = 0;
+    statusWidth = this.statusWidth;
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  // Note: Position coordinates start _inside_ the border, therefore we only use the padding
+  containerPadding = htmlContainer.getInsets({
+    includeBorder: false
+  });
+  top = containerPadding.top;
+  right = containerPadding.right;
+  bottom = containerPadding.bottom;
+  left = containerPadding.left;
 
   if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
@@ -39,10 +42,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         labelWidth = scout.graphics.prefSize(formField.$label, true).width;
       }
     }
-    labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
-      formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
-    if (labelPositionLeft) {
-      scout.graphics.setBounds(formField.$label, 0, 0, labelWidth, this.rowHeight);
+    if (scout.helpers.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+      scout.graphics.setBounds(formField.$label, top, left, labelWidth, this.rowHeight);
       left += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
       top += formField.$label.outerHeight(true);
@@ -66,8 +67,18 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
 
   if (formField.$fieldContainer) {
-    fieldSize = containerSize.subtract(scout.graphics.getMargins(formField.$fieldContainer));
-    fieldBounds = new scout.Rectangle(left, top, fieldSize.width - left - right, fieldSize.height - top);
+    // Calculate the additional field offset (because of label, mandatory indicator etc.) without the containerInset.
+    fieldOffset = new scout.Insets(
+        top - containerPadding.top,
+        right - containerPadding.right,
+        bottom - containerPadding.bottom,
+        left - containerPadding.left);
+    // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
+    fieldSize = htmlContainer.getAvailableSize()
+      .subtract(htmlContainer.getInsets())
+      .subtract(fieldOffset)
+      .subtract(scout.graphics.getMargins(formField.$fieldContainer));
+    fieldBounds = new scout.Rectangle(left, top, fieldSize.width, fieldSize.height);
     htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
       htmlField.setBounds(fieldBounds);
@@ -98,7 +109,6 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     scout.scrollbars.update(formField.$field);
     this._layoutDisabledOverlay(formField);
   }
-
 };
 
 scout.FormFieldLayout.prototype._layoutDisabledOverlay = function(formField) {
