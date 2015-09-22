@@ -26,7 +26,7 @@
     #scout.font-text-large();
     #scout.overflow-ellipsis-nowrap();
     padding: 13px 2px 13px 6px;
-    margin: 0 27px 12px 12px;
+    margin: 0 17px 12px 12px;
     border-bottom: 1px solid @breadcrumb-border-color;
   }
 }
