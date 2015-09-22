@@ -216,6 +216,30 @@ scout.DateField.prototype._renderErrorStatus = function() {
   }
 };
 
+/**
+ * @Override FormField.js
+ */
+scout.DateField.prototype._renderFont = function() {
+  this.$dateField && scout.helpers.legacyStyle(this, this.$dateField);
+  this.$timeField && scout.helpers.legacyStyle(this, this.$timeField);
+};
+
+/**
+ * @Override FormField.js
+ */
+scout.DateField.prototype._renderForegroundColor = function() {
+  this.$dateField && scout.helpers.legacyStyle(this, this.$dateField);
+  this.$timeField && scout.helpers.legacyStyle(this, this.$timeField);
+};
+
+/**
+ * @Override FormField.js
+ */
+scout.DateField.prototype._renderBackgroundColor = function() {
+  this.$dateField && scout.helpers.legacyStyle(this, this.$dateField);
+  this.$timeField && scout.helpers.legacyStyle(this, this.$timeField);
+};
+
 scout.DateField.prototype._onDateFieldClick = function() {
   this._openDatePicker(this.timestampAsDate);
 };
