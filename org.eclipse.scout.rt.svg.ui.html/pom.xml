@@ -36,9 +36,5 @@
       <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-    </dependency>
   </dependencies>
 </project>

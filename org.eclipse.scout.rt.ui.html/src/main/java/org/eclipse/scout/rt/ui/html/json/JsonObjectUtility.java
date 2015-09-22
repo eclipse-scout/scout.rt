@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 
@@ -24,12 +25,38 @@ import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class JsonObjectUtility {
 
   private JsonObjectUtility() {
     // static access only
+  }
+
+  public static String[] getNames(JSONObject source) {
+    if (source == null || source.length() == 0) {
+      return null;
+    }
+    String[] names = new String[source.length()];
+    int i = 0;
+    for (Iterator<String> it = source.keys(); it.hasNext();) {
+      String key = it.next();
+      names[i++] = key;
+    }
+    return names;
+  }
+
+  // TODO BSH Check if this is really needed
+  public static JSONObject putOnce(JSONObject object, String key, Object value) {
+    if (key == null || value == null) {
+      return object;
+    }
+    if (object.has(key)) {
+      throw new JSONException("Duplicate key \"" + key + "\"");
+    }
+    object.put(key, value);
+    return object;
   }
 
   /**
@@ -44,12 +71,12 @@ public final class JsonObjectUtility {
     if (json == null || source == null) {
       return;
     }
-    String[] names = JSONObject.getNames(source);
+    String[] names = getNames(source);
     if (names == null) {
       return;
     }
     for (String name : names) {
-      json.put(name, source.opt(name));
+      putOnce(json, name, source.opt(name));
     }
   }
 
@@ -165,7 +192,7 @@ public final class JsonObjectUtility {
     }
     try {
       HashSet<String> missingNames = new HashSet<>();
-      String[] nameArray = JSONObject.getNames(jbean);
+      String[] nameArray = getNames(jbean);
       if (nameArray != null) {
         for (String key : nameArray) {
           missingNames.add(key);
