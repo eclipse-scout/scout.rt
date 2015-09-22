@@ -1,4 +1,3 @@
-@breadcrumb-element-padding: 12px 2px 12px 2px !important;
 @breadcrumb-border-color: @outline-selection-background-color;
 
 /* we have to combine this with .outline, otherwise the definition would not be specific enough */
@@ -19,15 +18,15 @@
 
   .navigation-breadcrumb & > .outline-title {
     text-align: center;
-    padding: @breadcrumb-element-padding;
+    margin: 0;
   }
 
   & > .outline-title {
     cursor: pointer;
     #scout.font-text-large();
     #scout.overflow-ellipsis-nowrap();
-    padding: 5px 2px 21px 6px ;
-    margin: 0px 17px 4px 12px;
+    padding: 13px 2px 13px 6px;
+    margin: 0 27px 12px 12px;
     border-bottom: 1px solid @breadcrumb-border-color;
   }
 }
@@ -136,7 +135,7 @@
     border-bottom: 1px solid @breadcrumb-border-color;
 
     /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-    padding: @breadcrumb-element-padding !important;
+    padding: 12px 2px !important;
 
     &.parent,
     &.children,

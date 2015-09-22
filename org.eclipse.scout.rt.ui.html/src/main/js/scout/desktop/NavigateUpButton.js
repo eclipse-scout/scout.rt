@@ -41,5 +41,6 @@ scout.NavigateUpButton.prototype._drill = function() {
     $.log.debug('show default detail-form');
     this.outline.selectNodes([]);
     this.outline.handleOutlineContent(true);
+    this.outline.collapseAll();
   }
 };
