@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
  * @since 4.3.0 (Mars-M5)
  */
 @RunWith(PlatformTestRunner.class)
-public class SharedCodeServiceTest {
+public class CodeServiceTest {
   private static final Long ABC_ID = 150L;
   private static final Long ZYX_ID = 550L;
 
@@ -217,12 +217,12 @@ public class SharedCodeServiceTest {
   }
 
   protected ICodeService newCodeServiceInstance() {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = new P_TestCodeService();
     BeanInstanceUtil.initializeInstance(service);
     return service;
   }
 
-  static class P_SharedCodeService extends CodeService {
+  static class P_TestCodeService extends CodeService {
     private boolean m_isFirst = true;
 
     @Override
