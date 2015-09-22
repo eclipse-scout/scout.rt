@@ -52,6 +52,9 @@ scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
+  // Override layout
+  this.htmlComp.setLayout(new scout.OutlineLayout(this));
+
   if (this.selectedNodes.length === 0) {
     this._showDefaultDetailForm();
   }

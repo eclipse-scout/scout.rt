@@ -5,22 +5,29 @@ scout.TreeLayout = function(tree) {
 scout.inherits(scout.TreeLayout, scout.AbstractLayout);
 
 scout.TreeLayout.prototype.layout = function($container) {
-  var menuBarSize,
+  var menuBarSize, containerSize, heightOffset,
     menuBar = this.tree.menuBar,
-    $data = this.tree.$data,
-    height = 0,
     htmlMenuBar = menuBar.htmlComp,
-    htmlContainer = this.tree.htmlComp,
-    containerSize = htmlContainer.getAvailableSize()
-      .subtract(htmlContainer.getInsets());
+    htmlContainer = this.tree.htmlComp;
 
+  containerSize = htmlContainer.getAvailableSize()
+    .subtract(htmlContainer.getInsets());
+
+  heightOffset = 0;
   if (menuBar.$container.isVisible()) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
-    height += menuBarSize.height;
+    heightOffset += menuBarSize.height;
   }
-  height += $data.cssMarginTop() + $data.cssMarginBottom();
 
-  $data.css('height', 'calc(100% - ' + height + 'px)');
+  this._setDataHeight(heightOffset);
+};
+
+scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
+  var $data = this.tree.$data;
+
+  heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
+
+  $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
   scout.scrollbars.update($data);
 };

@@ -126,14 +126,19 @@ scout.MenuBarLayout.prototype._destroyEllipsis = function() {
   }
 };
 
+scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
+  // Menubar has an absolute css height set -> useCssSize = true
+  return scout.graphics.prefSize($container, false, true);
+};
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * @memberOf scout.MenuBarLayout
+ */
 scout.MenuBarLayout.size = function(htmlMenuBar, containerSize) {
   var menuBarSize = htmlMenuBar.getPreferredSize();
   menuBarSize.width = containerSize.width;
   menuBarSize = menuBarSize.subtract(htmlMenuBar.getMargins());
   return menuBarSize;
-};
-
-scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
-  // Menubar has an absolute css height set -> useCssSize = true
-  return scout.graphics.prefSize($container, false, true);
 };

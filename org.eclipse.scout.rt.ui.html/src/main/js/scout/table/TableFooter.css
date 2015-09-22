@@ -108,7 +108,7 @@
   position: relative;
   display: none;
   width: 0px;
-  height: @table-footer-height;
+  height: @table-footer-height - 1px; /* subtract border-top of .table-footer */
   color: @table-info-color;
   cursor: pointer;
   line-height: 19px;

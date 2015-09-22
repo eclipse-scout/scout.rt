@@ -183,6 +183,7 @@ __include("scout/desktop/FormToolButton.js");
 __include("scout/desktop/FormToolPopup.js");
 __include("scout/desktop/Outline.js");
 __include("scout/desktop/OutlineKeyStrokeContext.js");
+__include("scout/desktop/OutlineLayout.js");
 __include("scout/desktop/AbstractOutlineTreeNavigationKeyStroke.js");
 __include("scout/desktop/OutlineTreeNavigationUpKeyStroke.js");
 __include("scout/desktop/OutlineTreeCollapseAllKeyStroke.js");
