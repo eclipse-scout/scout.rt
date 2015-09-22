@@ -294,6 +294,7 @@ describe("Tree", function() {
         expect(tmpNode.childrenChecked).toEqual(true);
       }
     });
+
     it("checks a subnode and its sibling->mark upper nodes -> uncheck one of the siblings", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);
@@ -594,6 +595,73 @@ describe("Tree", function() {
 
       //Check gui
       expect(tree.$selectedNodes().length).toBe(0);
+    });
+  });
+
+  describe("updateItemPath", function() {
+    var model, tree, node1, child1, grandchild1, nodes;
+
+    beforeEach(function() {
+      model = createModelFixture(3, 3);
+      tree = createTree(model);
+      nodes = tree.nodes;
+      node1 = nodes[1];
+      child1 = node1.childNodes[1];
+      grandchild1 = child1.childNodes[1];
+    });
+
+    it("Sets css class parent on every ancestor of the selected element", function() {
+      tree.render(session.$entryPoint);
+
+      tree.selectNodes([]);
+      var $parents = tree.$data.find('.tree-node.parent');
+      expect($parents.length).toBe(0);
+
+      tree.selectNodes(node1);
+      $parents = tree.$data.find('.tree-node.parent');
+      expect($parents.length).toBe(0);
+
+      tree.selectNodes(child1);
+      $parents = tree.$data.find('.tree-node.parent');
+      expect($parents.length).toBe(1);
+      expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
+
+      tree.selectNodes(grandchild1);
+      $parents = tree.$data.find('.tree-node.parent');
+      expect($parents.length).toBe(2);
+      expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
+      expect($parents.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
+    });
+
+    it("Sets css class group on every element within the same group", function() {
+      tree.render(session.$entryPoint);
+      tree._isGroupingEnd = function(node) {
+        return node.nodeType === 'groupingParent';
+      };
+
+      tree.selectNodes([]);
+      var $groupNodes = tree.$data.find('.tree-node.group');
+      expect($groupNodes.length).toBe(0);
+
+      tree.selectNodes(node1);
+      $groupNodes = tree.$data.find('.tree-node.group');
+      expect($groupNodes.length).toBe(1);
+      expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
+
+      node1.nodeType = 'groupingParent';
+      tree.selectNodes(child1);
+      $groupNodes = tree.$data.find('.tree-node.group');
+      expect($groupNodes.length).toBe(1);
+      expect($groupNodes.eq(0)[0]).toBe(child1.$node[0]);
+
+      node1.nodeType = 'groupingParent';
+      tree.selectNodes(grandchild1);
+      $groupNodes = tree.$data.find('.tree-node.group');
+      expect($groupNodes.length).toBe(4);
+      expect($groupNodes.eq(0)[0]).toBe(child1.$node[0]);
+      expect($groupNodes.eq(1)[0]).toBe(child1.childNodes[0].$node[0]);
+      expect($groupNodes.eq(2)[0]).toBe(child1.childNodes[1].$node[0]);
+      expect($groupNodes.eq(3)[0]).toBe(child1.childNodes[2].$node[0]);
     });
   });
 

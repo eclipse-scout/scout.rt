@@ -120,7 +120,6 @@ describe("Outline", function() {
 
   });
 
-
   describe("onModelAction", function() {
 
     describe("nodesDeleted event", function() {

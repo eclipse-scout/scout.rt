@@ -353,6 +353,15 @@ scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedN
   return propertiesChanged;
 };
 
+/**
+ * Called by updateItemPath.
+ *
+ * @override
+ */
+scout.Outline.prototype._isGroupingEnd = function(node) {
+  return node.nodeType == 'table';
+};
+
 /* event handling */
 
 scout.Outline.prototype._onDetailTableRowsSelected = function(event) {

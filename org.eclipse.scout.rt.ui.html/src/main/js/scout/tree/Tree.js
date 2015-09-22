@@ -1328,7 +1328,8 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
 };
 
 scout.Tree.prototype._updateItemPath = function() {
-  var $selectedNodes, $node, level;
+  var $selectedNodes, $node, level,
+    selectedNode = this.selectedNodes[0];
 
   // first remove and select selected
   this.$data.find('.tree-node').removeClass('parent children group');
@@ -1360,7 +1361,14 @@ scout.Tree.prototype._updateItemPath = function() {
     $node = $node.next();
   }
 
-  // find parents
+  // Mark all parent nodes, especially necessary for bread crumb mode
+  var parentNode = selectedNode.parentNode;
+  while (parentNode) {
+    parentNode.$node.addClass('parent');
+    parentNode = parentNode.parentNode;
+  }
+
+  // find grouping end (ultimate parent)
   var $ultimate;
   if ($selectedNodes.parent().hasClass('animation-wrapper')) {
     //If node expansion animation is in progress, the nodes are wrapped by a div
@@ -1368,15 +1376,13 @@ scout.Tree.prototype._updateItemPath = function() {
   } else {
     $node = $selectedNodes.prev();
   }
-
   while ($node.length > 0) {
     var k = parseFloat($node.attr('data-level'));
     if (k < level) {
-      if ($node.data('node').nodeType == 'table' && !this._breadcrumbEnabled) {
+      if (this._isGroupingEnd($node.data('node'))) {
         break;
       }
 
-      $node.addClass('parent');
       level = k;
       $ultimate = $node;
     }
@@ -1406,6 +1412,11 @@ scout.Tree.prototype._updateItemPath = function() {
       break;
     }
   }
+};
+
+scout.Tree.prototype._isGroupingEnd = function(node) {
+  // May be implemented by subclasses, default tree has no grouping parent
+  return false;
 };
 
 scout.Tree.prototype.$selectedNodes = function() {

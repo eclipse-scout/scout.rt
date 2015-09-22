@@ -16,11 +16,6 @@
     color: @palette-white;
   }
 
-  .navigation-breadcrumb & > .outline-title {
-    text-align: center;
-    margin: 0;
-  }
-
   & > .outline-title {
     cursor: pointer;
     #scout.font-text-large();
@@ -28,45 +23,6 @@
     padding: 13px 2px 13px 6px;
     margin: 0 17px 12px 12px;
     border-bottom: 1px solid @breadcrumb-border-color;
-  }
-}
-
-.outline-control-panel {
-  @control-panel-height: 39px;
-  height: @control-panel-height;
-  border-bottom : 2px solid @navigation-background-color;
-
-  & ~ .tree {
-    height: calc(~'100%' - 70px);
-  }
-
-  & .menu-item:not(.last) {
-    margin-right: 0px;
-  }
-
-  & .menu-item {
-    height: 100%;
-    width: 50%;
-    line-height: 39px;
-    text-align: center;
-    background: @outline-control-button-background-color;
-    position: relative;
-
-    & > .font-icon {
-      color: @palette-white;
-    }
-
-    &:not(.disabled):hover:not(.default-menu) > .font-icon {
-      color: @palette-white;
-    }
-
-
-    &:first-child {
-      border-right: 1px solid @navigation-background-color;
-    }
-    &:last-child {
-      border-left: 1px solid @navigation-background-color;
-    }
   }
 }
 
@@ -122,84 +78,92 @@
       }
     }
   }
-
-  /* bread crumb mode */
-
-  .navigation-breadcrumb & > .tree-node,
-  .navigation-breadcrumb & > .animation-wrapper > .tree-node {
-    overflow: visible;
-    white-space: normal;
-    text-align: center;
-
-    display: none;
-    border-bottom: 1px solid @breadcrumb-border-color;
-
-    /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-    padding: 12px 2px !important;
-
-    &.parent,
-    &.children,
-    &.selected {
-      #scout.font-text-plus();
-      display: block;
-      background-color: @outline-group-background-color;
-    }
-
-    &.hidden {
-      display: none;
-    }
-
-    &.lazy::before {
-      content: '+';
-      padding-right: 5px;
-    }
-
-    &.selected {
-      background-color: @outline-selection-background-color;
-      color: @outline-selection-color;
-      cursor: default;
-    }
-
-    &.parent::before,
-    &.parent::after,
-    &.selected::before {
-      position: absolute;
-      left: 50%;
-      margin-left: -13px;
-      border: solid transparent;
-      content: '';
-      height: 0;
-      width: 0;
-      z-index: 1;
-    }
-
-    &.parent::before {
-      border-color: @outline-selection-background-color transparent transparent transparent;
-      border-width: 8px 13px 0 13px;
-      bottom: -9px;
-    }
-
-    &.parent::after {
-      border-color: @outline-group-background-color transparent transparent transparent;
-      border-width: 8px 13px 0 13px;
-      bottom: -8px;
-    }
-
-    &.selected::before {
-      border-color: @outline-selection-background-color transparent transparent transparent;
-      border-width: 8px 13px 0 13px;
-      bottom: -8px;
-    }
-
-    &.parent.leaf::before,
-    &.parent.leaf::after,
-    &.selected.leaf::before {
-      display: none;
-    }
-  }
-
-  .navigation-breadcrumb & > .tree-node-control {
-    display: none;
-  }
 }
 
+/* bread crumb mode */
+.navigation-breadcrumb > .navigation-container > .outline {
+
+  & > .outline-title {
+    text-align: center;
+    margin: 0;
+  }
+
+  & > .tree-data {
+    & > .tree-node,
+    & > .animation-wrapper > .tree-node {
+      overflow: visible;
+      white-space: normal;
+      text-align: center;
+
+      display: none;
+      border-bottom: 1px solid @breadcrumb-border-color;
+
+      /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
+      padding: 12px 2px !important;
+
+      &.parent,
+      &.children,
+      &.selected {
+        #scout.font-text-plus();
+        display: block;
+        background-color: @outline-group-background-color;
+      }
+
+      &.hidden {
+        display: none;
+      }
+
+      &.lazy::before {
+        content: '+';
+        padding-right: 5px;
+      }
+
+      &.selected {
+        background-color: @outline-selection-background-color;
+        color: @outline-selection-color;
+        cursor: default;
+      }
+
+      &.parent::before,
+      &.parent::after,
+      &.selected::before {
+        position: absolute;
+        left: 50%;
+        margin-left: -13px;
+        border: solid transparent;
+        content: '';
+        height: 0;
+        width: 0;
+        z-index: 1;
+      }
+
+      &.parent::before {
+        border-color: @outline-selection-background-color transparent transparent transparent;
+        border-width: 8px 13px 0 13px;
+        bottom: -9px;
+      }
+
+      &.parent::after {
+        border-color: @outline-group-background-color transparent transparent transparent;
+        border-width: 8px 13px 0 13px;
+        bottom: -8px;
+      }
+
+      &.selected::before {
+        border-color: @outline-selection-background-color transparent transparent transparent;
+        border-width: 8px 13px 0 13px;
+        bottom: -8px;
+      }
+
+      &.parent.leaf::before,
+      &.parent.leaf::after,
+      &.selected.leaf::before {
+        display: none;
+      }
+    }
+
+    & > .tree-node-control {
+      display: none;
+    }
+  }
+}
