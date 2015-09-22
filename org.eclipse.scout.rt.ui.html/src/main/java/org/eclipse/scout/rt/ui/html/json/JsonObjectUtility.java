@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 
 import org.eclipse.scout.commons.beans.FastBeanInfo;
@@ -80,19 +79,9 @@ public final class JsonObjectUtility {
     }
   }
 
+  // TODO BSH Remove this method
   public static JSONObject newOrderedJSONObject() {
-    JSONObject o = new JSONObject();
-    // Try to replace the internal hash map by a LinkedHashMap. Unfortunately, there is no API for that...
-    // LinkedHashMap preserves the insertion order of properties, which is helpful while debugging purposes.
-    try {
-      Field field = o.getClass().getDeclaredField("map");
-      field.setAccessible(true);
-      field.set(o, new LinkedHashMap<>());
-    }
-    catch (Exception e) {
-      // nop
-    }
-    return o;
+    return new JSONObject();
   }
 
   public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
