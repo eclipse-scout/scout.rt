@@ -1,0 +1,30 @@
+org.eclipse.scout.json
+----------------------
+
+org.json is a popular Java library to parse and create JSON strings. It is
+written by the author of the JSON standard, Douglas Crockford. This is a
+clean-room implementation of the org.json code. It was created by the Android
+team and can be used instead of the original one, as it provides a nearly
+identical API. It is released under the Apache 2.0 license (see the LICENSE
+file for details). By avoiding the the good vs. evil clause of the original
+license at http://www.json.org/license.html it is considered "free software".
+
+This module is an extract of the "org.json" relevant code from the Android
+project. The code was originally cloned on 2015-04-29 from:
+https://android.googlesource.com/platform/libcore/+/310eafdfeb5db23a4d5e405bbe607cffd1f4b24a/json/
+https://android.googlesource.com/platform/libcore/+/master/json
+
+Contributors:
+
+  The Android Open Source Project
+  - Original author (libandroid-json-org-jav)
+  - Clean-room reimplementation of org.json Java library
+
+  BSI Business Systems Integration AG:
+  - Wrapped org.json packages in Maven module, added POM with Scout as parent
+  - JSONException extends RuntimeException instead of Exception.
+  - Applied Scout code formatting rules
+  - Disabled/fixed failing JUnit tests (ParsingTest.test64BitHexValues, JSONObjectTest.test_wrap)
+
+Eclipse IP review: CQ# 9651
+https://dev.eclipse.org/ipzilla/show_bug.cgi?id=9651
