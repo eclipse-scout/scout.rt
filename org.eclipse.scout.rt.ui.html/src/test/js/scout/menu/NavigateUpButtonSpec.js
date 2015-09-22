@@ -75,6 +75,7 @@ describe("NavigateUpButton", function() {
     beforeEach(function() {
       outline.selectNodes = function(node) {};
       outline.collapseNode = function(node) {};
+      outline.collapseAll = function(node) {};
     });
 
     it("drills up to parent node, sets the selection on the tree", function() {
