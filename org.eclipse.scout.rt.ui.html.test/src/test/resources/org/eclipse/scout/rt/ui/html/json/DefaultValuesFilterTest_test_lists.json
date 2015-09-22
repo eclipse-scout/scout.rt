@@ -10,7 +10,7 @@
     {
       "id": "2",
       "objectType": "Menu",
-      "menuTypes": [ "Table.Header", "Table.Empty" ], // equal to default value (same order)
+      "menuTypes": [ "Table.Header", "Table.Empty" ] // equal to default value (same order)
     },
     {
       "id": "3",

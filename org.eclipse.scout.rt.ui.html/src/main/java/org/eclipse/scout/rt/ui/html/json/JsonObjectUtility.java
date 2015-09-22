@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class JsonObjectUtility {
@@ -46,18 +45,6 @@ public final class JsonObjectUtility {
     return names;
   }
 
-  // TODO BSH Check if this is really needed
-  public static JSONObject putOnce(JSONObject object, String key, Object value) {
-    if (key == null || value == null) {
-      return object;
-    }
-    if (object.has(key)) {
-      throw new JSONException("Duplicate key \"" + key + "\"");
-    }
-    object.put(key, value);
-    return object;
-  }
-
   /**
    * Puts every property from source to json.
    *
@@ -75,7 +62,7 @@ public final class JsonObjectUtility {
       return;
     }
     for (String name : names) {
-      putOnce(json, name, source.opt(name));
+      json.put(name, source.opt(name));
     }
   }
 
