@@ -88,7 +88,19 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     // client session household
     synchronized (m_cacheLock) {
       m_sessionIdToSession.remove(session.getId());
-      m_userToSessions.remove(userId);
+      List<WeakReference<IClientSession>> userSessions = m_userToSessions.get(userId);
+      if (userSessions != null) {
+        for (Iterator<WeakReference<IClientSession>> it = userSessions.iterator(); it.hasNext();) {
+          WeakReference<IClientSession> ref = it.next();
+          IClientSession clientSession = ref.get();
+          if (clientSession == null || CompareUtility.equals(clientSession.getId(), session.getId())) {
+            it.remove();
+          }
+        }
+        if (userSessions.isEmpty()) {
+          m_userToSessions.remove(userId);
+        }
+      }
     }
   }
 
