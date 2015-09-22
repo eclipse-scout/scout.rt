@@ -56,7 +56,11 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
     return scout.ButtonAdapterMenu.parent.prototype.doAction.call(this, srcEvent);
   }
   // Eventhing else is delegated to the button
-  return this.button.doAction();
+  var actionExecuted = this.button.doAction();
+  if (actionExecuted && this.actionStyle === scout.Action.ActionStyle.TOGGLE && this.rendered) {
+    this.setSelected(!this.selected);
+  }
+  return actionExecuted;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
