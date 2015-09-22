@@ -26,8 +26,8 @@
     cursor: pointer;
     #scout.font-text-large();
     #scout.overflow-ellipsis-nowrap();
-    padding: 12px 2px 18px 6px ;
-    margin: 0px 17px 10px 12px;
+    padding: 5px 2px 21px 6px ;
+    margin: 0px 17px 4px 12px;
     border-bottom: 1px solid @breadcrumb-border-color;
   }
 }

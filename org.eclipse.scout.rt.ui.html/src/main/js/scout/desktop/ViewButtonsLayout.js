@@ -17,11 +17,7 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     tabWidth = (containerBounds.width/tabs);
   $container.children().each(function() {
     var $tab = $(this);
-    var oldStyle = $tab.attr('style');
     $tab.removeAttr('style');
     scout.graphics.setSize($tab, new scout.Dimension(tabWidth, containerBounds.height));
-    if (oldStyle) { // restore style  (required for animation)
-      $tab.attr('style', oldStyle);
-    }
   });
 };
