@@ -666,6 +666,7 @@ public class JsonTreeTest {
     JSONObject data = new JSONObject();
     data.put(JsonTree.PROP_NODE_ID, nodeId);
     data.put("expanded", expanded);
+    data.put("expandedLazy", false);
     return new JsonEvent("", JsonTree.EVENT_NODE_EXPANDED, data);
   }
 
