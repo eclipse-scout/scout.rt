@@ -41,20 +41,31 @@ public class JsonStartupRequest extends JsonRequest {
     super(request.getRequestObject());
   }
 
+  /**
+   * @return clientSessionId or <code>null</code> (optional attribute)
+   */
   public String getClientSessionId() {
-    return getRequestObject().optString(PROP_CLIENT_SESSION_ID);
+    return getRequestObject().optString(PROP_CLIENT_SESSION_ID, null);
   }
 
+  /**
+   * @return parentUiSessionId or <code>null</code> (optional attribute)
+   */
   public String getParentUiSessionId() {
     return getRequestObject().optString(PROP_PARENT_UI_SESSION_ID, null);
   }
 
+  /**
+   * @return userAgent or <code>null</code> (optional attribute)
+   */
   public JSONObject getUserAgent() {
     return getRequestObject().optJSONObject(PROP_USER_AGENT);
   }
 
   /**
    * These properties are available at {@link PropertyMap#CURRENT} when the {@link IClientSession} starts
+   *
+   * @return customParams or <code>null</code> (optional attribute)
    */
   public JSONObject getCustomParams() {
     return getRequestObject().optJSONObject(PROP_CUSTOM_PARAMS);

@@ -174,16 +174,16 @@ public class JsonDateField<T extends IDateField> extends JsonBasicField<T> {
   }
 
   protected void handleUiTimestampChanged(JsonEvent event) {
-    Date date = new JsonDate(event.getData().optString(PROP_TIMESTAMP)).asJavaDate();
+    Date date = new JsonDate(event.getData().optString(PROP_TIMESTAMP, null)).asJavaDate();
     addPropertyEventFilterCondition(IValueField.PROP_VALUE, date);
     getModel().getUIFacade().removeParseErrorFromUI();
     getModel().getUIFacade().setDateTimeFromUI(date);
   }
 
   protected void handleUiParsingError(JsonEvent event) {
-    String invalidDisplayText = event.getData().optString(PROP_INVALID_DISPLAY_TEXT);
-    String invalidDateText = event.getData().optString(PROP_INVALID_DATE_TEXT);
-    String invalidTimeText = event.getData().optString(PROP_INVALID_TIME_TEXT);
+    String invalidDisplayText = event.getData().optString(PROP_INVALID_DISPLAY_TEXT, null);
+    String invalidDateText = event.getData().optString(PROP_INVALID_DATE_TEXT, null);
+    String invalidTimeText = event.getData().optString(PROP_INVALID_TIME_TEXT, null);
     getModel().getUIFacade().removeParseErrorFromUI();
     getModel().getUIFacade().setParseErrorFromUI(invalidDisplayText, invalidDateText, invalidTimeText);
   }

@@ -74,7 +74,7 @@ public class JsonBeanTest {
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();
-    assertEquals(Base64Utility.encode(str.getBytes()), json.optString("bytes"));
+    assertEquals(Base64Utility.encode(str.getBytes()), json.getString("bytes"));
   }
 
   @Test

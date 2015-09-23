@@ -129,8 +129,8 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   }
 
   protected void handleUiPostMessage(JsonEvent event) {
-    String data = event.getData().optString("data");
-    String origin = event.getData().optString("origin");
+    String data = event.getData().optString("data", null);
+    String origin = event.getData().optString("origin", null);
     getModel().getUIFacade().firePostMessageFromUI(data, origin);
   }
 
