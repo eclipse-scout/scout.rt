@@ -387,5 +387,12 @@
        </init-param>
     </filter>
   </extension>
+  <extension
+        point="org.eclipse.ui.statusHandlers">
+     <statusHandler
+           class="org.eclipse.scout.rt.ui.rap.ScoutErrorHandler"
+           id="org.eclipse.scout.rt.ui.rap.statusHandler">
+     </statusHandler>
+  </extension>
 
 </plugin>
