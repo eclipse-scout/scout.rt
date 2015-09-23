@@ -529,7 +529,7 @@ public class JSONObject {
    */
   public String getString(String name) throws JSONException {
     Object object = get(name);
-    String result = JSON.toString(object);
+    String result = (NULL.equals(object) ? null : JSON.toString(object));
     if (result == null) {
       throw JSON.typeMismatch(name, object, "String");
     }
@@ -550,7 +550,7 @@ public class JSONObject {
    */
   public String optString(String name, String fallback) {
     Object object = opt(name);
-    String result = JSON.toString(object);
+    String result = (NULL.equals(object) ? null : JSON.toString(object));
     return result != null ? result : fallback;
   }
 
