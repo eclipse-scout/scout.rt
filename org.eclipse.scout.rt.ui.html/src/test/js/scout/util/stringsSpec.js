@@ -296,12 +296,18 @@ describe("scout.strings", function() {
       expect(scout.strings.plainText(htmlText)).toBe('1. cell 2. cell\n1. cell(r2) 2. cell(r2)\n');
     });
 
-    it("converts &nbsp;, &amp;", function() {
+    it("converts &nbsp;, &amp;, &gt;, &lt;", function() {
       var htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
-      expect(scout.strings.plainText(htmlText)).toBe('first word next word');
+      expect(scout.strings.plainText(htmlText)).toBe('first word next word');
 
       htmlText = '<b>first&amp;word</b>&amp;next word';
       expect(scout.strings.plainText(htmlText)).toBe('first&word&next word');
+
+      htmlText = '<b>first&gt;word</b>&lt;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first>word<next word');
+
+      htmlText = '<b>first&lt;word</b>&gt;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first<word>next word');
     });
 
   });
