@@ -310,6 +310,11 @@ describe("scout.strings", function() {
       expect(scout.strings.plainText(htmlText)).toBe('first<word>next word');
     });
 
+    it("preserves tabs", function() {
+      var htmlText = '\t\t';
+      expect(scout.strings.plainText(htmlText)).toBe('\t\t');
+    });
+
   });
 
 });
