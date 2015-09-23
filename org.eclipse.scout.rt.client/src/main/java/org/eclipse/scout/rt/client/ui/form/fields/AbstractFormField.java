@@ -1966,6 +1966,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     propertySupport.setPropertyBool(PROP_STATUS_VISIBLE, statusVisible);
   }
 
+  @Override
+  public void setLoading(boolean loading) {
+    propertySupport.setPropertyBool(PROP_LOADING, loading);
+  }
+
+  @Override
+  public boolean isLoading() {
+    return propertySupport.getPropertyBool(PROP_LOADING);
+  }
+
   private class P_MasterListener implements MasterListener {
     @Override
     public void masterChanged(Object newMasterValue) {

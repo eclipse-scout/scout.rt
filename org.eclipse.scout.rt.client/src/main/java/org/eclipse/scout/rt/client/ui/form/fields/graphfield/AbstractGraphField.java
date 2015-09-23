@@ -43,14 +43,6 @@ public class AbstractGraphField extends AbstractValueField<GraphModel>implements
   protected void execAppLinkAction(String ref) throws ProcessingException {
   }
 
-  public boolean isLoading() {
-    return propertySupport.getPropertyBool(PROP_LOADING);
-  }
-
-  public void setLoading(boolean loading) {
-    propertySupport.setPropertyBool(PROP_LOADING, loading);
-  }
-
   @Override
   public IGraphFieldUIFacade getUIFacade() {
     return m_uiFacade;

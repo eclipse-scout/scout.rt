@@ -16,7 +16,5 @@ import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 
 public interface IGraphField extends IValueField<GraphModel>, IAppLinkCapable {
 
-  String PROP_LOADING = "loading";
-
   IGraphFieldUIFacade getUIFacade();
 }
