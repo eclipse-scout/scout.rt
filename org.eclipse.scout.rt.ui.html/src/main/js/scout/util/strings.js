@@ -136,10 +136,10 @@ scout.strings = {
     text = text.replace(/^[ ]+/gm, '');
     text = text.replace(/[ ]+$/gm, '');
 
-    // Replace character entities
-    text = text.replace(/&nbsp;/gi, " ");
-    text = text.replace(/&amp;/gi, "&");
-    return text;
+    // Replace character html entities (e.g. &nbsp;, &gt;, ...)
+    var textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
   },
 
   /**
