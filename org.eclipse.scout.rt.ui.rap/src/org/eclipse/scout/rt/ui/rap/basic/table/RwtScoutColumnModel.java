@@ -44,6 +44,9 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private final Image m_imgCheckboxFalse;
   private final Image m_imgCheckboxTrue;
   private final Color m_disabledForegroundColor;
+
+  private final Object m_cacheLock = new Object();
+  /** guarded by m_cacheLock */
   private Map<ITableRow, Map<IColumn<?>, P_CachedCell>> m_cachedCells;
 
   public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
@@ -257,12 +260,14 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   protected ICell getCell(Object row, int colIndex) {
     IColumn<?> column = m_columnManager.getColumnByModelIndex(colIndex - 1);
     if (column != null) {
-      if (m_cachedCells == null || m_cachedCells.get(row) == null) {
-        rebuildCache();
-      }
-      P_CachedCell cachedCell = m_cachedCells.get(row).get(column);
-      if (cachedCell != null) {
-        return cachedCell.m_cell;
+      synchronized (m_cacheLock) {
+        if (m_cachedCells == null || m_cachedCells.get(row) == null) {
+          rebuildCache();
+        }
+        P_CachedCell cachedCell = m_cachedCells.get(row).get(column);
+        if (cachedCell != null) {
+          return cachedCell.m_cell;
+        }
       }
     }
     return null;
@@ -329,7 +334,9 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   private void rebuildCache() {
     if (getScoutTable() == null) {
-      m_cachedCells = CollectionUtility.emptyHashMap();
+      synchronized (m_cacheLock) {
+        m_cachedCells = CollectionUtility.emptyHashMap();
+      }
       return;
     }
 
@@ -348,13 +355,16 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
           }
           tmp.put(scoutRow, cells);
         }
+        synchronized (m_cacheLock) {
+          m_cachedCells = tmp;
+        }
 
-        m_cachedCells = tmp;
       }
     };
 
     try {
-      getUiTable().getUiEnvironment().invokeScoutLater(r, 2345).join(2345);
+      //prohibit access of m_cachedCells during rebuild
+      getUiTable().getUiEnvironment().invokeScoutLater(r, -1).join(1);
     }
     catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for the model.", e);
