@@ -40,7 +40,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     logoWidth = 0,
     toolsWidth, tabsWidth;
 
-  if (this._desktop.session.uiOptions.useTaskbarLogo) {
+  if (this._desktop.session.uiUseTaskbarLogo) {
     var $logo = $container.find('.taskbar-logo');
     logoWidth = scout.graphics.getSize($logo, true).width;
   }

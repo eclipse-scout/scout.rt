@@ -3,18 +3,37 @@
 // }(window.scout = window.scout || {}, jQuery));
 scout.sessions = [];
 
-scout._uniqueIdSeqNo = 0;
-
 /**
- * Returns a new unique ID to be used for Widgets/Adapters created by the UI
- * without a model delivered by the server-side client.
+ * Main initialization function.<p>
  *
+ * Calls scout._bootstrap and scout._init.<p>
+ * During the bootstrap phase additional scripts may get loaded required for a successful session startup.
+ * The actual initialization does not get started before these bootstrap scripts are loaded.
  */
-scout.createUniqueId = function() {
-  return 'ui' + (++scout._uniqueIdSeqNo).toString();
+scout.init = function(options) {
+  var deferreds = scout._bootstrap(options.bootstrap);
+  $.when.apply($, deferreds)
+    .done(scout._init.bind(scout, options.session));
 };
 
-scout.init = function(options) {
+/**
+ * Executes the default bootstrap functions and returns an array of deferred objects.<p>
+ * The actual session startup begins only when every of these deferred objects are completed.
+ * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
+ */
+scout._bootstrap = function(options) {
+  return [
+    scout.logging.bootstrap(),
+    scout.device.bootstrap(),
+    scout.defaultValues.bootstrap(),
+    scout.fonts.bootstrap(options.fonts)
+  ];
+};
+
+/**
+ * Initializes a session for each html element with class '.scout' and stores them in scout.sessions.
+ */
+scout._init = function(options) {
   options = options || {};
   if (!this._checkBrowserCompability(options)) {
     return;
@@ -33,6 +52,17 @@ scout.init = function(options) {
     session.init();
     scout.sessions.push(session);
   });
+};
+
+scout._uniqueIdSeqNo = 0;
+
+/**
+ * Returns a new unique ID to be used for Widgets/Adapters created by the UI
+ * without a model delivered by the server-side client.
+ *
+ */
+scout.createUniqueId = function() {
+  return 'ui' + (++scout._uniqueIdSeqNo).toString();
 };
 
 /**
@@ -88,8 +118,8 @@ scout._installGlobalJavascriptErrorHandler = function() {
         var boxOptions = {
           header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
           body: scout.strings.join('\n\n',
-              session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
-              session.optText('ui.UiInconsistentMsg', '')),
+            session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
+            session.optText('ui.UiInconsistentMsg', '')),
           yesButtonText: session.optText('ui.Reload', 'Reload'),
           yesButtonAction: function() {
             scout.reloadPage();
@@ -163,8 +193,7 @@ scout.adapter = function(adapterId, sessionIndex) {
   var session;
   if (scout.sessions.length === 1) {
     session = scout.sessions[0];
-  }
-  else {
+  } else {
     sessionIndex = sessionIndex || 0;
     for (var i = 0; i < scout.sessions.length; i++) {
       if (scout.sessions[i].partId == sessionIndex) { // <-- compare with '==' is intentional!

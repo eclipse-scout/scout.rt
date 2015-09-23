@@ -124,7 +124,6 @@ scout.TableSelectionHandler.prototype.handleSelection = function(event) {
   }
 
   // Set the new selection
-  $.log.error("from:" + this.fromIndex + " to:" + this.toIndex);
   this._selectRange(this.fromIndex, this.toIndex, this.select);
 };
 

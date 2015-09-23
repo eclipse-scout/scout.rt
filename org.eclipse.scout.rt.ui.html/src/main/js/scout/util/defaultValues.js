@@ -13,7 +13,7 @@ scout.defaultValues = {
   /**
    * @memberOf scout.defaultValues
    */
-  init: function() {
+  bootstrap: function() {
     var that = this;
     // Load default value configuration from server (and cache it)
     return $.ajax({

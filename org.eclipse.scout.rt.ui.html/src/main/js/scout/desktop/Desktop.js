@@ -254,7 +254,7 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
   this._$taskBar = $parent.appendDiv('desktop-taskbar');
   var htmlTabbar = new scout.HtmlComponent(this._$taskBar, this.session);
   htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
-  if (this.session.uiOptions.useTaskbarLogo) {
+  if (this.session.uiUseTaskbarLogo) {
     this._$taskBarLogo = this._$taskBar.appendDiv('taskbar-logo');
   }
   this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');

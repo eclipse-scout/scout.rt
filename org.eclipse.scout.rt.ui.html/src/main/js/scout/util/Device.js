@@ -1,3 +1,4 @@
+/* global FastClick */
 /**
  * Provides information about the device and its supported features.<p>
  * The informations are detected lazily.
@@ -34,17 +35,32 @@ scout.Device.System = {
 };
 
 /**
- * Called by index.html. Precalculates the value of some attributes to store them
- * in a static way (and prevent many repeating function calls within loops).
+ * Called during bootstrap by index.html before the session startup.<p>
+ * Precalculates the value of some attributes to store them
+ * in a static way (and prevent many repeating function calls within loops).<p>
+ * Also loads device specific scripts (fast click for ios devices)
  */
-scout.Device.prototype.initDeviceSpecificAttributes = function() {
+scout.Device.prototype.bootstrap = function() {
+  var $deferred;
+
   // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
   this.unselectableAttribute = this.getUnselectableAttribute();
   this.tableAdditionalDivRequired = this.isTableAdditionalDivRequired();
+
+  if (this.isIos()) {
+    // We use fastscript to prevent the 300ms delay when touching an element.
+    // With Chrome 32 the issue is solved, so no need to load the script for other devices than ios
+    $deferred = $
+      .getCachedScript("res/fastclickmod-1.0.1.min.js")
+      .done(function(script, textStatus) {
+        FastClick.attach(document.body);
+      });
+  }
+  return $deferred;
 };
 
 scout.Device.prototype.isIos = function() {
-  return this.system === scout.Device.SYSTEM_IOS;
+  return this.system === scout.Device.System.IOS;
 };
 
 /**

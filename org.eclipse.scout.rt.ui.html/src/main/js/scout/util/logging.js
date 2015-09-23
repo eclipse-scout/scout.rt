@@ -1,13 +1,13 @@
 /* global log4javascript */
 scout.logging = {
-  defaultLevel: 'trace',
+  defaultLevel: 'info',
 
   /***
    * Loads log4javascript.min.js if logging is enabled.
    *
    * @returns $.deferred
    */
-  init: function() {
+  bootstrap: function() {
     var $deferred;
     var location = new scout.URL();
     var enabled = location.getParameter('logging');

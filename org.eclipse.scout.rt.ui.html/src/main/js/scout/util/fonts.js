@@ -12,7 +12,7 @@ scout.fonts = {
    * Start preloading the specified fonts. Font names may be passed as multiple arguments
    * or in a single string array.
    */
-  init: function() {
+  bootstrap: function() {
     // Allow vararg and single-array-arg style
     if (arguments.length === 0) {
       return;

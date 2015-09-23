@@ -30,11 +30,9 @@
  *     use setTimeout(), sometimes the Jasmine-Maven plug-in fails and aborts the
  *     build because there were console errors. These errors always happen in this
  *     class. That's why we can skip suppress error handling with this flag.
- *   [uiOptions]
- *     Optional objects object that influences various parts of the core Scout Html UI.
- *     Currently supported UI options:
- *     o "useTaskbarLogo": Default false. If true, the desktop will add a small logo
- *          to the taskbar. It is styled with the CSS class ".taskbar-logo".
+ *   [uiUseTaskbarLogo]
+ *     "uiUseTaskbarLogo": Default false. If true, the desktop will add a small logo
+ *        to the taskbar. It is styled with the CSS class ".taskbar-logo".
  */
 scout.Session = function($entryPoint, options) {
   options = options || {};
@@ -76,7 +74,7 @@ scout.Session = function($entryPoint, options) {
   this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.helpers.nvl(options.backgroundJobPollingEnabled, true));
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
-  this.uiOptions = options.uiOptions || {};
+  this.uiUseTaskbarLogo = options.uiUseTaskbarLogo;
 
   this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
@@ -737,7 +735,6 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
 };
 
 scout.Session.prototype.goOffline = function() {
-  $.log.error('goOffline');
   this.offline = true;
 
   // In Firefox, the current async polling request is interrupted immediately when the page is unloaded. Therefore,
@@ -930,6 +927,8 @@ scout.Session.prototype._processEvents = function(events) {
 };
 
 scout.Session.prototype.init = function() {
+  $.log.info('Session initializing...');
+
   // After a short time, display a loading animation (will be removed again in _onInitialized)
   this._setApplicationLoading(true);
 
@@ -1020,6 +1019,8 @@ scout.Session.prototype._onDisposeAdapter = function(event) {
 };
 
 scout.Session.prototype._onWindowUnload = function() {
+  $.log.info('Session unloading...');
+
   // Destroy UI session on server
   this._unload = true;
   this._sendNow();

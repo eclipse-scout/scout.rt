@@ -46,12 +46,11 @@
 
   <script type="text/javascript" src="src/main/js/scout/mobileObjectFactories.js"></script>
   <script type="text/javascript" src="src/main/js/scout/desktop/MobileDesktop.js"></script>
-  <script type="text/javascript" src="src/main/js/scout/desktop/MobileOutline.js"></script>
   <script type="text/javascript" src="src/main/js/scout/table/MobileTable.js"></script>
 
   <script type="text/javascript">
     <!-- This is usually done in index.html, but here, we have to do it manually -->
-    scout.logging.init();
+    scout.logging.bootstrap();
 
     jQuery.ajax({
       async: false,
