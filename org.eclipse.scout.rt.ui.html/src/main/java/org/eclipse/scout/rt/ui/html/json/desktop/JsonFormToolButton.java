@@ -14,12 +14,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 
-public class JsonFormToolButton<FORM_TOOL_BUTTON extends IFormToolButton<IForm>> extends JsonAction<FORM_TOOL_BUTTON> {
+public class JsonFormToolButton<FORM_TOOL_BUTTON extends IFormToolButton<IForm>> extends JsonMenu<FORM_TOOL_BUTTON> {
 
   public JsonFormToolButton(FORM_TOOL_BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

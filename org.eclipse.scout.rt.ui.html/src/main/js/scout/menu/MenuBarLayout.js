@@ -89,6 +89,12 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   } else {
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   }
+  this._menuBar.visibleMenuItems.forEach(function(menuItem) {
+    if (menuItem.popup && menuItem.popup.alignTo) {
+      // FIXME CGU verify if really ok and rename alignTo to position
+      menuItem.popup.alignTo();
+    }
+  });
 };
 
 /**

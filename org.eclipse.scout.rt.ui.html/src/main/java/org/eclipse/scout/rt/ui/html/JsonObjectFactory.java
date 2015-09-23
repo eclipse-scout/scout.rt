@@ -290,6 +290,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (model instanceof IContextMenu) {
       return new JsonContextMenu<IContextMenu>((IContextMenu) model, session, id, parent);
     }
+    if (model instanceof IFormToolButton<?>) {
+      return new JsonFormToolButton((IFormToolButton<?>) model, session, id, parent);
+    }
     if (model instanceof IMenu) {
       return new JsonMenu<IMenu>((IMenu) model, session, id, parent);
     }
@@ -310,9 +313,6 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IViewButton) {
       return new JsonViewButton<IViewButton>((IViewButton) model, session, id, parent);
-    }
-    if (model instanceof IFormToolButton<?>) {
-      return new JsonFormToolButton((IFormToolButton<?>) model, session, id, parent);
     }
     if (model instanceof ISearchOutline) {
       return new JsonSearchOutline<ISearchOutline>((ISearchOutline) model, session, id, parent);

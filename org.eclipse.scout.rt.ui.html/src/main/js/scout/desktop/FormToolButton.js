@@ -15,6 +15,11 @@ scout.FormToolButton.prototype._render = function($parent) {
   this.$title = this.$container.appendSpan('taskbar-tool-item-title');
 };
 
+scout.FormToolButton.prototype._remove = function() {
+  scout.FormToolButton.parent.prototype._remove.call(this);
+  this.popup = null;
+};
+
 scout.FormToolButton.prototype.toggle = function() {
   this.setSelected(!this.selected);
 };
@@ -35,6 +40,7 @@ scout.FormToolButton.prototype._openContainer = function() {
   if (!this.popup || !this.form.rendered) {
     this.popup = new scout.FormToolPopup(this, this.session);
     this.popup.render();
+    this.addChild(this.popup);
   } else {
     this.popup.attach();
   }
