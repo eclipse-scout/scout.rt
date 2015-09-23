@@ -56,18 +56,6 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   }
 
   @Override
-  protected void execStoreSession() throws ProcessingException {
-  }
-
-//  /**
-//   * export method as public setter
-//   */
-//  @Override
-//  public void setServiceTunnel(IClientServiceTunnel tunnel) {
-//    super.setServiceTunnel(tunnel);
-//  }
-
-  @Override
   public IDesktop getDesktop() {
     if (m_testDesktop == null) {
       return super.getDesktop();
