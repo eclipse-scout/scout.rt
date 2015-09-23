@@ -14,16 +14,14 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public class OrganizeColumnsMenu extends AbstractMenu {
+public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsForm> {
   private final ITable m_table;
 
   public OrganizeColumnsMenu(ITable table) {
@@ -45,21 +43,19 @@ public class OrganizeColumnsMenu extends AbstractMenu {
     return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
   }
 
-  @Override
-  protected void execAction() {
-    try {
-      OrganizeColumnsForm dlg = new OrganizeColumnsForm(m_table);
-      dlg.startModify();
-      dlg.waitFor();
-    }
-    catch (ProcessingException se) {
-      se.addContextMessage(getText());
-      BEANS.get(ExceptionHandler.class).handle(se);
-    }
-  }
-
   public ITable getTable() {
     return m_table;
+  }
+
+  @Override
+  protected void execSelectionChanged(boolean selected) throws ProcessingException {
+    super.execSelectionChanged(selected);
+    getForm().reload();
+  }
+
+  @Override
+  protected OrganizeColumnsForm createForm() throws ProcessingException {
+    return new OrganizeColumnsForm(m_table);
   }
 
 }

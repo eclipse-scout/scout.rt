@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.tool;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
  * Interface for action with menus that normally appear in the gui on the toolbar
  */
 
-public interface IToolButton extends IAction {
+public interface IToolButton extends IMenu {
   // FIXME AWE: should we rename to IToolMenu and extend IMenu?
 }

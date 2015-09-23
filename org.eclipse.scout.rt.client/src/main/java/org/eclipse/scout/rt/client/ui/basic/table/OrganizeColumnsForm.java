@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.CancelButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.DiscardChangesButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.AscendingButton;
@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.MoveUpButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.RemoveCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.SelectAllButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -51,10 +50,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetFi
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetSortingMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetViewMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
-import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
@@ -111,14 +107,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(AscendingButton.class);
   }
 
-  public CancelButton getCancelButton() {
-    return getFieldByClass(CancelButton.class);
-  }
-
-  public void startModify() throws ProcessingException {
-    startInternal(new OrganizeColumnsForm.ModifyHandler());
-  }
-
   public ColumnSortingBox getColumnSortingBox() {
     return getFieldByClass(ColumnSortingBox.class);
   }
@@ -159,10 +147,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(MoveUpButton.class);
   }
 
-  public OkButton getOkButton() {
-    return getFieldByClass(OkButton.class);
-  }
-
   public RemoveCustomColumnButton getRemoveCustomColumnButton() {
     return getFieldByClass(RemoveCustomColumnButton.class);
   }
@@ -193,6 +177,10 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   public WithoutButton getWithoutButton() {
     return getFieldByClass(WithoutButton.class);
+  }
+
+  public DiscardChangesButton getDiscardChangesButton() {
+    return getFieldByClass(DiscardChangesButton.class);
   }
 
   @Order(10.0)
@@ -975,12 +963,37 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
 
     @Order(20.0)
-    public class OkButton extends AbstractOkButton {
+    public class DiscardChangesButton extends AbstractLinkButton {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("DiscardChanges");
+      }
+
+      @Override
+      protected void execClickAction() throws ProcessingException {
+        // revert to original state
+        try {
+          m_table.setTableChanging(true);
+          if (m_table.getTableCustomizer() != null) {
+            m_table.getTableCustomizer().removeAllColumns();
+            m_table.getTableCustomizer().setSerializedData(m_oldtableCustomizerData);
+            ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
+          }
+          m_table.resetColumnConfiguration();
+          BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
+          if (m_table.getUserFilterManager() != null) {
+            m_table.getUserFilterManager().setSerializedData(m_oldUserFilterData);
+          }
+          m_table.addRowsByMatrix(m_oldData);
+        }
+        finally {
+          m_table.setTableChanging(false);
+        }
+        reload();
+      }
     }
 
-    @Order(30.0)
-    public class CancelButton extends AbstractCancelButton {
-    }
   }
 
   private void updateColumnVisibilityAndOrder() {
@@ -1083,62 +1096,22 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  public class ModifyHandler extends AbstractFormHandler {
+  private byte[] m_oldtableCustomizerData;
+  private byte[] m_oldUserFilterData;
+  private List<TableColumnState> m_oldColumns;
+  private Object[][] m_oldData;
 
-    private byte[] m_tableCustomizerData;
-    private byte[] m_oldUserFilterData;
-    private List<TableColumnState> m_oldColumns;
-    private Object[][] m_oldData;
-
-    @Override
-    protected void execLoad() throws ProcessingException {
-      // Back-up the current columns so we may restore them if
-      // the "organize columns" form is canceled:
-      if (m_table.getTableCustomizer() != null) {
-        m_tableCustomizerData = m_table.getTableCustomizer().getSerializedData();
-      }
-      m_oldColumns = BookmarkUtility.backupTableColumns(m_table);
-      m_oldData = m_table.getTableData();
-      if (m_table.getUserFilterManager() != null) {
-        m_oldUserFilterData = m_table.getUserFilterManager().getSerializedData();
-      }
-      getColumnsTableField().reloadTableData();
+  public void reload() throws ProcessingException {
+    // Back-up the current columns so we may restore them if
+    // the "organize columns" form is canceled:
+    if (m_table.getTableCustomizer() != null) {
+      m_oldtableCustomizerData = m_table.getTableCustomizer().getSerializedData();
     }
-
-    @Override
-    protected void execPostLoad() throws ProcessingException {
-      validateButtons();
+    m_oldColumns = BookmarkUtility.backupTableColumns(m_table);
+    m_oldData = m_table.getTableData();
+    if (m_table.getUserFilterManager() != null) {
+      m_oldUserFilterData = m_table.getUserFilterManager().getSerializedData();
     }
-
-    @Override
-    protected void execStore() throws ProcessingException {
-      // make changes persistent
-      ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
-    }
-
-    @Override
-    protected void execFinally() throws ProcessingException {
-      if (!isFormStored() && isSaveNeeded()) {
-        // revert to original state
-        try {
-          m_table.setTableChanging(true);
-          if (m_table.getTableCustomizer() != null) {
-            m_table.getTableCustomizer().removeAllColumns();
-            m_table.getTableCustomizer().setSerializedData(m_tableCustomizerData);
-            ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
-          }
-          m_table.resetColumnConfiguration();
-          BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
-          if (m_table.getUserFilterManager() != null) {
-            m_table.getUserFilterManager().setSerializedData(m_oldUserFilterData);
-          }
-          m_table.addRowsByMatrix(m_oldData);
-        }
-        finally {
-          m_table.setTableChanging(false);
-        }
-      }
-    }
-
+    getColumnsTableField().reloadTableData();
   }
 }

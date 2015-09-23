@@ -568,7 +568,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     //build completed menu, viewButton, toolButton lists
     // only top level menus
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
-    menus.addAllOrdered(new ActionFinder().findActions(actionList, IMenu.class, false));
+    List<IMenu> allMenus = new ActionFinder().findActions(actionList, IMenu.class, false);
+    for (IMenu menu : allMenus) {
+      if (!(menu instanceof IToolButton)) {
+        menus.addOrdered(menu);
+      }
+    }
+//    menus.addAllOrdered(allMenus);
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
 

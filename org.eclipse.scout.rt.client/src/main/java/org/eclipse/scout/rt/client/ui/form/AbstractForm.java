@@ -172,6 +172,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IGroupBox m_mainBox;
   private IWrappedFormField m_wrappedFormField;
   private P_SystemButtonListener m_systemButtonListener;
+  // FIXME ASA remove, menus können auf root-groupbox gesetzt werden
   private List<IToolButton> m_toolbuttons;
 
   private IFormHandler m_handler; // never null (ensured by setHandler())

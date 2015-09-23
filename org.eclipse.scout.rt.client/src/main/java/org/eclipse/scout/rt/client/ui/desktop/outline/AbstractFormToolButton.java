@@ -84,6 +84,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     }
     if (isToggleAction()) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
+      // FIXME ASA move this to Desktop (use a Listener on the button)
       // unselect other form tool buttons
       for (IToolButton b : desktop.getToolButtons()) {
         if (b != this && b instanceof IFormToolButton && b.isSelected()) {
