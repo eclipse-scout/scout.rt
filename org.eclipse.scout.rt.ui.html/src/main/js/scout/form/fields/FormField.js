@@ -87,6 +87,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelForegroundColor(this.labelForegroundColor);
   this._renderLabelBackgroundColor(this.labelBackgroundColor);
   this._renderGridData(this.gridData);
+  this._renderLoading();
 };
 
 scout.FormField.prototype._remove = function() {
@@ -267,6 +268,10 @@ scout.FormField.prototype._renderMenus = function() {
 
 scout.FormField.prototype._renderMenusVisible = function() {
   this._updateMenus();
+};
+
+scout.FormField.prototype._renderLoading = function() {
+  this.$container.toggleClass('loading', this.loading);
 };
 
 scout.FormField.prototype._getCurrentMenus = function() {

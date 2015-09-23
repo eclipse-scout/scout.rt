@@ -153,6 +153,12 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return JsonGridData.toJson((GridData) value);
       }
     });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_LOADING, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLoading();
+      }
+    });
   }
 
   @Override
