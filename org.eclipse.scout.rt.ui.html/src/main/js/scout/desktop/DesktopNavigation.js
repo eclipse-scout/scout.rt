@@ -78,8 +78,6 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
   this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
   this.outline.render(this.$container);
   this.outline.handleOutlineContent(bringToFront);
-  this.outline.htmlComp.validateLayout();
-  this.outline.pixelBasedSizing = true;
   this._updateViewButtons(outline);
   this.outline.validateFocus();
 };

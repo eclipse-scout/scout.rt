@@ -117,6 +117,9 @@ scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
 };
 
 scout.Outline.prototype._postRender = function() {
+  // Ensure outline layout is valid (because DialogLayout relies on that)
+  this.htmlComp.validateLayout();
+
   // Display attached forms, message boxes and file choosers.
   this.formController.render();
   this.messageBoxController.render();
