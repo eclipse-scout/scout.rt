@@ -160,11 +160,8 @@
 
     & > .font-icon {
       font-weight: normal;
+      color: @icon-inverted-color;
     }
-  }
-
-  &.default-menu > .font-icon {
-    color: @icon-inverted-color;
   }
 
   &.disabled {
