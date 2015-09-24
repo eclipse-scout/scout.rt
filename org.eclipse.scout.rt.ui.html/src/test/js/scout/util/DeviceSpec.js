@@ -2,12 +2,14 @@ describe('Device', function() {
 
   function verifyDevices(actual, expected) {
     expect(actual.system).toBe(expected.system);
+    expect(actual.type).toBe(expected.type);
   }
 
-  function createDevice(system) {
+  function createDevice(system, type) {
     var device = new scout.Device();
     device._userAgentParsed = true;
     device.system = system;
+    device.type = type;
     return device;
   }
 
@@ -24,24 +26,40 @@ describe('Device', function() {
   describe('parseUserAgent', function() {
 
     it('recognizes iOS devices', function() {
-      var userAgent, actualDevice , expectedDevice;
+      var userAgent, actualDevice, expectedDevice;
 
       // iPhone 4S
       userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25';
       actualDevice = new scout.Device(userAgent);
-      expectedDevice = createDevice(scout.Device.System.IOS);
+      expectedDevice = createDevice(scout.Device.System.IOS, scout.Device.Type.MOBILE);
       verifyDevices(actualDevice, expectedDevice);
 
       // iPad 3
       userAgent = 'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3';
       actualDevice = new scout.Device(userAgent);
-      expectedDevice = createDevice(scout.Device.System.IOS);
+      expectedDevice = createDevice(scout.Device.System.IOS, scout.Device.Type.TABLET);
       verifyDevices(actualDevice, expectedDevice);
 
       // iPad 3 (home screen icon mode)
       userAgent = 'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Mobile/9B176';
       actualDevice = new scout.Device(userAgent);
-      expectedDevice = createDevice(scout.Device.System.IOS);
+      expectedDevice = createDevice(scout.Device.System.IOS, scout.Device.Type.TABLET);
+      verifyDevices(actualDevice, expectedDevice);
+    });
+
+    it('recognizes Android devices', function() {
+      var userAgent, actualDevice, expectedDevice;
+
+      // Samsung Galaxy S4
+      userAgent = 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.170 Mobile Safari/537.36';
+      actualDevice = new scout.Device(userAgent);
+      expectedDevice = createDevice(scout.Device.System.ANDROID, scout.Device.Type.MOBILE);
+      verifyDevices(actualDevice, expectedDevice);
+
+      // Google Nexus 10 Tablet
+      userAgent = 'Mozilla/5.0 (Linux; Android 4.3; Nexus 10 Build/JWR66Y) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.82 Safari/537.36';
+      actualDevice = new scout.Device(userAgent);
+      expectedDevice = createDevice(scout.Device.System.ANDROID, scout.Device.Type.TABLET);
       verifyDevices(actualDevice, expectedDevice);
     });
 

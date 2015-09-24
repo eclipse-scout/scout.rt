@@ -28,7 +28,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -51,6 +53,17 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   public String getObjectType() {
     return "Outline";
+  }
+
+  @Override
+  protected void initJsonProperties(OUTLINE model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_BREADCRUMB_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isBreadcrumbEnabled();
+      }
+    });
   }
 
   @Override
@@ -93,6 +106,21 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     if (page.isTableVisible()) {
       attachDetailTable(page);
     }
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    super.handleUiEvent(event);
+    if ("breadcrumbEnabled".equals(event.getType())) {
+      handleUiBreadcrumbEnabled(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiBreadcrumbEnabled(JsonEvent event) {
+    getModel().setBreadcrumbEnabled(event.getData().getBoolean("breadcrumbEnabled"));
   }
 
   @Override

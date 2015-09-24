@@ -18,8 +18,8 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.$container.addClass('desktop');
   this.navigation = new scout.DesktopNavigation(this);
   this.navigation.render($parent);
-  this.navigation.onOutlineChanged(this.outline, true);
   this.navigation.setBreadcrumbEnabled(true);
+  this.navigation.onOutlineChanged(this.outline, true);
 
   $(window).on('resize', this.onResize.bind(this));
 };

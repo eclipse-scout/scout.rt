@@ -9,10 +9,9 @@ scout.DesktopNavigation = function(desktop) {
   this.htmlViewButtons;
 
   this.viewMenuTab;
-  this._breadcrumb = false;
 };
 
-scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 200; // FIXME AWE: make dynamic (min. breadcrumb width)
+scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 200; // Same value as in sizes.css // FIXME AWE: make dynamic (min. breadcrumb width)
 scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
 
 scout.DesktopNavigation.prototype.render = function($parent) {
@@ -75,7 +74,12 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
     this.outline.remove();
   }
   this.outline = outline;
-  this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
+  if (this._breadcrumbEnabled === undefined) {
+    // Read initial value from active outline
+    this.setBreadcrumbEnabled(outline.breadcrumbEnabled);
+  } else {
+    this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
+  }
   this.outline.render(this.$container);
   this.outline.handleOutlineContent(bringToFront);
   this._updateViewButtons(outline);
@@ -105,16 +109,19 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
 };
 
 scout.DesktopNavigation.prototype.setBreadcrumbEnabled = function(enabled) {
-  var oldBreadcrumbEnabled = this._breadcrumbEnabled;
-  if (oldBreadcrumbEnabled !== enabled) {
-    this._breadcrumbEnabled = enabled;
-    this.$navigation.toggleClass('navigation-breadcrumb', enabled);
-    this.outline.setBreadcrumbEnabled(enabled);
-    this.viewMenuTab.setBreadcrumbEnabled(enabled);
-    this._viewButtons('TAB').forEach(function(viewButton) {
-      viewButton.setBreadcrumbEnabled(enabled);
-    });
+  if (this._breadcrumbEnabled === enabled) {
+    return;
   }
+
+  this._breadcrumbEnabled = enabled;
+  if (this.outline) {
+    this.outline.setBreadcrumbEnabled(enabled);
+  }
+  this.viewMenuTab.setBreadcrumbEnabled(enabled);
+  this._viewButtons('TAB').forEach(function(viewButton) {
+    viewButton.setBreadcrumbEnabled(enabled);
+  });
+  this.$navigation.toggleClass('navigation-breadcrumb', enabled);
 };
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function(event) {

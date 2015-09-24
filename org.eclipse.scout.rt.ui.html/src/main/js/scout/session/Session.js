@@ -49,7 +49,7 @@ scout.Session = function($entryPoint, options) {
   this.partId = scout.helpers.nvl(options.portletPartId, 0);
   this.parentUiSession;
   this.clientSessionId = clientSessionId;
-  this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type);
   this.suppressErrors = scout.helpers.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
@@ -144,7 +144,7 @@ scout.Session.prototype._throwError = function(message) {
 
 scout.Session.prototype._initObjectFactory = function(objectFactories) {
   if (!objectFactories) {
-    if (this.userAgent.deviceType === scout.UserAgent.DEVICE_TYPE_MOBILE) {
+    if (this.userAgent.deviceType === scout.Device.Type.MOBILE) {
       objectFactories = scout.mobileObjectFactories;
     } else {
       objectFactories = scout.defaultObjectFactories;
@@ -286,7 +286,7 @@ scout.Session.prototype._sendNow = function() {
     if (this.parentUiSession) {
       request.parentUiSessionId = this.parentUiSession.uiSessionId;
     }
-    if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
+    if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
       request.userAgent = this.userAgent;
     }
     request.customParams = this._customParams;

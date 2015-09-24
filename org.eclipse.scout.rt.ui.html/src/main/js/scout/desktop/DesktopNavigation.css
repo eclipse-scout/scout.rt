@@ -10,6 +10,10 @@
   color: @navigation-color;
 }
 
+.navigation-breadcrumb {
+  width: @size-desktop-navigation-breadcrumb;
+}
+
 .navigation-container {
   position: relative;
   width: 100%;

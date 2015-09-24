@@ -81,7 +81,7 @@
 }
 
 /* bread crumb mode */
-.navigation-breadcrumb > .navigation-container > .outline {
+.outline.breadcrumb {
 
   & > .outline-title {
     text-align: center;

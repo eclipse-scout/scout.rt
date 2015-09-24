@@ -7,7 +7,7 @@ scout.Device = function(userAgent) {
   this.userAgent = userAgent;
   this.system;
   this.features = {};
-  this.type;
+  this.type = scout.Device.Type.DESKTOP;
   this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
   this.browserVersion = 0;
 
@@ -32,6 +32,12 @@ scout.Device.SupportedBrowsers = {
 scout.Device.System = {
   IOS: 'IOS',
   ANDROID: 'ANDROID'
+};
+
+scout.Device.Type = {
+  DESKTOP: 'DESKTOP',
+  TABLET: 'TABLET',
+  MOBILE: 'MOBILE'
 };
 
 /**
@@ -90,35 +96,34 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
 };
 
 scout.Device.prototype._parseSystem = function(userAgent) {
-  var i, device, iosDevices = ['iPad', 'iPhone'];
-  for (i = 0; i < iosDevices.length; i++) {
-    device = iosDevices[i];
-    if (this.contains(userAgent, device)) {
-      this.type = device;
-      this.system = scout.Device.System.IOS;
-      return;
-    }
-  }
-  if (this.contains(userAgent, "Android")) {
+  var i, device;
+
+  if (userAgent.indexOf('iPhone') > -1) {
+    this.system = scout.Device.System.IOS;
+    this.type = scout.Device.Type.MOBILE;
+  } else if (userAgent.indexOf('iPad') > -1) {
+    this.system = scout.Device.System.IOS;
+    this.type = scout.Device.Type.TABLET;
+  } else if (userAgent.indexOf('Android') > -1) {
     this.system = scout.Device.System.ANDROID;
+    if (userAgent.indexOf('Mobile') > -1) {
+      this.type = scout.Device.Type.MOBILE;
+    } else {
+      this.type = scout.Device.Type.TABLET;
+    }
   }
 };
 
 scout.Device.prototype._parseBrowser = function(userAgent) {
-  if (this.contains(userAgent, 'Firefox')) {
+  if (userAgent.indexOf('Firefox')  > -1) {
     this.browser = scout.Device.SupportedBrowsers.FIREFOX;
-  } else if (this.contains(userAgent, 'MSIE') || this.contains(userAgent, 'Trident')) {
+  } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
     this.browser = scout.Device.SupportedBrowsers.INTERNET_EXPLORER;
-  } else if (this.contains(userAgent, 'Chrome')) {
+  } else if (userAgent.indexOf('Chrome') > -1) {
     this.browser = scout.Device.SupportedBrowsers.CHROME;
-  } else if (this.contains(userAgent, 'Safari')) {
+  } else if (userAgent.indexOf('Safari') > -1) {
     this.browser = scout.Device.SupportedBrowsers.SAFARI;
   }
-};
-
-//we cannot use scout.strings at the time parseUserAgent is executed
-scout.Device.prototype.contains = function contains(haystack, needle) {
-  return haystack.indexOf(needle) !== -1;
 };
 
 scout.Device.prototype.supportsFeature = function(property, checkFunc) {
@@ -247,7 +252,7 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
     // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
     // additionally in new version the version-number after Trident/ is not the browser-version
     // but the engine-version.
-    if (this.contains(userAgent, 'MSIE')) {
+    if (userAgent.indexOf('MSIE') > -1) {
       versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
     } else {
       versionRegex = /rv:([0-9]+\.?[0-9]*)/;

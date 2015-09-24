@@ -245,7 +245,7 @@ describe('Session', function() {
     });
 
     it('sends user agent on startup if not desktop', function() {
-      var session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE));
+      var session = createSession(new scout.UserAgent(scout.Device.Type.MOBILE));
 
       session.init();
       uninstallUnloadHandlers(session);
@@ -262,7 +262,7 @@ describe('Session', function() {
       expect(requestData.userAgent).toBeUndefined();
 
       //device type desktop is the default, so don't send it
-      session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP));
+      session = createSession(new scout.UserAgent(scout.Device.Type.DESKTOP));
 
       session.init();
       uninstallUnloadHandlers(session);

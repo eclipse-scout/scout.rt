@@ -5,13 +5,13 @@ scout.mobileObjectFactories = scout.mobileObjectFactories.concat( [
   create : function() {
     return new scout.MobileDesktop();
   },
-  deviceType: scout.UserAgent.DEVICE_TYPE_MOBILE
+  deviceType: scout.Device.Type.MOBILE
 },
 {
   objectType : 'Table',
   create : function() {
     return new scout.MobileTable();
   },
-  deviceType: scout.UserAgent.DEVICE_TYPE_MOBILE
+  deviceType: scout.Device.Type.MOBILE
 }
 ]);

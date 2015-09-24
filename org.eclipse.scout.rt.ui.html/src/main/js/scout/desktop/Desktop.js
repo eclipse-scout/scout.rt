@@ -298,7 +298,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
     return;
   }
   // FIXME AWE: (user-prefs) Use user-preferences instead of sessionStorage
-  var storedSplitterPosition = sessionStorage.getItem('scout:desktopSplitterPosition');
+  var storedSplitterPosition = this.cacheSplitterPosition && sessionStorage.getItem('scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
     // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
@@ -307,7 +307,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   } else {
     // Set initial splitter position
     this.splitter.updatePosition();
-    this._handleUpdateSplitterPosition(this.splitter.positoin);
+    this._handleUpdateSplitterPosition(this.splitter.position);
   }
 };
 
@@ -353,7 +353,9 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
   var splitterPosition = event.data;
 
   // Store size
-  sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+  if (this.cacheSplitterPosition) {
+    sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+  }
 
   // Check if splitter is smaller than min size
   if (splitterPosition < scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH) {

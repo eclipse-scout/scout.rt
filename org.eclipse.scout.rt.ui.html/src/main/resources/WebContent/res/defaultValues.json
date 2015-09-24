@@ -133,6 +133,7 @@
       "fileChoosers": []
     },
     "Outline": {
+      "breadcrumbEnabled": false,
       "dialogs": [],
       "views": [],
       "messageBoxes": [],

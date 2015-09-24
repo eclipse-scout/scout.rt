@@ -194,7 +194,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         return getModel().getSelectViewTabsKeyStrokeModifier();
       }
     });
-
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_CACHE_SPLITTER_POSITION, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isCacheSplitterPosition();
+      }
+    });
   }
 
   @Override
