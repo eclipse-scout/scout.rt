@@ -19,10 +19,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonExtension;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -81,16 +79,6 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   protected void execSelectionChanged(boolean selected) throws ProcessingException {
     if (!selected) {
       return;
-    }
-    if (isToggleAction()) {
-      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-      // FIXME ASA move this to Desktop (use a Listener on the button)
-      // unselect other form tool buttons
-      for (IToolButton b : desktop.getToolButtons()) {
-        if (b != this && b instanceof IFormToolButton && b.isSelected()) {
-          b.setSelected(false);
-        }
-      }
     }
     ensureFormCreated();
     ensureFormStarted();

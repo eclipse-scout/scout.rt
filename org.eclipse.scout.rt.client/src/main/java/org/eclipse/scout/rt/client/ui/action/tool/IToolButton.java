@@ -17,5 +17,5 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
  */
 
 public interface IToolButton extends IMenu {
-  // FIXME AWE: should we rename to IToolMenu and extend IMenu?
+  // FIXME AWE/ASA: should we rename to IToolMenu and extend IMenu?
 }

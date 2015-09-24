@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -610,24 +609,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * was successful or not)
    */
   void setFormStored(boolean b);
-
-  /**
-   * Returns a read only list of all tool buttons
-   *
-   * @return list of all tool buttons
-   * @since Scout 4.0.0-M7
-   */
-  List<IToolButton> getToolButtons();
-
-  /**
-   * Returns the tool button identified with the {@link IToolButton} class
-   *
-   * @param clazz
-   *          the class of the tool button
-   * @return toolbutton
-   * @since Scout 4.0.0-M7
-   */
-  <T extends IToolButton> T getToolButtonByClass(Class<T> clazz);
 
   Object getProperty(String name);
 

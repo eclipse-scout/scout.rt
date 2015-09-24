@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
@@ -43,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -83,7 +83,6 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(ISearchForm.class, AbstractPageWithTable.class);
     addPossibleContributionForContainer(ITable.class, AbstractPageWithTable.class);
     addPossibleContributionForContainer(IGroupBox.class, AbstractForm.class);
-    addPossibleContributionForContainer(IToolButton.class, AbstractForm.class);
     addPossibleContributionForContainer(IFormField.class, AbstractCompositeField.class);
     addPossibleContributionForContainer(IKeyStroke.class, AbstractFormField.class);
     addPossibleContributionForContainer(IMenu.class, AbstractValueField.class);
@@ -100,6 +99,7 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(ITree.class, AbstractTreeBox.class);
     addPossibleContributionForContainer(ITree.class, AbstractTreeField.class);
     addPossibleContributionForContainer(IWizardStep.class, AbstractWizard.class);
+    addPossibleContributionForContainer(IMenu.class, AbstractGroupBox.class);
 
     // moves
     addPossibleMoveForContainer(IFormField.class, ICompositeField.class);

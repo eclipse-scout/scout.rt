@@ -50,7 +50,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
@@ -93,7 +92,6 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -137,7 +135,6 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
-import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -172,8 +169,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IGroupBox m_mainBox;
   private IWrappedFormField m_wrappedFormField;
   private P_SystemButtonListener m_systemButtonListener;
-  // FIXME ASA remove, menus können auf root-groupbox gesetzt werden
-  private List<IToolButton> m_toolbuttons;
 
   private IFormHandler m_handler; // never null (ensured by setHandler())
   // access control
@@ -643,25 +638,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_contributionHolder = new ContributionComposite(this);
     setToolbarLocation(getConfiguredToolbarLocation());
 
-    // tool buttons
-    List<Class<IToolButton>> configuredToolButtons = getConfiguredToolButtons();
-    List<IToolButton> toolButtonList = new ArrayList<IToolButton>(configuredToolButtons.size());
-    for (Class<? extends IToolButton> clazz : configuredToolButtons) {
-      try {
-        IToolButton b = ConfigurationUtility.newInnerInstance(this, clazz);
-        toolButtonList.add(b);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unable to create ToolButton '" + clazz.getName() + "'.", e));
-      }
-    }
-    List<IToolButton> contributedToolButtons = m_contributionHolder.getContributionsByClass(IToolButton.class);
-    toolButtonList.addAll(contributedToolButtons);
-    ExtensionUtility.moveModelObjects(toolButtonList);
-    Collections.sort(toolButtonList, new OrderedComparator());
-
-    m_toolbuttons = toolButtonList;
-
     // prepare injected fields
     List<Class<IFormField>> fieldArray = getConfiguredInjectedFields();
     DefaultFormFieldInjection injectedFields = null;
@@ -848,11 +824,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     propertySupport.setPropertyString(PROP_PERSPECTIVE_ID, perspectiveId);
   }
 
-  @Override
-  public List<IToolButton> getToolButtons() {
-    return CollectionUtility.arrayList(m_toolbuttons);
-  }
-
   /**
    * @param configuredToolbuttonLocation
    */
@@ -863,18 +834,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public int getToolbarLocation() {
     return m_toolbarLocation;
-  }
-
-  @Override
-  public <T extends IToolButton> T getToolButtonByClass(Class<T> clazz) {
-    for (IToolButton b : m_toolbuttons) {
-      if (b.getClass() == clazz) {
-        @SuppressWarnings("unchecked")
-        T button = (T) b;
-        return button;
-      }
-    }
-    return null;
   }
 
   /**
@@ -1614,7 +1573,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     initFormInternal();
     // fields
     FormUtility.initFormFields(this);
-    ActionUtility.initActions(getToolButtons());
     // custom
     interceptInitForm();
   }
