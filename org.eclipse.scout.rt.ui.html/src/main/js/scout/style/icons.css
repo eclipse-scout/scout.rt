@@ -23,13 +23,13 @@
 @icon-gear: '\E031';
 @icon-star: '\E032';
 @icon-share: '\E033';
-@icon-person: '\E034'; /* FIXME CGU change to E12*/
+@icon-person: '\E034';
 @icon-ellipsis-v: '\E040';
 @icon-list-ul: '\E041 ';
-@icon-collapse: '\E600 ';
+@icon-search: '\E042';
+@icon-folder: '\E043';
 
 /* scoutIcons: awesome icons */
-@icon-search: '\E042';
 @icon-th-list: '\F00B';
 @icon-remove: '\F00D'; /* close */
 @icon-rotate-right: '\F01E'; /* repeat */
