@@ -680,12 +680,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   private void calculateEnabled() {
-    boolean enabled = m_enabledGranted && m_enabledProperty;
-    boolean changed = enabled != m_enabled;
-    m_enabled = enabled;
-    if (changed && getTree() != null) {
-      getTree().fireNodeChanged(this);
-    }
+    m_enabled = m_enabledGranted && m_enabledProperty;
   }
 
   @Override
