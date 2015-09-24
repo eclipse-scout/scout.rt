@@ -138,57 +138,7 @@ public class ColumnSet {
       viewIndex++;
     }
     reorganizeIndexes();
-    //initialize sorting
-    sortMap.clear();
-    int index = 0;
-    for (IColumn col : getColumns()) {
-      int sortIndex = -1;
-      if (col.isInitialAlwaysIncludeSortAtBegin()) {
-        sortIndex = col.getInitialSortIndex();
-        if (sortIndex < 0) {
-          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured. Table: " + m_table.getClass().getName());
-        }
-      }
-      else if (col.isInitialAlwaysIncludeSortAtEnd()) {
-        sortIndex = col.getInitialSortIndex();
-        if (sortIndex < 0) {
-          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured. Table: " + m_table.getClass().getName());
-        }
-      }
-      else {
-        sortIndex = prefs.getTableColumnSortIndex(col, col.getInitialSortIndex());
-      }
-      if (sortIndex >= 0) {
-        sortMap.put(new CompositeObject(sortIndex, index), col);
-      }
-      index++;
-    }
-    //
-    clearSortColumns();
-    clearPermanentHeadSortColumns();
-    clearPermanentTailSortColumns();
-    for (IColumn col : sortMap.values()) {
-      if (col.isInitialAlwaysIncludeSortAtBegin()) {
-        boolean asc = col.isInitialSortAscending();
-        addPermanentHeadSortColumn(col, asc);
-      }
-      else if (col.isInitialAlwaysIncludeSortAtEnd()) {
-        boolean asc = col.isInitialSortAscending();
-        addPermanentTailSortColumn(col, asc);
-      }
-      else {
-        boolean asc = prefs.getTableColumnSortAscending(col, col.isInitialSortAscending());
-        addSortColumn(col, asc);
-      }
-    }
-    //restore explicit flag on user sort columns (after sort is built)
-    for (IColumn col : getUserSortColumns()) {
-      Boolean explicit = prefs.getTableColumnSortExplicit(col);
-      if (explicit != null) {
-        HeaderCell cell = (HeaderCell) col.getHeaderCell();
-        cell.setSortExplicit(explicit.booleanValue());
-      }
-    }
+    applySorting(null);
     /*
      * ticket 93309
      * sanity check: when there is no visible column at all, reset visibilities to model init defaults
@@ -211,6 +161,61 @@ public class ColumnSet {
       reorganizeIndexes();
     }
     checkMultiline();
+  }
+
+  public void applySorting(String configName) {
+    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+    TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
+    int index = 0;
+    for (IColumn col : getColumns()) {
+      int sortIndex = -1;
+      if (col.isInitialAlwaysIncludeSortAtBegin()) {
+        sortIndex = col.getInitialSortIndex();
+        if (sortIndex < 0) {
+          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured. Table: " + m_table.getClass().getName());
+        }
+      }
+      else if (col.isInitialAlwaysIncludeSortAtEnd()) {
+        sortIndex = col.getInitialSortIndex();
+        if (sortIndex < 0) {
+          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured. Table: " + m_table.getClass().getName());
+        }
+      }
+      else {
+        sortIndex = prefs.getTableColumnSortIndex(col, col.getInitialSortIndex(), configName);
+      }
+      if (sortIndex >= 0) {
+        sortMap.put(new CompositeObject(sortIndex, index), col);
+      }
+      index++;
+    }
+    //
+    clearSortColumns();
+    clearPermanentHeadSortColumns();
+    clearPermanentTailSortColumns();
+    for (IColumn col : sortMap.values()) {
+      if (col.isInitialAlwaysIncludeSortAtBegin()) {
+        boolean asc = col.isInitialSortAscending();
+        addPermanentHeadSortColumn(col, asc);
+      }
+      else if (col.isInitialAlwaysIncludeSortAtEnd()) {
+        boolean asc = col.isInitialSortAscending();
+        addPermanentTailSortColumn(col, asc);
+      }
+      else {
+        boolean asc = prefs.getTableColumnSortAscending(col, col.isInitialSortAscending(), configName);
+        addSortColumn(col, asc);
+      }
+    }
+    //restore explicit flag on user sort columns (after sort is built)
+    for (IColumn col : getUserSortColumns()) {
+      Boolean explicit = prefs.getTableColumnSortExplicit(col, configName);
+      if (explicit != null) {
+        HeaderCell cell = (HeaderCell) col.getHeaderCell();
+        cell.setSortExplicit(explicit.booleanValue());
+      }
+    }
+    m_table.sort();
   }
 
   public int getColumnCount() {

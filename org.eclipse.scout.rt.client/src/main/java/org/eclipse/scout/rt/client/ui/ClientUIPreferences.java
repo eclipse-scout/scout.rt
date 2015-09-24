@@ -11,7 +11,11 @@
 package org.eclipse.scout.rt.client.ui;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.scout.commons.StringUtility;
@@ -44,8 +48,7 @@ public class ClientUIPreferences {
   /**
    * @return a new instance of the {@link ClientUIPreferences}
    * @throws IllegalArgumentException
-   *           When no {@link IClientSession} is available in the current thread context (
-   *           {@link ISession#CURRENT}).
+   *           When no {@link IClientSession} is available in the current thread context ( {@link ISession#CURRENT}).
    */
   public static ClientUIPreferences getInstance() {
     return new ClientUIPreferences(ClientSessionProvider.currentSession());
@@ -60,6 +63,7 @@ public class ClientUIPreferences {
 
   private static final String PREFERENCES_NODE_ID = "org.eclipse.scout.rt.client";
 
+  private static final String TABLE_COLUMNS_CONFIGS = "table.columns.configs.";
   private static final String TABLE_CUSTOMIZER_DATA = "table.customizer.data.";
   private static final String TABLE_COLUMN_UIINDEX = "table.column.viewIndex.";
   private static final String TABLE_COLUMN_WIDTH = "table.column.width.";
@@ -75,7 +79,7 @@ public class ClientUIPreferences {
   private static final String FORM_BOUNDS = "form.bounds.";
 
   private final IClientSession m_session;
-  private IPreferences m_env;
+  private IPreferences m_prefs;
 
   private ClientUIPreferences(IClientSession session) {
     if (session == null) {
@@ -92,15 +96,15 @@ public class ClientUIPreferences {
    */
   public Rectangle getFormBounds(IForm form) {
     String key = form.computeCacheBoundsKey();
-    if (key == null || m_env == null) {
+    if (key == null || m_prefs == null) {
       return null;
     }
 
     key = getUserAgentPrefix() + FORM_BOUNDS + key;
-    String value = m_env.get(key, "");
+    String value = m_prefs.get(key, "");
     if (StringUtility.isNullOrEmpty(value)) {
       key = getLegacyFormBoundsKey(form);
-      value = m_env.get(key, "");
+      value = m_prefs.get(key, "");
     }
 
     if (!StringUtility.isNullOrEmpty(value)) {
@@ -123,16 +127,16 @@ public class ClientUIPreferences {
    */
   public void setFormBounds(IForm form, Rectangle bounds) {
     String key = form.computeCacheBoundsKey();
-    if (key == null || m_env == null) {
+    if (key == null || m_prefs == null) {
       return;
     }
 
     key = getUserAgentPrefix() + FORM_BOUNDS + key;
     if (bounds == null) {
-      m_env.remove(key);
+      m_prefs.remove(key);
     }
     else {
-      m_env.put(key, bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height);
+      m_prefs.put(key, bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height);
     }
     flush();
   }
@@ -228,11 +232,11 @@ public class ClientUIPreferences {
   }
 
   public Object getTableCustomizerData(String customizerKey) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return null;
     }
     String key = TABLE_CUSTOMIZER_DATA + customizerKey;
-    byte[] serialData = m_env.getByteArray(key, null);
+    byte[] serialData = m_prefs.getByteArray(key, null);
     if (serialData != null) {
       try {
         Object customizerData = SerializationUtility.createObjectSerializer().deserialize(serialData, null);
@@ -240,7 +244,7 @@ public class ClientUIPreferences {
       }
       catch (Exception t) {
         LOG.error("Failed reading custom table data for " + key + ": " + t);
-        m_env.remove(key);
+        m_prefs.remove(key);
         return null;
       }
     }
@@ -253,7 +257,7 @@ public class ClientUIPreferences {
    * store customizer data to persistent store
    */
   public void setTableCustomizerData(String customizerKey, Object customizerData) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
@@ -261,15 +265,15 @@ public class ClientUIPreferences {
     if (customizerData != null) {
       try {
         byte[] data = SerializationUtility.createObjectSerializer().serialize(customizerData);
-        m_env.putByteArray(key, data);
+        m_prefs.putByteArray(key, data);
       }
       catch (Exception t) {
         LOG.error("Failed storing custom table data for " + key, t);
-        m_env.remove(key);
+        m_prefs.remove(key);
       }
     }
     else {
-      m_env.remove(key);
+      m_prefs.remove(key);
     }
     //
     flush();
@@ -291,11 +295,15 @@ public class ClientUIPreferences {
   }
 
   public void setTableColumnPreferences(IColumn col, boolean flush) {
-    if (m_env == null) {
+    setTableColumnPreferences(col, flush, null);
+  }
+
+  public void setTableColumnPreferences(IColumn col, boolean flush, String configName) {
+    if (m_prefs == null) {
       return;
     }
-    String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_UIINDEX + keySuffix;
+
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX);
     int viewIndex = col.getVisibleColumnIndexHint();
     boolean visible = col.isVisibleInternal();
     int width = col.getWidth();
@@ -304,50 +312,50 @@ public class ClientUIPreferences {
     boolean sortExplicit = col.isSortExplicit();
     //
     if (viewIndex >= 0) {
-      m_env.put(key, "" + viewIndex);
+      m_prefs.put(key, "" + viewIndex);
     }
     else {
-      m_env.remove(key);
+      m_prefs.remove(key);
     }
     //
-    key = TABLE_COLUMN_VISIBLE + keySuffix;
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE);
     if (!visible) {
-      m_env.put(key, "no");
+      m_prefs.put(key, "no");
     }
     else {
-      m_env.put(key, "yes");
+      m_prefs.put(key, "yes");
     }
     //
-    key = getUserAgentPrefix() + TABLE_COLUMN_WIDTH + keySuffix;
+    key = getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH);
     if (width >= 0) {
-      m_env.put(key, "" + width);
+      m_prefs.put(key, "" + width);
     }
     else {
-      m_env.remove(key);
+      m_prefs.remove(key);
     }
     //
-    key = TABLE_COLUMN_SORT_INDEX + keySuffix;
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
     if (sortIndex >= 0) {
-      m_env.put(key, "" + sortIndex);
+      m_prefs.put(key, "" + sortIndex);
     }
     else {
-      m_env.put(key, "-1");
+      m_prefs.put(key, "-1");
     }
     //
-    key = TABLE_COLUMN_SORT_ASC + keySuffix;
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC);
     if (sortIndex >= 0 && sortUp) {
-      m_env.put(key, "true");
+      m_prefs.put(key, "true");
     }
     else {
-      m_env.put(key, "false");
+      m_prefs.put(key, "false");
     }
     //
-    key = TABLE_COLUMN_SORT_EXPLICIT + keySuffix;
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
     if (sortExplicit) {
-      m_env.put(key, "true");
+      m_prefs.put(key, "true");
     }
     else {
-      m_env.put(key, "false");
+      m_prefs.put(key, "false");
     }
 
     if (flush) {
@@ -355,23 +363,56 @@ public class ClientUIPreferences {
     }
   }
 
+  public void removeTableColumnPreferences(IColumn col, String configName) {
+    if (m_prefs == null) {
+      return;
+    }
+
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX);
+    m_prefs.remove(key);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE);
+    m_prefs.remove(key);
+    //
+    key = getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH);
+    m_prefs.remove(key);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
+    m_prefs.remove(key);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC);
+    m_prefs.remove(key);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
+    m_prefs.remove(key);
+
+  }
+
+  private String createColumnConfigKey(IColumn col, String configName, String propertyKey) {
+    StringBuilder sb = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(configName)) {
+      sb.append(configName).append(".");
+    }
+    sb.append(propertyKey).append(getColumnKey(col));
+    return sb.toString();
+  }
+
   public void updateTableColumnOrder(List<IColumn<?>> columnList, int[] visibleColumnIndexHints) {
     if (columnList.size() != visibleColumnIndexHints.length) {
       throw new IllegalArgumentException("columnList.size=" + columnList.size() + " hints.length=" + visibleColumnIndexHints.length);
     }
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
     for (int i = 0; i < visibleColumnIndexHints.length; i++) {
       IColumn<?> c = columnList.get(i);
       int viewIndex = visibleColumnIndexHints[i];
-      String keySuffix = getColumnKey(c);
-      String key = TABLE_COLUMN_UIINDEX + keySuffix;
+      String key = createColumnConfigKey(c, null, TABLE_COLUMN_UIINDEX);
       if (viewIndex >= 0) {
-        m_env.put(key, "" + viewIndex);
+        m_prefs.put(key, "" + viewIndex);
       }
       else {
-        m_env.remove(key);
+        m_prefs.remove(key);
       }
     }
     //
@@ -383,25 +424,24 @@ public class ClientUIPreferences {
   }
 
   public void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths) {
-    removeTableColumnPreferences(col, visibility, order, sorting, widths, true);
+    removeTableColumnPreferences(col, visibility, order, sorting, widths, true, null);
   }
 
-  private void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths, boolean flush) {
-    if (col != null && m_env != null) {
-      String keySuffix = getColumnKey(col);
+  private void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths, boolean flush, String configName) {
+    if (col != null && m_prefs != null) {
       if (visibility) {
-        m_env.remove(TABLE_COLUMN_VISIBLE + keySuffix);
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE));
       }
       if (order) {
-        m_env.remove(TABLE_COLUMN_UIINDEX + keySuffix);
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX));
       }
       if (sorting) {
-        m_env.remove(TABLE_COLUMN_SORT_INDEX + keySuffix);
-        m_env.remove(TABLE_COLUMN_SORT_ASC + keySuffix);
-        m_env.remove(TABLE_COLUMN_SORT_EXPLICIT + keySuffix);
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX));
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC));
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT));
       }
       if (widths) {
-        m_env.remove(getUserAgentPrefix() + TABLE_COLUMN_WIDTH + keySuffix);
+        m_prefs.remove(getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH));
       }
 
       if (flush) {
@@ -411,54 +451,126 @@ public class ClientUIPreferences {
   }
 
   public void removeAllTableColumnPreferences(ITable table, boolean visibility, boolean order, boolean sorting, boolean widths) {
+    removeAllTableColumnPreferences(table, visibility, order, sorting, widths, null);
+  }
+
+  public void removeAllTableColumnPreferences(ITable table, boolean visibility, boolean order, boolean sorting, boolean widths, String configName) {
     if (table == null) {
       return;
     }
 
     for (IColumn<?> col : table.getColumns()) {
-      removeTableColumnPreferences(col, visibility, order, sorting, widths, false);
+      removeTableColumnPreferences(col, visibility, order, sorting, widths, false, configName);
     }
 
     flush();
   }
 
-  public void setAllTableColumnPreferences(ITable table) {
+  public void removeAllTableColumnPreferences(ITable table, String configName) {
+    if (table == null || StringUtility.isNullOrEmpty(configName)) {
+      return;
+    }
+    for (IColumn col : table.getColumns()) {
+      if (col.isDisplayable()) {
+        removeTableColumnPreferences(col, configName);
+      }
+    }
+    flush();
+  }
+
+  public void setAllTableColumnPreferences(ITable table, String configName) {
     if (table == null) {
       return;
     }
 
     for (IColumn col : table.getColumns()) {
       if (col.isDisplayable()) {
-        setTableColumnPreferences(col, false);
+        setTableColumnPreferences(col, false, configName);
       }
     }
-
     flush();
+
+  }
+
+  public void setAllTableColumnPreferences(ITable table) {
+    setAllTableColumnPreferences(table, null);
+  }
+
+  public Set<String> getAllTableColumnsConfigs(ITable table) {
+    String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
+    return new LinkedHashSet<String>(getPropertyStringList(key, new ArrayList<String>()));
+  }
+
+  // TODO ASA unittest
+  public List<String> getPropertyStringList(String key, List<String> defaultValue) {
+    if (m_prefs == null) {
+      return defaultValue;
+    }
+    String existingPref = m_prefs.get(key, "");
+    if (!existingPref.isEmpty()) {
+      return new ArrayList<String>(Arrays.asList(existingPref.split(";")));
+    }
+    return defaultValue;
+  }
+
+  // TODO ASA unittest
+  public void setPropertyStringList(String key, List<String> values) {
+    if (m_prefs == null) {
+      return;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (String v : values) {
+      sb.append(v).append(";");
+    }
+    String property = sb.toString();
+    if (values.size() > 0) {
+      property = property.substring(0, property.length() - 1);
+    }
+    m_prefs.put(key, property);
+    flush();
+  }
+
+  public void removeTableColumnsConfig(ITable table, String name) {
+    String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
+    Set<String> configs = getAllTableColumnsConfigs(table);
+    configs.remove(name);
+    setPropertyStringList(key, new ArrayList<String>(configs));
+    removeAllTableColumnPreferences(table, true, true, true, true, name);
+  }
+
+  public void addTableColumnsConfig(ITable table, String name) {
+    if (m_prefs == null) {
+      return;
+    }
+    String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
+    Set<String> configs = getAllTableColumnsConfigs(table);
+    configs.add(name);
+    setPropertyStringList(key, new ArrayList<String>(configs));
   }
 
   /**
    * @return true if there are any user preferences for this tables columns
    */
   public boolean hasTableColumnPreferences(ITable table) {
-    if (table != null && m_env != null) {
+    if (table != null && m_prefs != null) {
       for (IColumn col : table.getColumns()) {
         String keySuffix = getColumnKey(col);
-        if (m_env.get(TABLE_COLUMN_VISIBLE + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_VISIBLE + keySuffix, null) != null) {
           return true;
         }
-        if (m_env.get(TABLE_COLUMN_UIINDEX + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_UIINDEX + keySuffix, null) != null) {
           return true;
         }
-        if (m_env.get(TABLE_COLUMN_SORT_INDEX + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_SORT_INDEX + keySuffix, null) != null) {
           return true;
         }
-        if (m_env.get(TABLE_COLUMN_SORT_ASC + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_SORT_ASC + keySuffix, null) != null) {
           return true;
         }
-        if (m_env.get(TABLE_COLUMN_SORT_EXPLICIT + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_SORT_EXPLICIT + keySuffix, null) != null) {
           return true;
         }
-        if (m_env.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) {
           return true;
         }
       }
@@ -472,18 +584,21 @@ public class ClientUIPreferences {
    * IUiDeviceType}.
    */
   public int getTableColumnWidth(IColumn col, int defaultWidth) {
-    if (m_env == null) {
+    return getTableColumnWidth(col, defaultWidth, null);
+  }
+
+  public int getTableColumnWidth(IColumn col, int defaultWidth, String configName) {
+    if (m_prefs == null) {
       return defaultWidth;
     }
 
-    String keySuffix = getColumnKey(col);
-    String baseKey = TABLE_COLUMN_WIDTH + keySuffix;
+    String baseKey = createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH);
     String key = getUserAgentPrefix() + baseKey;
 
-    String value = m_env.get(key, null);
+    String value = m_prefs.get(key, null);
     if (value == null) {
       //If no value has been found try to load with the base key. Done due to backward compatibility.
-      value = m_env.get(baseKey, null);
+      value = m_prefs.get(baseKey, null);
     }
     if (value != null) {
       try {
@@ -497,12 +612,15 @@ public class ClientUIPreferences {
   }
 
   public boolean getTableColumnVisible(IColumn col, boolean defaultValue) {
-    if (m_env == null) {
+    return getTableColumnVisible(col, defaultValue, null);
+  }
+
+  public boolean getTableColumnVisible(IColumn col, boolean defaultValue, String configName) {
+    if (m_prefs == null) {
       return defaultValue;
     }
-    String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_VISIBLE + keySuffix;
-    String value = m_env.get(key, null);
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       Boolean b = TypeCastUtility.castValue(value, Boolean.class);
       return b != null ? b.booleanValue() : defaultValue;
@@ -511,13 +629,16 @@ public class ClientUIPreferences {
   }
 
   public int getTableColumnViewIndex(IColumn col, int defaultIndex) {
-    if (m_env == null) {
+    return getTableColumnViewIndex(col, defaultIndex, null);
+  }
+
+  public int getTableColumnViewIndex(IColumn col, int defaultIndex, String configName) {
+    if (m_prefs == null) {
       return defaultIndex;
     }
 
-    String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_UIINDEX + keySuffix;
-    String value = m_env.get(key, null);
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       try {
         return Integer.parseInt(value);
@@ -529,14 +650,13 @@ public class ClientUIPreferences {
     return defaultIndex;
   }
 
-  public int getTableColumnSortIndex(IColumn col, int defaultValue) {
-    if (m_env == null) {
+  public int getTableColumnSortIndex(IColumn col, int defaultValue, String configName) {
+    if (m_prefs == null) {
       return defaultValue;
     }
 
-    String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_SORT_INDEX + keySuffix;
-    String value = m_env.get(key, null);
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       Integer i = TypeCastUtility.castValue(value, Integer.class);
       return i.intValue();
@@ -544,14 +664,13 @@ public class ClientUIPreferences {
     return defaultValue;
   }
 
-  public boolean getTableColumnSortAscending(IColumn col, boolean defaultValue) {
-    if (m_env == null) {
+  public boolean getTableColumnSortAscending(IColumn col, boolean defaultValue, String configName) {
+    if (m_prefs == null) {
       return defaultValue;
     }
 
-    String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_SORT_ASC + keySuffix;
-    String value = m_env.get(key, null);
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       Boolean b = TypeCastUtility.castValue(value, Boolean.class);
       return b != null ? b.booleanValue() : defaultValue;
@@ -559,14 +678,13 @@ public class ClientUIPreferences {
     return defaultValue;
   }
 
-  public Boolean getTableColumnSortExplicit(IColumn col) {
-    if (m_env == null) {
+  public Boolean getTableColumnSortExplicit(IColumn col, String configName) {
+    if (m_prefs == null) {
       return null;
     }
 
-    String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_SORT_EXPLICIT + keySuffix;
-    String value = m_env.get(key, null);
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       return TypeCastUtility.castValue(value, Boolean.class);
     }
@@ -574,44 +692,44 @@ public class ClientUIPreferences {
   }
 
   public void setApplicationWindowPreferences(BoundsSpec r, boolean maximized) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
     if (r != null) {
       String value = "" + r.x + "," + r.y + "," + r.width + "," + r.height;
-      m_env.put(APPLICATION_WINDOW_BOUNDS, value);
+      m_prefs.put(APPLICATION_WINDOW_BOUNDS, value);
     }
     else {
-      m_env.remove(APPLICATION_WINDOW_BOUNDS);
+      m_prefs.remove(APPLICATION_WINDOW_BOUNDS);
     }
     //
     if (maximized) {
-      m_env.put(APPLICATION_WINDOW_MAXIMIZED, "yes");
+      m_prefs.put(APPLICATION_WINDOW_MAXIMIZED, "yes");
     }
     else {
-      m_env.remove(APPLICATION_WINDOW_MAXIMIZED);
+      m_prefs.remove(APPLICATION_WINDOW_MAXIMIZED);
     }
     flush();
   }
 
   public boolean getApplicationWindowMaximized() {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return false;
     }
 
     String key = APPLICATION_WINDOW_MAXIMIZED;
-    String value = m_env.get(key, null);
+    String value = m_prefs.get(key, null);
     return "yes".equalsIgnoreCase(value);
   }
 
   public BoundsSpec getApplicationWindowBounds() {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return null;
     }
 
     String key = APPLICATION_WINDOW_BOUNDS;
-    String value = m_env.get(key, null);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       try {
         StringTokenizer tok = new StringTokenizer(value, ",");
@@ -626,22 +744,22 @@ public class ClientUIPreferences {
   }
 
   public void setCalendarPreferences(int displayMode, boolean displayCondensed) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
-    m_env.put(CALENDAR_DISPLAY_MODE, "" + displayMode);
-    m_env.put(CALENDAR_DISPLAY_CONDENSED, "" + displayCondensed);
+    m_prefs.put(CALENDAR_DISPLAY_MODE, "" + displayMode);
+    m_prefs.put(CALENDAR_DISPLAY_CONDENSED, "" + displayCondensed);
     flush();
   }
 
   public int getCalendarDisplayMode(int defaultValue) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return defaultValue;
     }
 
     String key = CALENDAR_DISPLAY_MODE;
-    String value = m_env.get(key, null);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       try {
         return Integer.parseInt(value);
@@ -654,12 +772,12 @@ public class ClientUIPreferences {
   }
 
   public boolean getCalendarDisplayCondensed(boolean defaultValue) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return defaultValue;
     }
 
     String key = CALENDAR_DISPLAY_CONDENSED;
-    String value = m_env.get(key, null);
+    String value = m_prefs.get(key, null);
     if (value != null) {
       try {
         return TypeCastUtility.castValue(value, Boolean.class);
@@ -672,11 +790,11 @@ public class ClientUIPreferences {
   }
 
   public int getPropertyInteger(String propName, int defaultValue, boolean setDefaultAsProperty) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return defaultValue;
     }
 
-    String value = m_env.get(propName, null);
+    String value = m_prefs.get(propName, null);
     if (value != null) {
       try {
         return TypeCastUtility.castValue(value, Integer.class);
@@ -697,20 +815,20 @@ public class ClientUIPreferences {
   }
 
   public void setPropertyInteger(String propName, int value) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
-    m_env.put(propName, "" + value);
+    m_prefs.put(propName, "" + value);
     flush();
   }
 
   public int[] getPropertyIntArray(String propName) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return null;
     }
 
-    String strVal = m_env.get(propName, null);
+    String strVal = m_prefs.get(propName, null);
     if (!StringUtility.hasText(strVal)) {
       return null;
     }
@@ -724,7 +842,7 @@ public class ClientUIPreferences {
   }
 
   public void setPropertyIntArray(String propName, int[] value) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
@@ -737,16 +855,16 @@ public class ClientUIPreferences {
         }
       }
     }
-    m_env.put(propName, builder.toString());
+    m_prefs.put(propName, builder.toString());
     flush();
   }
 
   public Double getPropertyDouble(String propName) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return null;
     }
 
-    String value = m_env.get(propName, null);
+    String value = m_prefs.get(propName, null);
     if (value != null) {
       try {
         return TypeCastUtility.castValue(value, Double.class);
@@ -759,11 +877,11 @@ public class ClientUIPreferences {
   }
 
   public void setPropertyDouble(String propName, Double value) {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
-    m_env.put(propName, "" + value);
+    m_prefs.put(propName, "" + value);
     flush();
   }
 
@@ -812,16 +930,16 @@ public class ClientUIPreferences {
   }
 
   protected void load() {
-    m_env = getClientPreferences(getSession());
+    m_prefs = getClientPreferences(getSession());
   }
 
   protected void flush() {
-    if (m_env == null) {
+    if (m_prefs == null) {
       return;
     }
 
     try {
-      m_env.flush();
+      m_prefs.flush();
     }
     catch (ProcessingException t) {
       LOG.error("Unable to flush preferences.", t);

@@ -50,7 +50,12 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsF
   @Override
   protected void execSelectionChanged(boolean selected) throws ProcessingException {
     super.execSelectionChanged(selected);
-    getForm().reload();
+    if (selected) {
+      getForm().reload();
+    }
+    else {
+      getForm().persistConfig();
+    }
   }
 
   @Override

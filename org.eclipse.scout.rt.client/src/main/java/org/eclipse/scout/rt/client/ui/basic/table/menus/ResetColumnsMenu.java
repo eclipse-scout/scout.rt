@@ -149,6 +149,7 @@ public class ResetColumnsMenu extends AbstractMenu {
     }
   }
 
+  // FIXME ASA delete if FilterHandling is really removed from OrganizeColumnsForm
   @Order(50.0)
   public class ResetFiltersMenu extends AbstractMenu {
 
