@@ -534,3 +534,8 @@ Additionally, the filtering now happens in the UI.
 The ui sends the filtered rows to the ui server to update its table state so that getFilteredRows return the currently visible rows on the ui.
 This rowsFiltered event leads to a creation of UserTableRowFilter which contains the filtered rows. This is the only active filter on a table.
 The filters managed by TableUserFilterManager are actually only filter states and are not added to the table.
+
+ASA 24.09.2015
+Removed IToolButton from Form. Therefore IToolButtons can not be added anymore as an extension to Forms.
+--> Instead IToolButton can be defined inside the MainBox of a Form. (IToolButton now is a IMenu and adding Menus to a GroupBoxes as
+    extension is also supported.)
