@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -29,7 +31,6 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
@@ -42,15 +43,14 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
  * @since 4.3.0 (Mars-M5)
  */
 @Order(2)
-public class CodeService extends AbstractService implements ICodeService {
+public class CodeService implements ICodeService {
 
   public static final String CODE_SERVICE_CACHE_ID = CodeService.class.getName();
 
-  private ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
+  private volatile ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
 
-  @Override
-  protected void initializeService() {
-    super.initializeService();
+  @PostConstruct
+  protected void initCache() {
     m_cache = createCacheBuilder().build();
   }
 
