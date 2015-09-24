@@ -29,6 +29,7 @@ import java.util.Set;
  * Changes to the original code:
  * -----------------------------
  * - Applied Scout code formatting rules
+ * - Changed getString()/optString() to return null for JSON values "null" instead of the string "null".
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -529,7 +530,7 @@ public class JSONObject {
    */
   public String getString(String name) throws JSONException {
     Object object = get(name);
-    String result = (NULL.equals(object) ? null : JSON.toString(object));
+    String result = (NULL.equals(object) ? null : JSON.toString(object)); // BSI
     if (result == null) {
       throw JSON.typeMismatch(name, object, "String");
     }
@@ -550,7 +551,7 @@ public class JSONObject {
    */
   public String optString(String name, String fallback) {
     Object object = opt(name);
-    String result = (NULL.equals(object) ? null : JSON.toString(object));
+    String result = (NULL.equals(object) ? null : JSON.toString(object)); // BSI
     return result != null ? result : fallback;
   }
 

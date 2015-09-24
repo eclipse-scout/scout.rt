@@ -38,6 +38,7 @@ import junit.framework.TestCase;
  * - Applied Scout code formatting rules
  * - Adjusted last check in "test_wrap()". The original intention of the test is not quite clear and may
  *   be system dependent. Instead of a java.nio.channels.Selector object, we use a simpler BigDecimal.
+ * - Adjusted "testNullCoercionToString()" according to changed optString/getString implementation in JSONObject.
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -529,7 +530,7 @@ public class JSONObjectTest extends TestCase {
   public void testNullCoercionToString() throws JSONException {
     JSONObject object = new JSONObject();
     object.put("foo", JSONObject.NULL);
-    assertEquals("null", object.getString("foo"));
+    assertEquals("null", object.optString("foo", "null")); // BSI
   }
 
   public void testArrayCoercion() throws JSONException {
