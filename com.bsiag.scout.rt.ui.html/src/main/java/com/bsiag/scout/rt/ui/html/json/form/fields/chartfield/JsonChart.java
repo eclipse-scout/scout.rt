@@ -22,7 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChart;
-import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChartValueGroupBean;
+import com.bsiag.scout.rt.shared.chart.IChartValueGroupBean;
 
 /**
  *
