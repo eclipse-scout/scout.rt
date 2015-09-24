@@ -256,20 +256,10 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void fireStateEvent(State newState) {
-    try {
-      PlatformEvent e = new PlatformEvent(this, newState);
-      for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
-        try {
-          IPlatformListener listener = bean.getInstance();
-          listener.stateChanged(e);
-        }
-        catch (Exception ex) {
-          LOG.warn(IPlatformListener.class.getSimpleName() + " " + bean.getBeanClazz(), ex);
-        }
-      }
-    }
-    catch (Exception ex) {
-      LOG.warn("state " + newState, ex);
+    PlatformEvent e = new PlatformEvent(this, newState);
+    for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
+      IPlatformListener listener = bean.getInstance();
+      listener.stateChanged(e);
     }
   }
 
