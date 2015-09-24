@@ -73,6 +73,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       return super.execInit();
     }
 
+    getDeviceTransformer().transformDesktop();
     return ContributionCommand.Continue;
   }
 

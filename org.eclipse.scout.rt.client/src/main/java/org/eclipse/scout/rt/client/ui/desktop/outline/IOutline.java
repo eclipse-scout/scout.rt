@@ -61,6 +61,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   String PROP_VIEW_ORDER = "viewOrder";
 
+  String PROP_BREADCRUMB_ENABLED = "breadcrumbEnabled";
+
   /**
    * alias to {@link ITree#getSelectedNode()}
    */
@@ -110,6 +112,10 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   void setVisibleGranted(boolean b);
 
   void setVisiblePermission(Permission p);
+
+  boolean isBreadcrumbEnabled();
+
+  void setBreadcrumbEnabled(boolean b);
 
   /**
    * @return the default detail form if no page is active (selected)

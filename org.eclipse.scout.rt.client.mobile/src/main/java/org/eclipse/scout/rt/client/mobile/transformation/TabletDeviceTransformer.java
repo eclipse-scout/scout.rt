@@ -10,68 +10,101 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.IPageForm;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
  * @since 3.9.0
  */
-public class TabletDeviceTransformer extends MobileDeviceTransformer {
-  private static int EAST_FORM_WIDTH = 700;
+public class TabletDeviceTransformer implements IDeviceTransformer {
+  private IDesktop m_desktop;
 
   public TabletDeviceTransformer() {
     this(null);
   }
 
   public TabletDeviceTransformer(IDesktop desktop) {
-    super(desktop);
+    if (desktop == null) {
+      desktop = ClientSessionProvider.currentSession().getDesktop();
+    }
+    m_desktop = desktop;
+    if (m_desktop == null) {
+      throw new IllegalArgumentException("No desktop found. Cannot create device transformer.");
+    }
   }
 
   @Override
-  protected void initTransformationConfig() {
-    super.initTransformationConfig();
-
-    getDeviceTransformationConfig().disableTransformation(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
-    getDeviceTransformationConfig().disableTransformation(MobileDeviceTransformation.ADD_MISSING_BACK_ACTION_TO_FORM_HEADER);
+  public void transformDesktop() throws ProcessingException {
+    m_desktop.setCacheSplitterPosition(false);
   }
 
   @Override
-  protected ToolFormHandler createToolFormHandler(IDesktop desktop) {
-    ToolFormHandler toolFormHandler = new ToolFormHandler(getDesktop());
-    toolFormHandler.setCloseToolFormsAfterTablePageLoaded(false);
-    return toolFormHandler;
+  public void transformForm(IForm form) throws ProcessingException {
   }
 
-  /**
-   * On tablet devices there are at maximum two view stacks, on mobile only one. So it is not necessary to create the
-   * other ones which saves unnecessary composites and therefore loading time.
-   */
+  @Override
+  public void transformOutline(IOutline outline) throws ProcessingException {
+    outline.setBreadcrumbEnabled(true);
+  }
+
+  @Override
+  public void transformPageDetailTable(ITable table) throws ProcessingException {
+  }
+
+  @Override
+  public void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList) {
+  }
+
+  @Override
+  public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
+  }
+
+  @Override
+  public void adaptDesktopActions(Collection<IAction> actions) {
+  }
+
+  @Override
+  public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
+  }
+
+  @Override
+  public void notifyDesktopClosing() {
+  }
+
+  @Override
+  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  }
+
+  @Override
+  public boolean acceptFormAddingToDesktop(IForm form) {
+    return false;
+  }
+
+  @Override
+  public boolean acceptMobileTabBoxTransformation(ITabBox tabBox) {
+    return false;
+  }
+
   @Override
   public List<String> getAcceptedViewIds() {
-    List<String> viewIds = new LinkedList<String>();
-    viewIds.add(IForm.VIEW_ID_CENTER);
-    viewIds.add(IForm.VIEW_ID_E);
-
-    return viewIds;
+    return null;
   }
 
   @Override
-  protected void transformView(IForm form) {
-    if (!(form instanceof IPageForm || form instanceof IOutlineChooserForm)) {
-      form.setDisplayViewId(IForm.VIEW_ID_E);
-    }
-    if (IForm.VIEW_ID_E.equals(form.getDisplayViewId())) {
-      boolean valueSet = MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
-      if (valueSet) {
-        markGridDataDirty();
-      }
-    }
+  public DeviceTransformationConfig getDeviceTransformationConfig() {
+    return null;
   }
 
 }

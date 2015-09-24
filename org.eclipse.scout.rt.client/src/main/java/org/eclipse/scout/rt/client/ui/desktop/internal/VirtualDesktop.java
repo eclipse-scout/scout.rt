@@ -733,4 +733,12 @@ public class VirtualDesktop implements IDesktop {
     return DesktopStyle.DEFAULT;
   }
 
+  @Override
+  public boolean isCacheSplitterPosition() {
+    return false;
+  }
+
+  @Override
+  public void setCacheSplitterPosition(boolean b) {
+  }
 }

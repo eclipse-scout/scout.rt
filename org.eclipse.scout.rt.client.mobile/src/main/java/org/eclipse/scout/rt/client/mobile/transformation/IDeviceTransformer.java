@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  */
 public interface IDeviceTransformer {
 
+  void transformDesktop() throws ProcessingException;
+
   void transformForm(IForm form) throws ProcessingException;
 
   void transformOutline(IOutline outline) throws ProcessingException;

@@ -153,6 +153,17 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
+   * Configures whether the outline should be displayed in bread crumb mode or not. It is currently not possible to have
+   * outlines with different modes. The mode of the outline which gets activated first is used for the other outlines as
+   * well.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(140)
+  protected boolean getConfiguredBreadcrumbEnabled() {
+    return false;
+  }
+
+  /**
    * Called during initialization of this outline. Creates the root node of this outline.
    * <p>
    * Subclasses should overwrite either this method or {@link AbstractOutline#execCreateChildPages(List)}.
@@ -234,6 +245,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
+    setBreadcrumbEnabled(getConfiguredBreadcrumbEnabled());
     // The outline must not display any menus because the detail form or table does
     getContextMenu().setVisibleGranted(false);
     try {
@@ -430,6 +442,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private void calculateVisible() {
     propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
+  }
+
+  @Override
+  public boolean isBreadcrumbEnabled() {
+    return propertySupport.getPropertyBool(PROP_BREADCRUMB_ENABLED);
+  }
+
+  @Override
+  public void setBreadcrumbEnabled(boolean b) {
+    propertySupport.setPropertyBool(PROP_BREADCRUMB_ENABLED, b);
   }
 
   @Override

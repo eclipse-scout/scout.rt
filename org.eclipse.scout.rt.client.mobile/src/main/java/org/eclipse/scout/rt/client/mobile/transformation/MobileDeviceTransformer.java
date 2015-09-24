@@ -172,6 +172,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void transformDesktop() throws ProcessingException {
+  }
+
+  @Override
   public void transformForm(IForm form) throws ProcessingException {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
@@ -487,5 +491,4 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       }
     }
   }
-
 }

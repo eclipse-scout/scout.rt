@@ -281,13 +281,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * style cannot be changed at runtime.
    * <p>
    * Subclasses can override this method. Default is {@code DesktopStyle.DEFAULT}.
-   *
-   * @return {@code true} if this application should be visible in the system tray, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(50)
   protected DesktopStyle getConfiguredDesktopStyle() {
     return DesktopStyle.DEFAULT;
+  }
+
+  /**
+   * Configures whether the position of the splitter between the navigation and bench should be stored in the session
+   * storage, so that the position may be restored after a page reload. If set to false, the default position is used.
+   *
+   * @return {@code true} if the splitter position should be cached, false if not
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(60)
+  protected boolean getConfiguredCacheSplitterPosition() {
+    return true;
   }
 
   private List<Class<? extends IAction>> getConfiguredActions() {
@@ -532,6 +542,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setDesktopStyle(getConfiguredDesktopStyle());
+    setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
 
@@ -1437,6 +1448,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     else {
       setStatus(null);
     }
+  }
+
+  @Override
+  public boolean isCacheSplitterPosition() {
+    return propertySupport.getPropertyBool(PROP_CACHE_SPLITTER_POSITION);
+  }
+
+  @Override
+  public void setCacheSplitterPosition(boolean b) {
+    propertySupport.setPropertyBool(PROP_CACHE_SPLITTER_POSITION, b);
   }
 
   @Override

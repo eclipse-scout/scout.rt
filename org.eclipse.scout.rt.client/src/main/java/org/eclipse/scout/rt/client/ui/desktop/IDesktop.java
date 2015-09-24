@@ -94,6 +94,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   String PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER = "selectViewTabsKeyStrokeModifier";
 
+  /**
+   * {@link Boolean}
+   */
+  String PROP_CACHE_SPLITTER_POSITION = "cacheSplitterPosition";
+
   String PROP_DESKTOP_STYLE = "desktopStyle";
 
   String PROP_ACTIVE_FORM = "activeForm";
@@ -568,6 +573,10 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean isAutoPrefixWildcardForTextSearch();
 
   void setAutoPrefixWildcardForTextSearch(boolean b);
+
+  boolean isCacheSplitterPosition();
+
+  void setCacheSplitterPosition(boolean b);
 
   /**
    * get the status of the desktop
