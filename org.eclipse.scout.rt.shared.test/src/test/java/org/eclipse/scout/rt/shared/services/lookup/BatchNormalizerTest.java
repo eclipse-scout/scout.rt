@@ -16,11 +16,8 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,14 +32,11 @@ import org.mockito.stubbing.Answer;
  */
 @RunWith(PlatformTestRunner.class)
 public class BatchNormalizerTest {
-  private List<IBean<?>> m_reg = new ArrayList<>();
+  @BeanMock
   private IFruitLookupService m_lookupService;
 
   @Before
   public void setUp() throws Exception {
-    //register services
-    m_lookupService = Mockito.mock(IFruitLookupService.class);
-
     Answer answer = new Answer<List<ILookupRow<Object>>>() {
 
       @Override
@@ -58,16 +52,6 @@ public class BatchNormalizerTest {
     Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
 
-    m_reg.add(
-        TestingUtility.registerBean(
-            new BeanMetaData(IFruitLookupService.class)
-                .withInitialInstance(m_lookupService)
-                .withApplicationScoped(true)));
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    TestingUtility.unregisterBeans(m_reg);
   }
 
   /**

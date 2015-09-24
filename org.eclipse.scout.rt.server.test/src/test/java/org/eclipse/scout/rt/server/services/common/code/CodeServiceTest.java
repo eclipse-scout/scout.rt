@@ -21,8 +21,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
@@ -31,16 +29,13 @@ import org.eclipse.scout.rt.shared.services.common.code.CodeService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheEntryFilter;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 /**
  * Test for {@link ICodeService}
@@ -49,19 +44,8 @@ import org.mockito.Mockito;
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
 public class CodeServiceTest {
+  @BeanMock
   private ClientNotificationRegistry m_clientNotificationReg;
-  private List<IBean<?>> m_reg;
-
-  @Before
-  public void before() {
-    m_clientNotificationReg = Mockito.mock(ClientNotificationRegistry.class);
-    m_reg = TestingUtility.registerBeans(new BeanMetaData(ClientNotificationRegistry.class).withInitialInstance(m_clientNotificationReg).withApplicationScoped(true));
-  }
-
-  @After
-  public void after() {
-    TestingUtility.unregisterBeans(m_reg);
-  }
 
   /**
    * Tests that a client notification is created when reloading a code type {@link CodeService#reloadCodeType}

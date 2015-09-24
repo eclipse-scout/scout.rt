@@ -17,6 +17,8 @@ import java.util.List;
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
@@ -110,7 +112,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   protected Statement withBefores(final FrameworkMethod method, final Object target, final Statement statement) {
     final List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(Before.class);
     if (befores.isEmpty()) {
-      return statement;
+      return new BeanAnnotationsInitStatement(statement, target);
     }
 
     Statement beforeStatement = new Statement() {
@@ -123,26 +125,22 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
     };
 
     final Statement interceptedBeforeStatement = interceptBeforeStatement(beforeStatement, getTestClass().getJavaClass(), method.getMethod());
-    return new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        interceptedBeforeStatement.evaluate();
-        statement.evaluate();
-      }
-    };
+    return new BeanAnnotationsInitStatement(new InterceptedBeforeStatement(statement, interceptedBeforeStatement), target);
   }
 
   @Override
   protected Statement withAfters(final FrameworkMethod method, final Object target, final Statement statement) {
     final List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(After.class);
     if (afters.isEmpty()) {
-      return statement;
+      return new BeanAnnotationsCleanupStatement(statement);
     }
 
     final List<Throwable> errors = new ArrayList<>();
     final Statement afterStatement = new RunAftersStatement(afters, target, errors);
     final Statement interceptedAfterStatement = interceptAfterStatement(afterStatement, getTestClass().getJavaClass(), method.getMethod());
-    return new InterceptedAfterStatement(statement, interceptedAfterStatement, errors);
+    InterceptedAfterStatement s1 = new InterceptedAfterStatement(statement, interceptedAfterStatement, errors);
+
+    return new BeanAnnotationsCleanupStatement(s1);
   }
 
   @Override
@@ -283,6 +281,24 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
         }
       }
     }
+  }
+
+  protected static class InterceptedBeforeStatement extends Statement {
+
+    private final Statement m_statement;
+    private final Statement m_interceptedBeforeStatement;
+
+    public InterceptedBeforeStatement(Statement statement, Statement interceptedBeforeStatement) {
+      m_statement = statement;
+      m_interceptedBeforeStatement = interceptedBeforeStatement;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      m_interceptedBeforeStatement.evaluate();
+      m_statement.evaluate();
+    }
+
   }
 
   protected static class InterceptedAfterStatement extends Statement {

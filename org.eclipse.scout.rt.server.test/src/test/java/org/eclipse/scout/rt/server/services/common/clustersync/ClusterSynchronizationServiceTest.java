@@ -12,17 +12,13 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
@@ -31,11 +27,10 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +46,7 @@ public class ClusterSynchronizationServiceTest {
   private static final String TEST_USER = "user";
 
   private ClusterNotificationMessage m_message;
-  private List<IBean<?>> m_beans = new ArrayList<>();
+  @BeanMock
   private IPublishSubscribeMessageService m_messageService;
   private ClusterSynchronizationService m_svc = null;
 
@@ -60,21 +55,9 @@ public class ClusterSynchronizationServiceTest {
     ClusterNotificationProperties testProps = new ClusterNotificationProperties(TEST_NODE, TEST_USER);
     m_message = new ClusterNotificationMessage("notification", testProps);
 
-    m_messageService = mock(IPublishSubscribeMessageService.class);
-    m_beans.add(
-        TestingUtility.registerBean(
-            new BeanMetaData(IPublishSubscribeMessageService.class)
-                .withInitialInstance(m_messageService)
-                .withApplicationScoped(true)));
-
     m_svc = new ClusterSynchronizationService();
     m_svc.initializeService();
     m_svc.enable();
-  }
-
-  @After
-  public void tearDown() {
-    TestingUtility.unregisterBeans(m_beans);
   }
 
   /**

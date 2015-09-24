@@ -16,11 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,15 +32,12 @@ import org.mockito.stubbing.Answer;
  */
 @RunWith(PlatformTestRunner.class)
 public class BatchLookupTest {
-  private List<IBean<?>> m_reg = new ArrayList<>();
+  @BeanMock
   private IFlowerLookupService m_lookupService;
   private static long m_localInvocations;
 
   @Before
   public void setUp() throws Exception {
-    //register services
-    m_lookupService = Mockito.mock(IFlowerLookupService.class);
-
     Answer answer = new Answer<List<ILookupRow<Object>>>() {
 
       @Override
@@ -58,17 +52,6 @@ public class BatchLookupTest {
     Mockito.doAnswer(answer).when(m_lookupService).getDataByAll(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
-
-    m_reg.add(
-        TestingUtility.registerBean(
-            new BeanMetaData(IFlowerLookupService.class)
-                .withInitialInstance(m_lookupService)
-                .withApplicationScoped(true)));
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    TestingUtility.unregisterBeans(m_reg);
   }
 
   @Test

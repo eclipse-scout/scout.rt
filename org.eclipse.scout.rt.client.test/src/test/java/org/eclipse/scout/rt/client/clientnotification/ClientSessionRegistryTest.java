@@ -13,24 +13,15 @@ package org.eclipse.scout.rt.client.clientnotification;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 /**
  * Tests for {@link ClientSessionRegistry}
@@ -38,25 +29,16 @@ import org.mockito.MockitoAnnotations;
 @RunWith(PlatformTestRunner.class)
 public class ClientSessionRegistryTest {
 
-  @Mock
+  @BeanMock
   private IClientNotificationService m_mockService;
 
   @Mock
   private IClientSession m_clientSession;
 
-  private List<IBean<?>> m_regs;
-
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
-    m_regs = TestingUtility.registerBeans(createBeanMetaDataWithoutTunnel(IClientNotificationService.class, m_mockService));
     when(m_clientSession.getId()).thenReturn("testSessionId");
     when(m_clientSession.getUserId()).thenReturn("testUserId");
-  }
-
-  @After
-  public void after() {
-    TestingUtility.unregisterBeans(m_regs);
   }
 
   /**
@@ -74,14 +56,6 @@ public class ClientSessionRegistryTest {
     ClientSessionRegistry reg = new TestClientSessionRegistry();
     reg.sessionStopped(m_clientSession);
     verify(m_mockService).unregisterSession(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-  }
-
-  private <T> BeanMetaData createBeanMetaDataWithoutTunnel(Class<T> beanClass, T initialInstance) {
-    BeanMetaData beanData = new BeanMetaData(beanClass).withInitialInstance(initialInstance).withApplicationScoped(true);
-    Map<Class<? extends Annotation>, Annotation> annotations = beanData.getBeanAnnotations();
-    annotations.remove(TunnelToServer.class);
-    beanData.setBeanAnnotations(annotations);
-    return beanData;
   }
 
   class TestClientSessionRegistry extends ClientSessionRegistry {
