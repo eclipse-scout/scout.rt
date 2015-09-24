@@ -79,6 +79,10 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       .subtract(fieldOffset)
       .subtract(scout.graphics.getMargins(formField.$fieldContainer));
     fieldBounds = new scout.Rectangle(left, top, fieldSize.width, fieldSize.height);
+    if (formField.$fieldContainer.css('position') !== 'absolute') {
+      fieldBounds.x = 0;
+      fieldBounds.y = 0;
+    }
     htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
       htmlField.setBounds(fieldBounds);
