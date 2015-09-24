@@ -17,42 +17,56 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
  *
  */
 public interface IChart extends IPropertyObserver, ITypeWithClassId {
+	int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
-  String PROP_AUTO_COLOR = "autoColor";
-  String PROP_CHART_TYPE = "chartType";
-  String PROP_CHART_DATA = "chartData";
-  String PROP_ENABLED = "enabled";
-  String PROP_VISIBLE = "visible";
-  String PROP_CONTAINER = "chartContainer";
+	String PROP_AUTO_COLOR = "autoColor";
+	String PROP_CHART_TYPE = "chartType";
+	String PROP_CHART_DATA = "chartData";
+	String PROP_ENABLED = "enabled";
+	String PROP_VISIBLE = "visible";
+	String PROP_CONTAINER = "chartContainer";
+	String PROP_MAX_SEGMENTS = "maxSegments";
 
-  void setChartType(int chartType);
+	void setChartType(int chartType);
 
-  int getChartType();
+	int getChartType();
 
-  void setAutoColor(boolean isAutoColor);
+	void setAutoColor(boolean isAutoColor);
 
-  boolean isAutoColor();
+	boolean isAutoColor();
 
-  IChartUIFacade getUIFacade();
+	IChartUIFacade getUIFacade();
 
-  void addChartListener(ChartListener listener);
+	void addChartListener(ChartListener listener);
 
-  void removeChartListener(ChartListener listener);
+	void removeChartListener(ChartListener listener);
 
-  void setChartData(IChartBean data);
+	void setChartData(IChartBean data);
 
-  IChartBean getChartData();
+	IChartBean getChartData();
 
-  void setEnabled(boolean enabled);
+	void setEnabled(boolean enabled);
 
-  boolean isEnabled();
+	boolean isEnabled();
 
-  void setVisible(boolean visible);
+	void setVisible(boolean visible);
 
-  boolean isVisible();
+	boolean isVisible();
 
-  void setContainerInternal(ITypeWithClassId container);
+	void setContainerInternal(ITypeWithClassId container);
 
-  ITypeWithClassId getContainer();
+	ITypeWithClassId getContainer();
+
+	/**
+	 * used for pie charts to limit segments-> if set, smallest segments are
+	 * collapsed
+	 */
+	int getMaxSegments();
+
+	/**
+	 * used for pie charts to limit segments-> if set, smallest segments are
+	 * collapsed
+	 */
+	void setMaxSegments(int maxSegments);
 
 }

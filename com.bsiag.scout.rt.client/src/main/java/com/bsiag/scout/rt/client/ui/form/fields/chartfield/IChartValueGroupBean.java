@@ -17,15 +17,17 @@ import java.util.List;
  *
  */
 public interface IChartValueGroupBean {
-  String getGroupName();
 
-  void setGroupName(String groupName);
+	String getGroupName();
 
-  List<BigDecimal> getValues();
+	void setGroupName(String groupName);
 
-  void setValues(List<BigDecimal> values);
+	List<BigDecimal> getValues();
 
-  List<String> getColorHexValue();
+	void setValues(List<BigDecimal> values);
 
-  void setColorHexValue(List<String> colorHexValue);
+	List<String> getColorHexValue();
+
+	void setColorHexValue(List<String> colorHexValue);
+
 }

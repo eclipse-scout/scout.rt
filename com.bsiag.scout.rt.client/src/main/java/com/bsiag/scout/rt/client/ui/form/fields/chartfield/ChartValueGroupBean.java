@@ -18,37 +18,38 @@ import java.util.List;
  *
  */
 public class ChartValueGroupBean implements IChartValueGroupBean {
-  private String m_groupName;
-  private List<BigDecimal> m_values = new ArrayList<BigDecimal>();
-  private List<String> m_colorHexValue = new ArrayList<String>();
+	private String m_groupName;
+	private List<BigDecimal> m_values = new ArrayList<BigDecimal>();
+	private List<String> m_colorHexValue = new ArrayList<String>();
 
-  @Override
-  public String getGroupName() {
-    return m_groupName;
-  }
+	@Override
+	public String getGroupName() {
+		return m_groupName;
+	}
 
-  @Override
-  public void setGroupName(String groupName) {
-    m_groupName = groupName;
-  }
+	@Override
+	public void setGroupName(String groupName) {
+		m_groupName = groupName;
+	}
 
-  @Override
-  public List<BigDecimal> getValues() {
-    return m_values;
-  }
+	@Override
+	public List<BigDecimal> getValues() {
+		return m_values;
+	}
 
-  @Override
-  public void setValues(List<BigDecimal> values) {
-    m_values = values;
-  }
+	@Override
+	public void setValues(List<BigDecimal> values) {
+		m_values = values;
+	}
 
-  @Override
-  public List<String> getColorHexValue() {
-    return m_colorHexValue;
-  }
+	@Override
+	public List<String> getColorHexValue() {
+		return m_colorHexValue;
+	}
 
-  @Override
-  public void setColorHexValue(List<String> colorHexValue) {
-    m_colorHexValue = colorHexValue;
-  }
+	@Override
+	public void setColorHexValue(List<String> colorHexValue) {
+		m_colorHexValue = colorHexValue;
+	}
+
 }

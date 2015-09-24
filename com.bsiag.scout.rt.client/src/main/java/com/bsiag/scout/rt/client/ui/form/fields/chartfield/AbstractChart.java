@@ -10,6 +10,7 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -23,128 +24,170 @@ import org.eclipse.scout.rt.platform.BEANS;
 
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
 public abstract class AbstractChart extends AbstractPropertyObserver implements IChart {
-  private IChartUIFacade m_uiFacade;
-  private final EventListenerList m_listenerList = new EventListenerList();
+	private IChartUIFacade m_uiFacade;
+	private final EventListenerList m_listenerList = new EventListenerList();
 
-  @Override
-  public void addChartListener(ChartListener listener) {
-    m_listenerList.add(ChartListener.class, listener);
-  }
+	public AbstractChart() {
+		this(true);
+	}
 
-  @Override
-  public void removeChartListener(ChartListener listener) {
-    m_listenerList.remove(ChartListener.class, listener);
-  }
+	public AbstractChart(boolean callInitializer) {
+		if (callInitializer) {
+			callInitializer();
+		}
+	}
 
-  @Override
-  public void setChartType(int chartType) {
-    propertySupport.setProperty(PROP_CHART_TYPE, chartType);
-  }
+	private void callInitializer() {
+		initConfig();
+	}
 
-  @Override
-  public int getChartType() {
-    return propertySupport.getPropertyInt(PROP_CHART_TYPE);
-  }
+	@Override
+	public void addChartListener(ChartListener listener) {
+		m_listenerList.add(ChartListener.class, listener);
+	}
 
-  @Override
-  public void setAutoColor(boolean isAutoColor) {
-    propertySupport.setProperty(PROP_AUTO_COLOR, isAutoColor);
-  }
+	@Override
+	public void removeChartListener(ChartListener listener) {
+		m_listenerList.remove(ChartListener.class, listener);
+	}
 
-  @Override
-  public boolean isAutoColor() {
-    return propertySupport.getPropertyBool(PROP_AUTO_COLOR);
-  }
+	@Override
+	public void setChartType(int chartType) {
+		propertySupport.setProperty(PROP_CHART_TYPE, chartType);
+	}
 
-  @Override
-  public void setChartData(IChartBean data) {
-    propertySupport.setProperty(PROP_CHART_DATA, data);
-  }
+	@Override
+	public int getChartType() {
+		return propertySupport.getPropertyInt(PROP_CHART_TYPE);
+	}
 
-  @Override
-  public IChartBean getChartData() {
-    return (IChartBean) propertySupport.getProperty(PROP_CHART_DATA);
-  }
+	@Override
+	public void setAutoColor(boolean isAutoColor) {
+		propertySupport.setProperty(PROP_AUTO_COLOR, isAutoColor);
+	}
 
-  @Override
-  public IChartUIFacade getUIFacade() {
-    return m_uiFacade;
-  }
+	@Override
+	public boolean isAutoColor() {
+		return propertySupport.getPropertyBool(PROP_AUTO_COLOR);
+	}
 
-  @Override
-  public void setEnabled(boolean enabled) {
-    propertySupport.setPropertyBool(PROP_ENABLED, enabled);
-  }
+	@Override
+	public void setChartData(IChartBean data) {
+		propertySupport.setProperty(PROP_CHART_DATA, data);
+	}
 
-  /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITable}
-   */
-  @Override
-  public void setContainerInternal(ITypeWithClassId container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
-  }
+	@Override
+	public IChartBean getChartData() {
+		return (IChartBean) propertySupport.getProperty(PROP_CHART_DATA);
+	}
 
-  @Override
-  public ITypeWithClassId getContainer() {
-    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
-  }
+	@Override
+	public IChartUIFacade getUIFacade() {
+		return m_uiFacade;
+	}
 
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
-  }
+	@Override
+	public void setEnabled(boolean enabled) {
+		propertySupport.setPropertyBool(PROP_ENABLED, enabled);
+	}
 
-  @Override
-  public void setVisible(boolean visible) {
-    propertySupport.setPropertyBool(PROP_VISIBLE, visible);
-  }
+	/**
+	 * do not use this internal method unless you are implementing a container
+	 * that holds and controls an {@link ITable}
+	 */
+	@Override
+	public void setContainerInternal(ITypeWithClassId container) {
+		propertySupport.setProperty(PROP_CONTAINER, container);
+	}
 
-  @Override
-  public boolean isVisible() {
-    return propertySupport.getPropertyBool(PROP_VISIBLE);
-  }
+	@Override
+	public ITypeWithClassId getContainer() {
+		return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
+	}
 
-  /*
-   * Configuration
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(10)
-  protected int getConfiguredChartType() {
-    return IChartType.PIE;
-  }
+	@Override
+	public boolean isEnabled() {
+		return propertySupport.getPropertyBool(PROP_ENABLED);
+	}
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(20)
-  protected boolean getConfiguredAutoColor() {
-    return true;
-  }
+	@Override
+	public void setVisible(boolean visible) {
+		propertySupport.setPropertyBool(PROP_VISIBLE, visible);
+	}
 
-  protected void initConfig() {
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    setChartType(getConfiguredChartType());
-    setAutoColor(getConfiguredAutoColor());
-  }
+	@Override
+	public boolean isVisible() {
+		return propertySupport.getPropertyBool(PROP_VISIBLE);
+	}
 
-  public void fireValueClicked(int[] axesPosition) {
-    ChartEvent e = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
-    e.setAxesPosition(axesPosition);
-    ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
-    for (ChartListener l : listeners) {
-      l.chartValueClicked(e);
-    }
-  }
+	@Override
+	public int getMaxSegments() {
+		return propertySupport.getPropertyInt(PROP_MAX_SEGMENTS);
+	}
 
-  protected class P_UIFacade implements IChartUIFacade {
-    /**
-     * position for all axes in IChartBean.getAxes() ordered in same order like axes.
-     *
-     * @param axisPosition
-     */
-    @Override
-    public void fireUIValueClicked(int[] axesPosition) {
-      fireValueClicked(axesPosition);
-    }
-  }
+	@Override
+	public void setMaxSegments(int maxSegments) {
+		propertySupport.setPropertyInt(PROP_MAX_SEGMENTS, maxSegments);
+	}
 
-//TODO nbu make extendable
+	/*
+	 * Configuration
+	 */
+	@ConfigProperty(ConfigProperty.INTEGER)
+	@Order(10)
+	protected int getConfiguredChartType() {
+		return IChartType.PIE;
+	}
+
+	@ConfigProperty(ConfigProperty.BOOLEAN)
+	@Order(20)
+	protected boolean getConfiguredAutoColor() {
+		return true;
+	}
+
+	@ConfigProperty(ConfigProperty.INTEGER)
+	@Order(30)
+	protected int getConfiguredMaxSegments() {
+		return DEFAULT_MAX_SEGMENTS_PIE;
+	}
+
+	protected void initConfig() {
+		m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+		setChartType(getConfiguredChartType());
+		setAutoColor(getConfiguredAutoColor());
+		setMaxSegments(getConfiguredMaxSegments());
+	}
+
+	public void fireValueClicked(int[] axesPosition) {
+		ChartEvent e = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
+		e.setAxesPosition(axesPosition);
+		ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
+		for (ChartListener l : listeners) {
+			l.chartValueClicked(e);
+		}
+	}
+
+	protected class P_UIFacade implements IChartUIFacade {
+		/**
+		 * position for all axes in IChartBean.getAxes() ordered in same order
+		 * like axes.
+		 *
+		 * @param axisPosition
+		 */
+		@Override
+		public void fireUIValueClicked(int[] axesPosition) {
+			fireValueClicked(axesPosition);
+		}
+	}
+
+	@Override
+	public String classId() {
+		String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+		if (getContainer() != null) {
+			return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+		}
+		return simpleClassId;
+	}
+
+	// TODO make extendable
 }

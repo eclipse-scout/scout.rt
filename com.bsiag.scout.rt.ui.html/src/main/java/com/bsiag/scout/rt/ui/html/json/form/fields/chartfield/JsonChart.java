@@ -28,111 +28,118 @@ import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChartValueGroupBean;
  *
  */
 public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserver<CHART> {
-  public static final String EVENT_VALUE_CLICKED = "valueClicked";
+	public static final String EVENT_VALUE_CLICKED = "valueClicked";
 
-  /**
-   * @param model
-   * @param uiSession
-   * @param id
-   * @param parent
-   */
-  public JsonChart(CHART model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
-    super(model, uiSession, id, parent);
-  }
+	/**
+	 * @param model
+	 * @param uiSession
+	 * @param id
+	 * @param parent
+	 */
+	public JsonChart(CHART model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+		super(model, uiSession, id, parent);
+	}
 
-  @Override
-  protected void initJsonProperties(CHART model) {
-    super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoColor();
-      }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CHART_TYPE, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getChartType();
-      }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_ENABLED, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isEnabled();
-      }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_VISIBLE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isVisible();
-      }
-    });
-  }
+	@Override
+	protected void initJsonProperties(CHART model) {
+		super.initJsonProperties(model);
+		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
+			@Override
+			protected Boolean modelValue() {
+				return getModel().isAutoColor();
+			}
+		});
+		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CHART_TYPE, model) {
+			@Override
+			protected Integer modelValue() {
+				return getModel().getChartType();
+			}
+		});
+		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_ENABLED, model) {
+			@Override
+			protected Object modelValue() {
+				return getModel().isEnabled();
+			}
+		});
+		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_VISIBLE, model) {
+			@Override
+			protected Object modelValue() {
+				return getModel().isVisible();
+			}
+		});
+		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_MAX_SEGMENTS, model) {
+			@Override
+			protected Object modelValue() {
+				return getModel().getMaxSegments();
+			}
+		});
+	}
 
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
+	@Override
+	public JSONObject toJson() {
+		JSONObject json = super.toJson();
 
-    JSONObject jsonChartBean = new JSONObject();
-    JSONArray jsonChartAxes = new JSONArray();
-    for (List<String> axis : getModel().getChartData().getAxes()) {
-      jsonChartAxes.put(axisToJson(axis));
-    }
-    jsonChartBean.put("axes", jsonChartAxes);
-    JSONArray jsonChartValueGroups = new JSONArray();
-    for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
-      jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
-    }
-    jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
+		JSONObject jsonChartBean = new JSONObject();
+		JSONArray jsonChartAxes = new JSONArray();
+		JSONArray jsonChartValueGroups = new JSONArray();
+		if (getModel().getChartData() != null) {
 
-    putProperty(json, IChart.PROP_CHART_DATA, jsonChartBean);
-    return json;
-  }
+			for (List<String> axis : getModel().getChartData().getAxes()) {
+				jsonChartAxes.put(axisToJson(axis));
+			}
+			for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
+				jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
+			}
+		}
+		jsonChartBean.put("axes", jsonChartAxes);
+		jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
 
-  @Override
-  public String getObjectType() {
-    return "Chart";
-  }
+		putProperty(json, IChart.PROP_CHART_DATA, jsonChartBean);
+		return json;
+	}
 
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_VALUE_CLICKED.equals(event.getType())) {
-      handleUiValueClicked(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
+	@Override
+	public String getObjectType() {
+		return "Chart";
+	}
 
-  protected void handleUiValueClicked(JsonEvent event) {
-    //TODO nbu
-    getModel().getUIFacade().fireUIValueClicked(new int[0]);
-  }
+	@Override
+	public void handleUiEvent(JsonEvent event) {
+		if (EVENT_VALUE_CLICKED.equals(event.getType())) {
+			handleUiValueClicked(event);
+		} else {
+			super.handleUiEvent(event);
+		}
+	}
 
-  protected JSONObject chartValueGroupBeanToJson(IChartValueGroupBean chartValueGroupBean) {
-    JSONObject jsonChartValueGroupBean = new JSONObject();
-    putProperty(jsonChartValueGroupBean, "groupName", chartValueGroupBean.getGroupName());
+	protected void handleUiValueClicked(JsonEvent event) {
+		// TODO nbu
+		getModel().getUIFacade().fireUIValueClicked(new int[0]);
+	}
 
-    JSONArray jsonValues = new JSONArray();
-    for (BigDecimal value : chartValueGroupBean.getValues()) {
-      jsonValues.put(value);
-    }
-    putProperty(jsonChartValueGroupBean, "values", jsonValues);
+	protected JSONObject chartValueGroupBeanToJson(IChartValueGroupBean chartValueGroupBean) {
+		JSONObject jsonChartValueGroupBean = new JSONObject();
+		putProperty(jsonChartValueGroupBean, "groupName", chartValueGroupBean.getGroupName());
+		JSONArray jsonValues = new JSONArray();
+		for (BigDecimal value : chartValueGroupBean.getValues()) {
+			jsonValues.put(value);
+		}
+		putProperty(jsonChartValueGroupBean, "values", jsonValues);
 
-    JSONArray jsonColors = new JSONArray();
-    for (String color : chartValueGroupBean.getColorHexValue()) {
-      jsonColors.put(color);
-    }
-    putProperty(jsonChartValueGroupBean, "colors", jsonColors);
-    return jsonChartValueGroupBean;
-  }
+		JSONArray jsonColors = new JSONArray();
+		for (String color : chartValueGroupBean.getColorHexValue()) {
+			jsonColors.put(color);
+		}
+		putProperty(jsonChartValueGroupBean, "colors", jsonColors);
+		return jsonChartValueGroupBean;
+	}
 
-  protected JSONArray axisToJson(List<String> axis) {
-    JSONArray jsonAxisValues = new JSONArray();
-    for (String axisValue : axis) {
-      jsonAxisValues.put(axisValue);
-    }
-    return jsonAxisValues;
-  }
+	protected JSONArray axisToJson(List<String> axis) {
+		JSONArray jsonAxisValues = new JSONArray();
+		for (String axisValue : axis) {
+			jsonAxisValues.put(axisValue);
+		}
+		return jsonAxisValues;
+	}
 
 }
