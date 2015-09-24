@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 
 /**
  * Scout platform life cycle manager.
@@ -24,16 +25,15 @@ public interface IPlatform {
    */
   enum State {
     /**
-     * This event signals that {@link IPlatform#getBeanContext()} was prepared with the beans found in the
-     * {@link IPlatform#getClassInventory()} and may manipulated using
-     * {@link IBeanContext#registerBean(org.eclipse.scout.rt.platform.IBean, Object)} etc.
+     * This event signals that {@link IPlatform#getBeanManager()} was prepared with the beans found in the
+     * {@link ClassInventory#get()} and may manipulated using {@link IBeanManager#registerBean(BeanMetaData)} etc.
      * <p>
      * However, {@link IBean#getInstance()} is not available yet
      */
     BeanManagerPrepared,
 
     /**
-     * This event signals that {@link IPlatform#getBeanContext()} is now valid and should not be manipulated anymore
+     * This event signals that {@link IPlatform#getBeanManager()} is now valid and should not be manipulated anymore
      * <p>
      * {@link IBean#getInstance()} is valid now.
      */
