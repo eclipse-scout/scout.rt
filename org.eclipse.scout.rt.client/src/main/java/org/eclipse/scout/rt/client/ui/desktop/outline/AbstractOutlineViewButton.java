@@ -103,11 +103,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
     }
   }
 
-  @Override
-  protected boolean getConfiguredToggleAction() {
-    return true;
-  }
-
   /**
    * since execInitAction sets the value of this method to the value of the outline. The getConfigured does not have any
    * affect.
