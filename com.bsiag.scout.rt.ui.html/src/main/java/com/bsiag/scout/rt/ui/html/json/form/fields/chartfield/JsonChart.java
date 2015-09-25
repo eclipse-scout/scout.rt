@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChart;
+import com.bsiag.scout.rt.shared.chart.IChartBean;
 import com.bsiag.scout.rt.shared.chart.IChartValueGroupBean;
 
 /**
@@ -43,6 +44,34 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
 	@Override
 	protected void initJsonProperties(CHART model) {
 		super.initJsonProperties(model);
+
+		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CHART_DATA, model) {
+			@Override
+			protected IChartBean modelValue() {
+				return getModel().getChartData();
+			}
+
+			@Override
+			public Object prepareValueForToJson(Object value) {
+				JSONObject jsonChartBean = new JSONObject();
+				JSONArray jsonChartAxes = new JSONArray();
+				JSONArray jsonChartValueGroups = new JSONArray();
+				if (getModel().getChartData() != null) {
+
+					for (List<String> axis : getModel().getChartData().getAxes()) {
+						jsonChartAxes.put(axisToJson(axis));
+					}
+					for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
+						jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
+					}
+				}
+				jsonChartBean.put("axes", jsonChartAxes);
+				jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
+
+				return jsonChartBean;
+			}
+		});
+
 		putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
 			@Override
 			protected Boolean modelValue() {
@@ -73,29 +102,6 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
 				return getModel().getMaxSegments();
 			}
 		});
-	}
-
-	@Override
-	public JSONObject toJson() {
-		JSONObject json = super.toJson();
-
-		JSONObject jsonChartBean = new JSONObject();
-		JSONArray jsonChartAxes = new JSONArray();
-		JSONArray jsonChartValueGroups = new JSONArray();
-		if (getModel().getChartData() != null) {
-
-			for (List<String> axis : getModel().getChartData().getAxes()) {
-				jsonChartAxes.put(axisToJson(axis));
-			}
-			for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
-				jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
-			}
-		}
-		jsonChartBean.put("axes", jsonChartAxes);
-		jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
-
-		putProperty(json, IChart.PROP_CHART_DATA, jsonChartBean);
-		return json;
 	}
 
 	@Override
