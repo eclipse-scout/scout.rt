@@ -43,9 +43,9 @@ scout.ViewButton.prototype._renderAsTab = function($parent) {
 /**
  * @override Action.js
  */
-scout.ViewButton.prototype._renderText = function(text) {
+scout.ViewButton.prototype._renderText = function() {
   if (this._isMenu()) {
-    scout.ViewButton.parent.prototype._renderText.call(this, text);
+    scout.ViewButton.parent.prototype._renderText.call(this);
   } else {
     this.$title.css('display', this._breadcrumbEnabled || this._isTab() ? 'none' : '');
   }
@@ -54,8 +54,8 @@ scout.ViewButton.prototype._renderText = function(text) {
 /**
  * @override Action.js
  */
-scout.ViewButton.prototype._renderSelected = function(selected) {
-  scout.ViewButton.parent.prototype._renderSelected.call(this, selected);
+scout.ViewButton.prototype._renderSelected = function() {
+  scout.ViewButton.parent.prototype._renderSelected.call(this);
   if (this._isTab()) {
       scout.tooltips.install(this.$container, this.session, {
         text: this.text
@@ -67,9 +67,9 @@ scout.ViewButton.prototype._renderSelected = function(selected) {
  * Use a default icon, when view-tab doesn't define one.
  * @override Action.js
  */
-scout.ViewButton.prototype._renderIconId = function(iconId) {
+scout.ViewButton.prototype._renderIconId = function() {
   if (this._isTab()) {
-    this.$container.icon(this.getIconId(iconId));
+    this.$container.icon(this.getIconId(this.iconId));
   }
 };
 
@@ -86,18 +86,14 @@ scout.ViewButton.prototype.getIconId = function(iconId) {
   return iconId;
 };
 
-scout.ViewButton.prototype._onClick = function() {
-  this.doAction();
-};
-
 scout.ViewButton.prototype.last = function() {
   this.$container.addClass('last');
 };
 
 scout.ViewButton.prototype.setBreadcrumbEnabled = function(enabled) {
   this._breadcrumbEnabled = enabled;
-  this._renderText(this.text);
-  this._renderSelected(this.selected);
+  this._renderText();
+  this._renderSelected();
 };
 
 /**

@@ -13,6 +13,7 @@ describe("FormToolButton", function() {
 
   var formMock = {
     render: function() {},
+    remove: function() {},
     htmlComp: {
       pack: function() {}
     },

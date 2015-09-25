@@ -76,6 +76,6 @@ scout.AbstractNavigationButton.prototype.doAction = function() {
 scout.AbstractNavigationButton.prototype.updateEnabled = function() {
   this.enabled = this._buttonEnabled();
   if (this.rendered) {
-    this._renderEnabled(this.enabled);
+    this._renderEnabled();
   }
 };

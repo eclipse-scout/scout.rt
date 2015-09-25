@@ -123,7 +123,7 @@ scout.Popup.prototype._detachCloseHandler = function() {
 
   // Uninstall mouse close handler
   if (this._mouseDownHandler) {
-  $(document).off('mousedown', this._mouseDownHandler);
+    $(document).off('mousedown', this._mouseDownHandler);
     this._mouseDownHandler = null;
   }
 };
@@ -135,7 +135,6 @@ scout.Popup.prototype._onMouseDown = function(event) {
     this._onMouseDownOutside(event);
   }
 };
-
 
 /**
  * Method invoked once a mouse down event occurs outside the popup.
@@ -271,9 +270,11 @@ scout.Popup.prototype._triggerLocationChanged = function() {
 /**
  * Fire event that this popup is about to open.
  */
-scout.Popup.prototype._triggerPopupOpenEvent= function() {
+scout.Popup.prototype._triggerPopupOpenEvent = function() {
   if (this.triggerPopupOpenEvent) {
-    this.session.desktop._trigger('popupopen', {popup: this});
+    this.session.desktop._trigger('popupopen', {
+      popup: this
+    });
   }
 };
 

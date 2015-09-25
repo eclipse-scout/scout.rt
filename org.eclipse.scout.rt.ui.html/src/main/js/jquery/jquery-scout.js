@@ -27,6 +27,37 @@
     }
   }
 
+  function explodeShorthandProperties(properties) {
+    var newProperties = [];
+    properties.forEach(function(prop) {
+      // shorthand css properties may not be copied directly (at least not in firefox) -> copy the actual properties
+      if (prop === 'margin' || prop === 'padding') {
+        newProperties.push(prop + '-top');
+        newProperties.push(prop + '-right');
+        newProperties.push(prop + '-bottom');
+        newProperties.push(prop + '-left');
+      } else if (prop === 'border') {
+        newProperties.push('border-top-style');
+        newProperties.push('border-right-style');
+        newProperties.push('border-bottom-style');
+        newProperties.push('border-left-style');
+
+        newProperties.push('border-top-color');
+        newProperties.push('border-right-color');
+        newProperties.push('border-bottom-color');
+        newProperties.push('border-left-color');
+
+        newProperties.push('border-top-width');
+        newProperties.push('border-right-width');
+        newProperties.push('border-bottom-width');
+        newProperties.push('border-left-width');
+      } else {
+        newProperties.push(prop);
+      }
+    });
+    return newProperties;
+  }
+
   // === $ extensions ===
 
   // chris' shortcut
@@ -603,36 +634,24 @@
 
   $.fn.copyCss = function($origin, props) {
     var properties = props.split(' ');
-    var newProperties = [];
     var $this = this;
+    properties = explodeShorthandProperties(properties);
     properties.forEach(function(prop) {
-      // shorthand css properties may not be copied directly (at least not in firefox) -> copy the actual properties
-      if (prop === 'margin' || prop === 'padding') {
-        newProperties.push(prop + '-top');
-        newProperties.push(prop + '-right');
-        newProperties.push(prop + '-bottom');
-        newProperties.push(prop + '-left');
-      } else if (prop === 'border') {
-        newProperties.push('border-top-style');
-        newProperties.push('border-right-style');
-        newProperties.push('border-bottom-style');
-        newProperties.push('border-left-style');
-
-        newProperties.push('border-top-color');
-        newProperties.push('border-right-color');
-        newProperties.push('border-bottom-color');
-        newProperties.push('border-left-color');
-
-        newProperties.push('border-top-width');
-        newProperties.push('border-right-width');
-        newProperties.push('border-bottom-width');
-        newProperties.push('border-left-width');
-      } else {
-        newProperties.push(prop);
-      }
-    });
-    newProperties.forEach(function(prop) {
       $this.css(prop, $origin.css(prop));
+    });
+    return $this;
+  };
+
+  $.fn.copyCssIfGreater = function($origin, props) {
+    var properties = props.split(' ');
+    var $this = this;
+    properties = explodeShorthandProperties(properties);
+    properties.forEach(function(prop) {
+      var originValue = $.pxToNumber($origin.css(prop));
+      var thisValue = $.pxToNumber($this.css(prop));
+      if (originValue > thisValue) {
+        $this.css(prop, originValue + 'px');
+      }
     });
     return $this;
   };

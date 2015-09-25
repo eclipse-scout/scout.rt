@@ -1,102 +1,47 @@
 scout.FormToolButton = function() {
   scout.FormToolButton.parent.call(this);
-  this.desktop;
-  this.$content;
-  this.$title;
-  this.popup;
   this._addAdapterProperties('form');
 };
-scout.inherits(scout.FormToolButton, scout.Action);
-
-scout.FormToolButton.prototype._render = function($parent) {
-  this.$container = $parent
-    .appendDiv('taskbar-tool-item')
-    .unfocusable();
-  this.$title = this.$container.appendSpan('taskbar-tool-item-title');
-};
-
-scout.FormToolButton.prototype._remove = function() {
-  scout.FormToolButton.parent.prototype._remove.call(this);
-  this.popup = null;
-};
-
-scout.FormToolButton.prototype.toggle = function() {
-  this.setSelected(!this.selected);
-};
-
-scout.FormToolButton.prototype._onMouseDown = function(event) {
-  this.toggle();
-};
-
-scout.FormToolButton.prototype.setSelected = function(selected) {
-  if (selected === this.selected) {
-    return;
-  }
-  scout.FormToolButton.parent.prototype.setSelected.call(this, selected);
-};
-
-scout.FormToolButton.prototype._openContainer = function() {
-  // Create a new popup if it was not yet created OR the form is not rendered (i.e. if it was closed by the model)
-  if (!this.popup || !this.form.rendered) {
-    this.popup = new scout.FormToolPopup(this, this.session);
-    this.popup.render();
-    this.addChild(this.popup);
-  } else {
-    this.popup.attach();
-  }
-};
-
-scout.FormToolButton.prototype._closeContainer = function() {
-  if (this.popup) {
-    this.popup.detach();
-  }
-};
-
-/* event handling */
+scout.inherits(scout.FormToolButton, scout.Menu);
 
 scout.FormToolButton.prototype._renderForm = function() {
   if (!this.rendered) {
     // Don't execute initially since _renderSelected will be executed
     return;
   }
-  this._renderSelected(this.selected);
-};
-
-scout.FormToolButton.prototype._renderSelected = function(selected) {
-  if (selected) {
-    if (this.form) {
-      this._openContainer();
-    }
-  } else {
-    if (this.form) {
-      this._closeContainer();
-    }
-  }
-};
-
-scout.FormToolButton.prototype._renderEnabled = function(enabled) {
-  if (enabled) {
-    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
-  } else {
-    this.$container.off('mousedown');
-  }
-  this.$container.setEnabled(enabled);
+  this._renderSelected();
 };
 
 /**
- * @override KeyStroke.js
+ * @override
  */
-scout.FormToolButton.prototype._renderText = function(text) {
-  text = text || '';
-  this.$title.text(text);
-  if (this.popup) {
+scout.FormToolButton.prototype._renderText = function() {
+  scout.FormToolButton.parent.prototype._renderText.call(this);
+  if (this.rendered && this.popup) {
     this.popup.rerenderHead();
-    this.popup.alignTo();
+    this.popup.position();
   }
 };
 
 /**
- * @override Action.js
+ * @override
+ */
+scout.FormToolButton.prototype._createPopup = function() {
+  return new scout.FormToolPopup(this, this.session, {
+    openingDirectionX: this.popupOpeningDirectionX,
+    openingDirectionY: this.popupOpeningDirectionY
+  });
+};
+
+/**
+ * @override
+ */
+scout.FormToolButton.prototype._doActionTogglesPopup = function() {
+  return !! this.form;
+};
+
+/**
+ * @override
  */
 scout.FormToolButton.prototype._createActionKeyStroke = function() {
   return new scout.FormToolButtonActionKeyStroke(this);

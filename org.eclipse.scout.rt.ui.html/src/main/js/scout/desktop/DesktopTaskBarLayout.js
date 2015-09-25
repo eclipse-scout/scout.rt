@@ -57,7 +57,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     $item.removeClass('min-padding');
     var dataText = $item.data('item-text');
     if (dataText) {
-      var $title = $item.find('.taskbar-tool-item-title');
+      var $title = $item.find('.text');
       $title.text(dataText);
     }
   });
@@ -97,7 +97,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // 2nd remove text from tool-bar items, only show icon
     $tools.find('.taskbar-tool-item').each(function() {
       var $item = $(this),
-        $title = $item.find('.taskbar-tool-item-title'),
+        $title = $item.find('.text'),
         text = $title.text();
       $title.empty();
       $item.data('item-text', text);

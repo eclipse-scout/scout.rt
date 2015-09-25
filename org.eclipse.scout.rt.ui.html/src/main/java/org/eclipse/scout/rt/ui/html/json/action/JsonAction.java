@@ -63,6 +63,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
       }
     });
 
+    putJsonProperty(new JsonProperty<ACTION>("toggleAction", model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isToggleAction();
+      }
+    });
+
     putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_SELECTED, model) {
       @Override
       protected Boolean modelValue() {

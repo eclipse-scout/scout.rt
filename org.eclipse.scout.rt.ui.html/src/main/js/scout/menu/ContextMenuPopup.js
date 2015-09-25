@@ -99,6 +99,7 @@ scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
   var clone = $.extend({}, menuItem);
   clone.rendered = false;
   clone.$container = null;
+  clone.$text = null;
 
   clone._addKeyStrokeContextSupport();
   clone._initKeyStrokeContext(clone.keyStrokeContext);

@@ -174,6 +174,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
 };
 
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
+  selected = scout.helpers.nvl(selected, this.selected);
   closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
 
   this.$container.select(selected);
@@ -199,6 +200,7 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
 };
 
 scout.TableControl.prototype._renderEnabled = function(enabled) {
+  enabled = scout.helpers.nvl(enabled, this.enabled);
   if (enabled) {
     this.$container.on('mousedown', '', this._onMouseDown.bind(this));
   } else {

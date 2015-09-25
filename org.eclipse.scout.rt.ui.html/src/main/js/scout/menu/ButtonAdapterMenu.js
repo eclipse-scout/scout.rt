@@ -60,7 +60,7 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
   }
   // Eventhing else is delegated to the button
   var actionExecuted = this.button.doAction();
-  if (actionExecuted && this.actionStyle === scout.Action.ActionStyle.TOGGLE && this.rendered) {
+  if (actionExecuted && this.isToggleAction() && this.rendered) {
     this.setSelected(!this.selected);
   }
   return actionExecuted;
@@ -83,6 +83,7 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
   menuProperties.text = scout.strings.removeAmpersand(buttonProperties.label);
   menuProperties.horizontalAlignment = (buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined);
   menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
+  menuProperties.toggleAction = buttonProperties.displayStyle === scout.Button.DisplayStyle.TOGGLE;
   menuProperties.childActions = buttonProperties.menus;
 
   // Cleanup: Remove all properties that have value 'undefined' from the result object,
@@ -100,9 +101,7 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
     if (buttonStyle === undefined) {
       return undefined;
     }
-    if (buttonStyle === scout.Button.DisplayStyle.TOGGLE) {
-      return scout.Action.ActionStyle.TOGGLE;
-    } else if (buttonStyle === scout.Button.DisplayStyle.LINK) {
+    if (buttonStyle === scout.Button.DisplayStyle.LINK) {
       return scout.Action.ActionStyle.DEFAULT;
     } else {
       return scout.Action.ActionStyle.BUTTON;

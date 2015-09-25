@@ -123,7 +123,7 @@ scout.Button.prototype.togglePopup = function() {
     this.popup.close();
   } else {
     this.popup = this._openPopup();
-    this.popup.on('close', function(event) {
+    this.popup.on('remove', function(event) {
       this.popup = null;
     }.bind(this));
   }

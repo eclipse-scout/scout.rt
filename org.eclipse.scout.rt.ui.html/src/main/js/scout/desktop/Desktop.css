@@ -64,6 +64,7 @@
 
       & > .menubar > .menu-item {
         padding-top: 10px;
+        padding-bottom: 10px;
         margin-right: 7px;
       }
 
@@ -266,17 +267,16 @@
   white-space: nowrap;
 }
 
-.taskbar-tool-item {
+.taskbar-tool-item.menu-item {
   position: relative;
   vertical-align: top;
-  display: inline-block;
   height: @desktop-taskbar-height - 1px;
   padding: 16px 20px 0 20px;
-  cursor: pointer;
   color: @text-color;
   #scout.font-text-plus();
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
+  line-height: normal;
 
   &:hover {
     color: @hover-color;
@@ -292,24 +292,25 @@
     padding-right: 4px;
   }
 
+  &:not(.last) {
+    /* Reset  default styles from menu.css */
+    margin-right: 0;
+  }
+
   & > .font-icon {
     color: @icon-color;
     font-size: 17px;
-    padding-right: @taskbar-menu-textandicon-padding-right;
+
+    /* Reset  default styles from menu.css */
+    line-height: normal;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    vertical-align: 0;
   }
 
   &:hover > .font-icon {
     color: @hover-color;
-  }
-
-  &.selected {
-    border-left: 1px solid @border-color;
-    border-right: 1px solid @border-color;
-    cursor: pointer;
-
-    & > .font-icon {
-      color: @active-color;
-    }
   }
 
   &.disabled > .font-icon {
@@ -328,9 +329,13 @@
   }
 }
 
+.taskbar-tool-item.menu-textandicon > .font-icon {
+  padding-right: @taskbar-menu-textandicon-padding-right;
+}
+
 /* taskbar: tools popup */
 
-.popup-head.taskbar-tool-item {
+.taskbar-tool-item.popup-head {
   border-left: 1px solid @border-color;
   border-right: 1px solid @border-color;
   background-color: @background-color;
@@ -339,6 +344,7 @@
   box-shadow: none;
   border-top: none;
   line-height: normal;
+  height: @desktop-taskbar-height - 1px;
 
   .popup.down > & {
     /* above selector is too less specific */
@@ -370,14 +376,10 @@
   }
 }
 
-.taskbar.menu-textandicon > .font-icon {
-  padding-right: @taskbar-menu-textandicon-padding-right;
-}
-
 /* taskbar: key boxes */
 
 .desktop-view-tab .key-box,
-.taskbar-tool-item .key-box {
+.taskbar-tool-item.menu-item .key-box {
   bottom: 4px;
 
   &.disabled {

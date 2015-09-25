@@ -46,7 +46,8 @@
       "horizontalAlignment": -1,
       "iconId": "",
       "tooltipText": "",
-      "text": ""
+      "text": "",
+      "toggleAction": false
     },
     "Menu": {
       "defaultMenu": false,

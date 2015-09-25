@@ -172,10 +172,10 @@ scout.Desktop.prototype._postRender = function() {
   // Align a potential open popup to its respective tool button.
   this.actions
     .filter(function(action) {
-      return action.selected && action.popup && action.popup.alignTo;
+      return action.selected && action.popup;
     })
     .some(function(action) {
-      action.popup.alignTo(); // TODO [dwi] positioning of the popup does not work properly, and must be analyzed in more detail (likely a timing problem; approx 10px too far on the left side)
+      action.popup.position();
       return true;
     });
 
@@ -211,7 +211,8 @@ scout.Desktop.prototype._renderToolMenus = function() {
   // we set the menuStyle property to render a menu with a different style
   // depending on where the menu is located (taskbar VS menubar).
   this.actions.forEach(function(action) {
-    action.actionStyle = scout.Action.ActionStyle.TASK_BAR;
+    action._customCssClasses = "taskbar-tool-item";
+    action.popupOpeningDirectionX = 'left';
     action.render(this._$toolBar);
   }.bind(this));
 

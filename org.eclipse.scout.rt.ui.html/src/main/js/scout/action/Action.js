@@ -10,7 +10,6 @@ scout.Action = function() {
   /**
    * Supported action styles are:
    * - default: regular menu-look, also used in overflow menus
-   * - taskbar: as used in the task bar
    * - button: menu looks like a button
    */
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
@@ -21,21 +20,19 @@ scout.inherits(scout.Action, scout.ModelAdapter);
 
 scout.Action.ActionStyle = {
   DEFAULT: 0,
-  BUTTON: 1,
-  TOGGLE: 2,
-  TASK_BAR: 3
+  BUTTON: 1
 };
 
 scout.Action.prototype._renderProperties = function() {
   scout.Action.parent.prototype._renderProperties.call(this);
 
-  this._renderText(this.text);
-  this._renderIconId(this.iconId);
-  this._renderTooltipText(this.tooltipText);
-  this._renderKeyStroke(this.keyStroke);
-  this._renderEnabled(this.enabled);
-  this._renderSelected(this.selected);
-  this._renderVisible(this.visible);
+  this._renderText();
+  this._renderIconId();
+  this._renderTooltipText();
+  this._renderKeyStroke();
+  this._renderEnabled();
+  this._renderSelected();
+  this._renderVisible();
   this._renderTabbable();
 };
 
@@ -46,33 +43,51 @@ scout.Action.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Action.prototype._remove = function() {
   this._hoverBound = false;
+  this._removeText();
   this._removeTooltip();
   scout.Action.parent.prototype._remove.call(this);
 };
 
-scout.Action.prototype._renderText = function(text) {
-  text = text || '';
-  this.$container.text(text);
+scout.Action.prototype._renderText = function() {
+  var text = this.text || '';
+  if (text) {
+    if (!this.$text) {
+      // Create a separate text element to so that setting the text does not remove the icon
+      this.$text = this.$container.appendSpan('text');
+    }
+    this.$text.text(text);
+  } else {
+    this._removeText();
+  }
 };
 
-scout.Action.prototype._renderIconId = function(iconId) {
-  iconId = iconId || '';
+scout.Action.prototype._removeText = function() {
+  if (this.$text) {
+    this.$text.remove();
+    this.$text = null;
+  }
+};
+
+scout.Action.prototype._renderIconId = function() {
+  var iconId = this.iconId || '';
   this.$container.icon(iconId);
 };
 
 scout.Action.prototype._renderEnabled = function(enabled) {
+  enabled = scout.helpers.nvl(enabled, this.enabled);
   this.$container.setEnabled(enabled);
 };
 
-scout.Action.prototype._renderVisible = function(visible) {
-  this.$container.setVisible(visible);
+scout.Action.prototype._renderVisible = function() {
+  this.$container.setVisible(this.visible);
 };
 
-scout.Action.prototype._renderSelected = function(selected) {
-  this.$container.select(selected);
+scout.Action.prototype._renderSelected = function() {
+  this.$container.select(this.selected);
 };
 
-scout.Action.prototype._renderKeyStroke = function(keyStroke) {
+scout.Action.prototype._renderKeyStroke = function() {
+  var keyStroke = this.keyStroke;
   if (keyStroke === undefined) {
     this.$container.removeAttr('data-shortcut');
   } else {
@@ -80,7 +95,8 @@ scout.Action.prototype._renderKeyStroke = function(keyStroke) {
   }
 };
 
-scout.Action.prototype._renderTooltipText = function(tooltipText) {
+scout.Action.prototype._renderTooltipText = function() {
+  var tooltipText = this.tooltipText;
   if (tooltipText && !this._hoverBound) {
     this.$container.hover(this._onHoverIn.bind(this), this._onHoverOut.bind(this));
     this._hoverBound = true;
@@ -100,6 +116,10 @@ scout.Action.prototype._renderTabbable = function() {
 
 scout.Action.prototype._renderHorizontalAlignment = function() {
   // nothing to render, property is only considered by the menubar
+};
+
+scout.Action.prototype._renderToggleAction = function() {
+  // nop
 };
 
 scout.Action.prototype._onHoverIn = function() {
@@ -158,12 +178,22 @@ scout.Action.prototype.doAction = function(event) {
     return false;
   }
 
-  if (this.actionStyle === scout.Action.ActionStyle.TOGGLE) {
+  if (this.isToggleAction()) {
     this.setSelected(!this.selected);
   } else {
     this.sendDoAction();
   }
   return true;
+};
+
+scout.Action.prototype.toggle = function() {
+  if (this.isToggleAction()) {
+    this.setSelected(!this.selected);
+  }
+};
+
+scout.Action.prototype.isToggleAction = function() {
+  return this.toggleAction;
 };
 
 /**
@@ -213,9 +243,12 @@ scout.Action.prototype.afterSendDoAction = function() {
 };
 
 scout.Action.prototype.setSelected = function(selected) {
+  if (selected === this.selected) {
+    return;
+  }
   this.selected = selected;
   if (this.rendered) {
-    this._renderSelected(this.selected);
+    this._renderSelected();
   }
   this.sendSelected();
 };

@@ -124,7 +124,7 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
         this.popup.close(event);
       } else {
         this.popup = this._openPopup(event);
-        this.popup.on('close', function(event) {
+        this.popup.on('remove', function(event) {
           this.popup = null;
         }.bind(this));
       }

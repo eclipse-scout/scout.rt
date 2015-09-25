@@ -90,9 +90,9 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   }
   this._menuBar.visibleMenuItems.forEach(function(menuItem) {
-    if (menuItem.popup && menuItem.popup.alignTo) {
-      // FIXME CGU verify if really ok and rename alignTo to position
-      menuItem.popup.alignTo();
+    // Make sure open popups are at the correct position after layouting
+    if (menuItem.popup) {
+      menuItem.popup.position();
     }
   });
 };

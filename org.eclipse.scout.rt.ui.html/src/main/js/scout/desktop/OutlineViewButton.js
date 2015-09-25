@@ -33,7 +33,7 @@ scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {
     selected = this.outline === outline;
   if (selected !== oldSelected) {
     this.selected = selected;
-    this._renderSelected(selected);
+    this._renderSelected();
     this._firePropertyChange('selected', oldSelected, selected);
   }
 };

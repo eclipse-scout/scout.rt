@@ -34,7 +34,6 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
     viewMenu.afterSendDoAction = this.close.bind(this);
     this.addChild(viewMenu);
   }, this);
-  this.alignTo();
 };
 
 /**
@@ -71,7 +70,7 @@ scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
   $viewMenuButton.addClass('menu-open');
 };
 
-scout.ViewMenuPopup.prototype.alignTo = function() {
+scout.ViewMenuPopup.prototype.position = function() {
   var pos = this.$tab.offset(),
     headSize = scout.graphics.getSize(this.$tab, true),
     bodyTop = headSize.height;
