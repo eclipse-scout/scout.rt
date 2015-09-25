@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CollectorVisitor;
 import org.eclipse.scout.commons.EventListenerList;
@@ -321,6 +322,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public void start(String sessionId) throws ProcessingException {
+    Assertions.assertNotNull(sessionId, "Session id must not be null");
     if (isActive()) {
       throw new IllegalStateException("session is active");
     }
@@ -604,7 +606,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
+  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER>implements IClientSessionExtension<OWNER> {
 
     public LocalClientSessionExtension(OWNER owner) {
       super(owner);
@@ -657,5 +659,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         LOG.error("Failed to notify listener about session state change", e);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return super.toString() + "[id = " + getId() + "]";
   }
 }
