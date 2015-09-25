@@ -22,6 +22,7 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   String PROP_HAS_ACTION = "hasAction";
   String PROP_INPUT_MASKED = "inputMasked";
   String PROP_WRAP_TEXT = "wrapText";
+  String PROP_TRIM_TEXT_ON_VALIDATE = "trimText";
   String PROP_MULTILINE_TEXT = "multilineText";
   String PROP_FORMAT = "format";
   String PROP_MAX_LENGTH = "maxLength";
@@ -62,6 +63,10 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   void setWrapText(boolean b);
 
   boolean isWrapText();
+
+  void setTrimText(boolean b);
+
+  boolean isTrimText();
 
   void setMultilineText(boolean b);
 

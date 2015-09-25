@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
-public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
+public abstract class AbstractStringField extends AbstractBasicField<String>implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
@@ -111,6 +111,16 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   @Order(300)
   protected boolean getConfiguredFormatUpper() {
     return false;
+  }
+
+  /**
+   * @return true if all characters of the string, with leading and trailing whitespace should be omitted. default is
+   *         true.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(310)
+  protected boolean getConfiguredTrimText() {
+    return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -231,6 +241,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     }
     setHasAction(getConfiguredHasAction());
     setWrapText(getConfiguredWrapText());
+    setTrimText(getConfiguredTrimText());
     setMultilineText(getConfiguredMultilineText());
     int configuredDragType = getConfiguredDragType();
     if (IDNDSupport.TYPE_TEXT_TRANSFER == configuredDragType) {
@@ -274,6 +285,9 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     String validValue = super.validateValueInternal(rawValue);
 
     if (validValue != null) {
+      if (isTrimText()) {
+        validValue = validValue.trim();
+      }
       if (validValue.length() > getMaxLength()) {
         validValue = validValue.substring(0, getMaxLength());
       }
@@ -344,6 +358,16 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   @Override
   public boolean isWrapText() {
     return propertySupport.getPropertyBool(PROP_WRAP_TEXT);
+  }
+
+  @Override
+  public void setTrimText(boolean b) {
+    propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, b);
+  }
+
+  @Override
+  public boolean isTrimText() {
+    return propertySupport.getPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE);
   }
 
   @Override
