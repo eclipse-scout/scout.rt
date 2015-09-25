@@ -1,6 +1,9 @@
 scout.ButtonAdapterMenu = function() {
   scout.ButtonAdapterMenu.parent.call(this);
   this._removeAdapterProperties('childActions'); // managed by button
+
+  this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
+  this._buttonDestroyHandler = this._onButtonDestroy.bind(this);
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 
@@ -16,13 +19,13 @@ scout.ButtonAdapterMenu.prototype._init = function(model, session) {
 };
 
 scout.ButtonAdapterMenu.prototype._installListeners = function() {
-  this.button.on('propertyChange', this._onButtonPropertyChange.bind(this));
-  this.button.on('destroy', this._onButtonDestroy.bind(this));
+  this.button.on('propertyChange', this._buttonPropertyChangeHandler);
+  this.button.on('destroy', this._buttonDestroyHandler);
 };
 
 scout.ButtonAdapterMenu.prototype._uninstallListeners = function() {
-  this.button.off('propertyChange');
-  this.button.off('destroy');
+  this.button.off('propertyChange', this._buttonPropertyChangeHandler);
+  this.button.off('destroy', this._buttonDestroyHandler);
 };
 
 scout.ButtonAdapterMenu.prototype._render = function($parent) {
