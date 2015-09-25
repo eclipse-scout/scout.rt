@@ -513,6 +513,59 @@ public class TreeEventBufferTest {
     assertEquals(1, coalesced.size());
   }
 
+  /**
+   * NODES_CHECKED events => coalesce same consecutive types
+   */
+  @Test
+  public void testCoalesce_Checked() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_NODES_CHECKED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeF));
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_NODES_CHECKED, nodeD));
+    m_testBuffer.add(mockEvent(nodeB, TreeEvent.TYPE_NODES_CHECKED, nodeE));
+    m_testBuffer.add(mockEvent(nodeC, TreeEvent.TYPE_NODES_CHECKED, nodeG));
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_NODES_CHECKED, nodeC));
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(5, coalesced.size());
+
+    assertEquals(TreeEvent.TYPE_NODES_CHECKED, coalesced.get(0).getType());
+    assertEquals(nodeA, coalesced.get(0).getCommonParentNode());
+    assertEquals(1, coalesced.get(0).getNodes().size());
+
+    assertEquals(TreeEvent.TYPE_NODES_UPDATED, coalesced.get(1).getType());
+
+    assertEquals(TreeEvent.TYPE_NODES_CHECKED, coalesced.get(2).getType());
+    assertEquals(nodeB, coalesced.get(2).getCommonParentNode());
+    assertEquals(1, coalesced.get(2).getNodes().size());
+
+    assertEquals(TreeEvent.TYPE_NODES_CHECKED, coalesced.get(3).getType());
+    assertEquals(nodeC, coalesced.get(3).getCommonParentNode());
+    assertEquals(1, coalesced.get(3).getNodes().size());
+
+    assertEquals(TreeEvent.TYPE_NODES_CHECKED, coalesced.get(4).getType());
+    assertEquals(nodeA, coalesced.get(4).getCommonParentNode());
+    assertEquals(2, coalesced.get(4).getNodes().size());
+  }
+
   private TreeEvent mockEvent(int type, String... nodeIds) {
     return mockEvent(type, mockNodes(nodeIds));
   }

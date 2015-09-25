@@ -279,9 +279,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected TreeEvent coalesceConsecutivePrevious(TreeEvent event, List<TreeEvent> list) {
     for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
       TreeEvent previous = it.previous();
-      if (event.getType() == previous.getType() && hasSameCommonParentNode(event, previous)) {
-        event = merge(previous, event);
-        it.remove();
+      if (event.getType() == previous.getType()) {
+        if (hasSameCommonParentNode(event, previous)) {
+          event = merge(previous, event);
+          it.remove();
+        }
       }
       else {
         return event;
