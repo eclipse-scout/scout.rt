@@ -146,7 +146,7 @@ public class BeanHierarchy<T> {
           if (bean.getBeanAnnotation(Replace.class) != null) {
             Class<?> superClazz = null;
             if (bean.getBeanClazz().isInterface()) {
-              //interface replaces interfaces, only replce FIRST declared interface
+              //interface replaces interfaces, only replace FIRST declared interface
               Class[] ifs = bean.getBeanClazz().getInterfaces();
               if (ifs != null && ifs.length > 0) {
                 superClazz = ifs[0];
