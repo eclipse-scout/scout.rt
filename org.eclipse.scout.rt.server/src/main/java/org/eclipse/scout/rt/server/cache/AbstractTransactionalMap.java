@@ -81,8 +81,8 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     return m_fastForward;
   }
 
-  protected Map<K, V> getTransactionMap() {
-    Map<K, V> m = getTransaction();
+  protected Map<K, V> getTransactionMap(boolean onlyReadOperation) {
+    Map<K, V> m = getTransaction(!onlyReadOperation);
     if (m == null) {
       // no transaction, return shared map
       return getSharedMap();
@@ -91,13 +91,13 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
   }
 
   @SuppressWarnings("unchecked")
-  protected <TM extends Map<K, V> & ITransactionMember> TM getTransaction() {
+  protected <TM extends Map<K, V> & ITransactionMember> TM getTransaction(boolean createIfNotExist) {
     ITransaction t = ITransaction.CURRENT.get();
     if (t == null) {
       return null;
     }
     TM m = (TM) t.getMember(getTransactionMemberId());
-    if (m == null) {
+    if (m == null && createIfNotExist) {
       m = createMapTransactionMember();
       try {
         t.registerMember(m);
@@ -113,62 +113,62 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
 
   @Override
   public int size() {
-    return getTransactionMap().size();
+    return getTransactionMap(true).size();
   }
 
   @Override
   public boolean isEmpty() {
-    return getTransactionMap().isEmpty();
+    return getTransactionMap(true).isEmpty();
   }
 
   @Override
   public boolean containsKey(Object key) {
-    return getTransactionMap().containsKey(key);
+    return getTransactionMap(true).containsKey(key);
   }
 
   @Override
   public boolean containsValue(Object value) {
-    return getTransactionMap().containsValue(value);
+    return getTransactionMap(true).containsValue(value);
   }
 
   @Override
   public V get(Object key) {
-    return getTransactionMap().get(key);
+    return getTransactionMap(true).get(key);
   }
 
   @Override
   public V put(K key, V value) {
-    return getTransactionMap().put(key, value);
+    return getTransactionMap(false).put(key, value);
   }
 
   @Override
   public V remove(Object key) {
-    return getTransactionMap().remove(key);
+    return getTransactionMap(false).remove(key);
   }
 
   @Override
   public void putAll(Map<? extends K, ? extends V> m) {
-    getTransactionMap().putAll(m);
+    getTransactionMap(false).putAll(m);
   }
 
   @Override
   public void clear() {
-    getTransactionMap().clear();
+    getTransactionMap(false).clear();
   }
 
   @Override
   public Set<K> keySet() {
-    return getTransactionMap().keySet();
+    return getTransactionMap(false).keySet();
   }
 
   @Override
   public Collection<V> values() {
-    return getTransactionMap().values();
+    return getTransactionMap(false).values();
   }
 
   @Override
   public Set<Map.Entry<K, V>> entrySet() {
-    return getTransactionMap().entrySet();
+    return getTransactionMap(false).entrySet();
   }
 
   public static abstract class MapTransactionMember<K, V> extends AbstractMap<K, V> implements ITransactionMember {
