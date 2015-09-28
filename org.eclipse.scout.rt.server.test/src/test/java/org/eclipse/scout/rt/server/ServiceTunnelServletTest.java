@@ -115,14 +115,17 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ProcessingException, ServletException {
-    ServletRunContexts.empty().withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
+    ServletRunContexts.empty()
+        .withServletRequest(m_requestMock)
+        .withServletResponse(m_responseMock)
+        .run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty());
-        assertNotNull(session);
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().withProperty(ServiceTunnelServlet.SESSION_ID, "testid"));
+            assertNotNull(session);
+          }
+        });
   }
 
   @Test
