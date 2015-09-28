@@ -120,7 +120,7 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
 
 	protected void handleUiValueClicked(JsonEvent event) {
 		// TODO nbu
-		getModel().getUIFacade().fireUIValueClicked(new int[0]);
+		getModel().getUIFacade().fireUIValueClicked(new int[0], null);
 	}
 
 	protected JSONObject chartValueGroupBeanToJson(IChartValueGroupBean chartValueGroupBean) {

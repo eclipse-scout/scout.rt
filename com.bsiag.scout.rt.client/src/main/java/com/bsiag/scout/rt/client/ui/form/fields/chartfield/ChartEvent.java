@@ -10,6 +10,7 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 
+import java.math.BigDecimal;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
@@ -19,41 +20,51 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
  */
 public class ChartEvent extends EventObject implements IModelEvent {
 
-  public static final int TYPE_VALUE_CLICKED = 1;
+	public static final int TYPE_VALUE_CLICKED = 1;
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  private final int m_type;
+	private final int m_type;
 
-  private int m_axisPosition[];
+	private int m_axisPosition[];
 
-  public ChartEvent(IChart source, int type) {
-    super(source);
-    m_type = type;
-  }
+	private BigDecimal m_value;
 
-  @Override
-  public IChart getSource() {
-    return (IChart) super.getSource();
-  }
+	public ChartEvent(IChart source, int type) {
+		super(source);
+		m_type = type;
+	}
 
-  @Override
-  public int getType() {
-    return m_type;
-  }
+	@Override
+	public IChart getSource() {
+		return (IChart) super.getSource();
+	}
 
-  /**
-   * Used for TYPE_VALUE_CLICKED
-   */
-  public int[] getAxisPosition() {
-    return m_axisPosition;
-  }
+	@Override
+	public int getType() {
+		return m_type;
+	}
 
-  /**
-   * Used for TYPE_VALUE_CLICKED
-   */
-  public void setAxesPosition(int axisPosition[]) {
-    m_axisPosition = axisPosition;
-  }
+	/**
+	 * Used for TYPE_VALUE_CLICKED
+	 */
+	public int[] getAxisPosition() {
+		return m_axisPosition;
+	}
+
+	/**
+	 * Used for TYPE_VALUE_CLICKED
+	 */
+	public void setAxesPosition(int axisPosition[]) {
+		m_axisPosition = axisPosition;
+	}
+
+	public BigDecimal getValue() {
+		return m_value;
+	}
+
+	public void setValue(BigDecimal m_value) {
+		this.m_value = m_value;
+	}
 
 }

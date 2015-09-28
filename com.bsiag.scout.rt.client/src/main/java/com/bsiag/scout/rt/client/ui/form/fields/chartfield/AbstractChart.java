@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.ITypeWithClassId;
@@ -160,9 +162,10 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
 		setMaxSegments(getConfiguredMaxSegments());
 	}
 
-	public void fireValueClicked(int[] axesPosition) {
+	public void fireValueClicked(int[] axesPosition, BigDecimal value) {
 		ChartEvent e = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
 		e.setAxesPosition(axesPosition);
+		e.setValue(value);
 		ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
 		for (ChartListener l : listeners) {
 			l.chartValueClicked(e);
@@ -177,8 +180,8 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
 		 * @param axisPosition
 		 */
 		@Override
-		public void fireUIValueClicked(int[] axesPosition) {
-			fireValueClicked(axesPosition);
+		public void fireUIValueClicked(int[] axesPosition, BigDecimal value) {
+			fireValueClicked(axesPosition, value);
 		}
 	}
 
