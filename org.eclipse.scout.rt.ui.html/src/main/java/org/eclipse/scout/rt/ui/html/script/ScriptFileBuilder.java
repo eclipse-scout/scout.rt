@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
+import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
@@ -51,10 +52,10 @@ public class ScriptFileBuilder {
    * <p>
    *
    * <pre>
-   * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $3=version, $4=fingerprint, $5="js" or "css"
+   * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $5="js" or "css"
    * </pre>
    */
-  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\w]+)-([0-9.]+)(?:\\-([a-f0-9]+|fingerprint))?(?:\\.min)?\\.(js|css)");
+  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\w]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css)");
 
   private final IWebContentService m_resourceLocator;
   private final ScriptProcessor m_scriptProcessor;
@@ -83,10 +84,10 @@ public class ScriptFileBuilder {
         return new ScriptOutput(pathInfo, IOUtility.readFromUrl(script.getURL()), script.getURL().openConnection().getLastModified());
       }
       case MACRO: {
-        return processMacroWithIncludesRec(pathInfo, script);
+        return processMacroWithIncludesRec(pathInfo, script, true);
       }
       case SRC_MODULE: {
-        return processModuleWithIncludes(pathInfo, script);
+        return processModuleWithIncludes(pathInfo, script, true);
       }
       default:
         throw new IOException("Unexpected " + NodeType.class.getSimpleName() + " " + script.getNodeType() + " for " + pathInfo);
@@ -115,9 +116,9 @@ public class ScriptFileBuilder {
       };
       urls = new URL[]{
           libraryMinimizedUrl, //libraryMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(5)), //libraryNonMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(5)), //macroUrl
-          m_resourceLocator.getScriptSource("" + mat.group(2) + "-module." + mat.group(5)), //srcModuleUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "." + mat.group(4)), //libraryNonMinimizedUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
+          m_resourceLocator.getScriptSource("" + mat.group(2) + "." + mat.group(4)), //srcModuleUrl
       };
     }
     else {
@@ -128,9 +129,9 @@ public class ScriptFileBuilder {
           ScriptSource.NodeType.LIBRARY,
       };
       urls = new URL[]{
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(5)), //libraryNonMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(5)), //macroUrl
-          m_resourceLocator.getScriptSource("" + mat.group(2) + "-module." + mat.group(5)), //srcModuleUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "." + mat.group(4)), //libraryNonMinimizedUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
+          m_resourceLocator.getScriptSource("" + mat.group(2) + "." + mat.group(4)), //srcModuleUrl
           libraryMinimizedUrl, //libraryMinimizedUrl
       };
     }
@@ -167,7 +168,7 @@ public class ScriptFileBuilder {
     return -1;
   }
 
-  protected ScriptOutput processMacroWithIncludesRec(String pathInfo, ScriptSource script) throws IOException {
+  protected ScriptOutput processMacroWithIncludesRec(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
     if (script.getNodeType() != ScriptSource.NodeType.MACRO) {
       throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.MACRO + ", but got " + script.getNodeType());
     }
@@ -196,13 +197,13 @@ public class ScriptFileBuilder {
             break;
           }
           case MACRO: {
-            ScriptOutput sub = processMacroWithIncludesRec(includePath, includeScript);
+            ScriptOutput sub = processMacroWithIncludesRec(includePath, includeScript, false);
             replacement = sub.getContent();
             lastModified = Math.max(lastModified, sub.getLastModified());
             break;
           }
           case SRC_MODULE: {
-            ScriptOutput sub = processModuleWithIncludes(includePath, includeScript);
+            ScriptOutput sub = processModuleWithIncludes(includePath, includeScript, false);
             replacement = sub.getContent();
             lastModified = Math.max(lastModified, sub.getLastModified());
             break;
@@ -234,10 +235,23 @@ public class ScriptFileBuilder {
       pos = mat.end();
     }
     buf.write(content.substring(pos).getBytes(Encoding.UTF_8));
-    return new ScriptOutput(pathInfo, buf.toByteArray(), lastModified);
+
+    String macroContent = buf.toString();
+    if (compileAndMinify) {
+      macroContent = compileAndMinifyContent(script.getFileType(), macroContent);
+    }
+    return new ScriptOutput(pathInfo, macroContent.getBytes(Encoding.UTF_8), lastModified);
   }
 
-  protected ScriptOutput processModuleWithIncludes(String pathInfo, ScriptSource script) throws IOException {
+  private String compileAndMinifyContent(FileType fileType, String content) throws IOException {
+    content = compileContent(fileType, content);
+    if (isMinifyEnabled()) {
+      content = minifyContent(fileType, content);
+    }
+    return content;
+  }
+
+  protected ScriptOutput processModuleWithIncludes(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
     if (script.getNodeType() != ScriptSource.NodeType.SRC_MODULE) {
       throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.SRC_MODULE + ", but got " + script.getNodeType());
     }
@@ -253,7 +267,7 @@ public class ScriptFileBuilder {
       String replacement = null;
       if (includeFragment != null) {
         switch (includeFragment.getNodeType()) {
-          case SRC_FRAGMENT: {
+          case SRC_FRAGMENT: { // FIXME AWE: braucht es den typ fragment noch?
             replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), Encoding.UTF_8);
             lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
             break;
@@ -288,16 +302,15 @@ public class ScriptFileBuilder {
       pos = mat.end();
     }
     buf.append(content.substring(pos));
-    String result = buf.toString();
-    //compile, minimize
-    result = compileModule(script.getFileType(), result);
-    if (isMinifyEnabled()) {
-      result = minifyModule(script.getFileType(), result);
+
+    String moduleContent = buf.toString();
+    if (compileAndMinify) {
+      moduleContent = compileAndMinifyContent(script.getFileType(), moduleContent);
     }
-    return new ScriptOutput(pathInfo, result.getBytes(Encoding.UTF_8), lastModified);
+    return new ScriptOutput(pathInfo, moduleContent.getBytes(Encoding.UTF_8), lastModified);
   }
 
-  protected String compileModule(ScriptSource.FileType fileType, String content) throws IOException {
+  protected String compileContent(ScriptSource.FileType fileType, String content) throws IOException {
     switch (fileType) {
       case JS:
         return m_scriptProcessor.compileJs(content);
@@ -308,7 +321,7 @@ public class ScriptFileBuilder {
     }
   }
 
-  protected String minifyModule(ScriptSource.FileType fileType, String content) throws IOException {
+  protected String minifyContent(ScriptSource.FileType fileType, String content) throws IOException {
     switch (fileType) {
       case JS:
         return m_scriptProcessor.minifyJs(content);

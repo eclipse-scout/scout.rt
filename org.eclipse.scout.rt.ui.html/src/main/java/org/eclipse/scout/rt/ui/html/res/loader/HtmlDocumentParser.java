@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -23,7 +24,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
@@ -33,6 +33,8 @@ public class HtmlDocumentParser {
 
   private static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message key=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout\\:stylesheet src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout\\:script src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   private final HtmlDocumentParserParameters m_params;
   private String m_workingContent;
@@ -46,8 +48,73 @@ public class HtmlDocumentParser {
     m_workingContent = new String(document, Encoding.UTF_8);
     replaceIncludeTags();
     replaceMessageTags();
-    replaceScriptTags();
+    replaceStylesheetTags();
+    replaceScriptTags_New();
     return m_workingContent.getBytes(Encoding.UTF_8);
+  }
+
+  protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) throws IOException {
+    Matcher m = pattern.matcher(m_workingContent);
+    StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+      String srcAttr = m.group(1);
+      String fingerprint = null;
+
+      if (m_params.isCacheEnabled()) {
+        HttpCacheObject script = m_params.loadScriptFile(srcAttr);
+        if (script == null) {
+          LOG.warn("Failed to locate script referenced in html file '" + m_params.getHtmlPath() + "': " + srcAttr);
+        }
+        else {
+          fingerprint = Long.toHexString(script.getResource().getFingerprint());
+        }
+      }
+
+      StringBuffer linkTag = new StringBuffer(tagPrefix);
+      File srcFile = new File(srcAttr);
+      String srcFileName = srcFile.getName();
+      String[] tmp = srcFileName.split("\\.");
+      // append path to file
+      if (srcFile.getParent() != null) {
+        linkTag.append(srcFile.getParent()).append("/");
+      }
+      // append file name without file-extension
+      // when file is a macro or module, remove that suffix
+      // FIXME AWE: discuss with C.GU: können wir das nicht einfach stehen lassen? Dann braucht es keine magie beim laden
+      String fileName = tmp[0];
+      if (fileName.endsWith("-macro")) {
+        fileName = fileName.substring(0, fileName.length() - 6);
+      }
+//      else if (fileName.endsWith("-module")) {
+//        fileName = fileName.substring(0, fileName.length() - 7);
+//      }
+      linkTag.append(fileName);
+      // append fingerprint
+      if (fingerprint != null) {
+        linkTag.append("-").append(fingerprint);
+      }
+      // append 'min'
+      if (m_params.isMinify()) {
+        linkTag.append(".min");
+      }
+      // append file-extension
+      linkTag.append(".").append(tmp[1]);
+      linkTag.append(tagSuffix);
+
+      m.appendReplacement(sb, linkTag.toString());
+    }
+    m.appendTail(sb);
+    m_workingContent = sb.toString();
+  }
+
+  protected void replaceStylesheetTags() throws IOException {
+    // <scout:stylesheet src="scout-all-macro.css" />
+    replaceScriptTags(PATTERN_STYLESHEET_TAG, "<link rel=\"stylesheet\" type=\"text/css\" href=\"", "\">");
+  }
+
+  protected void replaceScriptTags_New() throws IOException {
+    // <scout:script src="scout-all-macro.css" />
+    replaceScriptTags(PATTERN_SCRIPT_TAG, "<script src=\"", "\"></script>");
   }
 
   protected void replaceIncludeTags() throws IOException {
@@ -111,58 +178,6 @@ public class HtmlDocumentParser {
     // escape new-lines
     text = text.replaceAll("\r\n", "\\\\n");
     return "'" + text + "'";
-  }
-
-  /**
-   * Process all js and css script tags that contain the marker text "fingerprint". The marker text is replaced by the
-   * effective files {@link HttpCacheObject#getFingerprint()} in hex format
-   */
-  protected void replaceScriptTags() throws IOException {
-    Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(m_workingContent);
-    StringBuilder buf = new StringBuilder();
-    int lastEnd = 0;
-    int replaceCount = 0;
-    while (m.find()) {
-      buf.append(m_workingContent.substring(lastEnd, m.start()));
-      if ("fingerprint".equals(m.group(4))) {
-        replaceCount++;
-        String fingerprint = null;
-        if (m_params.isCacheEnabled()) {
-          HttpCacheObject script = m_params.loadScriptFile(m.group());
-          if (script == null) {
-            LOG.warn("Failed to locate script referenced in html file '" + m_params.getHtmlPath() + "': " + m.group());
-          }
-          fingerprint = (script != null ? Long.toHexString(script.getResource().getFingerprint()) : m.group(4));
-        }
-        buf.append(m.group(1));
-        buf.append(m.group(2));
-        buf.append("-");
-        buf.append(m.group(3));
-        if (fingerprint != null) {
-          buf.append("-");
-          buf.append(fingerprint);
-        }
-        if (m_params.isMinify()) {
-          buf.append(".min");
-        }
-        buf.append(".");
-        buf.append(m.group(5));
-      }
-      else {
-        buf.append(m.group());
-      }
-      //next
-      lastEnd = m.end();
-    }
-    if (replaceCount == 0) {
-      return;
-    }
-    buf.append(m_workingContent.substring(lastEnd));
-    String newHtml = buf.toString();
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("process html script tags:\nINPUT\n" + m_workingContent + "\n\nOUTPUT\n" + newHtml);
-    }
-    m_workingContent = newHtml;
   }
 
 }
