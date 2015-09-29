@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.BEANS;
 
 import com.bsiag.scout.rt.shared.chart.IChartBean;
+import com.bsiag.scout.rt.shared.chart.IChartType;
 
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
 public abstract class AbstractChart extends AbstractPropertyObserver implements IChart {
