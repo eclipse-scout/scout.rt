@@ -60,6 +60,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (this._isStatusVisible()) {
     formField.$status
       .cssTop(top)
+      .cssRight(right)
       .cssWidth(statusWidth)
       .cssHeight(this.rowHeight)
       .cssLineHeight(this.rowHeight);

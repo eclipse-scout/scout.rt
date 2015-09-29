@@ -13,7 +13,6 @@ scout.HtmlField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.HtmlField.prototype._render = function($parent) {
-
   this.addContainer($parent, 'html-field');
   this.addLabel();
 
