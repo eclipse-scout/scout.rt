@@ -1,7 +1,6 @@
 scout.DatePickerPopup = function(session, options) {
   options = options || {};
   options.installFocusContext = false;
-  options.triggerPopupOpenEvent = false; // Do not close other popups once this popup opens. Otherwise, the datepicker could not be used within other popups, like CellEditorPopup.js.
   scout.DatePickerPopup.parent.call(this, session, options);
 
   this.picker = new scout.DatePicker(session, options.dateFormat);
@@ -16,8 +15,7 @@ scout.DatePickerPopup.prototype._render = function($parent) {
   this.picker.render($parent);
   this.$container = this.picker.$container;
   this.$container
-    .addClass('date-picker-popup')
-    .on('mousedown', this._onContainerMouseDown.bind(this));
+    .addClass('date-picker-popup');
 };
 
 scout.DatePickerPopup.prototype.preselectDate = function(date, animated) {
@@ -64,16 +62,6 @@ scout.DatePickerPopup.prototype._onMouseDown = function(event) {
 
   // or else: clicked somewhere else on the document -> close
   scout.DatePickerPopup.parent.prototype._onMouseDown.call(this, event);
-};
-
-/**
- * This event handler is called before the mousedown handler on the _document_ is triggered
- * This allows us to prevent the default, which is important for the CellEditorPopup which
- * should stay open when the DatePicker popup is closed. It also prevents the focus blur
- * event on the DatePicker input-field.
- */
-scout.DatePickerPopup.prototype._onContainerMouseDown = function(event) {
-  return false;
 };
 
 scout.DatePickerPopup.prototype._onAnchorScroll = function(event) {

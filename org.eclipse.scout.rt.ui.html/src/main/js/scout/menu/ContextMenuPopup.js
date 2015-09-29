@@ -1,7 +1,6 @@
 scout.ContextMenuPopup = function(session, options) {
   options = options || {};
   options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
-  options.triggerPopupOpenEvent = scout.helpers.nvl(options.triggerPopupOpenEvent, false); // Do not close other popups once this context menu opens. Otherwise, the context menu could not be used within other popups, like form tool popups.
   scout.ContextMenuPopup.parent.call(this, session, options);
 
   this.menuItems = options.menuItems;
@@ -100,6 +99,7 @@ scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
   clone.rendered = false;
   clone.$container = null;
   clone.$text = null;
+  this.addChild(clone);
 
   clone._addKeyStrokeContextSupport();
   clone._initKeyStrokeContext(clone.keyStrokeContext);

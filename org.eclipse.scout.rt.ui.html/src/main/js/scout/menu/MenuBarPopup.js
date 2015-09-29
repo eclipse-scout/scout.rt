@@ -4,7 +4,6 @@
  */
 scout.MenuBarPopup = function(menu, session, options) {
   options = options || {};
-  options.triggerPopupOpenEvent = scout.helpers.nvl(options.triggerPopupOpenEvent, true);
   options.$anchor = menu.$container;
   scout.MenuBarPopup.parent.call(this, session, options);
   this.menu = menu;

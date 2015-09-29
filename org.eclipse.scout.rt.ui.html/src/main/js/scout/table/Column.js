@@ -148,6 +148,7 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
 
   cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
   popup = new scout.CellEditorPopup(this, row, cell, this.session);
+  this.table.addChild(popup);
   popup.$anchor = $cell;
   popup.render(this.table.$data);
   popup.pack();

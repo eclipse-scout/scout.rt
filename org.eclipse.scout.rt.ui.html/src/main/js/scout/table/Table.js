@@ -304,6 +304,7 @@ scout.Table.prototype.onContextMenu = function(event) {
           },
           $anchor: this.$data
         });
+        this.addChild(popup);
         popup.render(undefined, event);
       }
     }

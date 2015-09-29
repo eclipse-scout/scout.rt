@@ -4,7 +4,7 @@ scout.BusyIndicator = function(session, cancellable) {
   this._addKeyStrokeContextSupport();
   this.init(session);
 
-  this.parent = session.desktop;
+  session.desktop.addChild(this);
   this._cancellable = (cancellable === undefined ? true : !! cancellable);
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);

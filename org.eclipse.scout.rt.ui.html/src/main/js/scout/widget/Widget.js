@@ -20,6 +20,7 @@ scout.Widget.prototype.render = function($parent) {
     throw new Error('Widget is destroyed: ' + this);
   }
   this._renderInternal($parent);
+  this._link();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendered = true;
   this._postRender();
@@ -72,7 +73,6 @@ scout.Widget.prototype._postRender = function() {
   // NOP
 };
 
-
 scout.Widget.prototype.remove = function() {
   if (!this.rendered) {
     return;
@@ -89,6 +89,15 @@ scout.Widget.prototype.remove = function() {
   this._trigger('remove');
 };
 
+/**
+ * Links $container with the widget.
+ */
+scout.Widget.prototype._link = function() {
+  if (this.$container) {
+    this.$container.data('widget', this);
+  }
+};
+
 scout.Widget.prototype._trigger = function(type, event) {
   if (this.events) {
     this.events.trigger(type, event);
@@ -102,14 +111,35 @@ scout.Widget.prototype._remove = function() {
   }
 };
 
+//TODO CGU maybe better create a setParent method which sets the parent and adds the child
 scout.Widget.prototype.addChild = function(child) {
   $.log.trace('addChild(' + child + ') to ' + this);
+  child.parent = this;
   this.children.push(child);
 };
 
 scout.Widget.prototype.removeChild = function(child) {
   $.log.trace('removeChild(' + child + ') from ' + this);
+  child.parent = null;
   scout.arrays.remove(this.children, child);
+};
+
+scout.Widget.prototype.isOrHasWidget = function(widget) {
+  if (widget === this) {
+    return true;
+  }
+  return this.hasWidget(widget);
+};
+
+scout.Widget.prototype.hasWidget = function(widget) {
+  while (widget){
+    if (widget.parent === this) {
+      return true;
+    }
+    widget = widget.parent;
+  }
+
+  return false;
 };
 
 //--- Layouting / HtmlComponent methods ---
@@ -233,4 +263,17 @@ scout.Widget.prototype.off = function(type, func) {
 scout.Widget.prototype.toString = function() {
   return 'Widget[rendered=' +  this.rendered +
       (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
+};
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+scout.Widget.getWidgetFor = function($elem) {
+  while ($elem && $elem.length > 0) {
+    var widget = $elem.data('widget');
+    if (widget) {
+      return widget;
+    }
+    $elem = $elem.parent();
+  }
+  return null;
 };

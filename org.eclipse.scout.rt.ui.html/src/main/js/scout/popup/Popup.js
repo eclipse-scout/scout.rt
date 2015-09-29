@@ -28,7 +28,6 @@ scout.Popup = function(session, options) {
     return scout.focusRule.AUTO;
   });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
-  this.triggerPopupOpenEvent = scout.helpers.nvl(options.triggerPopupOpenEvent, true);
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -129,9 +128,13 @@ scout.Popup.prototype._detachCloseHandler = function() {
 };
 
 scout.Popup.prototype._onMouseDown = function(event) {
-  var $target = $(event.target);
-  // close the popup only if the click happened outside of the popup
-  if (this.$container && this.$container.has($target).length === 0) {
+  var $target = $(event.target),
+    targetWidget = scout.Widget.getWidgetFor($target);
+
+  // close the popup only if the click happened outside of the popup and its children
+  // It is not sufficient to check the dom hierarchy using $container.has($target)
+  // because the popup may open other popups which probably is not a dom child but a sibling
+  if (!this.isOrHasWidget(targetWidget)) {
     this._onMouseDownOutside(event);
   }
 };
@@ -154,7 +157,9 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
  * Method invoked once a popup is opened.
  */
 scout.Popup.prototype._onPopupOpen = function(event) {
-  if (event.popup !== this) {
+  // Make sure child popups don't close the parent popup
+  // Use case: Opening of a context menu or cell editor in a form popup
+  if (!this.isOrHasWidget(event.popup)) {
     this.close(event);
   }
 };
@@ -271,11 +276,9 @@ scout.Popup.prototype._triggerLocationChanged = function() {
  * Fire event that this popup is about to open.
  */
 scout.Popup.prototype._triggerPopupOpenEvent = function() {
-  if (this.triggerPopupOpenEvent) {
-    this.session.desktop._trigger('popupopen', {
-      popup: this
-    });
-  }
+  this.session.desktop._trigger('popupopen', {
+    popup: this
+  });
 };
 
 scout.Popup.prototype.belongsTo = function($anchor) {

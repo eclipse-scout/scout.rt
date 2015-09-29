@@ -20,6 +20,7 @@ scout.inherits(scout.GroupBox, scout.CompositeField);
 scout.GroupBox.prototype._init = function(model, session) {
   scout.GroupBox.parent.prototype._init.call(this, model, session);
   this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
+  this.addChild(this.menuBar);
   if (this.mainBox) {
     this.menuBar.large();
   }

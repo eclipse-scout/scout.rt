@@ -191,7 +191,6 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
       if (adapter.parent) {
         adapter.parent.removeChild(adapter);
       }
-      adapter.parent = parent;
       parent.addChild(adapter);
     } else {
       $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);

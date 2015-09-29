@@ -93,6 +93,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
   }
   this._renderPopup();
   this.proposalChooser.render(this._popup.$container);
+  this._popup.addChild(this.proposalChooser);
   this._popup.resize();
 };
 
