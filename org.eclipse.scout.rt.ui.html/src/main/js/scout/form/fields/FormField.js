@@ -27,6 +27,7 @@ scout.FormField = function() {
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
+  this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -271,7 +272,9 @@ scout.FormField.prototype._renderMenusVisible = function() {
 };
 
 scout.FormField.prototype._renderLoading = function() {
-  this.$container.toggleClass('loading', this.loading);
+  if (this.loadingSupport) {
+    this.loadingSupport.renderLoading();
+  }
 };
 
 scout.FormField.prototype._getCurrentMenus = function() {
