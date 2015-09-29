@@ -11,15 +11,14 @@
 package org.eclipse.scout.rt.shared.notification;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,28 +30,22 @@ import org.mockito.Mockito;
  */
 @RunWith(PlatformTestRunner.class)
 public class NotificationHandlerRegistryTest {
-  private List<IBean<?>> m_serviceReg;
 
   //notification handler for all Serializables
+  @BeanMock
   private GlobalNotificationHandler m_globalNotificationHanlder;
   //notification handler for all INotificationGroup
+  @BeanMock
   private GroupNotificationHandler m_groupNotificationHanlder;
 
   @Before
   public void before() throws Exception {
-    m_globalNotificationHanlder = Mockito.mock(GlobalNotificationHandler.class);
-    m_groupNotificationHanlder = Mockito.mock(GroupNotificationHandler.class);
-    m_serviceReg = TestingUtility.registerBeans(
-        new BeanMetaData(GlobalNotificationHandler.class).withInitialInstance(m_globalNotificationHanlder).withApplicationScoped(true),
-        new BeanMetaData(GroupNotificationHandler.class).withInitialInstance(m_groupNotificationHanlder).withApplicationScoped(true));
-
     // ensure bean hander cache of notification dispatcher gets refreshed
     ensureHandlerRegistryRefreshed();
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_serviceReg);
     ensureHandlerRegistryRefreshed();
   }
 

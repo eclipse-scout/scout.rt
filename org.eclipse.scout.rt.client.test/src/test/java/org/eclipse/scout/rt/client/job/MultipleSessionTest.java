@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -38,11 +37,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
 @RunWith(PlatformTestRunner.class)
 public class MultipleSessionTest {
 
+  @Mock
   private IClientSession m_clientSession1;
+  @Mock
   private IClientSession m_clientSession2;
 
   private List<IBean<?>> m_beans;
@@ -52,8 +54,6 @@ public class MultipleSessionTest {
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobManager.class)
             .withApplicationScoped(true));
-    m_clientSession1 = mock(IClientSession.class);
-    m_clientSession2 = mock(IClientSession.class);
   }
 
   @After

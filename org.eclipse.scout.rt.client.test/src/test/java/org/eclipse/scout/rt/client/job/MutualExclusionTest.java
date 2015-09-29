@@ -68,7 +68,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -95,8 +94,6 @@ public class MutualExclusionTest {
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
-
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobManager.class)

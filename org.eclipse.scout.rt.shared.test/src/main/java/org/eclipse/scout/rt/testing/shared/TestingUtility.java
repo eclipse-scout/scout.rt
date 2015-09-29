@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -50,8 +49,6 @@ public final class TestingUtility {
    */
   public static final int TESTING_RESOURSE_ORDER = 10000;
 
-  private static final String REGEX_MARKER = "regex:";
-
   private TestingUtility() {
   }
 
@@ -73,94 +70,6 @@ public final class TestingUtility {
     else {
       throw new InterruptedException("timeout reached");
     }
-  }
-
-  /**
-   * Checks if the given string is included in the list of include patterns and that it is not excluded by the list of
-   * exclude patterns. If the include or exclude pattern list is null or empty, the string is assumed to be included and
-   * not excluded, respectively.
-   *
-   * @param s
-   * @param includePatterns
-   * @param excludePatterns
-   * @return
-   */
-  public static boolean accept(String s, Pattern[] includePatterns, Pattern[] excludePatterns) {
-    if (s == null) {
-      return false;
-    }
-    boolean included = true;
-    boolean excluded = false;
-    if (includePatterns != null) {
-      included = false;
-      for (Pattern p : includePatterns) {
-        if (p.matcher(s).matches()) {
-          included = true;
-          break;
-        }
-      }
-    }
-    if (included && excludePatterns != null) {
-      for (Pattern p : excludePatterns) {
-        if (p.matcher(s).matches()) {
-          excluded = true;
-          break;
-        }
-      }
-    }
-    return included && !excluded;
-  }
-
-  /**
-   * Parses a comma-separated list of filter patterns. A filter pattern is either a wildcard pattern or a regular
-   * expression. Latter must be prefixed by <em>regex:</em>
-   *
-   * @param filter
-   * @return
-   */
-  public static Pattern[] parseFilterPatterns(String filter) {
-    if (filter == null) {
-      return null;
-    }
-    List<Pattern> patterns = new ArrayList<Pattern>();
-    for (String f : filter.split(",")) {
-      f = f.trim();
-      if (f.length() > 0) {
-        try {
-          f = toRegexPattern(f);
-          Pattern pattern = Pattern.compile(f);
-          patterns.add(pattern);
-        }
-        catch (Exception e) {
-          System.err.println("invalid bundle filter pattern: " + e);
-        }
-      }
-    }
-    if (patterns.isEmpty()) {
-      return null;
-    }
-    return patterns.toArray(new Pattern[patterns.size()]);
-  }
-
-  /**
-   * Transforms the given string into a regular expression pattern. The string is assumed to be a wildcard pattern or
-   * already a regular expression pattern. The latter must be prefixed by <em>regex:</em>.
-   *
-   * @param s
-   * @return
-   */
-  public static String toRegexPattern(String s) {
-    if (s == null) {
-      return null;
-    }
-    String pattern = s.trim();
-    if (pattern.startsWith(REGEX_MARKER)) {
-      return pattern.substring(REGEX_MARKER.length());
-    }
-    pattern = pattern.replaceAll("[.]", "\\\\.");
-    pattern = pattern.replaceAll("[*]", ".*");
-    pattern = pattern.replaceAll("[?]", ".");
-    return pattern;
   }
 
   /**
