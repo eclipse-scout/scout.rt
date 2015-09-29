@@ -56,7 +56,6 @@ public class NotificationDispatcherTest {
 
   @Before
   public void before() throws Exception {
-    System.out.println("BEFORE");
     m_globalNotificationHanlder = mock(GlobalNotificationHandler.class);
     m_groupNotificationHanlder = mock(GroupNotificationHandler.class);
     m_serviceReg = TestingUtility.registerBeans(
@@ -68,25 +67,20 @@ public class NotificationDispatcherTest {
     IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
     beanManager.unregisterBean(bean);
     beanManager.registerBean(new BeanMetaData(bean));
-
-    System.out.println("END BEFORE");
   }
 
   @After
   public void after() {
-    System.out.println("AFTER");
     TestingUtility.unregisterBeans(m_serviceReg);
     // ensure bean hander cache of notification dispatcher gets refreshed
     IBeanManager beanManager = BEANS.getBeanManager();
     IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
     beanManager.unregisterBean(bean);
     beanManager.registerBean(new BeanMetaData(bean));
-    System.out.println("END AFTER");
   }
 
   @Test
   public void testStringNotification() throws ProcessingException {
-    System.out.println("TEST 1");
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend JUnit model thread", true);
     final String stringNotification = "A simple string notification";
 
@@ -106,12 +100,10 @@ public class NotificationDispatcherTest {
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(0)).handleNotification(Mockito.any(INotificationGroup.class));
-    System.out.println("END TEST 1");
   }
 
   @Test
   public void testSuperClassNotification() throws ProcessingException {
-    System.out.println("TEST 2");
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend JUnit model thread1", true);
 
     ClientJobs.schedule(new IRunnable() {
@@ -127,13 +119,11 @@ public class NotificationDispatcherTest {
       @Override
       public void onDone(DoneEvent<Void> event) {
         cond.setBlocking(false);
-        System.out.println("stop");
       }
     });
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));
-    System.out.println("END TEST 2");
   }
 
   @IgnoreBean

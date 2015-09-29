@@ -37,16 +37,13 @@ public class HtmlContentBuilderTest {
   @Test
   public void testImportBinds() {
     IHtmlElement h2 = HTML.h2("0");
-    System.out.println(h2.getBinds());
     IHtmlElement h22 = HTML.h2("1", HTML.bold("2"));
-    System.out.println(h22.getBinds());
 
     HtmlContentBuilder cb = new HtmlContentBuilder(h2, h22);
     assertEquals("0", cb.getBinds().getBindMap().get(":b__0"));
     assertEquals("1", cb.getBinds().getBindMap().get(":b__1"));
     assertEquals("2", cb.getBinds().getBindMap().get(":b__2"));
   }
-
 
   @Test
   public void testManyBinds() throws Exception {
