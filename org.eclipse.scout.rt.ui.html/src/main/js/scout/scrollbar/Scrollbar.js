@@ -166,9 +166,9 @@ scout.Scrollbar.prototype.update = function() {
 
   // show scrollbar
   if (this._offsetSize >= this._scrollSize) {
-    this.$container.css('visibility', 'hidden');
+    this.$container.css('display', 'none');
   } else {
-    this.$container.css('visibility', 'visible');
+    this.$container.css('display', '');
   }
 
   // Position the scrollbar(s)
