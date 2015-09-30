@@ -67,6 +67,11 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
 
   public class ChartField extends AbstractChartField<ChartField.Chart> {
 
+    @Override
+    public String classId() {
+      return AbstractChartTile.this.classId() + ID_CONCAT_SYMBOL + super.classId();
+    }
+
     public class Chart extends AbstractChart {
     }
   }
