@@ -1,5 +1,6 @@
 package org.eclipse.scout.commons.annotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,6 +15,9 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  * <p/>
  * <h3>Usage on Beans</h3> If this annotation is added to a bean this means that the original bean is no longer
  * available in the Scout bean manager and only the new child class is returned.<br>
+ * If the super class of the replaced bean has an {@link Order} defined, this order is inherited to the replacing bean.
+ * <br>
+ * <br>
  * <b>Example:</b> The CustomFileSystemUserPreferencesStorageService replaces the
  * FileSystemUserPreferencesStorageService already present in Scout with some custom behavior:
  *
@@ -25,7 +29,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   }
  * }
  * </pre>
- * 
+ *
  * Wherever now an IUserPreferencesService is used the custom instance is returned. <br>
  * <h3>Usage on form fields</h3> If this annotation is added to a form field in an extended form, it works like the
  * {@link InjectFieldTo} annotation except that the original field is removed. The replaced field's container is used by
@@ -190,6 +194,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *
  * @since 3.8.2
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Replace {

@@ -40,6 +40,7 @@ public class BeanMetaData {
     m_beanClazz = Assertions.assertNotNull(clazz);
     m_beanAnnotations = new HashMap<>();
     readStaticAnnotations(clazz, false);
+    inheritOrderIfRequired(clazz);
     m_initialInstance = initialInstance;
   }
 
@@ -48,6 +49,35 @@ public class BeanMetaData {
     m_beanAnnotations = new HashMap<>(template.getBeanAnnotations());
     m_initialInstance = template.getInitialInstance();
     m_producer = template.getBeanInstanceProducer();
+  }
+
+  protected void inheritOrderIfRequired(Class<?> startClass) {
+    boolean isReplaceAnnotationPresent = getBeanAnnotation(Replace.class) != null;
+    boolean isOrderAnnotationPresent = getBeanAnnotation(Order.class) != null;
+    if (isOrderAnnotationPresent || !isReplaceAnnotationPresent) {
+      // don't inherit order annotation because:
+      // - we have a specific order defined
+      // - or we are not replacing anything
+      return;
+    }
+
+    // we have no order and are replacing: inherit order from replaced beans
+    Class<?> superClass = startClass;
+    Order orderAnnot = null;
+    while (orderAnnot == null && superClass != null && !Object.class.equals(superClass) && superClass.isAnnotationPresent(Replace.class)) {
+      // search for the first @Order up the hierarchy as long as beans are replaced
+      orderAnnot = superClass.getAnnotation(Order.class);
+      superClass = superClass.getSuperclass();
+    }
+
+    // if no order has been found so far, check if the last level (which no longer has a replace annotation) has one
+    if (orderAnnot == null && superClass != null) {
+      orderAnnot = superClass.getAnnotation(Order.class);
+    }
+
+    if (orderAnnot != null) {
+      withAnnotation(orderAnnot);
+    }
   }
 
   /**
@@ -182,7 +212,7 @@ public class BeanMetaData {
 
   /**
    * Replaces all annotations in this {@link BeanMetaData} with the ones provided.
-   * 
+   *
    * @param annotations
    *          The new annotations.
    */

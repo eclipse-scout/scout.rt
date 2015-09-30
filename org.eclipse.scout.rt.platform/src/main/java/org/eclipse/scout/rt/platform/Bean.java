@@ -48,8 +48,9 @@ import org.eclipse.scout.commons.annotations.Replace;
  * <p>
  * Without that annotation {@link IBeanManager} considers both the subclassed and the subclassing class as two beans
  * that are available at runtime.
- * 
+ *
  * @see IgnoreBean
+ * @see Replace
  */
 @Inherited
 @Documented
