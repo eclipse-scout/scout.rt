@@ -77,6 +77,9 @@ scout.BoxButtons.prototype.updateButtonWidths = function(availableWidth) {
     }
   });
 
+  var hasVisibleButtons = $visibleButtons.length > 0;
+  this._$parent.toggleClass('empty', !hasVisibleButtons);
+
   // Manually calculate equal width fore each button, adding remaining pixels to last button.
   // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
   availableWidth = availableWidth || this._$parent.width();

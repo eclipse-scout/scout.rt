@@ -1,5 +1,9 @@
 .box-buttons {
 
+  &.empty {
+    border-bottom: 1px solid @color-messagebox-border;
+  }
+
   & > .button {
     position: relative;
     padding: 12px;
