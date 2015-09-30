@@ -43,7 +43,7 @@
   overflow: hidden;
   border-left: 0px solid transparent;
   border-right: 0px solid transparent;
-  border-bottom: 1px solid @border-color;
+  border-bottom: 1px solid @table-row-border-color;
 
   &.sum-selection {
      color: @item-selection-border-color;
@@ -64,7 +64,7 @@
 
     &.select-top::after,
     &.select-middle::after {
-      border-bottom: 1px solid @border-color;
+      border-bottom: 1px solid @table-row-border-color;
       content: '';
       display: block;
     }

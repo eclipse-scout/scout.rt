@@ -59,7 +59,7 @@
   }
 
   .placeholder() {
-    opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
+    opacity: @text-field-placeholder-opacity;
   }
   .placeholder-disabled() {
     color: @disabled-color;

@@ -11,7 +11,7 @@
 }
 
 .root-group-box > .main-menubar {
-  border-bottom: 3px solid @border-color;
+  border-bottom: 3px solid @group-box-title-border-color;
 }
 
 .root-group-box > .group-box-body {
@@ -36,7 +36,7 @@
   width: calc(~'100%' - @mandatory-indicator-width);
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
-  border-bottom: 3px solid @border-color;
+  border-bottom: 3px solid @group-box-title-border-color;
   padding: @group-title-padding-y 0;
   #scout.overflow-ellipsis-nowrap();
 

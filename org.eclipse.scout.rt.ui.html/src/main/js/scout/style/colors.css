@@ -114,6 +114,7 @@
 @outline-control-button-background-color: @palette-blue-6;
 @panel-background-color: @palette-gray-2;
 @popup-border-color: @palette-blue-6;
+@table-header-background-color: @panel-background-color;
 @table-header-menu-background-color: @control-background-color;
 @table-header-cmd-border-color: @border-color;
 @table-header-cmd-active-color: @active-inverted-color;
@@ -121,9 +122,11 @@
 @table-header-cmd-active-border-color: @active-inverted-background-color;
 @table-info-color: @palette-gray-5;
 @table-info-active-color: @palette-gray-6;
+@table-row-border-color: @border-color;
 @text-field-icon-color: @palette-gray-5;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;
+@text-field-placeholder-opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
 @tooltip-color: @palette-gray-9;
 @tooltip-background-color: @palette-orange-0;
 @tooltip-border-color: @palette-orange-3;
@@ -131,3 +134,5 @@
 @view-button-tab-active-background-color: @navigation-background-color;
 @view-button-tab-active-color: @active-inverted-color;
 @checkbox-disabled-color: @palette-gray-5;
+@scrollbar-thumb-background-color: @palette-gray-5;
+@group-box-title-border-color: @border-color;
