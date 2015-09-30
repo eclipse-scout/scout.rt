@@ -853,6 +853,9 @@ describe("Table", function() {
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
 
+      // Reset internal state because there is no "sleep" in JS
+      table._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
+
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
