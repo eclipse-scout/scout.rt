@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Encoding;
+import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -72,23 +73,13 @@ public class HtmlDocumentParser {
 
       StringBuffer linkTag = new StringBuffer(tagPrefix);
       File srcFile = new File(srcAttr);
-      String srcFileName = srcFile.getName();
-      String[] tmp = srcFileName.split("\\.");
+      String[] filenameParts = FileUtility.getFilenameParts(srcFile);
       // append path to file
       if (srcFile.getParent() != null) {
         linkTag.append(srcFile.getParent()).append("/");
       }
       // append file name without file-extension
-      // when file is a macro or module, remove that suffix
-      // FIXME AWE: discuss with C.GU: können wir das nicht einfach stehen lassen? Dann braucht es keine magie beim laden
-      String fileName = tmp[0];
-      if (fileName.endsWith("-macro")) {
-        fileName = fileName.substring(0, fileName.length() - 6);
-      }
-//      else if (fileName.endsWith("-module")) {
-//        fileName = fileName.substring(0, fileName.length() - 7);
-//      }
-      linkTag.append(fileName);
+      linkTag.append(getScriptFileName(filenameParts[0]));
       // append fingerprint
       if (fingerprint != null) {
         linkTag.append("-").append(fingerprint);
@@ -98,13 +89,30 @@ public class HtmlDocumentParser {
         linkTag.append(".min");
       }
       // append file-extension
-      linkTag.append(".").append(tmp[1]);
+      linkTag.append(".").append(filenameParts[1]);
       linkTag.append(tagSuffix);
 
       m.appendReplacement(sb, linkTag.toString());
     }
     m.appendTail(sb);
     m_workingContent = sb.toString();
+  }
+
+  /**
+   * When file is a macro or module, remove that suffix. ScriptFileLocator tries to find the macro and module files by
+   * adding the suffix again and looking it up in the classpath.
+   *
+   * @param fileName
+   * @return
+   */
+  protected String getScriptFileName(String fileName) {
+    if (fileName.endsWith("-macro")) {
+      return fileName.substring(0, fileName.length() - 6);
+    }
+    if (fileName.endsWith("-module")) {
+      return fileName.substring(0, fileName.length() - 7);
+    }
+    return fileName;
   }
 
   protected void replaceStylesheetTags() throws IOException {

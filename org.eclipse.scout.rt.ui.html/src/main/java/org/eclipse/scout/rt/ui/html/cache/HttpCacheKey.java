@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.cache;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -22,14 +23,27 @@ public class HttpCacheKey implements Serializable {
 
   private final String m_resourcePath;
   private final Locale m_locale;
+  private final Object[] m_cacheAttributes;
 
   public HttpCacheKey(String resourcePath) {
-    this(resourcePath, null);
+    this(resourcePath, null, null);
   }
 
   public HttpCacheKey(String resourcePath, Locale locale) {
+    this(resourcePath, locale, null);
+  }
+
+  /**
+   * @param resourcePath
+   * @param locale
+   * @param cacheAttributes
+   *          an (optional) array of arbitrary cache attributes which may be exclusive for a certain type of
+   *          cache-object. For instance a HTML-document will store the 'theme' here.
+   */
+  public HttpCacheKey(String resourcePath, Locale locale, Object[] cacheAttributes) {
     m_resourcePath = resourcePath;
     m_locale = locale;
+    m_cacheAttributes = cacheAttributes;
   }
 
   public String getResourcePath() {
@@ -40,10 +54,15 @@ public class HttpCacheKey implements Serializable {
     return m_locale;
   }
 
+  public Object[] getCacheAttributes() {
+    return m_cacheAttributes;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + Arrays.hashCode(m_cacheAttributes);
     result = prime * result + ((m_locale == null) ? 0 : m_locale.hashCode());
     result = prime * result + ((m_resourcePath == null) ? 0 : m_resourcePath.hashCode());
     return result;
@@ -61,6 +80,9 @@ public class HttpCacheKey implements Serializable {
       return false;
     }
     HttpCacheKey other = (HttpCacheKey) obj;
+    if (!Arrays.equals(m_cacheAttributes, other.m_cacheAttributes)) {
+      return false;
+    }
     if (m_locale == null) {
       if (other.m_locale != null) {
         return false;
@@ -82,6 +104,6 @@ public class HttpCacheKey implements Serializable {
 
   @Override
   public String toString() {
-    return "HttpCacheKey[m_resourcePath=" + m_resourcePath + " m_locale=" + m_locale + "]";
+    return "HttpCacheKey[m_resourcePath=" + m_resourcePath + " m_locale=" + m_locale + " m_cacheAttributes=" + Arrays.toString(m_cacheAttributes) + "]";
   }
 }

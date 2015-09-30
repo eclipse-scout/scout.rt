@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
@@ -43,7 +44,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
   @Override
   public HttpCacheKey createCacheKey(String pathInfo, Locale locale) {
-    return new HttpCacheKey(pathInfo, locale);
+    return new HttpCacheKey(pathInfo, locale, new Object[]{UiHints.getThemeHint(getRequest())});
   }
 
   @Override

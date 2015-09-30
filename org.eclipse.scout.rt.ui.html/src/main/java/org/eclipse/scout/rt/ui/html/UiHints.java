@@ -41,10 +41,12 @@ public final class UiHints {
   private static final String URL_PARAM_CACHE_HINT = "cache";
   private static final String URL_PARAM_MINIFY_HINT = "minify";
   private static final String URL_PARAM_INSPECTOR_HINT = "inspector";
+  private static final String URL_PARAM_THEME_HINT = "theme";
 
   private static final String SESSION_ATTRIBUTE_CACHE_HINT = UiHints.class.getName() + "#cache";
   private static final String SESSION_ATTRIBUTE_MINIFY_HINT = UiHints.class.getName() + "#minify";
   private static final String SESSION_ATTRIBUTE_INSPECTOR_HINT = UiHints.class.getName() + "#inspector";
+  private static final String SESSION_ATTRIBUTE_THEME_HINT = UiHints.class.getName() + "#theme";
 
   private UiHints() {
     // static access only
@@ -63,9 +65,10 @@ public final class UiHints {
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_CACHE_HINT), SESSION_ATTRIBUTE_CACHE_HINT);
     updateHint(req, getRequestParameterBoolean(req, GzipServletFilter.URL_PARAM_COMPRESS_HINT), GzipServletFilter.SESSION_ATTRIBUTE_COMPRESS_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_MINIFY_HINT), SESSION_ATTRIBUTE_MINIFY_HINT);
+    updateHint(req, req.getParameter(URL_PARAM_THEME_HINT), SESSION_ATTRIBUTE_THEME_HINT);
   }
 
-  private static void updateHint(HttpServletRequest req, Boolean value, String... sessionAttributeNameToStoreTo) {
+  private static void updateHint(HttpServletRequest req, Object value, String... sessionAttributeNameToStoreTo) {
     if (value == null) {
       return;
     }
@@ -94,6 +97,14 @@ public final class UiHints {
 
   public static boolean isMinifyHint(HttpServletRequest req) {
     return calculateHint(req, SESSION_ATTRIBUTE_MINIFY_HINT, !Platform.get().inDevelopmentMode());
+  }
+
+  public static String getThemeHint(HttpServletRequest req) {
+    HttpSession session = req.getSession(false);
+    if (session == null) {
+      return null;
+    }
+    return (String) session.getAttribute(SESSION_ATTRIBUTE_THEME_HINT);
   }
 
   private static boolean calculateHint(HttpServletRequest req, String sessionAttr, boolean defaultValue) {

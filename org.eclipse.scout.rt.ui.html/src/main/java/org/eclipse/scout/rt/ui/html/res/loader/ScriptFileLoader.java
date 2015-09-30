@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -41,6 +42,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), m_scriptProcessor);
     builder.setMinifyEnabled(isMinify());
+    builder.setTheme(UiHints.getThemeHint(getRequest()));
     String resourcePath = cacheKey.getResourcePath();
     ScriptOutput out = builder.buildScript(resourcePath);
     if (out != null) {

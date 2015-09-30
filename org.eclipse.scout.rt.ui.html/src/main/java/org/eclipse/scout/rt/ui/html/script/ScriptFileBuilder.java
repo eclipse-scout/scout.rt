@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.ui.html.script;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Encoding;
+import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -55,15 +57,18 @@ public class ScriptFileBuilder {
    * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $5="js" or "css"
    * </pre>
    */
-  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\w]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css)");
+  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css)");
 
   private final IWebContentService m_resourceLocator;
   private final ScriptProcessor m_scriptProcessor;
+  private final ScriptFileLocator m_scriptLocator;
   private boolean m_minifyEnabled;
+  private String m_theme;
 
   public ScriptFileBuilder(IWebContentService locator, ScriptProcessor scriptProcessor) {
     m_resourceLocator = locator;
     m_scriptProcessor = scriptProcessor;
+    m_scriptLocator = new ScriptFileLocator(m_resourceLocator);
   }
 
   public boolean isMinifyEnabled() {
@@ -72,6 +77,10 @@ public class ScriptFileBuilder {
 
   public void setMinifyEnabled(boolean minifyEnabled) {
     m_minifyEnabled = minifyEnabled;
+  }
+
+  public void setTheme(String theme) {
+    m_theme = theme;
   }
 
   public ScriptOutput buildScript(String pathInfo) throws IOException {
@@ -96,76 +105,32 @@ public class ScriptFileBuilder {
 
   protected ScriptSource locateNonFragmentScript(String requestPath) throws IOException {
     Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
-    URL libraryMinimizedUrl = m_resourceLocator.getWebContentResource(requestPath);
-    if (!mat.matches()) {
-      if (libraryMinimizedUrl == null) {
-        LOG.warn("locate " + requestPath + ": does not match SCRIPT_URL_PATTERN " + SCRIPT_URL_PATTERN.pattern() + " and does not exist");
-        return null;
-      }
-      return new ScriptSource(requestPath, libraryMinimizedUrl, ScriptSource.NodeType.LIBRARY);
-    }
-
-    final ScriptSource.NodeType[] nodeTypes;
-    final URL[] urls;
-    if (isMinifyEnabled()) {
-      nodeTypes = new ScriptSource.NodeType[]{
-          ScriptSource.NodeType.LIBRARY,
-          ScriptSource.NodeType.LIBRARY,
-          ScriptSource.NodeType.MACRO,
-          ScriptSource.NodeType.SRC_MODULE,
-      };
-      urls = new URL[]{
-          libraryMinimizedUrl, //libraryMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "." + mat.group(4)), //libraryNonMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
-          m_resourceLocator.getScriptSource("" + mat.group(2) + "." + mat.group(4)), //srcModuleUrl
-      };
+    if (mat.matches()) {
+      return m_scriptLocator.locateFile(requestPath, mat, isMinifyEnabled());
     }
     else {
-      nodeTypes = new ScriptSource.NodeType[]{
-          ScriptSource.NodeType.LIBRARY,
-          ScriptSource.NodeType.MACRO,
-          ScriptSource.NodeType.SRC_MODULE,
-          ScriptSource.NodeType.LIBRARY,
-      };
-      urls = new URL[]{
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "." + mat.group(4)), //libraryNonMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
-          m_resourceLocator.getScriptSource("" + mat.group(2) + "." + mat.group(4)), //srcModuleUrl
-          libraryMinimizedUrl, //libraryMinimizedUrl
-      };
-    }
-
-    int index = firstWhichIsNotNull(urls);
-    if (index < 0) {
-      LOG.warn("locate " + requestPath + ": does not exist (no library, macro or source module)");
+      LOG.warn("locate " + requestPath + ": does not match SCRIPT_URL_PATTERN " + SCRIPT_URL_PATTERN.pattern());
       return null;
     }
-    return new ScriptSource(requestPath, urls[index], nodeTypes[index]);
   }
 
-  protected ScriptSource locateFragmentScript(String fragmentPath) {
+  protected ScriptSource locateFragmentScript(String fragmentPath, FileType fileType) {
+    if (FileType.CSS == fileType && m_theme != null) {
+      File file = new File(fragmentPath);
+      String[] parts = FileUtility.getFilenameParts(file);
+      File themeFile = new File(file.getParent(), parts[0] + "-" + m_theme + "." + parts[1]);
+      URL url = m_resourceLocator.getScriptSource(themeFile.getPath());
+      if (url != null) {
+        return new ScriptSource(fragmentPath, url, ScriptSource.NodeType.SRC_FRAGMENT);
+      }
+    }
+
     URL url = m_resourceLocator.getScriptSource(fragmentPath);
     if (url == null) {
       LOG.warn("locate fragment " + fragmentPath + ": does not exist");
       return null;
     }
     return new ScriptSource(fragmentPath, url, ScriptSource.NodeType.SRC_FRAGMENT);
-  }
-
-  /**
-   * @return the index of the first non-null {@link URL} in the given array, or <code>-1</code> if no non-null elements
-   *         are present.
-   */
-  protected int firstWhichIsNotNull(URL[] urls) {
-    if (urls != null) {
-      for (int i = 0; i < urls.length; i++) {
-        if (urls[i] != null) {
-          return i;
-        }
-      }
-    }
-    return -1;
   }
 
   protected ScriptOutput processMacroWithIncludesRec(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
@@ -263,11 +228,11 @@ public class ScriptFileBuilder {
     while (mat.find()) {
       buf.append(content.substring(pos, mat.start()));
       String includePath = StringUtility.nvl(mat.group(1), mat.group(2));
-      ScriptSource includeFragment = locateFragmentScript(includePath);
+      ScriptSource includeFragment = locateFragmentScript(includePath, script.getFileType());
       String replacement = null;
       if (includeFragment != null) {
         switch (includeFragment.getNodeType()) {
-          case SRC_FRAGMENT: { // FIXME AWE: braucht es den typ fragment noch?
+          case SRC_FRAGMENT: {
             replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), Encoding.UTF_8);
             lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
             break;
@@ -385,4 +350,5 @@ public class ScriptFileBuilder {
     int c = line.lastIndexOf("/*/");
     return (b >= 0 && (a < 0 || a < b || (c == a)));
   }
+
 }
