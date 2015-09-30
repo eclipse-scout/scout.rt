@@ -103,6 +103,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_ACTIVE_FORM = "activeForm";
 
+  String PROP_THEME = "theme";
+
   public enum DesktopStyle {
     /**
      * Default desktop style with header, navigation (tree) and bench (forms).
@@ -803,8 +805,21 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * @return the desktop style. Default value is <code>DesktopStyle.DEFAULT</code>.
-   * @since 6.0.0
+   * @since 5.2.0
    */
   DesktopStyle getDesktopStyle();
+
+  /**
+   * @return the name of the current theme or null when default theme is active.
+   * @since 5.2.0
+   */
+  String getTheme();
+
+  /**
+   * @param theme
+   *          name of the theme to activate or null when default theme should be active.
+   * @since 5.2.0
+   */
+  void setTheme(String theme);
 
 }

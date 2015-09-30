@@ -741,4 +741,13 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void setCacheSplitterPosition(boolean b) {
   }
+
+  @Override
+  public String getTheme() {
+    return null;
+  }
+
+  @Override
+  public void setTheme(String theme) {
+  }
 }

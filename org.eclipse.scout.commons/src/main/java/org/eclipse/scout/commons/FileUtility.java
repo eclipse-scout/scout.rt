@@ -606,4 +606,41 @@ public final class FileUtility {
   public static byte[] removeByteOrderMark(File f) throws ProcessingException {
     return IOUtility.removeByteOrderMark(IOUtility.getContent(f.getAbsolutePath()));
   }
+
+  /**
+   * @param file
+   * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return
+   *         "png".
+   */
+  public static String getFileExtension(File file) {
+    String[] parts = getFilenameParts(file);
+    if (parts == null) {
+      return null;
+    }
+    return parts[1];
+  }
+
+  /**
+   * @param file
+   * @return an array with two elements, [0] contains the file-name without extension [1] contains the file-extension
+   */
+  public static String[] getFilenameParts(File file) {
+    if (file == null) {
+      return null;
+    }
+    String fileName = file.getName();
+    int index = fileName.lastIndexOf('.');
+    if (index < 0) {
+      return new String[]{
+          fileName,
+          null
+      };
+    }
+    else {
+      return new String[]{
+          fileName.substring(0, index),
+          fileName.substring(index + 1)
+      };
+    }
+  }
 }
