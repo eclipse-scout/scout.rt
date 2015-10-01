@@ -76,11 +76,11 @@
 
   /* Expects a sibling html element with class 'icon' **/
   .text-field-with-icon(@icon; @className: ~'') {
-    padding-right: @text-field-padding + 15px;
+    padding-right: @text-field-padding-x + 15px;
 
     & ~ .icon@{className} {
       position: absolute;
-      margin-right: @text-field-padding;
+      margin-right: @text-field-padding-x;
       cursor: text;
     }
 
@@ -103,7 +103,7 @@
     }
 
     &.disabled {
-      padding-right: @text-field-padding;
+      padding-right: @text-field-padding-x;
     }
 
     &.disabled ~ .icon@{className} {
@@ -112,7 +112,7 @@
 
     /* When field is too small, hide the icon */
     &.compact {
-      padding-right: @text-field-padding;
+      padding-right: @text-field-padding-x;
 
       & ~ .icon {
         display: none;

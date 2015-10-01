@@ -89,7 +89,7 @@
   }
 
   & .table-row {
-    padding-left: @text-field-padding - 8px;
+    padding-left: @text-field-padding-x - 8px;
   }
 
   & .table-row.selected,

@@ -39,7 +39,7 @@
   counter-reset: hr;
   line-height: 20px;
   white-space: pre-wrap;
-  padding: 5px 5px 5px @text-field-padding;
+  padding: @text-field-padding-y @text-field-padding-x;
   color: @text-color;
   background-color: @control-background-color;
   -moz-user-select: text;

@@ -3,8 +3,10 @@
 @desktop-taskbar-height: 51px;
 @bench-margin-x: 20px;
 
-@text-field-padding: 10px;
+@text-field-padding-y: 7px;
+@text-field-padding-x: 10px;
 @button-padding: 7px;
+@borderless-field-padding-y: 8px;
 
 @border-radius: 3px;
 
@@ -15,8 +17,6 @@
 @logical-grid-height: 30px;
 @mandatory-indicator-width: 8px;
 /* ------------------------------- */
-
-@borderless-field-padding-y: 7px;
 
 @tree-node-control-size: 15px;
 @outline-node-control-size: 20px;
