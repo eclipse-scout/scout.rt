@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -62,7 +61,7 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   @ApplicationScoped
-  public static class TestService extends AbstractService implements ITestService {
+  public static class TestService implements ITestService {
     @Override
     public void doit() {
 

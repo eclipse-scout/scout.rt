@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
-import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 
@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchroni
  * @param <T>
  *          the type of message that should be sent and received
  */
-public abstract class AbstractJmsService<T> extends AbstractService {
+public abstract class AbstractJmsService<T> implements IService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJmsService.class);
 
   private Connection m_connection;

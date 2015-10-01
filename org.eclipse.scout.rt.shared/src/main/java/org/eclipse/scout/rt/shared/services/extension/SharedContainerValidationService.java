@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.shared.services.extension;
 
 import java.io.Serializable;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -32,10 +34,9 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  */
 @Order(-200)
 public class SharedContainerValidationService extends AbstractContainerValidationService {
-  @Override
-  protected void initializeService() {
-    super.initializeService();
 
+  @PostConstruct
+  protected void initializeContributions() {
     // contributions
     addPossibleContributionForContainer(AbstractFormFieldData.class, AbstractFormData.class);
     addPossibleContributionForContainer(AbstractPropertyData.class, AbstractFormData.class);

@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service.internal;
 
-import org.eclipse.scout.rt.platform.service.AbstractService;
-
 /**
  *
  */
-public class TestService extends AbstractService implements ITestService {
+public class TestService implements ITestService {
 
 }

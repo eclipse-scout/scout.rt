@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
@@ -51,7 +50,7 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   @ApplicationScoped
-  private static class TestService extends AbstractService implements ITestService {
+  private static class TestService implements ITestService {
     @Override
     public void doit() {
     }

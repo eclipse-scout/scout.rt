@@ -17,12 +17,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  *
  */
-public abstract class AbstractContainerValidationService extends AbstractService implements IExtensionRegistrationValidatorService {
+public abstract class AbstractContainerValidationService implements IExtensionRegistrationValidatorService {
 
   private final Map<Class<?>, Set<Class<?>>> m_possibleContributionsByContainer;
   private final Map<Class<? extends IOrdered>, Set<Class<? extends IOrdered>>> m_possibleMovesByContainer;

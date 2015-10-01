@@ -16,7 +16,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
@@ -24,7 +23,7 @@ import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 /**
  * @since 5.2
  */
-public class RemoteCacheService extends AbstractService implements IRemoteCacheService {
+public class RemoteCacheService implements IRemoteCacheService {
 
   @Override
   public <K, V> V get(String cacheId, K key) {

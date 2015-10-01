@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapHostProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapMailboxProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPasswordProperty;
@@ -34,7 +33,7 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPortProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapSslProtocolsProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapUsernameProperty;
 
-public abstract class AbstractIMAPService extends AbstractService implements IIMAPService {
+public abstract class AbstractIMAPService implements IIMAPService {
 
   private final String m_host;
   private final int m_port;

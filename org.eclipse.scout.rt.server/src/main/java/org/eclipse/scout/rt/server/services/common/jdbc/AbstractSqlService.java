@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IServiceInventory;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SqlDirectJdbcConnectionProperty;
@@ -64,7 +63,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 
-public abstract class AbstractSqlService extends AbstractService implements ISqlService, IServiceInventory {
+public abstract class AbstractSqlService implements ISqlService, IServiceInventory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
   public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1024 * 1024; // = 1MB default
 

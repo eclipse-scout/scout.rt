@@ -16,9 +16,8 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
-public class PerformanceAnalyzerService extends AbstractService implements IPerformanceAnalyzerService {
+public class PerformanceAnalyzerService implements IPerformanceAnalyzerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PerformanceAnalyzerService.class);
 
   private final PerformanceSampleSet m_networkLatency;

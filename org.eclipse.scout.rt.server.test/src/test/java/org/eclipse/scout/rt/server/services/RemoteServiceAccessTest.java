@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.security.Permissions;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
@@ -114,7 +113,7 @@ public class RemoteServiceAccessTest {
     void interna3();
   }
 
-  abstract class AbstractMockProcessService extends AbstractService implements IMockProcessService {
+  abstract class AbstractMockProcessService implements IMockProcessService {
 
     @Override
     public void hello() {

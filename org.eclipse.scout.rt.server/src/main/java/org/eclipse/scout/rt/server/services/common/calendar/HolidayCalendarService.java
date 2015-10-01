@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayCalendarItemParser;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;
@@ -31,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 /**
  * For details see {@link HolidayCalendarItemParser}
  */
-public class HolidayCalendarService extends AbstractService implements IHolidayCalendarService {
+public class HolidayCalendarService implements IHolidayCalendarService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarService.class);
 
   private TTLCache<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new TTLCache<String, HolidayCalendarItemParser>(TimeUnit.MINUTES.toMillis(5));// 5 minutes

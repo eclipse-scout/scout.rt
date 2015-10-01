@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.MatrixUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
@@ -26,7 +25,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 /**
  * <h4>AbstractLookupService</h4>
  */
-public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends AbstractService implements ILookupService<LOOKUP_ROW_KEY_TYPE> {
+public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILookupService<LOOKUP_ROW_KEY_TYPE> {
 
   /**
    * Convenience function to sort data for later call to {@link #createLookupRowArray(Object[][], LookupCall, Class)}.

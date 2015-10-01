@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -220,7 +219,7 @@ public class ValidatorTest {
     void call3(@MaxValue(3) Float m);
   }
 
-  public static class HelloService extends AbstractService implements IHelloService {
+  public static class HelloService implements IHelloService {
     @Override
     public void call1(int[] a, String s, Long n) {
     }

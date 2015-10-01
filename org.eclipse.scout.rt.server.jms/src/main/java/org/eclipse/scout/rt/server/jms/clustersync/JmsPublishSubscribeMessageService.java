@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.jms.clustersync;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Session;
@@ -53,7 +54,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   public JmsPublishSubscribeMessageService() {
   }
 
-  @Override
+  @PostConstruct
   protected void initializeService() {
     try {
       Hashtable<Object, Object> env = new Hashtable<>();
@@ -75,7 +76,6 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
     catch (NamingException e) {
       throw new PlatformException("cannot setup jms", e);
     }
-    super.initializeService();
   }
 
   @Override

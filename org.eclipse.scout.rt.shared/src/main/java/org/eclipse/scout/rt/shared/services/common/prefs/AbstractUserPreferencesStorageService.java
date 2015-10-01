@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -24,7 +23,7 @@ import org.eclipse.scout.rt.shared.ISession;
  * @since 5.1
  * @see Preferences#get(ISession, String)
  */
-public abstract class AbstractUserPreferencesStorageService extends AbstractService implements IUserPreferencesStorageService {
+public abstract class AbstractUserPreferencesStorageService implements IUserPreferencesStorageService {
 
   public static final String USER_PREF_KEY = "org.eclipse.scout.rt.shared.services.common.prefs";
 

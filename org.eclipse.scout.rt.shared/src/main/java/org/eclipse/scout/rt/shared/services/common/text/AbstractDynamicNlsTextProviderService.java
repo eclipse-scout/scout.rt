@@ -13,10 +13,11 @@ package org.eclipse.scout.rt.shared.services.common.text;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.commons.nls.DynamicNls;
-import org.eclipse.scout.rt.platform.service.AbstractService;
+import javax.annotation.PostConstruct;
 
-public abstract class AbstractDynamicNlsTextProviderService extends AbstractService implements ITextProviderService {
+import org.eclipse.scout.commons.nls.DynamicNls;
+
+public abstract class AbstractDynamicNlsTextProviderService implements ITextProviderService {
 
   /**
    * Gets the base name where the <code>DynamicNls</code> instance searches for .properties files.<br>
@@ -35,8 +36,8 @@ public abstract class AbstractDynamicNlsTextProviderService extends AbstractServ
 
   protected final DynamicNls instance = new DynamicNls();
 
-  @Override
-  protected void initializeService() {
+  @PostConstruct
+  protected void registerResourceBundle() {
     instance.registerResourceBundle(getDynamicNlsBaseName(), getClass());
   }
 

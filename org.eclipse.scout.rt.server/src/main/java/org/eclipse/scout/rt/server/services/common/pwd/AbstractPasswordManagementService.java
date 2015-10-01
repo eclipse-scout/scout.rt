@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.pwd;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 /**
@@ -19,7 +18,7 @@ import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementServic
  * <p>
  * In order to use, register your subclass in the extension "org.eclipse.scout.rt.server.service"
  */
-public abstract class AbstractPasswordManagementService extends AbstractService implements IPasswordManagementService {
+public abstract class AbstractPasswordManagementService implements IPasswordManagementService {
   private IPasswordPolicy m_passwordPolicy;
 
   public AbstractPasswordManagementService() {

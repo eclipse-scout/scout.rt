@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  * Service for caching server side data dependent on request/response.
@@ -34,7 +33,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
  *
  * @since 4.0.0
  */
-public abstract class AbstractHttpSessionCacheService extends AbstractService implements IHttpSessionCacheService {
+public abstract class AbstractHttpSessionCacheService implements IHttpSessionCacheService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpSessionCacheService.class);
 
   private final IObjectSerializer m_objs;

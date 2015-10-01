@@ -13,13 +13,12 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  * @since 3.9.0
  */
-public class DeviceTransformationService extends AbstractService implements IDeviceTransformationService {
+public class DeviceTransformationService implements IDeviceTransformationService {
   private String SESSION_DATA_KEY = "DeviceTransformationServiceData";
 
   @Override

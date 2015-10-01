@@ -34,9 +34,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
-public class ExtensionRegistry extends AbstractService implements IInternalExtensionRegistry {
+public class ExtensionRegistry implements IInternalExtensionRegistry {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensionRegistry.class);
 

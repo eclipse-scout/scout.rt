@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.FineGrainedAccessCheckRequiredException;
@@ -45,7 +44,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 @Client
 @Order(10)
 @CreateImmediately
-public class AccessControlServiceClientProxy extends AbstractService implements IAccessControlService, INotificationHandler<IAccessControlNotification> {
+public class AccessControlServiceClientProxy implements IAccessControlService, INotificationHandler<IAccessControlNotification> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);
   private static final String SESSION_DATA_KEY = "accessControlServiceState";
 

@@ -11,10 +11,9 @@
 package org.eclipse.scout.rt.client.fixture;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 
-public class MockServerProcessingCancelService extends AbstractService implements IRunMonitorCancelService {
+public class MockServerProcessingCancelService implements IRunMonitorCancelService {
 
   public MockServerProcessingCancelService() {
   }

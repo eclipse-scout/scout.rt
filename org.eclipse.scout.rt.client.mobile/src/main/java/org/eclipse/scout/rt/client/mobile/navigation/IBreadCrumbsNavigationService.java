@@ -1,8 +1,3 @@
-package org.eclipse.scout.rt.client.mobile.navigation;
-
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.service.IService;
-
 /*******************************************************************************
  * Copyright (c) 2010 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +8,10 @@ import org.eclipse.scout.rt.platform.service.IService;
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+package org.eclipse.scout.rt.client.mobile.navigation;
+
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * @since 3.9.0

@@ -21,6 +21,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
@@ -35,7 +37,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncNodeIdProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -49,7 +50,7 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 
-public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
+public class ClusterSynchronizationService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
@@ -70,9 +71,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     m_subject.setReadOnly();
   }
 
-  @Override
+  @PostConstruct
   public void initializeService() {
-    super.initializeService();
     m_nodeId = createNodeId();
   }
 
@@ -297,9 +297,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     }
   }
 
-  @Override
+  @PreDestroy
   public void disposeServices() {
-    super.disposeServices();
     disable();
   }
 

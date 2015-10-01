@@ -23,13 +23,12 @@ import java.util.Locale;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 @Client
-public class FileService extends AbstractService implements IFileService {
+public class FileService implements IFileService {
   private String m_rootPath = null;
 
   @Override

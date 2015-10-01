@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
@@ -28,7 +27,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 
 @Client
 @Order(3)
-public class BatchLookupServiceClientProxy extends AbstractService implements IBatchLookupService {
+public class BatchLookupServiceClientProxy implements IBatchLookupService {
 
   public BatchLookupServiceClientProxy() {
   }

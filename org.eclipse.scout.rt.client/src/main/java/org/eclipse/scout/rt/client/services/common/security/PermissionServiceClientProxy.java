@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 
@@ -32,7 +31,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
  */
 @Client
 @Order(-2)
-public class PermissionServiceClientProxy extends AbstractService implements IPermissionService {
+public class PermissionServiceClientProxy implements IPermissionService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionServiceClientProxy.class);
 
   private final Object m_stateLock = new Object();

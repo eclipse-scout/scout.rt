@@ -18,14 +18,13 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  * Abstract icon provider service. By default {@link #getFolderName()} links to
  * <code><em>concrete class's package name</em>.icons</code> (e.g. <em>org.eclipse.scout.sample.icons</em> if the icon
  * provider service is called <code>org.eclipse.scout.sample.SampleIconProviderService</code>).
  */
-public abstract class AbstractIconProviderService extends AbstractService implements IIconProviderService {
+public abstract class AbstractIconProviderService implements IIconProviderService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractIconProviderService.class);
   private static final String[] DEFAULT_ICON_EXTENSIONS = new String[]{"png", "gif", "jpg"};
 

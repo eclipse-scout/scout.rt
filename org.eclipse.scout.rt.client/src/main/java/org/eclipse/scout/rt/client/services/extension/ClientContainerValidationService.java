@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.extension;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -62,9 +64,8 @@ import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 @Order(-400)
 public class ClientContainerValidationService extends AbstractContainerValidationService {
 
-  @Override
-  protected void initializeService() {
-    super.initializeService();
+  @PostConstruct
+  protected void initializeContributions() {
     // contributions
     addPossibleContributionForContainer(IFormHandler.class, AbstractForm.class);
     addPossibleContributionForContainer(IActionNode.class, AbstractActionNode.class);

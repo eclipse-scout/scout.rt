@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -25,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.ActivateBookmarkKeyStroke;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
@@ -35,13 +36,12 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
 /**
  * Client side service for bookmark support
  * <p>
- * Uses the server side {@link IBookmarkStorageService} for data
- * persistence
+ * Uses the server side {@link IBookmarkStorageService} for data persistence
  * <p>
  * service state is per {@link IClientSession} instance
  */
 @Client
-public class BookmarkService extends AbstractService implements IBookmarkService {
+public class BookmarkService implements IBookmarkService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkService.class);
   private static final String SESSION_DATA_KEY = "bookmarkServiceState";
 
@@ -62,9 +62,8 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     return data;
   }
 
-  @Override
-  public void initializeService() {
-    super.initializeService();
+  @PostConstruct
+  public void addBookmarkServiceListener() {
     addBookmarkServiceListener(new BookmarkServiceListener() {
       @Override
       public void bookmarksChanged(BookmarkServiceEvent e) {

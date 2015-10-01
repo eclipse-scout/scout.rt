@@ -26,13 +26,12 @@ import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.RemoteFilesRootDirProperty;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
-public class RemoteFileService extends AbstractService implements IRemoteFileService {
+public class RemoteFileService implements IRemoteFileService {
   private String m_rootPath;
 
   public RemoteFileService() {

@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application. See Bug
@@ -24,7 +23,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
  * @since 4.3.0 (Mars-M5)
  */
 @Order(10)
-public class BatchLookupService extends AbstractService implements IBatchLookupService {
+public class BatchLookupService implements IBatchLookupService {
 
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {

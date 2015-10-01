@@ -13,12 +13,11 @@ package org.eclipse.scout.rt.client.mobile.navigation;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  * @since 3.9.0
  */
-public class BreadCrumbsNavigationService extends AbstractService implements IBreadCrumbsNavigationService {
+public class BreadCrumbsNavigationService implements IBreadCrumbsNavigationService {
   private String SESSION_DATA_KEY = "BreadCrumbsNavigationData";
 
   @Override
