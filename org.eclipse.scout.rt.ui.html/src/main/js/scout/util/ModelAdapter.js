@@ -16,33 +16,28 @@
 scout.ModelAdapter = function() {
   scout.ModelAdapter.parent.call(this);
 
-  this._adapterProperties = [];
-
   // Adapter structure
   this.owner;
   this.ownedAdapters = [];
+  this._adapterProperties = [];
 
-  this.initialized = false;
   this._register = true;
-  this.destroyed = false;
-  this._addEventSupport();
   this._addKeyStrokeContextSupport();
+  this._addEventSupport();
 };
 scout.inherits(scout.ModelAdapter, scout.Widget);
 
 /**
- * @param model
- * @param session
- * @param register (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
+ * @param model expects parent session to be set. Other options:
+ *   _register: (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
  *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
-scout.ModelAdapter.prototype.init = function(model, session, register) {
-  scout.ModelAdapter.parent.prototype.init.call(this, session);
-
+scout.ModelAdapter.prototype._init = function(model) {
+  scout.ModelAdapter.parent.prototype._init.call(this, model);
   this.id = model.id;
   this.objectType = model.objectType;
-  this.remoteHandler = session.send.bind(session);
-  this._register = scout.helpers.nvl(register, true);
+  this.remoteHandler = this.session.send.bind(this.session);
+  this._register = scout.helpers.nvl(model._register, true);
   if (this._register) {
     this.session.registerModelAdapter(this);
   }
@@ -60,18 +55,6 @@ scout.ModelAdapter.prototype.init = function(model, session, register) {
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
-  this._initKeyStrokeContext(this.keyStrokeContext);
-  this._init(model, session);
-  this.initialized = true;
-  this.trigger('initialized');
-};
-
-scout.ModelAdapter.prototype._init = function(model, session) {
-  // NOP
-};
-
-scout.ModelAdapter.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  // NOP
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {

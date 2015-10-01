@@ -1,13 +1,18 @@
-scout.FormToolPopup = function(formToolButton, session, options) {
-  options = options || {};
-  options.initialFocus = formToolButton.form._initialFocusElement.bind(formToolButton.form);
-  scout.FormToolPopup.parent.call(this, session, options);
-  this.$formToolButton = formToolButton.$container;
-  this.$headBlueprint = this.$formToolButton;
-  this.formToolButton = formToolButton;
-  formToolButton.form.rootGroupBox.menuBar.bottom();
+scout.FormToolPopup = function() {
+  scout.FormToolPopup.parent.call(this);
 };
 scout.inherits(scout.FormToolPopup, scout.PopupWithHead);
+
+scout.FormToolPopup.prototype._init = function(options) {
+  options = options || {};
+  this.formToolButton = options.formToolButton;
+  options.initialFocus = this.formToolButton.form._initialFocusElement.bind(this.formToolButton.form);
+  scout.FormToolPopup.parent.prototype._init.call(this, options);
+
+  this.$formToolButton = this.formToolButton.$container;
+  this.$headBlueprint = this.$formToolButton;
+  this.formToolButton.form.rootGroupBox.menuBar.bottom();
+};
 
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
@@ -18,7 +23,7 @@ scout.FormToolPopup.prototype._render = function($parent) {
   form.render(this.$body);
   form.htmlComp.pixelBasedSizing = true;
   form.htmlComp.pack();
-  this.addChild(form);
+  form.setParent(this);
 };
 
 scout.FormToolPopup.prototype._renderHead = function() {

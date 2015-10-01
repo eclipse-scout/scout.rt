@@ -17,6 +17,7 @@ function sandboxSession(options) {
   session = new scout.Session($('#sandbox'), options);
   session.locale = new LocaleSpecHelper().createLocale('de');
   session.desktop = new scout.Widget();
+  session.desktop.session = session;
   session.desktop._addEventSupport();
   session.focusManager = new scout.FocusManager(session);
 
@@ -29,13 +30,15 @@ function sandboxDesktop() {
   return $sandbox;
 }
 
-function createSimpleModel(objectType, id) {
+function createSimpleModel(objectType, session, id) {
   if (id === undefined) {
     id = scout.createUniqueId();
   }
   return {
     id: id,
-    objectType: objectType
+    objectType: objectType,
+    parent: new scout.NullWidget(),
+    session: session
   };
 }
 

@@ -27,7 +27,9 @@ scout.FormToolButton.prototype._renderText = function() {
  * @override
  */
 scout.FormToolButton.prototype._createPopup = function() {
-  return new scout.FormToolPopup(this, this.session, {
+  return scout.create(scout.FormToolPopup, {
+    parent: this,
+    formToolButton: this,
     openingDirectionX: this.popupOpeningDirectionX,
     openingDirectionY: this.popupOpeningDirectionY
   });

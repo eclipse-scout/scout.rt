@@ -3,7 +3,7 @@ var MenuSpecHelper = function(session) {
 };
 
 MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
-  var model = createSimpleModel('Menu');
+  var model = createSimpleModel('Menu', this.session);
   $.extend(model, {
     text: text,
     iconId: iconId,
@@ -15,5 +15,7 @@ MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
 
 MenuSpecHelper.prototype.createMenu = function(model) {
   model.objectType = model.objectType || 'Menu';
-  return scout.localObjects.createObject(this.session, model);
+  model.session = this.session;
+  model.parent = this.session.desktop;
+  return scout.create('Menu', model);
 };

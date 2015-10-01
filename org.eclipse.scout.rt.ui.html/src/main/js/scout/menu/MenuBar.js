@@ -1,9 +1,8 @@
-scout.MenuBar = function(session, menuSorter) {
+scout.MenuBar = function() {
   scout.MenuBar.parent.call(this);
-  this._addKeyStrokeContextSupport();
-  this.init(session);
 
-  this.menuSorter = menuSorter;
+  this._addKeyStrokeContextSupport();
+  this.menuSorter;
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'
   this.tabbable = true;
@@ -37,10 +36,10 @@ scout.MenuBar = function(session, menuSorter) {
 };
 scout.inherits(scout.MenuBar, scout.Widget);
 
-scout.MenuBar.prototype.init = function(session) {
-  scout.MenuBar.parent.prototype.init.call(this, session);
+scout.MenuBar.prototype._init = function(options) {
+  scout.MenuBar.parent.prototype._init.call(this, options);
 
-  this._initKeyStrokeContext(this.keyStrokeContext);
+  this.menuSorter = options.menuOrder;
 };
 
 scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {

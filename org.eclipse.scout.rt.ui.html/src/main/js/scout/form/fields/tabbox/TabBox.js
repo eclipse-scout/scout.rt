@@ -20,8 +20,8 @@ scout.inherits(scout.TabBox, scout.CompositeField);
 /**
  * @override FormField.js
  */
-scout.TabBox.prototype._init = function(model, session) {
-  scout.TabBox.parent.prototype._init.call(this, model, session);
+scout.TabBox.prototype._init = function(model) {
+  scout.TabBox.parent.prototype._init.call(this, model);
   this.tabItems[this.selectedTab].setTabActive(true);
 };
 

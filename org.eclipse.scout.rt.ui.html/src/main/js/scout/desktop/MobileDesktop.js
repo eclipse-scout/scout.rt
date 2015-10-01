@@ -5,8 +5,8 @@ scout.MobileDesktop = function() {
 };
 scout.inherits(scout.MobileDesktop, scout.Desktop);
 
-scout.MobileDesktop.prototype._init = function(model, session) {
-  scout.MobileDesktop.parent.prototype._init.call(this, model, session);
+scout.MobileDesktop.prototype._init = function(model) {
+  scout.MobileDesktop.parent.prototype._init.call(this, model);
   this.viewTabsController = new scout.MobileViewTabsController(this);
 };
 

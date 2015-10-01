@@ -4,11 +4,11 @@
  * the server which nodes have been selected. We do that for better user experience. In a first attempt
  * the whole navigation logic was on the server, which caused a lag and flickering in the UI.
  */
-scout.AbstractNavigationButton = function(outline, node) {
+scout.AbstractNavigationButton = function() {
   scout.AbstractNavigationButton.parent.call(this);
-  this.node = node;
-  this.outline = outline;
-  this.session = outline.session;
+
+  this.node;
+  this.outline;
   this._onClickFunc;
   this.selected = false;
   this.visible = true;
@@ -21,6 +21,13 @@ scout.AbstractNavigationButton = function(outline, node) {
   this._additionalCssClass = '';
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Menu);
+
+scout.AbstractNavigationButton.prototype._init = function(options) {
+  scout.AbstractNavigationButton.parent.prototype._init.call(this, options);
+
+  this.node = options.node;
+  this.outline = options.outline;
+};
 
 // FIXME AWE: re-name to *Menu
 

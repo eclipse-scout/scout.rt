@@ -3,8 +3,8 @@ scout.DateColumn = function() {
 };
 scout.inherits(scout.DateColumn, scout.Column);
 
-scout.DateColumn.prototype.init = function(model, session) {
-  scout.DateColumn.parent.prototype.init.call(this, model, session);
+scout.DateColumn.prototype.init = function(model) {
+  scout.DateColumn.parent.prototype.init.call(this, model);
 
   this.groupFormatFormatter = new scout.DateFormat(this.session.locale, this.groupFormat);
 };

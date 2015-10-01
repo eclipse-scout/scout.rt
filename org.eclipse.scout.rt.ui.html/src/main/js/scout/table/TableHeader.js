@@ -1,19 +1,25 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableHeader = function(table) {
+scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
-  this.init(table.session);
 
   this.dragging = false;
-  this.table = table;
-  this.columns = table.columns;
-  this.menuBar = new scout.MenuBar(this.session, new scout.GroupBoxMenuItemsOrder());
-  this.menuBar.tabbable = false;
-  this.menuBar.bottom();
-  this.addChild(this.menuBar);
 };
 scout.inherits(scout.TableHeader, scout.Widget);
+
+scout.TableHeader.prototype._init = function(options) {
+  scout.TableHeader.parent.prototype._init.call(this, options);
+
+  this.table = options.table;
+  this.columns = this.table.columns;
+  this.menuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
+  });
+  this.menuBar.tabbable = false;
+  this.menuBar.bottom();
+};
 
 scout.TableHeader.prototype._render = function($parent) {
   var column, $header, alignment, $defaultCheckedColumHeader, $separator,
@@ -40,12 +46,13 @@ scout.TableHeader.prototype._render = function($parent) {
       .css('max-width', column.width + 'px')
       .on('click', this._onHeaderItemClick.bind(this))
       .on('mousedown', dragHeader);
-    $header.toggleAttr('data-modelclass', !!column.modelClass, column.modelClass);
-    $header.toggleAttr('data-classid', !!column.classId, column.classId);
+    $header.toggleAttr('data-modelclass', !! column.modelClass, column.modelClass);
+    $header.toggleAttr('data-classid', !! column.classId, column.classId);
 
     column.$header = $header;
 
-    scout.tooltips.install($header, this.session, {
+    scout.tooltips.install($header, {
+      parent: this,
       tooltipText: tooltipFunction
     });
 
@@ -345,33 +352,35 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
   $headers.each(function() {
     // move to old position and then animate
     $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
-    .animate({left: 0}, {
-      progress: function(animation, progress, remainingMs) {
-        var $headerItem = $(this);
-        if (!$headerItem.isSelected()) {
-          return;
-        }
-        // make sure selected header item is visible
-        scout.scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
+      .animate({
+        left: 0
+      }, {
+        progress: function(animation, progress, remainingMs) {
+          var $headerItem = $(this);
+          if (!$headerItem.isSelected()) {
+            return;
+          }
+          // make sure selected header item is visible
+          scout.scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
 
-        // move menu
-        if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
-          that._tableHeaderMenu.position();
+          // move menu
+          if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
+            that._tableHeaderMenu.position();
+          }
         }
-      }
-    });
+      });
   });
 };
 
 scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
   var $header = column.$header;
-  this._tableHeaderMenu = new scout.TableHeaderMenu(this.session, {
+  this._tableHeaderMenu = scout.create(scout.TableHeaderMenu, {
+    parent: this,
     tableHeader: this,
     $anchor: $header,
     focusableContainer: true
   });
   this._tableHeaderMenu.render();
-  this.addChild(this._tableHeaderMenu);
 };
 
 scout.TableHeader.prototype.closeTableHeaderMenu = function() {

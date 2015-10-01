@@ -1,12 +1,18 @@
-scout.DatePickerPopup = function(session, options) {
-  options = options || {};
-  options.installFocusContext = false;
-  scout.DatePickerPopup.parent.call(this, session, options);
-
-  this.picker = new scout.DatePicker(session, options.dateFormat);
-  this.addChild(this.picker);
+scout.DatePickerPopup = function() {
+  scout.DatePickerPopup.parent.call(this);
 };
 scout.inherits(scout.DatePickerPopup, scout.Popup);
+
+scout.DatePickerPopup.prototype._init = function(options) {
+  options = options || {};
+  options.installFocusContext = false;
+  scout.DatePickerPopup.parent.prototype._init.call(this, options);
+
+  this.picker = scout.create(scout.DatePicker, {
+    parent: this,
+    dateFoFormat: options.dateFormat
+  });
+};
 
 scout.DatePickerPopup.prototype._render = function($parent) {
   if (!$parent) {

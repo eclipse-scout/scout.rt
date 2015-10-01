@@ -1,20 +1,14 @@
-scout.BusyIndicator = function(session, cancellable) {
+scout.BusyIndicator = function() {
   scout.BusyIndicator.parent.call(this);
-  this._addEventSupport();
   this._addKeyStrokeContextSupport();
-  this.init(session);
-
-  session.desktop.addChild(this);
-  this._cancellable = (cancellable === undefined ? true : !! cancellable);
+  this._addEventSupport();
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
 
-/**
- * @override Widget.js
- */
-scout.BusyIndicator.prototype.init = function(session) {
-  scout.BusyIndicator.parent.prototype.init.call(this, session);
-  this._initKeyStrokeContext(this.keyStrokeContext);
+scout.BusyIndicator.prototype._init = function(options) {
+  scout.BusyIndicator.parent.prototype._init.call(this, options);
+
+  this._cancellable = (options.cancellable === undefined ? true : !! options.cancellable);
 };
 
 scout.BusyIndicator.prototype._initKeyStrokeContext = function(keyStrokeContext) {

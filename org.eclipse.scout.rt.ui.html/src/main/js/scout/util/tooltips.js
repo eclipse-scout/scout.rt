@@ -1,6 +1,6 @@
 scout.tooltips = {
-  install: function($comp, session, options) {
-    var support = new scout.TooltipSupport(session, options);
+  install: function($comp, options) {
+    var support = new scout.TooltipSupport(options);
     support.install($comp);
   },
 
@@ -12,14 +12,13 @@ scout.tooltips = {
   }
 };
 
-scout.TooltipSupport = function(session, options) {
+scout.TooltipSupport = function(options) {
   var defaultOptions = {
     selector: null,
     tooltipDelay: 350,
     tooltipText: undefined
   };
   options = $.extend({}, defaultOptions, options);
-  this.session = session;
   this._options = options;
   this._mouseEnterHandler = this._onMouseEnter.bind(this);
   this._mouseLeaveHandler = this._onMouseLeave.bind(this);
@@ -87,7 +86,7 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
       $anchor: $comp,
       text: text
     }, this._options);
-    this._tooltip = new scout.Tooltip(this.session, options);
+    this._tooltip = scout.create(scout.Tooltip, options);
     this._tooltip.render();
   }
 };

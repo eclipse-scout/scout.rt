@@ -6,7 +6,6 @@ scout.Tree = function() {
   this.$data;
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
-  this.events = new scout.EventSupport();
   this._addAdapterProperties(['menus', 'keyStrokes']);
   this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
   this._treeItemPaddingLeft = 23;
@@ -23,14 +22,15 @@ scout.Tree = function() {
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
-scout.Tree.prototype._init = function(model, session) {
-  scout.Tree.parent.prototype._init.call(this, model, session);
+scout.Tree.prototype._init = function(model) {
+  scout.Tree.parent.prototype._init.call(this, model);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
-  var menuSorter = new scout.MenuItemsOrder(this.session, 'Tree');
-  this.menuBar = new scout.MenuBar(this.session, menuSorter);
+  this.menuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.MenuItemsOrder(this.session, 'Tree')
+  });
   this.menuBar.bottom();
-  this.addChild(this.menuBar);
   this._syncBreadcrumbEnabled('', this.breadcrumbEnabled);
 };
 
@@ -140,7 +140,8 @@ scout.Tree.prototype._render = function($parent) {
     .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
 
-  scout.scrollbars.install(this.$data, this.session, {
+  scout.scrollbars.install(this.$data, {
+    parent: this,
     axis: 'y'
   });
   this.menuBar.render(this.$container);
@@ -1189,7 +1190,8 @@ scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
-    var popup = new scout.ContextMenuPopup(this.session, {
+    var popup = scout.create(scout.ContextMenuPopup, {
+      parent: this,
       menuItems: filteredMenus,
       location: {
         x: event.pageX,

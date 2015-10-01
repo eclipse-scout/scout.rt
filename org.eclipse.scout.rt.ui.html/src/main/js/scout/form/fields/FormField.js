@@ -46,8 +46,8 @@ scout.FormField.MODE_DEFAULT = 'default';
  */
 scout.FormField.MODE_CELLEDITOR = 'celleditor';
 
-scout.FormField.prototype._init = function(model, session) {
-  scout.FormField.parent.prototype._init.call(this, model, session);
+scout.FormField.prototype._init = function(model) {
+  scout.FormField.parent.prototype._init.call(this, model);
   this.refFieldId = this.uniqueId('ref');
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
@@ -102,7 +102,7 @@ scout.FormField.prototype._renderMandatory = function() {
 };
 
 scout.FormField.prototype._renderErrorStatus = function() {
-  var hasError = !!(this.errorStatus);
+  var hasError = !! (this.errorStatus);
 
   this.$container.toggleClass('has-error', hasError);
   if (this.$field) {
@@ -201,7 +201,7 @@ scout.FormField.prototype._updateStatusVisible = function() {
  */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
-    hasError = !!(this.errorStatus),
+    hasError = !! (this.errorStatus),
     hasTooltip = this.tooltipText;
 
   return !this.suppressStatus && (statusVisible || hasError || hasTooltip || (this._hasMenus() && this.menusVisible));
@@ -285,7 +285,9 @@ scout.FormField.prototype._getCurrentMenus = function() {
       menuTypes.push('ValueField.' + elem);
     }, this);
   }
-  return menuTypes ? scout.menus.filter(this.menus, menuTypes) : this.menus.filter(function(menu) { return menu.visible; } );
+  return menuTypes ? scout.menus.filter(this.menus, menuTypes) : this.menus.filter(function(menu) {
+    return menu.visible;
+  });
 };
 
 scout.FormField.prototype._hasMenus = function() {
@@ -344,7 +346,8 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
         })) {
           return; // at least one menu item must be visible
         }
-        this.contextPopup = new scout.ContextMenuPopup(this.session, {
+        this.contextPopup = scout.create(scout.ContextMenuPopup, {
+          parent: this,
           menuItems: menus,
           cloneMenuItems: false,
           $anchor: this.$status
@@ -394,12 +397,13 @@ scout.FormField.prototype._showStatusMessage = function(options) {
   } else {
     // create new tooltip
     opts = {
+      parent: this,
       text: text,
       cssClass: cssClass,
       $anchor: this.$status
     };
     $.extend(opts, options);
-    this.tooltip = new scout.Tooltip(this.session, opts);
+    this.tooltip = scout.create(scout.Tooltip, opts);
     this.tooltip.render();
   }
 };

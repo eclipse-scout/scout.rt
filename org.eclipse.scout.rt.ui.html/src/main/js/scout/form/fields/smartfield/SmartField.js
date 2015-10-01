@@ -55,11 +55,11 @@ scout.SmartField.prototype.onCellEditorRendered = function(options) {
 };
 
 scout.SmartField.prototype.addSmartFieldPopup = function() {
-  this._popup = new scout.SmartFieldPopup(this.session, {
+  this._popup = scout.create(scout.SmartFieldPopup, {
+    parent: this,
     $anchor: this.$field,
     smartField: this
   });
-  this.addChild(this._popup);
 };
 
 scout.SmartField.prototype._renderProperties = function() {
@@ -93,7 +93,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
   }
   this._renderPopup();
   this.proposalChooser.render(this._popup.$container);
-  this._popup.addChild(this.proposalChooser);
+  this.proposalChooser.setParent(this._popup);
   this._popup.resize();
 };
 

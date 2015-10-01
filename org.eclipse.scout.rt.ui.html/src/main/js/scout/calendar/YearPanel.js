@@ -1,7 +1,6 @@
-scout.YearPanel = function(session) {
+scout.YearPanel = function() {
   scout.YearPanel.parent.call(this);
-  this.init(session);
-  
+
   this.$container;
   this.$yearTitle;
   this.$yearList;
@@ -20,7 +19,10 @@ scout.YearPanel.prototype._render = function($parent) {
 scout.YearPanel.prototype.renderContent = function() {
   this.removeContent();
   this._drawYear();
-  scout.scrollbars.install(this.$yearList, this.session, {axis: 'y'});
+  scout.scrollbars.install(this.$yearList, {
+    parent: this,
+    axis: 'y'
+  });
   this.yearRendered = true;
   this._colorYear();
 };

@@ -102,8 +102,8 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
   }
 
   var fieldId = this.id;
-  var menu = scout.localObjects.createObject(this.session, {
-    objectType: 'Menu',
+  var menu = scout.create('Menu', {
+    parent: this,
     text: this.session.text('ui.copy')
   });
   menu.remoteHandler = function(target, type) {
@@ -112,7 +112,8 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
     }
   };
 
-  var popup = new scout.ContextMenuPopup(this.session, {
+  var popup = scout.create(scout.ContextMenuPopup, {
+    parent: this,
     menuItems: [menu],
     cloneMenuItems: false,
     location: {

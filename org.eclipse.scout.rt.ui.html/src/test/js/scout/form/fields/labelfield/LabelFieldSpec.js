@@ -11,7 +11,7 @@ describe("LabelField", function() {
 
   function createField(model) {
     var field = new scout.LabelField();
-    field.init(model, session);
+    field.init(model);
     return field;
   }
 

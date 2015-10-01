@@ -1,12 +1,20 @@
-scout.CellEditorPopup = function(column, row, cell, session) {
-  scout.CellEditorPopup.parent.call(this, session);
-
-  this.table = column.table;
-  this.column = column;
-  this.row = row;
-  this.cell = cell;
+scout.CellEditorPopup = function() {
+  scout.CellEditorPopup.parent.call(this);
+  this.table;
+  this.column;
+  this.row;
+  this.cell;
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
+
+scout.CellEditorPopup.prototype._init = function(options) {
+  scout.CellEditorPopup.parent.prototype._init.call(this, options);
+
+  this.table = options.column.table;
+  this.column = options.column;
+  this.row = options.row;
+  this.cell = options.cell;
+};
 
 /**
  * @override Popup.js
@@ -40,7 +48,7 @@ scout.CellEditorPopup.prototype._render = function($parent) {
     firstCell: firstCell,
     cellHorizontalAlignment: scout.Table.parseHorizontalAlignment(this.cell.horizontalAlignment)
   });
-  this.addChild(field);
+  field.setParent(this);
 
   // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
   this.$anchor.css('visibility', 'hidden');

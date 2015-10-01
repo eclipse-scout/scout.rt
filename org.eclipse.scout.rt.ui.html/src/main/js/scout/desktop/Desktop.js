@@ -29,12 +29,12 @@ scout.Desktop = function() {
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
-scout.Desktop.prototype._init = function(model, session) {
-  scout.Desktop.parent.prototype._init.call(this, model, session);
+scout.Desktop.prototype._init = function(model) {
+  scout.Desktop.parent.prototype._init.call(this, model);
   this.viewTabsController = new scout.ViewTabsController(this);
-  this.formController = new scout.FormController(this, session);
-  this.messageBoxController = new scout.MessageBoxController(this, session);
-  this.fileChooserController = new scout.FileChooserController(this, session);
+  this.formController = new scout.FormController(this, model.session);
+  this.messageBoxController = new scout.MessageBoxController(this, model.session);
+  this.fileChooserController = new scout.FileChooserController(this, model.session);
   this._addNullOutline(model.outline);
 };
 
@@ -284,7 +284,8 @@ scout.Desktop.prototype._createSplitter = function($parent) {
   if (!this._hasNavigation()) {
     return;
   }
-  this.splitter = new scout.Splitter(this.session, {
+  this.splitter = scout.create(scout.Splitter, {
+    parent: this,
     $anchor: this.navigation.$navigation,
     $root: this.$container,
     maxRatio: 0.5
@@ -701,11 +702,11 @@ scout.Desktop.prototype._addNullOutline = function(outline) {
   if (outline) {
     return;
   }
-  var nullOutline = scout.localObjects.createObject(this.session, {
-    objectType: 'Outline'
+  var nullOutline = scout.create('Outline', {
+    parent: this
   }),
-    ovb = scout.localObjects.createObject(this.session, {
-      objectType: 'OutlineViewButton',
+    ovb = scout.create('OutlineViewButton', {
+      parent: this,
       displayStyle: 'MENU',
       selected: true,
       text: this.session.text('ui.Outlines'),

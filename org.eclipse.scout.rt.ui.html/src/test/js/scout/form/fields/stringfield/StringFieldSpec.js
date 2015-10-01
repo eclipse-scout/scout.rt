@@ -11,7 +11,7 @@ describe("StringField", function() {
 
   function createField(model) {
     var field = new scout.StringField();
-    field.init(model, session);
+    field.init(model);
     return field;
   }
 

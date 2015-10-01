@@ -4,13 +4,14 @@ describe("CheckBoxField", function() {
 
     var session;
     var checkBox;
-    var model = {id:'2'};
+    var model;
 
     beforeEach(function() {
       setFixtures(sandbox());
       session = sandboxSession();
+      model = createSimpleModel('CheckBoxField', session);
       checkBox = new scout.CheckBoxField();
-      checkBox.init(model, session);
+      checkBox.init(model);
     });
 
     it("inherits from ValueField", function() {

@@ -14,14 +14,16 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$contentContainer = $parent.appendDiv('chart-container');
 
   // scrollbars
-  scout.scrollbars.install(this.$contentContainer, this.session);
+  scout.scrollbars.install(this.$contentContainer, {
+    parent: this
+  });
 
   // group functions for dates
   var dateGroup = [
-      [scout.ChartTableControlMatrix.DateGroup.YEAR, this.session.text('ui.groupedByYear')],
-      [scout.ChartTableControlMatrix.DateGroup.MONTH, this.session.text('ui.groupedByMonth')],
-      [scout.ChartTableControlMatrix.DateGroup.WEEKDAY, this.session.text('ui.groupedByWeekday')]
-    ],
+    [scout.ChartTableControlMatrix.DateGroup.YEAR, this.session.text('ui.groupedByYear')],
+    [scout.ChartTableControlMatrix.DateGroup.MONTH, this.session.text('ui.groupedByMonth')],
+    [scout.ChartTableControlMatrix.DateGroup.WEEKDAY, this.session.text('ui.groupedByWeekday')]
+  ],
     countDesc = this.session.text('ui.Count'),
     removeChart = null,
     columns = this.table.columns,
@@ -66,11 +68,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   for (var c1 = 0; c1 < columns.length; c1++) {
     var column1 = columns[c1];
 
-    if (column1.type === 'key' || column1.type === 'number' ) {
+    if (column1.type === 'key' || column1.type === 'number') {
       continue;
     }
 
-    if (column1.text === null || column1.text === undefined ||  column1.text === '') {
+    if (column1.text === null || column1.text === undefined || column1.text === '') {
       continue;
     }
 
@@ -296,14 +298,12 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       return false;
     }
 
-
     // calculate matrix
     var cube = matrix.calculateCube();
 
     // set max width
     $chartMain.css('width', '3000px');
     $chartMain.css('height', '1500px');
-
 
     // based on chart type: set class and draw chart
     if ($chart.hasClassSVG('chart-bar')) {
@@ -330,7 +330,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     return false;
   }
 
-  function updateSize () {
+  function updateSize() {
     // adapt size of svg
     var box = $chartMain[0].getBBox();
     $chartMain.css('width', box.x + box.width);
@@ -358,7 +358,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       var label = labels[l],
         text = dataAxis.format(label);
 
-      drawAxisLine(x(0) - 10, y(label), x(xAxis.length ) + 7, y(label));
+      drawAxisLine(x(0) - 10, y(label), x(xAxis.length) + 7, y(label));
       drawAxisText(x(0) - 20, y(label), 'y', text);
     }
 
@@ -391,7 +391,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     if (maxWidth > (width - 3) * 3) {
       $('.main-axis-x', $chartMain).attr('fill-opacity', 0);
     } else if (maxWidth > width * 1.2) {
-      $('.main-axis-x', $chartMain).each(function () {
+      $('.main-axis-x', $chartMain).each(function() {
         $(this)
           .css('text-anchor', 'end')
           .attr('y', parseFloat($(this).attr('y')) - 4)
@@ -404,7 +404,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     removeChart = function() {
       $chartMain.children('.main-chart')
         .animateSVG('height', 0, 200)
-        .animateSVG('y', y(0), 200, $.removeThis );
+        .animateSVG('y', y(0), 200, $.removeThis);
     };
   }
 
@@ -476,9 +476,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     // dimension functions
     var maxWidth = Math.max(280, that.$contentContainer.width() - 700),
       x = function(i) {
-      i = i === null ? xAxis.max : i;
-      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
-    },
+        i = i === null ? xAxis.max : i;
+        return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
+      },
       y = function(i) {
         return 280 - i / (dataAxis.max - 0) * 240;
       };
@@ -549,7 +549,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       .attr('fill', 'none')
       .attr('d', 'M 210 160 m 0, -122 a 122,122 0 1, 1 0,244 a 122,122 0 1, 1 0,-244');
 
-
     var startAngle = 0,
       endAngle;
 
@@ -576,7 +575,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     }
 
     // order segments
-    segments.sort(function(a, b){ return (b[2] - a[2]); });
+    segments.sort(function(a, b) {
+      return (b[2] - a[2]);
+    });
 
     // collect small segmenets
     var TRESHOLD = 5;
@@ -591,7 +592,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         segments[TRESHOLD - 1][2] += segments[s][2];
         segments.pop();
       }
-      segments[TRESHOLD - 1][1] =  that.session.text('ui.otherValues');
+      segments[TRESHOLD - 1][1] = that.session.text('ui.otherValues');
     }
 
     for (var t = 0; t < segments.length; t++) {
@@ -600,7 +601,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         value = segments[t][2];
 
       endAngle = startAngle + value / dataAxis.total;
-
 
       // -0.001, else: only 1 arc is not drawn, svg...
       if (endAngle === 1) {
@@ -673,10 +673,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawScatter(xAxis, yAxis, dataAxis, cube) {
     // dimension functions
     var maxWidth = Math.max(280, that.$contentContainer.width() - 860),
-    x = function(i) {
-      i = i === null ? xAxis.max : i;
-      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
-    },
+      x = function(i) {
+        i = i === null ? xAxis.max : i;
+        return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
+      },
       y = function(i) {
         i = i === null ? yAxis.max : i;
         return 280 - (i - yAxis.min) / (yAxis.max - yAxis.min) * 240;
@@ -725,7 +725,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
           testValue = cube.getValue([key1, key2]);
 
         if (testValue) {
-          var value = testValue[0], r;
+          var value = testValue[0],
+            r;
 
           if (value === null) {
             continue;
@@ -803,7 +804,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     $text.attr('fill-opacity', $element.data('data-store-opacity'));
   }
 
-
   function chartClick(event) {
     var $clicked = $(this);
 
@@ -826,9 +826,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     // find all filter
     // different data may be stored: undefined, arrays (of keys )and single numbers (keys)
-    var readData = function (object, attribute)  {
+    var readData = function(object, attribute) {
       var a = object.attr(attribute);
-      if (typeof a === undefined ) {
+      if (typeof a === undefined) {
         return [null];
       } else {
         var n = parseFloat(a);
@@ -893,7 +893,6 @@ scout.ChartTableControl.prototype.onResize = function() {
     scout.scrollbars.update(this.$contentContainer);
   }
 };
-
 
 scout.ChartTableControl.prototype._removeContent = function() {
   scout.scrollbars.uninstall(this.$contentContainer, this.session);

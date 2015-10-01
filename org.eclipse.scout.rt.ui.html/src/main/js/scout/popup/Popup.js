@@ -1,21 +1,30 @@
+scout.Popup = function() {
+  scout.Popup.parent.call(this);
+
+  this._addKeyStrokeContextSupport();
+  this._addEventSupport();
+  this._mouseDownHandler;
+  this._scrollHandler;
+  this._popupOpenHandler;
+  this.openEvent;
+  this.anchorBounds;
+  this.$anchor;
+  this.windowPaddingX;
+  this.windowPaddingY;
+  this.withFocusContext;
+  this.initialFocus;
+  this.focusableContainer;
+};
+scout.inherits(scout.Popup, scout.Widget);
+
 /**
  * @param options:
  *          initialFocus: a function that returns the element to be focused or a <code>scout.focusRule</code>. Default returns <code>scout.focusRule.AUTO</code>
  *          focusableContainer: a boolean whether or not the container of the Popup is focusable
  */
-scout.Popup = function(session, options) {
-  // FIXME AWE: use this.options property here
-  scout.Popup.parent.call(this);
-  this._addEventSupport();
-  this._addKeyStrokeContextSupport();
-  this.init(session);
+scout.Popup.prototype._init = function(options) {
+  scout.Popup.parent.prototype._init.call(this, options);
 
-  options = options || {};
-  this._mouseDownHandler;
-  this._scrollHandler;
-  this._popupOpenHandler;
-
-  this.openEvent;
   this.anchorBounds = options.anchorBounds;
   if (options.location) {
     this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
@@ -28,13 +37,6 @@ scout.Popup = function(session, options) {
     return scout.focusRule.AUTO;
   });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
-};
-scout.inherits(scout.Popup, scout.Widget);
-
-scout.Popup.prototype.init = function(session) {
-  scout.Popup.parent.prototype.init.call(this, session);
-
-  this._initKeyStrokeContext(this.keyStrokeContext);
 };
 
 scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {

@@ -11,7 +11,7 @@ describe('BrowserField', function() {
 
   it('postMessage', function() {
     var browserField = new scout.BrowserField();
-    browserField.init({id:'foo'}, session);
+    browserField.init(createSimpleModel('BrowserField', session, 'foo'));
     browserField.render(session.$entryPoint);
 
     // FIXME AWE: discuss with C.GU: postMessage is an async call - how to test this with Jasmine?

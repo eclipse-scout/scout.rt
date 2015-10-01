@@ -1,7 +1,7 @@
 scout.Column = function() {};
 
-scout.Column.prototype.init = function(model, session) {
-  this.session = session;
+scout.Column.prototype.init = function(model) {
+  this.session = model.session;
 
   // Copy all properties from model to this
   $.extend(this, model);
@@ -31,7 +31,7 @@ scout.Column.prototype.initCell = function(cell) {
     };
   }
   // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
-  if (cell.value === undefined){
+  if (cell.value === undefined) {
     // Cell.value may be undefined for other column types -> use table.cellValue to access the value.
     // The only reason is to save some memory (may get obsolete in the future)
     if (this.type === 'number') {
@@ -76,7 +76,7 @@ scout.Column.prototype.buildCell = function(row) {
   var cellHtml = '';
   cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>';
   if (scout.device.tableAdditionalDivRequired) {
-    cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */) + 'px; ' + '">';
+    cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ) + 'px; ' + '">';
     // same calculation in scout.Table.prototype.resizeColumn
   }
   cellHtml += content;
@@ -100,8 +100,7 @@ scout.Column.prototype._icon = function(row, iconId, hasText) {
   if (icon.isFontIcon()) {
     cssClass += ' font-icon';
     return '<span class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
-  }
-  else {
+  } else {
     cssClass += ' image-icon';
     return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
@@ -147,8 +146,12 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
     $cell = this.table.$cell(this, $row);
 
   cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
-  popup = new scout.CellEditorPopup(this, row, cell, this.session);
-  this.table.addChild(popup);
+  popup = scout.create(scout.CellEditorPopup, {
+    parent: this.table,
+    column: this,
+    row: row,
+    cell: cell
+  });
   popup.$anchor = $cell;
   popup.render(this.table.$data);
   popup.pack();

@@ -8,9 +8,10 @@ scout.scrollbars = {
    * must set some additional CSS styles.
    *
    */
-  install: function($container, session, options) {
+  install: function($container, options) {
     var scrollbars, scrollbar, nativeScrollbars,
-      htmlContainer = scout.HtmlComponent.optGet($container);
+      htmlContainer = scout.HtmlComponent.optGet($container),
+      session = options.session || options.parent.session;
 
     options = options || {};
     options.axis = options.axis || 'both';
@@ -57,15 +58,15 @@ scout.scrollbars = {
       scrollbars = [];
       if (options.axis === 'both') {
         options.axis = 'y';
-        scrollbar = new scout.Scrollbar(session, options);
+        scrollbar = scout.create(scout.Scrollbar, options);
         scrollbars.push(scrollbar);
 
         options.axis = 'x';
         options.mouseWheelNeedsShift = true;
-        scrollbar = new scout.Scrollbar(session, options);
+        scrollbar = scout.create(scout.Scrollbar, options);
         scrollbars.push(scrollbar);
       } else {
-        scrollbar = new scout.Scrollbar(session, options);
+        scrollbar = scout.create(scout.Scrollbar, options);
         scrollbars.push(scrollbar);
       }
       $container.css('overflow', 'hidden');

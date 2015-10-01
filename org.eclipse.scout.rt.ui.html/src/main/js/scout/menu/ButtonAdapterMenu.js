@@ -10,8 +10,8 @@ scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 /**
  * @override Action.js
  */
-scout.ButtonAdapterMenu.prototype._init = function(model, session) {
-  scout.ButtonAdapterMenu.parent.prototype._init.call(this, model, session);
+scout.ButtonAdapterMenu.prototype._init = function(model) {
+  scout.ButtonAdapterMenu.parent.prototype._init.call(this, model);
   if (!this.button) {
     throw new Error('Cannot adapt to undefined button');
   }

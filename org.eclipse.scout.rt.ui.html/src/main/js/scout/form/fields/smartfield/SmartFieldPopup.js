@@ -1,11 +1,14 @@
-scout.SmartFieldPopup = function(session, options) {
-  options = options || {};
+scout.SmartFieldPopup = function() {
+  scout.SmartFieldPopup.parent.call(this);
+};
+scout.inherits(scout.SmartFieldPopup, scout.Popup);
+
+scout.SmartFieldPopup.prototype._init = function(options) {
   options.installFocusContext = false;
-  scout.SmartFieldPopup.parent.call(this, session, options);
+  scout.SmartFieldPopup.parent.prototype._init.call(this, options);
 
   this._smartField = options.smartField;
 };
-scout.inherits(scout.SmartFieldPopup, scout.Popup);
 
 scout.SmartFieldPopup.prototype._render = function($parent) {
   var popupLayout, fieldBounds, initialPopupSize;

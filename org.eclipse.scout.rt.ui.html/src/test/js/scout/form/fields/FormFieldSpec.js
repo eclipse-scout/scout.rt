@@ -15,7 +15,7 @@ describe("FormField", function() {
     beforeEach(function() {
       model = helper.createFieldModel();
       formField = new scout.FormField();
-      formField.init(model, session);
+      formField.init(model);
     });
 
     it("inherits from ModelAdapter", function() {
@@ -30,7 +30,7 @@ describe("FormField", function() {
     beforeEach(function() {
       model = helper.createFieldModel();
       formField = new scout.StringField();
-      formField.init(model, session);
+      formField.init(model);
     });
 
     describe("position on_field", function() {
@@ -92,7 +92,7 @@ describe("FormField", function() {
         this.addContainer($parent, 'form-field');
         this.addStatus();
       };
-      formField.init(model, session);
+      formField.init(model);
     });
 
     it("shows a status if status visible = true", function() {
@@ -148,7 +148,7 @@ describe("FormField", function() {
       formField._render = function($parent) {
         this.addContainer($parent, 'form-field');
       };
-      formField.init(model, session);
+      formField.init(model);
     });
 
     it("event should update model", function() {

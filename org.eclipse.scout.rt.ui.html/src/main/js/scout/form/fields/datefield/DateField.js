@@ -26,8 +26,8 @@ scout.DateField.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
 
-scout.DateField.prototype._init = function(model, session) {
-  scout.DateField.parent.prototype._init.call(this, model, session);
+scout.DateField.prototype._init = function(model) {
+  scout.DateField.parent.prototype._init.call(this, model);
   this._syncErrorStatus(this.errorStatus);
 };
 
@@ -47,10 +47,10 @@ scout.DateField.prototype._render = function($parent) {
   this.htmlDateTimeComposite.setLayout(new scout.DateTimeCompositeLayout(this));
 
   // Create date picker popup
-  this._datePickerPopup = new scout.DatePickerPopup(this.session, {
+  this._datePickerPopup = scout.create(scout.DatePickerPopup, {
+    parent: this,
     $anchor: this.$field
   });
-  this.addChild(this._datePickerPopup);
   this._datePickerPopup.picker
     .on('dateSelect', this._onDatePickerDateSelected.bind(this));
 };

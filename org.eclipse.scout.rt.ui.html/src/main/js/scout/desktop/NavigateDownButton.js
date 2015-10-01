@@ -4,9 +4,7 @@ scout.NavigateDownButton = function(outline, node) {
   this._defaultIconId = scout.icons.ANGLE_DOWN;
   this._defaultText = 'ui.Continue';
   this.iconId = this._defaultIconId;
-  this.objectType = 'NavigateDownButton';
   this.keyStroke = 'enter';
-  this._initKeyStrokeContext(this.keyStrokeContext);
 };
 scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
 

@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Table = function() {
-  scout.Table.parent.call(this);
+scout.Table = function(model) {
+  scout.Table.parent.call(this, model);
   this.$container;
   this.$data;
   this.header;
@@ -14,8 +14,6 @@ scout.Table = function() {
   this.rowsMap = {}; // rows by id
   this._rowWidth = 0;
   this.staticMenus = [];
-  this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
-  this._addEventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._filterMap = {};
@@ -28,6 +26,8 @@ scout.Table = function() {
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
+  this._addEventSupport();
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
@@ -46,18 +46,19 @@ scout.Table.GUI_EVENT_STATUS_CHANGED = 'statusChanged';
 
 scout.Table.COLUMN_MIN_WIDTH = 30;
 
-scout.Table.prototype._init = function(model, session) {
-  scout.Table.parent.prototype._init.call(this, model, session);
+scout.Table.prototype._init = function(model) {
+  scout.Table.parent.prototype._init.call(this, model);
 
   this._initColumns();
   this.rows.forEach(function(row) {
     this._initRow(row);
   }, this);
 
-  var menuSorter = new scout.MenuItemsOrder(this.session, 'Table');
-  this.menuBar = new scout.MenuBar(this.session, menuSorter);
+  this.menuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.MenuItemsOrder(this.session, 'Table')
+  });
   this.menuBar.bottom();
-  this.addChild(this.menuBar);
 
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
@@ -75,6 +76,7 @@ scout.Table.prototype._initRow = function(row) {
 scout.Table.prototype._initColumns = function() {
   var column, i;
   for (i = 0; i < this.columns.length; i++) {
+    this.columns[i].session = this.session;
     column = this.session.objectFactory.create(this.columns[i]);
     column.table = this;
     this.columns[i] = column;
@@ -196,7 +198,8 @@ scout.Table.prototype._render = function($parent) {
       event.stopPropagation();
       return false;
     });
-  scout.scrollbars.install(this.$data, this.session, {
+  scout.scrollbars.install(this.$data, {
+    parent: this,
     axis: 'both'
   });
   this.menuBar.render(this.$container);
@@ -296,7 +299,8 @@ scout.Table.prototype.onContextMenu = function(event) {
         event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
       }
       if (menuItems.length > 0) {
-        popup = new scout.ContextMenuPopup(this.session, {
+        popup = scout.create(scout.ContextMenuPopup, {
+          parent: this,
           menuItems: menuItems,
           location: {
             x: event.pageX,
@@ -304,7 +308,6 @@ scout.Table.prototype.onContextMenu = function(event) {
           },
           $anchor: this.$data
         });
-        this.addChild(popup);
         popup.render(undefined, event);
       }
     }
@@ -338,8 +341,7 @@ scout.Table.prototype._renderTableControls = function(dummy) {
 
 scout.Table.prototype._renderSortEnabled = function(dummy) {};
 
-scout.Table.prototype._renderUiSortPossible = function(dummy) {
-};
+scout.Table.prototype._renderUiSortPossible = function(dummy) {};
 
 scout.Table.prototype._syncTableControls = function(controls) {
   var i;
@@ -386,11 +388,17 @@ scout.Table.prototype._hasVisibleTableControls = function() {
 };
 
 scout.Table.prototype._createHeader = function() {
-  return new scout.TableHeader(this);
+  return scout.create(scout.TableHeader, {
+    parent: this,
+    table: this
+  });
 };
 
 scout.Table.prototype._createFooter = function() {
-  return new scout.TableFooter(this);
+  return scout.create(scout.TableFooter, {
+    parent: this,
+    table: this
+  });
 };
 
 scout.Table.prototype.reload = function() {
@@ -615,7 +623,8 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
 };
 
 scout.Table.prototype._updateSortColumns = function(column, direction, multiSort, remove) {
-  var sortIndex = -1, deviation;
+  var sortIndex = -1,
+    deviation;
 
   if (remove) {
     if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
@@ -637,11 +646,15 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
     if (multiSort) {
       // if not already sorted set the appropriate sort index
       if (!column.sortActive) {
-        sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) { return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex; })));
+        sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) {
+          return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex;
+        })));
         column.sortIndex = sortIndex + 1;
 
         // increase sortIndex for all permanent tail columns (a column has been added in front of them)
-        this._permanentTailSortColumns.forEach(function(c) { c.sortIndex++; });
+        this._permanentTailSortColumns.forEach(function(c) {
+          c.sortIndex++;
+        });
       }
     } else {
       column.sortIndex = this._permanentHeadSortColumns.length;
@@ -659,7 +672,9 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
 
     // set correct sort index for all permanent tail sort columns
     deviation = (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) ? 0 : 1;
-    this._permanentTailSortColumns.forEach(function(c, index) { c.sortIndex = this._permanentHeadSortColumns.length + deviation + index; }, this);
+    this._permanentTailSortColumns.forEach(function(c, index) {
+      c.sortIndex = this._permanentHeadSortColumns.length + deviation + index;
+    }, this);
   }
 
   column.sortAscending = direction === 'asc' ? true : false;
@@ -835,19 +850,18 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
     text = errorStatus.message;
 
   opts = {
+    parent: this,
     text: text,
     autoRemove: false,
     scrollType: 'position',
     $anchor: $cell,
     table: this
   };
-  tooltip = new scout.TableTooltip(this.session, opts);
+  tooltip = scout.create(scout.TableTooltip, opts);
   tooltip.render();
   // link to be able to remove it when row gets deleted
   tooltip.row = row;
   this.tooltips.push(tooltip);
-  // link so that it gets removed when table gets removed
-  this.addChild(tooltip);
 };
 
 /**
@@ -1059,7 +1073,8 @@ scout.Table.prototype._sendReload = function() {
   if (this.hasReloadHandler) {
     this.$data.empty();
     // scoll bar must be (re)installed after all content has been removed (because also scrollbars are removed)..
-    scout.scrollbars.install(this.$data, this.session, {
+    scout.scrollbars.install(this.$data, {
+      parent: this,
       axis: 'both'
     });
     this.remoteHandler(this.id, 'reload');
@@ -2267,8 +2282,12 @@ scout.Table.prototype.hasPermanentHeadOrTailSortColumns = function() {
 
 scout.Table.prototype._syncHeadAndTailSortColumns = function() {
   // find all sort columns (head and tail sort columns should always be included)
-  var sortColumns = this.columns.filter(function(c) { return c.sortIndex >= 0; });
-  sortColumns.sort(function(a, b) { return a.sortIndex - b.sortIndex; });
+  var sortColumns = this.columns.filter(function(c) {
+    return c.sortIndex >= 0;
+  });
+  sortColumns.sort(function(a, b) {
+    return a.sortIndex - b.sortIndex;
+  });
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
@@ -2347,7 +2366,6 @@ scout.Table.prototype._redraw = function() {
 scout.Table.prototype._renderTableHeader = function() {
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
-    this.addChild(this.header);
     this.header.render();
     this._renderEmptyData();
   } else if (!this.headerVisible && this.header) {
@@ -2390,7 +2408,6 @@ scout.Table.prototype._renderTableFooter = function() {
   if (footerVisible) {
     if (!this.footer) {
       this.footer = this._createFooter();
-      this.addChild(this.footer);
       this.footer.render();
     } else {
       this.footer.update();

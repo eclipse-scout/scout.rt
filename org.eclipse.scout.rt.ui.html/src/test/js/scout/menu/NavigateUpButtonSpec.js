@@ -9,7 +9,11 @@ describe("NavigateUpButton", function() {
       session: session,
       handleOutlineContent: function() {}
     };
-    menu = new scout.NavigateUpButton(outline, node);
+    var model = createSimpleModel('NavigateUpButton', session);
+    model.outline = outline;
+    model.node = node;
+    menu = new scout.NavigateUpButton();
+    menu.init(model);
   });
 
   it("_toggleDetail is always true", function() {

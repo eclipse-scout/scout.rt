@@ -50,18 +50,20 @@ scout.Planner.SelectionMode = {
   MULTI_RANGE: 3
 };
 
-scout.Planner.prototype._init = function(model, session) {
-  scout.Planner.parent.prototype._init.call(this, model, session);
-  this._yearPanel = new scout.YearPanel(session);
+scout.Planner.prototype._init = function(model) {
+  scout.Planner.parent.prototype._init.call(this, model);
+  this._yearPanel = scout.create(scout.YearPanel, {
+    parent: this
+  });
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-  this.addChild(this._yearPanel);
-  this._header = new scout.PlannerHeader(session);
+  this._header = scout.create(scout.PlannerHeader, {
+    parent: this
+  });
   this._header.on('todayClick', this._onTodayClick.bind(this));
   this._header.on('yearClick', this._onYearClick.bind(this));
   this._header.on('previousClick', this._onPreviousClick.bind(this));
   this._header.on('nextClick', this._onNextClick.bind(this));
   this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
-  this.addChild(this._header);
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }
@@ -71,15 +73,16 @@ scout.Planner.prototype._init = function(model, session) {
   this._syncSelectedResources(this.selectedResources);
   this._syncSelectionRange(this.selectionRange);
 
-  this._tooltipSupport = new scout.TooltipSupport(this.session, {
+  this._tooltipSupport = new scout.TooltipSupport({
     parent: this,
     arrowPosition: 50
   });
 
-  var menuOrder = new scout.PlannerMenuItemsOrder(this.session, 'Planner');
-  this.menuBar = new scout.MenuBar(this.session, menuOrder);
+  this.menuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.PlannerMenuItemsOrder(this.session, 'Planner')
+  });
   this.menuBar.bottom();
-  this.addChild(this.menuBar);
 };
 
 scout.Planner.prototype._initResource = function(resource) {
@@ -117,17 +120,21 @@ scout.Planner.prototype._render = function($parent) {
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render(this.$container);
 
-  scout.tooltips.install(this.$grid, this.session, {
+  scout.tooltips.install(this.$grid, {
+    parent: this,
     selector: '.planner-activity',
     tooltipText: function($comp) {
-        if (this._activityById($comp.attr('data-id'))) { return this._activityById($comp.attr('data-id')).tooltipText; }
-        else { return undefined; }
-      }.bind(this)
+      if (this._activityById($comp.attr('data-id'))) {
+        return this._activityById($comp.attr('data-id')).tooltipText;
+      } else {
+        return undefined;
+      }
+    }.bind(this)
   });
 
-  // scrollbars
-  scout.scrollbars.install(this.$grid, this.session);
-  this.session.detachHelper.pushScrollable(this.$grid);
+  scout.scrollbars.install(this.$grid, {
+    parent: this
+  });
   this._gridScrollHandler = this._onGridScroll.bind(this);
   this.$grid.on('scroll', this._gridScrollHandler);
 };
@@ -169,15 +176,15 @@ scout.Planner.prototype._navigateDate = function(direction) {
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
   } else if (this.displayMode === DISPLAY_MODE.WEEK || this.displayMode === DISPLAY_MODE.WORK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
-    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
+    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
   } else if (this.displayMode === DISPLAY_MODE.MONTH) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
+    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
+    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode === DISPLAY_MODE.YEAR) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
@@ -195,7 +202,7 @@ scout.Planner.prototype._onTodayClick = function(event) {
     day = (today.getDay() + 6) % 7,
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
-  if (this.displayMode === DISPLAY_MODE.DAY ) {
+  if (this.displayMode === DISPLAY_MODE.DAY) {
     today = new Date(year, month, day);
   } else if (this.displayMode === DISPLAY_MODE.YEAR) {
     today = new Date(year, month, 1);
@@ -249,11 +256,12 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
   event.stopPropagation();
   var func = function func(event, allowedType) {
     var filteredMenus = this._filterMenus([allowedType]),
-    $part = $(event.currentTarget);
+      $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
-    var popup = new scout.ContextMenuPopup(this.session, {
+    var popup = scout.create(scout.ContextMenuPopup, {
+      parent: this,
       menuItems: filteredMenus,
       location: {
         x: event.pageX,
@@ -555,10 +563,10 @@ scout.Planner.prototype._renderResources = function(resources) {
   $(resourcesHtml).appendTo(this.$grid);
 
   // Match resources
-  this.$grid.children('.planner-resource').each(function (index, element) {
-   var $element = $(element);
-   resource = this._resourceById($element.attr('data-id'));
-   this._linkResource($element, resource);
+  this.$grid.children('.planner-resource').each(function(index, element) {
+    var $element = $(element);
+    resource = this._resourceById($element.attr('data-id'));
+    this._linkResource($element, resource);
   }.bind(this));
 };
 
@@ -592,7 +600,7 @@ scout.Planner.prototype._buildActivitiesHtml = function(resource) {
   var activitiesHtml = '';
   resource.activities.forEach(function(activity) {
     if (activity.beginTime.valueOf() >= this.endScale ||
-        activity.endTime.valueOf() <= this.beginScale) {
+      activity.endTime.valueOf() <= this.beginScale) {
       // don't add activities which are not in the view range
       return;
     }

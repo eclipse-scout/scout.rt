@@ -1,14 +1,13 @@
-scout.TableFooter = function(table) {
+scout.TableFooter = function() {
   scout.TableFooter.parent.call(this);
-  this.init(table.session);
-  this._table = table;
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
 scout.TableFooter.CONTAINER_SIZE = 345;
 
-scout.TableFooter.prototype.init = function(session) {
-  scout.TableFooter.parent.prototype.init.call(this, session);
+scout.TableFooter.prototype._init = function(options) {
+  scout.TableFooter.parent.prototype._init.call(this, options);
+  this._table = options.table;
 
   // Keystroke context for the search field.
   // TODO [dwi] migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
@@ -416,12 +415,13 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   // Create new tooltip
   var opts = {
+    parent: this,
     text: text,
     cssClass: (isError ? 'tooltip-error' : (isWarning ? 'tooltip-warning' : (isInfo ? 'tooltip-info' : ''))),
     autoRemove: (!isError),
     $anchor: this._$infoTableStatusIcon
   };
-  this._tableStatusTooltip = new scout.Tooltip(this.session, opts);
+  this._tableStatusTooltip = scout.create(scout.Tooltip, opts);
   this._tableStatusTooltip.render();
 
   // Adjust icon style

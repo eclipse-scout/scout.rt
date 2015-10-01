@@ -20,7 +20,7 @@ describe("scout.tooltips", function() {
       this.addField($('<div>TestField</div>'));
       this.addStatus();
     };
-    formField.init(model, session);
+    formField.init(model);
     formField.render(session.$entryPoint);
   });
 
@@ -29,14 +29,23 @@ describe("scout.tooltips", function() {
   });
 
   it("can be installed and uninstalled for a form field", function() {
-    scout.tooltips.install(formField.$container, session, { tooltipText: 'Test1' });
+    scout.tooltips.install(formField.$container, {
+      parent: new scout.NullWidget(),
+      session: session,
+      tooltipText: 'Test1'
+    });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
     scout.tooltips.uninstall(formField.$container);
     expect(formField.$container.data('tooltipSupport')).toBeUndefined();
   });
 
   it("creates a tooltip on mouseenter and removes it on mouseleave", function() {
-    scout.tooltips.install(formField.$container, session, { tooltipText: 'Test2', tooltipDelay: 0 });
+    scout.tooltips.install(formField.$container, {
+      parent: new scout.NullWidget(),
+      session: session,
+      tooltipText: 'Test2',
+      tooltipDelay: 0
+    });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
     formField.$container.triggerMouseEnter();
@@ -57,11 +66,15 @@ describe("scout.tooltips", function() {
     scout.tooltips.uninstall(formField.$container);
   });
 
-
   describe("if text", function() {
 
     it("is empty no tooltip will be shown", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipText: '', tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipText: '',
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.triggerMouseEnter();
@@ -75,7 +88,14 @@ describe("scout.tooltips", function() {
     });
 
     it("is a function, it will be called for tooltip text", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipText: function() { return 'Test3'; }, tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipText: function() {
+          return 'Test3';
+        },
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.triggerMouseEnter();
@@ -91,7 +111,14 @@ describe("scout.tooltips", function() {
     });
 
     it("is undefined no tooltip will be shown", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipText: function() { return undefined; }, tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipText: function() {
+          return undefined;
+        },
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.triggerMouseEnter();
@@ -105,7 +132,11 @@ describe("scout.tooltips", function() {
     });
 
     it("is provided by component, it will be used as tooltip text", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.data('tooltipText', 'Test4');
@@ -122,10 +153,16 @@ describe("scout.tooltips", function() {
     });
 
     it("is provided as function by component, it will be called and used as tooltip text", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-      formField.$container.data('tooltipText', function() { return 'Test5'; });
+      formField.$container.data('tooltipText', function() {
+        return 'Test5';
+      });
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
@@ -139,7 +176,12 @@ describe("scout.tooltips", function() {
     });
 
     it("is provided using options and by component, text provided using options will be used", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipText: 'Test6', tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipText: 'Test6',
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.data('tooltipText', 'Test7');
@@ -156,9 +198,14 @@ describe("scout.tooltips", function() {
     });
 
     it("is a function, component is passed as first and only argument", function() {
-      scout.tooltips.install(formField.$container, session, { tooltipText: function() {
-        return (formField.$container.is(arguments[0]) && arguments.length == 1) ? 'Test8' : 'InvalidArguments';
-      }, tooltipDelay: 0 });
+      scout.tooltips.install(formField.$container, {
+        parent: new scout.NullWidget(),
+        session: session,
+        tooltipText: function() {
+          return (formField.$container.is(arguments[0]) && arguments.length == 1) ? 'Test8' : 'InvalidArguments';
+        },
+        tooltipDelay: 0
+      });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.triggerMouseEnter();

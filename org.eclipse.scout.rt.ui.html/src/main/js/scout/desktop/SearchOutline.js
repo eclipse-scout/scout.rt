@@ -6,8 +6,8 @@ scout.SearchOutline = function() {
 };
 scout.inherits(scout.SearchOutline, scout.Outline);
 
-scout.SearchOutline.prototype._init = function(model, session) {
-  scout.SearchOutline.parent.prototype._init.call(this, model, session);
+scout.SearchOutline.prototype._init = function(model) {
+  scout.SearchOutline.parent.prototype._init.call(this, model);
 
   this.titleVisible = false;
 };

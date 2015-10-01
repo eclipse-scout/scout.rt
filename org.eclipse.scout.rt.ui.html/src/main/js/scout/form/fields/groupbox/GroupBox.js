@@ -17,10 +17,12 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
-scout.GroupBox.prototype._init = function(model, session) {
-  scout.GroupBox.parent.prototype._init.call(this, model, session);
-  this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
-  this.addChild(this.menuBar);
+scout.GroupBox.prototype._init = function(model) {
+  scout.GroupBox.parent.prototype._init.call(this, model);
+  this.menuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
+  });
   if (this.mainBox) {
     this.menuBar.large();
   }
@@ -57,7 +59,8 @@ scout.GroupBox.prototype._render = function($parent) {
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
   if (this.scrollable) {
-    scout.scrollbars.install(this.$body, this.session, {
+    scout.scrollbars.install(this.$body, {
+      parent: this,
       axis: 'y'
     });
   }
@@ -255,11 +258,11 @@ scout.GroupBox.prototype._renderMenus = function() {
 
   // create a menu-adapter for each process button
   this.processButtons.forEach(function(button) {
-    menu = scout.localObjects.createObject(this.session,
+    menu = scout.create('ButtonAdapterMenu',
       scout.ButtonAdapterMenu.adaptButtonProperties(button, {
-        objectType: 'ButtonAdapterMenu',
+        parent: this,
         button: button
-    }));
+      }));
     menuItems.push(menu);
   }, this);
 

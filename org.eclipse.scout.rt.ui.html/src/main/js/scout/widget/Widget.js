@@ -1,18 +1,48 @@
 scout.Widget = function() {
-  this.parent;
   this.session;
   this.children = [];
+  this.initialized = false;
   this.rendered = false;
   this.destroyed = false;
   this.$container;
 };
 
-scout.Widget.prototype.init = function(session) {
-  this.session = session;
+scout.Widget.prototype.init = function(options) {
+  this._init(options);
+  this._initKeyStrokeContext(this.keyStrokeContext);
+  this.initialized = true;
+  if (this.events) {
+    this.trigger('initialized');
+  }
+};
+
+/**
+ * @param options
+ * - parent (required): The parent widget
+ * - session (optional): If not specified the session of the parent is used
+ */
+scout.Widget.prototype._init = function(options) {
+  options = options || {};
+  if (!options.parent) {
+    throw new Error('Parent expected: ' + this);
+  }
+  this.setParent(options.parent);
+
+  this.session = options.session || this.parent.session;
+  if (!this.session) {
+    throw new Error('Session expected: ' + this);
+  }
+};
+
+scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  // NOP
 };
 
 scout.Widget.prototype.render = function($parent) {
   $.log.trace('Rendering widget: ' + this);
+  if (!this.initialized) {
+    throw new Error('Not initialized: ' + this);
+  }
   if (this.rendered) {
     throw new Error('Already rendered: ' + this);
   }
@@ -111,16 +141,23 @@ scout.Widget.prototype._remove = function() {
   }
 };
 
-//TODO CGU maybe better create a setParent method which sets the parent and adds the child
+scout.Widget.prototype.setParent = function(parent) {
+  if (this.parent) {
+    // Remove from old parent if getting relinked
+    this.parent.removeChild(this);
+  }
+
+  this.parent = parent;
+  this.parent.addChild(this);
+};
+
 scout.Widget.prototype.addChild = function(child) {
   $.log.trace('addChild(' + child + ') to ' + this);
-  child.parent = this;
   this.children.push(child);
 };
 
 scout.Widget.prototype.removeChild = function(child) {
   $.log.trace('removeChild(' + child + ') from ' + this);
-  child.parent = null;
   scout.arrays.remove(this.children, child);
 };
 

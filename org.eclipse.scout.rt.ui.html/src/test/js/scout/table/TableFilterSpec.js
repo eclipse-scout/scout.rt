@@ -20,6 +20,7 @@ describe("Table Filter", function() {
   function createAndRegisterColumnFilter(table, column, selectedValues) {
     return helper.createAndRegisterColumnFilter({
       table: table,
+      session: session,
       column: column,
       selectedValues: selectedValues
     }, session);

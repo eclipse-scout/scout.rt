@@ -20,10 +20,11 @@ describe("TableHeaderMenu", function() {
   function createAndRegisterColumnFilter(table, column, selectedValues) {
     var filter = new scout.ColumnUserFilter();
     helper.createAndRegisterColumnFilter({
+      session: session,
       table: table,
       column: column,
       selectedValues: selectedValues
-    }, session);
+    });
     return filter;
   }
 

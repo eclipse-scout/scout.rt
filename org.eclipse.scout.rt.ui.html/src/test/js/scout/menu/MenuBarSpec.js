@@ -13,7 +13,11 @@ describe("MenuBar", function() {
     it('prefers EmptySpace for the left position if menu has multiple menuTypes', function() {
       var menu1 = helper.createMenu(helper.createModel('multi')),
         menu2 = helper.createMenu(helper.createModel('selection')),
-        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menuBar = scout.create(scout.MenuBar, {
+          parent: new scout.NullWidget(),
+          session: session,
+          menuOrder: new scout.MenuItemsOrder(session, 'Table')
+        }),
         menus = [menu2, menu1];
 
       menu1.menuTypes = ['Table.EmptySpace', 'Table.SingleSelection'];
@@ -31,7 +35,11 @@ describe("MenuBar", function() {
         menu1 = helper.createMenu(helper.createModel('empty')),
         menu2 = helper.createMenu(helper.createModel('selection-1')),
         menu3 = helper.createMenu(helper.createModel('selection-2')),
-        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menuBar = scout.create(scout.MenuBar, {
+          parent: new scout.NullWidget(),
+          session: session,
+          menuOrder: new scout.MenuItemsOrder(session, 'Table')
+        }),
         menus = [menu1, menu2];
 
       menu1.menuTypes = ['Table.EmptySpace'];
@@ -61,7 +69,11 @@ describe("MenuBar", function() {
 
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
-        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menuBar = scout.create(scout.MenuBar, {
+          parent: new scout.NullWidget(),
+          session: session,
+          menuOrder: new scout.MenuItemsOrder(session, 'Table')
+        }),
         menus = [menu1, menu2];
 
       menuBar.render(session.$entryPoint);
@@ -89,7 +101,11 @@ describe("MenuBar", function() {
 
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
-        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menuBar = scout.create(scout.MenuBar, {
+          parent: new scout.NullWidget(),
+          session: session,
+          menuOrder: new scout.MenuItemsOrder(session, 'Table')
+        }),
         menus = [menu1, menu2];
 
       menu1.visible = false;
@@ -111,7 +127,11 @@ describe("MenuBar", function() {
 
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
-        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menuBar = scout.create(scout.MenuBar, {
+          parent: new scout.NullWidget(),
+          session: session,
+          menuOrder: new scout.MenuItemsOrder(session, 'Table')
+        }),
         menus = [menu1, menu2];
 
       menu1.visible = false;

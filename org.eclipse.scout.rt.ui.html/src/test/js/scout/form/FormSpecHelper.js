@@ -16,11 +16,12 @@ FormSpecHelper.prototype.createFormWithOneField = function(session, parentId) {
 };
 
 FormSpecHelper.prototype.createFormModel = function() {
-  var form = createSimpleModel('Form');
+  var form = createSimpleModel('Form', this.session);
   // By definition, a Form must have a 'displayParent'. That is why a mocked parent is set.
   form.parent = {
       rendered: true,
       removeChild: function() {},
+      setParent: function() {},
       addChild: function() {},
       inFront: function() { return true; }, // expected API of a 'displayParent'
       glassPaneTargets: function() { return []; } // expected API of a 'displayParent'
@@ -29,14 +30,15 @@ FormSpecHelper.prototype.createFormModel = function() {
 };
 
 FormSpecHelper.prototype.createFieldModel = function(objectType, form) {
-  var model = createSimpleModel(objectType || 'StringField');
+  var session = this.session;
+  var model = createSimpleModel(objectType || 'StringField', session);
   model.enabled = true;
   model.visible = true;
   model.getForm = function() {
     if (form) {
       return form;
     } else {
-      return createSimpleModel('Form');
+      return createSimpleModel('Form', session);
     }
   };
 

@@ -134,12 +134,13 @@ scout.Action.prototype._onHoverOut = function() {
 };
 
 scout.Action.prototype._showTooltip = function() {
-  this.tooltip = new scout.Tooltip(this.session, this._configureTooltip());
+  this.tooltip = scout.create(scout.Tooltip, this._configureTooltip());
   this.tooltip.render();
 };
 
 scout.Action.prototype._configureTooltip = function() {
   return {
+    parent: this,
     text: this.tooltipText,
     $anchor: this.$container,
     arrowPosition: 50,

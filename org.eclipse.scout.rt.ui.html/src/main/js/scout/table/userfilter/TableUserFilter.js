@@ -1,7 +1,10 @@
 scout.TableUserFilter = function() {};
 
-scout.TableUserFilter.prototype.init = function(model, session) {
-  this.session = session;
+scout.TableUserFilter.prototype.init = function(model) {
+  this.session = model.session;
+  if (!this.session) {
+    throw new Error('Session expected: ' + this);
+  }
   $.extend(this, model);
 };
 

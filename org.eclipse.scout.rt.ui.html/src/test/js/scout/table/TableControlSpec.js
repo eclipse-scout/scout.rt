@@ -19,7 +19,7 @@ describe("TableControl", function() {
   });
 
   function createModel() {
-    var model = createSimpleModel('TableControl');
+    var model = createSimpleModel('TableControl', session);
     $.extend({
       "enabled": true,
       "visible": true
@@ -43,7 +43,7 @@ describe("TableControl", function() {
 
   function createAction(model) {
     var action = new scout.TableControl();
-    action.init(model, session);
+    action.init(model);
     action.form = createFormMock();
     return action;
   }
@@ -130,6 +130,7 @@ describe("TableControl", function() {
 
       it("attaches hover listener, but only once", function() {
         var action = createAction(createModel());
+        action.setParent(table);
         table.tableControls = [action];
         table.render(session.$entryPoint);
 
@@ -150,8 +151,8 @@ describe("TableControl", function() {
 
       it("attaches hover listener, even when re rendering", function() {
         var action = createAction(createModel());
+        action.setParent(table);
         table.tableControls = [action];
-        table.addChild(action);
         table.render(session.$entryPoint);
 
         table.remove();

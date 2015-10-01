@@ -21,7 +21,7 @@ describe("DateField", function() {
 
   function createField(model) {
     var field = new scout.DateField();
-    field.init(model, session);
+    field.init(model);
     return field;
   }
 

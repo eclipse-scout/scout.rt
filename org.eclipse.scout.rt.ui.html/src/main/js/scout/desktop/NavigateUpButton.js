@@ -1,12 +1,10 @@
-scout.NavigateUpButton = function(outline, node) {
-  scout.NavigateUpButton.parent.call(this, outline, node);
+scout.NavigateUpButton = function(options) {
+  scout.NavigateUpButton.parent.call(this);
   this._defaultIconId = scout.icons.ANGLE_UP;
   this._defaultText = 'ui.Up';
   this._additionalCssClass = 'small-gap';
   this.iconId = this._defaultIconId;
-  this.objectType = 'NavigateUpButton';
   this.keyStroke = 'backspace';
-  this._initKeyStrokeContext(this.keyStrokeContext);
 };
 scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);
 

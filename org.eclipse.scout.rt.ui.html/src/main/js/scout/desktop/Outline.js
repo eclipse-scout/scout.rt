@@ -14,12 +14,12 @@ scout.Outline = function() {
 };
 scout.inherits(scout.Outline, scout.Tree);
 
-scout.Outline.prototype._init = function(model, session) {
-  scout.Outline.parent.prototype._init.call(this, model, session);
+scout.Outline.prototype._init = function(model) {
+  scout.Outline.parent.prototype._init.call(this, model);
 
-  this.formController = new scout.FormController(this, session);
-  this.messageBoxController = new scout.MessageBoxController(this, session);
-  this.fileChooserController = new scout.FileChooserController(this, session);
+  this.formController = new scout.FormController(this, model.session);
+  this.messageBoxController = new scout.MessageBoxController(this, model.session);
+  this.fileChooserController = new scout.FileChooserController(this, model.session);
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
 };
@@ -213,11 +213,19 @@ scout.Outline.prototype._decorateNode = function(node) {
 scout.Outline.prototype._createOutlineNavigationButtons = function(node, staticMenus) {
   var menus = scout.arrays.ensure(staticMenus);
   if (!this._hasMenu(menus, scout.NavigateUpButton)) {
-    var upButton = new scout.NavigateUpButton(this, node);
+    var upButton = scout.create('NavigateUpButton', {
+      parent: this,
+      outline: this,
+      node: node
+    });
     menus.push(upButton);
   }
   if (!this._hasMenu(menus, scout.NavigateDownButton)) {
-    var downButton = new scout.NavigateDownButton(this, node);
+    var downButton = scout.create('NavigateDownButton', {
+      parent: this,
+      outline: this,
+      node: node
+    });
     menus.push(downButton);
   }
   return menus;
@@ -238,9 +246,10 @@ scout.Outline.prototype._hasMenu = function(menus, menuClass) {
 
 scout.Outline.prototype._onTitleClick = function(event) {
   this.collapseAll();
-  if(this.defaultDetailForm){
+  if (this.defaultDetailForm) {
     this.clearSelection();
-    this._showDefaultDetailForm();this._showDefaultDetailForm();
+    this._showDefaultDetailForm();
+    this._showDefaultDetailForm();
   } else {
     this.selectNodes(this.$nodes().first().data('node'), true, true);
   }

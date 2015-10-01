@@ -29,7 +29,10 @@ describe("scrollbars", function() {
         exec = true;
       };
       var $container = createScrollable();
-      var $content = scout.scrollbars.install($container, session);
+      var $content = scout.scrollbars.install($container, {
+        parent: new scout.NullWidget(),
+        session: session
+      });
       var $element = createContent($content);
 
       scout.scrollbars.onScroll($element, handler);
@@ -47,7 +50,10 @@ describe("scrollbars", function() {
         exec = true;
       };
       var $container = createScrollable();
-      var $content = scout.scrollbars.install($container, session);
+      var $content = scout.scrollbars.install($container, {
+        parent: new scout.NullWidget(),
+        session: session
+      });
       var $element = createContent($content);
 
       scout.scrollbars.onScroll($element, handler);

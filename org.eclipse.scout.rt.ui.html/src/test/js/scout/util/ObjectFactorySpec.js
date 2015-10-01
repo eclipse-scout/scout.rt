@@ -19,7 +19,7 @@ describe("ObjectFactory", function() {
    * adapaterDataCache of the Session.
    */
   function createModel(session, id, objectType) {
-    var model = createSimpleModel(objectType, id);
+    var model = createSimpleModel(objectType, session, id);
     if ('Menu.NavigateUp' === objectType || 'Menu.NavigateDown' === objectType) {
       var outlineId = 'outline' + id;
       model.outline = outlineId;
@@ -45,7 +45,7 @@ describe("ObjectFactory", function() {
         id: tabItemId,
         objectType: 'TabItem',
         getForm: function() {
-          return createSimpleModel("Form");
+          return createSimpleModel("Form", session);
         }
       };
     } else if ('ButtonAdapterMenu' === objectType) {
@@ -56,7 +56,7 @@ describe("ObjectFactory", function() {
 
     if ('GroupBox' === objectType || 'TabItem' === objectType) {
       model.getForm = function() {
-        return createSimpleModel("Form");
+        return createSimpleModel("Form", session);
       };
     }
 
@@ -75,7 +75,7 @@ describe("ObjectFactory", function() {
       factory = factories[i];
       model = createModel(session, i, factory.objectType);
       object = factory.create(model);
-      object.init(model, session);
+      object.init(model);
       session.registerModelAdapter(object);
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);

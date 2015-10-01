@@ -1,17 +1,24 @@
-scout.Splitter = function(session, options) {
+scout.Splitter = function() {
   scout.Splitter.parent.call(this);
-  this.init(session);
 
-  options = options || {};
-  this.splitHorizontal = scout.helpers.nvl(options.splitHorizontal, true);
-  this.$anchor = options.$anchor;
-  this._$root = options.$root;
-  this._maxRatio = options.maxRatio;
+  this.splitHorizontal;
+  this.$anchor;
+  this._$root;
+  this._maxRatio;
   this._oldRatio;
   this.position; // current splitter position in pixels, updated by updatePosition()
   this._addEventSupport();
 };
 scout.inherits(scout.Splitter, scout.Widget);
+
+scout.Splitter.prototype._init = function(options) {
+  scout.BusyIndicator.parent.prototype._init.call(this, options);
+
+  this.splitHorizontal = scout.helpers.nvl(options.splitHorizontal, true);
+  this.$anchor = options.$anchor;
+  this._$root = options.$root;
+  this._maxRatio = options.maxRatio;
+};
 
 scout.Splitter.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('splitter')

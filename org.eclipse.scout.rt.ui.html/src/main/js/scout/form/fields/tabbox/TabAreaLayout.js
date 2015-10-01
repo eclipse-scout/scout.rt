@@ -101,8 +101,8 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     overflowMenus = [],
     tabBox = this._tabBox;
   this._overflowTabs.forEach(function(tabItem) {
-    menu = scout.localObjects.createObject(tabBox.session, {
-      objectType: 'Menu',
+    menu = scout.create('Menu', {
+      parent: tabBox,
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem
     });
@@ -115,7 +115,8 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     overflowMenus.push(menu);
   });
 
-  popup = new scout.ContextMenuPopup(this._tabBox.session, {
+  popup = scout.create(scout.ContextMenuPopup, {
+    parent: tabBox,
     menuItems: overflowMenus,
     cloneMenuItems: false,
     location: {

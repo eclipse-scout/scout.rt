@@ -49,7 +49,9 @@ scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .unfocusable()
     .on('mousedown', this.togglePopup.bind(this))
-    .data('tooltipText', function() { return this.text; }.bind(this));
+    .data('tooltipText', function() {
+      return this.text;
+    }.bind(this));
   this.$title = this.$container
     .appendSpan('view-button-tab-title has-menu')
     .icon(this.iconId);
@@ -81,7 +83,10 @@ scout.ViewMenuTab.prototype._renderSelected = function() {
   if (this.selected && !this._breadcrumbEnabled) {
     scout.tooltips.uninstall(this.$container);
   } else {
-    scout.tooltips.install(this.$container, this.session, {text: this.text});
+    scout.tooltips.install(this.$container, {
+      parent: this.session.desktop,
+      text: this.text
+    });
   }
 };
 
@@ -103,7 +108,7 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
     viewMenu = this.viewMenus[i];
     if (viewMenu instanceof scout.OutlineViewButton) {
       if (!onlySelected ||
-           onlySelected && viewMenu.selected) {
+        onlySelected && viewMenu.selected) {
         return viewMenu;
       }
     }
@@ -137,7 +142,13 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
 
 scout.ViewMenuTab.prototype._openPopup = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
-  var popup = new scout.ViewMenuPopup(this.session, this.$container, this._popupViewMenus(), naviBounds, this._breadcrumbEnabled);
+  var popup = scout.create(scout.ViewMenuPopup, {
+    parent: this.session.desktop,
+    $tab: this.$container,
+    viewMenus: this._popupViewMenus(),
+    naviBounds: naviBounds,
+    breadcrumbEnabled: this._breadcrumbEnabled
+  });
   popup.headText = this.text;
   popup.render();
   return popup;
@@ -189,7 +200,6 @@ scout.ViewMenuTab.prototype.bringToFront = function() {
   this._inBackground = false;
   this._renderSelected();
 };
-
 
 scout.ViewMenuTab.prototype.setBreadcrumbEnabled = function(enabled) {
   this._breadcrumbEnabled = enabled;

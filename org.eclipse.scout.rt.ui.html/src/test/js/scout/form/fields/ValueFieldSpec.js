@@ -27,7 +27,7 @@ describe("ValueField", function() {
         this.addField($('<div>'));
         this.addStatus();
       };
-      formField.init(model, session);
+      formField.init(model);
     });
 
     it("shows a status even though status visible is false but there are visible menus", function() {
@@ -60,7 +60,7 @@ describe("ValueField", function() {
         this.addField($('<input>'));
         this.addStatus();
       };
-      formField.init(model, session);
+      formField.init(model);
     });
 
     it("context menu only shows visible menus", function() {

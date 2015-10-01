@@ -56,7 +56,9 @@ scout.HtmlField.prototype._remove = function() {
 
 scout.HtmlField.prototype._renderScrollBarsEnabled = function() {
   if (this.scrollBarsEnabled) {
-    scout.scrollbars.install(this.$field, this.session);
+    scout.scrollbars.install(this.$field, {
+      parent: this
+    });
   } else {
     scout.scrollbars.uninstall(this.$field, this.session);
   }

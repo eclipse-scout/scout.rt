@@ -16,7 +16,7 @@ describe("Planner", function() {
   });
 
   function createPlannerModel(numResources) {
-    var model = createSimpleModel('Planner');
+    var model = createSimpleModel('Planner', session);
     model.resources = [];
     for (var i = 0; i < numResources; i++) {
       model.resources[i] = createResource('resource' + i);
@@ -44,7 +44,7 @@ describe("Planner", function() {
 
   function createPlanner(model) {
     var planner = new scout.Planner();
-    planner.init(model, session);
+    planner.init(model);
     return planner;
   }
 

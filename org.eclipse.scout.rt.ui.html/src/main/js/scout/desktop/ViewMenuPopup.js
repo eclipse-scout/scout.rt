@@ -1,19 +1,28 @@
 /**
  * Popup menu to switch between outlines.
  */
-scout.ViewMenuPopup = function(session, $tab, viewMenus, naviBounds, breadcrumbEnabled) {
-  scout.ViewMenuPopup.parent.call(this, session, {
-    focusableContainer: true
-  });
-  this.$tab = $tab;
-  this.$headBlueprint = this.$tab;
-  this.viewMenus = viewMenus;
-  this._naviBounds = naviBounds;
-  this._breadcrumbEnabled = breadcrumbEnabled;
+scout.ViewMenuPopup = function() {
+  scout.ViewMenuPopup.parent.call(this);
+  this.$tab;
+  this.$headBlueprint;
+  this.viewMenus;
+  this._naviBounds;
+  this._breadcrumbEnabled;
   this._tooltip;
   this._tooltipDelay;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
+
+scout.ViewMenuPopup.prototype._init = function(options) {
+  options.focusableContainer = true;
+  scout.ViewMenuPopup.parent.prototype._init.call(this, options);
+
+  this.$tab = options.$tab;
+  this.$headBlueprint = this.$tab;
+  this.viewMenus = options.viewMenus;
+  this._naviBounds = options.naviBounds;
+  this._breadcrumbEnabled = options.breadcrumbEnabled;
+};
 
 scout.ViewMenuPopup.MAX_MENU_WIDTH = 300;
 
@@ -32,7 +41,7 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.render(this.$body);
     viewMenu.afterSendDoAction = this.close.bind(this);
-    this.addChild(viewMenu);
+    viewMenu.setParent(this);
   }, this);
 };
 

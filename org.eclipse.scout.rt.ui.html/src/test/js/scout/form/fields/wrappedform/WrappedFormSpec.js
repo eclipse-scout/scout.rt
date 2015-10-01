@@ -11,7 +11,7 @@ describe("WrappedForm", function() {
 
   function createField(model) {
     var field = new scout.WrappedFormField();
-    field.init(model, session);
+    field.init(model);
     return field;
   }
 

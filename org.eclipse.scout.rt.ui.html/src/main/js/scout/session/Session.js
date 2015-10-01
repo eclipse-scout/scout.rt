@@ -79,9 +79,11 @@ scout.Session = function($entryPoint, options) {
   this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
+    parent: new scout.NullWidget(),
+    session: this,
     id: '1',
     objectType: 'GlobalAdapter'
-  }, this);
+  });
 
   this._initCustomParams();
   this._registerWithParentUiSession();
@@ -188,10 +190,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     if (!adapter.rendered) {
       // Re-link
       $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + parent);
-      if (adapter.parent) {
-        adapter.parent.removeChild(adapter);
-      }
-      parent.addChild(adapter);
+      adapter.setParent(parent);
     } else {
       $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);
     }
@@ -223,7 +222,6 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
 
   owner.addOwnedAdapter(adapter);
-  parent.addChild(adapter);
   return adapter;
 };
 
@@ -647,7 +645,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 
   options = options || {};
   var model = {
-    objectType: 'MessageBox',
+    parent: this.desktop,
     iconId: options.iconId,
     severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
     header: options.header,
@@ -658,7 +656,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     cancelButtonText: options.cancelButtonText
   };
 
-  var messageBox = scout.localObjects.createObject(this, model);
+  var messageBox = scout.create('MessageBox', model);
   messageBox.remoteHandler = function(target, type, event) {
     if ('action' === type) {
       delete this._fatalMessagesOnScreen[errorCode];
@@ -827,7 +825,9 @@ scout.Session.prototype._renderBusy = function() {
     if (!this.desktop || !this.desktop.rendered) {
       return; // No busy indicator without desktop (e.g. during shutdown)
     }
-    this._busyIndicator = new scout.BusyIndicator(this);
+    this._busyIndicator = scout.create(scout.BusyIndicator, {
+      parent: this.desktop
+    });
     this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
     this._busyIndicator.render(this.$entryPoint);
   }.bind(this), 500);

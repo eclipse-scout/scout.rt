@@ -19,7 +19,7 @@ describe("Outline", function() {
   }
 
   function createModel(nodes) {
-    var model = createSimpleModel('Tree');
+    var model = createSimpleModel('Tree', session);
 
     if (nodes) {
       model.nodes = nodes;
@@ -65,7 +65,7 @@ describe("Outline", function() {
 
   function createOutline(model) {
     var tree = new scout.Outline();
-    tree.init(model, session);
+    tree.init(model);
     return tree;
   }
 

@@ -3,11 +3,29 @@
  * <li>options.text - either a String or a function which returns a String.</li>
  * </ul>
  */
-scout.Tooltip = function(session, options) {
+scout.Tooltip = function() {
   scout.Tooltip.parent.call(this);
-  this.init(session);
 
-  options = options || {};
+  this.text;
+  this.arrowPosition;
+  this.arrowPositionUnit;
+  this.windowPaddingX;
+  this.windowPaddingY;
+  this.origin;
+  this.$anchor;
+  this.autoRemove;
+  this.cssClass;
+  this.tooltipPosition;
+  this.scrollType;
+  this.htmlEnabled;
+  this.$content;
+  this._addEventSupport();
+};
+scout.inherits(scout.Tooltip, scout.Widget);
+
+scout.Tooltip.prototype._init = function(options) {
+  scout.Tooltip.parent.prototype._init.call(this, options);
+
   this.text = options.text || '';
   this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
   this.arrowPositionUnit = options.arrowPositionUnit || '%';
@@ -20,11 +38,7 @@ scout.Tooltip = function(session, options) {
   this.tooltipPosition = options.position || 'top';
   this.scrollType = options.scrollType || 'remove';
   this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
-  this.$content;
-
-  this._addEventSupport();
 };
-scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent

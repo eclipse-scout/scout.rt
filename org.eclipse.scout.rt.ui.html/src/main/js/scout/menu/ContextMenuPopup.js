@@ -1,16 +1,21 @@
-scout.ContextMenuPopup = function(session, options) {
+scout.ContextMenuPopup = function() {
+  scout.ContextMenuPopup.parent.call(this);
+
+  // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
+  this._headVisible = false;
+};
+scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
+
+scout.ContextMenuPopup.prototype._init = function(options) {
   options = options || {};
   options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
-  scout.ContextMenuPopup.parent.call(this, session, options);
+  scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
   this.menuItems = options.menuItems;
   this.options = $.extend({
     cloneMenuItems: true
   }, options);
-  // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
-  this._headVisible = false;
 };
-scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
 /**
  * @override Popup.js
@@ -99,7 +104,7 @@ scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
   clone.rendered = false;
   clone.$container = null;
   clone.$text = null;
-  this.addChild(clone);
+  clone.setParent(this);
 
   clone._addKeyStrokeContextSupport();
   clone._initKeyStrokeContext(clone.keyStrokeContext);

@@ -14,6 +14,7 @@ describe("FormToolButton", function() {
   var formMock = {
     render: function() {},
     remove: function() {},
+    setParent: function() {},
     htmlComp: {
       pack: function() {}
     },
@@ -29,7 +30,7 @@ describe("FormToolButton", function() {
 
   function createAction(model) {
     var action = new scout.FormToolButton();
-    action.init(model, session);
+    action.init(model);
     action.desktop = desktop;
     action.form = formMock;
     action.position = function() {};
@@ -45,7 +46,7 @@ describe("FormToolButton", function() {
     describe("selected", function() {
 
       it("opens and closes the tool container", function() {
-        var action = createAction(createSimpleModel('FormToolButton'));
+        var action = createAction(createSimpleModel('FormToolButton', session));
         action.render(session.$entryPoint);
         expect(findToolContainer()).not.toExist();
 

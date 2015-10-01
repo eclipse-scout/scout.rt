@@ -74,6 +74,51 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.parent = parentCtor;
 };
 
+/**
+ * Creates a new object instance.<p>
+ * Depending on the first parameter, either the object factory or the constructor function is used.
+ * - String (objectType):
+ *   Creates a new instance using the object factory.
+ * - Constructor function:
+ *   Creates a new instance using the given constructor function and calls init(options) of that instance.<p>
+ *   Used mainly for widgets but may actually be used for any objects which have a init method with one parameter.
+ */
+scout.create = function(constructorOrObjectType, options) {
+  if (typeof constructorOrObjectType === 'string') {
+    options.objectType = constructorOrObjectType;
+    return scout._createLocalObject(options);
+  } else {
+    var Constructor = constructorOrObjectType;
+    var obj = new Constructor();
+    obj.init(options);
+    return obj;
+  }
+};
+
+/**
+ * Creates a new object instance based on the given model by using the object factory.
+ * This method should be used when you create Widgets or Adapters in the UI without a
+ * model from the server-side client.
+ *
+ * The required properties are 'objectType', 'session' and 'parent'. A unique ID is generated automatically,
+ * when it is not provided by the model.
+ */
+scout._createLocalObject =  function(model) {
+  var session;
+  if (typeof model !== 'object') {
+    throw new Error('model must be an object');
+  }
+  session = model.session || model.parent.session;
+  if (!model.objectType) {
+    throw new Error('missing property objectType');
+  }
+  if (model.id === undefined) {
+    model.id = scout.createUniqueId();
+  }
+  model._register = false;
+  return session.objectFactory.create(model);
+};
+
 scout._checkBrowserCompability = function(options) {
   var device = scout.device;
   $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);

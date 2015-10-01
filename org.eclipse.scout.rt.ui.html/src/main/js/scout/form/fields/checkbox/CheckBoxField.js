@@ -28,7 +28,8 @@ scout.CheckBoxField.prototype._render = function($parent) {
     .appendTo(this.$field)
     .on('mousedown', this._onMouseDown.bind(this));
 
-  scout.tooltips.install(this.$checkBoxLabel, this.session, {
+  scout.tooltips.install(this.$checkBoxLabel, {
+    parent: this,
     tooltipText: function($label) {
       if ($label.isContentTruncated()) {
         return $label.text();

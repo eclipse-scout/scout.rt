@@ -6,10 +6,10 @@ scout.FileChooser = function() {
 };
 scout.inherits(scout.FileChooser, scout.ModelAdapter);
 
-scout.FileChooser.prototype._init = function(model, session) {
-  scout.FileChooser.parent.prototype._init.call(this, model, session);
+scout.FileChooser.prototype._init = function(model) {
+  scout.FileChooser.parent.prototype._init.call(this, model);
 
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(session, this, true);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, true);
 };
 
 /**
@@ -72,7 +72,9 @@ scout.FileChooser.prototype._render = function($parent) {
     this.$files = $('<ul>')
       .addClass('file-chooser-files')
       .appendTo(this.$content);
-    scout.scrollbars.install(this.$files, this.session);
+    scout.scrollbars.install(this.$files, {
+      parent: this
+    });
 
   } else {
     // legacy iframe code
@@ -88,8 +90,7 @@ scout.FileChooser.prototype._render = function($parent) {
             var json = $.parseJSON(text);
             this.session.processJsonResponse(json);
           }
-        }
-        finally {
+        } finally {
           // "onAjaxAlways"
           this.session.setBusy(false);
           this.session.layoutValidator.validate();

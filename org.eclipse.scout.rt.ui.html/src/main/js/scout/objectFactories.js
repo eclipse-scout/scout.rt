@@ -27,6 +27,16 @@ scout.defaultObjectFactories = [{
     return new scout.OutlineViewButton();
   }
 }, {
+  objectType: 'NavigateDownButton',
+  create: function() {
+    return new scout.NavigateDownButton();
+  }
+}, {
+  objectType: 'NavigateUpButton',
+  create: function() {
+    return new scout.NavigateUpButton();
+  }
+}, {
   objectType: 'FormToolButton',
   create: function() {
     return new scout.FormToolButton();

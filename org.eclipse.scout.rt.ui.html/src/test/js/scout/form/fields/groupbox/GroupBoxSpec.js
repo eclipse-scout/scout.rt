@@ -12,10 +12,11 @@ describe("GroupBox", function() {
   function createField(model, parent) {
     var field = new scout.GroupBox();
     field.getForm = function() {
-      return createSimpleModel('Form');
+      return createSimpleModel('Form', session);
     };
 
-    field.init(model, session);
+    model.session = session;
+    field.init(model);
     return field;
   }
 
@@ -28,7 +29,8 @@ describe("GroupBox", function() {
           y: 0
         },
         parent: {
-          objectType: 'GroupBox'
+          objectType: 'GroupBox',
+          addChild: function() {}
         }
       };
 
@@ -44,17 +46,17 @@ describe("GroupBox", function() {
   });
 
   describe("test predefined height and width in pixel", function() {
-    var form, formAdapter, formController, rootGroupBox, model = $.extend(createSimpleModel('GroupBox'), {
-          id: '3',
-          label: "fooBar",
-          gridData: {
-            x: 0,
-            y: 0,
-            widthInPixel: 97,
-            heightInPixel: 123
-          },
-          mainBox: true
-        });
+    var form, formAdapter, formController, rootGroupBox, model = $.extend(createSimpleModel('GroupBox', session), {
+        id: '3',
+        label: "fooBar",
+        gridData: {
+          x: 0,
+          y: 0,
+          widthInPixel: 97,
+          heightInPixel: 123
+        },
+        mainBox: true
+      });
 
     beforeEach(function() {
       form = helper.createFormModel();

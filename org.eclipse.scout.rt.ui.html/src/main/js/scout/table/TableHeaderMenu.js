@@ -2,16 +2,23 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 // FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
-scout.TableHeaderMenu = function(session, options) {
-  scout.TableHeaderMenu.parent.call(this, session, options);
-  this.session = session;
-  this.tableHeader = options.tableHeader;
-  this.table = this.tableHeader.table;
-  this.$headerItem = this.$anchor;
+scout.TableHeaderMenu = function() {
+  scout.TableHeaderMenu.parent.call(this);
+  this.tableHeader;
+  this.table;
+  this.$headerItem;
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChanged', this._onLocationChanged.bind(this));
 };
 scout.inherits(scout.TableHeaderMenu, scout.Popup);
+
+scout.TableHeaderMenu.prototype._init = function(options) {
+  scout.TableHeaderMenu.parent.prototype._init.call(this, options);
+
+  this.tableHeader = options.tableHeader;
+  this.table = this.tableHeader.table;
+  this.$headerItem = this.$anchor;
+};
 
 scout.TableHeaderMenu.prototype._render = function($parent) {
   var table = this.table,
@@ -62,17 +69,17 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
     if (!table.hasPermanentHeadOrTailSortColumns()) {
       var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
-      .data('label', session.text('ui.ascending'))
-      .click(this.remove.bind(this))
-      .click(function() {
-        sort('asc', false, $(this).hasClass('selected'));
-      });
-    var $sortDesc = $commandSort.appendDiv('header-command sort-desc')
-      .data('label', session.text('ui.descending'))
-      .click(this.remove.bind(this))
-      .click(function() {
-        sort('desc', false, $(this).hasClass('selected'));
-      });
+        .data('label', session.text('ui.ascending'))
+        .click(this.remove.bind(this))
+        .click(function() {
+          sort('asc', false, $(this).hasClass('selected'));
+        });
+      var $sortDesc = $commandSort.appendDiv('header-command sort-desc')
+        .data('label', session.text('ui.descending'))
+        .click(this.remove.bind(this))
+        .click(function() {
+          sort('desc', false, $(this).hasClass('selected'));
+        });
     }
 
     var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
@@ -107,10 +114,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       .click(groupAll);
 
     var $groupSelection = $commandGroup.appendDiv('header-command group-selection')
-    .data('label', session.text('ui.overSelection'))
-    .click(this.remove.bind(this))
-    .click(groupSelection);
-
+      .data('label', session.text('ui.overSelection'))
+      .click(this.remove.bind(this))
+      .click(groupSelection);
 
     if (column.type !== 'number') {
       var $groupSort = $commandGroup.appendDiv('header-command group-sort')
@@ -152,11 +158,12 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   var filter = table.getFilter(column.id);
   if (!filter) {
-    filter = new scout.ColumnUserFilter();
-    filter.init({
+    filter = this.session.objectFactory.create({
+      session: this.session,
+      objectType: 'ColumnUserFilter',
       table: table,
       column: column
-    }, this.session);
+    });
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
   filter.calculateCube();
@@ -177,7 +184,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   });
 
   this.$headerFilterContainer = $headerFilterContainer;
-  scout.scrollbars.install($headerFilterContainer, session);
+  scout.scrollbars.install($headerFilterContainer, {
+    parent: this
+  });
 
   var containerHeight = $headerFilterContainer.get(0).offsetHeight,
     scrollHeight = $headerFilterContainer.get(0).scrollHeight;
@@ -448,8 +457,8 @@ scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
   // (bounds must be computed after setVisible, if it was hidden before bounds are not correct)
   containerBounds = scout.graphics.offsetBounds(this.$container);
   this.$whiter
-    // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
-    .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
+  // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
+  .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
     .width(this._computeWhitherWidth());
 };
 

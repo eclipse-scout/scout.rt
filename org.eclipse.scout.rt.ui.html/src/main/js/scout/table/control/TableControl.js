@@ -7,8 +7,8 @@ scout.TableControl = function() {
 };
 scout.inherits(scout.TableControl, scout.Action);
 
-scout.TableControl.prototype._init = function(model, session) {
-  scout.TableControl.parent.prototype._init.call(this, model, session);
+scout.TableControl.prototype._init = function(model) {
+  scout.TableControl.parent.prototype._init.call(this, model);
   this._syncForm(this.form);
 };
 

@@ -39,7 +39,8 @@ scout.inherits(scout.Calendar, scout.ModelAdapter);
 scout.Calendar.prototype.init = function(model, session, register) {
   scout.Calendar.parent.prototype.init.call(this, model, session, register);
 
-  this._tooltipSupport = new scout.TooltipSupport(this.session, {
+  this._tooltipSupport = new scout.TooltipSupport({
+    parent: this,
     htmlEnabled: true,
     tooltipDelay: 750
   });
@@ -76,11 +77,12 @@ scout.Calendar.prototype._isWork = function() {
   return this.displayMode === scout.Calendar.DisplayMode.WORK;
 };
 
-scout.Calendar.prototype._init = function(model, session) {
-  scout.Calendar.parent.prototype._init.call(this, model, session);
-  this._yearPanel = new scout.YearPanel(session);
+scout.Calendar.prototype._init = function(model) {
+  scout.Calendar.parent.prototype._init.call(this, model);
+  this._yearPanel = scout.create(scout.YearPanel, {
+    parent: this
+  });
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-  this.addChild(this._yearPanel);
   this._syncSelectedDate(model.selectedDate);
   this._syncDisplayMode(model.displayMode);
   this._exactRange = this._calcExactRange();
@@ -592,7 +594,7 @@ scout.Calendar.prototype.layoutLabel = function() {
   if (this._isDay()) {
     text = this._format(exFrom, 'd. MMMM yyyy');
   } else if (this._isWork() || this._isWeek()) {
-    var toText=this.session.text('ui.To');
+    var toText = this.session.text('ui.To');
     if (exFrom.getMonth() === exTo.getMonth()) {
       text = scout.strings.join(' ', this._format(exFrom, 'd.'), toText, this._format(exTo, 'd. MMMM yyyy'));
     } else if (exFrom.getFullYear() === exTo.getFullYear()) {
@@ -747,14 +749,15 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
     if (filteredMenus.length === 0) {
       return;
     }
-    var popup = new scout.ContextMenuPopup(this.session, {
-        menuItems: filteredMenus,
-        location: {
-          x: event.pageX,
-          y: event.pageY
-        },
-        $anchor: $part
-      });
+    var popup = scout.create(scout.ContextMenuPopup, {
+      parent: this,
+      menuItems: filteredMenus,
+      location: {
+        x: event.pageX,
+        y: event.pageY
+      },
+      $anchor: $part
+    });
     popup.render();
   }.bind(this);
 

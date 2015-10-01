@@ -5,11 +5,11 @@ var TableSpecHelper = function(session) {
 };
 
 TableSpecHelper.prototype.createModel = function(columns, rows) {
-  var model = createSimpleModel('Table');
+  var model = createSimpleModel('Table', this.session);
   $.extend(model, {
-    "headerVisible": true,
-    "multiSelect": true,
-    "uiSortPossible": true
+    headerVisible: true,
+    multiSelect: true,
+    uiSortPossible: true
   });
 
   //Server will never send undefined -> don't create model with undefined properties.
@@ -157,19 +157,19 @@ TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
 
 TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table();
-  table.init(model, this.session);
+  table.init(model);
   return table;
 };
 
 TableSpecHelper.prototype.createMobileTable = function(model) {
   var table = new scout.MobileTable();
-  table.init(model, this.session);
+  table.init(model);
   return table;
 };
 
-TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model, session) {
+TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model) {
   var filter = new scout.ColumnUserFilter();
-  filter.init(model, session);
+  filter.init(model);
   model.table.addFilter(filter);
   return filter;
 };

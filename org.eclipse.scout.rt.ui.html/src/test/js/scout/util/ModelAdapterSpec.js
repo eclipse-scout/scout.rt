@@ -40,13 +40,13 @@ describe("ModelAdapter", function() {
   });
 
   function createGenericModel() {
-    return createSimpleModel('Generic');
+    return createSimpleModel('Generic', session);
   }
 
   function createModelAdapter(model, adapterProps) {
     var adapter = new scout.ModelAdapter();
     adapter._addAdapterProperties(adapterProps);
-    adapter.init(model, session);
+    adapter.init(model);
     return adapter;
   }
 
@@ -56,7 +56,9 @@ describe("ModelAdapter", function() {
     // Create a dummy object
     var modelAdapter = new scout.ModelAdapter();
     model.id = '2';
-    modelAdapter.init(model, session);
+    model.parent = new scout.NullWidget();
+    model.session = session;
+    modelAdapter.init(model);
     session.registerModelAdapter(modelAdapter);
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
@@ -155,7 +157,9 @@ describe("ModelAdapter", function() {
       var model = { foo: 6 },
         adapter = new scout.ModelAdapter();
       model.id = '123';
-      adapter.init(model, session);
+      model.parent = new scout.NullWidget();
+      model.session = session;
+      adapter.init(model);
       expect(adapter.foo).toBe(6);
     });
 

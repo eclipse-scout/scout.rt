@@ -6,8 +6,8 @@ scout.AnalysisTableControl = function() {
 
 scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
-scout.AnalysisTableControl.prototype._init = function(model, session) {
-  scout.AnalysisTableControl.parent.prototype._init.call(this, model, session);
+scout.AnalysisTableControl.prototype._init = function(model) {
+  scout.AnalysisTableControl.parent.prototype._init.call(this, model);
   this._initRootEntity();
 };
 

@@ -8,6 +8,7 @@ __include("jquery/jquery-scout.js");
 __include("scout/main.js");
 __include("scout/objectFactories.js");
 __include("scout/widget/Widget.js");
+__include("scout/widget/NullWidget.js");
 // Basic utilities
 __include("scout/util/arrays.js");
 __include("scout/util/BoxButtons.js");
@@ -25,7 +26,6 @@ __include("scout/util/FocusManager.js");
 __include("scout/util/FocusContext.js");
 __include("scout/util/focusUtils.js");
 __include("scout/util/focusRule.js");
-__include("scout/util/localObjects.js");
 __include("scout/util/logging.js");
 __include("scout/util/mimeTypes.js");
 __include("scout/util/ModelAdapter.js");

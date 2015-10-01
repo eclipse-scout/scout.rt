@@ -1,11 +1,10 @@
-scout.DesktopViewTab = function(view, $bench, session, viewTabController) {
+scout.DesktopViewTab = function() {
   scout.DesktopViewTab.parent.call(this);
-  this.init(session);
 
-  this._view = view;
-  this._$bench = $bench;
+  this._view;
+  this._$bench;
   this._mouseListener;
-  this.viewTabController = viewTabController;
+  this.viewTabController;
 
   // Container for the _Tab_ (not for the view).
   this.$container;
@@ -24,11 +23,20 @@ scout.DesktopViewTab = function(view, $bench, session, viewTabController) {
   // darum nicht aufgerufen und das 'remove event vom tab nie getriggert
   this._removeListener = this._onViewRemoved.bind(this);
 
-  this.addChild(this._view);
   this._addEventSupport();
-  this._installListeners();
 };
 scout.inherits(scout.DesktopViewTab, scout.Widget);
+
+scout.DesktopViewTab.prototype._init = function(options) {
+  scout.DesktopViewTab.parent.prototype._init.call(this, options);
+  options = options || {};
+  this._view = options.view;
+  this._view.setParent(this);
+  this.viewTabController = options.viewTabController;
+  this._$bench = options.$bench;
+
+  this._installListeners();
+};
 
 scout.DesktopViewTab.prototype._installListeners = function() {
   this._view.on('propertyChange', this._propertyChangeListener);

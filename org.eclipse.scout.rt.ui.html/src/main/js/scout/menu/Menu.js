@@ -128,7 +128,6 @@ scout.Menu.prototype._openPopup = function(event) {
     return;
   }
   this.popup = this._createPopup(event);
-  this.addChild(this.popup);
   this.popup.render();
   this.popup.on('remove', function(event) {
     this.popup = null;
@@ -143,7 +142,9 @@ scout.Menu.prototype._openPopup = function(event) {
 };
 
 scout.Menu.prototype._createPopup = function(event) {
-  return new scout.MenuBarPopup(this, this.session, {
+  return scout.create(scout.MenuBarPopup, {
+    parent: this,
+    menu: this,
     ignoreEvent: event,
     openingDirectionX: this.popupOpeningDirectionX,
     openingDirectionY: this.popupOpeningDirectionY

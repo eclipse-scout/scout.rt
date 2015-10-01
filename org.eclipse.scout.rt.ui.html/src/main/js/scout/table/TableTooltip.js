@@ -1,8 +1,13 @@
-scout.TableTooltip = function(session, options) {
-  scout.TableTooltip.parent.call(this, session, options);
-  this.table = options.table;
+scout.TableTooltip = function() {
+  scout.TableTooltip.parent.call(this);
 };
 scout.inherits(scout.TableTooltip, scout.Tooltip);
+
+scout.TableTooltip.prototype._init = function(options) {
+  scout.TableTooltip.parent.prototype._init.call(this, options);
+
+  this.table = options.table;
+};
 
 scout.TableTooltip.prototype._render = function($parent) {
   scout.TableTooltip.parent.prototype._render.call(this, $parent);

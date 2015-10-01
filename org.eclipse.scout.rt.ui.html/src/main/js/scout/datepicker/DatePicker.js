@@ -1,13 +1,12 @@
-scout.DatePicker = function(session, dateFormat) {
+scout.DatePicker = function() {
   scout.DatePicker.parent.call(this);
-  this.init(session);
 
-  this.dateFormat = dateFormat;
   // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
   // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
   // the UP or DOWN key while no date is selected.)
   this.preselectedDate;
   this.selectedDate;
+  this.dateFormat;
   this.viewDate;
   this.$container;
   this.$currentBox;
@@ -16,6 +15,12 @@ scout.DatePicker = function(session, dateFormat) {
   this._addEventSupport();
 };
 scout.inherits(scout.DatePicker, scout.Widget);
+
+scout.DatePicker.prototype._init = function(options) {
+  scout.DatePicker.parent.prototype._init.call(this, options);
+  options = options || {};
+  this.dateFormat = options.dateFormat;
+};
 
 scout.DatePicker.prototype._render = function($parent) {
   this.$container = $.makeDiv('date-picker')

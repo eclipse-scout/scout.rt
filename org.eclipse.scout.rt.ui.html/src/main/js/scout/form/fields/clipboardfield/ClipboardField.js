@@ -20,21 +20,27 @@ scout.ClipboardField.prototype._render = function($parent) {
 
   // add drag and drop support
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      function() { return this.dropType; }.bind(this),
-      function() { return this.maximumSize; }.bind(this),
-      undefined,
-      function() { return this.allowedMimeTypes; }.bind(this));
+    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    function() {
+      return this.dropType;
+    }.bind(this),
+    function() {
+      return this.maximumSize;
+    }.bind(this),
+    undefined,
+    function() {
+      return this.allowedMimeTypes;
+    }.bind(this));
   this.dragAndDropHandler.install(this.$field);
 
   this.$field.attr('contenteditable', 'true')
     .on('paste', this._onPaste.bind(this))
-    .on('copy',  this._onCopy.bind(this))
-    .on('cut',  this._onCopy.bind(this));
+    .on('copy', this._onCopy.bind(this))
+    .on('cut', this._onCopy.bind(this));
 
   $parent.on('click', function(event) {
     this.session.focusManager.requestFocus(this.$field);
-    }.bind(this));
+  }.bind(this));
 
   if (this.rendered) {
     this.session.focusManager.requestFocus(this.$field);
@@ -44,7 +50,9 @@ scout.ClipboardField.prototype._render = function($parent) {
 scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
   if (scout.strings.hasText(displayText)) {
     this.$field.html(scout.strings.nl2br(displayText, true));
-    scout.scrollbars.install(this.$field, this.session);
+    scout.scrollbars.install(this.$field, {
+      parent: this
+    });
     this.$field.selectAllText();
   } else {
     this.$field.empty();
@@ -76,7 +84,9 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   }
 
   // (re)install scroll bars
-  scout.scrollbars.install(this.$field, this.session);
+  scout.scrollbars.install(this.$field, {
+    parent: this
+  });
 
   return false;
 },
@@ -92,9 +102,9 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     throw new Error('Unable to access clipboard data.');
   }
 
-  var filesArgument = [],   // options to be uploaded, arguments for this.session.uploadFiles
+  var filesArgument = [], // options to be uploaded, arguments for this.session.uploadFiles
     additionalOptions = {},
-    additionalOptionsCompatibilityIndex = 0,   // counter for additional options
+    additionalOptionsCompatibilityIndex = 0, // counter for additional options
     contentCount = 0;
 
   // some browsers (e.g. IE) specify text content simply as data of type 'Text', it is not listed in list of types
@@ -102,7 +112,9 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   textContent = dataTransfer.getData('Text');
   if (textContent) {
     if (window.Blob) {
-      filesArgument.push(new Blob([textContent], {type: scout.mimeTypes.TEXT_PLAIN}));
+      filesArgument.push(new Blob([textContent], {
+        type: scout.mimeTypes.TEXT_PLAIN
+      }));
       contentCount++;
     } else {
       // compatibility workaround
@@ -115,11 +127,12 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     $.each(dataTransfer.items, function(idx, item) {
       if (item.type === scout.mimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
-          filesArgument.push(new Blob([str], {type: scout.mimeTypes.TEXT_PLAIN}));
+          filesArgument.push(new Blob([str], {
+            type: scout.mimeTypes.TEXT_PLAIN
+          }));
           contentCount++;
         });
-      }
-      else if (scout.helpers.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
+      } else if (scout.helpers.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
         filesArgument.push(item.getAsFile());
         contentCount++;
       }
@@ -132,7 +145,9 @@ scout.ClipboardField.prototype._onPaste = function(event) {
       var reader = new FileReader();
       // register functions for file reader
       reader.onload = function(event) {
-        var f = new Blob([event.target.result], {type: item.type});
+        var f = new Blob([event.target.result], {
+          type: item.type
+        });
         f.name = item.name;
         filesArgument.push(f);
         waitForFileReaderEvents--;
@@ -199,11 +214,13 @@ scout.ClipboardField.prototype._onPaste = function(event) {
 
               if (scout.helpers.isOneOf(srcDataMatch[1], [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
                 for (var i = 0; i < encData.length; i++) {
-                    byteNumbers[i] = encData.charCodeAt(i);
+                  byteNumbers[i] = encData.charCodeAt(i);
                 }
                 var byteArray = new Uint8Array(byteNumbers);
 
-                var f = new Blob([byteArray], {type: srcDataMatch[1]});
+                var f = new Blob([byteArray], {
+                  type: srcDataMatch[1]
+                });
                 f.name = '';
                 filesArgument.push(f);
               }

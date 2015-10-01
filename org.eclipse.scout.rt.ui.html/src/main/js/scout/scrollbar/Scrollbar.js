@@ -1,18 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-scout.Scrollbar = function(session, options) {
+scout.Scrollbar = function() {
   scout.Scrollbar.parent.call(this);
-  this.init(session);
-
-  var defaults = {
-    axis: 'y',
-    invertColors: false,
-    borderless: false,
-    updateScrollbarPos: true,
-    mouseWheelNeedsShift: false
-  };
-
-  $.extend(this, defaults, options);
 
   this._beginDefault = 0;
   this._thumbRange;
@@ -30,6 +19,19 @@ scout.Scrollbar = function(session, options) {
   this._unfixScrollbarHandler = this._unfixScrollbar.bind(this);
 };
 scout.inherits(scout.Scrollbar, scout.Widget);
+
+scout.Scrollbar.prototype._init = function(options) {
+  scout.Scrollbar.parent.prototype._init.call(this, options);
+  var defaults = {
+    axis: 'y',
+    invertColors: false,
+    borderless: false,
+    updateScrollbarPos: true,
+    mouseWheelNeedsShift: false
+  };
+
+  $.extend(this, defaults, options);
+};
 
 scout.Scrollbar.prototype._render = function($parent) {
   this._begin = 0;

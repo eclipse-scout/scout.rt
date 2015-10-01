@@ -13,19 +13,19 @@ scout.Form = function() {
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
-scout.Form.prototype._init = function(model, session) {
-  scout.Form.parent.prototype._init.call(this, model, session);
+scout.Form.prototype._init = function(model) {
+  scout.Form.parent.prototype._init.call(this, model);
   if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
     this.rootGroupBox.menuBar.bottom();
   }
 
-  this.formController = new scout.FormController(this, session);
-  this.messageBoxController = new scout.MessageBoxController(this, session);
-  this.fileChooserController = new scout.FileChooserController(this, session);
+  this.formController = new scout.FormController(this, model.session);
+  this.messageBoxController = new scout.MessageBoxController(this, model.session);
+  this.fileChooserController = new scout.FileChooserController(this, model.session);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(session, this, renderGlassPanes);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, renderGlassPanes);
 };
 
 scout.Form.prototype._initKeyStrokeContext = function(keyStrokeContext) {

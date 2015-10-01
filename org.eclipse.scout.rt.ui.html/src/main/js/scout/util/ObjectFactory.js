@@ -10,7 +10,7 @@ scout.ObjectFactory = function(session) {
  * @param register (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
  *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
-scout.ObjectFactory.prototype.create = function(model, register) {
+scout.ObjectFactory.prototype.create = function(model) {
   var factories, factory, deviceType,
     index = this.deviceTypeLookupOrder.indexOf(currentDeviceType),
     currentDeviceType = this.session.userAgent.deviceType;
@@ -27,8 +27,9 @@ scout.ObjectFactory.prototype.create = function(model, register) {
   if (!factory) {
     throw new Error('No factory registered for objectType ' + model.objectType);
   }
-  var object = factory.create(model);
-  object.init(model, this.session, register);
+  var object = factory.create();
+  model.session = this.session;
+  object.init(model);
   return object;
 };
 

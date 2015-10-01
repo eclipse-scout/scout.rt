@@ -1,13 +1,12 @@
 describe('Action', function() {
-
-  var $sandbox, session,
-    action = new scout.Action();
+  var $sandbox, session, action;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
-    action.session = session;
+    action = new scout.Action();
+    action.init(createSimpleModel('Action', session));
   });
 
   describe('defaults', function() {

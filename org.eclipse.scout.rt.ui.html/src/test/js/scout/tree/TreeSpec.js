@@ -21,7 +21,7 @@ describe("Tree", function() {
   }
 
   function createModel(nodes) {
-    var model = createSimpleModel('Tree');
+    var model = createSimpleModel('Tree', session);
 
     if (nodes) {
       model.nodes = nodes;
@@ -70,7 +70,7 @@ describe("Tree", function() {
 
   function createTree(model) {
     var tree = new scout.Tree();
-    tree.init(model, session);
+    tree.init(model);
     return tree;
   }
 

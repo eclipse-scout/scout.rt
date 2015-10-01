@@ -1,13 +1,20 @@
-scout.PopupWithHead = function(session, options) {
-  scout.PopupWithHead.parent.call(this, session, options);
+scout.PopupWithHead = function() {
+  scout.PopupWithHead.parent.call(this);
   this.$head;
   this.$body;
   this.$deco;
-  this.openingDirectionX = options.openingDirectionX || 'right';
-  this.openingDirectionY = options.openingDirectionY || 'down';
+  this.openingDirectionX;
+  this.openingDirectionY;
   this._headVisible = true;
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);
+
+scout.PopupWithHead.prototype._init = function(options) {
+  scout.PopupWithHead.parent.prototype._init.call(this, options);
+
+  this.openingDirectionX = options.openingDirectionX || 'right';
+  this.openingDirectionY = options.openingDirectionY || 'down';
+};
 
 scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);

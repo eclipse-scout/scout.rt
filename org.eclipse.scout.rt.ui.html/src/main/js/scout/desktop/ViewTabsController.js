@@ -13,7 +13,12 @@ scout.ViewTabsController = function(desktop) {
  */
 scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
   // Create the view tab.
-  var viewTab = new scout.DesktopViewTab(view, this._desktop.$bench, this._desktop.session, this);
+  var viewTab = scout.create(scout.DesktopViewTab, {
+    parent: this._desktop,
+    view: view,
+    $bench: this._desktop.$bench,
+    viewTabController: this
+  });
   var viewId = view.id;
 
   // Register lifecycle listener on view tab.

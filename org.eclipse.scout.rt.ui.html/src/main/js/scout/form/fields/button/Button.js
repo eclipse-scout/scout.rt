@@ -24,8 +24,8 @@ scout.Button.DisplayStyle = {
   LINK: 3
 };
 
-scout.Button.prototype._init = function(model, session) {
-  scout.Button.parent.prototype._init.call(this, model, session);
+scout.Button.prototype._init = function(model) {
+  scout.Button.parent.prototype._init.call(this, model);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };
 
@@ -130,7 +130,10 @@ scout.Button.prototype.togglePopup = function() {
 };
 
 scout.Button.prototype._openPopup = function() {
-  var popup = new scout.MenuBarPopup(this, this.session);
+  var popup = scout.create(scout.MenuBarPopup, {
+    parent: this,
+    menu: this
+  });
   popup.render();
   return popup;
 };

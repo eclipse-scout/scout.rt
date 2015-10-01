@@ -14,7 +14,8 @@ scout.WizardProgressField.prototype._render = function($parent) {
   this._$wizardSteps = $.makeDiv('wizard-steps');
   this.addField(this._$wizardSteps);
 
-  scout.scrollbars.install(this._$wizardSteps, this.session, {
+  scout.scrollbars.install(this._$wizardSteps, {
+    parent: this,
     axis: 'x'
   });
 
@@ -45,7 +46,8 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
       $wizardStep.addClass('disabled');
     }
     if (scout.strings.hasText(wizardStep.tooltipText)) {
-      scout.tooltips.install($wizardStep, this.session, {
+      scout.tooltips.install($wizardStep, {
+        parent: this,
         text: wizardStep.tooltipText,
         position: 'bottom'
       });
@@ -79,7 +81,7 @@ scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
   this._$wizardSteps.css('background-color', $wizardSteps.eq(this.wizardSteps.length - 1).css('background-color'));
 };
 
-scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep){
+scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep) {
   $wizardStep.removeClass('all-before-active before-active active all-after-active after-active');
   var wizardStepIndex = this._wizardStepIndex($wizardStep);
   if (wizardStepIndex >= 0 && this.activeWizardStepIndex >= 0) {
@@ -98,7 +100,6 @@ scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($w
     }
   }
 };
-
 
 scout.WizardProgressField.prototype._wizardStepIndex = function($wizardStep) {
   if ($wizardStep) {
