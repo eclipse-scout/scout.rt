@@ -53,6 +53,12 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
   }
 
   @Override
+  public void requestFocusQueryField() {
+    // Always fire property change since it is used as an event. Therefore it does not have a value.
+    propertySupport.setPropertyAlwaysFire(PROP_REQUEST_FOCUS_QUERY_FIELD, null);
+  }
+
+  @Override
   protected ITreeUIFacade createUIFacade() {
     return new P_UIFacade();
   }

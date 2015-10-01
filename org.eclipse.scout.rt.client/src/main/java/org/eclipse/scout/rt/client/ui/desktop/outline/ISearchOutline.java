@@ -21,6 +21,11 @@ public interface ISearchOutline extends IOutline {
 
   String PROP_SEARCH_QUERY = "searchQuery";
 
+  /**
+   * Property to request the focus for a query field on a search outline.
+   */
+  String PROP_REQUEST_FOCUS_QUERY_FIELD = "requestFocusQueryField";
+
   void search() throws ProcessingException;
 
   String getSearchQuery();
@@ -30,6 +35,8 @@ public interface ISearchOutline extends IOutline {
   String getSearchStatus();
 
   void setSearchStatus(String searchStatus);
+
+  void requestFocusQueryField();
 
   @Override
   ISearchOutlineUiFacade getUIFacade();
