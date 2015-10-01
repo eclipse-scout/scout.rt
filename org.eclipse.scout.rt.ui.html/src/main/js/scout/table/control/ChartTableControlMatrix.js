@@ -384,15 +384,14 @@ scout.ChartTableControlMatrix.prototype.columnCount = function() {
   var count = 0;
   for (var c = 0; c < this._columns.length; c++) {
     var column = this._columns[c];
-    if (column.type === 'key' || column.type === 'number' ) {
+    if (column.type === 'key' || column.type === 'number') {
       continue;
     }
 
-    if (column.text === null || column.text === undefined ||  column.text === '') {
+    if (column.text === null || column.text === undefined || column.text === '') {
       continue;
     }
     colCount.push([column, []]);
-
 
     for (var r = 0; r < this._rows.length; r++) {
       var row = this._rows[r];
