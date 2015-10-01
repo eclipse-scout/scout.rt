@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
   </parent>
 
   <groupId>org.eclipse.scout.rt</groupId>
@@ -96,13 +96,13 @@
         <artifactId>org.eclipse.scout.commons</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.json</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.commons.test</artifactId>
