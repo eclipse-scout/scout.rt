@@ -186,7 +186,7 @@ public class MailMessage {
    *          TO recipient to add
    */
   public MailMessage withReplyToRecipient(MailParticipant replyToRecipient) {
-    m_toRecipients.add(replyToRecipient);
+    m_replyToRecipients.add(replyToRecipient);
     return this;
   }
 
