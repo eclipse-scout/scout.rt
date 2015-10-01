@@ -23,10 +23,9 @@ import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 
 @Client
-public class HtmlScoutClipboardService extends AbstractService implements IClipboardService {
+public class HtmlScoutClipboardService implements IClipboardService {
 
   @Override
   public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) throws ProcessingException {

@@ -19,12 +19,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class DefaultValuesFilterService extends AbstractService implements IDefaultValuesFilterService {
+public class DefaultValuesFilterService implements IDefaultValuesFilterService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultValuesFilterService.class);
 
   private static final long FILE_UPDATE_CHECK_INTERVAL = 1234; // in milliseconds (only used in dev mode)
