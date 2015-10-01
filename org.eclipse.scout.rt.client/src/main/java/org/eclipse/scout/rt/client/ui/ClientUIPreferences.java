@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.shared.ISession;
@@ -253,13 +254,43 @@ public class ClientUIPreferences {
     }
   }
 
+  public void removeTableCustomizerData(ITable table, String configName) {
+    if (m_prefs == null) {
+      return;
+    }
+    ITableCustomizer customizer = table.getTableCustomizer();
+    if (customizer != null) {
+      m_prefs.remove(createTableCustomizerConfigKey(table, customizer.getClass(), configName));
+    }
+  }
+
+  public void setTableCustomizerData(ITable table, ITableCustomizer customizer, String configName) throws ProcessingException {
+    if (m_prefs == null) {
+      return;
+    }
+    m_prefs.putByteArray(createTableCustomizerConfigKey(table, customizer.getClass(), configName), customizer.getSerializedData());
+  }
+
+  public byte[] getTableCustomizerData(ITable table, Class customizer, String configName) {
+    if (m_prefs == null) {
+      return null;
+    }
+    return m_prefs.getByteArray(createTableCustomizerConfigKey(table, customizer, configName), null);
+  }
+
+  private String createTableCustomizerConfigKey(ITable table, Class customizer, String configName) {
+    StringBuilder sb = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(configName)) {
+      sb.append(configName).append(".");
+    }
+    sb.append(TABLE_CUSTOMIZER_DATA).append(getTableKey(table)).append("#").append(customizer.getName());
+    return sb.toString();
+  }
+
   /**
    * store customizer data to persistent store
    */
   public void setTableCustomizerData(String customizerKey, Object customizerData) {
-    if (m_prefs == null) {
-      return;
-    }
 
     String key = TABLE_CUSTOMIZER_DATA + customizerKey;
     if (customizerData != null) {
@@ -536,6 +567,7 @@ public class ClientUIPreferences {
     configs.remove(name);
     setPropertyStringList(key, new ArrayList<String>(configs));
     removeAllTableColumnPreferences(table, true, true, true, true, name);
+    removeTableCustomizerData(table, name);
   }
 
   public void addTableColumnsConfig(ITable table, String name) {

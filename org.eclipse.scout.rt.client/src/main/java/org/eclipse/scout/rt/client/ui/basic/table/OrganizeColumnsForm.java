@@ -852,7 +852,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return TEXTS.get("Without");
+            return TEXTS.get("WithoutUpperCase");
           }
 
           @Override
@@ -1113,6 +1113,11 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
+              protected int getConfiguredSortIndex() {
+                return 1;
+              }
+
+              @Override
               protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
                 IStringField field = (IStringField) super.execPrepareEdit(row);
                 if (getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
@@ -1129,14 +1134,14 @@ public class OrganizeColumnsForm extends AbstractForm {
                 if (!StringUtility.isNullOrEmpty(newValue)) {
                   switch (getConfigTypeColumn().getValue(row)) {
                     case NEW:
-                      storeCurrentStatAsConfig(newValue);
+                      storeCurrentStateAsConfig(newValue);
                       getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
                       break;
                     case CUSTOM:
                       P_TableState tableStateBackup = createTableStateSnpashot();
                       applyAll(oldValue);
                       deleteConfig(oldValue);
-                      storeCurrentStatAsConfig(newValue);
+                      storeCurrentStateAsConfig(newValue);
                       restoreTableState(tableStateBackup);
                       break;
                     case DEFAULT:
@@ -1150,6 +1155,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                   }
                 }
                 row.getCellForUpdate(getConfigNameColumn()).setEditable(getConfigTypeColumn().getValue(row) == ConfigType.NEW);
+                getTable().sort();
               }
 
             }
@@ -1159,6 +1165,11 @@ public class OrganizeColumnsForm extends AbstractForm {
               @Override
               protected boolean getConfiguredDisplayable() {
                 return false;
+              }
+
+              @Override
+              protected int getConfiguredSortIndex() {
+                return 0;
               }
 
             }
@@ -1222,7 +1233,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               public class ApplyViewMenu extends AbstractMenu {
                 @Override
                 protected String getConfiguredText() {
-                  return TEXTS.get("ResetTableColumnsView");
+                  return TEXTS.get("OnlyView");
                 }
 
                 @Override
@@ -1530,11 +1541,14 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  protected void storeCurrentStatAsConfig(String configName) {
+  protected void storeCurrentStateAsConfig(String configName) throws ProcessingException {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     if (prefs != null) {
       prefs.addTableColumnsConfig(m_table, configName);
       prefs.setAllTableColumnPreferences(m_table, configName);
+      if (m_table.getTableCustomizer() != null) {
+        prefs.setTableCustomizerData(m_table, m_table.getTableCustomizer(), configName);
+      }
     }
   }
 
@@ -1545,13 +1559,22 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  protected void applyAll(String configName) {
+  protected void applyAll(String configName) throws ProcessingException {
     applyViewForConfig(configName);
     m_table.getColumnSet().applySorting(configName);
   }
 
-  protected void applyViewForConfig(String configName) {
+  protected void applyViewForConfig(String configName) throws ProcessingException {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+    if (m_table.getTableCustomizer() != null) {
+      byte[] tableCustomizerData = prefs.getTableCustomizerData(m_table, m_table.getTableCustomizer().getClass(), configName);
+      if (tableCustomizerData != null) {
+        m_table.getTableCustomizer().removeAllColumns();
+        m_table.getTableCustomizer().setSerializedData(tableCustomizerData);
+      }
+      m_table.resetColumnConfiguration();
+      m_table.getReloadHandler().reload();
+    }
     for (IColumn<?> col : m_table.getColumnSet().getColumns()) {
       col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
       col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
