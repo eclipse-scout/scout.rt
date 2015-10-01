@@ -130,15 +130,20 @@ scout.Popup.prototype._detachCloseHandler = function() {
 };
 
 scout.Popup.prototype._onMouseDown = function(event) {
+  if (this._isMouseDownOutside(event)) {
+    this._onMouseDownOutside(event);
+  }
+};
+
+scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget = scout.Widget.getWidgetFor($target);
 
   // close the popup only if the click happened outside of the popup and its children
   // It is not sufficient to check the dom hierarchy using $container.has($target)
   // because the popup may open other popups which probably is not a dom child but a sibling
-  if (!this.isOrHasWidget(targetWidget)) {
-    this._onMouseDownOutside(event);
-  }
+  // Also ignore clicks if the popup is covert by a glasspane
+  return !this.isOrHasWidget(targetWidget) && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
 };
 
 /**

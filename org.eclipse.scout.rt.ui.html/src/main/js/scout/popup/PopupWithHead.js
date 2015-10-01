@@ -81,13 +81,16 @@ scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
   }
 };
 
-scout.PopupWithHead.prototype._onMouseDownOutside = function(event) {
-  // close popup only if source of event is not the blueprint button or it's child (icon).
+/**
+ * @override
+ */
+scout.PopupWithHead.prototype._isMouseDownOutside = function(event) {
   if (this.$headBlueprint && this.$headBlueprint.isOrHas(event.target)) {
-    return;
+    // click on the head still belongs to the popup -> not an outside click -> do not close popup
+    return false;
   }
 
-  this.close(event);
+  return scout.PopupWithHead.parent.prototype._isMouseDownOutside.call(this, event);
 };
 
 scout.PopupWithHead.prototype.appendToBody = function($element) {
@@ -179,11 +182,13 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
 
   if (openingDirectionY === 'up') {
     top -= bodySize.height;
-    headTop = bodySize.height;
+    bodyTop -= headSize.height;
+    headTop = bodyTop + bodySize.height;
     decoTop = headTop - 1; // -1 is body border (the purpose of deco is to hide the body border)
+    this.$container.cssMarginBottom(headSize.height);
   } else if (openingDirectionY === 'down') {
-    bodyTop += headSize.height;
-    decoTop = bodyTop;
+    headTop -= headSize.height;
+    this.$container.cssMarginTop(headSize.height);
   }
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
