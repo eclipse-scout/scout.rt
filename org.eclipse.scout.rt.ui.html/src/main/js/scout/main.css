@@ -124,6 +124,14 @@ input, textarea, .clipboard-field & > .field {
 
 input {
   padding: 0 @text-field-padding;
+
+  /* remove platform specific styling, mainly used to remove shadow on ios safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* text inputs on safari have 2px top and bottom margin -> remove*/
+  margin: 0;
 }
 
 button {
