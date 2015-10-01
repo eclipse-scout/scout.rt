@@ -25,8 +25,7 @@ scout.FocusManager = function(session, options) {
   this.$entryPoint.on('mousedown', function(event) {
     if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
       event.preventDefault();
-    }
-    else {
+    } else {
       //Because in ie divs are focusable also without tabindex we have to handle it here-> select next parent with tabindex.
       this._handleIEEvent(event);
     }
@@ -119,6 +118,8 @@ scout.FocusManager.prototype.isFocusContextInstalled = function($container) {
 
 /**
  * Checks if the given element is accessible, meaning not covert by a glasspane.
+ *
+ * @param element a HTMLElement or a jQuery collection
  */
 scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
   if (!this._glassPaneTargets.length) {
@@ -181,18 +182,23 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
  * Finds the first focusable element of the given $container, or null if not found.
  */
 scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
-  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents, $boxButtons,
+  var firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
     $candidates = $container
       .find(':focusable')
-      .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
-    .not(this.$entryPoint) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
-    .filter(filter || scout.filters.returnTrue);
+      .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
+      .not(this.$entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback. */
+      .filter(filter || scout.filters.returnTrue);
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
+    $candidate = $(candidate);
 
     // Check whether the candidate is accessible and not covert by a glass pane.
     if (this.isElementCovertByGlassPane(candidate)) {
+      continue;
+    }
+    // Check if the element (or one of its parents) does not want to be the first focusable element
+    if ($candidate.is('.prevent-initial-focus') || $candidate.closest('.prevent-initial-focus').length > 0) {
       continue;
     }
 
@@ -200,14 +206,14 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
       firstElement = candidate;
     }
 
-    if (!firstDefaultButton && $(candidate).is('.default-menu')) {
+    if (!firstDefaultButton && $candidate.is('.default-menu')) {
       firstDefaultButton = candidate;
     }
 
-    $menuParents = $(candidate).parents('.menubar');
-    $tabParents = $(candidate).parents('.tab-area');
-    $boxButtons = $(candidate).parents('.box-buttons');
-    if (($menuParents.length > 0 || $tabParents.length > 0 || $boxButtons.length > 0) && !firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
+    $menuParents = $candidate.parents('.menubar');
+    $tabParents = $candidate.parents('.tab-area');
+    $boxButtons = $candidate.parents('.box-buttons');
+    if (($menuParents.length > 0 || $tabParents.length > 0 || $boxButtons.length > 0) && !firstButton && ($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
       firstButton = candidate;
     } else if (!$menuParents.length && !$tabParents.length && !$boxButtons.length && typeof candidate.focus === 'function') { //inline buttons and menues are selectable before choosing button or menu from bar
       return candidate;
