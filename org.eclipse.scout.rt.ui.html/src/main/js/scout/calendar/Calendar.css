@@ -143,7 +143,7 @@
 
     & *:hover::before, & *:hover,
     & .selected::before, & .selected {
-      color: @hover-color;
+      color: @calendar-mode-active-text-color;
     }
   }
 }
@@ -304,7 +304,7 @@
 
   & .calendar-week-name {
     font-size: 11px;
-    color: @palette-gray-5;
+    color: @calendar-week-axis-color;
     padding-top: 9px;
     text-align: center;
   }
@@ -333,7 +333,7 @@
   & .calendar-day-name::before   {
     position: absolute;
     content: attr(data-day-name);
-    color: @palette-gray-6;
+    color: @calendar-day-color;
     left: 7px;
     bottom: 0px;
     z-index: 1; /* draw over calendar items */
@@ -344,22 +344,28 @@
   & .calendar-day::before  {
     position: absolute;
     content: attr(data-day-name);
-    color: @palette-gray-6;
+    color: @calendar-day-color;
     left: 7px;
     top: 7px;
     z-index: 1; /* draw over calendar items */
   }
 
-  & .out::before {
-    color: @palette-gray-4;
+  & .out {
+    background-color: @calendar-out-background-color;
+    &::before {
+      color: @calendar-out-color;
+    }
   }
 
   & .weekend::before {
-    color: @palette-blue-6;
+    color: @calendar-weekend-color;
   }
 
-  & .weekend-out::before {
-    color: @palette-blue-2 ;
+  & .weekend-out {
+    background-color: @calendar-weekend-out-background-color;
+    &::before {
+      color: @calendar-weekend-out-color;
+    }
   }
 
   & .now::before {
@@ -414,7 +420,7 @@
     font-size: 11px;
     top: -5px;
     left: -30px;
-    color: @palette-gray-5;
+    color: @calendar-week-axis-color;
     content: attr(data-axis-name);
    }
 
@@ -437,7 +443,7 @@
     font-size: 11px;
     top: 5px;
     left: 9px;
-    color: @palette-gray-5;
+    color: @calendar-week-axis-color;
     content: attr(data-axis-name);
   }
 

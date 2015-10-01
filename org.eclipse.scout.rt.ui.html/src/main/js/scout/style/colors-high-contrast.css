@@ -29,10 +29,11 @@
 @palette-gray-0: #FEFEFE;
 @palette-gray-1: #F6F6F6;
 @palette-gray-2: #EFEFEF;
+@palette-gray-2-5: #E2E2E2;
 @palette-gray-3: #DDDDDD;
 @palette-gray-4: #CCCCCC;
 @palette-gray-5: #999999;
-@palette-gray-5-5: #808080;
+@palette-gray-5-5: #828282;
 @palette-gray-6: #666666;
 @palette-gray-7: #5C5C5C;
 @palette-gray-8: #4C4C4C;
@@ -74,7 +75,7 @@
 @focus-glow-color: fade(@focus-border-color, 50%);
 @highlight-color: @palette-orange-4;
 @hover-color: @palette-blue-6;
-@icon-color: @palette-gray-9;
+@icon-color: @palette-gray-8;
 @icon-inverted-color: @palette-white;
 @icon-light-color: @palette-gray-5-5;
 @icon-disabled-color: @palette-gray-4;
@@ -97,7 +98,7 @@
 /* --------------------------- */
 
 @applink-color: @palette-blue-6;
-@button-background-color: @palette-gray-3;
+@button-background-color: @palette-gray-2-5;
 @chart-axis-line-color: @palette-gray-4;
 @chart-axis-text-color: @palette-gray-8;
 @chart-data-color: @palette-blue-5;
@@ -120,7 +121,7 @@
 @outline-control-button-background-color: @palette-blue-6;
 @panel-background-color: @palette-gray-2;
 @popup-border-color: @palette-blue-6;
-@table-header-background-color: @palette-gray-3;
+@table-header-background-color: @palette-gray-2-5;
 @table-header-menu-background-color: @control-background-color;
 @table-header-cmd-border-color: @border-color;
 @table-header-cmd-active-color: @active-inverted-color;
@@ -145,3 +146,11 @@
 @group-box-title-border-color: @palette-gray-4;
 @planner-timeline-background-color: @palette-gray-3;
 @planner-mode-active-text-color: @text-color;
+@calendar-day-color: @text-color;
+@calendar-out-color: @palette-gray-6;
+@calendar-weekend-color: @palette-blue-6;
+@calendar-weekend-out-color: @palette-gray-6;
+@calendar-mode-active-text-color: @text-color;
+@calendar-week-axis-color: @palette-gray-6;
+@calendar-out-background-color: fade(@palette-gray-3, 40%);
+@calendar-weekend-out-background-color: fade(@palette-gray-3, 40%);

@@ -143,3 +143,11 @@
 @group-box-title-border-color: @border-color;
 @planner-timeline-background-color: @panel-background-color;
 @planner-mode-active-text-color: @palette-blue-7;
+@calendar-day-color: @palette-gray-6;
+@calendar-out-color: @palette-gray-4;
+@calendar-weekend-color: @palette-blue-6;
+@calendar-weekend-out-color: @palette-blue-2;
+@calendar-mode-active-text-color: @palette-blue-7;
+@calendar-week-axis-color: @palette-gray-5;
+@calendar-out-background-color: none;
+@calendar-weekend-out-background-color: none;
