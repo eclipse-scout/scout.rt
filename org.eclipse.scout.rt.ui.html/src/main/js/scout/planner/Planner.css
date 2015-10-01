@@ -64,7 +64,7 @@
 
     & > .timeline-large {
       height: 50%;
-      background-color: @palette-gray-2;
+      background-color: @planner-timeline-background-color;
       line-height: @planner-scale-height / 2;
 
       & > .scale-item > .planner-large-scale-item-line {

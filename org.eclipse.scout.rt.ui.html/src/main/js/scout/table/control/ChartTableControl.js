@@ -636,7 +636,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       var $label2 = $chartMain.appendSVG('text', '', 'main-axis')
         .attr('x', 210 + 70 * Math.sin(midPoint))
         .attr('y', 160 - 70 * Math.cos(midPoint))
-        .attr('fill', '#fff')
         .text(Math.round(value / dataAxis.total * 100) + '%')
         .attr('opacity', 0)
         .delay(600).animateSVG('opacity', 1, 300);

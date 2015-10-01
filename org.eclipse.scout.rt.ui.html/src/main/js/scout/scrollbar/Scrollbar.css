@@ -36,7 +36,7 @@
   z-index: 11;
   cursor: pointer;
   border-radius: 4px;
-  background-color: fade(@scrollbar-thumb-background-color, 30%);
+  background-color: fade(@scrollbar-thumb-color, 30%);
 
   &.y-axis {
     width: @scrollbar-thumb-size;
@@ -55,7 +55,7 @@
 
 .scrollbar-thumb-move,
 .scrollbar-thumb:hover {
-    background-color: fade(@scrollbar-thumb-background-color, 60%);
+    background-color: fade(@scrollbar-thumb-color, 60%);
 
   &.inverted {
     background-color: rgba(0, 0, 0, 0.2);

@@ -236,7 +236,7 @@ line.main-axis {
 }
 
 text.main-axis {
-  fill: @palette-white;
+  fill: @chart-data-text-color;
   text-anchor: middle;
   dominant-baseline: middle;
   pointer-events: none;

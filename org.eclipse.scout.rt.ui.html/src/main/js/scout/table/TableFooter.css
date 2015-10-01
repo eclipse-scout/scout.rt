@@ -19,7 +19,7 @@
   height: 16px;
   cursor: row-resize;
   z-index: 1;
-  border-top: 3px solid @border-color;
+  border-top: 3px solid @group-box-title-border-color;
 }
 
 .control-container {

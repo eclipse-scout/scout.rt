@@ -3,12 +3,12 @@
 /* we have to combine this with .outline, otherwise the definition would not be specific enough */
 .outline.tree {
   & .scrollbar-thumb {
-    background-color: fade(@scrollbar-thumb-background-color, 30%);
+    background-color: fade(@scrollbar-thumb-inverted-color, 30%);
   }
 
   & .scrollbar-thumb-move,
   & .scrollbar-thumb:hover {
-    background-color: fade(@scrollbar-thumb-background-color, 60%);
+    background-color: fade(@scrollbar-thumb-inverted-color, 60%);
   }
 
   &.in-background .tree-node.selected {

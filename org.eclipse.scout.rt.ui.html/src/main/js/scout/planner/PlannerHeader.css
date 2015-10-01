@@ -108,7 +108,6 @@
         border-top-right-radius: @border-radius;
         border-bottom-right-radius: @border-radius;
         margin-right: 5px;
-
       }
 
       &.selected{
@@ -121,7 +120,6 @@
       margin-left: 5px;
     }
 
-
     & .planner-toggle-year::before {
       .planner-icon(@icon-calendar, 20px);
      }
@@ -132,7 +130,7 @@
 
     & *:hover::before, & *:hover,
     & .selected::before, & .selected {
-      color: @hover-color;
+      color: @planner-mode-active-text-color;
     }
   }
 }
