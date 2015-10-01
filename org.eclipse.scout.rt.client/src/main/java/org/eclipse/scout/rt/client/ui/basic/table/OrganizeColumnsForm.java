@@ -1126,19 +1126,30 @@ public class OrganizeColumnsForm extends AbstractForm {
                 String oldValue = getConfigNameColumn().getValue(row);
                 super.execCompleteEdit(row, editingField);
                 String newValue = ((IStringField) editingField).getValue();
-                if (!StringUtility.isNullOrEmpty(newValue) && !oldValue.equals(newValue)) {
-                  // FIXME ASA do not replace config for renames
-                  storeCurrentStatAsConfig(newValue);
-                  deleteConfig(oldValue);
-                  getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
-                  row.getCellForUpdate(getConfigNameColumn()).setEditable(false);
-                }
-                else {
-                  if (getConfigTypeColumn().getValue(row) != ConfigType.NEW) {
-                    getConfigNameColumn().setValue(row, oldValue);
-                    row.getCellForUpdate(getConfigNameColumn()).setEditable(false);
+                if (!StringUtility.isNullOrEmpty(newValue)) {
+                  switch (getConfigTypeColumn().getValue(row)) {
+                    case NEW:
+                      storeCurrentStatAsConfig(newValue);
+                      getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
+                      break;
+                    case CUSTOM:
+                      P_TableState tableStateBackup = createTableStateSnpashot();
+                      applyAll(oldValue);
+                      deleteConfig(oldValue);
+                      storeCurrentStatAsConfig(newValue);
+                      restoreTableState(tableStateBackup);
+                      break;
+                    case DEFAULT:
+                    default:
+                      throw new IllegalStateException("Rows of configType " + getConfigTypeColumn().getValue(row).name() + " should never be editable.");
                   }
                 }
+                else {
+                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
+                    getConfigNameColumn().setValue(row, oldValue);
+                  }
+                }
+                row.getCellForUpdate(getConfigNameColumn()).setEditable(getConfigTypeColumn().getValue(row) == ConfigType.NEW);
               }
 
             }
@@ -1199,23 +1210,12 @@ public class OrganizeColumnsForm extends AbstractForm {
                     doResetAction(ResetAllMenu.class);
                   }
                   else {
-                    applyViewForSelectedConfig();
                     String configName = getConfigNameColumn().getSelectedValue();
-                    m_table.getColumnSet().applySorting(configName);
+                    applyAll(configName);
                     getColumnsTableField().reloadTableData();
                   }
                 }
 
-              }
-
-              protected void applyViewForSelectedConfig() {
-                ClientUIPreferences prefs = ClientUIPreferences.getInstance();
-                String configName = getConfigNameColumn().getSelectedValue();
-                for (IColumn<?> col : m_table.getColumnSet().getColumns()) {
-                  col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
-                  col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
-                  col.setVisibleColumnIndexHint(prefs.getTableColumnViewIndex(col, col.getInitialSortIndex(), configName));
-                }
               }
 
               @Order(20.0)
@@ -1231,7 +1231,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                     doResetAction(ResetViewMenu.class);
                   }
                   else {
-                    applyViewForSelectedConfig();
+                    applyViewForConfig(getConfigNameColumn().getSelectedValue());
                     getColumnsTableField().reloadTableData();
                   }
                 }
@@ -1327,23 +1327,8 @@ public class OrganizeColumnsForm extends AbstractForm {
       @Override
       protected void execClickAction() throws ProcessingException {
         // revert to original state
-        try {
-          m_table.setTableChanging(true);
-          if (m_table.getTableCustomizer() != null) {
-            m_table.getTableCustomizer().removeAllColumns();
-            m_table.getTableCustomizer().setSerializedData(m_oldtableCustomizerData);
-            ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
-          }
-          m_table.resetColumnConfiguration();
-          BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
-          if (m_table.getUserFilterManager() != null) {
-            m_table.getUserFilterManager().setSerializedData(m_oldUserFilterData);
-          }
-          m_table.addRowsByMatrix(m_oldData);
-        }
-        finally {
-          m_table.setTableChanging(false);
-        }
+        P_TableState tableState = m_oldTableState;
+        restoreTableState(tableState);
         reload();
       }
     }
@@ -1450,10 +1435,50 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  private byte[] m_oldtableCustomizerData;
-  private byte[] m_oldUserFilterData;
-  private List<TableColumnState> m_oldColumns;
-  private Object[][] m_oldData;
+  /**
+   * complete state (config and data)
+   */
+  protected static class P_TableState {
+    protected byte[] m_tableCustomizerData;
+    protected byte[] m_userFilterData;
+    protected List<TableColumnState> m_columnStates;
+    protected Object[][] m_data;
+
+    public byte[] getTableCustomizerData() {
+      return m_tableCustomizerData;
+    }
+
+    public void setTableCustomizerData(byte[] tableCustomizerData) {
+      m_tableCustomizerData = tableCustomizerData;
+    }
+
+    public byte[] getUserFilterData() {
+      return m_userFilterData;
+    }
+
+    public void setUserFilterData(byte[] userFilterData) {
+      m_userFilterData = userFilterData;
+    }
+
+    public List<TableColumnState> getColumnStates() {
+      return m_columnStates;
+    }
+
+    public void setColumnStates(List<TableColumnState> columnStates) {
+      m_columnStates = columnStates;
+    }
+
+    public Object[][] getData() {
+      return m_data;
+    }
+
+    public void setData(Object[][] data) {
+      m_data = data;
+    }
+
+  }
+
+  protected P_TableState m_oldTableState;
 
   public void persistConfig() throws ProcessingException {
     // TODO ASA obsolete?
@@ -1466,19 +1491,46 @@ public class OrganizeColumnsForm extends AbstractForm {
   public void reload() throws ProcessingException {
     // Back-up the current columns so we may restore them if
     // the "organize columns" form is canceled:
-    if (m_table.getTableCustomizer() != null) {
-      m_oldtableCustomizerData = m_table.getTableCustomizer().getSerializedData();
-    }
-    m_oldColumns = BookmarkUtility.backupTableColumns(m_table);
-    m_oldData = m_table.getTableData();
-    if (m_table.getUserFilterManager() != null) {
-      m_oldUserFilterData = m_table.getUserFilterManager().getSerializedData();
-    }
+    m_oldTableState = createTableStateSnpashot();
     getColumnsTableField().reloadTableData();
     getNamedConfigTableField().reloadTableData();
   }
 
-  private void storeCurrentStatAsConfig(String configName) {
+  protected P_TableState createTableStateSnpashot() throws ProcessingException {
+    P_TableState tableState = new P_TableState();
+    if (m_table.getTableCustomizer() != null) {
+
+      tableState.setTableCustomizerData(m_table.getTableCustomizer().getSerializedData());
+    }
+    tableState.setColumnStates(BookmarkUtility.backupTableColumns(m_table));
+    tableState.setData(m_table.getTableData());
+    if (m_table.getUserFilterManager() != null) {
+      tableState.setUserFilterData(m_table.getUserFilterManager().getSerializedData());
+    }
+    return tableState;
+  }
+
+  protected void restoreTableState(P_TableState tableState) throws ProcessingException {
+    try {
+      m_table.setTableChanging(true);
+      if (m_table.getTableCustomizer() != null) {
+        m_table.getTableCustomizer().removeAllColumns();
+        m_table.getTableCustomizer().setSerializedData(tableState.getTableCustomizerData());
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
+      }
+      m_table.resetColumnConfiguration();
+      BookmarkUtility.restoreTableColumns(m_table, tableState.getColumnStates());
+      if (m_table.getUserFilterManager() != null) {
+        m_table.getUserFilterManager().setSerializedData(tableState.getUserFilterData());
+      }
+      m_table.addRowsByMatrix(tableState.getData());
+    }
+    finally {
+      m_table.setTableChanging(false);
+    }
+  }
+
+  protected void storeCurrentStatAsConfig(String configName) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     if (prefs != null) {
       prefs.addTableColumnsConfig(m_table, configName);
@@ -1486,10 +1538,24 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  private void deleteConfig(String config) {
+  protected void deleteConfig(String config) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     if (prefs != null) {
       prefs.removeTableColumnsConfig(m_table, config);
+    }
+  }
+
+  protected void applyAll(String configName) {
+    applyViewForConfig(configName);
+    m_table.getColumnSet().applySorting(configName);
+  }
+
+  protected void applyViewForConfig(String configName) {
+    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+    for (IColumn<?> col : m_table.getColumnSet().getColumns()) {
+      col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
+      col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
+      col.setVisibleColumnIndexHint(prefs.getTableColumnViewIndex(col, col.getInitialSortIndex(), configName));
     }
   }
 }
