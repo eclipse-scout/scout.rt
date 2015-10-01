@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 
 /**
@@ -48,6 +49,9 @@ public final class UiHints {
   private static final String SESSION_ATTRIBUTE_INSPECTOR_HINT = UiHints.class.getName() + "#inspector";
   private static final String SESSION_ATTRIBUTE_THEME_HINT = UiHints.class.getName() + "#theme";
 
+  private static String s_configTheme;
+  private static boolean s_configThemeRead;
+
   private UiHints() {
     // static access only
   }
@@ -61,6 +65,7 @@ public final class UiHints {
           SESSION_ATTRIBUTE_MINIFY_HINT);
       updateHint(req, debug.booleanValue(), SESSION_ATTRIBUTE_INSPECTOR_HINT);
     }
+
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_INSPECTOR_HINT), SESSION_ATTRIBUTE_INSPECTOR_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_CACHE_HINT), SESSION_ATTRIBUTE_CACHE_HINT);
     updateHint(req, getRequestParameterBoolean(req, GzipServletFilter.URL_PARAM_COMPRESS_HINT), GzipServletFilter.SESSION_ATTRIBUTE_COMPRESS_HINT);
@@ -99,12 +104,44 @@ public final class UiHints {
     return calculateHint(req, SESSION_ATTRIBUTE_MINIFY_HINT, !Platform.get().inDevelopmentMode());
   }
 
+  /**
+   * When theme is set to 'default' we return null instead. This is required because we cannot set the theme to 'null'
+   * with a request-parameter (because when a request-parameter return null it means the parameter is not set). Thus we
+   * send ?theme=default to set the theme to null (which is means Scout loads the default-theme).
+   *
+   * @param req
+   * @return
+   */
   public static String getThemeHint(HttpServletRequest req) {
     HttpSession session = req.getSession(false);
     if (session == null) {
       return null;
     }
-    return (String) session.getAttribute(SESSION_ATTRIBUTE_THEME_HINT);
+    String theme = (String) session.getAttribute(SESSION_ATTRIBUTE_THEME_HINT);
+    if (theme == null) {
+      theme = getConfiguredTheme();
+    }
+    if ("default".equals(theme)) {
+      return null;
+    }
+    else {
+      return theme;
+    }
+  }
+
+  /**
+   * Only read configuration for UI theme once.
+   */
+  private static String getConfiguredTheme() {
+    if (s_configThemeRead) {
+      return s_configTheme;
+    }
+    else {
+      s_configTheme = CONFIG.getPropertyValue(UiThemeProperty.class);
+      s_configThemeRead = true;
+      LOG.info("UI theme configured in config.properties: " + s_configTheme);
+      return s_configTheme;
+    }
   }
 
   private static boolean calculateHint(HttpServletRequest req, String sessionAttr, boolean defaultValue) {
