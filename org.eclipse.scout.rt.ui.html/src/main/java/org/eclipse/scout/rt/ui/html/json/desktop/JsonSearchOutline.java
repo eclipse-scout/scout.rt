@@ -45,6 +45,12 @@ public class JsonSearchOutline<SEARCH_OUTLINE extends ISearchOutline> extends Js
         return getModel().getSearchStatus();
       }
     });
+    putJsonProperty(new JsonProperty<SEARCH_OUTLINE>(ISearchOutline.PROP_REQUEST_FOCUS_QUERY_FIELD, model) {
+      @Override
+      protected String modelValue() {
+        return null; // This property is not really a property, but an event, therefore it does not have a value
+      }
+    });
   }
 
   @Override
