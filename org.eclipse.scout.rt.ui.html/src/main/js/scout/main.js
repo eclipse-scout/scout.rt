@@ -79,16 +79,23 @@ scout.inherits = function(childCtor, parentCtor) {
  * Depending on the first parameter, either the object factory or the constructor function is used.
  * - String (objectType):
  *   Creates a new instance using the object factory.
+ * - Object:
+ *   Creates a new instance using the object factory.
+ *   The objectType has to be specified as property in this first parameter.
+ *   The second parameter is not used.
  * - Constructor function:
  *   Creates a new instance using the given constructor function and calls init(options) of that instance.<p>
  *   Used mainly for widgets but may actually be used for any objects which have a init method with one parameter.
  */
-scout.create = function(constructorOrObjectType, options) {
-  if (typeof constructorOrObjectType === 'string') {
-    options.objectType = constructorOrObjectType;
+scout.create = function(vararg, options) {
+  if (typeof vararg === 'string') {
+    options.objectType = vararg;
+    return scout._createLocalObject(options);
+  } else if (typeof vararg === 'object') {
+    options = vararg;
     return scout._createLocalObject(options);
   } else {
-    var Constructor = constructorOrObjectType;
+    var Constructor = vararg;
     var obj = new Constructor();
     obj.init(options);
     return obj;

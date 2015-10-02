@@ -8,7 +8,7 @@ describe('main', function() {
 
   describe('create', function() {
 
-    it('accepts string or functions as first argument', function() {
+    it('accepts string, object or functions as first argument', function() {
       // must fail
       expect(function() {
         scout.create(1);
@@ -20,10 +20,16 @@ describe('main', function() {
         scout.create(true);
       }).toThrow();
 
-      // must not fail
       var menu = scout.create('Menu', {
         parent: new scout.NullWidget(),
         session: session
+      });
+      expect(menu instanceof scout.Menu).toBe(true);
+
+      menu = scout.create({
+        parent: new scout.NullWidget(),
+        session: session,
+        objectType: 'Menu'
       });
       expect(menu instanceof scout.Menu).toBe(true);
     });
@@ -40,7 +46,7 @@ describe('main', function() {
       expect(widget.session).toBe(session);
     });
 
-    describe('creates local model adapter if first parameter is the objectType', function() {
+    describe('creates local object if first parameter is the objectType', function() {
 
       it('sets property \'id\' correctly when no ID is provided', function() {
         var expectedSeqNo = scout._uniqueIdSeqNo + 1,
@@ -63,6 +69,17 @@ describe('main', function() {
         expect(scout.objects.countProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
       });
 
+    });
+
+    it('creates local object if first parameter of type object and contains objectType property', function() {
+      var expectedSeqNo = scout._uniqueIdSeqNo + 1,
+        menu = scout.create({
+          parent: new scout.NullWidget(),
+          session: session,
+          objectType: 'Menu'
+        });
+      expect(menu.id).toBe('ui' + expectedSeqNo.toString());
+      expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
     });
 
   });

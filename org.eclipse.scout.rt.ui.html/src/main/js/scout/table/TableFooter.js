@@ -135,10 +135,10 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
     filterText = $input.val();
 
   if (filterText) {
-    filter = new scout.TableTextUserFilter();
-    filter.init({
+    filter = scout.create('TableTextUserFilter', {
+      session: this.session,
       table: this._table
-    }, this.session);
+    });
     filter.text = filterText.toLowerCase();
     this._table.addFilter(filter);
   } else if (!filterText) {

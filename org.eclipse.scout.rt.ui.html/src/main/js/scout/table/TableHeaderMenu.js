@@ -158,9 +158,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   var filter = table.getFilter(column.id);
   if (!filter) {
-    filter = this.session.objectFactory.create({
+    filter = scout.create('ColumnUserFilter', {
       session: this.session,
-      objectType: 'ColumnUserFilter',
       table: table,
       column: column
     });

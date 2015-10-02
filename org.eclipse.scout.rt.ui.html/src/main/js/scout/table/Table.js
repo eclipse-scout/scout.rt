@@ -77,7 +77,7 @@ scout.Table.prototype._initColumns = function() {
   var column, i;
   for (i = 0; i < this.columns.length; i++) {
     this.columns[i].session = this.session;
-    column = this.session.objectFactory.create(this.columns[i]);
+    column = scout.create(this.columns[i]);
     column.table = this;
     this.columns[i] = column;
 
@@ -2336,7 +2336,8 @@ scout.Table.prototype._syncFilters = function(filters) {
         filterData.column = this.columnById(filterData.column);
       }
       filterData.table = this;
-      var filter = this.session.objectFactory.create(filterData);
+      filterData.session = this.session;
+      var filter = scout.create(filterData);
       this.addFilter(filter, false);
     }, this);
   }
