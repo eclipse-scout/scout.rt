@@ -96,6 +96,11 @@ scout.scrollbars = {
     }
     session.detachHelper.removeScrollable($container);
     $container.removeData('scrollable');
+
+    var htmlContainer = scout.HtmlComponent.optGet($container);
+    if (htmlContainer) {
+      htmlContainer.scrollable = false;
+    }
   },
 
   /**
