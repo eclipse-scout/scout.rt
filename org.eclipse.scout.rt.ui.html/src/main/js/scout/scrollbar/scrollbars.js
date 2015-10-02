@@ -208,9 +208,15 @@ scout.scrollbars = {
 
   scrollLeft: function($scrollable, scrollLeft) {
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'x');
-    scrollbar.notifyBeforeScroll();
-    $scrollable.scrollLeft(scrollLeft);
-    scrollbar.notifyAfterScroll();
+    if (scrollbar) {
+      // js scrolling
+      scrollbar.notifyBeforeScroll();
+      $scrollable.scrollLeft(scrollLeft);
+      scrollbar.notifyAfterScroll();
+    } else {
+      // native scrolling
+      $scrollable.scrollLeft(scrollLeft);
+    }
   },
 
   scrollbar: function($scrollable, axis) {
