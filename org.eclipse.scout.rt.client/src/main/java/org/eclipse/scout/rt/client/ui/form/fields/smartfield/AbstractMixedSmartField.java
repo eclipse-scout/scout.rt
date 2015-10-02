@@ -153,15 +153,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     String searchText = toSearchText(text);
     getLookupRowFetcher().update(searchText, false, true);
     List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = getLookupRowFetcher().getResult().getLookupRows();
-    int numRows = lookupRows.size();
-    if (numRows == 0) {
+    if (lookupRows == null || lookupRows.size() == 0) {
       setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text));
       return true;
     }
-    else if (numRows == 1) {
+    else if (lookupRows.size() == 1) {
       acceptProposal(lookupRows.get(0));
     }
-    else if (numRows > 1) {
+    else if (lookupRows.size() > 1) {
       setValidationError(text, TEXTS.get("SmartFieldNotUnique", text));
       return true;
     }
