@@ -59,7 +59,7 @@ scout.SearchOutline.prototype._renderProperties = function() {
   scout.SearchOutline.parent.prototype._renderProperties.call(this);
   this._renderSearchQuery(this.searchQuery);
   this._renderSearchStatus(this.searchStatus);
-  this._renderFocusQueryField();
+  this._renderRequestFocusQueryField();
 };
 
 scout.SearchOutline.prototype._renderSearchQuery = function(searchQuery) {
