@@ -163,6 +163,7 @@ scout.TableFooter.prototype._updateTableControls = function() {
     controls.forEach(function(control) {
       control.tableFooter = this;
       control.table = this._table;
+      control.setParent(this);
       control.render(this.$controlGroup);
     }.bind(this));
   } else {
