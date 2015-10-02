@@ -196,7 +196,9 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     this.$field.html('');
     var restoreOldHtmlContent = function() {
       this.$field.html(oldHtmlContent);
-      scout.scrollbars.install(this.$field, this.session);
+      scout.scrollbars.install(this.$field, {
+        parent: this
+      });
     }.bind(this);
 
     setTimeout(function() {
