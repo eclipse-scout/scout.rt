@@ -12,7 +12,7 @@ scout.FocusManager = function(session, options) {
 
   this.session = session;
   this.$entryPoint = session.$entryPoint;
-  this.active = scout.helpers.nvl(options.focusManagerActive, true);
+  this.active = scout.helpers.nvl(options.focusManagerActive, scout.device.focusManagerActive);
 
   this._focusContexts = [];
   this._glassPaneTargets = [];

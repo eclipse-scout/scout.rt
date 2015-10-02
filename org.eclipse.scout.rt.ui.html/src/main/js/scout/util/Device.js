@@ -11,9 +11,11 @@ scout.Device = function(userAgent) {
   this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
   this.browserVersion = 0;
 
+  // --- device specific configuration
   // initialize with empty string so that it can be used without calling initUnselectableAttribute()
   this.unselectableAttribute = '';
   this.tableAdditionalDivRequired = false;
+  this.focusManagerActive = true;
 
   this.parseUserAgent(userAgent);
   this.parseBrowserVersion(userAgent);
@@ -62,11 +64,23 @@ scout.Device.prototype.bootstrap = function() {
         FastClick.attach(document.body);
       });
   }
+  if (this.hasOnScreenKeyboard()) {
+    // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
+    this.focusManagerActive = false;
+  }
   return $deferred;
+};
+
+scout.Device.prototype.hasOnScreenKeyboard = function() {
+  return this.isIos() || this.isAndroid();
 };
 
 scout.Device.prototype.isIos = function() {
   return this.system === scout.Device.System.IOS;
+};
+
+scout.Device.prototype.isAndroid = function() {
+  return this.system === scout.Device.System.ANDROID;
 };
 
 /**
