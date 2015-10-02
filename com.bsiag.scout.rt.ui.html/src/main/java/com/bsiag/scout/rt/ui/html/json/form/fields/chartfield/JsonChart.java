@@ -103,6 +103,12 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
         return getModel().getMaxSegments();
       }
     });
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_MODEL_HANDELS_CLICK, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isModelHandelsClick();
+      }
+    });
   }
 
   @Override
