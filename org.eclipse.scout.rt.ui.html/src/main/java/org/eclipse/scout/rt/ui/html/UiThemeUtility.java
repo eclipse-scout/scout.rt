@@ -76,15 +76,25 @@ public class UiThemeUtility {
     }
 
     // 3rd - use theme configured in config.properties or 'default'
-    if (theme == null) {
-      theme = getConfiguredTheme();
-    }
+    theme = defaultIfNull(theme);
 
     // store theme in session so we must not check 2 and 3 again for the next requests
     if (session != null && !CompareUtility.equals(theme, themeFromSession)) {
       session.setAttribute(THEME_SESSION_ATTRIBUTE, theme);
     }
 
+    return theme;
+  }
+
+  /**
+   * When theme is set to 'default', we want to lookup 'colors.css' and not 'colors-default.css'. That's why this method
+   * returns null in that case.
+   */
+  public static String getThemeForLookup(HttpServletRequest req) {
+    String theme = getTheme(req);
+    if (UiThemeProperty.DEFAULT_THEME.equals(theme)) {
+      theme = null;
+    }
     return theme;
   }
 
@@ -104,6 +114,10 @@ public class UiThemeUtility {
       CookieUtility.addCookie(resp, THEME_COOKIE_NAME, theme);
     }
     session.setAttribute(THEME_SESSION_ATTRIBUTE, theme);
+  }
+
+  public static String defaultIfNull(String theme) {
+    return theme == null ? getConfiguredTheme() : theme;
   }
 
 }

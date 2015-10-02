@@ -42,7 +42,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), m_scriptProcessor);
     builder.setMinifyEnabled(isMinify());
-    builder.setTheme(UiThemeUtility.getTheme(getRequest()));
+    builder.setTheme(UiThemeUtility.getThemeForLookup(getRequest()));
     String resourcePath = cacheKey.getResourcePath();
     ScriptOutput out = builder.buildScript(resourcePath);
     if (out != null) {

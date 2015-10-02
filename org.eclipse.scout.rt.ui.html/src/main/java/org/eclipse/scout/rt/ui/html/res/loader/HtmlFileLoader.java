@@ -44,7 +44,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
   @Override
   public HttpCacheKey createCacheKey(String pathInfo, Locale locale) {
-    return new HttpCacheKey(pathInfo, locale, new Object[]{UiThemeUtility.getTheme(getRequest())});
+    return new HttpCacheKey(pathInfo, locale, new Object[]{UiThemeUtility.getThemeForLookup(getRequest())});
   }
 
   @Override
