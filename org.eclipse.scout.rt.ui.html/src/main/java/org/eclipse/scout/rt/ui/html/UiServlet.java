@@ -104,15 +104,13 @@ public class UiServlet extends HttpServlet {
   }
 
   protected Locale getPreferredLocale(HttpServletRequest req) {
-    Cookie[] cookies = req.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (IUiSession.PREFERRED_LOCALE_COOKIE_NAME.equals(cookie.getName())) {
-          return Locale.forLanguageTag(cookie.getValue());
-        }
-      }
+    Cookie cookie = CookieUtility.getCookieByName(req, IUiSession.PREFERRED_LOCALE_COOKIE_NAME);
+    if (cookie == null) {
+      return req.getLocale();
     }
-    return req.getLocale();
+    else {
+      return Locale.forLanguageTag(cookie.getValue());
+    }
   }
 
   /**

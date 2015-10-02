@@ -176,4 +176,11 @@ public interface IUiSession {
    * disposed (e.g. forms).
    */
   void sendDisposeAdapterEvent(IJsonAdapter<?> adapter);
+
+  /**
+   * Sets the new theme (session & cookie) and triggers a reload of the current page in the browser.
+   *
+   * @param theme
+   */
+  void updateTheme(String theme);
 }

@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -87,6 +86,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private static final String EVENT_INITIALIZED = "initialized";
   private static final String EVENT_LOCALE_CHANGED = "localeChanged";
   private static final String EVENT_DISPOSE_ADAPTER = "disposeAdapter";
+  private static final String EVENT_RELOAD_PAGE = "reloadPage";
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final P_RootAdapter m_rootJsonAdapter;
@@ -219,6 +219,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       // Add a cookie with the preferred user-language
       storePreferredLocaleInCookie(resp, m_clientSession.getLocale());
 
+      // Apply theme from model to HTTP session and cookie
+      boolean reloadTheme = initUiTheme(req, resp, httpSession);
+
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
@@ -230,12 +233,38 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
       // Send "initialized" event
       sendInitializationEvent(jsonClientSessionAdapter.getId());
+
+      // When theme changes during initialization, send page reload event
+      if (reloadTheme) {
+        sendReloadPageEvent();
+      }
+
       LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
     }
     finally {
       m_currentHttpContext.clear();
       m_currentJsonRequest = null;
     }
+  }
+
+  /**
+   * Info: instead of reload the current page in the browser, we could build a servlet-filter which determines what
+   * theme the user has _before_ the client-session is created. However the 'reload' will only be performed in the case
+   * where the browser sends a cookie that doesn't match the user-settings which should not happen often.
+   *
+   * @param req
+   * @param resp
+   * @param httpSession
+   * @return Whether or not the page must be reloaded by the browser (required when theme changes after client-session
+   *         has been initialized)
+   */
+  private boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
+    String modelTheme = StringUtility.nvl(m_clientSession.getDesktop().getTheme(), UiThemeProperty.DEFAULT_THEME);
+    String currentTheme = StringUtility.nvl(UiThemeUtility.getTheme(req), UiThemeProperty.DEFAULT_THEME);
+    boolean reloadPage = !modelTheme.equals(currentTheme);
+    UiThemeUtility.storeTheme(resp, httpSession, modelTheme);
+    LOG.debug("UI theme model=" + modelTheme + " current=" + currentTheme + " reloadPage=" + reloadPage);
+    return reloadPage;
   }
 
   @Override
@@ -307,9 +336,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
-    Cookie cookie = new Cookie(PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
-    cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
-    resp.addCookie(cookie);
+    CookieUtility.addCookie(resp, PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
   }
 
   /**
@@ -388,6 +415,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         }
       }
     }), uiJobs.newModelJobInput("start up desktop", m_clientSession, false), RuntimeExceptionTranslator.class);
+  }
+
+  protected void sendReloadPageEvent() {
+    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE, new JSONObject());
   }
 
   protected void sendInitializationEvent(String clientSessionAdapterId) {
@@ -757,6 +788,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     putLocaleData(jsonEvent, locale);
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_LOCALE_CHANGED, jsonEvent);
     updatePreferredLocaleCookie(locale);
+  }
+
+  @Override
+  public void updateTheme(String theme) {
+    UiThemeUtility.storeTheme(m_currentHttpContext.getResponse(), m_currentHttpSession, theme);
+    sendReloadPageEvent();
+    LOG.info("UI theme changed to: " + theme);
   }
 
   /**

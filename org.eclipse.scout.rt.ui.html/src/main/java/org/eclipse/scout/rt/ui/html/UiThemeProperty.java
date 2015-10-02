@@ -18,9 +18,16 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
  */
 public class UiThemeProperty extends AbstractStringConfigProperty {
 
+  public static final String DEFAULT_THEME = "default";
+
   @Override
   public String getKey() {
     return "scout.ui.theme";
+  }
+
+  @Override
+  protected String getDefaultValue() {
+    return DEFAULT_THEME;
   }
 
 }

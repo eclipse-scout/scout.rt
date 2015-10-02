@@ -955,9 +955,15 @@ scout.Session.prototype.onModelAction = function(event) {
     this._onLogout(event);
   } else if (event.type === 'disposeAdapter') {
     this._onDisposeAdapter(event);
+  } else if (event.type === 'reloadPage') {
+    this._onReloadPage(event);
   } else {
     $.log.warn('Model action "' + event.type + '" is not supported by UI session');
   }
+};
+
+scout.Session.prototype._onReloadPage = function(event) {
+  location.reload();
 };
 
 scout.Session.prototype._onLocaleChanged = function(event) {

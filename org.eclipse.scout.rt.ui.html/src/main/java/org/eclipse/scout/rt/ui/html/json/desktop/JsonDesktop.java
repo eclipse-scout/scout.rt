@@ -269,6 +269,13 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+    if (IDesktop.PROP_THEME.equals(propertyName)) {
+      getUiSession().updateTheme((String) newValue);
+    }
+  }
+
   protected void handleModelOpenUri(String uri, IOpenUriHint openUriHint) {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "uri", uri);
