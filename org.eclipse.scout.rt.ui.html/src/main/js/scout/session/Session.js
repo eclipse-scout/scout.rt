@@ -645,7 +645,8 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 
   options = options || {};
   var model = {
-    parent: this.desktop,
+    session: this,
+    parent: this.desktop || new scout.NullWidget(),
     iconId: options.iconId,
     severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
     header: options.header,
