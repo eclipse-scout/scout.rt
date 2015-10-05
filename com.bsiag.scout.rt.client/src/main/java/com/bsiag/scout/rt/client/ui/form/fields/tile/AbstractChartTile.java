@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.tile;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 
@@ -65,11 +67,12 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
     return getTileField().getChart();
   }
 
+  @ClassId("fb72a598-b9ca-44b7-b1be-0ca1a33bca6b")
   public class ChartField extends AbstractChartField<ChartField.Chart> {
 
     @Override
     public String classId() {
-      return AbstractChartTile.this.classId() + ID_CONCAT_SYMBOL + super.classId();
+      return AbstractChartTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     }
 
     public class Chart extends AbstractChart {
