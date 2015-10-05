@@ -1633,9 +1633,11 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   }
   if (oldNode.enabled !== updatedNode.enabled) {
     oldNode.enabled = updatedNode.enabled;
-    oldNode.$node.children('.tree-node-checkbox')
-      .children('.check-box')
-      .toggleClass('disabled', !(this.enabled && oldNode.enabled));
+    if (oldNode.$node) {
+      oldNode.$node.children('.tree-node-checkbox')
+        .children('.check-box')
+        .toggleClass('disabled', !(this.enabled && oldNode.enabled));
+    }
     propertiesChanged = true;
   }
   if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {
