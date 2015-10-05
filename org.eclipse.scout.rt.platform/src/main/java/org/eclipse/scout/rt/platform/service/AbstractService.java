@@ -18,7 +18,12 @@ import org.eclipse.scout.rt.platform.service.IServiceInitializer.ServiceInitiali
 
 /**
  * Convenience {@link IService} implementation with support for {@link IServiceInitializer}s.
+ *
+ * @deprecated use {@link PostConstruct} to initialize and {@link PreDestroy} to cleanup a service. Will be removed in
+ *             Scout 6.1.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractService implements IService {
 
   /**

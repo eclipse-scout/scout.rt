@@ -10,9 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 /**
  * Interface for a service initializer.
+ *
+ * @deprecated {@link PostConstruct} to initialize and {@link PreDestroy} to cleanup a service
  */
+@Deprecated
 public interface IServiceInitializer {
 
   enum ServiceInitializerResult {
