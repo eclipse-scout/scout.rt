@@ -1665,16 +1665,22 @@ scout.Table.prototype.renderSelection = function(rows) {
 
   for (var i = 0; i < rows.length; i++) { // traditional for loop, elements might be added during loop
     var row = rows[i],
+      thisRowSelected = this.selectedRows.indexOf(row) !== -1,
       filteredRows = this.filteredRows(),
       previousIndex = filteredRows.indexOf(row) - 1,
       previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
       followingIndex = filteredRows.indexOf(row) + 1,
-      followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1,
-      classChanged = addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1, 'selected') +
-        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && followingRowSelected, 'select-top') +
-        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && !followingRowSelected, 'select-bottom') +
-        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && !followingRowSelected, 'select-single') +
-        addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && followingRowSelected, 'select-middle');
+      followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
+
+    // Note: We deliberately use the '+' operator on booleans here! That way, _all_ methods are executed (boolean
+    // operators might stop in between) and the variable classChanged contains a number > 1 (which is truthy) when
+    // at least one method call returned true.
+    var classChanged = 0 +
+      addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected, 'selected') +
+      addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && followingRowSelected, 'select-top') +
+      addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && previousRowSelected && !followingRowSelected, 'select-bottom') +
+      addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && !followingRowSelected, 'select-single') +
+      addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && previousRowSelected && followingRowSelected, 'select-middle');
 
     if (classChanged && previousRowSelected && rows.indexOf(filteredRows[previousIndex]) == -1) {
       rows.push(filteredRows[previousIndex]);
