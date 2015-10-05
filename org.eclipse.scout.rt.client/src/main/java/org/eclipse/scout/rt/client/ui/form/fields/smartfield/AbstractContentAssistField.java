@@ -1262,7 +1262,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       acceptProposal(row);
     }
     else {
-      clearProposal(); // FIXME AWE: also set value to null?
+      clearProposal();
     }
   }
 

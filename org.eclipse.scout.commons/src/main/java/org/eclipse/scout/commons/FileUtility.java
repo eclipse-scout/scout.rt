@@ -613,7 +613,19 @@ public final class FileUtility {
    *         "png".
    */
   public static String getFileExtension(File file) {
-    String[] parts = getFilenameParts(file);
+    if (file == null) {
+      return null;
+    }
+    return getFileExtension(file.getName());
+  }
+
+  /**
+   * @param fileName
+   * @return the file-extension of the given file or null when file has no file-extension. Example "foo.png" will return
+   *         "png".
+   */
+  public static String getFileExtension(String fileName) {
+    String[] parts = getFilenameParts(fileName);
     if (parts == null) {
       return null;
     }
@@ -628,7 +640,18 @@ public final class FileUtility {
     if (file == null) {
       return null;
     }
-    String fileName = file.getName();
+    return getFilenameParts(file.getName());
+
+  }
+
+  /**
+   * @param fileName
+   * @return an array with two elements, [0] contains the file-name without extension [1] contains the file-extension
+   */
+  public static String[] getFilenameParts(String fileName) {
+    if (fileName == null) {
+      return null;
+    }
     int index = fileName.lastIndexOf('.');
     if (index < 0) {
       return new String[]{

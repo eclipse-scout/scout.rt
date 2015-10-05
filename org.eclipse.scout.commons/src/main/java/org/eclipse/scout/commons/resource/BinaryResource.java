@@ -64,10 +64,8 @@ public final class BinaryResource implements Serializable {
   public BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified) {
     m_filename = filename;
     if (contentType == null && filename != null) {
-      int i = filename.lastIndexOf('.'); // FIXME AWE: use FileUtility here
-      if (i >= 0) {
-        contentType = FileUtility.getContentTypeForExtension(filename.substring(i + 1));
-      }
+      String fileExtension = FileUtility.getFileExtension(filename);
+      contentType = FileUtility.getContentTypeForExtension(fileExtension);
     }
     m_contentType = contentType;
     m_charset = charset;
