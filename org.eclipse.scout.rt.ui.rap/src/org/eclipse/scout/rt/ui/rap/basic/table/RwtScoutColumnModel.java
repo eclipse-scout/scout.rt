@@ -364,7 +364,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
     try {
       //prohibit access of m_cachedCells during rebuild
-      getUiTable().getUiEnvironment().invokeScoutLater(r, -1).join(1);
+      getUiTable().getUiEnvironment().invokeScoutLater(r, -1).join();
     }
     catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for the model.", e);
