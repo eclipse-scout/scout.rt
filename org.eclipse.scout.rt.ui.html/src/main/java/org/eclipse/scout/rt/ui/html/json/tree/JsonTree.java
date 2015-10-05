@@ -748,7 +748,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   /**
    * Returns a treeNode for the given nodeId, or null when no node is found for the given nodeId.
    */
-  public ITreeNode optTreeNodeForNodeId(String nodeId) { // FIXME AWE: check where to use this method
+  public ITreeNode optTreeNodeForNodeId(String nodeId) {
     return m_treeNodes.get(nodeId);
   }
 

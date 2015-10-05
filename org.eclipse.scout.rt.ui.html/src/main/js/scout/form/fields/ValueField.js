@@ -28,18 +28,15 @@ scout.ValueField.prototype._onFieldBlur = function() {
   this.acceptInput(false);
 };
 
-// FIXME AWE: (naming) in JavaStyleGuide ergänzen:
-// - wenn als event handler registriert $field.on('click', this._onClick.bind(this));
-// - Wenn event vom server kommt, z.B. selection _onSelection(event)
-// - Wenn Wert an Server gesendet werden soll acceptInput();
-//   wird typischerweise auch im _onChange oder _onKeyUp aufgerufen.
-//   ruft typischerweise auch sendDisplayText(displayText) auf
-
 /**
- * Accepts the current input and writes it to the model.<p>
- * This method is typically called in onBlur of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc).<p>
- * The default reads the display text using this._readDisplayText and writes it to the model.
- * If subclasses don't have a display text or want to write another state to the server, they may override this method.
+ * Accepts the current input and writes it to the model.
+ * <p>
+ * This method is typically called by the _onBlur() function of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc).
+ * It is also called by the _aboutToBlurByMouseDown() function, which is required because our Ok- and Cancel-buttons are not focusable (thus _onBlur() is
+ * never called) but changes in the value-field must be sent to the server anyway when a button is clicked.
+ * <p>
+ * The default reads the display text using this._readDisplayText() and writes it to the model by calling _sendDisplayTextChanged().
+ * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
  *
  */
 scout.ValueField.prototype.acceptInput = function(whileTyping) {

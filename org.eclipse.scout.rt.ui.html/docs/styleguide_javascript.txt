@@ -315,6 +315,17 @@ Um die Lesbarkeit zu erhöhen ist folgende Notation für den Funktions-Namen zu 
 
 Durch das bind(this) zeigt this auf die Instanz der Klasse und nicht mehr auf das target. Wenn man auf das target zugreifen möchte, muss man dies über den event tun.
 
-scout.Example.prototype._onRowMousedown = function(event) {
-  var $target = $(event.target);
-}
+  scout.Example.prototype._onRowMousedown = function(event) {
+    var $target = $(event.target);
+  }
+
+Naming: für den entsprechenden Event-Typ soll eine _on[EventTyp] Methode deklartiert werden:
+
+  scout.MyField.prototype._onClick = function(event) {
+    ...
+  };
+
+  $field.on('click', this._onClick.bind(this));
+
+Die _on-Konvention wird auch für Events verwendet, die vom UI-Server kommen, z.B. Table#_onRowsInserted(rows);
+
