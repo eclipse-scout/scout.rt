@@ -1,7 +1,6 @@
 scout.DateTimeCompositeLayout = function(dateField) {
   scout.DateTimeCompositeLayout.parent.call(this);
   this._dateField = dateField;
-  this.invalidateOnResize = true;
 
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
   this.MIN_DATE_FIELD_WIDTH = 90;

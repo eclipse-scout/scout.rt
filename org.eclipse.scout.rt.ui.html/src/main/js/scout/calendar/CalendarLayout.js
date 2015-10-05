@@ -1,7 +1,6 @@
 scout.CalendarLayout = function(calendar) {
   scout.CalendarLayout.parent.call(this);
   this.calendar = calendar;
-  this.invalidateOnResize = true;
 };
 scout.inherits(scout.CalendarLayout, scout.AbstractLayout);
 

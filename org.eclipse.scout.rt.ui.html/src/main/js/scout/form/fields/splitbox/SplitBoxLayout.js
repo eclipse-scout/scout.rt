@@ -1,7 +1,6 @@
 scout.SplitBoxLayout = function(splitBox) {
   scout.SplitBoxLayout.parent.call(this);
   this._splitBox = splitBox;
-  this.invalidateOnResize = true;
 };
 scout.inherits(scout.SplitBoxLayout, scout.AbstractLayout);
 
