@@ -101,7 +101,7 @@ scout.Tooltip.prototype.renderText = function(text) {
 };
 
 scout.Tooltip.prototype.position = function() {
-  var top, left, arrowHeight, overlapX, overlapY, x, y, origin,
+  var top, left, arrowSize, overlapX, overlapY, x, y, origin,
     tooltipWidth, tooltipHeight, arrowDivWidth, arrowPosition, inView;
 
   if (this.origin) {
@@ -121,7 +121,7 @@ scout.Tooltip.prototype.position = function() {
 
   arrowDivWidth = this.$arrow.outerWidth();
   // Arrow is a div rotated by 45 deg -> visible height is half the div
-  arrowHeight = scout.Tooltip.computeHypotenuse(arrowDivWidth) / 2;
+  arrowSize = scout.Tooltip.computeHypotenuse(arrowDivWidth) / 2;
 
   tooltipHeight = this.$container.outerHeight();
   tooltipWidth = this.$container.outerWidth();
@@ -132,7 +132,7 @@ scout.Tooltip.prototype.position = function() {
     arrowPosition = tooltipWidth * this.arrowPosition / 100;
   }
 
-  top = y - tooltipHeight - arrowHeight;
+  top = y - tooltipHeight - arrowSize;
   left = x - arrowPosition;
   overlapX = left + tooltipWidth + this.windowPaddingX - $(window).width();
   overlapY = top - this.windowPaddingY;
@@ -144,13 +144,17 @@ scout.Tooltip.prototype.position = function() {
   }
 
   // Move tooltip to the bottom, arrow on top
+  this.$arrow.removeClass('arrow-top arrow-bottom');
   if (this.tooltipPosition === 'bottom' || overlapY < 0) {
     this.$arrow.addClass('arrow-top');
-    top = y + origin.height + arrowHeight;
+    top = y + origin.height + arrowSize;
   } else {
     this.$arrow.addClass('arrow-bottom');
   }
 
+  // Make sure arrow is never positioned outside of the tooltip
+  arrowPosition = Math.min(arrowPosition, this.$container.outerWidth() - arrowSize);
+  arrowPosition = Math.max(arrowPosition, arrowSize);
   this.$arrow.cssLeft(arrowPosition);
   this.$container
     .cssLeft(left)
