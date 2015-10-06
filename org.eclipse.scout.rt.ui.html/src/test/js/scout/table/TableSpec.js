@@ -392,7 +392,7 @@ describe("Table", function() {
 
     function render(table) {
       table.render(session.$entryPoint);
-      $colHeaders = table.header.$container.find('.header-item');
+      $colHeaders = table.header.$container.find('.table-header-item');
       $header0 = $colHeaders.eq(0);
       $header1 = $colHeaders.eq(1);
       $header2 = $colHeaders.eq(2);
@@ -723,7 +723,7 @@ describe("Table", function() {
 
     function render(table) {
       table.render(session.$entryPoint);
-      $colHeaders = table.header.$container.find('.header-item');
+      $colHeaders = table.header.$container.find('.table-header-item');
       $header0 = $colHeaders.eq(0);
       $header1 = $colHeaders.eq(1);
     }
@@ -1234,7 +1234,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table.header.$container.find('.header-item');
+      var $colHeaders = table.header.$container.find('.table-header-item');
       var $header0 = $colHeaders.eq(0);
       var $header1 = $colHeaders.eq(1);
       var $header2 = $colHeaders.eq(2);

@@ -40,7 +40,7 @@ scout.TableHeader.prototype._render = function($parent) {
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
-    $header = this.$container.appendDiv('header-item')
+    $header = this.$container.appendDiv('table-header-item')
       .data('column', column)
       .css('min-width', column.width + 'px')
       .css('max-width', column.width + 'px')
@@ -63,13 +63,13 @@ scout.TableHeader.prototype._render = function($parent) {
     }
 
     if (!column.fixedWidth) {
-      $separator = this.$container.appendDiv('header-resize');
+      $separator = this.$container.appendDiv('table-header-resize');
       $separator.on('mousedown', '', resizeHeader);
     }
   }
 
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
-  this.$filler = this.$container.appendDiv('header-item filler').css('visibility', 'hidden');
+  this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
   if (this.columns.length === 0) {
     // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
     this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
@@ -116,7 +116,7 @@ scout.TableHeader.prototype._render = function($parent) {
       oldPos = that.table.columns.indexOf(column),
       newPos = oldPos,
       move = $header.outerWidth(),
-      $otherHeaders = $header.siblings('.header-item');
+      $otherHeaders = $header.siblings('.table-header-item');
 
     that.dragging = false;
     // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
@@ -256,7 +256,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     }
 
     // adjust visibility of last resize item (avoid unnecessary scroll bars) (e.g. COLUMN_MIN_WIDTH has been used).
-    $headerResize = $header.next('.header-resize');
+    $headerResize = $header.next('.table-header-resize');
     $headerResize.css('display', (remainingHeaderSpace > menuBarWidth || column.width - width >= adjustment) ? '' : 'none');
   }
   $header
@@ -401,7 +401,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   for (i = 0; i < this.table.columns.length; i++) {
     column = this.table.columns[i];
     $header = column.$header;
-    $headerResize = $header.next('.header-resize');
+    $headerResize = $header.next('.table-header-resize');
 
     this.$container.append($header);
     this.$container.append($headerResize);
@@ -411,7 +411,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {
-  return this.$container.find('.header-item:not(.filler)');
+  return this.$container.find('.table-header-item:not(.filler)');
 };
 
 /**

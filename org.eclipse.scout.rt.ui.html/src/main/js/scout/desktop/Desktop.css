@@ -57,7 +57,7 @@
     }
 
     & > .table-header {
-      & > .header-item {
+      & > .table-header-item {
         padding-top: @desktop-table-header-padding-y;
         padding-bottom: @desktop-table-header-padding-y;
       }

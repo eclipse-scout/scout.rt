@@ -35,7 +35,7 @@ describe("Column", function() {
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
-    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
     var $headerItem1 = $headerItems.eq(1);
     var $headerItem2 = $headerItems.eq(2);
@@ -64,7 +64,7 @@ describe("Column", function() {
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
-    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
     var $rows = table.$rows();
     var $cells0 = $rows.eq(0).find('.table-cell');
@@ -85,7 +85,7 @@ describe("Column", function() {
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
-    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
     var $rows = table.$rows();
     var $cells0 = $rows.eq(0).find('.table-cell');
@@ -106,7 +106,7 @@ describe("Column", function() {
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
-    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
     var $rows = table.$rows();
     var $cells0 = $rows.eq(0).find('.table-cell');

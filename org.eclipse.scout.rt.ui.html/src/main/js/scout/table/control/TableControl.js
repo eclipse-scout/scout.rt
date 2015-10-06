@@ -34,7 +34,7 @@ scout.TableControl.prototype._createKeyStrokeContextForTableControl = function()
 };
 
 scout.TableControl.prototype._render = function($parent) {
-  var classes = 'control ';
+  var classes = 'table-control ';
   if (this.cssClass) {
     classes += this.cssClass;
   }
@@ -211,7 +211,7 @@ scout.TableControl.prototype._renderEnabled = function(enabled) {
 
 scout.TableControl.prototype._configureTooltip = function() {
   var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
-  options.cssClass = 'table-control';
+  options.cssClass = 'table-control-tooltip';
   return options;
 };
 

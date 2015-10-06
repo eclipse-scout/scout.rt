@@ -1,4 +1,4 @@
-.control {
+.table-control {
   position: relative;
   display: inline-block;
   padding: 0 @table-control-padding;
@@ -41,6 +41,6 @@
   }
 }
 
-.tooltip.table-control {
+.tooltip.table-control-tooltip {
   margin-top: 10px;
 }
