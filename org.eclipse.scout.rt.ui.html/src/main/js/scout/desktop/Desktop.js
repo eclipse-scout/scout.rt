@@ -313,7 +313,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   }
 };
 
-//TODO maybe better change to actual properties and set on server?
+// TODO CGU: maybe better change to actual properties and set on server?
 scout.Desktop.prototype._hasNavigation = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
