@@ -209,6 +209,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public final void start(String sessionId) throws ProcessingException {
+    Assertions.assertNotNull(sessionId, "Session id must not be null");
     m_id = sessionId;
     Assertions.assertFalse(isActive(), "Session already started");
     assignUserId();
@@ -293,5 +294,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
         LOG.error("Failed to notify listener about session state change", e);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return super.toString() + "[id = " + getId() + "]";
   }
 }
