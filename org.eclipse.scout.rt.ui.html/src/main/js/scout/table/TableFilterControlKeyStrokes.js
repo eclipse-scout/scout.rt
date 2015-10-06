@@ -10,7 +10,7 @@ scout.inherits(scout.TableFilterControlKeyStrokes, scout.KeyStroke);
  */
 scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
   // set focus
-  var $input = $('.control-filter', this._field.$container);
+  var $input = $('.table-text-filter', this._field.$container);
   //TODO nbu check if keyStroke should be registered when no filter control is available.
   if ($input[0]) {
     $input.focus();
@@ -24,7 +24,7 @@ scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
 scout.TableFilterControlKeyStrokes.prototype._drawKeyBox = function($container, drawedKeys) {
   var activeElement = document.activeElement;
   var elementType = activeElement.tagName.toLowerCase();
-  var $filterinput = $('.control-filter', this._field.$container);
+  var $filterinput = $('.table-text-filter', this._field.$container);
   if ((elementType === 'textarea' || elementType === 'input') && $filterinput[0] !== activeElement) {
     return;
   }
@@ -50,7 +50,7 @@ scout.TableFilterControlKeyStrokes.prototype.checkAndDrawKeyBox = function($cont
 scout.TableFilterControlKeyStrokes.prototype.accept = function(event) {
   var elementType = document.activeElement.tagName.toLowerCase();
 
-  if (document.activeElement.className !== 'control-filter' &&(elementType === 'textarea' || elementType === 'input')) {
+  if (document.activeElement.className !== 'table-text-filter' &&(elementType === 'textarea' || elementType === 'input')) {
     return false;
   }
 

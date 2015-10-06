@@ -75,7 +75,7 @@ scout.TableControl.prototype.removeContent = function() {
   if (this.contentRendered) {
     this._removeContent();
     if (this.cssClass) {
-      this.tableFooter.$controlContent.removeClass('control-content-' + this.cssClass);
+      this.tableFooter.$controlContent.removeClass('table-control-content-' + this.cssClass);
     }
     this.contentRendered = false;
   }
@@ -102,7 +102,7 @@ scout.TableControl.prototype.renderContent = function() {
 
   if (!this.contentRendered) {
     if (this.cssClass) {
-      this.tableFooter.$controlContent.addClass('control-content-' + this.cssClass);
+      this.tableFooter.$controlContent.addClass('table-control-content-' + this.cssClass);
     }
     this._renderContent(this.tableFooter.$controlContent);
     this.contentRendered = true;

@@ -326,6 +326,7 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
+  //FIXME CGU do not delete header and footer!
   this.header = null;
   this.footer = null;
   this.attached = false;
@@ -335,8 +336,11 @@ scout.Table.prototype._remove = function() {
 // FIXME AWE: refactor all _render* methods --> remove parameter, always use this.*
 // reason: the property on this is already synced at this point, the argument may contain
 // just a data-model value (and not a adpater).
-scout.Table.prototype._renderTableControls = function(dummy) {
+scout.Table.prototype._renderTableControls = function() {
   this._renderTableFooter();
+  if (this.footer) {
+    this.footer._renderControls();
+  }
 };
 
 scout.Table.prototype._renderSortEnabled = function(dummy) {};
@@ -2371,14 +2375,19 @@ scout.Table.prototype._redraw = function() {
 };
 
 scout.Table.prototype._renderTableHeader = function() {
+  var changed = false;
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
     this.header.render();
     this._renderEmptyData();
+    changed = true;
   } else if (!this.headerVisible && this.header) {
     this._removeTableHeader();
+    changed = true;
   }
-  this.invalidateLayoutTree();
+  if (changed) {
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.Table.prototype._removeTableHeader = function() {
@@ -2411,18 +2420,19 @@ scout.Table.prototype._removeEmptyData = function() {
 };
 
 scout.Table.prototype._renderTableFooter = function() {
-  var footerVisible = this._isFooterVisible();
-  if (footerVisible) {
-    if (!this.footer) {
-      this.footer = this._createFooter();
-      this.footer.render();
-    } else {
-      this.footer.update();
-    }
+  var footerVisible = this._isFooterVisible(),
+    changed = false;
+  if (footerVisible && !this.footer) {
+    this.footer = this._createFooter();
+    this.footer.render();
+    changed = true;
   } else if (!footerVisible && this.footer) {
     this._removeTableFooter();
+    changed = true;
   }
-  this.invalidateLayoutTree();
+  if (changed) {
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.Table.prototype._removeTableFooter = function() {

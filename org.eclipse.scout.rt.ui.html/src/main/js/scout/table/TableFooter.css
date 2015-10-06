@@ -7,12 +7,11 @@
   bottom: 0px;
   height: @table-footer-height;
   width: 100%;
-    /* FIXME nowrap does not seem to work, when fixing this. If white-space can be removed, remove resetting below too (white-space: normal) */
-/*   white-space: nowrap; */
+  white-space: nowrap;
   border-top: 1px solid @border-color;
 }
 
-.control-resize {
+.table-control-resize {
   position: absolute;
   width: 100%;
   left: 0px;
@@ -22,7 +21,7 @@
   border-top: 3px solid @group-box-title-border-color;
 }
 
-.control-container {
+.table-control-container {
   position: absolute;
   overflow: hidden;
   outline: none;
@@ -36,7 +35,7 @@
   white-space: normal;
 }
 
-.control-content {
+.table-control-content {
   height: 100%;
   width: 100%;
 
@@ -75,16 +74,22 @@
 
 }
 
-.control-group {
-  float: left;
+.table-controls {
+  position: absolute;
 
   .table-footer > & ~ & {
     margin-left: -1px;
   }
 }
 
-.control-filter {
-  float: right;
+.table-info {
+  position: absolute;
+  right: 0;
+}
+
+.table-text-filter {
+  display: inline-block;
+  vertical-align: top;
   width: 200px;
   min-height: 26px;
   font-size: 13px;
@@ -92,22 +97,16 @@
   margin-right: @table-control-padding;
 }
 
-.control-info {
-  float: right;
-}
-
 .table-info-load,
 .table-info-status,
 .table-info-filter,
 .table-info-selection {
-  float: left;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
   padding-top: @table-control-padding / 2;
   padding-bottom: 0;
-  padding-left: @table-control-padding;
-  padding-right: @table-control-padding - 1px; /* because left padding includes the ::before border */
-  position: relative;
-  display: none;
-  width: 0px;
+  display: inline-block;
   height: @table-footer-height - 1px; /* subtract border-top of .table-footer */
   color: @table-info-color;
   cursor: pointer;
@@ -123,7 +122,13 @@
     border-right: 1px solid @border-color;
   }
 
-  & > .info-button {
+  /* margins are used instead of paddings for a better animation */
+  & > span {
+    margin-left: @table-control-padding;
+    margin-right: @table-control-padding - 1px; /* because left padding includes the ::before border */
+  }
+
+  & > .table-info-button {
     text-decoration: underline;
 
     & > .key-box {
@@ -131,7 +136,7 @@
     }
   }
 
-  &:hover > .info-button {
+  &:hover > .table-info-button {
     color: @hover-color;
   }
 }

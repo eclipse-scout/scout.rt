@@ -129,6 +129,7 @@ __include("scout/table/control/GraphTableControl.js"); // requires TableControl.
 __include("scout/table/control/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/Table.js");
 __include("scout/table/TableFooter.js");
+__include("scout/table/TableFooterLayout.js");
 __include("scout/table/TableControlCloseKeyStroke.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");

@@ -4,7 +4,7 @@ scout.TableRefreshKeyStroke = function(table) {
   this.which = [scout.keys.F5];
   this.renderingHints.offset = 0;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.footer ? this.field.footer._$infoLoad.find('.info-button') : null;
+    return this.field.footer ? this.field.footer._$infoLoad.find('.table-info-button') : null;
   }.bind(this);
 };
 scout.inherits(scout.TableRefreshKeyStroke, scout.KeyStroke);

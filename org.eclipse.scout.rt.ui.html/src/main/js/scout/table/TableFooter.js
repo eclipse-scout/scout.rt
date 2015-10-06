@@ -13,10 +13,10 @@ scout.TableFooter.prototype._init = function(options) {
   // TODO [dwi] migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
   this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
   this.searchFieldKeyStrokeContext.$bindTarget = function() {
-    return this._$filterField;
+    return this._$textFilter;
   }.bind(this);
   this.searchFieldKeyStrokeContext.$scopeTarget = function() {
-    return this._$filterField;
+    return this._$textFilter;
   }.bind(this);
 };
 
@@ -25,84 +25,82 @@ scout.TableFooter.prototype._render = function($parent) {
   $parent = $parent || this._table.$container;
 
   this.$container = $parent.appendDiv('table-footer');
-  this.$controlContainer = this.$container.appendDiv('control-container').hide();
-  this._addResize(this.$controlContainer);
-  this.$controlContent = this.$controlContainer.appendDiv('control-content');
-  this.$controlGroup = this.$container.appendDiv('control-group');
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.TableFooterLayout(this));
+
+  // --- container for an open control ---
+  this.$controlContainer = this.$container.appendDiv('table-control-container').hide();
+  this._addResizer(this.$controlContainer);
+  this.$controlContent = this.$controlContainer.appendDiv('table-control-content');
+
+  // --- table controls section ---
+  this._$controls = this.$container.appendDiv('table-controls');
 
   // --- info section ---
-  this._$controlInfo = this.$container
-    .appendDiv('control-info');
+  this._$info = this.$container
+    .appendDiv('table-info');
+
+  // text filter
+  this._$textFilter = scout.fields.new$TextField()
+    .addClass('table-text-filter')
+    .appendTo(this._$info)
+    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
+    .placeholder(this.session.text('ui.FilterBy_'));
+  filter = this._table.getFilter(scout.TableTextUserFilter.Type);
+  if (filter) {
+    this._$textFilter.val(filter.text);
+  }
 
   // load info ("X rows loaded, click to reload")
-  this._$infoLoad = this._$controlInfo
-    .appendDiv('table-info-load')
-    .on('click', '', this._onClickInfoLoad.bind(this));
+  this._$infoLoad = this._$info
+    .appendDiv('table-info-item table-info-load')
+    .on('click', '', this._onInfoLoadClick.bind(this));
 
   // filter info ("X rows filtered by Y, click to remove filter")
-  this._$infoFilter = this._$controlInfo
-    .appendDiv('table-info-filter')
-    .on('click', '', this._onClickInfoFilter.bind(this));
+  this._$infoFilter = this._$info
+    .appendDiv('table-info-item table-info-filter')
+    .on('click', '', this._onInfoFilterClick.bind(this));
 
   // selection info ("X rows selected, click to select all/none")
-  this._$infoSelection = this._$controlInfo
-    .appendDiv('table-info-selection')
-    .on('click', '', this._onClickInfoSelection.bind(this));
+  this._$infoSelection = this._$info
+    .appendDiv('table-info-item table-info-selection')
+    .on('click', '', this._onInfoSelectionClick.bind(this));
 
   // table status
-  this._$infoTableStatus = this._$controlInfo
-    .appendDiv('table-info-status')
+  this._$infoTableStatus = this._$info
+    .appendDiv('table-info-item table-info-status')
     .on('mousedown', this._onStatusMousedown.bind(this));
   this._$infoTableStatusIcon = $('<span>')
     .addClass('font-icon icon')
     .appendTo(this._$infoTableStatus);
 
-  // --- text filter ---
-
-  this._$filterField = scout.fields.new$TextField()
-    .addClass('control-filter')
-    .appendTo(this.$container)
-    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
-    .placeholder(this.session.text('ui.FilterBy_'));
-  filter = this._table.getFilter(scout.TableTextUserFilter.Type);
-  if (filter) {
-    this._$filterField.val(filter.text);
-  }
-
   // ------
 
-  this._updateTableControls();
-  this._updateInfoLoad();
-  this._updateInfoLoadVisibility();
-  this._updateInfoTableStatus();
-  this._updateInfoTableStatusVisibility();
-  this._updateInfoFilter();
-  this._updateInfoFilterVisibility();
-  this._updateInfoSelection();
-  this._updateInfoSelectionVisibility();
+  this._renderControls();
+  this._renderInfo();
+  this._updateInfoVisibility();
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
-    this._updateInfoLoad();
-    this._updateInfoLoadVisibility();
+    this._renderInfoLoad();
   }.bind(this));
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
-    this._updateInfoFilter();
+    this._renderInfoFilter();
   }.bind(this));
 
   this._table.events.on('addFilter', function(event) {
-    this._updateInfoFilter();
+    this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     if (event.filter.filterType === scout.TableTextUserFilter.Type) {
-      this._$filterField.val(event.filter.text);
+      this._$textFilter.val(event.filter.text);
     }
   }.bind(this));
 
   this._table.events.on('removeFilter', function(event) {
-    this._updateInfoFilter();
+    this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     if (event.filter.filterType === scout.TableTextUserFilter.Type) {
-      this._$filterField.val('');
+      this._$textFilter.val('');
     }
   }.bind(this));
 
@@ -111,12 +109,11 @@ scout.TableFooter.prototype._render = function($parent) {
     if (event.rows) {
       numRows = event.rows.length;
     }
-    this._updateInfoSelection(numRows, event.allSelected);
-    this._updateInfoSelectionVisibility();
+    this._renderInfoSelection(numRows, event.allSelected);
   }.bind(this));
 
   this._table.events.on(scout.Table.GUI_EVENT_STATUS_CHANGED, function(event) {
-    this._updateInfoTableStatus();
+    this._renderInfoTableStatus();
     this._updateInfoTableStatusVisibility();
   }.bind(this));
 
@@ -146,70 +143,100 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
   }
 
   this._table.filter();
+  this.validateLayoutTree();
   event.stopPropagation();
 };
 
-scout.TableFooter.prototype.update = function() {
-  this._updateTableControls();
-  this._updateInfoLoadVisibility();
-  this._updateInfoTableStatusVisibility();
-  this._updateInfoSelectionVisibility();
-  this._updateInfoFilterVisibility();
-};
-
-scout.TableFooter.prototype._updateTableControls = function() {
+scout.TableFooter.prototype._renderControls = function() {
   var controls = this._table.tableControls;
   if (controls) {
     controls.forEach(function(control) {
       control.tableFooter = this;
       control.table = this._table;
       control.setParent(this);
-      control.render(this.$controlGroup);
+      control.render(this._$controls);
     }.bind(this));
   } else {
-    this.$controlGroup.empty();
+    this._$controls.empty();
   }
 };
 
-scout.TableFooter.prototype._updateInfoLoad = function() {
+scout.TableFooter.prototype._renderInfo = function() {
+  this._renderInfoLoad();
+  this._renderInfoTableStatus();
+  this._renderInfoFilter();
+  this._renderInfoSelection();
+};
+
+scout.TableFooter.prototype._renderInfoLoad = function() {
   var $info = this._$infoLoad;
   var numRows = this._table.rows.length;
 
   $info.empty();
-  $info.text(this.session.text('ui.NumRowsLoaded', this._computeCountInfo(numRows)));
-  $('<br>').appendTo($info);
-  $('<span>').addClass('info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+  if (!this._compactStyle) {
+    $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this._computeCountInfo(numRows)));
+    $info.appendBr();
+    $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+  } else {
+    $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
+    $info.appendBr();
+    $info.appendSpan().text(this._computeCountInfo(numRows));
+  }
+
+  if (!this.htmlComp.layouting) {
+    this.invalidateLayoutTree(false);
+  }
 };
 
-scout.TableFooter.prototype._updateInfoFilter = function() {
+scout.TableFooter.prototype._renderInfoFilter = function() {
   var $info = this._$infoFilter;
   var numRowsFiltered = this._table.filteredRows().length;
   var filteredBy = this._table.filteredBy().join(', '); // filteredBy() returns an array
 
   $info.empty();
-  if (filteredBy) {
-    $info.text(this.session.text('ui.NumRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy));
+  if (!this._compactStyle) {
+    if (filteredBy) {
+      $info.appendSpan().text(this.session.text('ui.NumRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy));
+    } else {
+      $info.appendSpan().text(this.session.text('ui.NumRowsFiltered', this._computeCountInfo(numRowsFiltered)));
+    }
+    $info.appendBr();
+    $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
   } else {
-    $info.text(this.session.text('ui.NumRowsFiltered', this._computeCountInfo(numRowsFiltered)));
+    $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
+    $info.appendBr();
+    $info.appendSpan().text(this._computeCountInfo(numRowsFiltered));
   }
-  $('<br>').appendTo($info);
-  $('<span>').addClass('info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
+
+  if (!this.htmlComp.layouting) {
+    this.invalidateLayoutTree(false);
+  }
 };
 
-scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all) {
+scout.TableFooter.prototype._renderInfoSelection = function(numRowsSelected, all) {
   var $info = this._$infoSelection;
   var numRows = this._table.rows.length;
 
-  numSelectedRows = scout.helpers.nvl(numSelectedRows, this._table.selectedRows.length);
-  all = scout.helpers.nvl(all, (numRows === numSelectedRows));
+  numRowsSelected = scout.helpers.nvl(numRowsSelected, this._table.selectedRows.length);
+  all = scout.helpers.nvl(all, (numRows === numRowsSelected));
 
   $info.empty();
-  $info.text(this.session.text('ui.NumRowsSelected', this._computeCountInfo(numSelectedRows)));
-  $('<br>').appendTo($info);
-  $('<span>').addClass('info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
+  if (!this._compactStyle) {
+    $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this._computeCountInfo(numRowsSelected)));
+    $info.appendBr();
+    $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
+  } else {
+    $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
+    $info.appendBr();
+    $info.appendSpan().text(this._computeCountInfo(numRowsSelected));
+  }
+
+  if (!this.htmlComp.layouting) {
+    this.invalidateLayoutTree(false);
+  }
 };
 
-scout.TableFooter.prototype._updateInfoTableStatus = function() {
+scout.TableFooter.prototype._renderInfoTableStatus = function() {
   var $info = this._$infoTableStatus;
   var tableStatus = this._table.tableStatus;
   if (tableStatus) {
@@ -220,76 +247,109 @@ scout.TableFooter.prototype._updateInfoTableStatus = function() {
     $info.toggleClass('has-warning', isWarning && !isError);
     $info.toggleClass('has-info', isInfo && !isWarning && !isError);
   }
+
+  if (!this.htmlComp.layouting) {
+    this.invalidateLayoutTree(false);
+  }
 };
 
-scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
-  var visible = (this._table.tableStatusVisible);
-  this._setInfoVisible(this._$infoLoad, visible);
+scout.TableFooter.prototype._updateInfoVisibility = function() {
+  this._updateInfoFilterVisibility();
+  this._updateInfoSelectionVisibility();
+  this._updateInfoTableStatusVisibility();
 };
 
 scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
-  var visible = (this._table.tableStatusVisible && this._table.filteredBy().length > 0);
+  var visible = this._table.filteredBy().length > 0;
   this._setInfoVisible(this._$infoFilter, visible);
 };
 
 scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
-  var visible = (this._table.tableStatusVisible && this._table.multiSelect);
+  var visible = this._table.multiSelect;
   this._setInfoVisible(this._$infoSelection, visible);
 };
 
 scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
-  var visible = (this._table.tableStatusVisible && this._table.tableStatus);
+  var visible = this._table.tableStatus;
   if (visible) {
     // If the uiState of the tableStatus was not yet manually changed, or the user
     // explicitly activated it (relevant when changing pages), show the tooltip
     // when the "info visible" animation has finished. Otherwise, we don't show
     // the tooltip to not disturb the user.
     var complete = null;
-    if (!this._table.tableStatus.uiState || this._table.tableStatus.uiState === 'user-shown') {
+    if (this._table.tableStatus.uiState !== 'user-hidden') {
       this._$infoTableStatus.addClass('tooltip-active'); // color icon before animation starts
       complete = function() {
         this._showTableStatusTooltip();
       }.bind(this);
     }
     this._setInfoVisible(this._$infoTableStatus, true, complete);
-  }
-  else {
+  } else {
     this._hideTableStatusTooltip();
     this._setInfoVisible(this._$infoTableStatus, false);
   }
 };
 
 scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete) {
-  if (!complete) {
-    complete = function() {
-      this._updateTableStatusTooltipPosition();
-    }.bind(this);
+  if ($info.isVisible() === visible) {
+    if (complete) {
+      complete();
+    }
+    return;
+  }
+  var animate = this.rendered; // Animate only on a user interaction, no while the table gets rendered
+  if (!animate) {
+    $info.setVisible(visible);
+    return;
   }
   if (visible) {
-    $info.css('display', 'inline-block').widthToContent(undefined, complete); // undefined = default duration
+    $info.cssWidth(0).show();
+    var animationOpts = {
+      progress: this.revalidateLayout.bind(this),
+      complete: function() {
+        this.revalidateLayout();
+        if (complete) {
+          complete();
+        }
+      }.bind(this)
+    };
+    // Save complete function so that layout may use it
+    $info.data('animationComplete', animationOpts.complete);
+    $info.widthToContent(animationOpts);
   } else {
-    $info.animateAVCSD('width', 0, function() {
-      $(this).hide();
-      complete();
+    // Mark element as hiding so that the layout does not try to resize it
+    $info.data('hiding', true);
+    $info.stop().animate({
+      width: 0
+    }, {
+      progress: this.revalidateLayout.bind(this),
+      complete: function() {
+        $info.removeData('hiding');
+        $info.hide();
+      }
     });
   }
 };
 
-scout.TableFooter.prototype._onClickInfoLoad = function() {
+scout.TableFooter.prototype._onInfoLoadClick = function() {
   this._table.reload();
 };
 
-scout.TableFooter.prototype._onClickInfoFilter = function() {
+scout.TableFooter.prototype._onInfoFilterClick = function() {
   this._table.resetFilter();
 };
 
-scout.TableFooter.prototype._onClickInfoSelection = function() {
+scout.TableFooter.prototype._onInfoSelectionClick = function() {
   this._table.toggleSelection();
 };
 
 scout.TableFooter.prototype._computeCountInfo = function(n) {
   if (scout.helpers.nvl(n, 0) === 0) {
-    return this.session.text('ui.TableRowCount0');
+    if (this._compactStyle) {
+      return this.session.text('ui.TableRowCount', 0);
+    } else {
+      return this.session.text('ui.TableRowCount0');
+    }
   } else if (n === 1) {
     return this.session.text('ui.TableRowCount1');
   } else {
@@ -341,8 +401,8 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
 
 };
 
-scout.TableFooter.prototype._addResize = function($parent) {
-  this._$controlResize = $parent.appendDiv('control-resize')
+scout.TableFooter.prototype._addResizer = function($parent) {
+  this._$controlResize = $parent.appendDiv('table-control-resize')
     .on('mousedown', '', resize.bind(this));
 
   function resize(event) {
@@ -439,11 +499,5 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
     this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {
       this._hideTableStatusTooltip();
     }.bind(this), 5000);
-  }
-};
-
-scout.TableFooter.prototype._updateTableStatusTooltipPosition = function() {
-  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
-    this._tableStatusTooltip.position();
   }
 };

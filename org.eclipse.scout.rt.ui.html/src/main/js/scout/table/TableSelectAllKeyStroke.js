@@ -5,7 +5,7 @@ scout.TableSelectAllKeyStroke = function(table) {
   this.which = [scout.keys.A];
   this.renderingHints.offset = 0;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.footer ? this.field.footer._$infoSelection.find('.info-button') : null;
+    return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
   }.bind(this);
 };
 scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);

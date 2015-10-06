@@ -28,7 +28,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var $filterInput = $('.control-filter', this.field.$container);
+  var $filterInput = $('.table-text-filter', this.field.$container);
   if (!$filterInput.length) {
     return false;
   }
@@ -36,7 +36,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
   var activeElement = document.activeElement;
   var activeElementType = activeElement.tagName.toLowerCase();
   var focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
-  if (activeElement.className === 'control-filter' || !focusOnInputField) {
+  if (activeElement.className === 'table-text-filter' || !focusOnInputField) {
     event._$filterInput = $filterInput;
     this._isKeyStrokeInRange(event);
     return true;

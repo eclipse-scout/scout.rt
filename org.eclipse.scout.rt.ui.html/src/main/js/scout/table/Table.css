@@ -188,7 +188,7 @@
   top: calc(~'50%' - 17px/2);
 }
 
-.control-group>.control>.key-box {
+.table-controls > .control > .key-box {
   bottom: 4px;
 }
 

@@ -232,6 +232,10 @@
     return $.makeSpan(cssClass, text).appendTo(this);
   };
 
+  $.fn.appendBr = function() {
+    return $('<br>').appendTo(this);
+  };
+
   // append svg
   $.fn.appendSVG = function(type, id, cssClass, htmlContent) {
     return $.makeSVG(type, id, cssClass, htmlContent).appendTo(this);
@@ -474,50 +478,37 @@
     }.bind(this), options.delay);
   };
 
-  // over engineered animate
-  $.fn.widthToContent = function(duration, complete) {
-    duration = scout.helpers.nvl(duration, 300);
+  /**
+   * Animates to the current width, expects a data 'oldWidth'.
+   */
+  $.fn.cssWidthAnimated = function(oldWidth, newWidth, opts) {
+    opts = opts || {};
+    opts.duration = scout.helpers.nvl(opts.duration, 300);
 
-    var oldW = this.outerWidth(),
-      newW = this.css('width', 'auto').outerWidth(),
-      finalWidth = this.data('finalWidth');
-
-    if (newW !== oldW) {
-      this.css('width', oldW);
+    if (oldWidth === newWidth) {
+      // No need to animate, make sure new width ist set
+      this.cssWidth(newWidth);
+      return;
     }
 
-    if (newW !== finalWidth) {
-      this.data('finalWidth', newW);
-      this.stop().animateAVCSD('width', newW, function() {
-        $(this).data('finalWidth', null);
-        if (complete) {
-          complete(); // call-back
-        }
-      }, null, duration);
-    }
+    // Reset to old width first
+    this.cssWidth(oldWidth);
 
+    // Then animate to new width
+    this.stop().animate({width: newWidth}, opts);
     return this;
   };
 
-  $.fn.heightToContent = function(duration) {
-    duration = (duration !== undefined) ? duration : 300;
 
-    var oldH = this.outerHeight(),
-      newH = this.css('height', 'auto').outerHeight(),
-      finalHeight = this.data('finalHeight');
-    if (newH !== oldH) {
-      this.css('height', oldH);
-    }
+  // over engineered animate
+  $.fn.widthToContent = function(opts) {
+    var oldW = this.outerWidth(),
+      newW = this.css('width', 'auto').outerWidth();
 
-    if (newH !== finalHeight) {
-      this.data('finalHeight', newH);
-      this.stop().animateAVCSD('height', newH, function() {
-        $(this).data('finalHeight', null);
-      }, null, duration);
-    }
-
-    return newH;
+    this.cssWidthAnimated(oldW, newW, opts);
+    return this;
   };
+
 
   $.fn.cssLeft = function(position) {
     return this.cssPxValue('left', position);

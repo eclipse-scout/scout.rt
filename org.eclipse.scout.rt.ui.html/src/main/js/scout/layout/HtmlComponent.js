@@ -9,6 +9,12 @@ scout.HtmlComponent = function($comp, session) {
   this._layout = new scout.NullLayout();
   this.layoutData;
   this.valid = false;
+
+  /**
+   * Flag to indicate that the component has been layouted at least once. Invalidation should NOT reset this flag.
+   */
+  this.layouted = false;
+
   /**
    * Set pixelBasedSizing to false if your component automatically adjusts its size,
    * e.g. by using CSS styling -> setSize won't be called.
@@ -70,7 +76,10 @@ scout.HtmlComponent.prototype.validateLayout = function() {
     throw new Error('Called layout() but component has no layout');
   }
   if (!this.valid) {
+    this.layouting = true;
     this._layout.layout(this.$comp);
+    this.layouting = false;
+    this.layouted = true;
     // Save size for later use (necessary if pixelBasedSizing is set to false)
     this.size = this.getSize();
     this.valid = true;
