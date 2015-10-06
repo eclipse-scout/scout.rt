@@ -26,7 +26,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
   viewTab.on('remove', this._removeViewTab.bind(this, viewTab, viewId));
 
   var index = position;
-  var parentViewTab = this.viewTab(viewTab._view.parent);
+  var parentViewTab = this.viewTab(viewTab._view.displayParent);
   if (parentViewTab) {
     index = this._viewTabs.indexOf(parentViewTab) + this._calculateExactPosition(parentViewTab, index) + 1;
   } else {

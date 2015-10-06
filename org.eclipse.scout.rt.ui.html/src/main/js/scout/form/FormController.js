@@ -14,7 +14,7 @@ scout.FormController = function(displayParent, session) {
  */
 scout.FormController.prototype.registerAndRender = function(formAdapterId, position) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
-
+  form.displayParent = this._displayParent;
   if (form.displayHint === 'view') {
     this._renderView(form, true, position);
   } else {
@@ -43,9 +43,11 @@ scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
  */
 scout.FormController.prototype.render = function() {
   this._displayParent.dialogs.forEach(function(dialog) {
+    dialog.displayParent = this._displayParent;
     this._renderDialog(dialog, false);
   }.bind(this));
   this._displayParent.views.forEach(function(view, position) {
+    view.displayParent = this._displayParent;
     this._renderView(view, false, position);
   }.bind(this));
 };
