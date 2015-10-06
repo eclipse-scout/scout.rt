@@ -34,7 +34,7 @@ describe("Tree", function() {
     return {
       "id": id,
       "text": text,
-      "childNodeIndex": position?position:0,
+      "childNodeIndex": position ? position : 0,
       "enabled": true,
       "checked": false
     };
@@ -137,6 +137,14 @@ describe("Tree", function() {
     };
   }
 
+  function createNodesUpdatedEvent(model, nodes) {
+    return {
+      target: model.id,
+      nodes: nodes,
+      type: 'nodesUpdated'
+    };
+  }
+
   function createTreeEnabledEvent(model, enabled) {
     return {
       target: model.id,
@@ -203,7 +211,7 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
-      .children('div');
+        .children('div');
       $checkbox.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -790,7 +798,7 @@ describe("Tree", function() {
       describe("inserting a child", function() {
 
         it("updates model", function() {
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',3);
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3', 3);
           expect(tree.nodes.length).toBe(3);
           expect(Object.keys(tree.nodesMap).length).toBe(12);
 
@@ -804,11 +812,10 @@ describe("Tree", function() {
           expect(Object.keys(tree.nodesMap).length).toBe(13);
         });
 
-
         it("updates html document if parent is expanded", function() {
           tree.render(session.$entryPoint);
 
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',3);
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3', 3);
           expect(findAllNodes(tree).length).toBe(12);
 
           var message = {
@@ -820,12 +827,11 @@ describe("Tree", function() {
           expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
         });
 
-
         it("updates html document on specific position", function() {
           tree.render(session.$entryPoint);
 
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',2);
-          var newNode0Child4 = createModelNode('0_4', 'newNode0Child4',3);
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3', 2);
+          var newNode0Child4 = createModelNode('0_4', 'newNode0Child4', 3);
           expect(findAllNodes(tree).length).toBe(12);
 
           var message = {
@@ -840,39 +846,31 @@ describe("Tree", function() {
           expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
           expect(node0.childNodes[3].$node.next().text()).toBe('node 2');
 
-
-          var newNode1Child3 = createModelNode('1_3', 'newNode1Child3',1);
-          var newNode1Child4 = createModelNode('1_4', 'newNode1Child4',2);
-
+          var newNode1Child3 = createModelNode('1_3', 'newNode1Child3', 1);
+          var newNode1Child4 = createModelNode('1_4', 'newNode1Child4', 2);
 
           var message2 = {
-              events: [createNodesInsertedEventTopNode(model, [newNode1Child3, newNode1Child4])]
-            };
-            session._processSuccessResponse(message2);
+            events: [createNodesInsertedEventTopNode(model, [newNode1Child3, newNode1Child4])]
+          };
+          session._processSuccessResponse(message2);
 
-            expect(findAllNodes(tree).length).toBe(16);
-            expect(tree.nodes[1].$node.prev().text()).toBe('node 2');
-            expect(tree.nodes[1].$node.prev().attr('data-level')).toBe('1');
-            expect(tree.nodes[1].$node.text()).toBe(newNode1Child3.text);
-            expect(tree.nodes[1].$node.attr('data-level')).toBe('0');
-            expect(tree.nodes[2].$node.text()).toBe(newNode1Child4.text);
-            expect(tree.nodes[2].$node.attr('data-level')).toBe('0');
-            expect(tree.nodes[2].$node.next().attr('data-level')).toBe('0');
-            expect(tree.nodes[2].$node.next().text()).toBe('node 1');
-
-
-
+          expect(findAllNodes(tree).length).toBe(16);
+          expect(tree.nodes[1].$node.prev().text()).toBe('node 2');
+          expect(tree.nodes[1].$node.prev().attr('data-level')).toBe('1');
+          expect(tree.nodes[1].$node.text()).toBe(newNode1Child3.text);
+          expect(tree.nodes[1].$node.attr('data-level')).toBe('0');
+          expect(tree.nodes[2].$node.text()).toBe(newNode1Child4.text);
+          expect(tree.nodes[2].$node.attr('data-level')).toBe('0');
+          expect(tree.nodes[2].$node.next().attr('data-level')).toBe('0');
+          expect(tree.nodes[2].$node.next().text()).toBe('node 1');
         });
-
-
-
       });
 
       it("only updates the model if parent is collapsed", function() {
         node0.expanded = false;
         tree.render(session.$entryPoint);
 
-        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',3);
+        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3', 3);
         expect(findAllNodes(tree).length).toBe(9);
 
         var message = {
@@ -1303,6 +1301,157 @@ describe("Tree", function() {
 
     });
 
+    describe("nodesUpdated event", function() {
+      var model;
+      var tree;
+      var node0;
+      var child0;
+
+      beforeEach(function() {
+        model = createModelFixture(3, 3, false);
+        tree = createTree(model);
+        node0 = model.nodes[0];
+        child0 = node0.childNodes[0];
+      });
+
+      describe("enabled update", function() {
+        var child0Update;
+
+        beforeEach(function() {
+          child0Update = {
+            id: child0.id,
+            enabled: false
+          };
+          tree.checkable = true;
+        });
+
+        it("updates the enabled state of the model node", function() {
+          expect(child0.enabled).toBe(true);
+          var message = {
+            events: [createNodesUpdatedEvent(model, [child0Update])]
+          };
+          session._processSuccessResponse(message);
+
+          expect(child0.enabled).toBe(false);
+        });
+
+        it("updates the enabled state of the html node, if visible", function() {
+          // Render tree and make sure child0 is visible
+          tree.render(session.$entryPoint);
+          tree.setNodeExpanded(node0, true);
+          expect(child0.$node.isEnabled()).toBe(true);
+
+          // Send update event
+          expect(child0.enabled).toBe(true);
+          var message = {
+            events: [createNodesUpdatedEvent(model, [child0Update])]
+          };
+          session._processSuccessResponse(message);
+
+          // Expect node and $node to be disabled
+          expect(child0.enabled).toBe(false);
+          expect(child0.$node.isEnabled()).toBe(false);
+        });
+
+        it("updates the enabled state of the html node after expansion, if not visible", function() {
+          // Render tree and make sure child0 is visible
+          tree.render(session.$entryPoint);
+          tree.setNodeExpanded(node0, true);
+          expect(child0.$node.isEnabled()).toBe(true);
+
+          // Make sure child0 is not visible anymore
+          tree.setNodeExpanded(node0, false);
+          expect(child0.$node).toBeFalsy();
+
+          // Send update event
+          expect(child0.enabled).toBe(true);
+          var message = {
+            events: [createNodesUpdatedEvent(model, [child0Update])]
+          };
+          session._processSuccessResponse(message);
+
+          // Mode state needs to be updated, $node is still node visible
+          expect(child0.enabled).toBe(false);
+          expect(child0.$node).toBeFalsy();
+
+          // Expand node -> node gets visible and needs to be disabled
+          tree.setNodeExpanded(node0, true);
+          expect(child0.$node.isEnabled()).toBe(false);
+        });
+      });
+
+      describe("enabled update on checkable tree", function() {
+        var child0Update;
+
+        function $checkbox(node) {
+          return node.$node.children('.tree-node-checkbox')
+            .children('.check-box');
+        }
+
+        beforeEach(function() {
+          child0Update = {
+            id: child0.id,
+            enabled: false
+          };
+          tree.checkable = true;
+        });
+
+        it("updates the enabled state of the model node", function() {
+          expect(child0.enabled).toBe(true);
+          var message = {
+            events: [createNodesUpdatedEvent(model, [child0Update])]
+          };
+          session._processSuccessResponse(message);
+
+          expect(child0.enabled).toBe(false);
+        });
+
+        it("updates the enabled state of the html node, if visible", function() {
+          // Render tree and make sure child0 is visible
+          tree.render(session.$entryPoint);
+          tree.setNodeExpanded(node0, true);
+          expect($checkbox(child0).isEnabled()).toBe(true);
+
+          // Send update event
+          expect(child0.enabled).toBe(true);
+          var message = {
+            events: [createNodesUpdatedEvent(model, [child0Update])]
+          };
+          session._processSuccessResponse(message);
+
+          // Expect node and $node to be disabled
+          expect(child0.enabled).toBe(false);
+          expect($checkbox(child0).isEnabled()).toBe(false);
+        });
+
+        it("updates the enabled state of the html node after expansion, if not visible", function() {
+          // Render tree and make sure child0 is visible
+          tree.render(session.$entryPoint);
+          tree.setNodeExpanded(node0, true);
+          expect($checkbox(child0).isEnabled()).toBe(true);
+
+          // Make sure child0 is not visible anymore
+          tree.setNodeExpanded(node0, false);
+          expect(child0.$node).toBeFalsy();
+
+          // Send update event
+          expect(child0.enabled).toBe(true);
+          var message = {
+            events: [createNodesUpdatedEvent(model, [child0Update])]
+          };
+          session._processSuccessResponse(message);
+
+          // Mode state needs to be updated, $node is still node visible
+          expect(child0.enabled).toBe(false);
+          expect(child0.$node).toBeFalsy();
+
+          // Expand node -> node gets visible and needs to be disabled
+          tree.setNodeExpanded(node0, true);
+          expect($checkbox(child0).isEnabled()).toBe(false);
+        });
+      });
+    });
+
     describe("multiple events", function() {
 
       var model;
@@ -1394,14 +1543,18 @@ describe("Tree", function() {
       expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
 
       // Disable tree
-      var message = { events: [ createTreeEnabledEvent(model, false) ] };
+      var message = {
+        events: [createTreeEnabledEvent(model, false)]
+      };
       session._processSuccessResponse(message);
 
       expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
       expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
 
       // Re-enable tree
-      message = { events: [ createTreeEnabledEvent(model, true) ] };
+      message = {
+        events: [createTreeEnabledEvent(model, true)]
+      };
       session._processSuccessResponse(message);
 
       expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');

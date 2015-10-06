@@ -1029,6 +1029,9 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
   $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
   $node.setEnabled( !! node.enabled);
+  $node.children('.tree-node-checkbox')
+    .children('.check-box')
+    .toggleClass('disabled', !(this.enabled && node.enabled));
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
@@ -1633,11 +1636,6 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   }
   if (oldNode.enabled !== updatedNode.enabled) {
     oldNode.enabled = updatedNode.enabled;
-    if (oldNode.$node) {
-      oldNode.$node.children('.tree-node-checkbox')
-        .children('.check-box')
-        .toggleClass('disabled', !(this.enabled && oldNode.enabled));
-    }
     propertiesChanged = true;
   }
   if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {

@@ -55,7 +55,7 @@ scout.Session = function($entryPoint, options) {
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
   this._asyncEvents = [];
-  this._asyncRequestQueued;
+  this._asyncResponses = [];
   this._childWindows = []; // for detached windows
   this._deferred;
   this._startup;
@@ -394,6 +394,11 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
         this.setBusy(false);
       }
       success = this.processJsonResponse(data);
+      // If responses are queued (by ?poll requests), handle them now
+      for (var i = 0; i < this._asyncResponses.length; i++) {
+        this.processJsonResponse(this._asyncResponses[i]);
+      }
+      this._asyncResponses = [];
     } catch (err) {
       jsError = jsError || err;
     }
@@ -480,7 +485,13 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       // otherwise the polling would ping the server to death in case of an error
       $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
       this._backgroundJobPollingSupport.setFailed();
-      this._processErrorJsonResponse(data.error);
+      if (this.areRequestsPending()) {
+        // Add response to queue, handle later by _performUserAjaxRequest()
+        this._asyncResponses.push(data);
+      } else {
+        // No user request pending, handle immediately
+        this._processErrorJsonResponse(data.error);
+      }
     } else if (data.sessionTerminated) {
       $.log.warn('Session terminated, stopped polling for background jobs');
       // If were are not yet logged out, redirect to the logout URL (the session that initiated the
@@ -489,8 +500,14 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
         this.logout(data.redirectUrl);
       }
     } else {
-      this._processSuccessResponse(data);
-      this.layoutValidator.validate();
+      if (this.areRequestsPending()) {
+        // Add response to queue, handle later by _performUserAjaxRequest()
+        this._asyncResponses.push(data);
+      } else {
+        // No user request pending, handle immediately
+        this._processSuccessResponse(data);
+        this.layoutValidator.validate();
+      }
       setTimeout(this._pollForBackgroundJobs.bind(this));
     }
   }
@@ -790,6 +807,10 @@ scout.Session.prototype.listen = function() {
 
 scout.Session.prototype.areEventsQueued = function() {
   return this._asyncEvents.length > 0;
+};
+
+scout.Session.prototype.areResponsesQueued = function() {
+  return this._asyncResponses.length > 0;
 };
 
 scout.Session.prototype.areRequestsPending = function() {

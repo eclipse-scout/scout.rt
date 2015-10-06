@@ -828,7 +828,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     // different data may be stored: undefined, arrays (of keys )and single numbers (keys)
     var readData = function(object, attribute) {
       var a = object.attr(attribute);
-      if (typeof a === undefined) {
+      if (a === undefined) {
         return [null];
       } else {
         var n = parseFloat(a);

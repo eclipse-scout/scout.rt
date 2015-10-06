@@ -166,13 +166,15 @@ describe('Session', function() {
       expect(session._asyncEvents[0].type).toBe('nodeClicked');
 
       // receive response for nodeSelected -> request for nodeClicked gets sent
-      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
+      jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(true);
 
       // receive response for nodeClicked
-      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
+      jasmine.clock().tick(0);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
     });
@@ -203,7 +205,7 @@ describe('Session', function() {
       expect(session._asyncEvents[0].type).toBe('nodeClicked');
 
       // receive response for nodeSelected -> request for nodeClicked does not get sent because it should be sent delayed
-      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(true);
@@ -218,9 +220,51 @@ describe('Session', function() {
       expect(session.areRequestsPending()).toBe(true);
 
       // receive response for nodeClicked
-      receiveResponseForAjaxCall(jasmine.Ajax.requests[0]);
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
+    });
+
+    it('queues ?poll results when user requests are pending', function() {
+      var session = createSession();
+      session.enableBackgroundJobPolling(true);
+      spyOn(session, '_processSuccessResponse').and.callThrough();
+
+      // Start ?poll request
+      session._resumeBackgroundJobPolling();
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Start user request
+      session.send(1, 'nodeSelected');
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(true); // <--
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Send response for ?poll request (response must be queued)
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(true); // <--
+      expect(session._processSuccessResponse).not.toHaveBeenCalled();
+
+      // Send response for user request (must be executed, including the queued response)
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false); // <--
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false); // <--
+      expect(session._processSuccessResponse).toHaveBeenCalled();
     });
   });
 
