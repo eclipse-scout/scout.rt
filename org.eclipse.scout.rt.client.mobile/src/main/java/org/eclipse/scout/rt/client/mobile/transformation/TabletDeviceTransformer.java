@@ -89,7 +89,7 @@ public class TabletDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public boolean acceptFormAddingToDesktop(IForm form) {
-    return false;
+    return true;
   }
 
   @Override
