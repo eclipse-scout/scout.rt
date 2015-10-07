@@ -144,17 +144,6 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_DEFAULT_ICON, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getDefaultIconId();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return BinaryResourceUrlUtility.createIconUrl((String) value);
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MULTI_SELECT, model) {
       @Override
       protected Boolean modelValue() {
