@@ -10,282 +10,132 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Default implementation of a last recently used cache mechanism using a HashMap. This implementation is thread-safe.
+ * Default implementation of a last recently used cache mechanism. This implementation is thread-safe.
  * {@link #setTargetSize(int)} is the number of items remaining in the cache, superfluous items are discarded and
- * notified by the DisposeListener
+ * notified by the DisposeListener.
+ * <p>
+ * <b>Consider using directly {@link ConcurrentExpiringMap}</b>
+ *
+ * @see ConcurrentExpiringMap
  */
-public class LRUCache<K, V> {
-  private long m_nextSecondarySeq = 1;
-  private int m_targetSize = 1000;
-  private int m_overflowSize;
-  private long m_timeout = -1;
-  private HashMap<K, CacheEntry> m_accessMap;
-  private final Object m_accessMapLock = new Object();
+public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
   private final EventListenerList m_listenerList = new EventListenerList();
 
-  public LRUCache(int targetSize, long timeout) {
-    m_accessMap = new HashMap<K, CacheEntry>();
-    setTargetSize(targetSize);
-    setTimeout(timeout);
+  public LRUCache(int targetSize, long timeToLive) {
+    super(timeToLive, TimeUnit.MILLISECONDS, targetSize);
   }
 
-  public V get(K key) {
-    boolean fire = false;
-    V fireValue = null;
-    V returnValue = null;
-    synchronized (m_accessMapLock) {
-      CacheEntry ce = m_accessMap.get(key);
-      if (ce != null) {
-        if (ce.isTimeout()) {
-          m_accessMap.remove(key);
-          fire = true;
-          fireValue = ce.getValue();
-          ce = null;
-        }
-      }
-      if (ce != null) {
-        ce.touch();
-        returnValue = ce.getValue();
-      }
-      else {
-        returnValue = null;
-      }
-    }
-    if (fire) {
-      fireValueDisposed(key, fireValue);
-    }
-    return returnValue;
-  }
-
-  public void put(K key, V value) {
-    if (m_targetSize <= 0) {
-      return;
-    }
-    boolean fire = false;
-    V fireValue = null;
-    //
-    synchronized (m_accessMapLock) {
-      validateCacheSizeNoLock();
-      CacheEntry ce = m_accessMap.get(key);
-      if (ce != null) {
-        V oldValue = ce.getValue();
-        ce.updateValue(value);
-        if (oldValue != value) {
-          fire = true;
-          fireValue = oldValue;
-        }
-      }
-      else {
-        ce = new CacheEntry(key, value);
-        m_accessMap.put(key, ce);
-      }
-    }
-    if (fire) {
-      fireValueDisposed(key, fireValue);
-    }
-  }
-
-  public void remove(K key) {
-    if (m_targetSize <= 0) {
-      return;
-    }
-    boolean fire = false;
-    V fireValue = null;
-    //
-    synchronized (m_accessMapLock) {
-      CacheEntry ce = m_accessMap.remove(key);
-      if (ce != null) {
-        fire = true;
-        fireValue = ce.getValue();
-      }
-    }
-    if (fire) {
-      fireValueDisposed(key, fireValue);
-    }
-  }
-
-  public void clear() {
-    Map<K, CacheEntry> oldMap;
-    synchronized (m_accessMapLock) {
-      oldMap = m_accessMap;
-      m_accessMap = new HashMap<K, CacheEntry>();
-    }
-    for (CacheEntry ce : oldMap.values()) {
-      fireValueDisposed(ce.getKey(), ce.getValue());
-    }
-  }
-
+  /**
+   * @deprecated timeToLive is now final in order to be thread safe. If you need to change ttl of a
+   *             {@link ConcurrentExpiringMap} simply create a new {@link ConcurrentExpiringMap} using a
+   *             copy-constructor: <br>
+   *             {@code m_ttlMap = new ConcurrentExpiringMap(m_ttlMap, newTimeToLive, timeToLiveUnit);} Important:
+   *             m_ttlMap must be volatile or be guarded by a lock.
+   */
+  @Deprecated
   public void setTimeout(long timeout) {
-    m_timeout = timeout;
   }
 
+  /**
+   * @deprecated use {@link #getTimeToLive()} instead
+   */
+  @Deprecated
   public long getTimeout() {
-    return m_timeout;
+    return getTimeToLive();
   }
 
+  /**
+   * @deprecated targetSize is now final in order to be thread safe. If you need to change targetSize of a
+   *             {@link ConcurrentExpiringMap} simply create a new {@link ConcurrentExpiringMap} using a
+   *             copy-constructor: <br>
+   *             {@code m_ttlMap = new ConcurrentExpiringMap(m_ttlMap, targetSize);} Important: m_ttlMap must be
+   *             volatile or be guarded by a lock.
+   */
+  @Deprecated
   public void setTargetSize(int size) {
-    m_targetSize = size;
-    m_overflowSize = m_targetSize * 3 / 2;
   }
 
-  public int getTargetSize() {
-    return m_targetSize;
-  }
-
+  @Deprecated
   public Map<K, V> entries() {
     return getCacheContent();
   }
 
+  @Deprecated
   public Map<K, V> getCacheContent() {
-    synchronized (m_accessMapLock) {
-      HashMap<K, V> map = new HashMap<K, V>();
-      for (CacheEntry ce : m_accessMap.values()) {
-        if (!ce.isTimeout()) {
-          map.put(ce.getKey(), ce.getValue());
-        }
-      }
-      return map;
-    }
+    return new HashMap<K, V>(this);
   }
 
+  @Override
   public Set<K> keySet() {
-    synchronized (m_accessMapLock) {
-      HashSet<K> set = new HashSet<K>(m_accessMap.size());
-      for (CacheEntry ce : m_accessMap.values()) {
-        if (!ce.isTimeout()) {
-          set.add(ce.getKey());
-        }
-      }
-      return set;
-    }
+    // old implementation did return an new independent set
+    return new HashSet<>(super.keySet());
   }
 
-  public boolean containsKey(K key) {
-    synchronized (m_accessMapLock) {
-      return m_accessMap.containsKey(key);
-    }
-  }
-
+  @Override
   public Collection<V> values() {
-    synchronized (m_accessMapLock) {
-      ArrayList<V> list = new ArrayList<V>(m_accessMap.size());
-      for (CacheEntry ce : m_accessMap.values()) {
-        if (!ce.isTimeout()) {
-          list.add(ce.getValue());
-        }
-      }
-      return list;
-    }
+    // old implementation did return an new independent set
+    return new HashSet<>(super.values());
   }
 
-  public boolean containsValue(V value) {
-    synchronized (m_accessMapLock) {
-      for (CacheEntry ce : m_accessMap.values()) {
-        if (ce.getValue() == null && value == null) {
-          return true;
-        }
-        else if (ce.getValue() != null && ce.getValue().equals(value)) {
-          return true;
-        }
-      }
-      return false;
-    }
+  @Override
+  protected void execEntryEvicted(K key, V value) {
+    fireValueDisposed(key, value);
   }
 
-  private void validateCacheSizeNoLock() {
-    if (m_accessMap.size() >= m_overflowSize) {
-      TreeSet<CacheEntry> sortSet = new TreeSet<CacheEntry>(new CacheEntryTimestampComparator());
-      for (CacheEntry ce : m_accessMap.values()) {
-        sortSet.add(ce);
-      }
-      // rebuild access map with a maximum of targetSize elements
-      m_accessMap.clear();
-      int count = 0;
-      for (CacheEntry ce : sortSet) {
-        if (count > m_targetSize || ce.isTimeout()) {
-          fireValueDisposed(ce.getKey(), ce.getValue());
-        }
-        else {
-          m_accessMap.put(ce.getKey(), ce);
-          count++;
-        }
-      }
+  @Override
+  public V remove(Object key) {
+    V value = super.remove(key);
+    if (value != null) {
+      fireValueDisposed(key, value);
     }
+    return value;
   }
 
-  /**
-   * Cache Entry Value Object
-   */
-  private final class CacheEntry {
-    private final K m_key;
-    private V m_value;
-    private long m_timestamp;
-    private Long m_secondarySeq;
-
-    public CacheEntry(K key, V value) {
-      m_key = key;
-      m_value = value;
-      touch();
+  @Override
+  public boolean remove(Object key, Object value) {
+    boolean removed = super.remove(key, value);
+    if (removed) {
+      fireValueDisposed(key, value);
     }
+    return removed;
+  }
 
-    public K getKey() {
-      return m_key;
+  @Override
+  public V replace(K key, V value) {
+    V oldValue = super.replace(key, value);
+    if (oldValue != null) {
+      fireValueDisposed(key, oldValue);
     }
+    return oldValue;
+  }
 
-    public V getValue() {
-      return m_value;
+  @Override
+  public boolean replace(K key, V oldValue, V newValue) {
+    boolean replaced = super.replace(key, oldValue, newValue);
+    if (replaced) {
+      fireValueDisposed(key, oldValue);
     }
+    return replaced;
+  }
 
-    public boolean isTimeout() {
-      return m_timeout > 0 && m_timestamp + m_timeout < System.currentTimeMillis();
+  @Override
+  public void clear() {
+    for (Iterator<Entry<K, V>> iterator = entrySet().iterator(); iterator.hasNext();) {
+      Entry<K, V> entry = iterator.next();
+      // we must use remove(K, V) in order to call fireValueDisposed(K, V) safely
+      remove(entry.getKey(), entry.getValue());
     }
-
-    public void updateValue(V newValue) {
-      m_value = newValue;
-      touch();
-    }
-
-    public void touch() {
-      m_timestamp = System.currentTimeMillis();
-    }
-
-    @Override
-    public String toString() {
-      return "LRU[" + m_key + "," + m_value + "]";
-    }
-  }// end class
-
-  private class CacheEntryTimestampComparator implements Comparator<CacheEntry> {
-
-    @Override
-    public int compare(CacheEntry ca, CacheEntry cb) {
-      if (ca.m_timestamp < cb.m_timestamp) {
-        return +1;
-      }
-      if (ca.m_timestamp > cb.m_timestamp) {
-        return -1;
-      }
-      // equal timestamps
-      if (ca.m_secondarySeq == null) {
-        ca.m_secondarySeq = (m_nextSecondarySeq++);
-      }
-      if (cb.m_secondarySeq == null) {
-        cb.m_secondarySeq = (m_nextSecondarySeq++);
-      }
-      return ca.m_secondarySeq.compareTo(cb.m_secondarySeq);
-    }
-  }// end class
+  }
 
   /**
    * Dispose observer

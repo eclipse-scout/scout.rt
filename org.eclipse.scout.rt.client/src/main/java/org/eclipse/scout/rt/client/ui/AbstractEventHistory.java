@@ -11,21 +11,22 @@
 package org.eclipse.scout.rt.client.ui;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.TTLCache;
+import org.eclipse.scout.commons.ConcurrentExpiringMap;
 
 /**
- * The events are kept in history for at most n milliseconds using a {@link TTLCache}
+ * The events are kept in history for at most n milliseconds using a {@link ConcurrentExpiringMap}
  * <p>
  * This object is thread safe.
  *
  * @since 3.8
  */
 public abstract class AbstractEventHistory<T> implements IEventHistory<T> {
-  private final TTLCache<Object, T> m_cache;
+  private final ConcurrentExpiringMap<Object, T> m_cache;
 
   public AbstractEventHistory(long timeToLiveMillis) {
-    m_cache = new TTLCache<Object, T>(timeToLiveMillis);
+    m_cache = new ConcurrentExpiringMap<Object, T>(timeToLiveMillis, TimeUnit.MILLISECONDS);
   }
 
   /**

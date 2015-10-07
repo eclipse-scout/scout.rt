@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.cache;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -72,9 +74,18 @@ public interface ICacheBuilder<K, V> {
   ICacheBuilder<K, V> withThreadSafe(boolean threadSafe);
 
   /**
+   * @param atomicInsertion
+   *          if set to true, a cache might concurrently resolve a key, but the get operations that issued these
+   *          resolves will return the same value. This option is only valid if threadSafe is set to true. Typically set
+   *          this option to true if the cache value is modifiable. (Default false)
+   * @return this builder
+   */
+  ICacheBuilder<K, V> withAtomicInsertion(boolean atomicInsertion);
+
+  /**
    * @param clusterEnabled
    *          if true a cache that runs in a clustered server (<code>IClusterSynchronizationService#isEnabled()</code>)
-   *          will publish cache invalidations to the cluster. (Default true)
+   *          will publish cache invalidations to the cluster. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withClusterEnabled(boolean clusterEnabled);
@@ -101,6 +112,40 @@ public interface ICacheBuilder<K, V> {
    * @return this builder
    */
   ICacheBuilder<K, V> withSingleton(boolean singleton);
+
+  /**
+   * If booth arguments are not null, any resolved cache value will expire and have to be resolved again after the given
+   * time to live duration.
+   * <p>
+   * <b>Note:</b> If one uses additionally the option {@link #withSizeBound(Integer)} the parameter <tt>touchOnGet</tt>
+   * is overruled and set to true.
+   * <p>
+   * Read accesses through {@link ICache#getUnmodifiableMap()} do <em>not</em> reset the time to live duration of a
+   * cache entry.
+   *
+   * @param timeToLiveDuration
+   *          time to live duration
+   * @param timeToLiveUnit
+   *          time to live unit
+   * @param touchOnGet
+   *          if true getting an value will reset the time to live of a cache entry
+   * @return this builder
+   * @throws IllegalArgumentException
+   *           if readTimeToLive is negative
+   */
+  ICacheBuilder<K, V> withTimeToLive(Long timeToLiveDuration, TimeUnit timeToLiveUnit, boolean touchOnGet);
+
+  /**
+   * If set to a non null value, the maximum number of cached values is bounded. The provided size bound is <em>not</em>
+   * enforced and is just a guidance value.
+   * <p>
+   * The current policy that is used to evict elements is least recently used (LRU).
+   *
+   * @param sizeBound
+   *          the target size that map should have approximately.
+   * @return this builder
+   */
+  ICacheBuilder<K, V> withSizeBound(Integer sizeBound);
 
   /**
    * <b>Warning: Potential deadlock</b>

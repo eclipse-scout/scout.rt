@@ -14,8 +14,11 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.LRUCache;
+import org.eclipse.scout.commons.ConcurrentExpiringMap;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementCache;
@@ -26,25 +29,18 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
 
   public static final String TRANSACTION_MEMBER_ID = "PreparedStatementCache";
 
-  private LRUCache<String, Integer> m_countCache;
-  private LRUCache<String, PreparedStatement> m_statementCache;
+  private ConcurrentExpiringMap<String, Integer> m_countCache;
+  private ConcurrentExpiringMap<String, PreparedStatement> m_statementCache;
 
   public PreparedStatementCache(int statementCacheSize) {
     super(TRANSACTION_MEMBER_ID);
-    m_countCache = new LRUCache<String, Integer>(200, 120000L);
-    m_statementCache = new LRUCache<String, PreparedStatement>(statementCacheSize, 3600000L);
-    m_statementCache.addDisposeListener(new LRUCache.DisposeListener() {
+    m_countCache = new ConcurrentExpiringMap<String, Integer>(2L, TimeUnit.MINUTES, 200);
+    m_statementCache = new ConcurrentExpiringMap<String, PreparedStatement>(1L, TimeUnit.HOURS, statementCacheSize) {
       @Override
-      public void valueDisposed(Object key, Object value) {
-        PreparedStatement ps = (PreparedStatement) value;
-        try {
-          ps.close();
-        }
-        catch (SQLException e) {
-          LOG.warn("disposing prepared statement");
-        }
+      protected void execEntryEvicted(String key, PreparedStatement value) {
+        closePreparedStatement(value);
       }
-    });
+    };
   }
 
   @Override
@@ -135,8 +131,21 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
 
   @Override
   public void release() {
-    m_statementCache.clear();// will call the dispose listener
+    for (Iterator<Entry<String, PreparedStatement>> iterator = m_statementCache.entrySet().iterator(); iterator.hasNext();) {
+      Entry<String, PreparedStatement> entry = iterator.next();
+      iterator.remove();
+      closePreparedStatement(entry.getValue());
+    }
     m_countCache.clear();
   }
 
+  private void closePreparedStatement(Object value) {
+    PreparedStatement ps = (PreparedStatement) value;
+    try {
+      ps.close();
+    }
+    catch (SQLException e) {
+      LOG.warn("disposing prepared statement");
+    }
+  }
 }

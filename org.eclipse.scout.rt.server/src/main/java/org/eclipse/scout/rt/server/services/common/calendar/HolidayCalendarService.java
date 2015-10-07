@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.TTLCache;
+import org.eclipse.scout.commons.ConcurrentExpiringMap;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 public class HolidayCalendarService implements IHolidayCalendarService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarService.class);
 
-  private TTLCache<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new TTLCache<String, HolidayCalendarItemParser>(TimeUnit.MINUTES.toMillis(5));// 5 minutes
+  private ConcurrentExpiringMap<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new ConcurrentExpiringMap<String, HolidayCalendarItemParser>(5, TimeUnit.MINUTES);
 
   @Override
   public Set<? extends ICalendarItem> getItems(RemoteFile spec, Date minDate, Date maxDate) throws ProcessingException {
@@ -41,13 +41,10 @@ public class HolidayCalendarService implements IHolidayCalendarService {
     HolidayCalendarItemParser p = null;
     String key = spec.getPath();
     synchronized (m_holidayXmlCache) {
-      if (m_holidayXmlCache.containsKey(key)) {
-        p = m_holidayXmlCache.get(key);
-      }
-      else {
-        RemoteFile f = null;
+      p = m_holidayXmlCache.get(key);
+      if (p == null) {
         try {
-          f = BEANS.get(IRemoteFileService.class).getRemoteFile(spec);
+          RemoteFile f = BEANS.get(IRemoteFileService.class).getRemoteFile(spec);
           if (f != null) {
             p = new HolidayCalendarItemParser(f.getDecompressedInputStream(), spec.getPath());
             m_holidayXmlCache.put(key, p);

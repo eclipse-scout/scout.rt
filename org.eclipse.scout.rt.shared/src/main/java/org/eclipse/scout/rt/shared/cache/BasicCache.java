@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -41,8 +42,9 @@ public class BasicCache<K, V> implements ICache<K, V> {
   private final ICacheValueResolver<K, V> m_resolver;
   private final Map<K, V> m_cacheMap;
   private final Map<K, V> m_unmodifiableMap;
+  private final boolean m_atomicInsertion;
 
-  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
+  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, boolean atomicInsertion) {
     super();
     if (cacheId == null || resolver == null || cacheMap == null) {
       throw new NullPointerException();
@@ -51,6 +53,10 @@ public class BasicCache<K, V> implements ICache<K, V> {
     m_resolver = resolver;
     m_cacheMap = cacheMap;
     m_unmodifiableMap = Collections.unmodifiableMap(m_cacheMap);
+    m_atomicInsertion = atomicInsertion;
+    if (m_atomicInsertion && !(cacheMap instanceof ConcurrentMap)) {
+      throw new IllegalArgumentException("To use atomic insertions cacheMap must implement ConcurrentMap interface");
+    }
   }
 
   public ICacheValueResolver<K, V> getResolver() {
@@ -85,7 +91,13 @@ public class BasicCache<K, V> implements ICache<K, V> {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException(String.format("Failed resolving key: %s", key), e));
       }
       if (value != null) {
-        m_cacheMap.put(key, value);
+        if (m_atomicInsertion) {
+          V alreadySetValue = ((ConcurrentMap<K, V>) m_cacheMap).putIfAbsent(key, value);
+          value = alreadySetValue != null ? alreadySetValue : value;
+        }
+        else {
+          m_cacheMap.put(key, value);
+        }
       }
     }
     return value;
@@ -120,8 +132,16 @@ public class BasicCache<K, V> implements ICache<K, V> {
       if (entry.getKey() == null || entry.getValue() == null) {
         iterator.remove();
       }
+      else if (m_atomicInsertion) {
+        V alreadySetValue = ((ConcurrentMap<K, V>) m_cacheMap).putIfAbsent(entry.getKey(), entry.getValue());
+        if (alreadySetValue != null) {
+          entry.setValue(alreadySetValue);
+        }
+      }
     }
-    m_cacheMap.putAll(resolvedValues);
+    if (!m_atomicInsertion) {
+      m_cacheMap.putAll(resolvedValues);
+    }
     result.putAll(resolvedValues);
     return result;
   }

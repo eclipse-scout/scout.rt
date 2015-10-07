@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.cache;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -26,16 +27,21 @@ public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
 
   @Override
   protected Map<K, V> createCacheMap() {
-    if (isTransactional()) {
-      if (isSingleton() || !isTransactionalFastForward()) {
-        return new CopyOnWriteTransactionalMap<K, V>(getCacheId(), isTransactionalFastForward());
-      }
-      else {
-        return new ConcurrentTransactionalMap<K, V>(getCacheId(), isTransactionalFastForward());
-      }
+    if (!isCreateExpiringMap() && isTransactional() && !isAtomicInsertion() && (isSingleton() || !isTransactionalFastForward())) {
+      return new CopyOnWriteTransactionalMap<>(getCacheId(), isTransactionalFastForward());
     }
     else {
       return super.createCacheMap();
+    }
+  }
+
+  @Override
+  protected <KK, VV> ConcurrentMap<KK, VV> createConcurrentMap() {
+    if (isTransactional()) {
+      return new ConcurrentTransactionalMap<>(getCacheId(), isTransactionalFastForward());
+    }
+    else {
+      return super.createConcurrentMap();
     }
   }
 

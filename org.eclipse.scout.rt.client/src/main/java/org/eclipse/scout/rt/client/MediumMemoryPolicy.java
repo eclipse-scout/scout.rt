@@ -11,9 +11,10 @@
 package org.eclipse.scout.rt.client;
 
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.commons.LRUCache;
+import org.eclipse.scout.commons.ConcurrentExpiringMap;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -38,12 +39,12 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
 
   private boolean m_release = false;
   //cache last 5 search form contents and table filters
-  private final LRUCache<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
-  private final LRUCache<String /*pageTableIdentifier*/, byte[]> m_tableUserFilterState;
+  private final ConcurrentExpiringMap<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
+  private final ConcurrentExpiringMap<String /*pageTableIdentifier*/, byte[]> m_tableUserFilterState;
 
   public MediumMemoryPolicy() {
-    m_searchFormCache = new LRUCache<String, SearchFormState>(5, 0L);
-    m_tableUserFilterState = new LRUCache<String, byte[]>(5, 0L);
+    m_searchFormCache = new ConcurrentExpiringMap<String, SearchFormState>(0L, TimeUnit.MILLISECONDS, 5);
+    m_tableUserFilterState = new ConcurrentExpiringMap<String, byte[]>(0L, TimeUnit.MILLISECONDS, 5);
   }
 
   @Override

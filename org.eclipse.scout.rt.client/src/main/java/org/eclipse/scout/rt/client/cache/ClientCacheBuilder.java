@@ -30,9 +30,9 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
   protected ICache<K, V> createBasicCache(Map<K, V> cacheMap) {
     ICacheValueResolver<K, V> valueResolver = getValueResolver();
     if (isSharedAndRemoteAvailable()) {
-      valueResolver = new RemoteCacheValueResolver<K, V>(getCacheId());
+      valueResolver = new RemoteCacheValueResolver<>(getCacheId());
     }
-    BasicCache<K, V> cache = new BasicCache<K, V>(getCacheId(), valueResolver, cacheMap);
+    BasicCache<K, V> cache = new BasicCache<>(getCacheId(), valueResolver, cacheMap, isAtomicInsertion());
     addCacheInstance(cache);
     return cache;
   }
@@ -41,7 +41,7 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
   protected ICache<K, V> addBeforeCustomWrappers(ICache<K, V> cache) {
     cache = super.addBeforeCustomWrappers(cache);
     if (isSharedAndRemoteAvailable()) {
-      cache = new ClientNotificationClientCacheWrapper<K, V>(cache);
+      cache = new ClientNotificationClientCacheWrapper<>(cache);
       addCacheInstance(cache);
     }
     return cache;

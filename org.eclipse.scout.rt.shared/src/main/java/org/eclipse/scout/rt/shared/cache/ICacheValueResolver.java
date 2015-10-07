@@ -30,7 +30,7 @@ public interface ICacheValueResolver<K, V> {
   /**
    * @param keys
    *          never null, empty or contains null elements
-   * @return non null map
+   * @return non null modifiable map
    */
   Map<K, V> resolveAll(Set<K> keys) throws Exception;
 }
