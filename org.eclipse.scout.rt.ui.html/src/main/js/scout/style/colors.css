@@ -119,7 +119,7 @@
 @map-item-data-color: @chart-data-color;
 @default-button-color: @palette-white;
 @default-button-background-color: @palette-blue-6;
-@default-button-hover-background-color: @palette-blue-3;
+@default-button-hover-background-color: @palette-blue-5;
 @navigation-color: @palette-gray-2;
 @navigation-background-color: @palette-blue-7;
 @outline-selection-color: @text-color;
