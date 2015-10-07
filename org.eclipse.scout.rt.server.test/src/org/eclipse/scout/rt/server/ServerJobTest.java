@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,9 +28,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.shared.HandlerAdapter;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Tests for {@link ServerJob}
@@ -36,6 +47,7 @@ import org.junit.Test;
  */
 public class ServerJobTest {
 
+  private static final ProcessingException EXPECTED_PROCESSING_EXCEPTION = new ProcessingException("Expected exception");
   private static final RuntimeException m_rollBackException = new RuntimeException("Exception in transaction.rollBack()!");
   private static final Throwable[] m_transactionFailures = new Throwable[2];
   static {
@@ -52,6 +64,51 @@ public class ServerJobTest {
     assertEquals("Could not find the RollbackException in the Logs!", true, interceptor.hasExceptionLogged(m_rollBackException));
     assertEquals("Could not find transactionFailure1 in the Logs!", true, interceptor.hasExceptionLogged(m_transactionFailures[0]));
     assertEquals("Could not find transactionFailure1 in the Logs!", true, interceptor.hasExceptionLogged(m_transactionFailures[1]));
+  }
+
+  @Test
+  public void testRollbackAndRelease() throws Exception {
+    doTestRollbackAndRelease();
+  }
+
+  @Test
+  public void testRollbackAndReleaseUsingCustomExceptionHandlerService() throws Exception {
+    final IExceptionHandlerService exceptionHandlerService = mock(IExceptionHandlerService.class);
+    Mockito.doThrow(new RuntimeException("translated exception")).when(exceptionHandlerService).handleException(any(ProcessingException.class));
+    List<ServiceRegistration> testServices = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, exceptionHandlerService);
+
+    try {
+      doTestRollbackAndRelease();
+    }
+    finally {
+      TestingUtility.unregisterServices(testServices);
+    }
+  }
+
+  protected void doTestRollbackAndRelease() {
+    final ITransactionMember txnMember = mock(ITransactionMember.class);
+    when(txnMember.needsCommit()).thenReturn(true);
+
+    final ServerJob job = new ServerJob("test rollback and release job", mock(IServerSession.class)) {
+      @Override
+      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+        ITransaction txn = ThreadContext.getTransaction();
+        txn.registerMember(txnMember);
+        throw EXPECTED_PROCESSING_EXCEPTION;
+      }
+    };
+
+    job.runNow(new NullProgressMonitor());
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      assertSame(EXPECTED_PROCESSING_EXCEPTION, e);
+    }
+
+    InOrder order = inOrder(txnMember);
+    order.verify(txnMember).rollback();
+    order.verify(txnMember).release();
   }
 
   private P_LogHandler installLogInterceptor() {
@@ -80,7 +137,6 @@ public class ServerJobTest {
       doThrow(m_rollBackException).when(transaction).rollback(); //Throw unchecked exception here!
       return transaction;
     }
-
   }
 
   private class P_LogHandler extends HandlerAdapter {
@@ -101,5 +157,4 @@ public class ServerJobTest {
       return false;
     }
   }
-
 }

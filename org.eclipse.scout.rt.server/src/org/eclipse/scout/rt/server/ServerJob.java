@@ -251,25 +251,31 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     finally {
       ActiveTransactionRegistry.unregister(transaction);
       if (transaction.hasFailures()) {
-        try {
-          IExceptionHandlerService exceptionHandlerService = SERVICES.getService(IExceptionHandlerService.class);
-          for (Throwable transactionFailure : transaction.getFailures()) {
-            if (transactionFailure instanceof ProcessingException) {
+        IExceptionHandlerService exceptionHandlerService = SERVICES.getService(IExceptionHandlerService.class);
+        for (Throwable transactionFailure : transaction.getFailures()) {
+          if (transactionFailure instanceof ProcessingException) {
+            try {
               exceptionHandlerService.handleException((ProcessingException) transactionFailure);
             }
-            else {
-              LOG.error("Transaction had failure.", transactionFailure);
+            catch (Throwable t) {
+              if (LOG.isDebugEnabled()) {
+                LOG.warn("Handling transaction failure throwed another exception", t);
+              }
+              else {
+                LOG.warn("Handling transaction failure throwed another exception of type '{}'", t.getClass().getName());
+              }
             }
           }
+          else {
+            LOG.error("Transaction had failure.", transactionFailure);
+          }
         }
-        finally {
-          // xa rollback
-          try {
-            transaction.rollback();
-          }
-          catch (Throwable t) {
-            LOG.error("Transaction rollback failed with exception.", t);
-          }
+        // xa rollback
+        try {
+          transaction.rollback();
+        }
+        catch (Throwable t) {
+          LOG.error("Transaction rollback failed with exception.", t);
         }
       }
       else {
