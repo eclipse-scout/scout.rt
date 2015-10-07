@@ -116,59 +116,60 @@ __include("scout/planner/PlannerMenuItemsOrder.js");
 __include("scout/filechooser/FileChooser.js");
 __include("scout/filechooser/FileChooserController.js");
 // Table
-__include("scout/table/Column.js");
-__include("scout/table/BeanColumn.js"); // requires Column.js
-__include("scout/table/CheckBoxColumn.js"); // requires Column.js
-__include("scout/table/DateColumn.js"); // requires Column.js
-__include("scout/table/IconColumn.js"); //requires Column.js
-__include("scout/table/control/TableControl.js");
-__include("scout/table/control/AnalysisTableControl.js"); // requires TableControl.js
-__include("scout/table/control/ChartTableControl.js"); // requires TableControl.js
-__include("scout/table/control/ChartTableControlMatrix.js"); // requires TableControl.js
-__include("scout/table/control/GraphTableControl.js"); // requires TableControl.js
-__include("scout/table/control/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/Table.js");
 __include("scout/table/TableFooter.js");
 __include("scout/table/TableFooterLayout.js");
-__include("scout/table/TableControlCloseKeyStroke.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");
-__include("scout/table/TableStartCellEditKeyStroke.js");
-__include("scout/table/TableSelectAllKeyStroke.js");
-__include("scout/table/TableRefreshKeyStroke.js");
-__include("scout/table/TableToggleRowKeyStroke.js");
-__include("scout/table/TableCopyKeyStroke.js");
 __include("scout/table/TableLayout.js");
 __include("scout/table/TableSelectionHandler.js");
-__include("scout/table/AbstractTableNavigationKeyStroke.js");
-__include("scout/table/TableNavigationUpKeyStroke.js");
-__include("scout/table/TableNavigationDownKeyStroke.js");
-__include("scout/table/TableNavigationHomeKeyStroke.js");
-__include("scout/table/TableNavigationEndKeyStroke.js");
-__include("scout/table/TableNavigationPageUpKeyStroke.js");
-__include("scout/table/TableNavigationPageDownKeyStroke.js");
-__include("scout/table/TableFocusFilterFieldKeyStroke.js");
 __include("scout/table/TableTooltip.js");
+__include("scout/table/columns/Column.js");
+__include("scout/table/columns/BeanColumn.js"); // requires Column.js
+__include("scout/table/columns/CheckBoxColumn.js"); // requires Column.js
+__include("scout/table/columns/DateColumn.js"); // requires Column.js
+__include("scout/table/columns/IconColumn.js"); //requires Column.js
+__include("scout/table/controls/TableControl.js");
+__include("scout/table/controls/AnalysisTableControl.js"); // requires TableControl.js
+__include("scout/table/controls/ChartTableControl.js"); // requires TableControl.js
+__include("scout/table/controls/ChartTableControlMatrix.js"); // requires TableControl.js
+__include("scout/table/controls/GraphTableControl.js"); // requires TableControl.js
+__include("scout/table/controls/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/editor/CellEditorPopup.js");
 __include("scout/table/editor/CellEditorPopupLayout.js");
 __include("scout/table/editor/CellEditorCancelEditKeyStroke.js");
 __include("scout/table/editor/CellEditorCompleteEditKeyStroke.js");
 __include("scout/table/editor/CellEditorTabKeyStroke.js");
+__include("scout/table/keystrokes/AbstractTableNavigationKeyStroke.js");
+__include("scout/table/keystrokes/TableControlCloseKeyStroke.js");
+__include("scout/table/keystrokes/TableCopyKeyStroke.js");
+__include("scout/table/keystrokes/TableSelectAllKeyStroke.js");
+__include("scout/table/keystrokes/TableStartCellEditKeyStroke.js");
+__include("scout/table/keystrokes/TableRefreshKeyStroke.js");
+__include("scout/table/keystrokes/TableToggleRowKeyStroke.js");
+__include("scout/table/keystrokes/TableNavigationUpKeyStroke.js");
+__include("scout/table/keystrokes/TableNavigationDownKeyStroke.js");
+__include("scout/table/keystrokes/TableNavigationHomeKeyStroke.js");
+__include("scout/table/keystrokes/TableNavigationEndKeyStroke.js");
+__include("scout/table/keystrokes/TableNavigationPageUpKeyStroke.js");
+__include("scout/table/keystrokes/TableNavigationPageDownKeyStroke.js");
+__include("scout/table/keystrokes/TableFocusFilterFieldKeyStroke.js");
 __include("scout/table/userfilter/TableUserFilter.js");
 __include("scout/table/userfilter/ColumnUserFilter.js");
 __include("scout/table/userfilter/TableTextUserFilter.js");
-// Desktop
+// Tree
 __include("scout/tree/Tree.js");
 __include("scout/tree/TreeCompact.js");
 __include("scout/tree/TreeLayout.js");
 __include("scout/tree/TreeCompactLayout.js");
-__include("scout/tree/AbstractTreeNavigationKeyStroke.js");
-__include("scout/tree/TreeSpaceKeyStroke.js");
-__include("scout/tree/TreeNavigationUpKeyStroke.js");
-__include("scout/tree/TreeNavigationDownKeyStroke.js");
-__include("scout/tree/TreeCollapseAllKeyStroke.js");
-__include("scout/tree/TreeCollapseOrDrillUpKeyStroke.js");
-__include("scout/tree/TreeExpandOrDrillDownKeyStroke.js");
+__include("scout/tree/keystrokes/AbstractTreeNavigationKeyStroke.js");
+__include("scout/tree/keystrokes/TreeSpaceKeyStroke.js");
+__include("scout/tree/keystrokes/TreeNavigationUpKeyStroke.js");
+__include("scout/tree/keystrokes/TreeNavigationDownKeyStroke.js");
+__include("scout/tree/keystrokes/TreeCollapseAllKeyStroke.js");
+__include("scout/tree/keystrokes/TreeCollapseOrDrillUpKeyStroke.js");
+__include("scout/tree/keystrokes/TreeExpandOrDrillDownKeyStroke.js");
+// Desktop
 __include("scout/desktop/BaseDesktop.js");
 __include("scout/desktop/Desktop.js");
 __include("scout/desktop/DesktopTaskBarLayout.js");
@@ -179,27 +180,27 @@ __include("scout/desktop/ViewMenuTab.js");
 __include("scout/desktop/ViewTabSelectKeyStroke.js");
 __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
-__include("scout/desktop/NullDesktopNavigation.js");
-__include("scout/desktop/FormToolButton.js");
-__include("scout/desktop/FormToolPopup.js");
-__include("scout/desktop/Outline.js");
-__include("scout/desktop/OutlineKeyStrokeContext.js");
-__include("scout/desktop/OutlineLayout.js");
-__include("scout/desktop/AbstractOutlineTreeNavigationKeyStroke.js");
-__include("scout/desktop/OutlineTreeNavigationUpKeyStroke.js");
-__include("scout/desktop/OutlineTreeCollapseAllKeyStroke.js");
-__include("scout/desktop/OutlineTreeCollapseOrDrillUpKeyStroke.js");
-__include("scout/desktop/OutlineTreeExpandOrDrillDownKeyStroke.js");
-__include("scout/desktop/OutlineTreeNavigationDownKeyStroke.js");
 __include("scout/desktop/DetailTableTreeFilter.js");
+__include("scout/desktop/NullDesktopNavigation.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
-__include("scout/desktop/OutlineViewButton.js");
-__include("scout/desktop/SearchOutline.js");
 __include("scout/desktop/ViewTabsController.js");
+__include("scout/desktop/outline/Outline.js");
+__include("scout/desktop/outline/OutlineKeyStrokeContext.js");
+__include("scout/desktop/outline/OutlineLayout.js");
+__include("scout/desktop/outline/AbstractOutlineTreeNavigationKeyStroke.js");
+__include("scout/desktop/outline/OutlineTreeNavigationUpKeyStroke.js");
+__include("scout/desktop/outline/OutlineTreeCollapseAllKeyStroke.js");
+__include("scout/desktop/outline/OutlineTreeCollapseOrDrillUpKeyStroke.js");
+__include("scout/desktop/outline/OutlineTreeExpandOrDrillDownKeyStroke.js");
+__include("scout/desktop/outline/OutlineTreeNavigationDownKeyStroke.js");
+__include("scout/desktop/outline/OutlineViewButton.js");
+__include("scout/desktop/outline/SearchOutline.js");
 // Basics for form fields
 __include("scout/form/Form.js");
 __include("scout/form/FormLayout.js");
+__include("scout/form/FormToolButton.js");
+__include("scout/form/FormToolPopup.js");
 __include("scout/form/DialogLayout.js");
 __include("scout/form/fields/fields.js");
 __include("scout/form/fields/AppLinkKeyStroke.js");
