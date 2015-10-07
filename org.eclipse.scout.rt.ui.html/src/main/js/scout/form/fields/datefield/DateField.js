@@ -885,7 +885,7 @@ scout.DateField.prototype._setDateValid = function(valid, dateText) {
       };
     }
     errorStatus.invalidDateText = dateText;
-    errorStatus.invalidDisplayText = scout.strings.join(" ",
+    errorStatus.invalidDisplayText = scout.strings.join(' ',
       dateText,
       this.$timeField && this.$timeField.val());
     this.setErrorStatus(errorStatus);
@@ -916,7 +916,7 @@ scout.DateField.prototype._setTimeValid = function(valid, timeText) {
       };
     }
     errorStatus.invalidTimeText = timeText;
-    errorStatus.invalidDisplayText = scout.strings.join(" ",
+    errorStatus.invalidDisplayText = scout.strings.join(' ',
       this.$dateField && this.$dateField.val(),
       timeText);
     this.setErrorStatus(errorStatus);
