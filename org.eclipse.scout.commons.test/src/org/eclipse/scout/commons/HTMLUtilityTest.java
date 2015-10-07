@@ -657,7 +657,7 @@ public class HTMLUtilityTest {
 
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}.
-   * 
+   *
    * @see Bug 415316
    */
   @Test
@@ -699,7 +699,7 @@ public class HTMLUtilityTest {
 
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)} with comments.
-   * 
+   *
    * @See Bug 415316
    */
   @Test
@@ -738,10 +738,50 @@ public class HTMLUtilityTest {
     assertEquals("normal body", HTMLUtility.toPlainTextWithTable(input));
   }
 
+  @Test
+  public void testNewLinesToPlainTextWithTable() {
+    String in1 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p />After</body>" +
+        "</html>";
+
+    String in2 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p></p>After</body>" +
+        "</html>";
+
+    String in3 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p>InBetween</p>After</body>" +
+        "</html>";
+
+    String in4 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p>   \t\n</p>After</body>" +
+        "</html>";
+
+    String in5 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p>&nbsp;</p>After</body>" +
+        "</html>";
+
+    String in6 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p/>After</body>" +
+        "</html>";
+
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in1));
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in2));
+    assertEquals("Before\nInBetween\nAfter", HTMLUtility.toPlainTextWithTable(in3));
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in4));
+    assertEquals("Before\n \nAfter", HTMLUtility.toPlainTextWithTable(in5));
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in6));
+  }
+
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}:
    * ensure that the line breaks in table cell will be ignored.
-   * 
+   *
    * @See Bug 415316
    */
   @Test
@@ -775,7 +815,7 @@ public class HTMLUtilityTest {
 
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}: test different lines breaks (p, br, table)
-   * 
+   *
    * @See Bug 415316
    */
   @Test
