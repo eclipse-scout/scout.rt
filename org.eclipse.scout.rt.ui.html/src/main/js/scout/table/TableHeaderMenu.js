@@ -113,17 +113,19 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       .click(this.remove.bind(this))
       .click(groupAll);
 
-    var $groupSelection = $commandGroup.appendDiv('header-command group-selection')
-      .data('label', session.text('ui.overSelection'))
-      .click(this.remove.bind(this))
-      .click(groupSelection);
-
     if (column.type !== 'number') {
-      var $groupSort = $commandGroup.appendDiv('header-command group-sort')
+      var $groupColumn = $commandGroup.appendDiv('header-command group-column')
         .data('label', session.text('ui.grouped'))
         .click(this.remove.bind(this))
         .click(groupSort);
+
+
+      var $groupColumnAdditional = $commandGroup.appendDiv('header-command group-column-additional')
+        .data('label', session.text('ui.grouped')) //TODO fko: text
+        .click(this.remove.bind(this))
+        .click(groupSortAdditional);
     }
+
     groupSelect();
   }
 
@@ -256,7 +258,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   function sort(direction, multiSort, remove) {
-    table.removeGrouping();
+//    table.removeGrouping();
     table.sort(column, direction, multiSort, remove);
 
     sortSelect();
@@ -270,8 +272,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     var addIcon = '\uF067',
       sortCount = getSortColumnCount();
 
+
     $('.header-command', $commandSort).removeClass('selected');
 
+    //TODO: fko cgu: use column properties instead of css class?
     if (sortCount === 1 && !table.hasPermanentHeadOrTailSortColumns()) {
       if ($headerItem.hasClass('sort-asc')) {
         $sortAsc.addClass('selected');
@@ -315,23 +319,40 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     return sortCount;
   }
 
-  function groupAll() {
-    doGroup($(this), null, false);
+  function getGroupColumnCount() {
+    var groupCount = 0;
+
+    for (var i = 0; i < table.columns.length; i++) {
+      if (table.columns[i].grouped) {
+        groupCount++;
+      }
+    }
+
+    return groupCount;
   }
 
-  function groupSelection() {
-    doGroup($(this), null, true);
+  function groupAll() {
+    doGroup($(this));
   }
 
   function groupSort() {
-    doGroup($(this), column, false);
+    groupColumn($(this), column, 'asc', false);
   }
 
-  function doGroup($command, column, selection) {
+  function groupSortAdditional() {
+    groupColumn($(this), column, 'asc', true);
+  }
+
+  function groupColumn($command, column, direction, additional) {
+    var remove = $command.isSelected();
+    table.groupColumn(column, additional, direction, remove);
+  }
+
+  function doGroup($command) {
     if ($command.isSelected()) {
-      table.removeGrouping();
+      table.removeTableGrouping();
     } else {
-      table.group(column, selection);
+      table.groupTable();
     }
 
     sortSelect();
@@ -339,21 +360,35 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   function groupSelect() {
+
+    var  iconPlus = '\uF067',
+      groupCount = getGroupColumnCount();
+
     $groupAll.removeClass('selected');
-    if ($groupSort) {
-      $groupSort.removeClass('selected');
+    if ($groupColumn) {
+      $groupColumn.removeClass('selected');
+    }
+
+    if($groupColumnAdditional) {
+      $groupColumnAdditional.removeClass('selected');
     }
 
     if (table.grouped && !table.groupedSelection) {
       $groupAll.addClass('selected');
     }
 
-    if (table.grouped && table.groupedSelection) {
-      $groupSelection.addClass('selected');
+    if($groupColumnAdditional){
+      if(groupCount === 0 || column.grouped){
+        $groupColumnAdditional.hide();
+      }
+      else{
+        $groupColumnAdditional.show().attr('data-icon', iconPlus);
+      }
     }
 
-    if (column.grouped) {
-      $groupSort.addClass('selected');
+    if($groupColumn && column.grouped){
+      $groupColumn.addClass('selected');
+      $groupColumn.show().attr('data-icon', column.sortIndex + 1);
     }
   }
 

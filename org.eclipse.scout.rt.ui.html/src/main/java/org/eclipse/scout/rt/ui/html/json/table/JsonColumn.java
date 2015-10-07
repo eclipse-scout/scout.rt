@@ -62,6 +62,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
       json.put("sortActive", true);
       json.put("sortAscending", getColumn().isSortAscending());
       json.put("sortIndex", getColumn().getSortIndex());
+      json.put("grouped", getColumn().isGroupingActive());
     }
     if (getColumn() instanceof ICustomColumn) {
       json.put("custom", true);

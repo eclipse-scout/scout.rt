@@ -83,6 +83,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
   public static final String EVENT_ROWS_SORTED = "rowsSorted";
   public static final String EVENT_SORT_ROWS = "sortRows";
+  public static final String EVENT_ROWS_GROUPED = "rowsGrouped";
+  public static final String EVENT_GROUP_ROWS = "groupRows";
   public static final String EVENT_COLUMN_MOVED = "columnMoved";
   public static final String EVENT_COLUMN_RESIZED = "columnResized";
   public static final String EVENT_RELOAD = "reload";
@@ -403,6 +405,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     else if (EVENT_ROWS_SORTED.equals(event.getType())) {
       handleUiRowsSorted(event);
     }
+    else if (EVENT_GROUP_ROWS.equals(event.getType())) {
+      handleUiGroupRows(event);
+    }
+    else if (EVENT_ROWS_GROUPED.equals(event.getType())) {
+      handleUiRowsGrouped(event);
+    }
     else if (EVENT_COLUMN_MOVED.equals(event.getType())) {
       handleUiColumnMoved(event);
     }
@@ -519,6 +527,31 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       boolean sortAscending = data.getBoolean("sortAscending");
       getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort, sortAscending);
     }
+  }
+
+  protected void handleUiRowsGrouped(JsonEvent event) {
+    addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
+    fireGroupRowsFromUi(event.getData());
+  }
+
+  protected void handleUiGroupRows(JsonEvent event) {
+    fireGroupRowsFromUi(event.getData());
+  }
+
+  protected void fireGroupRowsFromUi(JSONObject data) {
+
+    IColumn column = extractColumn(data);
+    boolean groupingRemoved = data.optBoolean("groupingRemoved");
+
+    if (groupingRemoved) {
+      getModel().getUIFacade().fireGroupColumnRemovedFromUI(column);
+    }
+    else {
+      boolean multiGroup = data.optBoolean("multiGroup");
+      boolean groupAscending = data.getBoolean("groupAscending");
+      getModel().getUIFacade().fireHeaderGroupFromUI(column, multiGroup, groupAscending);
+    }
+
   }
 
   protected void handleUiColumnMoved(JsonEvent event) {

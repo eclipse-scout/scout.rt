@@ -590,9 +590,8 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   // update grouping if group by column is active
-  if (this._groupColumn()) {
-    this._group();
-  }
+  this._group();
+
 
   this.renderSelection();
 };
@@ -631,6 +630,8 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
     deviation;
 
   if (remove) {
+    //TODO: fko: handle case where column is also grouped.
+
     if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
       column.sortActive = false;
 
@@ -671,6 +672,7 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
       if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd)) {
         siblingColumn.sortIndex = -1;
         siblingColumn.sortActive = false;
+        siblingColumn.grouped = false;
       }
     });
 
@@ -684,6 +686,105 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
   column.sortAscending = direction === 'asc' ? true : false;
   column.sortActive = true;
 };
+
+scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove){
+  var sortIndex = -1,
+  deviation;
+
+  if (remove) {
+    column.grouped = false;
+    return this._updateSortColumns(column, direction, multiGroup, remove);
+  }
+
+  //TODO: fko: handle head sort case.
+
+  if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
+    // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
+    if (multiGroup) {
+
+      sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) {
+        return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped) ? -1 : c.sortIndex;
+      })));
+
+
+      if (!column.sortActive) {
+        // column was not yet present: insert at determined position
+        // and move all subsequent nodes by one.
+        // add just after all other grouping columns in column set.
+        column.sortIndex = sortIndex + 1;
+        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+          if(siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex > sortIndex){
+            siblingColumn.sortIndex++;
+          }
+        });
+
+        // increase sortIndex for all permanent tail columns (a column has been added in front of them)
+        this._permanentTailSortColumns.forEach(function(c) {
+          c.sortIndex++;
+        });
+      } else{
+        //column already sorted, update position:
+        //move all sort columns between the newly determined sortindex and the old sortindex by one.
+        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+          if(siblingColumn.sortActive &&
+              !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
+               (siblingColumn.sortIndex > sortIndex) &&
+               (siblingColumn.sortIndex < column.sortIndex)){
+            siblingColumn.sortIndex++;
+          }
+        });
+        column.sortIndex = sortIndex + 1;
+      }
+    } else {
+      //no multigroup:
+        sortIndex = this._permanentHeadSortColumns.length;
+
+        if(column.sortActive){
+        //column already sorted, update position:
+          //move all sort columns between the newly determined sortindex and the old sortindex by one.
+          scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+            if(siblingColumn.sortActive &&
+                !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
+                 (siblingColumn.sortIndex >= sortIndex) &&
+                 (siblingColumn.sortIndex < column.sortIndex)){
+              siblingColumn.sortIndex++;
+            }
+          });
+          column.sortIndex = sortIndex;
+        }
+        else{ //not sorted yet
+          scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+            if(siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex){
+              siblingColumn.sortIndex++;
+            }
+          });
+
+          column.sortIndex = sortIndex;
+
+          // increase sortIndex for all permanent tail columns (a column has been added in front of them)
+          this._permanentTailSortColumns.forEach(function(c) {
+            c.sortIndex++;
+          });
+        }
+
+        //remove all other grouped properties:
+        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+          if(siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex){
+            siblingColumn.grouped = false;
+          }
+        });
+
+    }
+  } else {
+    //TODO: head or tail sort column.
+
+  }
+
+  column.sortAscending = direction === 'asc' ? true : false;
+  column.sortActive = true;
+  column.grouped = true;
+};
+
 
 scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelected, followingRowSelected) {
   var rowWidth = this._rowWidth;
@@ -1221,12 +1322,15 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 };
 
 scout.Table.prototype._group = function(update) {
-  var column, alignment, rows, sum, row, value, nextRow, useRow, skip, hasCellTextForGroupingFunction,
+  var column, alignment, rows, sum, totalSum, row, value, nextRow, useRow, skip, hasCellTextForGroupingFunction, i,
     that = this,
+    groupColumns = this._groupColumns(),
     groupColumn = this._groupColumn();
 
   // remove all sum rows
+  update = update || !this.rendered;
   if (update) {
+    //TODO: cgu/fko: update scroll bar?
     this.$sumRows().remove();
   } else {
     this.$sumRows().animateAVCSD('height', 0, function() {
@@ -1242,6 +1346,7 @@ scout.Table.prototype._group = function(update) {
   // prepare data
   rows = this.filteredRows();
   sum = [];
+  totalSum = [];
 
   for (var r = 0; r < rows.length; r++) {
     row = rows[r];
@@ -1254,6 +1359,9 @@ scout.Table.prototype._group = function(update) {
 
       if (column.type === 'number') {
         sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
+        if(this.grouped){
+          totalSum[c] = (totalSum[c] || 0) + (value === '' || !useRow ? 0 : value);
+        }
       }
     }
 
@@ -1262,16 +1370,43 @@ scout.Table.prototype._group = function(update) {
 
     // test if group is finished
     skip = (r === rows.length - 1);
-    hasCellTextForGroupingFunction = groupColumn && groupColumn.cellTextForGrouping && typeof groupColumn.cellTextForGrouping === 'function';
-    skip = skip || (hasCellTextForGroupingFunction && !this.grouped && groupColumn.cellTextForGrouping(row) !== groupColumn.cellTextForGrouping(nextRow));
-    skip = skip || (!hasCellTextForGroupingFunction && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
-
+    skip = skip || this._isNewGroup(groupColumns, row, nextRow);
     // if group is finished: add group row
-    if (sum.length > 0 && skip) {
-      this._appendSumRow(sum, groupColumn, row, this.grouped, update);
-      sum = [];
+
+    if(skip){
+      //append total sum first, otherwise column of last group will be bottom.
+      if((r === rows.length - 1) && totalSum.length > 0){
+        this._appendSumRow(totalSum, row, true, update);
+      }
+      if(sum.length > 0){
+        this._appendSumRow(sum, row, false, update);
+        sum = []; //reset after group
+      }
     }
   }
+};
+
+scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
+  var i, col, newRow = false, hasCellTextForGroupingFunction;
+
+  if(!nextRow){
+    return true; //row is last row
+  }
+
+  for(i=0; i<groupedColumns.length;i++){
+    col = groupedColumns[i];
+    hasCellTextForGroupingFunction = col && col.cellTextForGrouping && typeof col.cellTextForGrouping === 'function';
+    newRow = newRow || (hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow));
+    newRow = newRow || (!hasCellTextForGroupingFunction && this.cellText(col, row) !== this.cellText(col, nextRow));
+    if(newRow){
+      return true;
+    }
+  }
+  return false;
+};
+
+scout.Table.prototype._groupColumns = function() {
+  return this.columns.filter(function(col) {return col.grouped;});
 };
 
 scout.Table.prototype._groupColumn = function() {
@@ -1283,7 +1418,7 @@ scout.Table.prototype._groupColumn = function() {
 /**
  * Appends a new sum row after row.$row
  */
-scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, update) {
+scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
   var c, column, alignment, $cell,
     $sumRow = $.makeDiv('table-row-sum');
 
@@ -1302,12 +1437,12 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
       }
       $cell = $.makeDiv('table-cell', sumValue)
         .css('text-align', alignment);
-    } else if (!all && column === groupColumn) {
+    } else if (!all && column.grouped) {
       if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
         $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row))
           .css('text-align', alignment);
       } else {
-        $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
+        $cell = $.makeDiv('table-cell', this.cellText(column, row))
           .css('text-align', alignment);
       }
     } else {
@@ -1326,34 +1461,59 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
       .hide()
       .slideDown(300, this.updateScrollbars.bind(this));
   }
+
 };
 
-scout.Table.prototype.removeGrouping = function() {
-  this.grouped = false;
-  for (var i = 0; i < this.columns.length; i++) {
-    this.columns[i].grouped = false;
+scout.Table.prototype.removeGrouping = function(column) {
+  if(column){
+    this.groupColumn(column, false, 'asc', true);
+  }
+  else{
+    this.grouped = false;
+    for (var i = 0; i < this.columns.length; i++) {
+      this.columns[i].grouped = false;
+    }
+    this._group();
   }
 
+};
+
+scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove){
+  var data, sorted;
+
+  this._updateSortColumnsForGrouping(column, direction, multiGroup, remove);
+
+  if (this.header) {
+    this.header.onSortingChanged();
+  }
+  sorted = this._sort();
+
+  data = {
+    columnId: column.id,
+    groupingRemoved: remove,
+    multiGroup: multiGroup,
+    groupAscending: column.sortAscending
+  };
+  if (sorted) {
+    this.remoteHandler(this.id, 'rowsGrouped', data);
+    this._renderRowOrderChanges();
+    this._triggerRowOrderChanged();
+    this._group();
+  } else {
+    // Delegate sorting to server when it is not possible on client side
+    this.remoteHandler(this.id, 'groupRows', data);
+  }
+
+};
+
+scout.Table.prototype.groupTable = function(){
+  this.grouped = true;
   this._group();
 };
 
-scout.Table.prototype.group = function(column, selection) {
+scout.Table.prototype.removeTableGrouping = function(){
   this.grouped = false;
-  for (var i = 0; i < this.columns.length; i++) {
-    this.columns[i].grouped = false;
-  }
-
-  if (!column) {
-    this.grouped = true;
-    this.groupedSelection = selection;
-    this._group();
-  } else {
-    column.grouped = true;
-    this.groupedSelection = false;
-
-    // sort also takes care about the grouping
-    this.sort(column, 'asc', false);
-  }
+  this._group();
 };
 
 scout.Table.prototype.colorData = function(column, mode) {

@@ -449,10 +449,16 @@ scout.TableHeader.prototype._applyColumnText = function($header, column) {
 scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
   $header.removeClass('sort-asc');
   $header.removeClass('sort-desc');
+  $header.removeClass('group-asc');
+  $header.removeClass('group-desc');
 
   var sortDirection;
+
   if (column.sortActive) {
     sortDirection = column.sortAscending ? 'asc' : 'desc';
+    if(column.grouped){
+      $header.addClass('group-' + sortDirection);
+    }
     $header.addClass('sort-' + sortDirection);
   }
 };

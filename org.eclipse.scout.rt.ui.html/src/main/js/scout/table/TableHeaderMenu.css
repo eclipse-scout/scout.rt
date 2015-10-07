@@ -134,7 +134,8 @@
   &.sort-desc-add.selected:hover::before,
   &.group-all.selected:hover::before,
   &.group-selection.selected:hover::before,
-  &.group-sort.selected:hover::before {
+  &.group-column.selected:hover::before,
+  &.group-column-additional.selected:hover::before {
     top: -1px;
     font-size: 17px;
     line-height: 20px;
@@ -148,13 +149,14 @@
   &.sort-desc-add.selected:hover::after,
   &.group-all.selected:hover::after,
   &.group-selection.selected:hover::after,
-  &.group-sort.selected:hover::after {
+  &.group-sort.selected:hover::after,
+  &.group-column.selected:hover::after,
+  &.group-column-additional.selected:hover::after {
     content: '';
   }
 
   &.group-all::before,
-  &.group-selection::before,
-  &.group-sort::before {
+  &.group-selection::before {
     position: relative;
     top: 0px;
     font-size: 20px;
@@ -162,12 +164,26 @@
     content: @icon-sum;
   }
 
+  &.group-column::before,
+  &.group-column-additional::before {
+    position: relative;
+    top: 0px;
+    font-size: 20px;
+    line-height: 20px;
+    content: @icon-th-list;
+  }
+
+  &.group-column::after,
+  &.group-column-additional::after {
+    content: attr(data-icon);
+  }
+
   &.group-selection::after {
     content: @icon-menu;
   }
 
-  &.group-sort::after {
-    content: @icon-th-list;
+  &.group-column-additional::after {
+    content: @icon-plus;
   }
 
   &.color-red::after {
