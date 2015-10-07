@@ -635,6 +635,8 @@ public final class HTMLUtility {
       matcher = pattern.matcher(s);
     }
 
+    // handle <p></p> same as <p/>
+    s = Pattern.compile("<p>\\s*</p>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("<p/>");
     //create new lines:
     s = Pattern.compile("<br\\s*/?\\s*>|</?p/?[^>]*>|</tr\\s*>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("\n");
     //table column

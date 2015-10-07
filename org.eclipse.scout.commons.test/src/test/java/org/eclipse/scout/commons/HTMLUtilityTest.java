@@ -51,6 +51,46 @@ public class HTMLUtilityTest {
   }
 
   @Test
+  public void testNewLinesToPlainTextWithTable() {
+    String in1 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p />After</body>" +
+        "</html>";
+
+    String in2 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p></p>After</body>" +
+        "</html>";
+
+    String in3 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p>InBetween</p>After</body>" +
+        "</html>";
+
+    String in4 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p>   \t\n</p>After</body>" +
+        "</html>";
+
+    String in5 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p>&nbsp;</p>After</body>" +
+        "</html>";
+
+    String in6 = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>Before<p/>After</body>" +
+        "</html>";
+
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in1));
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in2));
+    assertEquals("Before\nInBetween\nAfter", HTMLUtility.toPlainTextWithTable(in3));
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in4));
+    assertEquals("Before\n \nAfter", HTMLUtility.toPlainTextWithTable(in5));
+    assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in6));
+  }
+
+  @Test
   public void testStyleHtmlTextCompleteHtml() throws Exception {
     String input = ""
         + "<html>"
