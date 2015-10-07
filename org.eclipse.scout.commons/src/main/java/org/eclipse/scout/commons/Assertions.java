@@ -526,6 +526,43 @@ public final class Assertions {
   }
 
   /**
+   * Asserts <code>instance</code> to be an instance of <code>clazz</code>
+   *
+   * @param value
+   *          instance to be tested.
+   * @param clazz
+   *          class to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>instance</code>, if it is an instance of <code>clazz</code>
+   * @throws AssertionException
+   *           if <code>instance</code> is not an instance of <code>clazz</code>
+   */
+  public static <T> T assertInstance(final T value, final Class<?> clazz) {
+    return assertInstance(value, clazz, "expected 'value' to be an instance of 'class' [value=%s, class=%s]", value, clazz);
+  }
+
+  /**
+   * Asserts <code>instance</code> to be an instance of <code>clazz</code>
+   *
+   * @param value
+   *          instance to be tested.
+   * @param clazz
+   *          class to be tested against.
+   * @return <code>instance</code>, if it is an instance of <code>clazz</code>
+   * @throws AssertionException
+   *           if <code>instance</code> is not an instance of <code>clazz</code>
+   */
+  public static <T> T assertInstance(final T value, final Class<?> clazz, final String msg, final Object... msgArgs) {
+    if (!clazz.isInstance(value)) {
+      fail(msg, msgArgs);
+    }
+    return value;
+  }
+
+  /**
    * To always throw an {@code AssertionException}.
    *
    * @param msg
@@ -549,4 +586,5 @@ public final class Assertions {
       super(String.format(msg, msgArgs));
     }
   }
+
 }

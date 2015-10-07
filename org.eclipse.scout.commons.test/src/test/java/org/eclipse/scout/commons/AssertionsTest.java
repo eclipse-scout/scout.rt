@@ -18,9 +18,33 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class AssertionsTest {
+
+  @Rule
+  public ExpectedException expectedEx = ExpectedException.none();
+
+  @Test
+  public void testInstance() {
+    String s = "test";
+    String res = Assertions.assertInstance(s, String.class);
+    assertEquals(s, res);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testInstance_AssertionError() {
+    Assertions.assertInstance(new Object(), String.class);
+  }
+
+  @Test
+  public void testInstanceCustomMessage() {
+    expectedEx.expect(AssertionException.class);
+    expectedEx.expectMessage("custom arg1");
+    Assertions.assertInstance(new Object(), String.class, "custom %s", "arg1");
+  }
 
   @Test
   public void testNotNull_Positive() {
