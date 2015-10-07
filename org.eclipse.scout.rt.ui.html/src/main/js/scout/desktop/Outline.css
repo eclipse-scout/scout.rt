@@ -12,7 +12,7 @@
   }
 
   &.in-background .tree-node.selected {
-    background-color: @palette-blue-4;
+    background-color: @outline-in-background-selection-background-color;
     color: @palette-white;
   }
 

@@ -64,29 +64,31 @@
 }
 
 .tooltip-warning {
-  background-color: @palette-blue-0;
-  border-color: @palette-blue-3;
+  background-color: @tooltip-warning-background-color;
+  border-color: @tooltip-warning-border-color;
+  color: @tooltip-warning-color;
 
   & .tooltip-arrow {
-    background-color: @palette-blue-0;
-    border-color: @palette-blue-3;
+    background-color: @tooltip-warning-background-color;
+    border-color: @tooltip-warning-border-color;
   }
 
   & .tooltip-content {
-    background-color: @palette-blue-0;
+    background-color: @tooltip-warning-background-color;
   }
 }
 
 .tooltip-info {
-  background-color: @palette-gray-2;
-  border-color: @palette-gray-5;
+  background-color: @tooltip-info-background-color;
+  border-color: @tooltip-info-border-color;
+  color: @tooltip-info-color;
 
   & .tooltip-arrow {
-    background-color: @palette-gray-2;
-    border-color: @palette-gray-5;
+    background-color: @tooltip-info-background-color;
+    border-color: @tooltip-info-border-color;
   }
 
   & .tooltip-content {
-    background-color: @palette-gray-2;
+    background-color: @tooltip-info-background-color;
   }
 }

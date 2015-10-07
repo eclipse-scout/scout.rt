@@ -61,7 +61,7 @@
     color: @hover-color;
 
     &.menu-button.default-menu {
-      background-color: @palette-blue-5;
+      background-color: @default-button-hover-background-color;
     }
 
     &:not(.default-menu) > .font-icon {
@@ -155,7 +155,7 @@
     }
 
     &:active {
-      background-color: @palette-blue-7;
+      background-color: @active-color;
     }
 
     & > .font-icon {
