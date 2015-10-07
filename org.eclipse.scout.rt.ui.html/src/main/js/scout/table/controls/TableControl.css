@@ -42,5 +42,6 @@
 }
 
 .tooltip.table-control-tooltip {
-  margin-top: 10px;
+  /* move tooltip a little down, make sure it is on the same height as other table footer tooltips (table-info, table-status) */
+  margin-top: 7px;
 }

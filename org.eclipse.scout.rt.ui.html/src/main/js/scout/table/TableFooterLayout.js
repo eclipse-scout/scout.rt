@@ -35,6 +35,10 @@ scout.TableFooterLayout.prototype.layout = function($container) {
   }
   infoWidth = scout.graphics.getSize($info).width;
   if (controlsWidth + infoWidth <= containerWidth) {
+    // Make sure table info tooltip is not shown anymore (only available in compact style)
+    if (this._tableFooter._tableInfoTooltip) {
+      this._tableFooter._tableInfoTooltip.remove();
+    }
     contentFits = true;
   }
 
@@ -49,12 +53,15 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     }
   }
 
-  // don't animate on the first layouting -> only animate on user interactions  
+  // don't animate on the first layouting -> only animate on user interactions
   var animated = this._tableFooter.htmlComp.layouted;
   this._setInfoItemsSize($infoItems, animated);
 
   if (this._tableFooter._tableStatusTooltip && this._tableFooter._tableStatusTooltip.rendered) {
     this._tableFooter._tableStatusTooltip.position();
+  }
+  if (this._tableFooter._tableInfoTooltip && this._tableFooter._tableInfoTooltip.rendered) {
+    this._tableFooter._tableInfoTooltip.position();
   }
 };
 

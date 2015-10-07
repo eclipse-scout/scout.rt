@@ -7,7 +7,7 @@ scout.TableFooter.CONTAINER_SIZE = 345;
 
 scout.TableFooter.prototype._init = function(options) {
   scout.TableFooter.parent.prototype._init.call(this, options);
-  this._table = options.table;
+  this.table = options.table;
 
   // Keystroke context for the search field.
   // TODO [dwi] migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
@@ -22,7 +22,7 @@ scout.TableFooter.prototype._init = function(options) {
 
 scout.TableFooter.prototype._render = function($parent) {
   var filter;
-  $parent = $parent || this._table.$container;
+  $parent = $parent || this.table.$container;
 
   this.$container = $parent.appendDiv('table-footer');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -46,7 +46,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .appendTo(this._$info)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));
-  filter = this._table.getFilter(scout.TableTextUserFilter.Type);
+  filter = this.table.getFilter(scout.TableTextUserFilter.Type);
   if (filter) {
     this._$textFilter.val(filter.text);
   }
@@ -80,15 +80,15 @@ scout.TableFooter.prototype._render = function($parent) {
   this._renderInfo();
   this._updateInfoVisibility();
 
-  this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
+  this.table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
     this._renderInfoLoad();
   }.bind(this));
 
-  this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
+  this.table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
     this._renderInfoFilter();
   }.bind(this));
 
-  this._table.events.on('addFilter', function(event) {
+  this.table.events.on('addFilter', function(event) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     if (event.filter.filterType === scout.TableTextUserFilter.Type) {
@@ -96,7 +96,7 @@ scout.TableFooter.prototype._render = function($parent) {
     }
   }.bind(this));
 
-  this._table.events.on('removeFilter', function(event) {
+  this.table.events.on('removeFilter', function(event) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     if (event.filter.filterType === scout.TableTextUserFilter.Type) {
@@ -104,7 +104,7 @@ scout.TableFooter.prototype._render = function($parent) {
     }
   }.bind(this));
 
-  this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
+  this.table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
     var numRows = 0;
     if (event.rows) {
       numRows = event.rows.length;
@@ -112,7 +112,7 @@ scout.TableFooter.prototype._render = function($parent) {
     this._renderInfoSelection(numRows, event.allSelected);
   }.bind(this));
 
-  this._table.events.on(scout.Table.GUI_EVENT_STATUS_CHANGED, function(event) {
+  this.table.events.on(scout.Table.GUI_EVENT_STATUS_CHANGED, function(event) {
     this._renderInfoTableStatus();
     this._updateInfoTableStatusVisibility();
   }.bind(this));
@@ -134,25 +134,25 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
   if (filterText) {
     filter = scout.create('TableTextUserFilter', {
       session: this.session,
-      table: this._table
+      table: this.table
     });
     filter.text = filterText.toLowerCase();
-    this._table.addFilter(filter);
+    this.table.addFilter(filter);
   } else if (!filterText) {
-    this._table.removeFilterByKey(scout.TableTextUserFilter.Type);
+    this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
   }
 
-  this._table.filter();
+  this.table.filter();
   this.validateLayoutTree();
   event.stopPropagation();
 };
 
 scout.TableFooter.prototype._renderControls = function() {
-  var controls = this._table.tableControls;
+  var controls = this.table.tableControls;
   if (controls) {
     controls.forEach(function(control) {
       control.tableFooter = this;
-      control.table = this._table;
+      control.table = this.table;
       control.setParent(this);
       control.render(this._$controls);
     }.bind(this));
@@ -170,17 +170,17 @@ scout.TableFooter.prototype._renderInfo = function() {
 
 scout.TableFooter.prototype._renderInfoLoad = function() {
   var $info = this._$infoLoad;
-  var numRows = this._table.rows.length;
+  var numRows = this.table.rows.length;
 
   $info.empty();
   if (!this._compactStyle) {
-    $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this._computeCountInfo(numRows)));
+    $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
   } else {
     $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
     $info.appendBr();
-    $info.appendSpan().text(this._computeCountInfo(numRows));
+    $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
   }
 
   if (!this.htmlComp.layouting) {
@@ -190,22 +190,22 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
 
 scout.TableFooter.prototype._renderInfoFilter = function() {
   var $info = this._$infoFilter;
-  var numRowsFiltered = this._table.filteredRows().length;
-  var filteredBy = this._table.filteredBy().join(', '); // filteredBy() returns an array
+  var numRowsFiltered = this.table.filteredRows().length;
+  var filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
 
   $info.empty();
   if (!this._compactStyle) {
     if (filteredBy) {
-      $info.appendSpan().text(this.session.text('ui.NumRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy));
+      $info.appendSpan().text(this.session.text('ui.NumRowsFilteredBy', this.computeCountInfo(numRowsFiltered), filteredBy));
     } else {
-      $info.appendSpan().text(this.session.text('ui.NumRowsFiltered', this._computeCountInfo(numRowsFiltered)));
+      $info.appendSpan().text(this.session.text('ui.NumRowsFiltered', this.computeCountInfo(numRowsFiltered)));
     }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
   } else {
     $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
     $info.appendBr();
-    $info.appendSpan().text(this._computeCountInfo(numRowsFiltered));
+    $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
   }
 
   if (!this.htmlComp.layouting) {
@@ -215,20 +215,20 @@ scout.TableFooter.prototype._renderInfoFilter = function() {
 
 scout.TableFooter.prototype._renderInfoSelection = function(numRowsSelected, all) {
   var $info = this._$infoSelection;
-  var numRows = this._table.rows.length;
+  var numRows = this.table.rows.length;
 
-  numRowsSelected = scout.helpers.nvl(numRowsSelected, this._table.selectedRows.length);
+  numRowsSelected = scout.helpers.nvl(numRowsSelected, this.table.selectedRows.length);
   all = scout.helpers.nvl(all, (numRows === numRowsSelected));
 
   $info.empty();
   if (!this._compactStyle) {
-    $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this._computeCountInfo(numRowsSelected)));
+    $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
   } else {
     $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
     $info.appendBr();
-    $info.appendSpan().text(this._computeCountInfo(numRowsSelected));
+    $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
   }
 
   if (!this.htmlComp.layouting) {
@@ -238,7 +238,7 @@ scout.TableFooter.prototype._renderInfoSelection = function(numRowsSelected, all
 
 scout.TableFooter.prototype._renderInfoTableStatus = function() {
   var $info = this._$infoTableStatus;
-  var tableStatus = this._table.tableStatus;
+  var tableStatus = this.table.tableStatus;
   if (tableStatus) {
     var isInfo = (tableStatus.severity > scout.status.Severity.OK);
     var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
@@ -260,24 +260,24 @@ scout.TableFooter.prototype._updateInfoVisibility = function() {
 };
 
 scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
-  var visible = this._table.filteredBy().length > 0;
+  var visible = this.table.filteredBy().length > 0;
   this._setInfoVisible(this._$infoFilter, visible);
 };
 
 scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
-  var visible = this._table.multiSelect;
+  var visible = this.table.multiSelect;
   this._setInfoVisible(this._$infoSelection, visible);
 };
 
 scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
-  var visible = this._table.tableStatus;
+  var visible = this.table.tableStatus;
   if (visible) {
     // If the uiState of the tableStatus was not yet manually changed, or the user
     // explicitly activated it (relevant when changing pages), show the tooltip
     // when the "info visible" animation has finished. Otherwise, we don't show
     // the tooltip to not disturb the user.
     var complete = null;
-    if (this._table.tableStatus.uiState !== 'user-hidden') {
+    if (this.table.tableStatus.uiState !== 'user-hidden') {
       this._$infoTableStatus.addClass('tooltip-active'); // color icon before animation starts
       complete = function() {
         this._showTableStatusTooltip();
@@ -332,18 +332,47 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
 };
 
 scout.TableFooter.prototype._onInfoLoadClick = function() {
-  this._table.reload();
+  if (this._compactStyle) {
+    this._toggleTableInfoTooltip(this._$infoLoad, scout.TableInfoLoadTooltip);
+  } else {
+    this.table.reload();
+  }
 };
 
 scout.TableFooter.prototype._onInfoFilterClick = function() {
-  this._table.resetFilter();
+  if (this._compactStyle) {
+    this._toggleTableInfoTooltip(this._$infoFilter, scout.TableInfoFilterTooltip);
+  } else {
+    this.table.resetFilter();
+  }
 };
 
 scout.TableFooter.prototype._onInfoSelectionClick = function() {
-  this._table.toggleSelection();
+  if (this._compactStyle) {
+    this._toggleTableInfoTooltip(this._$infoSelection, scout.TableInfoSelectionTooltip);
+  } else {
+    this.table.toggleSelection();
+  }
 };
 
-scout.TableFooter.prototype._computeCountInfo = function(n) {
+scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipClass) {
+  if (this._tableInfoTooltip && this._tableInfoTooltip.rendered) {
+    this._tableInfoTooltip.remove();
+    this._tableInfoTooltip = null;
+  } else {
+    this._tableInfoTooltip = scout.create(tooltipClass, {
+      parent: this,
+      tableFooter: this,
+      cssClass: 'table-info-tooltip',
+      arrowPosition: 50,
+      arrowPositionUnit: '%',
+      $anchor: $info
+    });
+    this._tableInfoTooltip.render();
+  }
+};
+
+scout.TableFooter.prototype.computeCountInfo = function(n) {
   if (scout.helpers.nvl(n, 0) === 0) {
     if (this._compactStyle) {
       return this.session.text('ui.TableRowCount', 0);
@@ -360,7 +389,7 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
 /* open, close and resize of the container */
 
 scout.TableFooter.prototype._revalidateTableLayout = function() {
-  this._table.htmlComp.revalidateLayoutTree();
+  this.table.htmlComp.revalidateLayoutTree();
 };
 
 scout.TableFooter.prototype.openControlContainer = function(control) {
@@ -412,7 +441,7 @@ scout.TableFooter.prototype._addResizer = function($parent) {
     $('body').addClass('row-resize');
 
     function resizeMove(event) {
-      var newHeight = this._table.$container.height() - event.pageY;
+      var newHeight = this.table.$container.height() - event.pageY;
       this.$controlContainer.height(newHeight);
       this.$controlContent.outerHeight(newHeight);
       this._revalidateTableLayout();
@@ -433,7 +462,7 @@ scout.TableFooter.prototype._addResizer = function($parent) {
 };
 
 scout.TableFooter.prototype.onResize = function() {
-  this._table.tableControls.forEach(function(control) {
+  this.table.tableControls.forEach(function(control) {
     control.onResize();
   });
 };
@@ -441,13 +470,12 @@ scout.TableFooter.prototype.onResize = function() {
 scout.TableFooter.prototype._onStatusMousedown = function(event) {
   // Toggle tooltip
   if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
-    this._table.tableStatus.uiState = 'user-hidden';
+    this.table.tableStatus.uiState = 'user-hidden';
     this._hideTableStatusTooltip();
   } else {
-    this._table.tableStatus.uiState = 'user-shown';
+    this.table.tableStatus.uiState = 'user-shown';
     this._showTableStatusTooltip();
   }
-  $.suppressEvent(event);
 };
 
 scout.TableFooter.prototype._hideTableStatusTooltip = function() {
@@ -464,7 +492,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
     this._tableStatusTooltip.remove();
   }
 
-  var tableStatus = this._table.tableStatus;
+  var tableStatus = this.table.tableStatus;
   var text = (tableStatus ? tableStatus.message : null);
   if (!scout.strings.hasText(text)) {
     return; // Refuse to show empty tooltip
@@ -493,9 +521,9 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   // Auto-hide unimportant messages
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
-  if (!isError && !this._table.tableStatus.uiState) {
+  if (!isError && !this.table.tableStatus.uiState) {
     // Remember auto-hidden, in case the user changes outline before timeout elapses
-    this._table.tableStatus.uiState = 'auto-hidden';
+    this.table.tableStatus.uiState = 'auto-hidden';
     this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {
       this._hideTableStatusTooltip();
     }.bind(this), 5000);

@@ -1,8 +1,3 @@
-/**
- * <ul>
- * <li>options.text - either a String or a function which returns a String.</li>
- * </ul>
- */
 scout.Tooltip = function() {
   scout.Tooltip.parent.call(this);
 
@@ -23,6 +18,11 @@ scout.Tooltip = function() {
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 
+/**
+ * <ul>
+ * <li>options.text - either a String or a function which returns a String.</li>
+ * </ul>
+ */
 scout.Tooltip.prototype._init = function(options) {
   scout.Tooltip.parent.prototype._init.call(this, options);
 
@@ -57,7 +57,7 @@ scout.Tooltip.prototype._render = function($parent) {
 
   this.$arrow = $.makeDiv('tooltip-arrow').appendTo(this.$container);
   this.$content = $.makeDiv('tooltip-content').appendTo(this.$container);
-  this.renderText(this.text);
+  this._renderText();
   this.$container.show();
 
   if (this.autoRemove) {
@@ -80,6 +80,10 @@ scout.Tooltip.prototype._render = function($parent) {
   }
 };
 
+scout.Tooltip.prototype._postRender = function() {
+  this.position();
+};
+
 scout.Tooltip.prototype._remove = function() {
   $(document).off('mousedown', this._mousedownHandler);
   $(document).off('keydown', this._keydownHandler);
@@ -90,14 +94,22 @@ scout.Tooltip.prototype._remove = function() {
   scout.Tooltip.parent.prototype._remove.call(this);
 };
 
-scout.Tooltip.prototype.renderText = function(text) {
+scout.Tooltip.prototype.setText = function(text) {
+  this.text = text;
+  if (this.rendered) {
+    this._renderText();
+    this.position();
+  }
+};
+
+scout.Tooltip.prototype._renderText = function() {
+  var text = this.text;
   if (this.htmlEnabled) {
     this.$content.html(text);
   } else {
     // use nl2br to allow tooltips with line breaks
     this.$content.html(scout.strings.nl2br(scout.strings.removeAmpersand(text)));
   }
-  this.position();
 };
 
 scout.Tooltip.prototype.position = function() {
@@ -162,12 +174,26 @@ scout.Tooltip.prototype.position = function() {
 };
 
 scout.Tooltip.prototype._onDocumentMousedown = function(event) {
-  // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
-  var $target = $(event.target);
-  if ($target[0] === this.$container[0] || this.$container.children().is($target) ||
-    $target[0] === this.$anchor[0] || this.$anchor.children().is($target)) {
-    return;
+  if (this._isMousedownOutside(event)) {
+    this._onMousedownOutside(event);
   }
+};
+
+scout.Tooltip.prototype._isMousedownOutside = function(event) {
+  var $target = $(event.target),
+    targetWidget = scout.Widget.getWidgetFor($target);
+
+  // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
+  // Also ignore clicks if the tooltip is covert by a glasspane
+  return !this.isOrHasWidget(targetWidget) &&
+    (this.$anchor && !this.$anchor.isOrHas($target[0])) &&
+    !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
+};
+
+/**
+ * Method invoked once a mouse down event occurs outside the tooltip.
+ */
+scout.Tooltip.prototype._onMousedownOutside = function() {
   this.remove();
 };
 

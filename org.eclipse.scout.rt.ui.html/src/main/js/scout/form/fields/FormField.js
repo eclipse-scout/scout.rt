@@ -393,7 +393,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
 
   if (this.tooltip && this.tooltip.rendered) {
     // update existing tooltip
-    this.tooltip.renderText(text);
+    this.tooltip.setText(text);
   } else {
     // create new tooltip
     opts = {

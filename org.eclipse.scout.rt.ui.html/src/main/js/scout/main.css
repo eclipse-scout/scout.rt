@@ -236,6 +236,7 @@ button::-moz-focus-inner {
 }
 
 a,
+.link,
 .app-link {
   color: @applink-color;
   text-decoration: underline;
