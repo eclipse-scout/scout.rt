@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
@@ -126,7 +126,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
   public List<ILookupRow<CODE_ID_TYPE>> getDataByKey() throws ProcessingException {
     CODE_ID_TYPE key = getKey();
     List<ICode<CODE_ID_TYPE>> list = new ArrayList<ICode<CODE_ID_TYPE>>(1);
-    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       ICode<CODE_ID_TYPE> c = t.getCode(key);
       if (c != null) {
@@ -158,7 +158,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
         return true;
       }
     };
-    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }
@@ -187,7 +187,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
         return true;
       }
     };
-    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }
@@ -219,7 +219,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
         return true;
       }
     };
-    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }

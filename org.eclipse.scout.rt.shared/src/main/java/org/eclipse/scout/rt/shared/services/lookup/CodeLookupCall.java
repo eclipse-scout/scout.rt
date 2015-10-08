@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
@@ -279,7 +278,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    */
   protected ICode<CODE_ID> resolveCodeByKey() throws ProcessingException {
     CODE_ID key = getKey();
-    ICodeType<?, CODE_ID> t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID> t = BEANS.opt(m_codeTypeClass);
     if (t == null) {
       return null;
     }
@@ -294,7 +293,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * @since 3.8.1
    */
   protected void resolveCodes(ICodeVisitor<ICode<CODE_ID>> v) throws ProcessingException {
-    ICodeType<?, CODE_ID> t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }

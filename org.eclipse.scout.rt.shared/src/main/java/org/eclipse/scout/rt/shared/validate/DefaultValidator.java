@@ -20,11 +20,11 @@ import java.util.Map;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.validate.annotations.CodeValue;
@@ -158,7 +158,7 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
       if (value == null || (value.getClass().isArray() && Array.getLength(value) == 0)) {
         return;
       }
-      (x.subtree() ? subtreeSet : localSet).addCheck(new CodeValueCheck(CODES.getCodeType(x.value())));
+      (x.subtree() ? subtreeSet : localSet).addCheck(new CodeValueCheck(BEANS.opt(x.value())));
     }
     else if (a.annotationType() == LookupValue.class) {
       LookupValue x = (LookupValue) a;
@@ -328,7 +328,7 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
   protected ICodeType<?, ?> createCodeTypeByValidationRules(FormDataCheckContext ctx) throws Exception {
     @SuppressWarnings("unchecked")
     Class<? extends ICodeType<?, ?>> cls = (Class<? extends ICodeType<?, ?>>) ctx.ruleValue;
-    ICodeType<?, ?> codeType = CODES.getCodeType(cls);
+    ICodeType<?, ?> codeType = BEANS.opt(cls);
     if (codeType == null) {
       throw new ProcessingException(ctx.fieldName + " codeType " + cls.getSimpleName() + " does not exist");
     }

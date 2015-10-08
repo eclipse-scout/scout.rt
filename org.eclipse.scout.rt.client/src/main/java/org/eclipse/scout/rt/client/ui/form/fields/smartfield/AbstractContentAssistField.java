@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -624,7 +623,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     if (m_codeTypeClass != null) {
       CodeLookupCall<LOOKUP_KEY> codeLookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
       m_lookupCall = codeLookupCall;
-      ICodeType t = CODES.getCodeType(m_codeTypeClass);
+      ICodeType t = BEANS.opt(m_codeTypeClass);
       if (t != null) {
         if (!ConfigurationUtility.isMethodOverwrite(AbstractContentAssistField.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
           setBrowseHierarchy(t.isHierarchy());

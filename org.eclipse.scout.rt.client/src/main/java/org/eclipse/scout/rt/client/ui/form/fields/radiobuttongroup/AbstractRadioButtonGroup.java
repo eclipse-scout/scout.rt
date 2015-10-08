@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.Radi
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -294,7 +293,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
     // If no label is configured use the code type's text
     if (getConfiguredLabel() == null) {
-      setLabel(CODES.getCodeType(codeTypeClass).getText());
+      setLabel(BEANS.get(codeTypeClass).getText());
     }
   }
 

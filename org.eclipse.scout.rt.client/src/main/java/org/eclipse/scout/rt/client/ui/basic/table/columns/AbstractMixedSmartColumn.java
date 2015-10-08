@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
@@ -164,7 +163,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
 
   @Override
   public int compareTableRows(ITableRow r1, ITableRow r2) {
-    ICodeType<?, LOOKUP_CALL_KEY_TYPE> codeType = getCodeTypeClass() != null ? CODES.getCodeType(getCodeTypeClass()) : null;
+    ICodeType<?, LOOKUP_CALL_KEY_TYPE> codeType = getCodeTypeClass() != null ? BEANS.opt(getCodeTypeClass()) : null;
     ILookupCall<LOOKUP_CALL_KEY_TYPE> call = getLookupCall() != null ? getLookupCall() : null;
     if (codeType != null) {
       if (isSortCodesByDisplayText()) {

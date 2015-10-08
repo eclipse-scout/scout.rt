@@ -26,8 +26,11 @@ public final class CODES {
   private CODES() {
   }
 
+  /**
+   * use {@link BEANS#get(Class)} or {@link BEANS#get(Class)} directly
+   */
   public static <T extends ICodeType<?, ?>> T getCodeType(Class<T> type) {
-    return BEANS.get(ICodeService.class).getCodeType(type);
+    return BEANS.opt(type);
   }
 
   /**
