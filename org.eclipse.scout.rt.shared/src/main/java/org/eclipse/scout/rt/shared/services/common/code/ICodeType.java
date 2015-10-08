@@ -13,20 +13,17 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.BeanProducer;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * Code types are dynamic enumerations used in front- and back-end. <br>
- * A code type may (must not) contain codes divided into different partitions (german: Mandanten) using the partitionId.
- * <br>
- * If partitions are used, a context contains to a certain partition and receives only his codes.
+ * Values are cached on client and server.
  */
+@Bean
+@BeanProducer(CodeTypeProducer.class)
 public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITypeWithClassId {
-
-  /**
-   * property into ISharedContextService's Map to get default partitionId of current Subject / User
-   */
-  String PROP_PARTITION_ID = "partitionId";
 
   CODE_TYPE_ID getId();
 
