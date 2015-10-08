@@ -225,7 +225,7 @@ scout.Table.prototype._render = function($parent) {
     // determine @table-cell-padding-left and @table-cell-padding-right (actually the sum)
     var test = this.$data.appendDiv('table-cell');
     test.text('&nbsp;');
-    this.cellHorizontalPadding = test.cssPxValue("padding-left") + test.cssPxValue("padding-right");
+    this.cellHorizontalPadding = test.cssPxValue('padding-left') + test.cssPxValue('padding-right');
     test.remove();
   }
 
