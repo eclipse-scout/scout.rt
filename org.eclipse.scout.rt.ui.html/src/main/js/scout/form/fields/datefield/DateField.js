@@ -78,11 +78,12 @@ scout.DateField.prototype._remove = function() {
 };
 
 scout.DateField.prototype._renderHasDate = function() {
-  // Add $dateField
   if (this.hasDate && !this.$dateField) {
+    // Add $dateField
     this.$dateField = scout.fields.new$TextField()
       .addClass('date')
       .on('keydown', this._onDateFieldKeydown.bind(this))
+      .on('input', this._onDateFieldInput.bind(this))
       .on('mousedown', this._onDateFieldClick.bind(this))
       .on('blur', this._onDateFieldBlur.bind(this))
       .appendTo(this.$field);
@@ -95,8 +96,8 @@ scout.DateField.prototype._renderHasDate = function() {
 
     this.invalidateLayout();
 
-    // Remove $dateField
   } else if (!this.hasDate && this.$dateField) {
+    // Remove $dateField
     this.$dateField.remove();
     this.$dateField = null;
     this.$dateFieldIcon.remove();
@@ -107,11 +108,12 @@ scout.DateField.prototype._renderHasDate = function() {
 };
 
 scout.DateField.prototype._renderHasTime = function() {
-  // Add $timeField
   if (this.hasTime && !this.$timeField) {
+    // Add $timeField
     this.$timeField = scout.fields.new$TextField()
       .addClass('time')
       .on('keydown', this._onTimeFieldKeydown.bind(this))
+      .on('input', this._onTimeFieldInput.bind(this))
       .on('blur', this._onTimeFieldBlur.bind(this))
       .appendTo(this.$field);
     this.$timeFieldIcon = scout.fields.new$Icon()
@@ -122,8 +124,8 @@ scout.DateField.prototype._renderHasTime = function() {
 
     this.invalidateLayout();
 
-    // Remove $timeField
   } else if (!this.hasTime && this.$timeField) {
+    // Remove $timeField
     this.$timeField.remove();
     this.$timeField = null;
     this.$timeFieldIcon.remove();
@@ -264,6 +266,10 @@ scout.DateField.prototype._onTimeFieldBlur = function() {
   this._acceptDateTimePrediction(false, true);
 };
 
+/**
+ * Handle "navigation" keys, i.e. keys that don't emit visible characters. Character input is handled
+ * in _onDateFieldInput(), which is fired after 'keydown'.
+ */
 scout.DateField.prototype._onDateFieldKeydown = function(event) {
   var delta = 0,
     diffYears = 0,
@@ -378,51 +384,50 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     $.suppressEvent(event);
     return;
   }
+};
 
-  // All other keys are treated as text input, but only if shift is pressed or no modifier at all.
-  if (modifierCount > 1 || (modifierCount === 1 && !event.shiftKey)) {
+/**
+ * Handle changed input. This method is fired when the field's content has been altered by a user
+ * action (not by JS) such as pressing a character key, deleting a character using DELETE or
+ * BACKSPACE, cutting or pasting text with ctrl-x / ctrl-v or mouse drag'n'drop.
+ * Keys that don't alter the content (e.g. modifier keys, arrow keys, home, end etc.) are handled
+ * in _onDateFieldKeydown().
+ */
+scout.DateField.prototype._onDateFieldInput = function(event) {
+  var displayText = this.$dateField.val();
+
+  // If the focus has changed to another field in the meantime, don't predict anything and
+  // don't show the picker. Just validate the input.
+  if (this.$dateField[0] !== document.activeElement) {
     return;
   }
 
-  // Remember the old displayText (which is not changed yet in the 'keydown' event) and then use setTimeout()
-  // to check and handle the new (altered) displayText. We don't use the keyUp event because it feels slow.
-  var oldDisplayText = this.$dateField.val();
-  setTimeout(function(event) {
-    if (!this.rendered) {
-      return;
-    }
+  // Create $predictDateField if necessary
+  if (!this._$predictDateField) {
+    this._$predictDateField = this._createPredictionField(this.$dateField);
+  }
 
-    var displayText = this.$dateField.val();
-
-    // If key did not alter the displayText (e.g. when an F key was pressed) or the focus has changed to another
-    // field in the meantime, don't predict anything and don't show the picker. Just validate the input.
-    if (oldDisplayText === displayText || this.$dateField[0] !== document.activeElement) {
-      return;
+  // Predict date
+  var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
+  if (datePrediction) {
+    // If the resulting date is null (because the input was empty), reset the "date" part of
+    // the internal time stamp, but do _not_ sync to server yet. This allows selecting a new
+    // date based on "today" without leaving the field first.
+    if (!datePrediction.date) {
+      this.updateTimestamp(this._newTimestampAsDate(null, this.timestampAsDate), false);
     }
-
-    // Create $predictDateField if necessary
-    if (!this._$predictDateField) {
-      this._$predictDateField = this._createPredictionField(this.$dateField);
-    }
-
-    // Predict date
-    var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
-    if (datePrediction) {
-      // If the resulting date is null (because the input was empty), reset the "date" part of
-      // the internal time stamp, but do _not_ sync to server yet. This allows selecting a new
-      // date based on "today" without leaving the field first.
-      if (!datePrediction.date) {
-        this.updateTimestamp(this._newTimestampAsDate(null, this.timestampAsDate), false);
-      }
-      this._$predictDateField.val(datePrediction.text);
-      this._openDatePicker(datePrediction.date);
-    } else {
-      // No valid prediction!
-      this._removePredictionFields();
-    }
-  }.bind(this));
+    this._$predictDateField.val(datePrediction.text);
+    this._openDatePicker(datePrediction.date);
+  } else {
+    // No valid prediction!
+    this._removePredictionFields();
+  }
 };
 
+/**
+ * Handle "navigation" keys, i.e. keys that don't emit visible characters. Character input is handled
+ * in _onTimeFieldInput(), which is fired after 'keydown'.
+ */
 scout.DateField.prototype._onTimeFieldKeydown = function(event) {
   var delta = 0,
     diffHours = 0,
@@ -508,49 +513,44 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     $.suppressEvent(event);
     return;
   }
+};
 
-  // All other keys are treated as text input, but only if shift is pressed or no modifier at all.
-  if (modifierCount > 1 || (modifierCount === 1 && !event.shiftKey)) {
+/**
+ * Handle changed input. This method is fired when the field's content has been altered by a user
+ * action (not by JS) such as pressing a character key, deleting a character using DELETE or
+ * BACKSPACE, cutting or pasting text with ctrl-x / ctrl-v or mouse drag'n'drop.
+ * Keys that don't alter the content (e.g. modifier keys, arrow keys, home, end etc.) are handled
+ * in _onTimeFieldKeydown().
+ */
+scout.DateField.prototype._onTimeFieldInput = function(event) {
+  var displayText = this.$timeField.val();
+
+  // If the focus has changed to another field in the meantime, don't predict anything and
+  // don't show the picker. Just validate the input.
+  if (this.$timeField[0] !== document.activeElement) {
     return;
   }
 
-  // Remember the old displayText (which is not changed yet in the 'keydown' event) and then use setTimeout()
-  // to check and handle the new (altered) displayText. We don't use the keyUp event because it feels slow.
-  var oldDisplayText = this.$timeField.val();
-  setTimeout(function(event) {
-    if (!this.rendered) {
-      return;
-    }
+  // Create $predictTimeField if necessary
+  if (!this._$predictTimeField) {
+    this._$predictTimeField = this._createPredictionField(this.$timeField);
+  }
 
-    var displayText = this.$timeField.val();
-
-    // If key did not alter the displayText (e.g. when an F key was pressed) or the focus has changed to another
-    // field in the meantime, don't predict anything and don't show the picker. Just validate the input.
-    if (oldDisplayText === displayText || this.$timeField[0] !== document.activeElement) {
-      return;
+  // Predict time
+  var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
+  if (timePrediction) {
+    // If the resulting date is null (because the input was empty), reset the "time" part of
+    // the internal time stamp, but do _not_ sync to server yet. This allows selecting a new
+    // time based on "today" without leaving the field first.
+    if (!timePrediction.date) {
+      this.updateTimestamp(this._newTimestampAsDate(this.timestampAsDate, null), false);
     }
-
-    // Create $predictTimeField if necessary
-    if (!this._$predictTimeField) {
-      this._$predictTimeField = this._createPredictionField(this.$timeField);
-    }
-
-    // Predict time
-    var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
-    if (timePrediction) {
-      // If the resulting date is null (because the input was empty), reset the "time" part of
-      // the internal time stamp, but do _not_ sync to server yet. This allows selecting a new
-      // time based on "today" without leaving the field first.
-      if (!timePrediction.date) {
-        this.updateTimestamp(this._newTimestampAsDate(this.timestampAsDate, null), false);
-      }
-      this._$predictTimeField.val(timePrediction.text);
-    } else {
-      // No valid prediction!
-      this._tempTimeDate = null;
-      this._removePredictionFields();
-    }
-  }.bind(this));
+    this._$predictTimeField.val(timePrediction.text);
+  } else {
+    // No valid prediction!
+    this._tempTimeDate = null;
+    this._removePredictionFields();
+  }
 };
 
 scout.DateField.prototype._onDatePickerDateSelected = function(event) {
