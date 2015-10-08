@@ -66,6 +66,8 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
             jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
           }
           jsonChartBean.put("redLeft", getModel().getChartData().isRedLeft());
+          jsonChartBean.put("proportional", getModel().getChartData().isProportional());
+          jsonChartBean.put("calculateConversionRate", getModel().getChartData().isCalculateConverionRate());
         }
         jsonChartBean.put("axes", jsonChartAxes);
         jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
