@@ -110,7 +110,7 @@ scout.create = function(vararg, options) {
  * The required properties are 'objectType', 'session' and 'parent'. A unique ID is generated automatically,
  * when it is not provided by the model.
  */
-scout._createLocalObject =  function(model) {
+scout._createLocalObject = function(model) {
   var session;
   if (typeof model !== 'object') {
     throw new Error('model must be an object');
@@ -263,27 +263,47 @@ scout.adapter = function(adapterId, sessionIndex) {
 /**
  * Reloads the entire browser window.
  *
- * @param redirectUrl
- *          The new URL to load. If not specified, the current location is used (window.location).
- * @param suppressUnload
- *          If this argument is set to true, 'unload' events are not fired on the window. This can
- *          be used to disable sending the session 'unload' event to the server.
+ * Options:
+ *   [schedule]
+ *     If true, the page reload is not executed in the current thread but scheduled using setTimeout().
+ *     This is useful if the caller wants to execute some other code before the reload. The default is false.
+ *   [clearBody]
+ *     If true, the body is cleared first before the reload is performed. This is useful to prevent
+ *     showing "old" content in the browser until the new content arrives. The default is true.
+ *   [redirectUrl]
+ *      The new URL to load. If not specified, the current location is used (window.location).
+ *   [suppressUnload]
+ *      If this argument is set to true, 'unload' events are not fired on the window. This can
+ *      be used to disable sending the session 'unload' event to the server. The default is false.
  */
-scout.reloadPage = function(redirectUrl, suppressUnload) {
-  // Hide everything (on entire page, not only $entryPoint)
-  $('body').html('');
-
-  // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
-  if (suppressUnload) {
-    $(window).off('unload.' + this.id);
+scout.reloadPage = function(options) {
+  options = options || {};
+  if (options.schedule) {
+    setTimeout(reloadPageImpl);
+  } else {
+    reloadPageImpl();
   }
 
-  // Reload window (using setTimeout, to overcome drawing issues in IE)
-  setTimeout(function() {
-    if (redirectUrl) {
-      window.location.href = redirectUrl;
-    } else {
-      window.location.reload();
+  // ----- Helper functions -----
+
+  function reloadPageImpl() {
+    // Hide everything (on entire page, not only $entryPoint)
+    if (scout.helpers.nvl(options.clearBody, true)) {
+      $('body').html('');
     }
-  });
+
+    // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
+    if (options.suppressUnload) {
+      $(window).off('unload.' + this.id);
+    }
+
+    // Reload window (using setTimeout, to overcome drawing issues in IE)
+    setTimeout(function() {
+      if (options.redirectUrl) {
+        window.location.href = options.redirectUrl;
+      } else {
+        window.location.reload();
+      }
+    });
+  }
 };

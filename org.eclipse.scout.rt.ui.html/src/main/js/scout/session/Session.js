@@ -31,8 +31,8 @@
  *     build because there were console errors. These errors always happen in this
  *     class. That's why we can skip suppress error handling with this flag.
  *   [uiUseTaskbarLogo]
- *     "uiUseTaskbarLogo": Default false. If true, the desktop will add a small logo
- *        to the taskbar. It is styled with the CSS class ".taskbar-logo".
+ *     If true, the desktop will add a small logo to the taskbar. It is styled with
+ *     the CSS class ".taskbar-logo". Defaults to false.
  */
 scout.Session = function($entryPoint, options) {
   options = options || {};
@@ -985,7 +985,11 @@ scout.Session.prototype.onModelAction = function(event) {
 };
 
 scout.Session.prototype._onReloadPage = function(event) {
-  location.reload();
+  // Don't clear the body, because other events might be processed before the reload and
+  // it could cause errors when all DOM elements are already removed.
+  scout.reloadPage({
+    clearBody: false
+  });
 };
 
 scout.Session.prototype._onLocaleChanged = function(event) {
@@ -1033,7 +1037,10 @@ scout.Session.prototype.logout = function(logoutUrl) {
   sessionStorage.setItem('scout:loginUrl', window.location.href);
   // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
   setTimeout(function() {
-    scout.reloadPage(logoutUrl, true);
+    scout.reloadPage({
+      redirectUrl: logoutUrl,
+      suppressUnload: true
+    });
   });
 };
 

@@ -231,12 +231,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       // Start desktop
       fireDesktopOpened();
 
-      // Send "initialized" event
-      sendInitializationEvent(jsonClientSessionAdapter.getId());
-
-      // When theme changes during initialization, send page reload event
       if (reloadTheme) {
+        // When theme changes during initialization, send page reload event instead of "initialized" event
         sendReloadPageEvent();
+      }
+      else {
+        // Send "initialized" event
+        sendInitializationEvent(jsonClientSessionAdapter.getId());
       }
 
       LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
@@ -252,18 +253,17 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * theme the user has _before_ the client-session is created. However the 'reload' will only be performed in the case
    * where the browser sends a cookie that doesn't match the user-settings which should not happen often.
    *
-   * @param req
-   * @param resp
-   * @param httpSession
    * @return Whether or not the page must be reloaded by the browser (required when theme changes after client-session
    *         has been initialized)
    */
-  private boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
+  protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
     String modelTheme = UiThemeUtility.defaultIfNull(m_clientSession.getDesktop().getTheme());
     String currentTheme = UiThemeUtility.defaultIfNull(UiThemeUtility.getTheme(req));
     boolean reloadPage = !modelTheme.equals(currentTheme);
     UiThemeUtility.storeTheme(resp, httpSession, modelTheme);
-    LOG.debug("UI theme model=" + modelTheme + " current=" + currentTheme + " reloadPage=" + reloadPage);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("UI theme model=" + modelTheme + " current=" + currentTheme + " reloadPage=" + reloadPage);
+    }
     return reloadPage;
   }
 
@@ -343,7 +343,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * Updates the locale Cookie but only when a current HTTP response exists. Which means when the locale of the session
    * changes during a client-job, the cookie cannot be updated.
    */
-  private void updatePreferredLocaleCookie(Locale locale) {
+  protected void updatePreferredLocaleCookie(Locale locale) {
     HttpServletResponse resp = m_currentHttpContext.getResponse();
     if (resp != null) {
       storePreferredLocaleInCookie(resp, locale);

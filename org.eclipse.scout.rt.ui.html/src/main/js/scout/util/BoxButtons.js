@@ -22,15 +22,15 @@ scout.BoxButtons = function($parent, onClickHandler) {
 
 /**
  * @param opts
- *          [text] required, text of button to add
+ *          [text]     required, text of button to add
  *          [tabIndex] optional, tabindex to assign (default '0')
- *          [enabled] optional, if button should be enabled or not (default true)
- *          [onClick] optional, function to be executed when button is clicked.
- *            This function does _not_ have to check by itself if the button is
- *            enabled. If this argument is omitted, the global onClickHandler is
- *            used (see constructor).
- *          [option] optiona, a string that is assigned to be button and is passed
- *            to the global onClickHandler as an argument.
+ *          [enabled]  optional, if button should be enabled or not (default true)
+ *          [onClick]  optional, function to be executed when button is clicked.
+ *                               This function does _not_ have to check by itself if the button is
+ *                               enabled. If this argument is omitted, the global onClickHandler is
+ *                               used (see constructor).
+ *          [option]   optional, a string that is assigned to be button and is passed
+ *                               to the global onClickHandler as an argument.
  */
 scout.BoxButtons.prototype.addButton = function(opts) {
   opts = opts || {};
