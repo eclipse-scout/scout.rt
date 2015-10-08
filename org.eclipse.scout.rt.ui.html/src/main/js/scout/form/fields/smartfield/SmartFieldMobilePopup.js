@@ -1,47 +1,49 @@
-scout.SmartFieldButtonPopup = function() {
-  scout.SmartFieldButtonPopup.parent.call(this);
+scout.SmartFieldMobilePopup = function() {
+  scout.SmartFieldMobilePopup.parent.call(this);
 };
-scout.inherits(scout.SmartFieldButtonPopup, scout.Popup);
+scout.inherits(scout.SmartFieldMobilePopup, scout.Popup);
 
-scout.SmartFieldButtonPopup.MARGIN = 45; // min. margin around popup
+scout.SmartFieldMobilePopup.MARGIN = 45; // min. margin around popup
 
-scout.SmartFieldButtonPopup.prototype._init = function(options) {
-  scout.SmartFieldButtonPopup.parent.prototype._init.call(this, options);
-  this._smartFieldButton = options.smartFieldButton;
+scout.SmartFieldMobilePopup.prototype._init = function(options) {
+  scout.SmartFieldMobilePopup.parent.prototype._init.call(this, options);
+  this._readonlySmartField = options.smartField;
 
-  // clone original smart-field(button)
-  var model = this._smartFieldButton.extractModel();
+  // clone original readonly smart-field
+  var model = this._readonlySmartField.extractModel();
   model.parent = this;
   model.labelPosition = scout.FormField.LABEL_POSITION_TOP;
   model.noPopup = true; // FIXME AWE: (popups) get rid of this flags
-  model.buttonOnly = false;
+  model.mobile = false;
+
   this._smartField = scout.create(model);
-  this._smartField._popup = this; // FIXME AWE: (popups) beautify this, see addSmartFieldPopup() called in render
+  // readonly smart-field and smart-field clone point to the same popup instance
+  this._smartField._popup = this;
   // local smart-field should receive all events adressed to button
-  this.session.registerAdapterClone(this._smartFieldButton, this._smartField);
+  this.session.registerAdapterClone(this._readonlySmartField, this._smartField);
 };
 
 /**
  * @override Popup.js
  */
-scout.SmartFieldButtonPopup.prototype.prefLocation = function($container, openingDirectionY) {
+scout.SmartFieldMobilePopup.prototype.prefLocation = function($container, openingDirectionY) {
   var popupSize = this.prefSize($container),
     screenWidth = $(document).width(),
     x = (screenWidth - popupSize.width) / 2;
-  return new scout.Point(x, scout.SmartFieldButtonPopup.MARGIN);
+  return new scout.Point(x, scout.SmartFieldMobilePopup.MARGIN);
 };
 
 /**
  * @override Popup.js
  */
-scout.SmartFieldButtonPopup.prototype.prefSize = function($container) {
+scout.SmartFieldMobilePopup.prototype.prefSize = function($container) {
   var screenWidth = $(document).width(),
     screenHeight = $(document).height(),
     minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
     maxPopupWidth = scout.HtmlEnvironment.formColumnWidth,
     maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
-    popupWidth = screenWidth - 2 * scout.SmartFieldButtonPopup.MARGIN,
-    popupHeight = screenHeight / 2 - scout.SmartFieldButtonPopup.MARGIN;
+    popupWidth = screenWidth - 2 * scout.SmartFieldMobilePopup.MARGIN,
+    popupHeight = screenHeight / 2 - scout.SmartFieldMobilePopup.MARGIN;
 
   popupWidth = Math.min(popupWidth, maxPopupWidth);
   popupWidth = Math.max(popupWidth, minPopupWidth);
@@ -50,14 +52,14 @@ scout.SmartFieldButtonPopup.prototype.prefSize = function($container) {
   return new scout.Dimension(popupWidth, popupHeight);
 };
 
-scout.SmartFieldButtonPopup.prototype._render = function($parent) {
+scout.SmartFieldMobilePopup.prototype._render = function($parent) {
   if (!$parent) { // FIXME AWE: (popups) was für einen grund gibt es für dieses if? (siehe auch SmartFieldPopup)
     // wahrscheinlich haben wir ja dann nie einen $parent gesetzt, wenn man explizit das field als parent setzt
     // kommt es sowieso nicht gut wegen der z-order (popup wird verdeckt von anderen fields).
     $parent = this.session.$entryPoint;
   }
 
-  this.$container = $.makeDiv('smart-field-popup button')
+  this.$container = $.makeDiv('smart-field-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME AWE: (popups) is this line required?
     .appendTo($parent);
 
@@ -69,18 +71,18 @@ scout.SmartFieldButtonPopup.prototype._render = function($parent) {
   this._smartField.render(this.$container);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SmartFieldButtonPopupLayout(this));
+  this.htmlComp.setLayout(new scout.SmartFieldMobilePopupLayout(this));
 };
 
-scout.SmartFieldButtonPopup.prototype._postRender = function() {
-  scout.SmartFieldButtonPopup.parent.prototype._postRender.call(this);
+scout.SmartFieldMobilePopup.prototype._postRender = function() {
+  scout.SmartFieldMobilePopup.parent.prototype._postRender.call(this);
   this._smartField._onClick(); // open proposal
 };
 
 /**
  * @override Popup.js
  */
-scout.SmartFieldButtonPopup.prototype._onMouseDown = function(event) {
+scout.SmartFieldMobilePopup.prototype._onMouseDown = function(event) {
   // when user clicks on SmartField input-field, cannot prevent default
   // because text-selection would not work anymore
   if (this.$anchor.isOrHas(event.target)) {
@@ -88,7 +90,7 @@ scout.SmartFieldButtonPopup.prototype._onMouseDown = function(event) {
   }
 
   // or else: clicked somewhere else on the document -> close
-  scout.SmartFieldButtonPopup.parent.prototype._onMouseDown.call(this, event);
+  scout.SmartFieldMobilePopup.parent.prototype._onMouseDown.call(this, event);
 };
 
 /**
@@ -98,7 +100,7 @@ scout.SmartFieldButtonPopup.prototype._onMouseDown = function(event) {
  * event on the SmartField input-field.
  */
 //TODO CGU/AWE this is not required by the cell editor anymore, but we cannot remove it either because mouse down on a row would immediately close the popup, why?
-scout.SmartFieldButtonPopup.prototype._onContainerMouseDown = function(event) {
+scout.SmartFieldMobilePopup.prototype._onContainerMouseDown = function(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
@@ -107,29 +109,3 @@ scout.SmartFieldButtonPopup.prototype._onContainerMouseDown = function(event) {
   // müssen wir für mobile und editierbare tabellen (?) noch lösen
 };
 
-scout.SmartFieldButtonPopup.prototype._onAnchorScroll = function(event) {
-  this.position();
-};
-
-
-// ---- SmartFieldButtonPopupLayout ---- //
-
-scout.SmartFieldButtonPopupLayout = function(popup) {
-  scout.SmartFieldButtonPopupLayout.parent.call(this);
-  this._popup = popup;
-};
-scout.inherits(scout.SmartFieldButtonPopupLayout, scout.AbstractLayout);
-
-scout.SmartFieldButtonPopupLayout.prototype.layout = function($container) {
-  var popupSize = this._popup.htmlComp.getSize(),
-    popup = this._popup,
-    smartFieldHeight = popup._smartField.htmlComp.getPreferredSize().height,
-    proposalChooserVOffset = smartFieldHeight + scout.HtmlEnvironment.formRowGap;
-
-  popup._smartField.htmlComp.setBounds(new scout.Rectangle(0, 0, popupSize.width, smartFieldHeight));
-  popup._proposalChooserHtmlComp.setBounds(new scout.Rectangle(0, proposalChooserVOffset, popupSize.width, popupSize.height - proposalChooserVOffset));
-};
-
-scout.SmartFieldButtonPopupLayout.prototype.preferredLayoutSize = function($container) {
-  return new scout.Dimension(400, 300);
-};

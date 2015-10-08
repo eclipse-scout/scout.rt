@@ -34,18 +34,32 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
 scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
   this._noPopup = model.noPopup;
+
+  // when 'mobile' is not set explicitly, check the device
+  if (model.mobile === undefined) {
+    this.mobile = scout.device.type !== scout.Device.Type.DESKTOP;
+  } else {
+    this.mobile = model.mobile;
+  }
 };
 
 scout.SmartField.prototype._render = function($parent) {
   var cssClass = this.proposal ? 'proposal-field' : 'smart-field';
   this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
   this.addLabel();
-  this.addField(scout.fields.new$TextField()
-    .blur(this._onFieldBlur.bind(this))
-    .click(this._onClick.bind(this))
-    .focus(this._onFocus.bind(this))
-    .keyup(this._onKeyUp.bind(this))
-    .keydown(this._onKeyDown.bind(this)));
+
+  var $field = scout.fields.new$TextField()
+      .click(this._onClick.bind(this));
+  if (this.mobile) {
+    $field.prop('readonly', true);
+  } else {
+    $field
+      .blur(this._onFieldBlur.bind(this))
+      .focus(this._onFocus.bind(this))
+      .keyup(this._onKeyUp.bind(this))
+      .keydown(this._onKeyDown.bind(this));
+  }
+  this.addField($field);
 
   this.addMandatoryIndicator();
   this.addIcon();
@@ -66,8 +80,8 @@ scout.SmartField.prototype.addSmartFieldPopup = function() {
   if (this._noPopup) {
     return;
   }
-
-  this._popup = scout.create(scout.SmartFieldPopup, {
+  var popupType = this.mobile ? scout.SmartFieldMobilePopup : scout.SmartFieldPopup;
+  this._popup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
     smartField: this
@@ -100,6 +114,9 @@ scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
   $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser);
+  if (this.mobile) {
+    return;
+  }
   if (!this.proposalChooser) {
     return;
   }
@@ -120,6 +137,9 @@ scout.SmartField.prototype._renderProposalChooser = function() {
  */
 scout.SmartField.prototype._removeProposalChooser = function() {
   $.log.trace('(SmartField#_removeProposalChooser) proposalChooser=' + this.proposalChooser);
+  if (this.mobile) {
+    return;
+  }
   this._closeProposal(false);
 };
 
@@ -135,11 +155,17 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 };
 
 scout.SmartField.prototype._onClick = function(e) {
+  // FIXME AWE: (popups) beautify this if/else mess
   if (this._noPopup) {
     this._openProposal(true);
   } else {
     if (!this._popup.rendered) {
-      this._openProposal(true);
+      if (this.mobile) {
+        this._popup.render();
+        this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+      } else {
+        this._openProposal(true);
+      }
     }
   }
 };

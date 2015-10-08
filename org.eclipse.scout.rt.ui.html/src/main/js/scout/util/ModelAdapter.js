@@ -477,7 +477,9 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
  * Returns an object which contains only the 'model' properties of this ModelAdapter instance.
  * Other properties like $container, etc. are not included in the result.
  */
-scout.ModelAdapter.prototype.extractModel = function() { // FIXME AWE: (popups) JasmineTest this method
+scout.ModelAdapter.prototype.extractModel = function() {
+  // FIXME AWE: (popups) solve problem for already resolved adapter properties
+  // when we extract a model, we always want the ID not the adapter object for these properties
   var model = {};
   this._modelProperties.forEach(function(propertyName) {
     model[propertyName] = this[propertyName];

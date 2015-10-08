@@ -123,8 +123,6 @@
 .delay-1 { #scout.animation-delay(200ms); }
 .delay-2 { #scout.animation-delay(400ms); }
 
-
-
 /* FIXME AWE: (popups) move to the right file */
 .proposal-chooser-container {
   position: absolute;

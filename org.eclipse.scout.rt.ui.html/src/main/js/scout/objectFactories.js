@@ -214,15 +214,7 @@ scout.defaultObjectFactories = [{
 }, {
   objectType: 'SmartField',
   create: function(model) {
-    var button = true;
-    if (model) {
-      button = scout.helpers.nvl(model.buttonOnly, true); // FIXME AWE: (popups)
-    }
-    if (button) {
-      return new scout.SmartFieldButton();
-    } else {
-      return new scout.SmartField();
-    }
+    return new scout.SmartField();
   }
 }, {
   objectType: 'SmartFieldMultiline',
