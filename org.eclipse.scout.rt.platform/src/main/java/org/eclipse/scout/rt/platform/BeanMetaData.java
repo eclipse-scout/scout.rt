@@ -144,10 +144,10 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    * @throws IllegalArgumentException
-   *           + * if argument initialInstance is not an instance of the bean class.
+   *           if argument initialInstance is not null and is not an instance of the bean class.
    */
   public BeanMetaData withInitialInstance(Object initialInstance) {
-    if (!m_beanClazz.isInstance(initialInstance)) {
+    if (initialInstance != null && !m_beanClazz.isInstance(initialInstance)) {
       throw new IllegalArgumentException(String.format("InitialInstance '%s' is not of type '%s'", initialInstance, m_beanClazz));
     }
     m_initialInstance = initialInstance;
