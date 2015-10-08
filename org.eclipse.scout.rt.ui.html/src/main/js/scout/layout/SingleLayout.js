@@ -17,7 +17,9 @@ scout.SingleLayout.prototype.layout = function($container) {
   if (!htmlChild) {
     htmlChild = this._getHtmlSingleChild($container);
   }
-  htmlChild.setSize(childSize);
+  if (htmlChild) {
+    htmlChild.setSize(childSize);
+  }
 };
 
 scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
@@ -25,9 +27,21 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
   if (!htmlChild) {
     htmlChild = this._getHtmlSingleChild($container);
   }
-  return htmlChild.getPreferredSize();
+  if (htmlChild) {
+    return htmlChild.getPreferredSize();
+  } else{
+    return new scout.Dimension(1, 1);
+  }
 };
 
+/**
+ * @returns a HtmlComponent instance for the first child of the given container or null if the container has no children.
+ */
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
-  return scout.HtmlComponent.get($container.children().first());
+  var $firstChild = $container.children().first();
+  if ($firstChild.length) {
+    return scout.HtmlComponent.get($firstChild);
+  } else {
+    return null;
+  }
 };

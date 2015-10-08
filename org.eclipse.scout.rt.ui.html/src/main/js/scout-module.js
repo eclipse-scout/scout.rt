@@ -252,6 +252,8 @@ __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
 __include("scout/form/fields/richtextfield/RichTextField.js");
 __include("scout/form/fields/sequencebox/SequenceBox.js");
 __include("scout/form/fields/smartfield/SmartField.js");
+__include("scout/form/fields/smartfield/SmartFieldButton.js");
+__include("scout/form/fields/smartfield/SmartFieldButtonPopup.js");
 __include("scout/form/fields/smartfield/SmartFieldLayout.js");
 __include("scout/form/fields/smartfield/SmartFieldPopup.js");
 __include("scout/form/fields/smartfield/SmartFieldPopupLayout.js");

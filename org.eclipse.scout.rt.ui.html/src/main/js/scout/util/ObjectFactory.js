@@ -27,7 +27,7 @@ scout.ObjectFactory.prototype.create = function(model) {
   if (!factory) {
     throw new Error('No factory registered for objectType ' + model.objectType);
   }
-  var object = factory.create();
+  var object = factory.create(model);
   model.session = this.session;
   object.init(model);
   return object;

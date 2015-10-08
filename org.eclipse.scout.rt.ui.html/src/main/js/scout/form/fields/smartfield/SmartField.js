@@ -28,6 +28,14 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
 
+/**
+ * @override FormField.js
+ */
+scout.SmartField.prototype._init = function(model) {
+  scout.SmartField.parent.prototype._init.call(this, model);
+  this._noPopup = model.noPopup;
+};
+
 scout.SmartField.prototype._render = function($parent) {
   var cssClass = this.proposal ? 'proposal-field' : 'smart-field';
   this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
@@ -55,6 +63,10 @@ scout.SmartField.prototype.onCellEditorRendered = function(options) {
 };
 
 scout.SmartField.prototype.addSmartFieldPopup = function() {
+  if (this._noPopup) {
+    return;
+  }
+
   this._popup = scout.create(scout.SmartFieldPopup, {
     parent: this,
     $anchor: this.$field,
@@ -91,10 +103,16 @@ scout.SmartField.prototype._renderProposalChooser = function() {
   if (!this.proposalChooser) {
     return;
   }
-  this._renderPopup();
-  this.proposalChooser.render(this._popup.$container);
-  this.proposalChooser.setParent(this._popup);
-  this._popup.resize();
+  if (this._noPopup) { // FIXME AWE: (popups) beautify this, make more generic
+    this.proposalChooser.render(this._popup._proposalChooserHtmlComp.$comp);
+    this.proposalChooser.setParent(this._popup);
+    this._popup._proposalChooserHtmlComp.revalidateLayout();
+  } else {
+    this._renderPopup();
+    this.proposalChooser.render(this._popup.$container);
+    this.proposalChooser.setParent(this._popup);
+    this._popup.resize();
+  }
 };
 
 /**
@@ -117,8 +135,12 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 };
 
 scout.SmartField.prototype._onClick = function(e) {
-  if (!this._popup.rendered) {
+  if (this._noPopup) {
     this._openProposal(true);
+  } else {
+    if (!this._popup.rendered) {
+      this._openProposal(true);
+    }
   }
 };
 
