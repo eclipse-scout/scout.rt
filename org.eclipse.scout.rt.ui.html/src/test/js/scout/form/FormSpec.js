@@ -6,9 +6,9 @@ describe("Form", function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
-    helper = new FormSpecHelper(session);
     session = sandboxSession();
     session.init();
+    helper = new FormSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
 
@@ -21,7 +21,7 @@ describe("Form", function() {
   describe("destroy", function() {
 
     it("destroys the adapter and its children", function() {
-      var form = helper.createFormWithOneField(session);
+      var form = helper.createFormWithOneField();
 
       expect(form.rootGroupBox).toBeTruthy();
       expect(session.getModelAdapter(form.rootGroupBox.id)).toBe(form.rootGroupBox);
@@ -49,7 +49,7 @@ describe("Form", function() {
       }
 
       it("destroys the form", function() {
-        var form = helper.createFormWithOneField(session);
+        var form = helper.createFormWithOneField();
         spyOn(form, 'destroy');
 
         var message = {

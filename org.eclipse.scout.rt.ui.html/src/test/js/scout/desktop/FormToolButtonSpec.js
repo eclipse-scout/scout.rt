@@ -1,38 +1,22 @@
+/* global FormSpecHelper */
 describe("FormToolButton", function() {
-  var session;
-  var desktop;
+  var session, desktop, helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
+    helper = new FormSpecHelper(session);
     desktop = {
       $parent: session.$entryPoint,
       $toolContainer: session.$entryPoint.appendDiv('taskbar-tools').hide()
     };
   });
 
-  var formMock = {
-    render: function() {},
-    remove: function() {},
-    setParent: function() {},
-    htmlComp: {
-      pack: function() {}
-    },
-    rootGroupBox: {
-      menuBar: {
-        bottom: function() {}
-      }
-    },
-    _initialFocusElement: function() {
-      return null;
-    }
-  };
-
   function createAction(model) {
     var action = new scout.FormToolButton();
     action.init(model);
     action.desktop = desktop;
-    action.form = formMock;
+    action.form = helper.createFormWithOneField();
     action.position = function() {};
     return action;
   }

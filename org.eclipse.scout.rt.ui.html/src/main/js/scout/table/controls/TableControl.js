@@ -63,7 +63,6 @@ scout.TableControl.prototype._renderContent = function($parent) {
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.revalidateLayout();
   this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
-
 };
 
 scout.TableControl.prototype._removeContent = function() {

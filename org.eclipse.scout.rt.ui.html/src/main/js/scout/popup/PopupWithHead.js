@@ -101,10 +101,6 @@ scout.PopupWithHead.prototype.addClassToBody = function(clazz) {
   this.$body.addClass(clazz);
 };
 
-scout.PopupWithHead.prototype.position = function() {
-  this._position(this.$body);
-};
-
 /**
  * @override Popup.js
  */
@@ -147,10 +143,10 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   }
   openingDirectionX = openingDirectionX || this.openingDirectionX;
   openingDirectionY = openingDirectionY || this.openingDirectionY;
-  this.$container.removeClass('up down');
-  this.$body.removeClass('up down');
-  this.$container.addClass(openingDirectionY);
-  this.$body.addClass(openingDirectionY);
+  this.$container.removeClass('up down left right');
+  this.$body.removeClass('up down left right');
+  this.$container.addClass(openingDirectionY + ' ' + openingDirectionX);
+  this.$body.addClass(openingDirectionY + ' ' + openingDirectionX);
 
   // Make sure the elements inside the header have the same style as to blueprint (menu)
   // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint

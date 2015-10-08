@@ -5,11 +5,11 @@ describe('scout.Focusmanager', function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    formHelper = new FormSpecHelper(session);
-    focusHelper = new FocusManagerSpecHelper();
     jasmine.Ajax.install();
     session = sandboxSession();
     session.init();
+    formHelper = new FormSpecHelper(session);
+    focusHelper = new FocusManagerSpecHelper();
     jasmine.clock().install();
     uninstallUnloadHandlers(session);
   });
@@ -43,7 +43,7 @@ describe('scout.Focusmanager', function() {
 
       var form;
       beforeEach(function() {
-        form = formHelper.createFormXFields(4, session, false);
+        form = formHelper.createFormXFields(4, false);
         form.render(session.$entryPoint);
       });
 
@@ -80,7 +80,7 @@ describe('scout.Focusmanager', function() {
         var sandboxContext = session.focusManager._findActiveContext();
         expect(sandboxContext.$container).toBe(session.$entryPoint);
 
-        var dialog = formHelper.createFormXFields(2, session, true);
+        var dialog = formHelper.createFormXFields(2, true);
         dialog.render(session.$entryPoint);
 
         expect(session.focusManager._focusContexts.length).toBe(2);

@@ -200,6 +200,10 @@ scout.HtmlComponent.prototype.getBounds = function() {
   return scout.graphics.getBounds(this.$comp);
 };
 
+scout.HtmlComponent.prototype.offsetBounds = function() {
+  return scout.graphics.offsetBounds(this.$comp);
+};
+
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
   if (!this.$comp.isVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong

@@ -155,6 +155,10 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   this._lastVisibleItemRight = null;
   this._defaultMenu = null;
 
+  // Make sure menubar is visible before the items get rendered
+  // especially important for menu items with open popups to position them correctly
+  this.updateVisibility();
+
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
   // float:right. In Firefox elements with float:right must come first in the HTML order
   // of elements. Otherwise a strange layout bug occurs.
@@ -178,8 +182,6 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
       }
     }.bind(this));
   }
-
-  this.updateVisibility();
 };
 
 scout.MenuBar.prototype.setTabbableMenu = function(menu) {

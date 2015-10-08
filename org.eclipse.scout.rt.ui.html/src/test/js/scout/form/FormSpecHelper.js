@@ -2,17 +2,17 @@ var FormSpecHelper = function(session) {
   this.session = session;
 };
 
-FormSpecHelper.prototype.createFormWithOneField = function(session, parentId) {
+FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   var form = this.createFormModel();
   var rootGroupBox = this.createGroupBoxModel();
   var field = this.createFieldModel('StringField', form);
 
   form.rootGroupBox = rootGroupBox.id;
   rootGroupBox.mainBox = true;
-  form.owner = parentId || session.rootAdapter.id;
+  form.owner = parentId || this.session.rootAdapter.id;
   rootGroupBox.fields = [field.id];
 
-  return createAdapter(form, session, [rootGroupBox, field]);
+  return createAdapter(form, this.session, [rootGroupBox, field]);
 };
 
 FormSpecHelper.prototype.createFormModel = function() {
@@ -49,7 +49,7 @@ FormSpecHelper.prototype.createGroupBoxModel = function() {
   return this.createFieldModel('GroupBox');
 };
 
-FormSpecHelper.prototype.createFormXFields = function(x, session, isModal, parentId) {
+FormSpecHelper.prototype.createFormXFields = function(x, isModal, parentId) {
   var form = isModal ? this.createFormModelWithDisplayHint('dialog') : this.createFormModelWithDisplayHint('view');
   var rootGroupBox = this.createGroupBoxModel();
   var fields = [];
@@ -62,9 +62,9 @@ FormSpecHelper.prototype.createFormXFields = function(x, session, isModal, paren
   }
   rootGroupBox.fields = fieldIds;
   form.rootGroupBox = rootGroupBox.id;
-  form.owner = parentId || session.rootAdapter.id;
+  form.owner = parentId || this.session.rootAdapter.id;
   fields.push(rootGroupBox);
-  return createAdapter(form, session, fields);
+  return createAdapter(form, this.session, fields);
 };
 
 FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {

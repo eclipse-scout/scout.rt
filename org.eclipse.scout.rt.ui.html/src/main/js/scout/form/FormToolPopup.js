@@ -11,19 +11,19 @@ scout.FormToolPopup.prototype._init = function(options) {
 
   this.$formToolButton = this.formToolButton.$container;
   this.$headBlueprint = this.$formToolButton;
-  this.formToolButton.form.rootGroupBox.menuBar.bottom();
+  this.form = this.formToolButton.form;
+  this.form.rootGroupBox.menuBar.bottom();
 };
 
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
   this.$container.addClass('form-tool-popup');
+  this.htmlComp.setLayout(new scout.FormToolPopupLayout(this));
 
-  var form = this.formToolButton.form;
-  form.renderInitialFocusEnabled = false;
-  form.render(this.$body);
-  form.htmlComp.pixelBasedSizing = true;
-  form.htmlComp.pack();
-  form.setParent(this);
+  this.form.renderInitialFocusEnabled = false;
+  this.form.render(this.$body);
+  this.form.htmlComp.pixelBasedSizing = true;
+  this.form.setParent(this);
 };
 
 scout.FormToolPopup.prototype._renderHead = function() {

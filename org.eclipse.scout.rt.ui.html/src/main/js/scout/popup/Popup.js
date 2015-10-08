@@ -50,6 +50,7 @@ scout.Popup.prototype.render = function($parent, event) {
 
 scout.Popup.prototype._render = function($parent) {
   this.$container = $.makeDiv('popup').appendTo($parent || this.session.$entryPoint);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
 
   // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
   if (this.withFocusContext && this.focusableContainer) {
@@ -179,7 +180,7 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   }
   openingDirectionY = openingDirectionY || 'down';
   $container.removeClass('up down');
-  $container.addClass(openingDirectionY);
+  $container.addClass(openingDirectionY + ' right'); // always use right as openingDirectionX
   height = $container.outerHeight(true),
 
   anchorBounds = this.anchorBounds;

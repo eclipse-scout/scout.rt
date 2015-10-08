@@ -204,6 +204,7 @@ __include("scout/form/Form.js");
 __include("scout/form/FormLayout.js");
 __include("scout/form/FormToolButton.js");
 __include("scout/form/FormToolPopup.js");
+__include("scout/form/FormToolPopupLayout.js");
 __include("scout/form/DialogLayout.js");
 __include("scout/form/fields/fields.js");
 __include("scout/form/fields/AppLinkKeyStroke.js");

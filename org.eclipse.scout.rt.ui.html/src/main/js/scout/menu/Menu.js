@@ -129,6 +129,7 @@ scout.Menu.prototype._openPopup = function(event) {
   }
   this.popup = this._createPopup(event);
   this.popup.render();
+  this.popup.revalidateLayout();
   this.popup.on('remove', function(event) {
     this.popup = null;
   }.bind(this));

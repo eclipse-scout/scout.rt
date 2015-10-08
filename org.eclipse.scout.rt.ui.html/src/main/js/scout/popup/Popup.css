@@ -2,19 +2,6 @@
   position: absolute;
   top: 0px;
 
-  &.down > .popup-head {
-    padding-top: 3px;
-    border-top-width: 1px;
-    #scout.drop-shadow();
-  }
-
-  &.up > .popup-head {
-    padding-bottom: 3px;
-    border-bottom-width: 1px;
-    #scout.drop-shadow(@y: -6px;);
-  }
-
-
   &:focus {
     outline: none;
   }
@@ -30,6 +17,18 @@
   border-top-width: 0;
   border-bottom-width: 0;
   color: @active-color;
+
+  .popup.down > & {
+    padding-top: 3px;
+    border-top-width: 1px;
+    #scout.drop-shadow();
+  }
+
+  .popup.up > & {
+    padding-bottom: 3px;
+    border-bottom-width: 1px;
+    #scout.drop-shadow(@y: -6px;);
+  }
 
   &.has-submenu::after {
     .sub-menu-icon;
