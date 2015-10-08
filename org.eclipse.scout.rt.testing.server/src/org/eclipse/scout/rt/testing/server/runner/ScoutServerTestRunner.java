@@ -14,7 +14,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.testing.server.DefaultTestServerSessionProvider;
 import org.eclipse.scout.rt.testing.server.ITestServerSessionProvider;
+import org.eclipse.scout.rt.testing.shared.runner.TestEnvironmentUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.AfterClass;
@@ -87,15 +87,19 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   private static ITestServerSessionProvider s_defaultServerSessionProvider = new DefaultTestServerSessionProvider();
   private static final IServerJobService BACKEND_JOB_SERVICE;
   private static final IScoutLogger LOG;
-  private static final IServerTestEnvironment FACTORY;
+  private static final IServerTestEnvironment SERVER_TEST_ENVIRONMENT;
 
   static {
     LOG = ScoutLogManager.getLogger(ScoutServerTestRunner.class);
-    FACTORY = createServerTestEnvironmentFactory();
+    SERVER_TEST_ENVIRONMENT = TestEnvironmentUtility.createTestEnvironment(
+        IServerTestEnvironment.class,
+        "org.eclipse.scout.testing.server.runner.customServerTestEnvironmentClassName",
+        "org.eclipse.scout.testing.server.runner.CustomServerTestEnvironment");
+
     BACKEND_JOB_SERVICE = SERVICES.getService(IServerJobService.class);
 
-    if (FACTORY != null) {
-      FACTORY.setupGlobalEnvironment();
+    if (SERVER_TEST_ENVIRONMENT != null) {
+      SERVER_TEST_ENVIRONMENT.setupGlobalEnvironment();
     }
   }
 
@@ -126,8 +130,8 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   public ScoutServerTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
 
-    if (FACTORY != null) {
-      FACTORY.setupInstanceEnvironment();
+    if (SERVER_TEST_ENVIRONMENT != null) {
+      SERVER_TEST_ENVIRONMENT.setupInstanceEnvironment();
     }
 
     try {
@@ -344,32 +348,4 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
       return m_serverSession;
     }
   }
-
-  private static IServerTestEnvironment createServerTestEnvironmentFactory() {
-    IServerTestEnvironment environment = null;
-    if (SerializationUtility.getClassLoader() != null) {
-      // check whether there is a custom test environment available
-      try {
-        Class<?> customTestEnvironment = SerializationUtility.getClassLoader().loadClass("org.eclipse.scout.testing.server.runner.CustomServerTestEnvironment");
-        LOG.info("loaded custom test environment: [" + customTestEnvironment + "]");
-        if (!IServerTestEnvironment.class.isAssignableFrom(customTestEnvironment)) {
-          LOG.warn("custom test environment is not implementing [" + IServerTestEnvironment.class + "]");
-        }
-        else if (Modifier.isAbstract(customTestEnvironment.getModifiers())) {
-          LOG.warn("custom test environment is an abstract class [" + customTestEnvironment + "]");
-        }
-        else {
-          environment = (IServerTestEnvironment) customTestEnvironment.newInstance();
-        }
-      }
-      catch (ClassNotFoundException e) {
-        LOG.debug("no custom custom test environment installed", e);
-      }
-      catch (Exception e) {
-        LOG.warn("Unexpected problem while creating a new instance of custom test environment", e);
-      }
-    }
-    return environment;
-  }
-
 }
