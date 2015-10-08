@@ -50,7 +50,7 @@ describe("ModelAdapter", function() {
     return adapter;
   }
 
-  it("can handle properties in any order", function() {
+  it('can handle properties in any order', function() {
     var event;
 
     // Create a dummy object
@@ -290,6 +290,27 @@ describe("ModelAdapter", function() {
 
         expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapter);
         expect(session.getModelAdapter(model1.id)).toBeFalsy();
+      });
+
+    });
+
+    describe('extractModel', function() {
+
+      it('returns only model properties', function() {
+        var model = createSimpleModel('FooBar', session),
+          adapter = createModelAdapter(model),
+          expectedProperties = ['id', 'session', 'objectType', 'parent'];
+
+        adapter.$container = 'dummy container property';
+        var extractedModel = adapter.extractModel();
+
+        // should contain the following properties:
+        expectedProperties.forEach(function(propertyName) {
+          expect(extractedModel[propertyName]).not.toBe(undefined);
+        });
+
+        // but not the $container property (which has been added later)
+        expect(extractedModel.$container).toBe(undefined);
       });
 
     });

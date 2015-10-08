@@ -3,24 +3,57 @@ scout.SmartFieldButtonPopup = function() {
 };
 scout.inherits(scout.SmartFieldButtonPopup, scout.Popup);
 
+scout.SmartFieldButtonPopup.MARGIN = 45; // min. margin around popup
+
 scout.SmartFieldButtonPopup.prototype._init = function(options) {
   scout.SmartFieldButtonPopup.parent.prototype._init.call(this, options);
   this._smartFieldButton = options.smartFieldButton;
 
   // clone original smart-field(button)
-  var modelClone = $.extend({}, this._smartFieldButton._model);
-  modelClone.parent = this;
-  modelClone.noPopup = true; // FIXME AWE: (popups) get rid of this flags
-  modelClone.buttonOnly = false;
-  this._smartField = scout.create(modelClone);
+  var model = this._smartFieldButton.extractModel();
+  model.parent = this;
+  model.labelPosition = scout.FormField.LABEL_POSITION_TOP;
+  model.noPopup = true; // FIXME AWE: (popups) get rid of this flags
+  model.buttonOnly = false;
+  this._smartField = scout.create(model);
   this._smartField._popup = this; // FIXME AWE: (popups) beautify this, see addSmartFieldPopup() called in render
   // local smart-field should receive all events adressed to button
   this.session.registerAdapterClone(this._smartFieldButton, this._smartField);
 };
 
+/**
+ * @override Popup.js
+ */
+scout.SmartFieldButtonPopup.prototype.prefLocation = function($container, openingDirectionY) {
+  var popupSize = this.prefSize($container),
+    screenWidth = $(document).width(),
+    x = (screenWidth - popupSize.width) / 2;
+  return new scout.Point(x, scout.SmartFieldButtonPopup.MARGIN);
+};
+
+/**
+ * @override Popup.js
+ */
+scout.SmartFieldButtonPopup.prototype.prefSize = function($container) {
+  var screenWidth = $(document).width(),
+    screenHeight = $(document).height(),
+    minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
+    maxPopupWidth = scout.HtmlEnvironment.formColumnWidth,
+    maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
+    popupWidth = screenWidth - 2 * scout.SmartFieldButtonPopup.MARGIN,
+    popupHeight = screenHeight / 2 - scout.SmartFieldButtonPopup.MARGIN;
+
+  popupWidth = Math.min(popupWidth, maxPopupWidth);
+  popupWidth = Math.max(popupWidth, minPopupWidth);
+  popupHeight = Math.min(popupHeight, maxPopupHeight);
+
+  return new scout.Dimension(popupWidth, popupHeight);
+};
+
 scout.SmartFieldButtonPopup.prototype._render = function($parent) {
-  var popupLayout, fieldBounds, initialPopupSize;
-  if (!$parent) {
+  if (!$parent) { // FIXME AWE: (popups) was für einen grund gibt es für dieses if? (siehe auch SmartFieldPopup)
+    // wahrscheinlich haben wir ja dann nie einen $parent gesetzt, wenn man explizit das field als parent setzt
+    // kommt es sowieso nicht gut wegen der z-order (popup wird verdeckt von anderen fields).
     $parent = this.session.$entryPoint;
   }
 
@@ -37,6 +70,11 @@ scout.SmartFieldButtonPopup.prototype._render = function($parent) {
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SmartFieldButtonPopupLayout(this));
+};
+
+scout.SmartFieldButtonPopup.prototype._postRender = function() {
+  scout.SmartFieldButtonPopup.parent.prototype._postRender.call(this);
+  this._smartField._onClick(); // open proposal
 };
 
 /**
@@ -74,7 +112,7 @@ scout.SmartFieldButtonPopup.prototype._onAnchorScroll = function(event) {
 };
 
 
-// ------------------------
+// ---- SmartFieldButtonPopupLayout ---- //
 
 scout.SmartFieldButtonPopupLayout = function(popup) {
   scout.SmartFieldButtonPopupLayout.parent.call(this);
@@ -83,10 +121,13 @@ scout.SmartFieldButtonPopupLayout = function(popup) {
 scout.inherits(scout.SmartFieldButtonPopupLayout, scout.AbstractLayout);
 
 scout.SmartFieldButtonPopupLayout.prototype.layout = function($container) {
-  var size = this._popup.htmlComp.getSize(),
-    popup = this._popup;
-  popup._smartField.htmlComp.setBounds(new scout.Rectangle(10, 10, size.width - 20, 30));
-  popup._proposalChooserHtmlComp.setBounds(new scout.Rectangle(10, 50, size.width - 20, size.height - 60));
+  var popupSize = this._popup.htmlComp.getSize(),
+    popup = this._popup,
+    smartFieldHeight = popup._smartField.htmlComp.getPreferredSize().height,
+    proposalChooserVOffset = smartFieldHeight + scout.HtmlEnvironment.formRowGap;
+
+  popup._smartField.htmlComp.setBounds(new scout.Rectangle(0, 0, popupSize.width, smartFieldHeight));
+  popup._proposalChooserHtmlComp.setBounds(new scout.Rectangle(0, proposalChooserVOffset, popupSize.width, popupSize.height - proposalChooserVOffset));
 };
 
 scout.SmartFieldButtonPopupLayout.prototype.preferredLayoutSize = function($container) {

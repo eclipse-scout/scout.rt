@@ -61,6 +61,7 @@ scout.Popup.prototype._postRender = function() {
   // position must be set _before_ focus is installed, otherwise we'd focus an element
   // that is currently not on the screen. Which would cause the whole desktop to
   // be shifted for a few pixels.
+  this.size();
   this.position();
 
   if (this.withFocusContext) {
@@ -253,6 +254,18 @@ scout.Popup.prototype.adjustLocation = function($container, location, anchorBoun
     x: left,
     y: top
   };
+};
+
+scout.Popup.prototype.size = function() {
+  var size = this.prefSize(this.$container);
+  if (!size) {
+    return;
+  }
+  scout.graphics.setSize(this.$container, size);
+};
+
+scout.Popup.prototype.prefSize = function($container) {
+  return null;
 };
 
 scout.Popup.prototype.position = function() {

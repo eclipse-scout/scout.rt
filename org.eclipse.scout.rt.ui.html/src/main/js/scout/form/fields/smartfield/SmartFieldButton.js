@@ -1,25 +1,10 @@
-// FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
-// --> Keine Daten vorhanden
-
-// FIXME AWE: (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
-
-// FIXME AWE: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
 scout.SmartFieldButton = function() {
   scout.SmartFieldButton.parent.call(this);
 
   this._popup;
-  this._model;
   this._smartField;
 };
 scout.inherits(scout.SmartFieldButton, scout.ValueField);
-
-/**
- * @override FormField.js
- */
-scout.SmartFieldButton.prototype._init = function(model) {
-  scout.SmartFieldButton.parent.prototype._init.call(this, model);
-  this._model = model;
-};
 
 /**
  * @override Widget.js
@@ -33,7 +18,8 @@ scout.SmartFieldButton.prototype._render = function($parent) {
   this.addContainer($parent, cssClass);
   this.addLabel();
 
-  this.addField($('<button>')
+  this.addField(scout.fields.new$TextField()
+      .attr('readonly', 'readonly')
       .click(this._onClick.bind(this)));
 
   this.addMandatoryIndicator();
@@ -42,11 +28,12 @@ scout.SmartFieldButton.prototype._render = function($parent) {
   this.addSmartFieldButtonPopup();
 };
 
-/**
- * @override ValueField.js
- */
-scout.SmartFieldButton.prototype._renderDisplayText = function(displayText) {
-  this.$field.text(displayText);
+scout.SmartFieldButton.prototype.addSmartFieldButtonPopup = function() {
+  this._popup = scout.create(scout.SmartFieldButtonPopup, {
+    parent: this,
+    $anchor: this.$field,
+    smartFieldButton: this
+  });
 };
 
 /**
@@ -70,7 +57,7 @@ scout.SmartFieldButton.prototype._removeProposalChooser = function() {
 scout.SmartFieldButton.prototype._onClick = function(e) {
   if (!this._popup.rendered) {
     this._popup.render();
-    this._popup.htmlComp.setSize(new scout.Dimension(400, 300)); // FIXME AWE: (popups) flexible layout, position
+    this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
   }
 };
 
@@ -82,10 +69,3 @@ scout.SmartFieldButton.prototype._fieldBounds = function() {
   return scout.graphics.offsetBounds(this.$field);
 };
 
-scout.SmartFieldButton.prototype.addSmartFieldButtonPopup = function() {
-  this._popup = scout.create(scout.SmartFieldButtonPopup, {
-    parent: this,
-    $anchor: this.$field,
-    smartFieldButton: this
-  });
-};

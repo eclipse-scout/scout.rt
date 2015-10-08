@@ -21,6 +21,13 @@ scout.ModelAdapter = function() {
   this.ownedAdapters = [];
   this._adapterProperties = [];
 
+  /**
+   * This array contains the name of all model-properties. It is used to distinct between ModelAdapter properties
+   * from the (server-side) model and other properties (like $container, etc.) which are added on the ModelAdapter
+   * instance.
+   */
+  this._modelProperties = [];
+
   this._register = true;
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
@@ -44,6 +51,7 @@ scout.ModelAdapter.prototype._init = function(model) {
 
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
+    this._modelProperties.push(propertyName);
     if (scout.helpers.isOneOf(propertyName, 'id', 'session', 'objectType')) {
       return; // Ignore (already set manually above)
     }
@@ -463,6 +471,18 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
   }
   s +=  '[' + this.session.partId + '-' + scout.helpers.nvl(this.id, 'NO_ID') + ']';
   return s.replace(/\s/g, '');
+};
+
+/**
+ * Returns an object which contains only the 'model' properties of this ModelAdapter instance.
+ * Other properties like $container, etc. are not included in the result.
+ */
+scout.ModelAdapter.prototype.extractModel = function() { // FIXME AWE: (popups) JasmineTest this method
+  var model = {};
+  this._modelProperties.forEach(function(propertyName) {
+    model[propertyName] = this[propertyName];
+  }, this);
+  return model;
 };
 
 scout.ModelAdapter.prototype.toString = function() {
