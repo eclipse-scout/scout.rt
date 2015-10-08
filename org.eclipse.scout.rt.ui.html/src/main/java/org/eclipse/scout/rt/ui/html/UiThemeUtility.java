@@ -33,6 +33,10 @@ public class UiThemeUtility {
   private static String s_configTheme;
   private static boolean s_configThemeRead;
 
+  private UiThemeUtility() {
+    // static access only
+  }
+
   /**
    * Only read configuration for UI theme once.
    */
@@ -52,9 +56,6 @@ public class UiThemeUtility {
    * When theme is set to 'default' we return null instead. This is required because we cannot set the theme to 'null'
    * with a request-parameter (because when a request-parameter return null it means the parameter is not set). Thus we
    * send ?theme=default to set the theme to null (which is means Scout loads the default-theme).
-   *
-   * @param req
-   * @return
    */
   public static String getTheme(HttpServletRequest req) {
     HttpSession session = req.getSession(false);
@@ -105,11 +106,10 @@ public class UiThemeUtility {
    * @param session
    *          HTTP session
    * @param theme
+   *          (<code>null</code> will reset the theme to the configured theme)
    */
   public static void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
-    if (theme == null) {
-      throw new IllegalArgumentException("theme cannot not be null");
-    }
+    theme = defaultIfNull(theme);
     if (resp != null) {
       CookieUtility.addCookie(resp, THEME_COOKIE_NAME, theme);
     }
@@ -119,5 +119,4 @@ public class UiThemeUtility {
   public static String defaultIfNull(String theme) {
     return theme == null ? getConfiguredTheme() : theme;
   }
-
 }
