@@ -280,7 +280,7 @@ scout.Table.prototype._render = function($parent) {
   function onDoubleClick(event) {
     var $row = $(event.currentTarget),
       column = that._columnAtX(event.pageX);
-    that._sendRowAction($row, column.id);
+    that.doRowAction($row.data('row'), column);
   }
 
   this.attached = true;
@@ -1059,10 +1059,10 @@ scout.Table.prototype._sendRowsFiltered = function(rowIds) {
   this.session.sendEvent(event, 250);
 };
 
-scout.Table.prototype._sendRowAction = function($row, columnId) {
+scout.Table.prototype._sendRowAction = function(row, column) {
   this.remoteHandler(this.id, 'rowAction', {
-    rowId: $row.data('row').id,
-    columnId: columnId
+    rowId: row.id,
+    columnId: column.id
   });
 };
 
@@ -1452,6 +1452,16 @@ scout.Table.prototype.checkRow = function(row, checked) {
   }
 };
 
+scout.Table.prototype.doRowAction = function(row, column) {
+  if (!row) {
+    return;
+  }
+  if (!column) {
+    column = this.columns[0];
+  }
+  this._sendRowAction(row, column);
+};
+
 scout.Table.prototype._insertRows = function(rows) {
   var filterChanged = false;
   // Update model
@@ -1734,16 +1744,18 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
 scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualsRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
-  if (!selectedEqualsRows) {
-    //never fire clear selection because of notification thru select row
-    this.clearSelection(true);
-    this.selectedRows = rows;
-    if (notifyServer) {
-      this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
-    }
+  if (selectedEqualsRows) {
+    return;
   }
 
-  if (this.rendered && !selectedEqualsRows) {
+  // never fire clear selection because of notification thru select row
+  this.clearSelection(true);
+  this.selectedRows = rows;
+  if (notifyServer) {
+    this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
+  }
+
+  if (this.rendered) {
     this.selectedRows.forEach(function(row) {
       this.renderSelection(row);
 
