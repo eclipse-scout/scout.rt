@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -53,26 +54,37 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        JSONObject jsonChartBean = new JSONObject();
-        JSONArray jsonChartAxes = new JSONArray();
-        JSONArray jsonChartValueGroups = new JSONArray();
-        if (getModel().getChartData() != null) {
-          if (getModel().getChartData().getAxes() != null) {
-            for (List<String> axis : getModel().getChartData().getAxes()) {
-              jsonChartAxes.put(axisToJson(axis));
-            }
-          }
-          for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
-            jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
-          }
-          jsonChartBean.put("redLeft", getModel().getChartData().isRedLeft());
-          jsonChartBean.put("proportional", getModel().getChartData().isProportional());
-          jsonChartBean.put("calculateConversionRate", getModel().getChartData().isCalculateConverionRate());
-        }
-        jsonChartBean.put("axes", jsonChartAxes);
-        jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
+        return MainJsonObjectFactory.get().createJsonObject(value).toJson();
+      }
 
-        return jsonChartBean;
+//      @Override
+//      public Object prepareValueForToJson(Object value) {
+//        JSONObject jsonChartBean = new JSONObject();
+//        JSONArray jsonChartAxes = new JSONArray();
+//        JSONArray jsonChartValueGroups = new JSONArray();
+//        if (getModel().getChartData() != null) {
+//          if (getModel().getChartData().getAxes() != null) {
+//            for (List<String> axis : getModel().getChartData().getAxes()) {
+//              jsonChartAxes.put(axisToJson(axis));
+//            }
+//          }
+//          for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
+//            jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
+//          }
+//
+//          jsonChartBean.put("customProperties", getModel().getChartData().getCustomProperties());
+//        }
+//        jsonChartBean.put("axes", jsonChartAxes);
+//        jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
+//
+//        return jsonChartBean;
+//      }
+    });
+
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAutoColor();
       }
     });
 
