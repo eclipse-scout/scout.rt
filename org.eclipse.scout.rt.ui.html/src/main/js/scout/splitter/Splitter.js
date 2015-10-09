@@ -90,7 +90,7 @@ scout.Splitter.prototype._onMouseMove = function(event) {
     ratio = this._maxRatio;
   }
   if (ratio !== this._oldRatio) {
-    var newPosition = ratio * obj.rootSize;
+    var newPosition = Math.floor(ratio * obj.rootSize);
     this.updatePosition(newPosition);
     this.trigger('resize', {
       data: newPosition
