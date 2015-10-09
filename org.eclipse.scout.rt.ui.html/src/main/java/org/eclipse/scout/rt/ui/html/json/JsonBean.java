@@ -53,7 +53,7 @@ public class JsonBean implements IJsonObject {
 
     Class<?> type = m_bean.getClass();
     // basic types
-    if (type.isPrimitive() || type == String.class || Number.class.isAssignableFrom(type)) {
+    if (type.isPrimitive() || type == String.class || type == Boolean.class || Number.class.isAssignableFrom(type)) {
       return m_bean;
     }
 
