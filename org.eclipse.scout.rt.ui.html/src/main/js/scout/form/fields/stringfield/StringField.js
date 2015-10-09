@@ -134,7 +134,7 @@ scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnable
   }
 };
 
-//Not called in _renderProperties() because this is not really a property (more like an event)
+// Not called in _renderProperties() because this is not really a property (more like an event)
 scout.StringField.prototype._renderInsertText = function() {
   var s = this.insertText;
   if (s && this.$field.length > 0) {
@@ -148,6 +148,13 @@ scout.StringField.prototype._renderInsertText = function() {
     var text = elem.value;
     text = text.slice(0, a) + s + text.slice(b);
     elem.value = text;
+
+    // Make sure display text gets sent (necessary if field does not have the focus)
+    if (this.updateDisplayTextOnModify) {
+      // If flag is true, we need to send two events (First while typing=true, second = false)
+      this.acceptInput(true);
+    }
+    this.acceptInput();
   }
 };
 

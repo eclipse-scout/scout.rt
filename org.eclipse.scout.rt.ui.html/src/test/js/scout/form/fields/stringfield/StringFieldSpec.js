@@ -7,6 +7,13 @@ describe("StringField", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
+    jasmine.Ajax.install();
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
+    jasmine.Ajax.uninstall();
   });
 
   function createField(model) {
@@ -136,6 +143,76 @@ describe("StringField", function() {
       expect(field.$field[0].value).toBe('ABC2');
     });
 
+    it("sends display text changed to server using accept text", function() {
+      field.render(session.$entryPoint);
+      var message = {
+        events: [createPropertyChangeEvent(field, {
+          insertText: 'Test1'
+        })]
+      };
+      session._processSuccessResponse(message);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      var event = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test1', whileTyping: false
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+
+      message = {
+        events: [createPropertyChangeEvent(field, {
+          insertText: 'ABC2'
+        })]
+      };
+      session._processSuccessResponse(message);
+      expect(field.$field[0].value).toBe('Test1ABC2');
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      event = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test1ABC2', whileTyping: false
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true", function() {
+      field.updateDisplayTextOnModify = true;
+      field.render(session.$entryPoint);
+      var message = {
+        events: [createPropertyChangeEvent(field, {
+          insertText: 'Test1'
+        })]
+      };
+      session._processSuccessResponse(message);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      var events = [];
+      // displayTextChanged needs to be sent twice, with whileTyping = true and = false
+      events[0] = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test1', whileTyping: true
+      });
+      events[1] = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test1', whileTyping: false
+      });
+      expect(mostRecentJsonRequest()).toContainEventsExactly(events);
+
+      message = {
+        events: [createPropertyChangeEvent(field, {
+          insertText: 'ABC2'
+        })]
+      };
+      session._processSuccessResponse(message);
+      expect(field.$field[0].value).toBe('Test1ABC2');
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      events = [];
+      events[0] = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test1ABC2', whileTyping: true
+      });
+      events[1] = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test1ABC2', whileTyping: false
+      });
+      expect(mostRecentJsonRequest()).toContainEventsExactly(events);
+    });
+
   });
 
   describe("displayTextChanged must always be sent to server at the end of input, if at least one change has been was made", function() {
@@ -143,8 +220,6 @@ describe("StringField", function() {
 
     beforeEach(function() {
       field = createField(createModel());
-      jasmine.Ajax.install();
-      jasmine.clock().install();
     });
 
     it("updateDisplayTextOnModify = true, with changed text", function() {
