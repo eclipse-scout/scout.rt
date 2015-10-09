@@ -209,6 +209,7 @@ __include("scout/form/FormToolPopupLayout.js");
 __include("scout/form/DialogLayout.js");
 __include("scout/form/fields/fields.js");
 __include("scout/form/fields/AppLinkKeyStroke.js");
+__include("scout/form/fields/DefaultFieldLoadingSupport.js");
 __include("scout/form/fields/FormField.js");
 __include("scout/form/fields/FormFieldLayout.js");
 __include("scout/form/fields/CompositeField.js");

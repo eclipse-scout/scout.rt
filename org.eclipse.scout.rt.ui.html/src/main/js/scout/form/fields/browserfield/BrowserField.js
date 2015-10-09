@@ -1,6 +1,7 @@
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
   this._postMessageListener;
+  this.loadingSupport = new scout.DefaultFieldLoadingSupport(this);
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
@@ -69,3 +70,4 @@ scout.BrowserField.prototype._remove = function() {
   window.removeEventListener('message', this._postMessageListener);
   this._postMessageListener = null;
 };
+
