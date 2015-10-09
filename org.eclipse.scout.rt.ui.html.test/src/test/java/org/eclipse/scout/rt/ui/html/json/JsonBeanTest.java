@@ -16,7 +16,9 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.annotations.IgnoreProperty;
@@ -97,6 +99,35 @@ public class JsonBeanTest {
   }
 
   @Test
+  public void testBeanWithMap() {
+    BeanWithMap bean = new BeanWithMap();
+    Map<Object, Object> map = new HashMap<Object, Object>();
+    map.put("key1", new Integer(2));
+    map.put("key2", new Integer(3));
+    bean.setMap(map);
+
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+
+    JSONObject json = (JSONObject) jsonObj.toJson();
+    assertEquals(2, json.getJSONObject("map").getLong("key1"));
+    assertEquals(3, json.getJSONObject("map").getLong("key2"));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testBeanWithMapIllegal() {
+    BeanWithMap bean = new BeanWithMap();
+    Map<Object, Object> map = new HashMap<Object, Object>();
+    map.put(new Integer(1), new Integer(2));
+    map.put(new Integer(4), new Integer(3));
+    bean.setMap(map);
+
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+    jsonObj.toJson();
+  }
+
+  @Test
   public void testBeanWithIgnoredProperty() {
     BeanWithIgnoredProperty bean = new BeanWithIgnoredProperty();
     bean.setProperty("property");
@@ -168,6 +199,19 @@ public class JsonBeanTest {
 
     public void setBytes(byte[] bytes) {
       m_bytes = bytes;
+    }
+
+  }
+
+  public static class BeanWithMap {
+    private Map<Object, Object> m_map = new HashMap<Object, Object>();
+
+    public Map getMap() {
+      return m_map;
+    }
+
+    public void setMap(Map<Object, Object> map) {
+      m_map = map;
     }
 
   }

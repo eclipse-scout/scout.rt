@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.IgnoreProperty;
 import org.eclipse.scout.commons.annotations.IgnoreProperty.Context;
@@ -28,7 +29,8 @@ import org.json.JSONObject;
  * <p>
  * The java class may have public fields or getter/setter methods.
  * <p>
- * Valid data types are: boolean, int, long, String, byte[], array or {@link Collection} of before mentioned types.
+ * Valid data types are: boolean, int, long, String, byte[], array, {@link Collection} of before mentioned types and
+ * {@link Map} with String as key and value as one of before mentioned types.
  *
  * @param o
  *          the java bean
@@ -51,7 +53,7 @@ public class JsonBean implements IJsonObject {
 
     Class<?> type = m_bean.getClass();
     // basic types
-    if (type.isPrimitive() || type == String.class || type == Integer.class || type == Long.class || type == Boolean.class) {
+    if (type.isPrimitive() || type == String.class || Number.class.isAssignableFrom(type)) {
       return m_bean;
     }
 
@@ -75,6 +77,19 @@ public class JsonBean implements IJsonObject {
         jsonArray.put(jsonObject.toJson());
       }
       return jsonArray;
+    }
+
+    // Map
+    if (Map.class.isAssignableFrom(type)) {
+      JSONObject jsonMap = new JSONObject();
+      Map map = (Map) m_bean;
+      for (Object key : map.keySet()) {
+        if (!(key instanceof String)) {
+          throw new IllegalArgumentException("Cannot convert " + type + " to json object");
+        }
+        jsonMap.put((String) key, map.get(key));
+      }
+      return jsonMap;
     }
 
     // bean
