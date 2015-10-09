@@ -7,6 +7,7 @@ describe("NavigateUpButton", function() {
     session = sandboxSession();
     outline = {
       session: session,
+      navigateToTop: function() {},
       handleOutlineContent: function() {}
     };
     var model = createSimpleModel('NavigateUpButton', session);
@@ -92,12 +93,12 @@ describe("NavigateUpButton", function() {
       expect(outline.collapseNode).toHaveBeenCalledWith(node.parentNode, {collapseChildNodes: true});
     });
 
-    it("shows default detail-form by removing selection from tree", function() {
+    it("shows default detail-form or outline overview", function() {
       node.parentNode = undefined;
       menu.drill;
-      spyOn(outline, 'selectNodes');
+      spyOn(outline, 'navigateToTop');
       menu._drill();
-      expect(outline.selectNodes).toHaveBeenCalledWith([]);
+      expect(outline.navigateToTop).toHaveBeenCalled();
     });
 
   });

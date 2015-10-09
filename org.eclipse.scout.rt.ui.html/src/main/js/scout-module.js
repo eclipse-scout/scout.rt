@@ -189,6 +189,7 @@ __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/ViewTabsController.js");
 __include("scout/desktop/outline/Outline.js");
+__include("scout/desktop/outline/OutlineOverview.js");
 __include("scout/desktop/outline/OutlineKeyStrokeContext.js");
 __include("scout/desktop/outline/OutlineLayout.js");
 __include("scout/desktop/outline/AbstractOutlineTreeNavigationKeyStroke.js");

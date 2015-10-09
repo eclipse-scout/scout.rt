@@ -209,22 +209,3 @@ scout.Tooltip.prototype._onDocumentKeydown = function(event) {
 scout.Tooltip.computeHypotenuse = function(x) {
   return Math.sqrt(Math.pow(x, 2) + Math.pow(x, 2));
 };
-
-/**
- * Finds every tooltip whose $anchor belongs to $context.
- *
- * @memberOf scout.Tooltip
- */
-scout.Tooltip.findTooltips = function($context) {
-  var $tooltips, i, tooltip,
-    tooltips = [];
-  $tooltips = $('.tooltip');
-
-  for (i = 0; i < $tooltips.length; i++) {
-    tooltip = $tooltips.eq(i).data('tooltip');
-    if ($context.has(tooltip.$anchor).length > 0) {
-      tooltips.push(tooltip);
-    }
-  }
-  return tooltips;
-};

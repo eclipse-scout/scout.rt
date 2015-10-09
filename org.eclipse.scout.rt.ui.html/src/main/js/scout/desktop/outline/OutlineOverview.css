@@ -1,0 +1,23 @@
+.outline-overview {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: table;
+}
+
+.outline-overview-content {
+  color: @palette-gray-5;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  padding-bottom: 150px;
+}
+
+.outline-overview-icon {
+  font-size: 40px;
+  padding-bottom: 20px;
+}
+
+.outline-overview-title {
+  font-size: 20px;
+}

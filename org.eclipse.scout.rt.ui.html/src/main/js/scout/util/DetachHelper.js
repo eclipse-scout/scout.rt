@@ -96,7 +96,7 @@ scout.DetachHelper.prototype.removeScrollable = function($container) {
 };
 
 scout.DetachHelper.prototype._storeTooltips = function($container) {
-  var tooltips = scout.Tooltip.findTooltips($container);
+  var tooltips = scout.tooltips.find($container);
   tooltips.forEach(function(tooltip) {
     tooltip.remove();
   });

@@ -72,7 +72,10 @@ scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
 /**
  * @override Menu.js
  */
-scout.AbstractNavigationButton.prototype.doAction = function() {
+scout.AbstractNavigationButton.prototype.doAction = function(event) {
+  if (!this.prepareDoAction(event)) {
+    return false;
+  }
   this._onClickFunc();
   return true;
 };

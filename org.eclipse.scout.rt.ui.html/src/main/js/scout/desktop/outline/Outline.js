@@ -22,6 +22,10 @@ scout.Outline.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, model.session);
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
+  this.outlineOverview = scout.create(scout.OutlineOverview, {
+    parent: this,
+    outline: this
+  });
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -56,7 +60,11 @@ scout.Outline.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.OutlineLayout(this));
 
   if (this.selectedNodes.length === 0) {
-    this._showDefaultDetailForm();
+    if (this.defaultDetailForm) {
+      this._showDefaultDetailForm();
+    } else if (this.outlineOverview) {
+      this._showOutlineOverview();
+    }
   }
   this._renderTitleVisible();
 };
@@ -245,13 +253,16 @@ scout.Outline.prototype._hasMenu = function(menus, menuClass) {
 };
 
 scout.Outline.prototype._onTitleClick = function(event) {
+  this.navigateToTop();
+};
+
+scout.Outline.prototype.navigateToTop = function() {
   this.collapseAll();
+  this.clearSelection();
   if (this.defaultDetailForm) {
-    this.clearSelection();
     this._showDefaultDetailForm();
-    this._showDefaultDetailForm();
-  } else {
-    this.selectNodes(this.$nodes().first().data('node'), true, true);
+  } else if (this.outlineOverview) {
+    this._showOutlineOverview();
   }
 
   this.handleOutlineContentDebounced(true);
@@ -283,6 +294,10 @@ scout.Outline.prototype._showDefaultDetailForm = function() {
   if (this.defaultDetailForm) {
     this.session.desktop.setOutlineContent(this.defaultDetailForm, true);
   }
+};
+
+scout.Outline.prototype._showOutlineOverview = function() {
+  this.session.desktop.setOutlineContent(this.outlineOverview, true);
 };
 
 /**

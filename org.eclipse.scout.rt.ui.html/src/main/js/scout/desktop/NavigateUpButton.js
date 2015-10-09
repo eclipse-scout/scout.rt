@@ -24,7 +24,7 @@ scout.NavigateUpButton.prototype._toggleDetail = function() {
  */
 scout.NavigateUpButton.prototype._buttonEnabled = function() {
   var parentNode = this.node.parentNode;
-  return !!parentNode || !! this.outline.defaultDetailForm;
+  return !!parentNode || !! this.outline.defaultDetailForm || !! this.outline.outlineOverview;
 };
 
 scout.NavigateUpButton.prototype._drill = function() {
@@ -36,9 +36,7 @@ scout.NavigateUpButton.prototype._drill = function() {
     this.outline.handleOutlineContent(true);
     this.outline.collapseNode(parentNode, {collapseChildNodes: true});
   } else {
-    $.log.debug('show default detail-form');
-    this.outline.selectNodes([]);
-    this.outline.handleOutlineContent(true);
-    this.outline.collapseAll();
+    $.log.debug('drill up to top');
+    this.outline.navigateToTop();
   }
 };

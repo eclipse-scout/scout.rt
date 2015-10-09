@@ -81,9 +81,6 @@ scout.ViewButton.prototype.getIconId = function(iconId) {
   if (arguments.length === 0) {
     iconId = this.iconId;
   }
-  if (!scout.strings.hasText(iconId)) {
-    iconId = scout.icons.OUTLINE;
-  }
   return iconId;
 };
 

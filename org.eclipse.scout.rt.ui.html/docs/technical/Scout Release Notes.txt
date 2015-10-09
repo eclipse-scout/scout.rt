@@ -458,16 +458,12 @@ Migration:
 - If you want another groupbox to be scrollable, you have to set the groupbox to scrollable while setting the mainbox to scrollable = false.
 
 BSH 15.07.2015:
-ITree.getConfiguredIconId() was renamed to getConfiguredDefaultIconId() to make it clear that
-this iconId is used as a default for all tree nodes that don't have an icon on their own.
-The outline's (which is a tree) defaultIconId is _not_ used to specify an icon for the
-outline view button. This icon has to be defined on the outline view button explicitly, only
-the label is inherited from the outline.
+ITree.getConfiguredDefaultIconId() in addition to ITree.getConfiguredIconId
+Difference:
+DefaultIconId is used as default for all tree nodes that don't have an icon on their own.
+IconId may be used in the same way as the title, e.g as outline icon.
 Migration:
-- Define an outline specific icon on the AbstractViewButton in your desktop or desktop extension.
-- Rename ITree.getConfiguredIconId() to ITree.getConfiguredDefaultIconId() if you want to
-  specify a default icon for all tree nodes. Otherwise, remove it entirely. The old methods
-  are still provided for convenience, but will be removed in the next release.
+- If you want every tree node to have an icon, use defaultIconId. Otherwise no migration necessary.
 
 MOT 16.07.2015:
 - AbstractColumn.execPrepareEdit(ITableRow) must not return null anymore use Cell.setEditable(boolean) instead.
@@ -539,3 +535,9 @@ ASA 24.09.2015
 Removed IToolButton from Form. Therefore IToolButtons can not be added anymore as an extension to Forms.
 --> Instead IToolButton can be defined inside the MainBox of a Form. (IToolButton now is a IMenu and adding Menus to a GroupBoxes as
     extension is also supported.)
+
+CGU 09.10.2015
+Outline: Having a selected page is not mandatory anymore.
+An outline overview or the default detail form will be displayed if no page is selected.
+Therefore activating an outline does not automatically select the first page anymore.
+If the previous behavior is still wanted, one can implemented IDesktop#execOutlineChanged and call activateFirstPage if active page is null

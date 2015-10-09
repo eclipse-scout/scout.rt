@@ -2690,9 +2690,8 @@ scout.Table.prototype.attach = function() {
 
   this._$parent.append(this.$container);
 
-  var htmlComp = scout.HtmlComponent.get(this.$container);
-  var htmlParent = htmlComp.getParent();
-  htmlComp.setSize(htmlParent.getSize());
+  var htmlParent = this.htmlComp.getParent();
+  this.htmlComp.setSize(htmlParent.getSize());
 
   this.session.detachHelper.afterAttach(this.$container);
 
