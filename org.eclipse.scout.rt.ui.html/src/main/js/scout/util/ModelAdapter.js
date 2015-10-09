@@ -178,10 +178,21 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
   }
 };
 
-scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterIds) {
-  return this._processAdapters(adapterIds, function(adapterId) {
-    var adapter = this.session.getOrCreateModelAdapter(adapterId, this);
-    this.onChildAdapterCreated(propertyName, adapter);
+/**
+ * This method creates adapter instances for a given adapter-ID or an array of adapter-IDs.
+ * In some cases the adapter-ID is already resolved and replaced by a ModelAdapter instance,
+ * this happens when you use the ModelAdapter#extractModel() method. In that case we simply
+ * use the provided instance and don't lookup the adapter by ID.
+ */
+scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterOrIds) {
+  return this._processAdapters(adapterOrIds, function(adapterOrId) {
+    var adapter;
+    if (adapterOrId instanceof scout.ModelAdapter) {
+      adapter = adapterOrId;
+    } else {
+      adapter = this.session.getOrCreateModelAdapter(adapterOrId, this);
+      this.onChildAdapterCreated(propertyName, adapter);
+    }
     return adapter;
   }.bind(this));
 };

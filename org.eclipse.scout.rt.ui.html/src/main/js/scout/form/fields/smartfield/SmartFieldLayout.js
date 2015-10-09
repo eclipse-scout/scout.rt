@@ -9,7 +9,7 @@ scout.inherits(scout.SmartFieldLayout, scout.FormFieldLayout);
 
 scout.SmartFieldLayout.prototype.layout = function($container) {
   scout.SmartFieldLayout.parent.prototype.layout.call(this, $container);
-  if (this._smartField._noPopup) {
+  if (this._smartField.embedded) {
     return; // FIXME AWE: (popups) beautify this
   }
 

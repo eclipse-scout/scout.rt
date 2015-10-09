@@ -1,6 +1,6 @@
 /* global log4javascript */
 scout.logging = {
-  defaultLevel: 'info',
+  defaultLevel: 'debug',
 
   /***
    * Loads log4javascript.min.js if logging is enabled.

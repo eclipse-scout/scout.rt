@@ -1,9 +1,10 @@
+// FIXME AWE: (popups) play animation when popup opens?
 scout.SmartFieldMobilePopup = function() {
   scout.SmartFieldMobilePopup.parent.call(this);
 };
 scout.inherits(scout.SmartFieldMobilePopup, scout.Popup);
 
-scout.SmartFieldMobilePopup.MARGIN = 45; // min. margin around popup
+scout.SmartFieldMobilePopup.MARGIN = 45;
 
 scout.SmartFieldMobilePopup.prototype._init = function(options) {
   scout.SmartFieldMobilePopup.parent.prototype._init.call(this, options);
@@ -13,7 +14,7 @@ scout.SmartFieldMobilePopup.prototype._init = function(options) {
   var model = this._readonlySmartField.extractModel();
   model.parent = this;
   model.labelPosition = scout.FormField.LABEL_POSITION_TOP;
-  model.noPopup = true; // FIXME AWE: (popups) get rid of this flags
+  model.embedded = true; // FIXME AWE: (popups) get rid of this flags
   model.mobile = false;
 
   this._smartField = scout.create(model);
@@ -76,7 +77,7 @@ scout.SmartFieldMobilePopup.prototype._render = function($parent) {
 
 scout.SmartFieldMobilePopup.prototype._postRender = function() {
   scout.SmartFieldMobilePopup.parent.prototype._postRender.call(this);
-  this._smartField._onClick(); // open proposal
+  this._smartField._openProposal(true);
 };
 
 /**
@@ -109,3 +110,7 @@ scout.SmartFieldMobilePopup.prototype._onContainerMouseDown = function(event) {
   // müssen wir für mobile und editierbare tabellen (?) noch lösen
 };
 
+scout.SmartFieldMobilePopup.prototype.close = function(event) {
+  this._smartField._sendCancelProposal();
+  scout.SmartFieldMobilePopup.parent.prototype.close.call(this);
+};

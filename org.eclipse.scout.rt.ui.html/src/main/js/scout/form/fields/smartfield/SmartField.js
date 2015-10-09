@@ -4,6 +4,20 @@
 // FIXME AWE: (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
 
 // FIXME AWE: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
+
+/**
+ * Three smart-field modes:
+ *
+ * [default] when no flag is set, used for Desktop applications
+ *     smart-field opens a popup for proposal-chooser when user
+ *     clicks into input-field
+ * [mobile] smart-field is only a DIV that shows the display-text
+ *     when user clicks on the DIV it opens a popup that has an
+ *     embedded smart-field and a proposal-chooser.
+ * [embedded] used in the popup opend by the mobile smart-field.
+ *     this type of smart-field does not react on focus / blur
+ *     events.
+ */
 scout.SmartField = function() {
   scout.SmartField.parent.call(this);
 
@@ -33,14 +47,10 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
  */
 scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
-  this._noPopup = model.noPopup;
-
+  this.embedded = scout.helpers.nvl(model.embedded, false);
   // when 'mobile' is not set explicitly, check the device
-  if (model.mobile === undefined) {
-    this.mobile = scout.device.type !== scout.Device.Type.DESKTOP;
-  } else {
-    this.mobile = model.mobile;
-  }
+  this.mobile = scout.helpers.nvl(model.mobile, scout.device.type !== scout.Device.Type.DESKTOP);
+  $.log.debug('(SmartField#init) embedded=' + this.embedded + ' mobile=' + this.mobile);
 };
 
 scout.SmartField.prototype._render = function($parent) {
@@ -48,17 +58,17 @@ scout.SmartField.prototype._render = function($parent) {
   this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
   this.addLabel();
 
-  var $field = scout.fields.new$TextField()
-      .click(this._onClick.bind(this));
+  var $field;
   if (this.mobile) {
-    $field.prop('readonly', true);
+    $field = $.makeDiv('input-field');
   } else {
-    $field
+    $field = scout.fields.new$TextField()
       .blur(this._onFieldBlur.bind(this))
       .focus(this._onFocus.bind(this))
       .keyup(this._onKeyUp.bind(this))
       .keydown(this._onKeyDown.bind(this));
   }
+  $field.click(this._onClick.bind(this));
   this.addField($field);
 
   this.addMandatoryIndicator();
@@ -77,7 +87,7 @@ scout.SmartField.prototype.onCellEditorRendered = function(options) {
 };
 
 scout.SmartField.prototype.addSmartFieldPopup = function() {
-  if (this._noPopup) {
+  if (this.embedded) {
     return;
   }
   var popupType = this.mobile ? scout.SmartFieldMobilePopup : scout.SmartFieldPopup;
@@ -99,6 +109,17 @@ scout.SmartField.prototype._syncDisplayText = function(displayText) {
 };
 
 /**
+ * @override ValueField.js
+ */
+scout.SmartField.prototype._renderDisplayText = function(displayText) {
+  if (this.mobile) {
+    this.$field.text(displayText);
+  } else {
+    scout.SmartField.parent.prototype._renderDisplayText.call(this, displayText);
+  }
+};
+
+/**
  * Sync method is required because when proposal-chooser has never been rendered and the search-string
  * does not return any proposals in a proposal field, neither _renderProposalChooser nor _removeProposalChooser
  * is called and thus the _requestedProposal flag would never be resetted.
@@ -113,17 +134,18 @@ scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
  * When popup is not rendered at this point, we render the popup.
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
-  $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser);
-  if (this.mobile) {
+  $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser + ' mobile=' + this.mobile);
+  if (!this.proposalChooser || this.mobile) {
     return;
   }
-  if (!this.proposalChooser) {
-    return;
-  }
-  if (this._noPopup) { // FIXME AWE: (popups) beautify this, make more generic
-    this.proposalChooser.render(this._popup._proposalChooserHtmlComp.$comp);
-    this.proposalChooser.setParent(this._popup);
-    this._popup._proposalChooserHtmlComp.revalidateLayout();
+  if (this.embedded) { // FIXME AWE: (popups) beautify this, make more generic
+    if (this._popup.rendered) {
+      this.proposalChooser.render(this._popup._proposalChooserHtmlComp.$comp);
+      this.proposalChooser.setParent(this._popup);
+      this._popup._proposalChooserHtmlComp.revalidateLayout();
+    } else { // FIXME AWE: (popups) avoid this case
+      $.log.warn('!!! Render proposal chooser requested, but popup is not rendered !!!');
+    }
   } else {
     this._renderPopup();
     this.proposalChooser.render(this._popup.$container);
@@ -154,15 +176,23 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
   return e.which >= scout.keys.F1 && e.which < scout.keys.F12;
 };
 
-scout.SmartField.prototype._onClick = function(e) {
+scout.SmartField.prototype._onClick = function(event) {
+  // note: the INPUT element does not process the click event when the field is disabled
+  // however, the DIV element used in mobile-mode does process the event anyway, that's
+  // why this check is required.
+  if (!this.enabled) {
+    return;
+  }
+
   // FIXME AWE: (popups) beautify this if/else mess
-  if (this._noPopup) {
-    this._openProposal(true);
+  if (this.embedded) {
+    // NOP
   } else {
     if (!this._popup.rendered) {
       if (this.mobile) {
         this._popup.render();
         this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+        return false;
       } else {
         this._openProposal(true);
       }
@@ -171,9 +201,20 @@ scout.SmartField.prototype._onClick = function(e) {
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
-  scout.SmartField.parent.prototype._onIconClick.call(this, event);
-  if (!this._popup.rendered) {
-    this._openProposal(true);
+  if (!this.enabled) {
+    return;
+  }
+
+  if (this.embedded) {
+    // NOP
+  } else if (this.mobile) {
+    this._popup.render();
+    this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+  } else {
+    scout.SmartField.parent.prototype._onIconClick.call(this, event);
+    if (!this._popup.rendered) {
+      this._openProposal(true);
+    }
   }
 };
 
@@ -296,6 +337,10 @@ scout.SmartField.prototype._onFieldBlur = function() {
   $.log.debug('(SmartField#_onFieldBlur) tabPrevented=' + this._tabPrevented);
   this._requestedProposal = false;
 
+  if (this.embedded) {
+    return;
+  }
+
   // When we have prevented TAB handling in keyDown handler, we have already sent an acceptProposal event.
   // At this time the proposalChooser was open, and thus the proposalChooserOpen flag was set to true
   // which means the Java-client uses the selected row from the proposalChooser and _not_ the display text.
@@ -385,10 +430,14 @@ scout.SmartField.prototype._focusNextTabbable = function() {
 scout.SmartField.prototype._closeProposal = function(notifyServer) {
   if (this._popup.rendered) {
     if (scout.helpers.nvl(notifyServer, true)) {
-      this.remoteHandler(this.id, 'cancelProposal');
+      this._sendCancelProposal();
     }
     this._popup.close();
   }
+};
+
+scout.SmartField.prototype._sendCancelProposal = function() {
+  this.remoteHandler(this.id, 'cancelProposal');
 };
 
 /**
