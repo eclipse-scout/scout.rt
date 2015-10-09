@@ -155,6 +155,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /*
    * Configuration
    */
+  /**
+   * Configures the title of the tree.
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   protected String getConfiguredTitle() {
@@ -162,17 +165,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * @deprecated use {@link #getConfiguredDefaultIconId()} instead, this method will be removed in the O release.
+   * Configures the icon of the tree.
+   *
+   * @return the ID (name) of the icon
+   * @see IIconProviderService
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(20)
-  @Deprecated
   protected String getConfiguredIconId() {
     return null;
   }
 
   /**
-   * Configured the default iconId to be used for all tree nodes without an own icon.
+   * Configures the default iconId to be used for all tree nodes without an own icon.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
@@ -524,6 +529,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setTitle(getConfiguredTitle());
+    setIconId(getConfiguredIconId());
     setDefaultIconId(getConfiguredDefaultIconId());
     setAutoTitle(getConfiguredAutoTitle());
     setCheckable(getConfiguredCheckable());
@@ -882,17 +888,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
   public String getIconId() {
-    return getDefaultIconId();
+    return propertySupport.getPropertyString(PROP_ICON_ID);
   }
 
   @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
   public void setIconId(String iconId) {
-    setDefaultIconId(iconId);
+    propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
   @Override

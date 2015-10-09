@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 public class AbstractSearchOutline extends AbstractOutline implements ISearchOutline {
@@ -22,6 +23,11 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Search");
+  }
+
+  @Override
+  protected String getConfiguredIconId() {
+    return AbstractIcons.Search;
   }
 
   @Override

@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
@@ -161,6 +162,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Order(140)
   protected boolean getConfiguredBreadcrumbEnabled() {
     return false;
+  }
+
+  /**
+   * Configures the icon of the outline.
+   * <p>
+   * The folder icon {@link AbstractIcons#Folder} is used as default.
+   */
+  @Override
+  protected String getConfiguredIconId() {
+    return AbstractIcons.Folder;
   }
 
   /**

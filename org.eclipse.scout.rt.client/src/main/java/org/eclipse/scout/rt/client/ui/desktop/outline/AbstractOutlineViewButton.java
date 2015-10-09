@@ -56,6 +56,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
     setVisible(m_outline.isVisible());
     setEnabled(m_outline.isEnabled());
     setText(m_outline.getTitle());
+    setIconId(m_outline.getIconId());
     setSelected(m_desktop.getOutline() == m_outline);
     // add selection listener
     m_desktop.addDesktopListener(
@@ -86,7 +87,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
             else if (n.equals(IOutline.PROP_TITLE)) {
               setText((String) v);
             }
-            else if (n.equals(IOutline.PROP_DEFAULT_ICON_ID)) {
+            else if (n.equals(IOutline.PROP_ICON_ID)) {
               setIconId((String) v);
             }
           }
