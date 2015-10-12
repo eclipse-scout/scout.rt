@@ -144,13 +144,7 @@ scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
 };
 
 scout.GroupBox.prototype._getMnemonic = function(field) {
-  var res;
-  if (field.label !== scout.strings.removeAmpersand(field.label)) {
-    //Add mnemonic keyStroke
-    var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
-    res = mnemonic.charAt(mnemonic.length - 1);
-  }
-  return res;
+  return scout.strings.getMnemonic(field.label);
 };
 
 /**

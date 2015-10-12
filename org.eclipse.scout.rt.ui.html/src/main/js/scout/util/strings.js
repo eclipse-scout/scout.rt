@@ -28,6 +28,28 @@ scout.strings = {
     return text;
   },
 
+  getMnemonic: function(text, resolveKey) {
+    if (text === undefined || text === null) {
+      return text;
+    }
+    text = this.asString(text);
+    // Remove escaped & (they are not of concern)
+    text = text.replace(/&&/g, '');
+    var m = text.match(/&(.)/);
+    if (m !== null) {
+      // Potential mnemonic found
+      var mnemonic = m[1];
+      if (mnemonic) {
+        // Unless disabled explicitly, check if mnemonic matches with a known key
+        if (scout.helpers.nvl(resolveKey, true) && !scout.keys[mnemonic.toUpperCase()]) {
+          mnemonic = null;
+        }
+        return mnemonic;
+      }
+    }
+    return null;
+  },
+
   /**
    * @returns true if the given string contains any non-space characters
    */

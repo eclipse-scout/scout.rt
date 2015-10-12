@@ -59,7 +59,8 @@ scout.KeyStroke.prototype.parseAndSetKeyStroke = function(keyStroke) {
     } else if (part === 'shift') {
       this.shift = true;
     } else {
-      this.which = [scout.keys[part.toUpperCase()]];
+      var key = scout.keys[part.toUpperCase()];
+      this.which = key && [key];
     }
   }, this);
 };

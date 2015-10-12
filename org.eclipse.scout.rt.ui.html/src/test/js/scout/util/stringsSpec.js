@@ -42,6 +42,30 @@ describe("scout.strings", function() {
 
   });
 
+  describe("getMnemonic", function() {
+
+    it("can extract mnemonics", function() {
+      expect(scout.strings.getMnemonic()).toBe(undefined);
+      expect(scout.strings.getMnemonic(null)).toBe(null);
+      expect(scout.strings.getMnemonic('')).toBe(null);
+      expect(scout.strings.getMnemonic(' ')).toBe(null);
+      expect(scout.strings.getMnemonic('Hello')).toBe(null);
+      expect(scout.strings.getMnemonic('Hello & Co')).toBe(null);
+      expect(scout.strings.getMnemonic('&Menu')).toBe('M');
+      expect(scout.strings.getMnemonic('Ne&xt...')).toBe('x');
+      expect(scout.strings.getMnemonic('N&ächster Eintrag')).toBe(null); // ä is not defined in scout.keys
+      expect(scout.strings.getMnemonic('Next&...')).toBe(null);
+      expect(scout.strings.getMnemonic('&')).toBe(null);
+      expect(scout.strings.getMnemonic('&One &Two &Three&')).toBe('O');
+      expect(scout.strings.getMnemonic('You&&Me')).toBe(null);
+      expect(scout.strings.getMnemonic('You&&&Me')).toBe('M');
+      expect(scout.strings.getMnemonic('You&&&&Me')).toBe(null);
+      expect(scout.strings.getMnemonic('You&&&&&Me')).toBe('M');
+      expect(scout.strings.getMnemonic(123)).toBe(null);
+    });
+
+  });
+
   describe("hasText", function() {
 
     it("can check if string has text", function() {
