@@ -13,8 +13,8 @@ scout.GraphField.prototype._render = function($parent) {
 scout.GraphField.prototype._renderProperties = function() {
   scout.GraphField.parent.prototype._renderProperties.call(this);
 
-  this._renderValue(this.value);
-  this._renderLoading(this.loading);
+  this._renderValue();
+  this._renderLoading();
 };
 
 /**
@@ -24,9 +24,9 @@ scout.GraphField.prototype._renderDisplayText = function() {
  // nop
 };
 
-scout.GraphField.prototype._renderValue = function(value) {
+scout.GraphField.prototype._renderValue = function() {
   this.$field.empty();
-  if (!value) {
+  if (!this.value) {
     return;
   }
   // XXX scout.PhonebookColumn.renderPhoneBookEntry(this.$field, value);

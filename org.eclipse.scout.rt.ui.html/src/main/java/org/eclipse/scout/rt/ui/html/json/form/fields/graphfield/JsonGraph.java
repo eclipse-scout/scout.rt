@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.graphfield;
 
 import java.util.HashMap;
@@ -5,52 +15,30 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.graphfield.IGraphField;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphEdge;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphLineStyle;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphNode;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphShape;
-import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-public class JsonGraphField<GRAPH_FIELD extends IGraphField> extends JsonValueField<GRAPH_FIELD> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraphField.class);
+/**
+ * @since 5.2
+ */
+public class JsonGraph implements IJsonObject {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraph.class);
 
-  public JsonGraphField(GRAPH_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
-    super(model, uiSession, id, parent);
+  private GraphModel m_graphModel;
+
+  public JsonGraph(GraphModel model) {
+    m_graphModel = model;
   }
 
   @Override
-  public String getObjectType() {
-    return "GraphField";
-  }
-
-  @Override
-  protected void initJsonProperties(GRAPH_FIELD model) {
-    super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IGraphField>(IValueField.PROP_VALUE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().getValue();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return graphModelToJson((GraphModel) value);
-      }
-    });
-  }
-
-  protected Object graphModelToJson(GraphModel graphModel) {
-    if (graphModel == null) {
+  public Object toJson() {
+    if (m_graphModel == null) {
       return null;
     }
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
@@ -58,15 +46,16 @@ public class JsonGraphField<GRAPH_FIELD extends IGraphField> extends JsonValueFi
     int nodeCounter = 0;
 
     // 1. Nodes
-    for (GraphNode node : graphModel.getNodes()) {
+    for (GraphNode node : m_graphModel.getNodes()) {
       String graphNodeId = (nodeCounter++) + ""; // Convert to string, then increment
       graphNodeIds.put(node, graphNodeId);
 
       JSONObject jsonNode = JsonObjectUtility.newOrderedJSONObject();
       jsonNode.put("id", graphNodeId);
       jsonNode.put("label", node.getLabel());
-//      jsonNode.put("shape", shapeAsString(node.getShape()));
+      jsonNode.put("shape", shapeAsString(node.getShape()));
       jsonNode.put("url", node.getUrl());
+      jsonNode.put("cssClass", node.getCssClass());
       if (node.getColor() != null) {
         jsonNode.put("foregroundColor", node.getColor().getForeground());
         jsonNode.put("backgroundColor", node.getColor().getBackground());
@@ -81,10 +70,10 @@ public class JsonGraphField<GRAPH_FIELD extends IGraphField> extends JsonValueFi
     }
 
     // 2. Edges
-    for (GraphEdge edge : graphModel.getEdges()) {
+    for (GraphEdge edge : m_graphModel.getEdges()) {
       JSONObject jsonEdge = JsonObjectUtility.newOrderedJSONObject();
-      jsonEdge.put("startNodeId", graphNodeIds.get(edge.getSource()));
-      jsonEdge.put("endNodeId", graphNodeIds.get(edge.getTarget()));
+      jsonEdge.put("source", graphNodeIds.get(edge.getSource()));
+      jsonEdge.put("target", graphNodeIds.get(edge.getTarget()));
       jsonEdge.put("label", edge.getLabel());
       jsonEdge.put("style", lineStyleAsString(edge.getStyle()));
       jsonEdge.put("directed", edge.isDirected());
@@ -138,18 +127,4 @@ public class JsonGraphField<GRAPH_FIELD extends IGraphField> extends JsonValueFi
     }
   }
 
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
-      handleUiAppLinkAction(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  protected void handleUiAppLinkAction(JsonEvent event) {
-    String ref = event.getData().getString("ref");
-    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
-  }
 }

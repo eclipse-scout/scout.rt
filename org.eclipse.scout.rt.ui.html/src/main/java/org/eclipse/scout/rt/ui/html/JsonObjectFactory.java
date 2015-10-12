@@ -83,6 +83,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
@@ -114,6 +115,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.clipboardfield.JsonClipboar
 import org.eclipse.scout.rt.ui.html.json.form.fields.colorfield.JsonColorField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield.JsonFileChooserField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraph;
 import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraphField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
@@ -406,6 +408,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (object instanceof TableTextUserFilterState) {
       return new JsonTableTextUserFilter((TableTextUserFilterState) object);
+    }
+    if (object instanceof GraphModel) {
+      return new JsonGraph((GraphModel) object);
     }
     return null;
   }
