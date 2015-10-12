@@ -627,13 +627,15 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
 
 scout.Table.prototype._updateSortColumns = function(column, direction, multiSort, remove) {
   var sortIndex = -1,
-    deviation;
+    deviation,
+    groupColCount,
+    sortColCount;
 
   if (remove) {
-    //TODO: fko: handle case where column is also grouped.
 
     if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
       column.sortActive = false;
+      column.grouped = false;
 
       // Adjust sibling columns with higher index
       scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
@@ -667,6 +669,15 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
   }
 
   if (!multiSort) {
+
+    groupColCount = this._groupColumns() ? this._groupColumns().length : 0;
+    sortColCount = 0;
+    this.columns.forEach(function(c) {
+      if(c.sortActive){
+        sortColCount++;
+      }
+    });
+
     // remove sort index for siblings (ignore permanent head/tail columns, only if not multi sort)
     scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
       if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd)) {
@@ -676,6 +687,14 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
       }
     });
 
+    //special case: if it is the only sort column and also grouped, do not remove grouped property.
+    if(sortColCount === 1 && groupColCount === 1){
+      //do not remove grouping property
+    }
+    else{
+      column.grouped = false;
+    }
+
     // set correct sort index for all permanent tail sort columns
     deviation = (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) ? 0 : 1;
     this._permanentTailSortColumns.forEach(function(c, index) {
@@ -683,8 +702,45 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
     }, this);
   }
 
-  column.sortAscending = direction === 'asc' ? true : false;
-  column.sortActive = true;
+  if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
+    column.sortAscending = direction === 'asc' ? true : false;
+    column.sortActive = true;
+  }
+};
+
+scout.Table.prototype._isGroupingPossible = function(column){
+  var possible = true;
+
+  //TODO: incorporate this logic into visibility of grouping buttons on column header
+
+  if(this._permanentHeadSortColumns && this._permanentHeadSortColumns.length === 0){
+    //no permanent head sort columns. grouping ok.
+    return true;
+  }
+
+
+  if(!column.initialAlwaysIncludeSortAtBegin && !column.initialAlwaysIncludeSortAtEnd){
+    //col itself is not a head or tail sort column. therefore, all head sort columns must be grouped.
+    this._permanentHeadSortColumns.forEach(function(c){
+      possible &= c.grouped;
+    });
+    return possible;
+  }
+
+  if(column.initialAlwaysIncludeSortAtEnd){
+    possible = true;
+    scout.arrays.eachSibling(this._permanentHeadSortColumns, column, function(c){
+      if(c.sortIndex < column.sortIndex){
+        possible &= c.grouped;
+      }
+    });
+    return possible;
+  }
+
+  //else: it is a tail sort column. grouping does not make sense.
+  return false;
+
+
 };
 
 scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove){
@@ -693,10 +749,22 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
 
   if (remove) {
     column.grouped = false;
+
+    if(column.initialAlwaysIncludeSortAtBegin){
+      //head sort case: remove all groupings after this column.
+      this.columns.forEach(function(c){
+        if(c.sortIndex >= column.sortIndex){
+          c.grouped = false;
+        }
+      });
+    }
+
     return this._updateSortColumns(column, direction, multiGroup, remove);
   }
 
-  //TODO: fko: handle head sort case.
+  if(!this._isGroupingPossible(column)){
+    return;
+  }
 
   if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
     // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
@@ -775,13 +843,19 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
         });
 
     }
+
+    column.sortAscending = direction === 'asc' ? true : false;
+    column.sortActive = true;
+
   } else {
-    //TODO: head or tail sort column.
+
+    if(column.initialAlwaysIncludeSortAtBegin){
+      //do not change order or direction. just set grouped to true.
+      column.grouped = true;
+    }
 
   }
 
-  column.sortAscending = direction === 'asc' ? true : false;
-  column.sortActive = true;
   column.grouped = true;
 };
 
