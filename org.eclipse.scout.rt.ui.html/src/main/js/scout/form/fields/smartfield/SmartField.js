@@ -71,7 +71,9 @@ scout.SmartField.prototype._render = function($parent) {
   $field.click(this._onClick.bind(this));
   this.addField($field);
 
-  this.addMandatoryIndicator();
+  if (!this.embedded) {
+    this.addMandatoryIndicator();
+  }
   this.addIcon();
   this.addStatus();
   this.addSmartFieldPopup();
@@ -139,13 +141,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
     return;
   }
   if (this.embedded) { // FIXME AWE: (popups) beautify this, make more generic
-    if (this._popup.rendered) {
-      this.proposalChooser.render(this._popup._proposalChooserHtmlComp.$comp);
-      this.proposalChooser.setParent(this._popup);
-      this._popup._proposalChooserHtmlComp.revalidateLayout();
-    } else { // FIXME AWE: (popups) avoid this case
-      $.log.warn('!!! Render proposal chooser requested, but popup is not rendered !!!');
-    }
+    this._popup._embedProposalChooser(this.proposalChooser);
   } else {
     this._renderPopup();
     this.proposalChooser.render(this._popup.$container);

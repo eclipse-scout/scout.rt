@@ -52,10 +52,6 @@
   }
 
   & > .table {
-    &:focus {
-      outline: none;
-    }
-
     & > .table-header {
       & > .table-header-item {
         padding-top: @desktop-table-header-padding-y;

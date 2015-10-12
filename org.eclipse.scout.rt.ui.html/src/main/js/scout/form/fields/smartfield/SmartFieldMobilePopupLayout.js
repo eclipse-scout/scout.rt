@@ -5,13 +5,19 @@ scout.SmartFieldMobilePopupLayout = function(popup) {
 scout.inherits(scout.SmartFieldMobilePopupLayout, scout.AbstractLayout);
 
 scout.SmartFieldMobilePopupLayout.prototype.layout = function($container) {
-  var popupSize = this._popup.htmlComp.getSize(),
-    popup = this._popup,
-    smartFieldHeight = popup._smartField.htmlComp.getPreferredSize().height,
-    proposalChooserVOffset = smartFieldHeight + scout.HtmlEnvironment.formRowGap;
+  var popup = this._popup,
+    smartField = popup._smartField,
+    sfLeftMargin = 4,
+    sfRightMargin = 6,
+    sfTopMargin = 4,
+    sfBottomMargin = 5,
+    popupSize = this._popup.htmlComp.getSize(),
+    sfHeight = popup._smartField.htmlComp.getPreferredSize().height,
+    sfWidth = popupSize.width - sfLeftMargin - sfRightMargin,
+    proposalChooserVOffset = sfTopMargin + sfHeight + sfBottomMargin;
 
-  popup._smartField.htmlComp.setBounds(new scout.Rectangle(0, 0, popupSize.width, smartFieldHeight));
-  popup._proposalChooserHtmlComp.setBounds(new scout.Rectangle(0, proposalChooserVOffset, popupSize.width, popupSize.height - proposalChooserVOffset));
+  popup._smartField.htmlComp.setBounds(new scout.Rectangle(sfLeftMargin, sfTopMargin, sfWidth, sfHeight));
+  popup.proposalChooserContainerHtmlComp.setBounds(new scout.Rectangle(0, proposalChooserVOffset, popupSize.width, popupSize.height - proposalChooserVOffset));
 };
 
 scout.SmartFieldMobilePopupLayout.prototype.preferredLayoutSize = function($container) {

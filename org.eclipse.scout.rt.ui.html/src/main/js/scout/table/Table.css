@@ -12,6 +12,7 @@
 
   &:focus,
   &.focused {
+    outline: none;
     & .table-row.selected {
       background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;

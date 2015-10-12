@@ -1,27 +1,37 @@
 // FIXME AWE: (popups) play animation when popup opens?
 scout.SmartFieldMobilePopup = function() {
   scout.SmartFieldMobilePopup.parent.call(this);
+
+  this.$proposalChooserContainer;
+  this.proposalChooserContainerHtmlComp;
 };
 scout.inherits(scout.SmartFieldMobilePopup, scout.Popup);
 
-scout.SmartFieldMobilePopup.MARGIN = 45;
+scout.SmartFieldMobilePopup.MARGIN = 45; // FIXME AWE: (popups) replace this with center position / max width
 
 scout.SmartFieldMobilePopup.prototype._init = function(options) {
   scout.SmartFieldMobilePopup.parent.prototype._init.call(this, options);
-  this._readonlySmartField = options.smartField;
+  this._mobileSmartField = options.smartField;
 
-  // clone original readonly smart-field
-  var model = this._readonlySmartField.extractModel();
+  // clone original mobile smart-field
+  var model = this._mobileSmartField.extractModel();
   model.parent = this;
-  model.labelPosition = scout.FormField.LABEL_POSITION_TOP;
-  model.embedded = true; // FIXME AWE: (popups) get rid of this flags
+  model.labelPosition = scout.FormField.LABEL_POSITION_ON_FIELD;
+  model.embedded = true;
   model.mobile = false;
 
   this._smartField = scout.create(model);
-  // readonly smart-field and smart-field clone point to the same popup instance
+
+  // DEEP CLONE!? how? problem ist, dass die menus noch auf das alte smartField zeigen
+  // man darf nun aber nicht einfach
+  this._smartField.children.forEach(function(child) {
+    child.setParent(this._smartField);
+  }, this);
+
+  // mobile smart-field and embedded smart-field point to the same popup instance
   this._smartField._popup = this;
-  // local smart-field should receive all events adressed to button
-  this.session.registerAdapterClone(this._readonlySmartField, this._smartField);
+  // embedded smart-field should receive all events adressed to the original mobile smart-field
+  this.session.registerAdapterClone(this._mobileSmartField, this._smartField);
 };
 
 /**
@@ -60,14 +70,14 @@ scout.SmartFieldMobilePopup.prototype._render = function($parent) {
     $parent = this.session.$entryPoint;
   }
 
-  this.$container = $.makeDiv('smart-field-popup')
+  this.$container = $.makeDiv('smart-field-popup mobile')
     .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME AWE: (popups) is this line required?
     .appendTo($parent);
 
-  var $proposalChooserContainer = $.makeDiv('proposal-chooser-container')
+  this.$proposalChooserContainer = $.makeDiv('proposal-chooser-container')
     .appendTo(this.$container);
-  this._proposalChooserHtmlComp = new scout.HtmlComponent($proposalChooserContainer, this.session);
-  this._proposalChooserHtmlComp.setLayout(new scout.SingleLayout());
+  this.proposalChooserContainerHtmlComp = new scout.HtmlComponent(this.$proposalChooserContainer, this.session);
+  this.proposalChooserContainerHtmlComp.setLayout(new scout.SingleLayout());
 
   this._smartField.render(this.$container);
 
@@ -78,6 +88,19 @@ scout.SmartFieldMobilePopup.prototype._render = function($parent) {
 scout.SmartFieldMobilePopup.prototype._postRender = function() {
   scout.SmartFieldMobilePopup.parent.prototype._postRender.call(this);
   this._smartField._openProposal(true);
+};
+
+scout.SmartFieldMobilePopup.prototype._embedProposalChooser = function(proposalChooser) {
+  if (!this.rendered) {
+    $.log.warn('Tried to embed proposal chooser, but popup is not rendered');
+    return; // FIXME AWE: (popups) schauen ob und wann dieser fall auftritt
+  }
+
+  proposalChooser.setParent(this);
+  proposalChooser.render(this.$proposalChooserContainer);
+  // must use revalidate because size of proposal-chooser _container_ has not changed
+  // but the content of the container must be laid out
+  this.proposalChooserContainerHtmlComp.revalidateLayout();
 };
 
 /**
@@ -110,7 +133,11 @@ scout.SmartFieldMobilePopup.prototype._onContainerMouseDown = function(event) {
   // müssen wir für mobile und editierbare tabellen (?) noch lösen
 };
 
+/**
+ * @override Popup.js
+ */
 scout.SmartFieldMobilePopup.prototype.close = function(event) {
   this._smartField._sendCancelProposal();
   scout.SmartFieldMobilePopup.parent.prototype.close.call(this);
 };
+
