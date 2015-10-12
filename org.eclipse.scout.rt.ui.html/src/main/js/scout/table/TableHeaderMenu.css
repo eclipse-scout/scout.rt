@@ -169,7 +169,7 @@
     top: 0px;
     font-size: 20px;
     line-height: 20px;
-    content: @icon-th-list;
+    content: @icon-group;
   }
 
   &.group-column::after,
