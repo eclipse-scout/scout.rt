@@ -125,6 +125,8 @@ scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
 };
 
 scout.Outline.prototype._postRender = function() {
+  scout.Outline.parent.prototype._postRender.call(this);
+
   // Ensure outline layout is valid (because DialogLayout relies on that)
   this.htmlComp.validateLayout();
 

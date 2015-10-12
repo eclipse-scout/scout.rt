@@ -164,6 +164,9 @@ scout.Tree.prototype._render = function($parent) {
   this.dragAndDropHandler.install(this.$data);
 
   this._addNodes(this.nodes);
+};
+
+scout.Tree.prototype._postRender = function() {
   if (this.selectedNodes.length > 0) {
     this._renderSelection();
   }
