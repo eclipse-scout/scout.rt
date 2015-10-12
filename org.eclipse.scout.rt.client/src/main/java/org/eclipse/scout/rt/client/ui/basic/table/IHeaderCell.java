@@ -34,6 +34,8 @@ public interface IHeaderCell {
    */
   boolean isSortPermanent();
 
+  boolean isGroupingActive();
+
   /**
    * there is no setText method in interface,<br>
    * use {@link #IColumn.decorateHeaderCell()} and {@link #IColumn.execDecorateHeaderCell()}

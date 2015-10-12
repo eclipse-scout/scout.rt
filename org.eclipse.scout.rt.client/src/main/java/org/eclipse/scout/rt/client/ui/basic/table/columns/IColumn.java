@@ -215,6 +215,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   void setInitialVisible(boolean b);
 
+  boolean isInitialGrouped();
+
+  void setInitialGrouped(boolean b);
+
   int getInitialSortIndex();
 
   void setInitialSortIndex(int i);
@@ -324,7 +328,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * column without computing the order on a client server (e.g. application server). The ui uses a very simplified sort
    * rule set, e.g. alphabetical or numerical sorting is possible, more advanced sort rules are not implemented. Which
    * rules to use are determined by the client. To use advanced sort rules return <code>false</code>.
-   * 
+   *
    * @see ITable#isUiSortPossible()
    */
   boolean isUiSortPossible();
@@ -365,6 +369,8 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * Convenience for {@link ColumnSet#getSortColumns()} and finding the index
    */
   int getSortIndex();
+
+  boolean isGroupingActive();
 
   /**
    * Used for mapping an {@link AbstractTableRowData} to an {@link ITableRow} by {@link TableRowDataMapper}

@@ -3381,6 +3381,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     propertySupport.setPropertyBool(PROP_UI_SORT_POSSIBLE, b);
   }
 
+  public void onGroupedColumnInvisible(IColumn<?> col) {
+    if (isTableChanging()) {
+      m_sortValid = false;
+    }
+    else {
+      sort();
+    }
+  }
+
   @Override
   public void sort() {
     try {
@@ -3562,6 +3571,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(list);
     }
+    //
     //Order
     if (order) {
       TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
@@ -3574,8 +3584,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(orderMap.values());
     }
-    //Sorting
+    //
+    //Sorting & Grouping
     if (sorting) {
+
+      //Sorting
       TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
       int index = 0;
       for (IColumn<?> col : getColumns()) {
@@ -3599,6 +3612,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           getColumnSet().addSortColumn(col, col.isInitialSortAscending());
         }
       }
+
+      //Grouping
+
+      //TODO: fko: delegate to ColumnSet?
+      getColumnSet().applyGrouping(null);
+
     }
     //Widths
     if (widths) {
@@ -4403,6 +4422,25 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
+    public void fireHeaderGroupFromUI(IColumn<?> c, boolean multiGroup, boolean ascending) {
+      try {
+        pushUIProcessor();
+        //
+        if (isSortEnabled()) {
+          c = getColumnSet().resolveColumn(c);
+          if (c != null) {
+            getColumnSet().handleGroupingEvent(c, multiGroup, ascending);
+            ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+            sort();
+          }
+        }
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
     public void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked) {
       if (!isEnabled()) {
         return;
@@ -4622,6 +4660,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         pushUIProcessor();
         //
         getColumnSet().removeSortColumn(column);
+        sort();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireGroupColumnRemovedFromUI(IColumn<?> column) {
+      try {
+        pushUIProcessor();
+        //
+        getColumnSet().removeGroupColumn(column);
         sort();
       }
       finally {

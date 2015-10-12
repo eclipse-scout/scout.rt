@@ -395,6 +395,7 @@ public final class BookmarkUtility {
         if (sortOrder >= 0) {
           colState.setSortOrder(sortOrder);
           colState.setSortAscending(c.isSortAscending());
+          colState.setGroupingActive(c.isGroupingActive());
         }
         else {
           colState.setSortOrder(-1);
@@ -438,17 +439,24 @@ public final class BookmarkUtility {
       //sort order (only respect visible and user-sort columns)
       boolean userSortValid = true;
       TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
-      HashMap<IColumn, Boolean> sortColAscMap = new HashMap<IColumn, Boolean>();
+      HashMap<IColumn<?>, TableColumnState> sortColToColumnState = new HashMap<>();
+      HashSet<IColumn<?>> groupedCols = new HashSet<>();
       for (TableColumnState colState : oldColumns) {
         if (colState.getSortOrder() >= 0) {
           IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
           if (col != null) {
             sortColMap.put(colState.getSortOrder(), col);
-            sortColAscMap.put(col, colState.isSortAscending());
+            sortColToColumnState.put(col, colState);
+            if (colState.isGroupingActive()) {
+              groupedCols.add(col);
+            }
             if (col.getSortIndex() != colState.getSortOrder()) {
               userSortValid = false;
             }
             if (col.isSortAscending() != colState.isSortAscending()) {
+              userSortValid = false;
+            }
+            if (col.isGroupingActive() != colState.isGroupingActive()) {
               userSortValid = false;
             }
           }
@@ -463,10 +471,39 @@ public final class BookmarkUtility {
       if (!sortColMap.values().containsAll(existingExplicitUserSortCols)) {
         userSortValid = false;
       }
+
+      if (userSortValid) {
+        HashSet<IColumn<?>> existingGroupedUserSortCols = new HashSet<>();
+        //check if grouping is valid also:
+        for (IColumn<?> c : columnSet.getUserSortColumns()) {
+          if (c.isGroupingActive()) {
+            existingGroupedUserSortCols.add(c);
+          }
+        }
+        if (!groupedCols.containsAll(existingGroupedUserSortCols)) {
+          userSortValid = false;
+        }
+      }
+
       if (!userSortValid) {
         columnSet.clearSortColumns();
-        for (IColumn col : sortColMap.values()) {
-          columnSet.addSortColumn(col, sortColAscMap.get(col));
+        //TODO  fko: grouping for header sort cols
+        // do not just set to true, check if headers are grouped & visible or whatever my be necessary
+        boolean groupingPossible = true;
+        for (IColumn<?> col : sortColMap.values()) {
+          TableColumnState state = sortColToColumnState.get(col);
+          if (groupingPossible) {
+            if (state.isGroupingActive()) {
+              columnSet.addGroupingColumn(col, state.isSortAscending());
+            }
+            else {
+              columnSet.addSortColumn(col, state.isSortAscending());
+              groupingPossible = false;
+            }
+          }
+          else {
+            columnSet.addSortColumn(col, state.isSortAscending());
+          }
         }
         table.sort();
       }

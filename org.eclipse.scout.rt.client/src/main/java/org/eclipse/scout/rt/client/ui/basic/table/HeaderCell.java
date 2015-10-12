@@ -25,6 +25,7 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   private boolean m_sortActive;
   private boolean m_sortPermanent;
   private boolean m_sortExplicit;
+  private boolean m_groupingActive;
   private String m_iconId;
   private String m_text;
   private String m_tooltip;
@@ -147,6 +148,15 @@ public class HeaderCell implements IHeaderCell, IStyleable {
 
   public void setSortActive(boolean b) {
     m_sortActive = b;
+  }
+
+  @Override
+  public boolean isGroupingActive() {
+    return m_groupingActive;
+  }
+
+  public void setGroupingActive(boolean b) {
+    m_groupingActive = b;
   }
 
   @Override

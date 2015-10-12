@@ -70,6 +70,7 @@ public class ClientUIPreferences {
   private static final String TABLE_COLUMN_WIDTH = "table.column.width.";
   private static final String TABLE_COLUMN_VISIBLE = "table.column.visible.";
   private static final String TABLE_COLUMN_SORT_INDEX = "table.column.sortIndex.";
+  private static final String TABLE_COLUMN_GROUPED = "table.column.grouped.";
   private static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   private static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
   private static final String APPLICATION_WINDOW_MAXIMIZED = "application.window.maximized";
@@ -339,6 +340,7 @@ public class ClientUIPreferences {
     boolean visible = col.isVisibleInternal();
     int width = col.getWidth();
     int sortIndex = col.getSortIndex();
+    boolean grouped = col.isGroupingActive();
     boolean sortUp = col.isSortAscending();
     boolean sortExplicit = col.isSortExplicit();
     //
@@ -383,6 +385,14 @@ public class ClientUIPreferences {
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
     if (sortExplicit) {
+      m_prefs.put(key, "true");
+    }
+    else {
+      m_prefs.put(key, "false");
+    }
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_GROUPED);
+    if (grouped) {
       m_prefs.put(key, "true");
     }
     else {
@@ -692,6 +702,20 @@ public class ClientUIPreferences {
     if (value != null) {
       Integer i = TypeCastUtility.castValue(value, Integer.class);
       return i.intValue();
+    }
+    return defaultValue;
+  }
+
+  public boolean getTableColumnGrouped(IColumn col, boolean defaultValue, String configName) {
+    if (m_prefs == null) {
+      return defaultValue;
+    }
+
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_GROUPED);
+    String value = m_prefs.get(key, null);
+    if (value != null) {
+      Boolean b = TypeCastUtility.castValue(value, Boolean.class);
+      return b != null ? b.booleanValue() : defaultValue;
     }
     return defaultValue;
   }

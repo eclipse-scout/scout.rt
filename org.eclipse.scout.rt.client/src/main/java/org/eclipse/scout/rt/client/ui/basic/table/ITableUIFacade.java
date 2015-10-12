@@ -62,6 +62,8 @@ public interface ITableUIFacade {
    */
   void fireHeaderSortFromUI(IColumn<?> column, boolean multiSort, boolean ascending);
 
+  void fireHeaderGroupFromUI(IColumn<?> c, boolean multiGroup, boolean ascending);
+
   void setSelectedRowsFromUI(List<? extends ITableRow> rows);
 
   /**
@@ -101,6 +103,8 @@ public interface ITableUIFacade {
   void fireTableResetFromUI();
 
   void fireSortColumnRemovedFromUI(IColumn<?> column);
+
+  void fireGroupColumnRemovedFromUI(IColumn<?> column);
 
   void fireFilterAddedFromUI(IUserFilterState filter);
 

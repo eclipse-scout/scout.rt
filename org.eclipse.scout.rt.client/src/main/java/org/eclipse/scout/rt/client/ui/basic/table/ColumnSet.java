@@ -41,6 +41,7 @@ public class ColumnSet {
   private final List<IColumn<?>> m_userSortColumns;
   private final List<IColumn<?>> m_permanentHeadSortColumns;
   private final List<IColumn<?>> m_permanentTailSortColumns;
+
   /**
    * key index to model index
    */
@@ -87,14 +88,17 @@ public class ColumnSet {
       public void propertyChange(PropertyChangeEvent e) {
         IColumn c = (IColumn) e.getSource();
         if (IColumn.PROP_VIEW_COLUMN_INDEX_HINT.equals(e.getPropertyName())) {
-          //ignore
+          return;
         }
-        else if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
+        if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
           resetColumnsViewOrder();
+          return;
         }
-        else {
-          updateColumnStructure(c);
+        if (c.isGroupingActive() && IColumn.PROP_VISIBLE.equals(e.getPropertyName())) {
+          onGroupedColumnInvisible(c); //also notifies table and to invalidate sorting.
         }
+        //default:
+        updateColumnStructure(c);
       }
     };
     int index = 0;
@@ -215,7 +219,70 @@ public class ColumnSet {
         cell.setSortExplicit(explicit.booleanValue());
       }
     }
+
+    //when all sorted, apply gruoping:
+
+    applyGrouping(configName);
+
     m_table.sort();
+
+  }
+
+  /**
+   * Applies the grouping property of columns. </br>
+   * <b>Important:</b> This is already called by {@link ColumnSet#applySorting()}. </br>
+   * If you do call it, Make sure sorting is applied first.
+   *
+   * @param configName
+   */
+  public void applyGrouping(String configName) {
+    //all columns that are not sort columns but have grouping property set will not be grouped:
+    for (IColumn<?> col : getColumns()) {
+      if (col.getSortIndex() < 0 && col.isGroupingActive()) {
+        LOG.warn("Column marked as grouped but no sort index set. Column will not be grouped");
+        ((HeaderCell) col.getHeaderCell()).setGroupingActive(false);
+      }
+    }
+
+    //First: head sort columns:
+    applyGroupingConfiguration(configName, getPermanentHeadSortColumns(), true);
+
+    //Custom sort columns
+    boolean valid = isUserColumnGroupingAllowed();
+    applyGroupingConfiguration(configName, getSortColumns(), valid);
+  }
+
+  /**
+   * Applies the grouping state of columns (if valid)
+   *
+   * @param configName
+   * @param columns
+   * @param initiallyValid
+   */
+  private void applyGroupingConfiguration(String configName, List<IColumn<?>> columns, boolean initiallyValid) {
+    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+    boolean allPreviousColumnsGroupedAndVisible = initiallyValid;
+    for (IColumn<?> col : columns) {
+      boolean grouped = prefs.getTableColumnGrouped(col, col.isInitialGrouped(), configName);
+      HeaderCell headerCell = (HeaderCell) col.getHeaderCell();
+      if (allPreviousColumnsGroupedAndVisible) {
+        if (grouped && col.isVisible()) {
+          headerCell.setGroupingActive(true);
+        }
+        else {
+          headerCell.setGroupingActive(false);
+          allPreviousColumnsGroupedAndVisible = false;
+        }
+      }
+      else {
+        if (grouped) {
+          LOG.warn("Invalid column grouping config. " +
+              "Column marked as grouped but there are non-grouped or non-visible sort columns with smaller sort index. " +
+              "Grouping will be set to false.");
+        }
+        headerCell.setGroupingActive(false);
+      }
+    }
   }
 
   public int getColumnCount() {
@@ -549,7 +616,7 @@ public class ColumnSet {
   }
 
   /*
-   * Sorting
+   * Sorting and Grouping
    */
 
   /**
@@ -581,6 +648,9 @@ public class ColumnSet {
       else {
         int explicitCount = 0;
         for (IColumn c : m_userSortColumns) {
+          if (c != col) {
+            ((HeaderCell) c.getHeaderCell()).setGroupingActive(false);
+          }
           if (c.isSortExplicit()) {
             explicitCount++;
           }
@@ -590,12 +660,238 @@ public class ColumnSet {
         }
         else {
           setSortColumn(col, ascending, 5);
+          ((HeaderCell) col.getHeaderCell()).setGroupingActive(false);
         }
       }
     }
     finally {
       m_table.setTableChanging(false);
     }
+  }
+
+  /**
+   * Checks if the user may define a grouping column. This depends on the defined permanend head sort columns.
+   * Specifically, for a user group column to make sense, all permanent head sort columns must be both visible and
+   * grouped.
+   */
+  public boolean isUserColumnGroupingAllowed() {
+    for (IColumn<?> col : getPermanentHeadSortColumns()) {
+      if (!(col.isVisible() && col.isGroupingActive())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks for a specific column if it may be grouped.
+   */
+  public boolean isGroupingAllowed(IColumn<?> col) {
+    if (isPermanentTailSortColumn(col)) {
+      //TODO: fko: make sure this is checked everywhere, e.g. in applyGrouping.
+      return false;
+    }
+
+    //all previous head sort cols must be visible and grouped.
+    //col itself must be visible
+    for (IColumn<?> other : getPermanentHeadSortColumns()) {
+      if (other == col) {
+        return col.isVisible();
+      }
+      if (!(other.isVisible() && other.isGroupingActive())) {
+        return false;
+      }
+    }
+
+    //all head sort cols are grouped and visible.
+    return true;
+
+  }
+
+  /**
+   * Handles the case when a column with grouping active becomes invisible. Since grouping is done in the ui only, an
+   * invisible grouped column does not make sense. (Ui only knows visible columns) </br>
+   * Also, if there are other grouped columns, the invisible state would lead to wrong grouping. </br>
+   * This is because firstly, the ui cannot group values it does not see, and </br>
+   * secondly, the implicit remaining sorting would falsify the visible groups. Therefore, both grouping and sorting
+   * must be removed.
+   *
+   * @param col
+   * @return
+   */
+  public void onGroupedColumnInvisible(IColumn<?> col) {
+    m_table.setTableChanging(true);
+    try {
+      if (!isGroupingColumn(col) || (col.isVisible())) {
+        return;
+      }
+      // removes both sorting and grouping:
+      removeGroupColumn(col);
+      m_table.onGroupedColumnInvisible(col);
+    }
+    finally {
+      m_table.setTableChanging(false);
+    }
+
+  }
+
+  public boolean isGroupingColumn(IColumn<?> col) {
+    IColumn rCol = resolveColumn(col);
+    return rCol != null && isSortColumn(rCol) && rCol.isSortExplicit() && rCol.isGroupingActive();
+  }
+
+  public void updateGroupingColumn(IColumn<?> col, boolean ascending) {
+    col = resolveColumn(col);
+    if (!isGroupingColumn(col) || col.isSortPermanent()) {
+      return;
+    }
+
+    HeaderCell cell = (HeaderCell) col.getHeaderCell();
+    cell.setSortAscending(ascending);
+    rebuildHeaderCell(col);
+    fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
+
+  }
+
+  /**
+   * Adds an additional grouping column. This is done by inserting it as a user-sort column just after other grouped
+   * columns, but before other the other user sort columns.
+   *
+   * @param col
+   * @param ascending
+   */
+  public void addGroupingColumn(IColumn<?> col, boolean ascending) {
+    col = resolveColumn(col);
+    if (col == null) {
+      return;
+    }
+
+    if (!isGroupingAllowed(col)) {
+      return;
+    }
+
+    m_userSortColumns.remove(col);
+
+    //find the first correct sort index for this grouping column,
+    //which is the first index that is not grouped
+    int index = 0;
+    for (IColumn<?> column : m_userSortColumns) {
+      if (!column.isGroupingActive()) {
+        break;
+      }
+      index++;
+    }
+
+    if (index == 0) {
+      LOG.warn("Multi grouping event, but no column currently grouped");
+    }
+
+    if (!isSortColumn(col)) {
+      m_userSortColumns.add(index, col);
+      HeaderCell cell = (HeaderCell) col.getHeaderCell();
+      cell.setSortExplicit(true);
+      cell.setSortActive(true);
+      cell.setSortAscending(ascending);
+      cell.setGroupingActive(true);
+      fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
+    }
+
+  }
+
+  /**
+   * Adds column at first position of user sort columns, and marks it as grouped. </br>
+   * Other columns that were previously grouped are un-grouped and will no longer be sorted. </br>
+   * Other sort-columns that were previously sorted will be shifted accordingly, but will still be sorted. </br>
+   *
+   * @param col
+   * @param ascending
+   */
+  public void setGroupingColumn(IColumn<?> col, boolean ascending) {
+    col = resolveColumn(col);
+    if (col == null) {
+      return;
+    }
+
+    m_userSortColumns.remove(col);
+    for (IColumn<?> column : m_userSortColumns) {
+      HeaderCell cell = (HeaderCell) column.getHeaderCell();
+      cell.setGroupingActive(false);
+    }
+
+    if (!isSortColumn(col)) {
+      m_userSortColumns.add(0, col);
+      HeaderCell cell = (HeaderCell) col.getHeaderCell();
+      cell.setSortExplicit(true);
+      cell.setSortActive(true);
+      cell.setSortAscending(ascending);
+      cell.setGroupingActive(true);
+    }
+
+    fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
+
+  }
+
+  public void handleGroupingEvent(IColumn col, boolean multiGroup, boolean ascending) {
+    col = resolveColumn(col);
+    if (col == null) {
+      return;
+    }
+    if (!isGroupingAllowed(col)) {
+      return;
+    }
+    //
+    try {
+      m_table.setTableChanging(true);
+      if (col.isGroupingActive()) {
+        updateGroupingColumn(col, ascending);
+        return;
+      }
+      if (multiGroup) {
+        addGroupingColumn(col, ascending);
+      }
+      else {
+        setGroupingColumn(col, ascending);
+      }
+    }
+    finally {
+      m_table.setTableChanging(false);
+    }
+
+  }
+
+  public void removeGroupColumn(IColumn<?> col) {
+
+    col = resolveColumn(col);
+    if (col == null) {
+      return;
+    }
+
+    if (isPermanentHeadSortColumn(col)) {
+      List<IColumn<?>> toBeRemoved = new ArrayList<>();
+      //must remove all following grouping columns as well.
+      boolean after = false;
+      for (IColumn<?> other : getSortColumns()) {
+        if (other == col) {
+          after = true;
+        }
+        if (after) {
+          ((HeaderCell) other.getHeaderCell()).setGroupingActive(false);
+          toBeRemoved.add(other);
+        }
+      }
+
+      for (IColumn<?> c : toBeRemoved) {
+        removeSortColumn(c);
+      }
+    }
+
+    else {
+      //remove from user cols and set grouped to false;
+      HeaderCell cell = (HeaderCell) col.getHeaderCell();
+      cell.setGroupingActive(false);
+      removeSortColumn(col);
+    }
+
   }
 
   public int getSortColumnCount() {
@@ -618,6 +914,16 @@ public class ColumnSet {
    */
   public List<IColumn<?>> getUserSortColumns() {
     return CollectionUtility.arrayList(m_userSortColumns);
+  }
+
+  public int getGroupedColumnCount() {
+    int result = 0;
+    for (IColumn<?> c : getSortColumns()) {
+      if (c.isGroupingActive()) {
+        result++;
+      }
+    }
+    return result;
   }
 
   /**
@@ -746,17 +1052,20 @@ public class ColumnSet {
           cell.setSortActive(false);
           cell.setSortExplicit(false);
           cell.setSortAscending(false);
+          cell.setGroupingActive(false);
           rebuildHeaderCell(c);
         }
         for (IColumn c : m_userSortColumns) {
           HeaderCell cell = (HeaderCell) c.getHeaderCell();
           cell.setSortExplicit(false);
+          cell.setGroupingActive(false);
           rebuildHeaderCell(c);
         }
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
         cell.setSortActive(true);
         cell.setSortExplicit(true);
         cell.setSortAscending(ascending);
+        cell.setGroupingActive(false);
         m_userSortColumns.add(0, col);
         rebuildHeaderCell(col);
         fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
@@ -783,6 +1092,7 @@ public class ColumnSet {
             cell.setSortActive(false);
             cell.setSortExplicit(false);
             cell.setSortAscending(false);
+            cell.setGroupingActive(false);
             rebuildHeaderCell(c);
           }
         }
@@ -841,6 +1151,7 @@ public class ColumnSet {
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
         cell.setSortActive(false);
         cell.setSortExplicit(false);
+        cell.setGroupingActive(false);
         rebuildHeaderCell(col);
         fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
       }
@@ -865,6 +1176,7 @@ public class ColumnSet {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setSortActive(false);
       cell.setSortExplicit(false);
+      cell.setGroupingActive(false);
     }
     for (IColumn c : userSortColumnsBackup) {
       rebuildHeaderCell(c);
@@ -883,6 +1195,7 @@ public class ColumnSet {
       cell.setSortActive(false);
       cell.setSortExplicit(false);
       cell.setSortPermanent(false);
+      cell.setGroupingActive(false);
     }
     for (IColumn col : currentColumnList) {
       rebuildHeaderCell(col);
@@ -901,6 +1214,7 @@ public class ColumnSet {
       cell.setSortActive(false);
       cell.setSortExplicit(false);
       cell.setSortPermanent(false);
+      cell.setGroupingActive(false);
     }
     for (IColumn col : currentColumnList) {
       rebuildHeaderCell(col);

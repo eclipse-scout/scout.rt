@@ -93,6 +93,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_visibleGranted;
   private int m_initialWidth;
   private boolean m_initialVisible;
+  private boolean m_initialGrouped;
   private int m_initialSortIndex;
   private boolean m_initialSortAscending;
   private boolean m_initialAlwaysIncludeSortAtBegin;
@@ -375,6 +376,18 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Order(130)
   protected String getConfiguredFont() {
     return null;
+  }
+
+  /**
+   * Configures the group-by index of this column A group-by index {@code < 0} means that the column is not considered
+   * for grouping. For a column to be considered for sorting, the sort index must be {@code >=0}.
+   *
+   * @return "Group-By" index of this column
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(135)
+  protected boolean getConfiguredGrouped() {
+    return false;
   }
 
   /**
@@ -823,6 +836,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setInitialSortAscending(getConfiguredSortAscending());
     setInitialAlwaysIncludeSortAtBegin(getConfiguredAlwaysIncludeSortAtBegin());
     setInitialAlwaysIncludeSortAtEnd(getConfiguredAlwaysIncludeSortAtEnd());
+    setInitialGrouped(getConfiguredGrouped());
     setOrder(calculateViewOrder());
     setWidth(getConfiguredWidth());
     setFixedWidth(getConfiguredFixedWidth());
@@ -950,6 +964,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setInitialVisible(boolean b) {
     m_initialVisible = b;
+  }
+
+  @Override
+  public boolean isInitialGrouped() {
+    return m_initialGrouped;
+  }
+
+  @Override
+  public void setInitialGrouped(boolean b) {
+    m_initialGrouped = b;
   }
 
   @Override
@@ -1342,6 +1366,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public boolean isSortPermanent() {
     return getHeaderCell().isSortPermanent();
   }
+
+  @Override
+  public boolean isGroupingActive() {
+    return getHeaderCell().isGroupingActive();
+  }
+
+
 
   @Override
   public int getSortIndex() {
