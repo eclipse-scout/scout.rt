@@ -40,8 +40,24 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     return JsonAdapterPropertyConfigBuilder.defaultConfig();
   }
 
-  public IUiSession getUiSession() {
+  protected IUiSession getUiSession() {
     return m_uiSession;
+  }
+
+  protected boolean isGlobal() {
+    return m_global;
+  }
+
+  protected boolean isDisposeOnChange() {
+    return m_disposeOnChange;
+  }
+
+  protected IFilter<Object> getFilter() {
+    return m_filter;
+  }
+
+  protected Set<IJsonAdapter> getOwnedAdapters() {
+    return m_ownedAdapters;
   }
 
   @Override
@@ -99,8 +115,11 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   }
 
   /**
-   * If the property is a collection: Disposes every old model if the new list does not contain it. If the property is
-   * not a collection: Dispose the old model.
+   * If the new value is a collection:<br>
+   * Disposes every owned old adapter if the new list does not contain it.
+   * <p>
+   * If the new value is <i>not</i> a collection:<br>
+   * Dispose all old owned adapters.
    */
   protected void disposeAdapters(Object newModels) {
     Set<IJsonAdapter> attachedAdapters = new HashSet<IJsonAdapter>(m_ownedAdapters);
@@ -108,20 +127,25 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
       if (newModels instanceof Collection) {
         // Dispose adapter only if's model is not part of the new models
         if (!((Collection) newModels).contains(adapter.getModel())) {
-          adapter.dispose();
-          m_ownedAdapters.remove(adapter);
+          disposeAdapterImpl(adapter);
         }
       }
       else {
-        adapter.dispose();
-        m_ownedAdapters.remove(adapter);
+        disposeAdapterImpl(adapter);
       }
     }
+  }
+
+  /**
+   * Disposes the given adapter and removes it from the set of owned adapters.
+   */
+  protected void disposeAdapterImpl(IJsonAdapter adapter) {
+    adapter.dispose();
+    m_ownedAdapters.remove(adapter);
   }
 
   @Override
   public void attachChildAdapters() {
     createAdapters();
   }
-
 }

@@ -26,11 +26,13 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -64,12 +66,17 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return getModel().isBreadcrumbEnabled();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<OUTLINE>(IOutline.PROP_DEFAULT_DETAIL_FORM, model, getUiSession()) {
+      @Override
+      protected IForm modelValue() {
+        return getModel().getDefaultDetailForm();
+      }
+    });
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putAdapterIdProperty(json, "defaultDetailForm", getModel().getDefaultDetailForm());
     putAdapterIdsProperty(json, "views", m_desktop.getViews(getModel()));
     putAdapterIdsProperty(json, "dialogs", m_desktop.getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", m_desktop.getMessageBoxes(getModel()));
