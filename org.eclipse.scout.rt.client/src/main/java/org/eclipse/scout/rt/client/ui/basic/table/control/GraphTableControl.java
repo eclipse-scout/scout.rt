@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.control;
 
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 
 public class GraphTableControl extends AbstractTableControl implements IGraphTableControl {
 
@@ -28,5 +29,15 @@ public class GraphTableControl extends AbstractTableControl implements IGraphTab
     super.initConfig();
     setTooltipText(TEXTS.get("ui.Network"));
     setIconId(AbstractIcons.Graph);
+  }
+
+  @Override
+  public void setGraphModel(GraphModel graphModel) {
+    propertySupport.setProperty(PROP_GRAPH, graphModel);
+  }
+
+  @Override
+  public GraphModel getGraphModel() {
+    return (GraphModel) propertySupport.getProperty(PROP_GRAPH);
   }
 }

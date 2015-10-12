@@ -16,12 +16,14 @@ public class GraphNode implements Serializable {
   private final GraphNodeSize m_size;
   private final GraphCoordinate m_location;
   private final Long m_order;
+  private final String m_cssClass;
 
-  public GraphNode(String label, String url, GraphShape shape, GraphColor color, GraphNodeSize size, GraphCoordinate location, Long order) {
+  public GraphNode(String label, String url, GraphShape shape, GraphColor color, String cssClass, GraphNodeSize size, GraphCoordinate location, Long order) {
     m_label = label;
     m_url = url;
     m_shape = shape;
     m_color = color;
+    m_cssClass = cssClass;
     m_size = size;
     m_location = location;
     m_order = order;
@@ -53,5 +55,9 @@ public class GraphNode implements Serializable {
 
   public Long getOrder() {
     return m_order;
+  }
+
+  public String getCssClass() {
+    return m_cssClass;
   }
 }
