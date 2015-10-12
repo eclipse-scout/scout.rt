@@ -37,7 +37,7 @@ import org.json.JSONObject;
  *
  * @param <VALUE_FIELD>
  */
-public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends JsonFormField<VALUE_FIELD>implements IJsonContextMenuOwner {
+public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends JsonFormField<VALUE_FIELD> implements IJsonContextMenuOwner {
 
   /**
    * This event is used when display-text has changed after field loses focus or when the display-text has changed while

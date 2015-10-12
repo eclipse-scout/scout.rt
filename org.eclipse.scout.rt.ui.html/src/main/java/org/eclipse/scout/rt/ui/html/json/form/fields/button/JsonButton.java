@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
-public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON>implements IJsonContextMenuOwner {
+public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> implements IJsonContextMenuOwner {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";

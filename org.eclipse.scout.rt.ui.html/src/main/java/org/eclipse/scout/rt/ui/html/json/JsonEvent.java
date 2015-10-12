@@ -34,9 +34,9 @@ public class JsonEvent implements IJsonObject {
    *          Optional reference value, used to clean up events in the JSON response (see
    *          {@link JsonResponse#removeJsonAdapter(String)}. Should be of the same type as the 'target' attribute.
    * @param data
-   *          Event data (or <code>null</code>).
-   *          <b><font color=red>Important:</font></b> Do not use the reserved property names <code>'target'</code> and
-   *          <code>'type'</code> in this object, as they will be overridden by the corresponding first two arguments.
+   *          Event data (or <code>null</code>). <b><font color=red>Important:</font></b> Do not use the reserved
+   *          property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
+   *          the corresponding first two arguments.
    */
   public JsonEvent(String target, String type, String reference, JSONObject data) {
     if (target == null) {
@@ -60,9 +60,9 @@ public class JsonEvent implements IJsonObject {
    * @param type
    *          See {@link JsonEventType} enum for a list of often used event types.
    * @param data
-   *          Event data (or <code>null</code>).
-   *          <b><font color=red>Important:</font></b> Do not use the reserved property names <code>'target'</code> and
-   *          <code>'type'</code> in this object, as they will be overridden by the corresponding first two arguments.
+   *          Event data (or <code>null</code>). <b><font color=red>Important:</font></b> Do not use the reserved
+   *          property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
+   *          the corresponding first two arguments.
    */
   public JsonEvent(String target, String type, JSONObject data) {
     this(target, type, null, data);

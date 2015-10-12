@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonPropertyObserver<CALENDAR>implements IJsonContextMenuOwner {
+public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonPropertyObserver<CALENDAR> implements IJsonContextMenuOwner {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
 

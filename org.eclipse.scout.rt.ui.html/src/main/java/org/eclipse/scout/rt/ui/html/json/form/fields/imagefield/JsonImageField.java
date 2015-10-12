@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD>implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
+public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
 
   public static final String PROP_IMAGE_URL = "imageUrl";
 
