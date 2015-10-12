@@ -16,11 +16,10 @@ import java.math.BigDecimal;
  *
  */
 public interface IChartUIFacade {
-	/**
-	 * position for all axes in IChartBean.getAxes() ordered in same order like
-	 * axes.
-	 *
-	 * @param axisPosition
-	 */
-	public void fireUIValueClicked(int[] axesPosition, BigDecimal value);
+  /**
+   * position for all axes in IChartBean.getAxes() ordered in same order like axes.
+   *
+   * @param axisPosition
+   */
+  public void fireUIValueClicked(int[] axesPosition, BigDecimal value);
 }
