@@ -1,6 +1,5 @@
 .table-header-menu {
   position: absolute;
-  z-index: 1;
   width: 225px;
   background-color: @table-header-menu-background-color;
   padding-bottom: 5px;

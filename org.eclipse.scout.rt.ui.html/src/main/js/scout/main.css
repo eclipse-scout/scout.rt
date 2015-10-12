@@ -281,6 +281,7 @@ a,
 .scout > .form-tool-popup,
 .scout > .smart-field-popup,
 .scout > .date-picker-popup,
+.scout > .table-header-menu,
 .scout > .notifications {
   z-index: 0;
 }
