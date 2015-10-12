@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
  * Column holding Number
  */
 @ClassId("6b77a24f-8685-4023-b353-cbbe7d4bf22a")
-public abstract class AbstractNumberColumn<NUMBER extends Number> extends AbstractColumn<NUMBER>implements INumberColumn<NUMBER> {
+public abstract class AbstractNumberColumn<NUMBER extends Number> extends AbstractColumn<NUMBER> implements INumberColumn<NUMBER> {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
   private boolean m_validateOnAnyKey;
@@ -272,7 +272,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     return (value != null) ? getFormat().format(value) : "";
   }
 
-  protected static class LocalNumberColumnExtension<NUMBER extends Number, OWNER extends AbstractNumberColumn<NUMBER>> extends LocalColumnExtension<NUMBER, OWNER>implements INumberColumnExtension<NUMBER, OWNER> {
+  protected static class LocalNumberColumnExtension<NUMBER extends Number, OWNER extends AbstractNumberColumn<NUMBER>> extends LocalColumnExtension<NUMBER, OWNER> implements INumberColumnExtension<NUMBER, OWNER> {
 
     public LocalNumberColumnExtension(OWNER owner) {
       super(owner);

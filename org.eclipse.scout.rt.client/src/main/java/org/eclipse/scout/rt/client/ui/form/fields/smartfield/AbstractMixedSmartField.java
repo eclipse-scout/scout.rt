@@ -56,7 +56,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
  * @param <LOOKUP_KEY>
  */
 @ScoutSdkIgnore
-public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY>implements IMixedSmartField<VALUE, LOOKUP_KEY> {
+public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
 

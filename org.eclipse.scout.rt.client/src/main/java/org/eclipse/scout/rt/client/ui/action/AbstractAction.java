@@ -724,7 +724,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER>implements IActionExtension<OWNER> {
+  protected static class LocalActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER> implements IActionExtension<OWNER> {
 
     public LocalActionExtension(OWNER owner) {
       super(owner);

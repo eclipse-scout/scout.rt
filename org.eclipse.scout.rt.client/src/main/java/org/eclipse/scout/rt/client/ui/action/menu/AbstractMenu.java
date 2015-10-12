@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-public abstract class AbstractMenu extends AbstractActionNode<IMenu>implements IMenu {
+public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMenu.class);
 
   private Object m_ownerValue;
@@ -244,7 +244,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu>implements I
     chain.execOwnerValueChanged(newOwnerValue);
   }
 
-  protected static class LocalMenuExtension<OWNER extends AbstractMenu> extends LocalActionNodeExtension<IMenu, OWNER>implements IMenuExtension<OWNER> {
+  protected static class LocalMenuExtension<OWNER extends AbstractMenu> extends LocalActionNodeExtension<IMenu, OWNER> implements IMenuExtension<OWNER> {
 
     public LocalMenuExtension(OWNER owner) {
       super(owner);

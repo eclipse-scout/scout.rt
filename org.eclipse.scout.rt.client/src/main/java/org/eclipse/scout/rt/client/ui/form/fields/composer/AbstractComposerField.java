@@ -942,7 +942,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return chain.execCreateEntityNode(parentNode, e, negated, values, texts);
   }
 
-  protected static class LocalComposerFieldExtension<OWNER extends AbstractComposerField> extends LocalFormFieldExtension<OWNER>implements IComposerFieldExtension<OWNER> {
+  protected static class LocalComposerFieldExtension<OWNER extends AbstractComposerField> extends LocalFormFieldExtension<OWNER> implements IComposerFieldExtension<OWNER> {
 
     public LocalComposerFieldExtension(OWNER owner) {
       super(owner);

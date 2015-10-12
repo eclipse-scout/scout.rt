@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 
-public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends AbstractTreeNodeExtension<OWNER>implements IPageExtension<OWNER> {
+public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends AbstractTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
 
   public AbstractPageExtension(OWNER owner) {
     super(owner);

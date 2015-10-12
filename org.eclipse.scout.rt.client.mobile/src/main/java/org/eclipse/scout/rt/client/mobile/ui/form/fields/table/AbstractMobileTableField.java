@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 /**
  * @since 3.9.0
  */
-public abstract class AbstractMobileTableField<T extends ITable> extends AbstractTableField<T>implements IMobileTableField<T> {
+public abstract class AbstractMobileTableField<T extends ITable> extends AbstractTableField<T> implements IMobileTableField<T> {
 
   @Override
   protected void initConfig() {

@@ -4803,7 +4803,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE>implements ITableExtension<TABLE> {
+  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE> implements ITableExtension<TABLE> {
 
     public LocalTableExtension(TABLE owner) {
       super(owner);

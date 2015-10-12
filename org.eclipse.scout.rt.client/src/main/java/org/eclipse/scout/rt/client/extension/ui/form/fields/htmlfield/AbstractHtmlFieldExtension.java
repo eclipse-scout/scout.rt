@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldEx
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 
-public abstract class AbstractHtmlFieldExtension<OWNER extends AbstractHtmlField> extends AbstractValueFieldExtension<String, OWNER>implements IHtmlFieldExtension<OWNER> {
+public abstract class AbstractHtmlFieldExtension<OWNER extends AbstractHtmlField> extends AbstractValueFieldExtension<String, OWNER> implements IHtmlFieldExtension<OWNER> {
 
   public AbstractHtmlFieldExtension(OWNER owner) {
     super(owner);

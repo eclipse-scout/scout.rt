@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 /**
  * @since 3.9.0
  */
-public class SmartColumnField<T> extends AbstractSmartField<T>implements IColumnWrapper<ISmartColumn<T>> {
+public class SmartColumnField<T> extends AbstractSmartField<T> implements IColumnWrapper<ISmartColumn<T>> {
   private SmartColumnFieldPropertyDelegator<T> m_propertyDelegator;
 
   public SmartColumnField(ISmartColumn<T> column) {

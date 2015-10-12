@@ -34,7 +34,7 @@ public abstract class AbstractKeyStroke extends AbstractAction implements IKeySt
     return getClass().getSimpleName() + "[key=" + getKeyStroke() + "]";
   }
 
-  protected static class LocalKeyStrokeExtension<OWNER extends AbstractKeyStroke> extends LocalActionExtension<OWNER>implements IKeyStrokeExtension<OWNER> {
+  protected static class LocalKeyStrokeExtension<OWNER extends AbstractKeyStroke> extends LocalActionExtension<OWNER> implements IKeyStrokeExtension<OWNER> {
 
     public LocalKeyStrokeExtension(OWNER owner) {
       super(owner);

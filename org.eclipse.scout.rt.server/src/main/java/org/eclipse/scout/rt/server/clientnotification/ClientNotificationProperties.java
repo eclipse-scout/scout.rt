@@ -71,8 +71,7 @@ public class ClientNotificationProperties {
 
   /**
    * If no message is consumed for a certain amount of time, notification queues are removed to avoid overflows and
-   * unnecessary memory consumption. This may happen, if a node does not properly unregister (e.g. due to a crash).
-   * <br>
+   * unnecessary memory consumption. This may happen, if a node does not properly unregister (e.g. due to a crash). <br>
    * This timeout in milliseconds specifies the amount of time in milliseconds waited, until a queue (with possibly
    * pending notifications) is removed, if notifications are not consumed.
    */

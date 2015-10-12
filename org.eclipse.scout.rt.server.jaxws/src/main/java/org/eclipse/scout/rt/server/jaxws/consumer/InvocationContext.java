@@ -154,8 +154,8 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets the connect timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
-   * expires before the connection can be established, the request is aborted. Use <code>null</code> to specify
-   * an infinite timeout.
+   * expires before the connection can be established, the request is aborted. Use <code>null</code> to specify an
+   * infinite timeout.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
@@ -165,9 +165,9 @@ public class InvocationContext<PORT> {
   }
 
   /**
-   * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
-   * expires before there is data available for read, the request is aborted. Use <code>null</code> to specify an
-   * infinite timeout.
+   * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout expires
+   * before there is data available for read, the request is aborted. Use <code>null</code> to specify an infinite
+   * timeout.
    *
    * @return <code>this</code> in order to support for method chaining.
    */

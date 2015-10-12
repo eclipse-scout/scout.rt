@@ -24,5 +24,5 @@ public @interface Data {
   /**
    * @return Specifies the DTO class
    */
-  Class<?>value() default Object.class;
+  Class<?> value() default Object.class;
 }

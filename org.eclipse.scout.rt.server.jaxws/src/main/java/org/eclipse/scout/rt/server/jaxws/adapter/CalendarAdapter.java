@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  * loosing the local time. If the UTC (Zulu-time) is sufficent, use {@link UtcDateAdapter} instead.
  * </p>
  * <p>
- * The {@link String} provided must correspond to the <code>xsd:dateTime</code> format defined on <a
- * href="http://www.w3.org/TR/xmlschema-2/#dateTime">http://www.w3.org/TR/xmlschema-2/#dateTime</a>. The format was
+ * The {@link String} provided must correspond to the <code>xsd:dateTime</code> format defined on
+ * <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">http://www.w3.org/TR/xmlschema-2/#dateTime</a>. The format was
  * inspired by [ISO 8601] but with timezone information included, because in [ISO 8601], a time is only represented as
  * local time or in relation to UTC (Zulu time).
  * </p>
@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 public final class CalendarAdapter extends XmlAdapter<String, Calendar> {
 
   protected static final DatatypeFactory FACTORY;
+
   static {
     try {
       FACTORY = DatatypeFactory.newInstance();

@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
  * custom form.<br>
  * The default outline table form makes use of this field.
  */
-public abstract class AbstractOutlineTableField extends AbstractTableField<ITable>implements IOutlineTableField {
+public abstract class AbstractOutlineTableField extends AbstractTableField<ITable> implements IOutlineTableField {
   private DesktopListener m_desktopListener;
   private PropertyChangeListener m_tablePropertyListener;
 
@@ -102,7 +102,7 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
     chain.execTableTitleChanged();
   }
 
-  protected static class LocalOutlineTableFieldExtension<OWNER extends AbstractOutlineTableField> extends LocalTableFieldExtension<ITable, OWNER>implements IOutlineTableFieldExtension<OWNER> {
+  protected static class LocalOutlineTableFieldExtension<OWNER extends AbstractOutlineTableField> extends LocalTableFieldExtension<ITable, OWNER> implements IOutlineTableFieldExtension<OWNER> {
 
     public LocalOutlineTableFieldExtension(OWNER owner) {
       super(owner);

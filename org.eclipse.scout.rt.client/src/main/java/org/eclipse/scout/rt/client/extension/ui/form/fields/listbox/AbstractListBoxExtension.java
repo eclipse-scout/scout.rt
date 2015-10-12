@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public abstract class AbstractListBoxExtension<KEY, OWNER extends AbstractListBox<KEY>> extends AbstractValueFieldExtension<Set<KEY>, OWNER>implements IListBoxExtension<KEY, OWNER> {
+public abstract class AbstractListBoxExtension<KEY, OWNER extends AbstractListBox<KEY>> extends AbstractValueFieldExtension<Set<KEY>, OWNER> implements IListBoxExtension<KEY, OWNER> {
 
   public AbstractListBoxExtension(OWNER owner) {
     super(owner);

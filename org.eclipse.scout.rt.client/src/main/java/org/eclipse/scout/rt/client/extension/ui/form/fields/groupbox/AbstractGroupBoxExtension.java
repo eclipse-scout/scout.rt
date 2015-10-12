@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 /**
  *
  */
-public abstract class AbstractGroupBoxExtension<OWNER extends AbstractGroupBox> extends AbstractCompositeFieldExtension<OWNER>implements IGroupBoxExtension<OWNER> {
+public abstract class AbstractGroupBoxExtension<OWNER extends AbstractGroupBox> extends AbstractCompositeFieldExtension<OWNER> implements IGroupBoxExtension<OWNER> {
 
   /**
    * @param owner

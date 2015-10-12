@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE>implements ICodeRow<ID_TYPE> {
+public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
 
   private String m_extKey;

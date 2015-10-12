@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.util.DateFormatProvider;
  * Column holding Date
  */
 @ClassId("9185f9ed-3dc2-459b-b06b-f39c6c6fed2e")
-public abstract class AbstractDateColumn extends AbstractColumn<Date>implements IDateColumn {
+public abstract class AbstractDateColumn extends AbstractColumn<Date> implements IDateColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
   private String m_format;
@@ -235,7 +235,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date>implements 
     return df;
   }
 
-  protected static class LocalDateColumnExtension<OWNER extends AbstractDateColumn> extends LocalColumnExtension<Date, OWNER>implements IDateColumnExtension<OWNER> {
+  protected static class LocalDateColumnExtension<OWNER extends AbstractDateColumn> extends LocalColumnExtension<Date, OWNER> implements IDateColumnExtension<OWNER> {
 
     public LocalDateColumnExtension(OWNER owner) {
       super(owner);

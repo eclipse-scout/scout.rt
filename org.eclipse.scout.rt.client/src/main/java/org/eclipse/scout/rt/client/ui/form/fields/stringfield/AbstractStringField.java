@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
-public abstract class AbstractStringField extends AbstractBasicField<String>implements IStringField {
+public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;

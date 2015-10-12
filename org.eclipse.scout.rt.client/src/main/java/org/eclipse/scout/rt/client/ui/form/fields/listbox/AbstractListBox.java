@@ -78,7 +78,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("3dc8747d-19eb-4c0a-b5fc-c3dc2ad0783d")
-public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>>implements IListBox<KEY> {
+public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> implements IListBox<KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
 
   private ITable m_table;
@@ -1081,7 +1081,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>>i
     chain.execPrepareLookup(call);
   }
 
-  protected static class LocalListBoxExtension<KEY, OWNER extends AbstractListBox<KEY>> extends LocalValueFieldExtension<Set<KEY>, OWNER>implements IListBoxExtension<KEY, OWNER> {
+  protected static class LocalListBoxExtension<KEY, OWNER extends AbstractListBox<KEY>> extends LocalValueFieldExtension<Set<KEY>, OWNER> implements IListBoxExtension<KEY, OWNER> {
 
     public LocalListBoxExtension(OWNER owner) {
       super(owner);

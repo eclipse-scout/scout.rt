@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 /**
  *
  */
-public abstract class AbstractCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER>implements ICodeExtension<T, OWNER> {
+public abstract class AbstractCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER> implements ICodeExtension<T, OWNER> {
   private static final long serialVersionUID = 1L;
 
   /**

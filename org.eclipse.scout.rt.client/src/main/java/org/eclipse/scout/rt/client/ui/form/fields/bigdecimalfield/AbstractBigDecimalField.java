@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalFi
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("68508a2e-690c-46e2-aa78-062e1504c0ac")
-public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDecimal>implements IBigDecimalField {
+public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDecimal> implements IBigDecimalField {
   private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
   private static final BigDecimal DEFAULT_MAX_VALUE = new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
 
@@ -70,7 +70,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
     return parseToBigDecimalInternal(text);
   }
 
-  protected static class LocalBigDecimalFieldExtension<OWNER extends AbstractBigDecimalField> extends LocalDecimalFieldExtension<BigDecimal, OWNER>implements IBigDecimalFieldExtension<OWNER> {
+  protected static class LocalBigDecimalFieldExtension<OWNER extends AbstractBigDecimalField> extends LocalDecimalFieldExtension<BigDecimal, OWNER> implements IBigDecimalFieldExtension<OWNER> {
 
     public LocalBigDecimalFieldExtension(OWNER owner) {
       super(owner);

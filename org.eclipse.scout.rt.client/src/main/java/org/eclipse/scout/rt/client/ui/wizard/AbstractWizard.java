@@ -1297,7 +1297,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER>implements IWizardExtension<OWNER> {
+  protected static class LocalWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER> implements IWizardExtension<OWNER> {
 
     public LocalWizardExtension(OWNER owner) {
       super(owner);

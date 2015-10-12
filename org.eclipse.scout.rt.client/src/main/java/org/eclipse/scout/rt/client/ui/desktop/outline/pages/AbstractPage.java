@@ -866,7 +866,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     chain.execInitDetailForm();
   }
 
-  protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER>implements IPageExtension<OWNER> {
+  protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
 
     public LocalPageExtension(OWNER owner) {
       super(owner);

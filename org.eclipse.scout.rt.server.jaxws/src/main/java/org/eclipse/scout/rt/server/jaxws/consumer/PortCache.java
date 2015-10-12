@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
- * LRU-Cache for webservice Ports to be reused across multiple webservice calls. This cache improves performance
- * because Port creation is an expensive operation due to WSDL/schema validation.<br/>
+ * LRU-Cache for webservice Ports to be reused across multiple webservice calls. This cache improves performance because
+ * Port creation is an expensive operation due to WSDL/schema validation.<br/>
  * This cache is based on a 'corePoolSize', meaning that that number of Ports is created on a preemptively basis. If
  * more Ports than that number is required, they are are created on demand and additionally added to the cache until
  * expired, which is useful at a high load.

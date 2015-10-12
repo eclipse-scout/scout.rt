@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
 
-public abstract class AbstractRichTextField extends AbstractBasicField<String>implements IRichTextField {
+public abstract class AbstractRichTextField extends AbstractBasicField<String> implements IRichTextField {
   private IBasicFieldUIFacade m_uiFacade;
 
   public AbstractRichTextField() {

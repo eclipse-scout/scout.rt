@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * This field is similar to the smart field but also allows custom text. A proposal field is always of the value type
  * {@link String}. The proposals are delivered as lookup rows of any type.
  */
-public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY>implements IProposalField<LOOKUP_KEY> {
+public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY> implements IProposalField<LOOKUP_KEY> {
 
   private IContentAssistFieldUIFacade m_uiFacade;
 
@@ -156,7 +156,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
   }
 
-  protected static class LocalProposalFieldExtension<LOOKUP_KEY, OWNER extends AbstractProposalField<LOOKUP_KEY>> extends LocalContentAssistFieldExtension<String, LOOKUP_KEY, OWNER>implements IProposalFieldExtension<LOOKUP_KEY, OWNER> {
+  protected static class LocalProposalFieldExtension<LOOKUP_KEY, OWNER extends AbstractProposalField<LOOKUP_KEY>> extends LocalContentAssistFieldExtension<String, LOOKUP_KEY, OWNER> implements IProposalFieldExtension<LOOKUP_KEY, OWNER> {
 
     public LocalProposalFieldExtension(OWNER owner) {
       super(owner);

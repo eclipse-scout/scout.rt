@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 
-public abstract class AbstractTabBoxExtension<OWNER extends AbstractTabBox> extends AbstractCompositeFieldExtension<OWNER>implements ITabBoxExtension<OWNER> {
+public abstract class AbstractTabBoxExtension<OWNER extends AbstractTabBox> extends AbstractCompositeFieldExtension<OWNER> implements ITabBoxExtension<OWNER> {
 
   public AbstractTabBoxExtension(OWNER owner) {
     super(owner);

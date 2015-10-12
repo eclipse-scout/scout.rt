@@ -40,8 +40,7 @@ public class CodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypeClasses(java.lang.String)}
-   * .
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypeClasses(java.lang.String)} .
    */
   @Test
   public void testGetAllCodeTypeClasses() {
@@ -59,8 +58,7 @@ public class CodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypes(java.lang.String)}
-   * .
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypes(java.lang.String)} .
    */
   @Test
   public void testGetAllCodeTypesString() {
@@ -80,8 +78,7 @@ public class CodeServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getCodeType(java.lang.Class)}.
+   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getCodeType(java.lang.Class)}.
    */
   @Test
   public void testGetCodeTypeClass() {
@@ -98,8 +95,7 @@ public class CodeServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getCodeTypes(List)}.
+   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getCodeTypes(List)}.
    */
   @Test
   public void testGetCodeTypesList() {
@@ -136,8 +132,7 @@ public class CodeServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeType(Class)}.
+   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeType(Class)}.
    *
    * @throws Exception
    */
@@ -160,8 +155,7 @@ public class CodeServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeTypes(List)}.
+   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeTypes(List)}.
    *
    * @throws Exception
    */
@@ -191,8 +185,7 @@ public class CodeServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#findCodeTypeById(Object)} .
+   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#findCodeTypeById(Object)} .
    *
    * @throws Exception
    */

@@ -621,7 +621,7 @@ public class StatementProcessor implements IStatementProcessor {
     ISqlStyle sqlStyle = m_callerService.getSqlStyle();
     for (IBindInput in : m_inputList) {
       SqlBind bind = in.produceSqlBindAndSetReplaceToken(sqlStyle);
-      assert(bind != null) == in.isJdbcBind(sqlStyle);
+      assert (bind != null) == in.isJdbcBind(sqlStyle);
       if (bind != null) {
         m_currentInputBindMap.put(in.getJdbcBindIndex(), bind);
       }

@@ -63,7 +63,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  * same time. In an AbstractRadioButtonGroup only 1 RadioButton can be selected at a time.
  */
 @ClassId("20dd4412-e677-4996-afcc-13c43b9dcae8")
-public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T>implements IRadioButtonGroup<T>, ICompositeField {
+public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T>, ICompositeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRadioButtonGroup.class);
 
   private boolean m_valueAndSelectionMediatorActive;
@@ -655,7 +655,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T>i
     chain.execFilterLookupResult(call, result);
   }
 
-  protected static class LocalRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends LocalValueFieldExtension<T, OWNER>implements IRadioButtonGroupExtension<T, OWNER> {
+  protected static class LocalRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends LocalValueFieldExtension<T, OWNER> implements IRadioButtonGroupExtension<T, OWNER> {
 
     public LocalRadioButtonGroupExtension(OWNER owner) {
       super(owner);

@@ -1923,7 +1923,7 @@ public final class TypeCastUtility {
     return result;
   }
 
-  private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector, boolean debugEnabled) {
+  private boolean/* foundStopType */ visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector, boolean debugEnabled) {
     if (loopDetector.contains(type)) {
       return false;
     }

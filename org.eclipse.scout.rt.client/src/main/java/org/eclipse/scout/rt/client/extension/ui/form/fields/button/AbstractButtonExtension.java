@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonSelectionChangedChain;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 
-public abstract class AbstractButtonExtension<OWNER extends AbstractButton> extends AbstractFormFieldExtension<OWNER>implements IButtonExtension<OWNER> {
+public abstract class AbstractButtonExtension<OWNER extends AbstractButton> extends AbstractFormFieldExtension<OWNER> implements IButtonExtension<OWNER> {
 
   public AbstractButtonExtension(OWNER owner) {
     super(owner);

@@ -207,7 +207,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     chain.execPopulateResources();
   }
 
-  protected static class LocalPlannerFieldExtension<P extends IPlanner<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<P, RI, AI>> extends LocalFormFieldExtension<OWNER>implements IPlannerFieldExtension<P, RI, AI, OWNER> {
+  protected static class LocalPlannerFieldExtension<P extends IPlanner<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<P, RI, AI>> extends LocalFormFieldExtension<OWNER> implements IPlannerFieldExtension<P, RI, AI, OWNER> {
 
     public LocalPlannerFieldExtension(OWNER owner) {
       super(owner);

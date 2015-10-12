@@ -186,7 +186,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     }
   } // end UIFacade
 
-  protected static class LocalSplitBoxExtension<OWNER extends AbstractSplitBox> extends LocalCompositeFieldExtension<OWNER>implements ISplitBoxExtension<OWNER> {
+  protected static class LocalSplitBoxExtension<OWNER extends AbstractSplitBox> extends LocalCompositeFieldExtension<OWNER> implements ISplitBoxExtension<OWNER> {
 
     public LocalSplitBoxExtension(OWNER owner) {
       super(owner);

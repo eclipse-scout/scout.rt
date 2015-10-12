@@ -237,7 +237,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     chain.execAppLinkAction(ref);
   }
 
-  protected static class LocalSvgFieldExtension<OWNER extends AbstractSvgField> extends LocalFormFieldExtension<OWNER>implements ISvgFieldExtension<OWNER> {
+  protected static class LocalSvgFieldExtension<OWNER extends AbstractSvgField> extends LocalFormFieldExtension<OWNER> implements ISvgFieldExtension<OWNER> {
 
     public LocalSvgFieldExtension(OWNER owner) {
       super(owner);

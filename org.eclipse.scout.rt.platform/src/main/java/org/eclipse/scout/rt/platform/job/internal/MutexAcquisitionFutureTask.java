@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.annotations.Internal;
  * @since 5.1
  */
 @Internal
-public abstract class MutexAcquisitionFutureTask extends FutureTask<Void>implements IMutexTask<Void>, IRejectable {
+public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implements IMutexTask<Void>, IRejectable {
 
   private final Object m_mutexObject;
   private volatile boolean m_awaitMutex;

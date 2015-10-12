@@ -3075,7 +3075,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM>implements IFormExtension<FORM> {
+  protected static class LocalFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM> implements IFormExtension<FORM> {
 
     /**
      * @param owner

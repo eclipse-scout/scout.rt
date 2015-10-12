@@ -1372,8 +1372,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     return getHeaderCell().isGroupingActive();
   }
 
-
-
   @Override
   public int getSortIndex() {
     ITable table = getTable();
@@ -1924,7 +1922,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends AbstractExtension<OWNER>implements IColumnExtension<VALUE, OWNER> {
+  protected static class LocalColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends AbstractExtension<OWNER> implements IColumnExtension<VALUE, OWNER> {
 
     public LocalColumnExtension(OWNER owner) {
       super(owner);

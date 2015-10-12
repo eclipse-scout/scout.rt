@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
  * @see LookupCall
  */
 @ClassId("bf3702b8-ee95-4c7b-870d-105b9d0deec2")
-public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID>implements Serializable {
+public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements Serializable {
   private static final long serialVersionUID = 0L;
 
   /**

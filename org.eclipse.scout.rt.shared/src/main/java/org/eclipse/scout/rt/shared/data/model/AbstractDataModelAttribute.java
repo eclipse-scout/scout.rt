@@ -774,7 +774,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER>implements IDataModelAttributeExtension<OWNER> {
+  protected static class LocalDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER> implements IDataModelAttributeExtension<OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalDataModelAttributeExtension(OWNER owner) {

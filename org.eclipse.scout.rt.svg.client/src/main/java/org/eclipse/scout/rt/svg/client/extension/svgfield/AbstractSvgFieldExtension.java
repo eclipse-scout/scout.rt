@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFiel
 import org.eclipse.scout.rt.svg.client.svgfield.AbstractSvgField;
 import org.eclipse.scout.rt.svg.client.svgfield.SvgFieldEvent;
 
-public abstract class AbstractSvgFieldExtension<OWNER extends AbstractSvgField> extends AbstractFormFieldExtension<OWNER>implements ISvgFieldExtension<OWNER> {
+public abstract class AbstractSvgFieldExtension<OWNER extends AbstractSvgField> extends AbstractFormFieldExtension<OWNER> implements ISvgFieldExtension<OWNER> {
 
   public AbstractSvgFieldExtension(OWNER owner) {
     super(owner);

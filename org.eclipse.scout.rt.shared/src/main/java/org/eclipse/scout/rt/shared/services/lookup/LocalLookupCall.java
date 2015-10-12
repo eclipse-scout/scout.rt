@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  */
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
+
   public LocalLookupCall() {
   }
 

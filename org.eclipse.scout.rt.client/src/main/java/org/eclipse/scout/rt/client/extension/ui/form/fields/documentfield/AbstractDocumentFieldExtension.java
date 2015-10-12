@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.Docume
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
-public abstract class AbstractDocumentFieldExtension<OWNER extends AbstractDocumentField> extends AbstractValueFieldExtension<RemoteFile, OWNER>implements IDocumentFieldExtension<OWNER> {
+public abstract class AbstractDocumentFieldExtension<OWNER extends AbstractDocumentField> extends AbstractValueFieldExtension<RemoteFile, OWNER> implements IDocumentFieldExtension<OWNER> {
 
   public AbstractDocumentFieldExtension(OWNER owner) {
     super(owner);

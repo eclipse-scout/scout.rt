@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
  * Column holding Decimal number
  */
 @ClassId("961989bf-d585-40a2-ab9f-b7e545baaac9")
-public abstract class AbstractDecimalColumn<NUMBER extends Number> extends AbstractNumberColumn<NUMBER>implements IDecimalColumn<NUMBER> {
+public abstract class AbstractDecimalColumn<NUMBER extends Number> extends AbstractNumberColumn<NUMBER> implements IDecimalColumn<NUMBER> {
 
   public AbstractDecimalColumn() {
     super();
@@ -221,7 +221,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
     f.setFractionDigits(getFractionDigits());
   }
 
-  protected static class LocalDecimalColumnExtension<NUMBER extends Number, OWNER extends AbstractDecimalColumn<NUMBER>> extends LocalNumberColumnExtension<NUMBER, OWNER>implements IDecimalColumnExtension<NUMBER, OWNER> {
+  protected static class LocalDecimalColumnExtension<NUMBER extends Number, OWNER extends AbstractDecimalColumn<NUMBER>> extends LocalNumberColumnExtension<NUMBER, OWNER> implements IDecimalColumnExtension<NUMBER, OWNER> {
 
     public LocalDecimalColumnExtension(OWNER owner) {
       super(owner);

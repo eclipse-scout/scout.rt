@@ -69,9 +69,9 @@ public class MutexSemaphores {
     try {
       final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(task.getMutexObject());
       if (mutexSemaphore != null) {
-          return mutexSemaphore.isMutexOwner(task);
-        }
-        return false;
+        return mutexSemaphore.isMutexOwner(task);
+      }
+      return false;
     }
     finally {
       m_readLock.unlock();
@@ -105,10 +105,10 @@ public class MutexSemaphores {
     Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
 
     if (m_executor.isShutdown()) {
-        task.cancel(true);
-        return false;
-      }
-    
+      task.cancel(true);
+      return false;
+    }
+
     m_writeLock.lock();
     try {
       if (m_executor.isShutdown()) {

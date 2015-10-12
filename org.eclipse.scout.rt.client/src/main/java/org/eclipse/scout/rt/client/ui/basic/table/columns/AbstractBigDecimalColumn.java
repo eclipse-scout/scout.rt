@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDec
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
 
 @ClassId("cf4984e1-7ec9-4442-a9d8-23145b0e1614")
-public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<BigDecimal>implements IBigDecimalColumn {
+public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<BigDecimal> implements IBigDecimalColumn {
 
   public AbstractBigDecimalColumn() {
     super();
@@ -72,7 +72,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
     };
   }
 
-  protected static class LocalBigDecimalColumnExtension<OWNER extends AbstractBigDecimalColumn> extends LocalDecimalColumnExtension<BigDecimal, OWNER>implements IBigDecimalColumnExtension<OWNER> {
+  protected static class LocalBigDecimalColumnExtension<OWNER extends AbstractBigDecimalColumn> extends LocalDecimalColumnExtension<BigDecimal, OWNER> implements IBigDecimalColumnExtension<OWNER> {
 
     public LocalBigDecimalColumnExtension(OWNER owner) {
       super(owner);

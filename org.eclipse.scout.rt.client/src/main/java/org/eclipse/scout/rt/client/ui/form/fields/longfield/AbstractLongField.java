@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("cfc961a1-195f-491d-94c5-762f9d86efee")
-public abstract class AbstractLongField extends AbstractNumberField<Long>implements ILongField {
+public abstract class AbstractLongField extends AbstractNumberField<Long> implements ILongField {
   public AbstractLongField() {
     this(true);
   }
@@ -80,7 +80,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long>impleme
     return retVal;
   }
 
-  protected static class LocalLongFieldExtension<OWNER extends AbstractLongField> extends LocalNumberFieldExtension<Long, OWNER>implements ILongFieldExtension<OWNER> {
+  protected static class LocalLongFieldExtension<OWNER extends AbstractLongField> extends LocalNumberFieldExtension<Long, OWNER> implements ILongFieldExtension<OWNER> {
 
     public LocalLongFieldExtension(OWNER owner) {
       super(owner);

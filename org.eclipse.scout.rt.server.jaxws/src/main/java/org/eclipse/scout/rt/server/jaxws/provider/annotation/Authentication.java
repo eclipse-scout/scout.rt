@@ -54,17 +54,20 @@ public @interface Authentication {
    * Indicates the authentication method to be used to challenge the client to provide credentials. By default,
    * {@link BasicAuthenticationMethod} is used.
    */
-  Clazz method() default @Clazz(value = BasicAuthenticationMethod.class);
+  Clazz method() default @Clazz(value = BasicAuthenticationMethod.class)
+  ;
 
   /**
    * Indicates against which data source credentials are to be validated. By default, {@link ConfigFileAuthenticator} is
    * used.
    */
-  Clazz authenticator() default @Clazz(value = ConfigFileAuthenticator.class);
+  Clazz authenticator() default @Clazz(value = ConfigFileAuthenticator.class)
+  ;
 
   /**
-   * Indicates which {@link ServerRunContextProvider} to use to run authenticated requests. By
-   * default, {@link ServerRunContextProvider} is used which is based on a LRU cache to provide a {@link IServerSession}
+   * Indicates which {@link ServerRunContextProvider} to use to run authenticated requests. By default,
+   * {@link ServerRunContextProvider} is used which is based on a LRU cache to provide a {@link IServerSession}
    */
-  Clazz runContextProvider() default @Clazz(value = ServerRunContextProvider.class);
+  Clazz runContextProvider() default @Clazz(value = ServerRunContextProvider.class)
+  ;
 }

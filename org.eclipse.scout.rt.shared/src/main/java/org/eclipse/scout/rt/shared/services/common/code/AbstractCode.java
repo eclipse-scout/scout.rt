@@ -561,7 +561,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER>implements ICodeExtension<T, OWNER> {
+  protected static class LocalCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER> implements ICodeExtension<T, OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalCodeExtension(OWNER owner) {

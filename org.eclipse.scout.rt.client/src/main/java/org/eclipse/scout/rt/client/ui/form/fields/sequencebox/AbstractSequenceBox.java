@@ -467,7 +467,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return chain.execCreateLabelSuffix();
   }
 
-  protected static class LocalSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends LocalCompositeFieldExtension<OWNER>implements ISequenceBoxExtension<OWNER> {
+  protected static class LocalSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends LocalCompositeFieldExtension<OWNER> implements ISequenceBoxExtension<OWNER> {
 
     public LocalSequenceBoxExtension(OWNER owner) {
       super(owner);

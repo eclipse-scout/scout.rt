@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 
-public abstract class AbstractSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends AbstractCompositeFieldExtension<OWNER>implements ISequenceBoxExtension<OWNER> {
+public abstract class AbstractSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends AbstractCompositeFieldExtension<OWNER> implements ISequenceBoxExtension<OWNER> {
 
   public AbstractSequenceBoxExtension(OWNER owner) {
     super(owner);

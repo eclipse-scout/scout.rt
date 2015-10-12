@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 /**
  *
  */
-public abstract class AbstractDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER>implements IDataModelAttributeExtension<OWNER> {
+public abstract class AbstractDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER> implements IDataModelAttributeExtension<OWNER> {
   private static final long serialVersionUID = 1L;
 
   public AbstractDataModelAttributeExtension(OWNER owner) {

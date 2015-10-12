@@ -566,7 +566,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends AbstractExtension<OWNER>implements IWizardStepExtension<FORM, OWNER> {
+  protected static class LocalWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends AbstractExtension<OWNER> implements IWizardStepExtension<FORM, OWNER> {
 
     public LocalWizardStepExtension(OWNER owner) {
       super(owner);

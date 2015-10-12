@@ -29,7 +29,7 @@ public abstract class AbstractPlaceholderField extends AbstractFormField impleme
     super.initConfig();
   }
 
-  protected static class LocalPlaceholderFieldExtension<OWNER extends AbstractPlaceholderField> extends LocalFormFieldExtension<OWNER>implements IPlaceholderFieldExtension<OWNER> {
+  protected static class LocalPlaceholderFieldExtension<OWNER extends AbstractPlaceholderField> extends LocalFormFieldExtension<OWNER> implements IPlaceholderFieldExtension<OWNER> {
 
     public LocalPlaceholderFieldExtension(OWNER owner) {
       super(owner);

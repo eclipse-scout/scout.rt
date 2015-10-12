@@ -83,8 +83,8 @@ public class KeyStrokeNormalizer {
    * ks.{@link #isValid()}; //returns 'true' <br>
    * </code> <br>
    * If the keystroke is invalid, {@link #isValid()} will return <code>false</code>, all modifiers ({@link #hasAlt()},
-   * {@link #hasCtrl()}, {@link #hasShift()}) will be <code>false</code> and the
-   * {@link #getNormalizedKeystroke()} will return <code>null</code>
+   * {@link #hasCtrl()}, {@link #hasShift()}) will be <code>false</code> and the {@link #getNormalizedKeystroke()} will
+   * return <code>null</code>
    */
   public void normalize() {
     String keyStroke = m_originalKeyStroke;

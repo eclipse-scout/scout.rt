@@ -46,9 +46,7 @@ public class BasicCacheTest {
   protected ICache<Integer, String> createCache(ICacheValueResolver<Integer, String> resolver) {
     @SuppressWarnings("unchecked")
     ICacheBuilder<Integer, String> cacheBuilder = BEANS.get(ICacheBuilder.class);
-    return cacheBuilder.withCacheId(CACHE_ID).
-        withValueResolver(resolver).
-        withThreadSafe(false).build();
+    return cacheBuilder.withCacheId(CACHE_ID).withValueResolver(resolver).withThreadSafe(false).build();
   }
 
   @Test

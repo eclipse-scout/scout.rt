@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 
-public abstract class AbstractTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends AbstractFormFieldExtension<OWNER>implements ITableFieldExtension<T, OWNER> {
+public abstract class AbstractTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends AbstractFormFieldExtension<OWNER> implements ITableFieldExtension<T, OWNER> {
 
   public AbstractTableFieldExtension(OWNER owner) {
     super(owner);

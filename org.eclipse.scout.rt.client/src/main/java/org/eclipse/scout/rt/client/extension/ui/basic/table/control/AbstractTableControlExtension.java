@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 
-public abstract class AbstractTableControlExtension<OWNER extends AbstractTableControl> extends AbstractActionExtension<OWNER>implements ITableControlExtension<OWNER> {
+public abstract class AbstractTableControlExtension<OWNER extends AbstractTableControl> extends AbstractActionExtension<OWNER> implements ITableControlExtension<OWNER> {
 
   public AbstractTableControlExtension(OWNER owner) {
     super(owner);

@@ -300,7 +300,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     chain.execInnerFormChanged(oldInnerForm, newInnerForm);
   }
 
-  protected static class LocalWrappedFormFieldExtension<FORM extends IForm, OWNER extends AbstractWrappedFormField<FORM>> extends LocalFormFieldExtension<OWNER>implements IWrappedFormFieldExtension<FORM, OWNER> {
+  protected static class LocalWrappedFormFieldExtension<FORM extends IForm, OWNER extends AbstractWrappedFormField<FORM>> extends LocalFormFieldExtension<OWNER> implements IWrappedFormFieldExtension<FORM, OWNER> {
 
     public LocalWrappedFormFieldExtension(OWNER owner) {
       super(owner);

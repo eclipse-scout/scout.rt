@@ -93,7 +93,6 @@ public final class JaxWsConfigProperties {
       return "jaxws.implementor";
     }
 
-
   }
 
   /**
@@ -105,7 +104,6 @@ public final class JaxWsConfigProperties {
     public String getKey() {
       return "jaxws.provider.authentication.credentials";
     }
-
 
   }
 

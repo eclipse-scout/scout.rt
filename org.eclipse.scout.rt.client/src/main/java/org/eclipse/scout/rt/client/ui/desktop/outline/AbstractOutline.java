@@ -874,7 +874,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     chain.execCreateChildPages(pageList);
   }
 
-  protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER>implements IOutlineExtension<OWNER> {
+  protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER> implements IOutlineExtension<OWNER> {
 
     public LocalOutlineExtension(OWNER owner) {
       super(owner);

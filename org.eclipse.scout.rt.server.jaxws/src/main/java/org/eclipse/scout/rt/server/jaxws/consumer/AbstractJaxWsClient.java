@@ -121,7 +121,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   public AbstractJaxWsClient() {
     m_serviceClazz = resolveServiceClass();
     m_portTypeClazz = resolvePortClass();
-    m_webServiceClientAnnotation = Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '%s' annotation on webservice [service=%s]", AbstractJaxWsClient.class.getSimpleName(), m_serviceClazz.getName());
+    m_webServiceClientAnnotation =
+        Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '%s' annotation on webservice [service=%s]", AbstractJaxWsClient.class.getSimpleName(), m_serviceClazz.getName());
   }
 
   @PostConstruct
@@ -132,7 +133,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     m_connectTimeout = CONFIG.getPropertyValue(getConfiguredConnectTimeoutProperty());
     m_readTimeout = CONFIG.getPropertyValue(getConfiguredReadTimeoutProperty());
 
-    m_wsdlLocation = resolveWsdlUrl(Assertions.assertNotNullOrEmpty(m_webServiceClientAnnotation.wsdlLocation(), "Missing 'wsdlLocation' on %s annotation. Use argument 'wsdlLocation' when generating webservice stub. [service=%s]", WebServiceClient.class.getSimpleName(), m_serviceClazz.getName()));
+    m_wsdlLocation = resolveWsdlUrl(Assertions.assertNotNullOrEmpty(m_webServiceClientAnnotation.wsdlLocation(), "Missing 'wsdlLocation' on %s annotation. Use argument 'wsdlLocation' when generating webservice stub. [service=%s]",
+        WebServiceClient.class.getSimpleName(), m_serviceClazz.getName()));
     m_targetNamespace = m_webServiceClientAnnotation.targetNamespace();
     m_serviceName = m_webServiceClientAnnotation.name();
 
@@ -156,7 +158,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a cached Port.<br/>
+   * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a cached Port.
+   * <br/>
    * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
    * context. That is useful if having a port with some operations require some different properties set, e.g. another
    * read-timeout to transfer big data. Also, if associated with a transaction, respective commit or rollback listeners
@@ -247,8 +250,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to resolve to a specific port class. By default, the super hierarchy is looked for the port type in
-   * the generic type declaration.
+   * Overwrite to resolve to a specific port class. By default, the super hierarchy is looked for the port type in the
+   * generic type declaration.
    */
   protected Class<PORT> resolvePortClass() {
     return this.<PORT> resolveGenericTypeArguments()[1];
@@ -382,7 +385,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   /**
    * Overwrite to provide another {@link PortProvider} to create new port objects.
    */
-  protected PortProvider<SERVICE, PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation, final String targetNamespace, final String serviceName, final IPortInitializer portInitializer) {
+  protected PortProvider<SERVICE, PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation, final String targetNamespace, final String serviceName,
+      final IPortInitializer portInitializer) {
     return new PortProvider<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
   }
 }

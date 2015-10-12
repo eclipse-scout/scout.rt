@@ -30,7 +30,7 @@ public abstract class AbstractCheckBox extends AbstractBooleanField implements I
     super(callInitializer);
   }
 
-  protected static class LocalCheckBoxExtension<OWNER extends AbstractCheckBox> extends LocalBooleanFieldExtension<OWNER>implements ICheckBoxExtension<OWNER> {
+  protected static class LocalCheckBoxExtension<OWNER extends AbstractCheckBox> extends LocalBooleanFieldExtension<OWNER> implements ICheckBoxExtension<OWNER> {
 
     public LocalCheckBoxExtension(OWNER owner) {
       super(owner);

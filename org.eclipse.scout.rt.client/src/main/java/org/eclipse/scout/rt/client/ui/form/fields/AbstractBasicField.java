@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
  */
 @ScoutSdkIgnore
 @ClassId("d5a72dd8-cb1c-4dea-a568-90d77e65854e")
-public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE>implements IBasicField<VALUE> {
+public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE> implements IBasicField<VALUE> {
 
   public class P_UIFacade implements IBasicFieldUIFacade {
     @Override

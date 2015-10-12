@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeTypeExten
 /**
  *
  */
-public abstract class AbstractCodeType<CODE_TYPE_ID, CODE_ID> extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>>implements ICodeType<CODE_TYPE_ID, CODE_ID> {
+public abstract class AbstractCodeType<CODE_TYPE_ID, CODE_ID> extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID> {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -50,7 +50,7 @@ public abstract class AbstractCodeType<CODE_TYPE_ID, CODE_ID> extends AbstractCo
    * any further chain elements.
    */
   protected static class LocalCodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER extends AbstractCodeType<CODE_TYPE_ID, CODE_ID>>
-      extends LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>, OWNER>implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
+      extends LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>, OWNER> implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalCodeTypeExtension(OWNER owner) {

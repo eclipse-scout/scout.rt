@@ -30,7 +30,7 @@ public abstract class AbstractTextField extends AbstractStringField implements I
     super(callInitializer);
   }
 
-  protected static class LocalTextFieldExtension<OWNER extends AbstractTextField> extends LocalStringFieldExtension<OWNER>implements ITextFieldExtension<OWNER> {
+  protected static class LocalTextFieldExtension<OWNER extends AbstractTextField> extends LocalStringFieldExtension<OWNER> implements ITextFieldExtension<OWNER> {
 
     public LocalTextFieldExtension(OWNER owner) {
       super(owner);

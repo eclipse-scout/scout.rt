@@ -69,7 +69,7 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
     propertySupport.setProperty(PROP_RADIOVALUE, o);
   }
 
-  protected static class LocalRadioButtonExtension<T, OWNER extends AbstractRadioButton<T>> extends LocalButtonExtension<OWNER>implements IRadioButtonExtension<T, OWNER> {
+  protected static class LocalRadioButtonExtension<T, OWNER extends AbstractRadioButton<T>> extends LocalButtonExtension<OWNER> implements IRadioButtonExtension<T, OWNER> {
 
     public LocalRadioButtonExtension(OWNER owner) {
       super(owner);

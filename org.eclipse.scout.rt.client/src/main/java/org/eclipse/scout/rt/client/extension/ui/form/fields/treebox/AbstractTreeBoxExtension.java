@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public abstract class AbstractTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends AbstractValueFieldExtension<Set<T>, OWNER>implements ITreeBoxExtension<T, OWNER> {
+public abstract class AbstractTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends AbstractValueFieldExtension<Set<T>, OWNER> implements ITreeBoxExtension<T, OWNER> {
 
   public AbstractTreeBoxExtension(OWNER owner) {
     super(owner);

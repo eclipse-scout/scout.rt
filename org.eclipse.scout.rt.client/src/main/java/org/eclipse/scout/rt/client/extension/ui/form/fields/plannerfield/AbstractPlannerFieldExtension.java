@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField;
 
-public abstract class AbstractPlannerFieldExtension<P extends IPlanner<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<P, RI, AI>> extends AbstractFormFieldExtension<OWNER>implements IPlannerFieldExtension<P, RI, AI, OWNER> {
+public abstract class AbstractPlannerFieldExtension<P extends IPlanner<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<P, RI, AI>> extends AbstractFormFieldExtension<OWNER> implements IPlannerFieldExtension<P, RI, AI, OWNER> {
 
   public AbstractPlannerFieldExtension(OWNER owner) {
     super(owner);

@@ -442,7 +442,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalCalendarItemProviderExtension<OWNER extends AbstractCalendarItemProvider> extends AbstractExtension<OWNER>implements ICalendarItemProviderExtension<OWNER> {
+  protected static class LocalCalendarItemProviderExtension<OWNER extends AbstractCalendarItemProvider> extends AbstractExtension<OWNER> implements ICalendarItemProviderExtension<OWNER> {
 
     public LocalCalendarItemProviderExtension(OWNER owner) {
       super(owner);

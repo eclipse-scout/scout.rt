@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 /**
  *
  */
-public abstract class AbstractStringFieldExtension<OWNER extends AbstractStringField> extends AbstractBasicFieldExtension<String, OWNER>implements IStringFieldExtension<OWNER> {
+public abstract class AbstractStringFieldExtension<OWNER extends AbstractStringField> extends AbstractBasicFieldExtension<String, OWNER> implements IStringFieldExtension<OWNER> {
 
   /**
    * @param owner

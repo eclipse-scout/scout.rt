@@ -163,7 +163,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalTableControlExtension<OWNER extends AbstractTableControl> extends AbstractAction.LocalActionExtension<OWNER>implements ITableControlExtension<OWNER> {
+  protected static class LocalTableControlExtension<OWNER extends AbstractTableControl> extends AbstractAction.LocalActionExtension<OWNER> implements ITableControlExtension<OWNER> {
 
     public LocalTableControlExtension(OWNER owner) {
       super(owner);

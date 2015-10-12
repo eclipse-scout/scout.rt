@@ -108,7 +108,7 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
 
   }
 
-  protected static class LocalChartBoxExtension<OWNER extends AbstractChartBox> extends LocalFormFieldExtension<OWNER>implements IChartBoxExtension<OWNER> {
+  protected static class LocalChartBoxExtension<OWNER extends AbstractChartBox> extends LocalFormFieldExtension<OWNER> implements IChartBoxExtension<OWNER> {
 
     public LocalChartBoxExtension(OWNER owner) {
       super(owner);

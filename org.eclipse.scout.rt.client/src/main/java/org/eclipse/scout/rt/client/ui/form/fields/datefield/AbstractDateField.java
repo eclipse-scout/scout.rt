@@ -88,7 +88,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
 @ClassId("f73eed8c-1e70-4903-a23f-4a29d884e5ea")
-public abstract class AbstractDateField extends AbstractBasicField<Date>implements IDateField {
+public abstract class AbstractDateField extends AbstractBasicField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
 
   private IDateFieldUIFacade m_uiFacade;
@@ -545,7 +545,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date>implemen
     chain.execShiftDate(level, value);
   }
 
-  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalBasicFieldExtension<Date, OWNER>implements IDateFieldExtension<OWNER> {
+  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalBasicFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
 
     public LocalDateFieldExtension(OWNER owner) {
       super(owner);

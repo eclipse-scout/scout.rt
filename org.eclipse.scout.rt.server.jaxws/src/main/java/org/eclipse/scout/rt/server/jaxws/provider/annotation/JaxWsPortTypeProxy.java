@@ -68,8 +68,8 @@ public @interface JaxWsPortTypeProxy {
   String portTypeProxyName() default JaxWsPortTypeProxy.DERIVED;
 
   /**
-   * The service name as specified in the WSDL file, and must be set if publishing a webservice in J2EE container.
-   * Both, {@link #serviceName()} and {@link #portName()}, uniquely identify a webservice endpoint to be published.
+   * The service name as specified in the WSDL file, and must be set if publishing a webservice in J2EE container. Both,
+   * {@link #serviceName()} and {@link #portName()}, uniquely identify a webservice endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="SERVICE_NAME">
@@ -101,8 +101,8 @@ public @interface JaxWsPortTypeProxy {
    * The authentication mechanism to be installed on the webservice endpoint, and to specify in which {@link RunContext}
    * to run authenticated webservice requests. By default, {@link BasicAuthenticationMethod} with
    * {@link ConfigFileAuthenticator} is used. Authentication can be disabled by setting <i>enabled</i> to
-   * <code>false</code>. If <i>enabled</i>, an {@link AuthenticationHandler} is generated at compile time (APT)
-   * and registered in the handler chain as very first handler.
+   * <code>false</code>. If <i>enabled</i>, an {@link AuthenticationHandler} is generated at compile time (APT) and
+   * registered in the handler chain as very first handler.
    * <ul>
    * <li>The {@link IAuthenticator} can be configured to run in a {@link RunContext} by annotating it with
    * <code>&#064;RunWithRunContext</code> annotation.</li>
@@ -113,7 +113,8 @@ public @interface JaxWsPortTypeProxy {
    * <li>If providing a handler binding file yourself, this annotation is ignored.</li>
    * </ul>
    */
-  Authentication authentication() default @Authentication();
+  Authentication authentication() default @Authentication()
+  ;
 
   /**
    * To specify JAX-WS handlers to be installed on the webservice endpoint in the order as being declared. Thereto, for

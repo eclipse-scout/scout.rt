@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNo
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
-public abstract class AbstractPageWithNodesExtension<OWNER extends AbstractPageWithNodes> extends AbstractPageExtension<OWNER>implements IPageWithNodesExtension<OWNER> {
+public abstract class AbstractPageWithNodesExtension<OWNER extends AbstractPageWithNodes> extends AbstractPageExtension<OWNER> implements IPageWithNodesExtension<OWNER> {
 
   public AbstractPageWithNodesExtension(OWNER owner) {
     super(owner);

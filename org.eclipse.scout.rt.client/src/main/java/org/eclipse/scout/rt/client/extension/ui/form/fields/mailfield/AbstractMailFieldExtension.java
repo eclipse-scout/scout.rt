@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldHyperlinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.AbstractMailField;
 
-public abstract class AbstractMailFieldExtension<OWNER extends AbstractMailField> extends AbstractValueFieldExtension<MimeMessage, OWNER>implements IMailFieldExtension<OWNER> {
+public abstract class AbstractMailFieldExtension<OWNER extends AbstractMailField> extends AbstractValueFieldExtension<MimeMessage, OWNER> implements IMailFieldExtension<OWNER> {
 
   public AbstractMailFieldExtension(OWNER owner) {
     super(owner);

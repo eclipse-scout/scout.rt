@@ -24,7 +24,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 
 /**
- * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.<br/>
+ * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.
+ * <br/>
  * Replace this class via {@link Replace} annotation if your provider implementation divergences from the JAX-WS
  * standard.
  */

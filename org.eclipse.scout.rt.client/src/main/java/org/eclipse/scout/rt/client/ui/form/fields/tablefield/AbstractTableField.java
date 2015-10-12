@@ -566,7 +566,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
-  protected static class LocalTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends LocalFormFieldExtension<OWNER>implements ITableFieldExtension<T, OWNER> {
+  protected static class LocalTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends LocalFormFieldExtension<OWNER> implements ITableFieldExtension<T, OWNER> {
 
     public LocalTableFieldExtension(OWNER owner) {
       super(owner);

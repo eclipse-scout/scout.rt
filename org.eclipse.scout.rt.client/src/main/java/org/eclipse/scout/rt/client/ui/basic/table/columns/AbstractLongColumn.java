@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
  * Column holding Long
  */
 @ClassId("97d8375f-84fa-4673-876f-9b274f218cce")
-public abstract class AbstractLongColumn extends AbstractNumberColumn<Long>implements ILongColumn {
+public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> implements ILongColumn {
 
   public AbstractLongColumn() {
     super();
@@ -75,7 +75,7 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long>imple
     };
   }
 
-  protected static class LocalLongColumnExtension<OWNER extends AbstractLongColumn> extends LocalNumberColumnExtension<Long, OWNER>implements ILongColumnExtension<OWNER> {
+  protected static class LocalLongColumnExtension<OWNER extends AbstractLongColumn> extends LocalNumberColumnExtension<Long, OWNER> implements ILongColumnExtension<OWNER> {
 
     public LocalLongColumnExtension(OWNER owner) {
       super(owner);

@@ -1114,7 +1114,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER>implements ITreeNodeExtension<OWNER> {
+  protected static class LocalTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER> implements ITreeNodeExtension<OWNER> {
 
     public LocalTreeNodeExtension(OWNER owner) {
       super(owner);

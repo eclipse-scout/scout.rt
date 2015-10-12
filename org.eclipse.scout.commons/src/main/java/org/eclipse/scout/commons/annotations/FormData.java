@@ -152,7 +152,7 @@ public @interface FormData {
 
   int genericOrdinal() default -1;
 
-  Class[]interfaces() default {};
+  Class[] interfaces() default {};
 
   public static enum SdkCommand {
     CREATE, USE, IGNORE, DEFAULT

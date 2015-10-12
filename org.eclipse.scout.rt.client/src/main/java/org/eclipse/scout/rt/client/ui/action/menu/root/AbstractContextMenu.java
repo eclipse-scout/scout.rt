@@ -183,7 +183,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     }
   }
 
-  protected static class LocalContextMenuExtension<OWNER extends AbstractContextMenu> extends LocalMenuExtension<OWNER>implements IContextMenuExtension<OWNER> {
+  protected static class LocalContextMenuExtension<OWNER extends AbstractContextMenu> extends LocalMenuExtension<OWNER> implements IContextMenuExtension<OWNER> {
 
     public LocalContextMenuExtension(OWNER owner) {
       super(owner);

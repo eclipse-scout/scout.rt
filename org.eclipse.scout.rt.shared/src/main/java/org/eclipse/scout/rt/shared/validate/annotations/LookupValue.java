@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 @ValidateAnnotationMarker
 public @interface LookupValue {
 
-  Class<? extends LookupCall>value();
+  Class<? extends LookupCall> value();
 
   /**
    * subtree=false is the default, the check is applied to the parameter or field only.

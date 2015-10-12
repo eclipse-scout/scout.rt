@@ -328,7 +328,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     chain.execPostMessage(data, origin);
   }
 
-  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER>implements IBrowserFieldExtension<OWNER> {
+  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER> implements IBrowserFieldExtension<OWNER> {
 
     public LocalBrowserFieldExtension(OWNER owner) {
       super(owner);

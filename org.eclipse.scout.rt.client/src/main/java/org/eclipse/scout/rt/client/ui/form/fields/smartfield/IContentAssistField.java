@@ -43,7 +43,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";
-  
+
   void addSmartFieldListener(ContentAssistFieldListener listener);
 
   void removeSmartFieldListener(ContentAssistFieldListener listener);

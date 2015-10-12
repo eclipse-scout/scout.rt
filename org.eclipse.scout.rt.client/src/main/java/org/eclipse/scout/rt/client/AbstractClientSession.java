@@ -606,7 +606,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER>implements IClientSessionExtension<OWNER> {
+  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
 
     public LocalClientSessionExtension(OWNER owner) {
       super(owner);

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
  * Column holding Objects
  */
 @ClassId("c6a6ffc3-d042-427b-abe5-8e4f288c358d")
-public abstract class AbstractObjectColumn extends AbstractColumn<Object>implements IObjectColumn {
+public abstract class AbstractObjectColumn extends AbstractColumn<Object> implements IObjectColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -60,7 +60,7 @@ public abstract class AbstractObjectColumn extends AbstractColumn<Object>impleme
     return "";
   }
 
-  protected static class LocalObjectColumnExtension<OWNER extends AbstractObjectColumn> extends LocalColumnExtension<Object, OWNER>implements IObjectColumnExtension<OWNER> {
+  protected static class LocalObjectColumnExtension<OWNER extends AbstractObjectColumn> extends LocalColumnExtension<Object, OWNER> implements IObjectColumnExtension<OWNER> {
 
     public LocalObjectColumnExtension(OWNER owner) {
       super(owner);

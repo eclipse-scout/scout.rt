@@ -48,7 +48,7 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
     return false;
   }
 
-  protected static class LocalSearchFormExtension<OWNER extends AbstractSearchForm> extends LocalFormExtension<OWNER>implements ISearchFormExtension<OWNER> {
+  protected static class LocalSearchFormExtension<OWNER extends AbstractSearchForm> extends LocalFormExtension<OWNER> implements ISearchFormExtension<OWNER> {
 
     public LocalSearchFormExtension(OWNER owner) {
       super(owner);

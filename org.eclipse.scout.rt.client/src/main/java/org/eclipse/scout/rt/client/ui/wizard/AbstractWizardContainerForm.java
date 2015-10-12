@@ -155,7 +155,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
     }
   }
 
-  protected static class LocalWizardContainerFormExtension<OWNER extends AbstractWizardContainerForm> extends LocalFormExtension<OWNER>implements IWizardContainerFormExtension<OWNER> {
+  protected static class LocalWizardContainerFormExtension<OWNER extends AbstractWizardContainerForm> extends LocalFormExtension<OWNER> implements IWizardContainerFormExtension<OWNER> {
 
     public LocalWizardContainerFormExtension(OWNER owner) {
       super(owner);

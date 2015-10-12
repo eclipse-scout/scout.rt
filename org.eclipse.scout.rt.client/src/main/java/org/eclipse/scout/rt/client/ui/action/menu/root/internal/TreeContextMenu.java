@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 /**
  *
  */
-public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree>implements ITreeContextMenu {
+public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
   private Set<? extends ITreeNode> m_currentSelection;
 
   /**

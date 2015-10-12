@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.AbstractT
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 
-public abstract class AbstractOutlineTableFieldExtension<OWNER extends AbstractOutlineTableField> extends AbstractTableFieldExtension<ITable, OWNER>implements IOutlineTableFieldExtension<OWNER> {
+public abstract class AbstractOutlineTableFieldExtension<OWNER extends AbstractOutlineTableField> extends AbstractTableFieldExtension<ITable, OWNER> implements IOutlineTableFieldExtension<OWNER> {
 
   public AbstractOutlineTableFieldExtension(OWNER owner) {
     super(owner);

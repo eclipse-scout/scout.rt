@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 /**
  * The invisible root menu node of any activity map. (internal usage only)
  */
-public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPlanner<?, ?>>implements IPlannerContextMenu {
+public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPlanner<?, ?>> implements IPlannerContextMenu {
 
   public PlannerContextMenu(IPlanner<?, ?> owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);

@@ -72,7 +72,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * instead.
  */
 @ScoutSdkIgnore
-public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE>implements IContentAssistField<VALUE, LOOKUP_KEY> {
+public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.

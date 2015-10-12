@@ -2403,7 +2403,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP>implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
+  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP> implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
 
     public LocalDesktopExtension(DESKTOP desktop) {
       super(desktop);

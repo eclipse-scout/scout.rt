@@ -62,11 +62,7 @@ public class CodeService implements ICodeService {
   protected ICacheBuilder<CodeTypeCacheKey, ICodeType<?, ?>> createCacheBuilder() {
     @SuppressWarnings("unchecked")
     ICacheBuilder<CodeTypeCacheKey, ICodeType<?, ?>> cacheBuilder = BEANS.get(ICacheBuilder.class);
-    return cacheBuilder.withCacheId(CODE_SERVICE_CACHE_ID).
-        withValueResolver(createCacheValueResolver()).
-        withShared(true).
-        withTransactional(true).
-        withTransactionalFastForward(true);
+    return cacheBuilder.withCacheId(CODE_SERVICE_CACHE_ID).withValueResolver(createCacheValueResolver()).withShared(true).withTransactional(true).withTransactionalFastForward(true);
   }
 
   protected ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>> createCacheValueResolver() {

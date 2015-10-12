@@ -26,6 +26,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface BeanProducer {
 
-  Class<? extends IBeanInstanceProducer>value();
+  Class<? extends IBeanInstanceProducer> value();
 
 }

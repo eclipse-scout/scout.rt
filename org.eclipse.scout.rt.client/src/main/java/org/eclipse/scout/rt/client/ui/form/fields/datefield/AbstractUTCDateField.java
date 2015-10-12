@@ -39,7 +39,7 @@ public abstract class AbstractUTCDateField extends AbstractDateField implements 
     return super.getHolderType();
   }
 
-  protected static class LocalUTCDateFieldExtension<OWNER extends AbstractUTCDateField> extends LocalDateFieldExtension<OWNER>implements IUTCDateFieldExtension<OWNER> {
+  protected static class LocalUTCDateFieldExtension<OWNER extends AbstractUTCDateField> extends LocalDateFieldExtension<OWNER> implements IUTCDateFieldExtension<OWNER> {
 
     public LocalUTCDateFieldExtension(OWNER owner) {
       super(owner);

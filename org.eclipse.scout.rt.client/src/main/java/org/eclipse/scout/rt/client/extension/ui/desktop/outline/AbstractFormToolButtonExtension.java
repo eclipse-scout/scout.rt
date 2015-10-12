@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonCh
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public abstract class AbstractFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends AbstractToolButtonExtension<OWNER>implements IFormToolButtonExtension<FORM, OWNER> {
+public abstract class AbstractFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends AbstractToolButtonExtension<OWNER> implements IFormToolButtonExtension<FORM, OWNER> {
 
   public AbstractFormToolButtonExtension(OWNER owner) {
     super(owner);

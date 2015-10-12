@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribe
  */
 @Bean
 @ApplicationScoped
-public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<IClusterNotificationMessage>implements IPublishSubscribeMessageService {
+public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<IClusterNotificationMessage> implements IPublishSubscribeMessageService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(JmsPublishSubscribeMessageService.class);
 
   private volatile IPublishSubscribeMessageListener m_listener;

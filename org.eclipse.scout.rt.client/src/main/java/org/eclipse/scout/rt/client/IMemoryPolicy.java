@@ -62,8 +62,7 @@ public interface IMemoryPolicy {
   void afterOutlineSelectionChanged(IDesktop desktop) throws ProcessingException;
 
   /**
-   * Before data is fetched and loaded this method is called to give the possibility to previously manipulate the
-   * table.
+   * Before data is fetched and loaded this method is called to give the possibility to previously manipulate the table.
    */
   void beforeTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
 

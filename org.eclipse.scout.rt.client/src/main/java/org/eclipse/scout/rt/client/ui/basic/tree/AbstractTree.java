@@ -3067,7 +3067,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalTreeExtension<OWNER extends AbstractTree> extends AbstractExtension<OWNER>implements ITreeExtension<OWNER> {
+  protected static class LocalTreeExtension<OWNER extends AbstractTree> extends AbstractExtension<OWNER> implements ITreeExtension<OWNER> {
 
     public LocalTreeExtension(OWNER owner) {
       super(owner);

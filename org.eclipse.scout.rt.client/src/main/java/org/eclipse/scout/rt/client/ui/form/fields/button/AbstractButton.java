@@ -483,7 +483,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     chain.execClickAction();
   }
 
-  protected static class LocalButtonExtension<OWNER extends AbstractButton> extends LocalFormFieldExtension<OWNER>implements IButtonExtension<OWNER> {
+  protected static class LocalButtonExtension<OWNER extends AbstractButton> extends LocalFormFieldExtension<OWNER> implements IButtonExtension<OWNER> {
 
     public LocalButtonExtension(OWNER owner) {
       super(owner);

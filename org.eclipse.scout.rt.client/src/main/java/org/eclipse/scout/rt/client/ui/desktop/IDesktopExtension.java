@@ -124,10 +124,10 @@ public interface IDesktopExtension {
   ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException;
 
   /**
-   * Called right before a form is shown and therefore added to the desktop. This means this method is called
-   * before any UI is informed about the new form. The form is provided in a holder. This allows it to prevent the form
-   * being added to the desktop (set reference to {@code null}), do some general modifications needed to be done prior
-   * UI instantiation, or even replace it with a different instance.
+   * Called right before a form is shown and therefore added to the desktop. This means this method is called before any
+   * UI is informed about the new form. The form is provided in a holder. This allows it to prevent the form being added
+   * to the desktop (set reference to {@code null}), do some general modifications needed to be done prior UI
+   * instantiation, or even replace it with a different instance.
    *
    * @param formHolder
    *          contains the form that will be added to the core desktop

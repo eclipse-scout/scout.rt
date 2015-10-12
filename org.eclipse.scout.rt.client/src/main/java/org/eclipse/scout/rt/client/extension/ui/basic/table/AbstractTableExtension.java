@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-public abstract class AbstractTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE>implements ITableExtension<TABLE> {
+public abstract class AbstractTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE> implements ITableExtension<TABLE> {
 
   public AbstractTableExtension(TABLE owner) {
     super(owner);

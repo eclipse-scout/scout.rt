@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * @version 3.x
  */
 @ClassId("35e1fd57-3c86-4c99-92ca-188c3c2dedde")
-public abstract class AbstractMailField extends AbstractValueField<MimeMessage>implements IMailField {
+public abstract class AbstractMailField extends AbstractValueField<MimeMessage> implements IMailField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMailField.class);
   private IMailFieldUIFacade m_uiFacade;
   private boolean m_mailEditor;
@@ -290,7 +290,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage>i
     chain.execAttachementAction(file);
   }
 
-  protected static class LocalMailFieldExtension<OWNER extends AbstractMailField> extends LocalValueFieldExtension<MimeMessage, OWNER>implements IMailFieldExtension<OWNER> {
+  protected static class LocalMailFieldExtension<OWNER extends AbstractMailField> extends LocalValueFieldExtension<MimeMessage, OWNER> implements IMailFieldExtension<OWNER> {
 
     public LocalMailFieldExtension(OWNER owner) {
       super(owner);

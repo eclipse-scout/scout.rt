@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("0b1ac83b-6fa4-4e12-88d0-680ed168e914")
-public abstract class AbstractCalendarField<T extends ICalendar> extends AbstractValueField<Date>implements ICalendarField<T> {
+public abstract class AbstractCalendarField<T extends ICalendar> extends AbstractValueField<Date> implements ICalendarField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarField.class);
 
   private T m_calendar;
@@ -179,7 +179,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
     getCalendar().reloadCalendarItems();
   }
 
-  protected static class LocalCalendarFieldExtension<T extends ICalendar, OWNER extends AbstractCalendarField<T>> extends LocalValueFieldExtension<Date, OWNER>implements ICalendarFieldExtension<T, OWNER> {
+  protected static class LocalCalendarFieldExtension<T extends ICalendar, OWNER extends AbstractCalendarField<T>> extends LocalValueFieldExtension<Date, OWNER> implements ICalendarFieldExtension<T, OWNER> {
 
     public LocalCalendarFieldExtension(OWNER owner) {
       super(owner);

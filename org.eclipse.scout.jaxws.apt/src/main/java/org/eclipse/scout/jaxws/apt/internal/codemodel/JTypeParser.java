@@ -27,16 +27,16 @@ public class JTypeParser {
   }
 
   /**
-   * This method is similar to {@link JCodeModel#parseType(String)}, but fixes an issue that JCodeModel does not
-   * support '&lt;?&gt;' generic declaration (short for '&lt;? extends Object&gt;').
+   * This method is similar to {@link JCodeModel#parseType(String)}, but fixes an issue that JCodeModel does not support
+   * '&lt;?&gt;' generic declaration (short for '&lt;? extends Object&gt;').
    */
   public static JType parseType(final JCodeModel model, final String type) throws ClassNotFoundException {
     return model.parseType(type.replaceAll("<\\?>", "<? extends Object>"));
   }
 
   /**
-   * This method is similar to {@link JCodeModel#parseType(String)}, but fixes an issue that JCodeModel does not
-   * support '&lt;?&gt;' generic declaration (short for '&lt;? extends Object&gt;').
+   * This method is similar to {@link JCodeModel#parseType(String)}, but fixes an issue that JCodeModel does not support
+   * '&lt;?&gt;' generic declaration (short for '&lt;? extends Object&gt;').
    */
   public static JType parseType(final JCodeModel model, final TypeMirror _typeMirror) throws ClassNotFoundException {
     return model.parseType(_typeMirror.toString().replaceAll("<\\?>", "<? extends Object>")); // bug in JCode model that it does not accept

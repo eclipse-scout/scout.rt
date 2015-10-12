@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
  * Column holding Strings
  */
 @ClassId("e564abbc-5f57-4ccc-a50c-003c408df519")
-public abstract class AbstractStringColumn extends AbstractColumn<String>implements IStringColumn {
+public abstract class AbstractStringColumn extends AbstractColumn<String> implements IStringColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -260,7 +260,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String>impleme
     return StringUtility.compareIgnoreCase(s1, s2);
   }
 
-  protected static class LocalStringColumnExtension<OWNER extends AbstractStringColumn> extends LocalColumnExtension<String, OWNER>implements IStringColumnExtension<OWNER> {
+  protected static class LocalStringColumnExtension<OWNER extends AbstractStringColumn> extends LocalColumnExtension<String, OWNER> implements IStringColumnExtension<OWNER> {
 
     public LocalStringColumnExtension(OWNER owner) {
       super(owner);

@@ -241,7 +241,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
   @Order(10)
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
-  public class ListBoxField extends AbstractListBox<Object>implements IComposerValueField {
+  public class ListBoxField extends AbstractListBox<Object> implements IComposerValueField {
 
     @Override
     protected boolean getConfiguredAutoLoad() {
@@ -330,7 +330,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
   @Order(10)
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
-  public class TreeBoxField extends AbstractTreeBox<Object>implements IComposerValueField {
+  public class TreeBoxField extends AbstractTreeBox<Object> implements IComposerValueField {
 
     @Override
     protected boolean getConfiguredAutoLoad() {
@@ -824,7 +824,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
   @Order(10)
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
-  public class SmartField extends AbstractSmartField<Object>implements IComposerValueField {
+  public class SmartField extends AbstractSmartField<Object> implements IComposerValueField {
 
     @Override
     protected void execPrepareLookup(ILookupCall<Object> call) throws ProcessingException {
@@ -1311,7 +1311,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     chain.execChangedValue();
   }
 
-  protected static class LocalComposerValueBoxExtension<OWNER extends AbstractComposerValueBox> extends LocalGroupBoxExtension<OWNER>implements IComposerValueBoxExtension<OWNER> {
+  protected static class LocalComposerValueBoxExtension<OWNER extends AbstractComposerValueBox> extends LocalGroupBoxExtension<OWNER> implements IComposerValueBoxExtension<OWNER> {
 
     public LocalComposerValueBoxExtension(OWNER owner) {
       super(owner);

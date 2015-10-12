@@ -46,7 +46,7 @@ public abstract class AbstractViewButton extends AbstractAction implements IView
     propertySupport.setProperty(PROP_DISPLAY_STYLE, displayStyle);
   }
 
-  protected static class LocalViewButtonExtension<OWNER extends AbstractViewButton> extends LocalActionExtension<OWNER>implements IViewButtonExtension<OWNER> {
+  protected static class LocalViewButtonExtension<OWNER extends AbstractViewButton> extends LocalActionExtension<OWNER> implements IViewButtonExtension<OWNER> {
 
     public LocalViewButtonExtension(OWNER owner) {
       super(owner);

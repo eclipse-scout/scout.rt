@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 /**
  *
  */
-public abstract class AbstractServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractSerializableExtension<OWNER>implements IServerSessionExtension<OWNER> {
+public abstract class AbstractServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractSerializableExtension<OWNER> implements IServerSessionExtension<OWNER> {
   private static final long serialVersionUID = 1L;
 
   public AbstractServerSessionExtension(OWNER owner) {

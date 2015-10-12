@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
 @ClassId("f4ec575e-f572-418d-a49c-3d0811ea7540")
-public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T>implements IDecimalField<T> {
+public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T> implements IDecimalField<T> {
 
   public AbstractDecimalField() {
     this(true);
@@ -247,7 +247,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     return valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
   }
 
-  protected static class LocalDecimalFieldExtension<T extends Number, OWNER extends AbstractDecimalField<T>> extends LocalNumberFieldExtension<T, OWNER>implements IDecimalFieldExtension<T, OWNER> {
+  protected static class LocalDecimalFieldExtension<T extends Number, OWNER extends AbstractDecimalField<T>> extends LocalNumberFieldExtension<T, OWNER> implements IDecimalFieldExtension<T, OWNER> {
 
     public LocalDecimalFieldExtension(OWNER owner) {
       super(owner);

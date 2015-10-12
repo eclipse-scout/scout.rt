@@ -191,7 +191,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     chain.execWizardStepIndex(stepIndex);
   }
 
-  protected static class LocalWizardProgressFieldExtension<OWNER extends AbstractWizardProgressField> extends LocalFormFieldExtension<OWNER>implements IWizardProgressFieldExtension<OWNER> {
+  protected static class LocalWizardProgressFieldExtension<OWNER extends AbstractWizardProgressField> extends LocalFormFieldExtension<OWNER> implements IWizardProgressFieldExtension<OWNER> {
 
     public LocalWizardProgressFieldExtension(OWNER owner) {
       super(owner);

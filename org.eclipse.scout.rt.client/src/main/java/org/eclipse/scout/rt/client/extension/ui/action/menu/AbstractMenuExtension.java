@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.AbstractActionNodeEx
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-public abstract class AbstractMenuExtension<OWNER extends AbstractMenu> extends AbstractActionNodeExtension<IMenu, OWNER>implements IMenuExtension<OWNER> {
+public abstract class AbstractMenuExtension<OWNER extends AbstractMenu> extends AbstractActionNodeExtension<IMenu, OWNER> implements IMenuExtension<OWNER> {
 
   public AbstractMenuExtension(OWNER owner) {
     super(owner);

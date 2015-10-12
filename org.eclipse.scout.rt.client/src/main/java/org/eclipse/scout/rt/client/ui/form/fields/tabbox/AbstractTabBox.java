@@ -213,7 +213,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     chain.execTabSelected(selectedBox);
   }
 
-  protected static class LocalTabBoxExtension<OWNER extends AbstractTabBox> extends LocalCompositeFieldExtension<OWNER>implements ITabBoxExtension<OWNER> {
+  protected static class LocalTabBoxExtension<OWNER extends AbstractTabBox> extends LocalCompositeFieldExtension<OWNER> implements ITabBoxExtension<OWNER> {
 
     public LocalTabBoxExtension(OWNER owner) {
       super(owner);

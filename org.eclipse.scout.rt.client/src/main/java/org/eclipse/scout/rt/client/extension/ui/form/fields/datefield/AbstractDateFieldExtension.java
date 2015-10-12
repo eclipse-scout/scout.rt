@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 
-public abstract class AbstractDateFieldExtension<OWNER extends AbstractDateField> extends AbstractBasicFieldExtension<Date, OWNER>implements IDateFieldExtension<OWNER> {
+public abstract class AbstractDateFieldExtension<OWNER extends AbstractDateField> extends AbstractBasicFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
 
   public AbstractDateFieldExtension(OWNER owner) {
     super(owner);

@@ -212,7 +212,8 @@ public class PortTypeProxyDescriptor {
           m_handlerType = HandlerType.LOGICAL;
         }
         else {
-          throw new IllegalArgumentException(String.format("Unsupported handler type; must implement '%s' for a SOAP protocol-specific handler, or '%s' for a protocol-agnostic handler.", SOAPHandler.class.getSimpleName(), LogicalHandler.class.getSimpleName()));
+          throw new IllegalArgumentException(
+              String.format("Unsupported handler type; must implement '%s' for a SOAP protocol-specific handler, or '%s' for a protocol-agnostic handler.", SOAPHandler.class.getSimpleName(), LogicalHandler.class.getSimpleName()));
         }
       }
       else {

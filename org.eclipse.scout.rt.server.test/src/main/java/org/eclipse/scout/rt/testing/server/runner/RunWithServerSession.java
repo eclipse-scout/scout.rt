@@ -25,10 +25,10 @@ public @interface RunWithServerSession {
   /**
    * @return session class to be used.
    */
-  Class<? extends ISession>value();
+  Class<? extends ISession> value();
 
   /**
    * @return provider to create and start the session; by default, {@link ServerSessionProviderWithCache} is used.
    */
-  Class<? extends ServerSessionProvider>provider() default ServerSessionProviderWithCache.class;
+  Class<? extends ServerSessionProvider> provider() default ServerSessionProviderWithCache.class;
 }

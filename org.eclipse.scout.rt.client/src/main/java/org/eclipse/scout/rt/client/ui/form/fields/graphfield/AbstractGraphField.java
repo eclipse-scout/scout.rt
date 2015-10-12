@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 
-public class AbstractGraphField extends AbstractValueField<GraphModel>implements IGraphField {
+public class AbstractGraphField extends AbstractValueField<GraphModel> implements IGraphField {
 
   private IGraphFieldUIFacade m_uiFacade;
 
@@ -72,7 +72,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel>implements
     chain.execAppLinkAction(ref);
   }
 
-  protected static class LocalGraphFieldExtension<OWNER extends AbstractGraphField> extends LocalValueFieldExtension<GraphModel, OWNER>implements IGraphFieldExtension<OWNER> {
+  protected static class LocalGraphFieldExtension<OWNER extends AbstractGraphField> extends LocalValueFieldExtension<GraphModel, OWNER> implements IGraphFieldExtension<OWNER> {
 
     public LocalGraphFieldExtension(OWNER owner) {
       super(owner);

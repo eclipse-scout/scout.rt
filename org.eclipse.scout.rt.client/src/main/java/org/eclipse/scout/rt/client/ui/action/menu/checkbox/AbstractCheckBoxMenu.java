@@ -53,7 +53,7 @@ public abstract class AbstractCheckBoxMenu extends AbstractMenu implements IChec
     // void here
   }
 
-  protected static class LocalCheckBoxMenuExtension<OWNER extends AbstractCheckBoxMenu> extends LocalMenuExtension<OWNER>implements ICheckBoxMenuExtension<OWNER> {
+  protected static class LocalCheckBoxMenuExtension<OWNER extends AbstractCheckBoxMenu> extends LocalMenuExtension<OWNER> implements ICheckBoxMenuExtension<OWNER> {
 
     public LocalCheckBoxMenuExtension(OWNER owner) {
       super(owner);

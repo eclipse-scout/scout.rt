@@ -70,7 +70,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
  * A page containing a list of "menu" entries<br>
  * child pages are explicitly added
  */
-public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T>implements IPageWithTable<T>, IContributionOwner {
+public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
 
   private ISearchForm m_searchForm;
@@ -1053,7 +1053,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     chain.execInitSearchForm();
   }
 
-  protected static class LocalPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends LocalPageExtension<OWNER>implements IPageWithTableExtension<T, OWNER> {
+  protected static class LocalPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends LocalPageExtension<OWNER> implements IPageWithTableExtension<T, OWNER> {
 
     public LocalPageWithTableExtension(OWNER owner) {
       super(owner);

@@ -1997,7 +1997,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalFormFieldExtension<OWNER extends AbstractFormField> extends AbstractExtension<OWNER>implements IFormFieldExtension<OWNER> {
+  protected static class LocalFormFieldExtension<OWNER extends AbstractFormField> extends AbstractExtension<OWNER> implements IFormFieldExtension<OWNER> {
 
     public LocalFormFieldExtension(OWNER owner) {
       super(owner);

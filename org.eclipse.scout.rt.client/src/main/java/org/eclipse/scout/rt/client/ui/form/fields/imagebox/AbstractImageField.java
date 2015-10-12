@@ -534,7 +534,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     chain.execDropRequest(transferObject);
   }
 
-  protected static class LocalImageFieldExtension<OWNER extends AbstractImageField> extends LocalFormFieldExtension<OWNER>implements IImageFieldExtension<OWNER> {
+  protected static class LocalImageFieldExtension<OWNER extends AbstractImageField> extends LocalFormFieldExtension<OWNER> implements IImageFieldExtension<OWNER> {
 
     public LocalImageFieldExtension(OWNER owner) {
       super(owner);

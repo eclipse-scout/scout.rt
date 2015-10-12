@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 /**
  * This field may be used if the value is relevant for the gui, and not just the display text.
  */
-public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE>implements IBeanField<VALUE> {
+public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implements IBeanField<VALUE> {
   private IBeanFieldUIFacade m_uiFacade;
 
   @Override
@@ -58,7 +58,7 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE>implement
     chain.execAppLinkAction(ref);
   }
 
-  protected static class LocalBeanFieldExtension<VALUE, OWNER extends AbstractBeanField<VALUE>> extends LocalValueFieldExtension<VALUE, OWNER>implements IBeanFieldExtension<VALUE, OWNER> {
+  protected static class LocalBeanFieldExtension<VALUE, OWNER extends AbstractBeanField<VALUE>> extends LocalValueFieldExtension<VALUE, OWNER> implements IBeanFieldExtension<VALUE, OWNER> {
 
     public LocalBeanFieldExtension(OWNER owner) {
       super(owner);

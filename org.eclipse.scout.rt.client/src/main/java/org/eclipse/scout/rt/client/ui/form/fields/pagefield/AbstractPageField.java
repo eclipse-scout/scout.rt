@@ -243,7 +243,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     chain.execPageChanged(oldPage, newPage);
   }
 
-  protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER>implements IPageFieldExtension<T, OWNER> {
+  protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER> implements IPageFieldExtension<T, OWNER> {
 
     public LocalPageFieldExtension(OWNER owner) {
       super(owner);

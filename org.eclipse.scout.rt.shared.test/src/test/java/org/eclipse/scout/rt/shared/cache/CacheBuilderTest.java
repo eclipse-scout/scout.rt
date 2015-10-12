@@ -36,12 +36,8 @@ public class CacheBuilderTest {
     @SuppressWarnings("unchecked")
     ICacheBuilder<Integer, String> cacheBuilder = BEANS.get(ICacheBuilder.class);
 
-    ICache<Integer, String> cache = cacheBuilder.withCacheId(CACHE_ID).
-        withMaxConcurrentResolve(2).
-        withValueResolver(resolver).
-        withAdditionalCustomWrapper(TestCacheWrapper.class).
-        withAdditionalCustomWrapper(BoundedResolveCacheWrapper.class, 12).
-        build();
+    ICache<Integer, String> cache =
+        cacheBuilder.withCacheId(CACHE_ID).withMaxConcurrentResolve(2).withValueResolver(resolver).withAdditionalCustomWrapper(TestCacheWrapper.class).withAdditionalCustomWrapper(BoundedResolveCacheWrapper.class, 12).build();
 
     assertTrue(cache instanceof BoundedResolveCacheWrapper);
     ICache<Integer, String> cacheDelegate = ((AbstractCacheWrapper<Integer, String>) cache).getDelegate();

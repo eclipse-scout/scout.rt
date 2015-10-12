@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalFie
 /**
  * @since 3.9.0
  */
-public class ProposalColumnField<T> extends AbstractProposalField<T>implements IColumnWrapper<IProposalColumn<T>> {
+public class ProposalColumnField<T> extends AbstractProposalField<T> implements IColumnWrapper<IProposalColumn<T>> {
   private ProposalColumnFieldPropertyDelegator<T> m_propertyDelegator;
 
   public ProposalColumnField(IProposalColumn<T> column) {

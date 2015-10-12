@@ -646,7 +646,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     }
   }
 
-  protected static class LocalGroupBoxExtension<OWNER extends AbstractGroupBox> extends LocalCompositeFieldExtension<OWNER>implements IGroupBoxExtension<OWNER> {
+  protected static class LocalGroupBoxExtension<OWNER extends AbstractGroupBox> extends LocalCompositeFieldExtension<OWNER> implements IGroupBoxExtension<OWNER> {
 
     public LocalGroupBoxExtension(OWNER owner) {
       super(owner);

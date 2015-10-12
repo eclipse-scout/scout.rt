@@ -68,7 +68,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("5648579d-1968-47be-a0c9-a8c846d2caf4")
-public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>>implements ITreeBox<T> {
+public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> implements ITreeBox<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeBox.class);
 
   private ITree m_tree;
@@ -1148,7 +1148,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>>imple
     chain.execFilterLookupResult(call, result);
   }
 
-  protected static class LocalTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends LocalValueFieldExtension<Set<T>, OWNER>implements ITreeBoxExtension<T, OWNER> {
+  protected static class LocalTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends LocalValueFieldExtension<Set<T>, OWNER> implements ITreeBoxExtension<T, OWNER> {
 
     public LocalTreeBoxExtension(OWNER owner) {
       super(owner);

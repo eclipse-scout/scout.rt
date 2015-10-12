@@ -56,17 +56,96 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * ServerServiceFactory = ServerJob.getCurrentSession()!=null && (BE || OFF)
  * </p>
  * <h3>Visibility overview per tier and offline state</h3>
- * <table border=1> <tr> <td>&nbsp;</td> <td>P</td> <td>C</td> <td>S</td> <td>G</td> </tr> <tr> <td>FE-ON</td>
- * <td>X</td> <td>X</td> <td>&nbsp;</td> <td>X</td> </tr> <tr> <td>FE-OFF</td> <td>X</td> <td>X</td> <td>X</td>
- * <td>X</td> </tr> <tr> <td>BE</td> <td>&nbsp;</td> <td>X</td> <td>X</td> <td>X</td> </tr> </table> <h3>Proxy
- * visibility per tier and offline state</h3> <table border=1> <tr> <td>&nbsp;</td> <td>ON</td> <td>OFF</td> </tr> <tr>
- * <td>FE</td> <td>X</td> <td>X (via IOfflineDispatcher)</td> </tr> <tr> <td>BE</td> <td>&nbsp;</td> <td>&nbsp;</td>
- * </tr> </table> Special care has to be taken when implementing pseudo proxies as client services. <h3>Client service
- * visibility per tier and offline state</h3> <table border=1> <tr> <td>&nbsp;</td> <td>ON</td> <td>OFF</td> </tr> <tr>
- * <td>FE</td> <td>X</td> <td>X</td> </tr> <tr> <td>BE</td> <td>X</td> <td>X</td> </tr> </table> <h3>Server service
- * visibility per tier and offline state</h3> <table border=1> <tr> <td>&nbsp;</td> <td>ON</td> <td>OFF</td> </tr> <tr>
- * <td>FE</td> <td>&nbsp;</td> <td>X</td> </tr> <tr> <td>BE</td> <td>X</td> <td>X</td> </tr> </table> <p> Offline Mode
- * in client is FE and OFF </p> <p> Online Mode in client (even though there are offline plugins available) is FE and ON
+ * <table border=1>
+ * <tr>
+ * <td>&nbsp;</td>
+ * <td>P</td>
+ * <td>C</td>
+ * <td>S</td>
+ * <td>G</td>
+ * </tr>
+ * <tr>
+ * <td>FE-ON</td>
+ * <td>X</td>
+ * <td>X</td>
+ * <td>&nbsp;</td>
+ * <td>X</td>
+ * </tr>
+ * <tr>
+ * <td>FE-OFF</td>
+ * <td>X</td>
+ * <td>X</td>
+ * <td>X</td>
+ * <td>X</td>
+ * </tr>
+ * <tr>
+ * <td>BE</td>
+ * <td>&nbsp;</td>
+ * <td>X</td>
+ * <td>X</td>
+ * <td>X</td>
+ * </tr>
+ * </table>
+ * <h3>Proxy visibility per tier and offline state</h3>
+ * <table border=1>
+ * <tr>
+ * <td>&nbsp;</td>
+ * <td>ON</td>
+ * <td>OFF</td>
+ * </tr>
+ * <tr>
+ * <td>FE</td>
+ * <td>X</td>
+ * <td>X (via IOfflineDispatcher)</td>
+ * </tr>
+ * <tr>
+ * <td>BE</td>
+ * <td>&nbsp;</td>
+ * <td>&nbsp;</td>
+ * </tr>
+ * </table>
+ * Special care has to be taken when implementing pseudo proxies as client services.
+ * <h3>Client service visibility per tier and offline state</h3>
+ * <table border=1>
+ * <tr>
+ * <td>&nbsp;</td>
+ * <td>ON</td>
+ * <td>OFF</td>
+ * </tr>
+ * <tr>
+ * <td>FE</td>
+ * <td>X</td>
+ * <td>X</td>
+ * </tr>
+ * <tr>
+ * <td>BE</td>
+ * <td>X</td>
+ * <td>X</td>
+ * </tr>
+ * </table>
+ * <h3>Server service visibility per tier and offline state</h3>
+ * <table border=1>
+ * <tr>
+ * <td>&nbsp;</td>
+ * <td>ON</td>
+ * <td>OFF</td>
+ * </tr>
+ * <tr>
+ * <td>FE</td>
+ * <td>&nbsp;</td>
+ * <td>X</td>
+ * </tr>
+ * <tr>
+ * <td>BE</td>
+ * <td>X</td>
+ * <td>X</td>
+ * </tr>
+ * </table>
+ * <p>
+ * Offline Mode in client is FE and OFF
+ * </p>
+ * <p>
+ * Online Mode in client (even though there are offline plugins available) is FE and ON
  * </p>
  * See also {@link Order} for defining service ranking or {@link Replace} to hide the parent service
  */

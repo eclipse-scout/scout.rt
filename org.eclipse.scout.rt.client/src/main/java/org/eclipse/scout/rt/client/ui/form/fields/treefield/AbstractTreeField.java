@@ -436,7 +436,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
   }
 
-  protected static class LocalTreeFieldExtension<OWNER extends AbstractTreeField> extends LocalFormFieldExtension<OWNER>implements ITreeFieldExtension<OWNER> {
+  protected static class LocalTreeFieldExtension<OWNER extends AbstractTreeField> extends LocalFormFieldExtension<OWNER> implements ITreeFieldExtension<OWNER> {
 
     public LocalTreeFieldExtension(OWNER owner) {
       super(owner);

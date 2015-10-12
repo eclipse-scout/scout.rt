@@ -495,7 +495,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER>implements IDataModelEntityExtension<OWNER> {
+  protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalDataModelEntityExtension(OWNER owner) {

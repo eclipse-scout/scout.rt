@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.shared.data.form.ValidationRule;
  * fragment such as microsoft word editor)
  */
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
-public abstract class AbstractHtmlField extends AbstractValueField<String>implements IHtmlField {
+public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
 
   private IHtmlFieldUIFacade m_uiFacade;
@@ -330,7 +330,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String>implem
     chain.execAppLinkAction(ref);
   }
 
-  protected static class LocalHtmlFieldExtension<OWNER extends AbstractHtmlField> extends LocalValueFieldExtension<String, OWNER>implements IHtmlFieldExtension<OWNER> {
+  protected static class LocalHtmlFieldExtension<OWNER extends AbstractHtmlField> extends LocalValueFieldExtension<String, OWNER> implements IHtmlFieldExtension<OWNER> {
 
     public LocalHtmlFieldExtension(OWNER owner) {
       super(owner);

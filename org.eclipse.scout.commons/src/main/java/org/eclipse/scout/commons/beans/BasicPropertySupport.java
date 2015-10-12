@@ -555,7 +555,7 @@ public class BasicPropertySupport implements IEventListenerSource {
    * Returns whether there are any listeners registerd (unspecific or specific for the given propertyName)
    *
    * @param propertyName
-   * <br>
+   *          <br>
    *          if null, returns true if any unspecific Listeners are registered else false<br>
    *          if not null, returns true if any Listeners specific for the given propertyName - or unspecifc are
    *          registered

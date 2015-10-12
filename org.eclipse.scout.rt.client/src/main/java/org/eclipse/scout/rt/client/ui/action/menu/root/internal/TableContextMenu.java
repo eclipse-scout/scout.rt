@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 /**
  * The invisible root menu node of any table. (internal usage only)
  */
-public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable>implements ITableContextMenu {
+public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
   private List<? extends ITableRow> m_currentSelection;
 
   /**

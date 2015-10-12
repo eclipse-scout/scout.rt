@@ -138,7 +138,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     chain.execInitForm(form);
   }
 
-  protected static class LocalFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends LocalToolButtonExtension<OWNER>implements IFormToolButtonExtension<FORM, OWNER> {
+  protected static class LocalFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends LocalToolButtonExtension<OWNER> implements IFormToolButtonExtension<FORM, OWNER> {
 
     public LocalFormToolButtonExtension(OWNER owner) {
       super(owner);
