@@ -1,6 +1,6 @@
 scout.ColumnUserFilter = function() {
   scout.ColumnUserFilter.parent.call(this);
-  this.filterType = 'column';
+  this.filterType = scout.ColumnUserFilter.Type;
 
   /**
    * array of (normalized) key, text composite
@@ -13,6 +13,8 @@ scout.ColumnUserFilter = function() {
   this.selectedValues = [];
 };
 scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
+
+scout.ColumnUserFilter.Type = 'column';
 
 scout.ColumnUserFilter.prototype.calculateCube = function() {
   var containsSelectedValue, reorderAxis,

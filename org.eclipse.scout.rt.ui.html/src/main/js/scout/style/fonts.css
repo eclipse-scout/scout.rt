@@ -50,6 +50,7 @@ Try these to switch between fonts:
 
   .font-icon {
     font-family: scoutIcons, @defaultFont;
+    font-weight: normal;
     speak: none;
     font-style: normal;
     -webkit-font-smoothing: antialiased;

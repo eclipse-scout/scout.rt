@@ -56,6 +56,10 @@
       & > .table-header-item {
         padding-top: @desktop-table-header-padding-y;
         padding-bottom: @desktop-table-header-padding-y;
+
+        & > .table-header-item-state {
+          top: 10px;
+        }
       }
 
       & > .menubar > .menu-item {

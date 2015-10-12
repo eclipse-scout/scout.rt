@@ -142,16 +142,15 @@ scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.Table.prototype._insertCheckBoxColumn = function() {
-  var column = new scout.CheckBoxColumn(),
-    model = {
-      fixedWidth: true,
-      fixedPosition: true,
-      guiOnly: true,
-      disallowHeaderMenu: true,
-      width: scout.Table.COLUMN_MIN_WIDTH,
-      table: this
-    };
-  column.init(model, this.session);
+  var column = scout.create('BooleanColumn', {
+    session: this.session,
+    fixedWidth: true,
+    fixedPosition: true,
+    guiOnly: true,
+    disallowHeaderMenu: true,
+    width: scout.Table.COLUMN_MIN_WIDTH,
+    table: this
+  });
 
   scout.arrays.insert(this.columns, column, 0);
   this.checkableColumn = column;
@@ -159,16 +158,15 @@ scout.Table.prototype._insertCheckBoxColumn = function() {
 
 scout.Table.prototype._insertRowIconColumn = function() {
   var position = 0,
-    column = new scout.Column(),
-    model = {
+    column = scout.create('Column', {
+      session: this.session,
       fixedWidth: true,
       fixedPosition: true,
       guiOnly: true,
       disallowHeaderMenu: true,
       width: scout.Table.COLUMN_MIN_WIDTH,
       table: this
-    };
-  column.init(model, this.session);
+    });
   if (this.columns[0] === this.checkableColumn) {
     position = 1;
   }

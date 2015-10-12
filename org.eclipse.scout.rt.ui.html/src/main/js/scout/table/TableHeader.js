@@ -80,6 +80,9 @@ scout.TableHeader.prototype._render = function($parent) {
   this.updateMenuBar();
   this._reconcileScrollPos();
 
+  this.table.on('addFilter', this._onTableAddRemoveFilter.bind(this));
+  this.table.on('removeFilter', this._onTableAddRemoveFilter.bind(this));
+
   function resizeHeader(event) {
     var startX = event.pageX,
       $header = $(this).prev(),
@@ -265,7 +268,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
 };
 
 scout.TableHeader.prototype._onHeaderItemClick = function(event) {
-  var $headerItem = $(event.target),
+  var $headerItem = $(event.currentTarget),
     column = $headerItem.data('column');
 
   if (column.disallowHeaderMenu) {
@@ -306,8 +309,12 @@ scout.TableHeader.prototype._reconcileScrollPos = function() {
 scout.TableHeader.prototype.onSortingChanged = function() {
   for (var i = 0; i < this.table.columns.length; i++) {
     var column = this.table.columns[i];
-    this._applyColumnSorting(column.$header, column);
+    this._renderColumnState(column);
   }
+};
+
+scout.TableHeader.prototype.onFilterChanged = function(column) {
+  this._renderColumnState(column);
 };
 
 scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dragged) {
@@ -430,12 +437,14 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
   if (column.disallowHeaderMenu) {
     $header.addClass('disabled');
   }
-  this._applyColumnText($header, column);
-  this._applyColumnSorting($header, column);
+  this._renderColumnText(column);
+  this._renderColumnState(column);
 };
 
-scout.TableHeader.prototype._applyColumnText = function($header, column) {
-  var text = column.text;
+scout.TableHeader.prototype._renderColumnText = function(column) {
+  var text = column.text,
+    $header = column.$header;
+
   if (!text) {
     // Make sure empty header is as height as the others to make it properly clickable
     $header.html('&nbsp;');
@@ -444,26 +453,55 @@ scout.TableHeader.prototype._applyColumnText = function($header, column) {
     $header.text(text);
     $header.removeClass('empty');
   }
+
+  // Create state div
+  $header.data('state', $header.appendSpan('table-header-item-state'));
 };
 
-scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
-  $header.removeClass('sort-asc');
-  $header.removeClass('sort-desc');
-  $header.removeClass('group-asc');
-  $header.removeClass('group-desc');
+scout.TableHeader.prototype._renderColumnState = function(column) {
+  var sortDirection,
+    $header = column.$header,
+    $state = $header.data('state'),
+    filtered = this.table.getFilter(column.id);
 
-  var sortDirection;
+  $state.empty();
+  $header.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
+  $state.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
 
   if (column.sortActive) {
     sortDirection = column.sortAscending ? 'asc' : 'desc';
-    if(column.grouped){
+    if (column.grouped){
       $header.addClass('group-' + sortDirection);
     }
-    $header.addClass('sort-' + sortDirection);
+    $header.addClass('sorted sort-' + sortDirection);
+    $state.addClass('sorted sort-' + sortDirection);
   }
+
+  if (column.grouped || filtered) {
+    // contains group and filter symbols
+    var $left = $state.appendDiv('left');
+    if (column.grouped) {
+      $header.addClass('grouped');
+      $state.addClass('grouped');
+      $left.appendDiv().text('G');
+    }
+    if (filtered) {
+      $state.addClass('filtered');
+      $state.addClass('filtered');
+      $left.appendDiv().text('F');
+    }
+  }
+  // Contains sort arow
+  $state.appendDiv('right');
 };
 
 scout.TableHeader.prototype.updateMenuBar = function() {
   var menuItems = this.table._filterMenus(['Table.Header']);
   this.menuBar.updateItems(menuItems);
+};
+
+scout.TableHeader.prototype._onTableAddRemoveFilter = function(event) {
+  if (event.filter.filterType === scout.ColumnUserFilter.Type) {
+    this._renderColumnState(event.filter.column);
+  }
 };
