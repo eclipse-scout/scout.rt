@@ -12,6 +12,8 @@
 @icon-calendar: '\E003';
 @icon-clock: '\E004';
 @icon-checked: '\E005';
+@icon-group: '\E006';
+@icon-ungroup: '\E007';
 @icon-wand: '\E010';
 @icon-phone: '\E011';
 @icon-target: '\E020';
