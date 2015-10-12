@@ -50,6 +50,11 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   String PROP_DETAIL_FORM = "detailForm";
 
   /**
+   * {@link IForm}
+   */
+  String PROP_DEFAULT_DETAIL_FORM = "defaultDetailForm";
+
+  /**
    * {@link ITable}
    */
   String PROP_DETAIL_TABLE = "detailTable";

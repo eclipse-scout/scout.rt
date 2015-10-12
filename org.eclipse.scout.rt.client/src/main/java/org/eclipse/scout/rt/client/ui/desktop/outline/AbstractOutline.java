@@ -70,7 +70,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private IPageChangeStrategy m_pageChangeStrategy;
   private OptimisticLock m_contextPageOptimisticLock;
   private OutlineMediator m_outlineMediator;
-  private IForm m_defaultDetailForm;
 
   // internal usage of menus temporarily added to the tree.
   private List<IMenu> m_inheritedMenusOfPage;
@@ -467,7 +466,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public IForm getDefaultDetailForm() {
-    return m_defaultDetailForm;
+    return (IForm) propertySupport.getProperty(PROP_DEFAULT_DETAIL_FORM);
+  }
+
+  protected void setDefaultDetailFormInternal(IForm form) {
+    propertySupport.setProperty(PROP_DEFAULT_DETAIL_FORM, form);
   }
 
   @Override
@@ -693,8 +696,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       }
       form.setShowOnStart(false);
     }
-    m_defaultDetailForm = form;
-    firePageChanged(null);
+    setDefaultDetailFormInternal(form);
   }
 
   /**
