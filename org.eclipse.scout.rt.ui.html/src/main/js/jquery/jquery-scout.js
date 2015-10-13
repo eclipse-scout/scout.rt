@@ -97,16 +97,20 @@
     return $elem;
   };
 
-  $.makeSVG = function(type, id, cssClass, htmlContent) {
-    var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
-    if (id) {
-      $svgElement.attr('id', id);
+  $.makeSVG = function(type, cssClass, htmlContent, id) {
+    if (id === 0) {
+      //Allow 0 as id (!id would result in false)
+      id = '0';
     }
+    var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
     if (cssClass) {
       $svgElement.attr('class', cssClass);
     }
     if (htmlContent) {
       $svgElement.html(htmlContent);
+    }
+    if (id) {
+      $svgElement.attr('id', id);
     }
     return $svgElement;
   };
@@ -237,8 +241,8 @@
   };
 
   // append svg
-  $.fn.appendSVG = function(type, id, cssClass, htmlContent) {
-    return $.makeSVG(type, id, cssClass, htmlContent).appendTo(this);
+  $.fn.appendSVG = function(type, cssClass, htmlContent, id) {
+    return $.makeSVG(type, cssClass, htmlContent, id).appendTo(this);
   };
 
   $.pxToNumber = function(pixel) {

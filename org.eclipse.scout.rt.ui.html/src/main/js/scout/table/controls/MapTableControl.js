@@ -15,7 +15,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     tableCountries;
 
   this.$contentContainer = $parent
-    .appendSVG('svg', '', 'map-container')
+    .appendSVG('svg', 'map-container')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG('preserveAspectRatio', 'xMidYMid');
 
@@ -82,7 +82,8 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     }
 
     // finally: append country as svg path
-    var $country = this.$contentContainer.appendSVG('path', countries[c].id, 'map-item')
+    var $country = this.$contentContainer.appendSVG('path', 'map-item')
+      .attr('id', countries[c].id)
       .attr('d', pathString)
       .click(onMapClick);
 

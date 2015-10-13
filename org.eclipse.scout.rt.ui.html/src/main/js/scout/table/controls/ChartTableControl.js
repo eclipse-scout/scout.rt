@@ -47,7 +47,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   // add addition rectangle for hover and event handling
   $('svg.select-chart')
-    .appendSVG('rect', '', 'select-events')
+    .appendSVG('rect', 'select-events')
     .attr('width', 60)
     .attr('height', 45)
     .attr('fill', 'none')
@@ -138,15 +138,15 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('.select-data').first().addClass('selected');
 
   // draw first chart
-  var $chartMain = this.$contentContainer.appendSVG('svg', '', 'chart-main');
+  var $chartMain = this.$contentContainer.appendSVG('svg', 'chart-main');
   drawChart();
 
   function addSelectBar($container) {
-    var $svg = $container.appendSVG('svg', '', 'chart-bar select-chart');
+    var $svg = $container.appendSVG('svg', 'chart-bar select-chart');
     var show = [2, 4, 3, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
-      $svg.appendSVG('rect', '', 'select-fill')
+      $svg.appendSVG('rect', 'select-fill')
         .attr('x', s * 14)
         .attr('y', 50 - show[s] * 9)
         .attr('width', 12)
@@ -155,11 +155,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function addSelectStacked($container) {
-    var $svg = $container.appendSVG('svg', '', 'chart-stacked select-chart'),
+    var $svg = $container.appendSVG('svg', 'chart-stacked select-chart'),
       show = [2, 4, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
-      $svg.appendSVG('rect', '', 'select-fill')
+      $svg.appendSVG('rect', 'select-fill')
         .attr('x', 0)
         .attr('y', 16 + s * 9)
         .attr('width', show[s] * 14)
@@ -168,7 +168,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function addSelectLine($container) {
-    var $svg = $container.appendSVG('svg', '', 'chart-line select-chart'),
+    var $svg = $container.appendSVG('svg', 'chart-line select-chart'),
       show = [0, 1.7, 1, 2, 1.5, 3],
       pathPoints = [];
 
@@ -176,12 +176,12 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       pathPoints.push(2 + (s * 14) + ',' + (45 - show[s] * 11));
     }
 
-    $svg.appendSVG('path', '', 'select-fill-line').
+    $svg.appendSVG('path', 'select-fill-line').
     attr('d', 'M' + pathPoints.join('L'));
   }
 
   function addSelectPie($container) {
-    var $svg = $container.appendSVG('svg', '', 'chart-pie select-chart'),
+    var $svg = $container.appendSVG('svg', 'chart-pie select-chart'),
       show = [
         [0, 0.1],
         [0.1, 0.25],
@@ -189,27 +189,27 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       ];
 
     for (var s = 0; s < show.length; s++) {
-      $svg.appendSVG('path', '', 'select-fill-pie').
-      attr('d', pathSegment(37, 30, 24, show[s][0], show[s][1]));
+      $svg.appendSVG('path', 'select-fill-pie')
+        .attr('d', pathSegment(37, 30, 24, show[s][0], show[s][1]));
     }
   }
 
   function addSelectScatter($container) {
-    var $svg = $container.appendSVG('svg', '', 'chart-scatter select-chart');
+    var $svg = $container.appendSVG('svg', 'chart-scatter select-chart');
 
-    $svg.appendSVG('line', '', 'select-fill-line')
+    $svg.appendSVG('line', 'select-fill-line')
       .attr('x1', 3).attr('y1', 53)
       .attr('x2', 70).attr('y2', 53);
 
-    $svg.appendSVG('line', '', 'select-fill-line')
+    $svg.appendSVG('line', 'select-fill-line')
       .attr('x1', 8).attr('y1', 12)
       .attr('x2', 8).attr('y2', 58);
 
-    $svg.appendSVG('circle', '', 'select-fill')
+    $svg.appendSVG('circle', 'select-fill')
       .attr('cx', 22).attr('cy', 40)
       .attr('r', 5);
 
-    $svg.appendSVG('circle', '', 'select-fill')
+    $svg.appendSVG('circle', 'select-fill')
       .attr('cx', 50).attr('cy', 26)
       .attr('r', 11);
   }
@@ -374,7 +374,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
       maxWidth = (w > maxWidth) ? w : maxWidth;
 
-      $chartMain.appendSVG('rect', '', 'main-chart')
+      $chartMain.appendSVG('rect', 'main-chart')
         .attr('x', x(a)).attr('y', y(0))
         .attr('width', width - 3).attr('height', 0)
         .delay(200)
@@ -443,7 +443,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
       maxHeight = (h > maxHeight) ? h : maxHeight;
 
-      $chartMain.appendSVG('rect', '', 'main-chart')
+      $chartMain.appendSVG('rect', 'main-chart')
         .attr('x', x(0)).attr('y', y(a))
         .attr('width', 0).attr('height', height - 3)
         .delay(200)
@@ -523,7 +523,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         value1 = xAxis.indexOf(key1) == -1 ? 0 : cube.getValue([key1])[0],
         value2 = xAxis.indexOf(key2) == -1 ? 0 : cube.getValue([key2])[0];
 
-      $chartMain.appendSVG('line', '', 'main-chart')
+      $chartMain.appendSVG('line', 'main-chart')
         .attr('x1', x(key1)).attr('y1', y(0))
         .attr('x2', x(key2)).attr('y2', y(0))
         .delay(200)
@@ -541,11 +541,13 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   function drawPie(xAxis, dataAxis, cube) {
     // circle for surrounding text, hehe: svg ;)
-    $chartMain.appendSVG('path', 'ArcAxis', 'main-axis')
+    $chartMain.appendSVG('path', 'main-axis')
+      .attr('id', 'ArcAxis')
       .attr('fill', 'none')
       .attr('d', 'M 210 160 m 0, -110 a 110,110 0 1, 1 0,220 a 110,110 0 1, 1 0,-220');
 
-    $chartMain.appendSVG('path', 'ArcAxisWide', 'main-axis')
+    $chartMain.appendSVG('path', 'main-axis')
+      .attr('id', 'ArcAxisWide')
       .attr('fill', 'none')
       .attr('d', 'M 210 160 m 0, -122 a 122,122 0 1, 1 0,244 a 122,122 0 1, 1 0,-244');
 
@@ -608,7 +610,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       }
 
       // arc segement
-      var $arc = $chartMain.appendSVG('path', '', 'main-chart')
+      var $arc = $chartMain.appendSVG('path', 'main-chart')
         .attr('data-start', startAngle)
         .attr('data-end', endAngle - 0.001)
         .delay(200)
@@ -622,7 +624,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         .click(chartClick);
 
       // labels
-      var $label1 = $chartMain.appendSVG('text', '', 'main-axis-x')
+      var $label1 = $chartMain.appendSVG('text', 'main-axis-x')
         .appendSVG('textPath')
         .attrSVG('startOffset', (startAngle + endAngle) / 2 * 100 + '%')
         .attrXLINK('href', '#ArcAxis')
@@ -633,7 +635,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       // data inside the arc
       var midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI;
 
-      var $label2 = $chartMain.appendSVG('text', '', 'main-axis')
+      var $label2 = $chartMain.appendSVG('text', 'main-axis')
         .attr('x', 210 + 70 * Math.sin(midPoint))
         .attr('y', 160 - 70 * Math.cos(midPoint))
         .text(Math.round(value / dataAxis.total * 100) + '%')
@@ -736,7 +738,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
             r = Math.max(Math.sqrt((value - dataAxis.min) / (dataAxis.max - dataAxis.min)) * 40, 10);
           }
 
-          $chartMain.appendSVG('circle', '', 'main-chart')
+          $chartMain.appendSVG('circle', 'main-chart')
             .attr('cx', x(key1))
             .attr('cy', y(key2))
             .attr('r', 0)
@@ -757,7 +759,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawAxisLine(x1, y1, x2, y2) {
-    $chartMain.appendSVG('line', '', 'main-axis')
+    $chartMain.appendSVG('line', 'main-axis')
       .attr('x1', x1).attr('y1', y1)
       .attr('x2', x2).attr('y2', y2)
       .attr('opacity', 0)
@@ -765,7 +767,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawAxisText(x, y, c, t) {
-    var $text = $chartMain.appendSVG('text', '', 'main-axis-' + c)
+    var $text = $chartMain.appendSVG('text', 'main-axis-' + c)
       .attr('x', x).attr('y', y)
       .text(t)
       .attr('opacity', 0);

@@ -15,7 +15,7 @@ scout.TagCloudField.prototype.demo = [[368, 'Geschäftsvorfälle'], [117726, 'Ko
 
 scout.TagCloudField.prototype._render = function($parent) {
   this.addContainer($parent, 'tag-cloud-field');
-  this.addField($.makeSVG('svg', '', 'tag-cloud'));
+  this.addField($.makeSVG('svg', 'tag-cloud'));
 
   this.addLabel();
   this.addStatus();
@@ -47,7 +47,7 @@ scout.TagCloudField.prototype._renderPostponed = function() {
 
   // initial draw with size and color and position
   for (i = 0; i < data.length; i++) {
-    $t = this.$field.appendSVG('text', '', '', this.session.locale.decimalFormat.format(data[i][0]) + ' ' + data[i][1]);
+    $t = this.$field.appendSVG('text', '', this.session.locale.decimalFormat.format(data[i][0]) + ' ' + data[i][1]);
     color = i % 5;
     size = 25 + (data[i][0] - minCount) / (maxCount - minCount) * 25;
     driftX = (Math.random() * 2) - 1;

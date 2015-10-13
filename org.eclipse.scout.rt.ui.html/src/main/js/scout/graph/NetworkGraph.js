@@ -7,7 +7,6 @@ scout.NetworkGraph = function() {
 };
 scout.inherits(scout.NetworkGraph, scout.Widget);
 
-
 scout.NetworkGraph.prototype._init = function(options) {
   scout.NetworkGraph.parent.prototype._init.call(this, options);
 
@@ -15,7 +14,8 @@ scout.NetworkGraph.prototype._init = function(options) {
   this.initGraph();
 };
 
-scout.NetworkGraph.prototype.initGraph = function(){
+scout.NetworkGraph.prototype.initGraph = function() {
+  // TODO BSH Check if labels need to be html-encoded (appendSVG)
   var edge, i;
 
   this.edgeLength = 100;
@@ -23,13 +23,13 @@ scout.NetworkGraph.prototype.initGraph = function(){
   this.repulsion = 150;
 
   //initialize nodes
-  for (i=0; i< this.nodes.length; i++){
+  for (i = 0; i < this.nodes.length; i++) {
     this.edgesByNode[this.nodes[i].id] = [];
     this.nodes[i].degree = 0;
   }
 
   //initialize edges
-  for (i = 0; i< this.edges.length; i++){
+  for (i = 0; i < this.edges.length; i++) {
     edge = this.edges[i];
     this.edgesByNode[edge.source].push(edge);
     this.edgesByNode[edge.target].push(edge);
@@ -42,26 +42,27 @@ scout.NetworkGraph.prototype.initGraph = function(){
 
 scout.NetworkGraph.prototype._renderInternal = function($parent) {
 
-  var n = this.nodes.length, i, node;
+  var n = this.nodes.length,
+    i, node;
   //copied from Chris' prototype...
-  this.$container = $parent.appendSVG('svg', '', 'graph-container');
+  this.$container = $parent.appendSVG('svg', 'graph-container');
 
-//some basics
+  //some basics
   this.radius = 10.0;
   this.kelvin = 0.99;
   this.wContainer = this.$container.width();
   this.hContainer = this.$container.height();
 
-//create all links with label
+  //create all links with label
   for (var l = 0; l < this.edges.length; l++) {
     var link = this.edges[l];
 
-    link.$div = this.$container.appendSVG('line', null, 'graph-link');
-    link.$divText = this.$container.appendSVG('text', null, 'graph-link-text', link.label)
+    link.$div = this.$container.appendSVG('line', 'graph-link');
+    link.$divText = this.$container.appendSVG('text', 'graph-link-text', link.label)
       .attr('dy', -5);
   }
 
-//create nodes with text and place them randomly
+  //create nodes with text and place them randomly
   for (i = 0; i < this.nodes.length; i++) {
 
     node = this.nodes[i];
@@ -75,7 +76,7 @@ scout.NetworkGraph.prototype._renderInternal = function($parent) {
   }
 
   var done = false;
-  for(i=0; i<this.nodes.length; i++){
+  for (i = 0; i < this.nodes.length; i++) {
     done = this.step(false, false);
   }
 
@@ -83,57 +84,48 @@ scout.NetworkGraph.prototype._renderInternal = function($parent) {
 
   for (i = 0; i < this.nodes.length; i++) {
     node = this.nodes[i];
-    node.$div = this.$container.appendSVG('circle', null, 'graph-node ' + node.cssClass)
-    .attr('r', this.getSize(node))
-    .attr('cx', node.x).attr('cy', node.y)
-    .on('mousedown', this.moveNode.bind(this))
-    .on('dblclick', this.lockNode.bind(this, node));
+    node.$div = this.$container.appendSVG('circle', 'graph-node ' + node.cssClass)
+      .attr('r', this.getSize(node))
+      .attr('cx', node.x).attr('cy', node.y)
+      .on('mousedown', this.moveNode.bind(this))
+      .on('dblclick', this.lockNode.bind(this, node));
 
-    node.$divText = this.$container.appendSVG('text', null, 'graph-node-text', node.label)
-    .on('mousedown', this.moveNode.bind(this));
+    node.$divText = this.$container.appendSVG('text', 'graph-node-text', node.label)
+      .on('mousedown', this.moveNode.bind(this));
   }
 
-
-//start optimization
+  //start optimization
   this.start();
 };
 
-
-scout.NetworkGraph.prototype.adjustTemperature = function(k){
+scout.NetworkGraph.prototype.adjustTemperature = function(k) {
   k = +k;
-  if(k === 0){
+  if (k === 0) {
     this.kelvin = 0; //will stop after current step() call
-  }
-  else if(this.kelvin === 0){
+  } else if (this.kelvin === 0) {
     //start it up:
     this.kelvin = k;
     setTimeout(this.step.bind(this), 0);
-  }
-  else if(k > this.kelvin){
+  } else if (k > this.kelvin) {
     //already running, increase if necessary.
     this.kelvin = k;
   }
 };
 
-scout.NetworkGraph.prototype.start = function(){
+scout.NetworkGraph.prototype.start = function() {
   this.adjustTemperature(0.9);
 };
 
-scout.NetworkGraph.prototype.resume = function(){
+scout.NetworkGraph.prototype.resume = function() {
   this.adjustTemperature(0.3);
 };
 
 //executes one simulation step
 scout.NetworkGraph.prototype.step = function(draw, recurse) {
+  draw = scout.helpers.nvl(draw, true);
+  recurse = scout.helpers.nvl(recurse, true);
 
-  if( typeof(draw)==='undefined') {
-    draw = true;
-  }
-  if( typeof(recurse)==='undefined') {
-    recurse = true;
-  }
-
-  if((this.kelvin *= 0.98) < 0.01){
+  if ((this.kelvin *= 0.98) < 0.01) {
     //end
     this.kelvin = 0;
     return true;
@@ -141,25 +133,28 @@ scout.NetworkGraph.prototype.step = function(draw, recurse) {
 
   //variables:
   var m = this.edges.length,
-  n = this.nodes.length,
-  i, j = 0,
-  dx, dy = 0,
-  w,
-  f = 0, repForce = 0, //force factor
-  d = 0,
-  cx = this.wContainer / 2, cy = this.hContainer / 2, //coordinates of center of drawing area
-  rf = [], sf = [], gf = [],
-  n1, n2;
-
+    n = this.nodes.length,
+    i, j = 0,
+    dx, dy = 0,
+    w,
+    f = 0,
+    repForce = 0, //force factor
+    d = 0,
+    cx = this.wContainer / 2,
+    cy = this.hContainer / 2, //coordinates of center of drawing area
+    rf = [],
+    sf = [],
+    gf = [],
+    n1, n2;
 
   //First: accumulate rep forces:
 
-//repulsive force
-  for(i=0; i<n; i++){
+  //repulsive force
+  for (i = 0; i < n; i++) {
     n1 = this.nodes[i];
-    for(j=i; j<n; j++){
+    for (j = i; j < n; j++) {
       //repulsion force:
-      if(i===j){
+      if (i === j) {
         continue;
       }
       n2 = this.nodes[j];
@@ -169,16 +164,21 @@ scout.NetworkGraph.prototype.step = function(draw, recurse) {
       dy = n2.y - n1.y; //n1 to n2 in y-coord
 
       d = (dx * dx + dy * dy); //squared distance between n1 and n2
-      if(d) { //avoid division by zero
+      if (d) { //avoid division by zero
         repForce = this.kelvin * (this.repulsion / d);
         dx *= repForce;
         dy *= repForce;
         w = (n1.degree / (n1.degree + n2.degree));
-//        w = 0.5;
-        rf.push({n1:n1, n2:n2, x:dx, y:dy});
-        n1.dx -=  (2-w) * dx;
-        n1.dy -= (2-w) * dy;
-        n2.dx +=  (1 + w) * dx;
+        //        w = 0.5;
+        rf.push({
+          n1: n1,
+          n2: n2,
+          x: dx,
+          y: dy
+        });
+        n1.dx -= (2 - w) * dx;
+        n1.dy -= (2 - w) * dy;
+        n2.dx += (1 + w) * dx;
         n2.dy += (1 + w) * dy;
       }
     }
@@ -188,13 +188,12 @@ scout.NetworkGraph.prototype.step = function(draw, recurse) {
   //verlet integration:
 
   var oldx, oldy;
-  for(i=0; i<n; i++){
+  for (i = 0; i < n; i++) {
     n1 = this.nodes[i];
-    if(n1.locked || n1.userLocked){
+    if (n1.locked || n1.userLocked) {
       n1.x = n1.prevX;
       n1.y = n1.prevY;
-    }
-    else{
+    } else {
       oldx = n1.x;
       oldy = n1.y;
       n1.x = n1.x + (n1.x - n1.prevX + n1.dx) * 0.9;
@@ -211,35 +210,40 @@ scout.NetworkGraph.prototype.step = function(draw, recurse) {
   //constraint satisfaction
 
   //spring force
-  for(i=0; i<m; i++){
-    n1=this.nodes[this.edges[i].source];
-    n2=this.nodes[this.edges[i].target];
+  for (i = 0; i < m; i++) {
+    n1 = this.nodes[this.edges[i].source];
+    n2 = this.nodes[this.edges[i].target];
 
     //(dx, dy) is the vector from n1 to n2;
     dx = n2.x - n1.x; //n1 to n2 in x-coord
     dy = n2.y - n1.y; //n1 to n2 in y-coord
 
     d = (dx * dx + dy * dy); //squared distance between n1 and n2
-    if(d) { //avoid division by zero
+    if (d) { //avoid division by zero
       d = Math.sqrt(d);
-        f = this.kelvin * ((d - this.edgeLengths[i]) / (d));
-//      f = this.kelvin * (Math.max((d - this.edgeLengths[i]), 0) / (1.5*d));
+      f = this.kelvin * ((d - this.edgeLengths[i]) / (d));
+      //      f = this.kelvin * (Math.max((d - this.edgeLengths[i]), 0) / (1.5*d));
       dx *= f;
       dy *= f;
       w = (n1.degree / (n1.degree + n2.degree));
-      sf.push({n1:n1, n2:n2, x:dx, y:dy});
-      n1.x += dx * (1-w);
-      n1.y += dy * (1-w);
+      sf.push({
+        n1: n1,
+        n2: n2,
+        x: dx,
+        y: dy
+      });
+      n1.x += dx * (1 - w);
+      n1.y += dy * (1 - w);
       n2.x -= dx * w;
       n2.y -= dy * w;
     }
   }
 
-  for(i=0; i<n; i++){
+  for (i = 0; i < n; i++) {
     n1 = this.nodes[i];
     f = this.kelvin * this.gravity;
     if (n1.cssClass.localeCompare('node_center') === 0) {
-      f += ((1-f) / 10); //make center node strive more to middle
+      f += ((1 - f) / 10); //make center node strive more to middle
     }
     //gravity:
     //(dx, dy) is the vector from n1 to the center;
@@ -249,29 +253,27 @@ scout.NetworkGraph.prototype.step = function(draw, recurse) {
     n1.y += f * dy;
   }
 
-
-  for(i=0;i<n;i++){
+  for (i = 0; i < n; i++) {
     n1 = this.nodes[i];
-    if(n1.locked || n1.userLocked){
+    if (n1.locked || n1.userLocked) {
       n1.x = n1.prevX;
       n1.y = n1.prevY;
     }
-//    this.ensureInside(n1);
+    //    this.ensureInside(n1);
   }
 
-  if(draw){
-    for(i=0; i<n; i++){
+  if (draw) {
+    for (i = 0; i < n; i++) {
       n1 = this.nodes[i];
       this.setNodeDirect(n1, n1.x, n1.y);
     }
   }
 
-  if(recurse){
+  if (recurse) {
     setTimeout(this.step.bind(this), 0);
   }
 
 };
-
 
 //set label of a link
 scout.NetworkGraph.prototype.setLabel = function(link) {
@@ -350,14 +352,13 @@ scout.NetworkGraph.prototype.moveNode = function(event) {
 
   function nodeMove(event) {
     var dx = event.pageX - startX,
-    dy = event.pageY - startY;
+      dy = event.pageY - startY;
 
     clickedNode.x += dx;
     clickedNode.y += dy;
     clickedNode.prevX = clickedNode.x;
     clickedNode.prevY = clickedNode.y;
     clickedNode.locked = true;
-
 
     that.setNodeDirect.call(that, clickedNode, clickedNode.x, clickedNode.y);
     startX = event.pageX;
@@ -373,10 +374,9 @@ scout.NetworkGraph.prototype.moveNode = function(event) {
 };
 
 scout.NetworkGraph.prototype.lockNode = function(node) {
-  if(node.userLocked){
+  if (node.userLocked) {
     node.userLocked = false;
-  }
-  else{
+  } else {
     node.userLocked = true;
   }
 };
@@ -436,9 +436,9 @@ scout.NetworkGraph.prototype._remove = function() {
   scout.NetworkGraph.parent.prototype._remove.call(this);
 };
 
-scout.NetworkGraph.prototype._resetGraph = function(){
+scout.NetworkGraph.prototype._resetGraph = function() {
   var i, n1;
-  for(i=0; i<this.nodes.length; i++){
+  for (i = 0; i < this.nodes.length; i++) {
     n1 = this.nodes[i];
     n1.locked = false;
     n1.userLocked = false;
@@ -449,7 +449,7 @@ scout.NetworkGraph.prototype.stopAnimation = function() {
   this.adjustTemperature(0);
 };
 
-scout.NetworkGraph.prototype.ensureInside = function(node){
+scout.NetworkGraph.prototype.ensureInside = function(node) {
   var actualX, actualY;
   actualX = Math.min(node.x, this.wContainer - this.radius);
   actualX = Math.max(actualX, 0);
@@ -466,4 +466,3 @@ scout.NetworkGraph.prototype.onResize = function() {
   this.hContainer = this.$container.height();
   this.resume();
 };
-

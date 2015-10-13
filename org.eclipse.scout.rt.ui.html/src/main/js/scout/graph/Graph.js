@@ -6,47 +6,49 @@ scout.Graph = function(graphModel) {
 scout.inherits(scout.Graph, scout.Widget);
 
 scout.Graph.prototype._render = function($parent) {
+  // TODO BSH Check if labels need to be html-encoded (appendSVG)
 
   //This is Chris's prototype
 
-  this.$container = $parent.appendSVG('svg', '', 'graph-container');
+  this.$container = $parent.appendSVG('svg', 'graph-container');
 
-//some basics
+  //some basics
   this.wBox = 120;
   this.hBox = 60;
   this.kelvin = 1000;
   this.wContainer = this.$container.width();
   this.hContainer = this.$container.height();
 
-//create all links with label
+  //create all links with label
   for (var l = 0; l < this.edges.length; l++) {
     var link = this.edges[l];
 
-    link.$div = this.$container.appendSVG('line', null, 'graph-link');
-    link.$divText = this.$container.appendSVG('text', null, 'graph-link-text', link.label)
+    link.$div = this.$container.appendSVG('line', 'graph-link');
+    link.$divText = this.$container.appendSVG('text', 'graph-link-text', link.label)
       .attr('dy', -5);
   }
 
-//create nodes with text and place them randomly
+  //create nodes with text and place them randomly
   for (var n = 0; n < this.nodes.length; n++) {
     var node = this.nodes[n];
 
-    node.$div = this.$container.appendSVG('rect', null, 'graph-node ' + node.cssClass)
-      .attr('width', this.wBox).attr('height', this.hBox)
-      .attr('x', 0).attr('y', 0)
+    node.$div = this.$container.appendSVG('rect', 'graph-node ' + node.cssClass)
+      .attr('width', this.wBox)
+      .attr('height', this.hBox)
+      .attr('x', 0)
+      .attr('y', 0)
       .on('mousedown', this.moveNode.bind(this));
 
-    node.$divText = this.$container.appendSVG('text', null, 'graph-node-text', node.label)
+    node.$divText = this.$container.appendSVG('text', 'graph-node-text', node.label)
       .on('mousedown', this.moveNode.bind(this));
 
     this.setNode(node, Math.random() * (this.wContainer - this.wBox), Math.random() * (this.hContainer - this.hBox));
   }
 
-//start optimization
+  //start optimization
   this.disolveLinks();
   this.doPhysics();
 };
-
 
 //set label of a link
 scout.Graph.prototype.setLabel = function(link) {

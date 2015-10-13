@@ -24,20 +24,20 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
   // svg container for venn
   var $vennContainer = this.$contentContainer
-    .appendSVG('svg', '', 'venn-container')
+    .appendSVG('svg', 'venn-container')
     .attrSVG('viewBox', '0 0 500 330')
     .attrSVG('preserveAspectRatio', 'xMinYMin')
     .on('click', clickCriteria)
     .on('contextmenu', clickSet);
 
-  var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
+  var $vennDefs = $vennContainer.appendSVG('defs', 'venn-defs');
 
   appendRect($vennContainer, 'venn-all');
 
   // criteria container
   this.$contentContainer.appendDiv('criteria-back')
     .on('click', '', backMap);
-  var $criteriaNavigation = this.$contentContainer.appendDiv('', 'criteria-navigation');
+  var $criteriaNavigation = this.$contentContainer.appendDiv('criteria-navigation');
   this.$contentContainer.append('<input class="criteria-search"></input>')
     .on('input paste', '', searchMap)
     .placeholder(this.session.text('ui.FilterBy_'));
@@ -69,11 +69,11 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   // draw buttons
-  $vennContainer.appendSVG('text', '', 'venn-button', 'Schnittmenge')
+  $vennContainer.appendSVG('text', 'venn-button', 'Schnittmenge')
     .attr('x', 490).attr('y', 290)
     .click(setIntersect);
 
-  $vennContainer.appendSVG('text', '', 'venn-button', 'Vereinigungsmenge')
+  $vennContainer.appendSVG('text', 'venn-button', 'Vereinigungsmenge')
     .attr('x', 490).attr('y', 307)
     .click(setUnion);
 
@@ -419,10 +419,10 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
     // show count all data
     if (count.total) {
-      $vennContainer.appendSVG('text', '', 'venn-all-text venn-switch', count.total + ' Datensätze')
+      $vennContainer.appendSVG('text', 'venn-all-text venn-switch', count.total + ' Datensätze')
         .attr('x', 490).attr('y', 28);
 
-      $vennContainer.appendSVG('text', '', 'venn-button venn-switch', 'Ansicht wechseln')
+      $vennContainer.appendSVG('text', 'venn-button venn-switch', 'Ansicht wechseln')
         .attr('x', 490).attr('y', 273)
         .click(switchShow);
     }
@@ -644,7 +644,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
   function drawText(text, dx, dy) {
     if (count.total) {
-      $vennContainer.appendSVG('text', '', 'venn-circle-text', text || '0')
+      $vennContainer.appendSVG('text', 'venn-circle-text', text || '0')
         .attr('x', MID_X + dx)
         .attr('y', MID_Y + dy)
         .attr('opacity', 0)
@@ -653,7 +653,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawSetOuter(ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
-    var $mask = $vennDefs.empty().appendSVG('mask', 'maskAll', '');
+    var $mask = $vennDefs.empty().appendSVG('mask').attr('id', 'maskAll');
     appendRect($mask, '', 'white');
     if (ra) {
       appendCircle($mask, dxa, dya, ra);
@@ -671,7 +671,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function appendRect($def, claz, fill) {
-    var $rect = $def.appendSVG('rect', '', '')
+    var $rect = $def.appendSVG('rect')
       .attr('x', 5).attr('y', 15)
       .attr('width', 490).attr('height', 300)
       .attr('rx', 5).attr('ry', 8);
@@ -687,7 +687,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function appendCircle($def, dx, dy, r, claz, fill) {
-    var $circle = $def.appendSVG('circle', '', '')
+    var $circle = $def.appendSVG('circle')
       .attr('cx', MID_X + dx)
       .attr('cy', MID_Y + dy)
       .attr('r', r);
@@ -703,7 +703,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawSetMain(id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
-    var $mask = $vennDefs.appendSVG('mask', 'set' + id, '');
+    var $mask = $vennDefs.appendSVG('mask').attr('id', 'set' + id);
     appendCircle($mask, dxa, dya, ra, '', 'white');
     if (rb) {
       appendCircle($mask, dxb, dyb, rb);
@@ -718,11 +718,11 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawSetIntersect(id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
-    var $clip = $vennDefs.appendSVG('clipPath', 'set-clip' + id, '');
+    var $clip = $vennDefs.appendSVG('clipPath').attr('id', 'set-clip' + id);
     appendCircle($clip, dxb, dyb, rb);
 
     if (rc) {
-      var $mask = $vennDefs.appendSVG('mask', 'set-mask' + id, '');
+      var $mask = $vennDefs.appendSVG('mask').attr('id', 'set-mask' + id);
       appendCircle($mask, dxa, dya, ra, '', 'white');
       appendCircle($mask, dxc, dyc, rc);
     }
@@ -734,10 +734,10 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawSetTriple(id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
-    var $clip = $vennDefs.appendSVG('clipPath', 'set-clip' + id, '');
+    var $clip = $vennDefs.appendSVG('clipPath').attr('id', 'set-clip' + id);
     appendCircle($clip, dxb, dyb, rb);
 
-    var $mask = $vennDefs.appendSVG('mask', 'set-mask' + id, '');
+    var $mask = $vennDefs.appendSVG('mask').attr('id', 'set-mask' + id);
     appendCircle($mask, dxa, dya, ra);
     appendCircle($mask, dxc, dyc, rc, '', 'white');
 
