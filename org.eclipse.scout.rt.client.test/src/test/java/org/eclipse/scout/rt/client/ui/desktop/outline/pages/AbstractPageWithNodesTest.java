@@ -49,6 +49,7 @@ public class AbstractPageWithNodesTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
     ITreeNode parentPageNode = desktop.getOutline().getSelectedNode();
     assertEquals("Parent page", parentPageNode.getCell().getText());
   }
@@ -60,6 +61,7 @@ public class AbstractPageWithNodesTest {
 
     desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
 
     IOutline outline = desktop.getOutline();
     assertNotNull(outline);
@@ -74,6 +76,7 @@ public class AbstractPageWithNodesTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
 
     AbstractPageWithNodes parentPage = (AbstractPageWithNodes) desktop.getOutline().getActivePage();
     ITreeNode parentPageNode = desktop.getOutline().getSelectedNode();

@@ -49,6 +49,7 @@ public class ColumnAutoResizeTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
     IOutline outline = desktop.getOutline();
 
     IPage<?> page = outline.getActivePage();

@@ -71,6 +71,7 @@ public class PageWithTableAndPageBeanTest {
 
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
 
     IOutline outline = desktop.getOutline();
     assertNotNull(outline);

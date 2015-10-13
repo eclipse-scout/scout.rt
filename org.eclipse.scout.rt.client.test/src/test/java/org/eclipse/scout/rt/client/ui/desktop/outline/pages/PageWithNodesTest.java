@@ -43,6 +43,7 @@ public class PageWithNodesTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
     IOutline outline = desktop.getOutline();
     PageWithNodes page = (PageWithNodes) outline.getActivePage();
     Assert.assertEquals(1, page.m_execPageDataLoadedCalled);

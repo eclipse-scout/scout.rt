@@ -405,6 +405,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void activateFirstPage() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public <T extends IForm> T findForm(Class<T> formType) {
     throw createUnsupportedOperationException();
   }

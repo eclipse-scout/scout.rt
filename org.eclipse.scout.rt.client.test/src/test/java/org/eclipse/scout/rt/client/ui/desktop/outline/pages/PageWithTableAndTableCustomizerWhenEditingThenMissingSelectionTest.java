@@ -66,6 +66,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   public void testWithUnchangedTableCustomizer() throws Exception {
     tableCustomizerSerialDataIsRandom = false;
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.activateFirstPage();
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
     //
@@ -83,6 +84,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   public void testWithChangedTableCustomizer() throws Exception {
     tableCustomizerSerialDataIsRandom = true;
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.activateFirstPage();
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
     //

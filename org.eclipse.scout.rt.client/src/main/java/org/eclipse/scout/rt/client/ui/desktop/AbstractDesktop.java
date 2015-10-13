@@ -1217,10 +1217,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     activateOutline(outline);
   }
 
-  /**
-   * Activates the first visible and enabled page of the current outline.
-   */
-  protected void activateFirstPage() {
+  @Override
+  public void activateFirstPage() {
     if (m_outline.isRootNodeVisible()) {
       m_outline.selectNode(m_outline.getRootNode(), false);
     }

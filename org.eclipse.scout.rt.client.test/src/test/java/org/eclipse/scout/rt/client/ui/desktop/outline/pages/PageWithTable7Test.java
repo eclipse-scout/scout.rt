@@ -44,6 +44,7 @@ public class PageWithTable7Test {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
     IOutline outline = desktop.getOutline();
     PageWithTable page = (PageWithTable) outline.getActivePage();
 

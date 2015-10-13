@@ -188,6 +188,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void activateOutline(IOutline outline);
 
   /**
+   * Activates the first visible and enabled page of the current outline.
+   */
+  void activateFirstPage();
+
+  /**
    * @return <code>true</code> if the given {@link IForm} is currently displayed. However, a value of <code>true</code>
    *         does not imply that the {@link IForm} is the currently active {@link IForm}.
    * @see #showForm(IForm)

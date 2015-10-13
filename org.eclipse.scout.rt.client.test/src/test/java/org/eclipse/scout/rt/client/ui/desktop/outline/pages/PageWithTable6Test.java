@@ -54,6 +54,7 @@ public class PageWithTable6Test {
     Outline outline = new Outline();
     desktop.setAvailableOutlines(Collections.singletonList(outline));
     desktop.activateOutline(outline);
+    desktop.activateFirstPage();
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
     //

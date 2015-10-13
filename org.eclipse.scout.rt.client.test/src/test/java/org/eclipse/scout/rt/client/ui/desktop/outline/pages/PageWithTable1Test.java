@@ -48,6 +48,7 @@ public class PageWithTable1Test {
 
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
 
     IOutline outline = desktop.getOutline();
     assertNotNull(outline);
@@ -70,6 +71,7 @@ public class PageWithTable1Test {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
     IOutline outline = desktop.getOutline();
     PageWithTable page = (PageWithTable) outline.getActivePage();
     Assert.assertEquals(1, page.m_execPageDataLoadedCalled);
