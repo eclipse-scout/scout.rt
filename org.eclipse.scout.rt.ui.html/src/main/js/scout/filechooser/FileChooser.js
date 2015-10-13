@@ -181,7 +181,7 @@ scout.FileChooser.prototype._doUpload = function() {
 };
 
 scout.FileChooser.prototype._doCancel = function() {
-  this.remoteHandler(this.id, 'cancel');
+  this._send('cancel');
 };
 
 scout.FileChooser.prototype._doAddFile = function() {

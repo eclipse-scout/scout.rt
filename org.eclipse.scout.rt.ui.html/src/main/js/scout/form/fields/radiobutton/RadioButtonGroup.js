@@ -79,7 +79,7 @@ scout.RadioButtonGroup.prototype.setNewSelection = function(formField) {
         }
         this.formFields[i].selected = true;
         this.formFields[i].$field.toggleClass('checked', true);
-        this.formFields[i].session.send(this.formFields[i].id, 'selected');
+        this.formFields[i]._send('selected');
         this.formFields[i]._renderTabbable(true);
         this.$field.focus();
       } else {

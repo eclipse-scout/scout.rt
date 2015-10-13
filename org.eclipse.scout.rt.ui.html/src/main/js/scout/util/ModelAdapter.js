@@ -43,7 +43,7 @@ scout.ModelAdapter.prototype._init = function(model) {
   scout.ModelAdapter.parent.prototype._init.call(this, model);
   this.id = model.id;
   this.objectType = model.objectType;
-  this.remoteHandler = this.session.send.bind(this.session);
+  this.remoteHandler = this.session.sendEvent.bind(this.session);
   this._register = scout.helpers.nvl(model._register, true);
   if (this._register) {
     this.session.registerModelAdapter(this);
@@ -63,6 +63,26 @@ scout.ModelAdapter.prototype._init = function(model) {
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
+};
+
+/**
+ * @returns Creates a scout.Event object from the current adapter instance and
+ *   sends the event by using the Session#sendEvent() method. Local objects may
+ *   set a different remoteHandler to call custom code instead of the Session#sendEvent()
+ *   method.
+ *
+ * @param type of event
+ * @param data of event
+ * @param delay (optional) delay before event is sent. default 0
+ * @param coalesceFunc (optional) coalesce function added to event-object
+ */
+scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
+  var adapterId = this.cloneOf || this.id;
+  var event = new scout.Event(adapterId, type, data);
+  if (coalesceFunc) {
+    event.coalesce = coalesceFunc;
+  }
+  this.remoteHandler(event, delay);
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
@@ -486,9 +506,9 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
 
 /**
  * Creates a deep clone of the current adapter instance. For each adapter a local object is created.
- * The 'cloneOf' property of the local-object points to the original adapter. You should use the
- * originalId() in place of 'this.id' when you're calling a remote-handler, so the event will be
- * sent to the original adapter on the UI server.
+ * The 'cloneOf' property of the local-object points to the original adapter. When the ModelAdapter#
+ * _send() method sends events to the server, it uses the ID of the original adapter for cloned instances
+ * so the original adapter/model is notified on the server.
  */
 scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
   var cloneProperty, cloneAdapter, adapterProperty,
@@ -532,22 +552,6 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
 
   this.session.registerAdapterClone(this, cloneAdapter);
   return cloneAdapter;
-};
-
-/**
- * @returns the ID of the model adapter or if the instance is a clone of another
- *   model adapter instance, the ID of the original adapter. Use this method as
- *   target parameter for calls to the remote-handler, so the original adapter
- *   will receive the event.
- */
-// FIXME AWE: remove originalId() move send-logic to model-adapter so we don't have to pass this.id everywhere
-// refactor remoteHandler and existing sendEvent methods
-scout.ModelAdapter.prototype.originalId = function() {
-  if (this.cloneOf) {
-    return this.cloneOf;
-  } else {
-    return this.id;
-  }
 };
 
 scout.ModelAdapter.prototype._isModelProperty = function(propertyName) {

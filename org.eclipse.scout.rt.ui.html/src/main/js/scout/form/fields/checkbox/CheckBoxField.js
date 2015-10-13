@@ -58,9 +58,7 @@ scout.CheckBoxField.prototype._toggleChecked = function() {
   }
   this.$checkBox.toggleClass('checked');
   var uiChecked = this.$checkBox.hasClass('checked');
-  this.remoteHandler(this.id, 'clicked', {
-    checked: uiChecked
-  });
+  this._send('clicked', {checked: uiChecked});
 };
 
 /**

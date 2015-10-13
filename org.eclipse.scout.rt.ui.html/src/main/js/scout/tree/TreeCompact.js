@@ -217,7 +217,5 @@ scout.TreeCompact.prototype._selectNode = function(node) {
     this._applyFilter('');
   }.bind(this), 100);
 
-  this.remoteHandler(this.id, 'nodeAction', {
-    nodeId: node.id
-  });
+  this._send('nodeAction', {nodeId: node.id});
 };

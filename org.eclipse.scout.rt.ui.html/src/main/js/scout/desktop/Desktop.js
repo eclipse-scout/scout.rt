@@ -739,17 +739,11 @@ scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
 };
 
 scout.Desktop.prototype._sendFormActivated = function(form) {
-  var data = {
-    formId: null
+  var eventData = {
+    formId: form ? form.id : null
   };
-  if (form) {
-    data.formId = form.id;
-  }
 
-  var event = new scout.Event(this.id, 'formActivated', data);
-  event.coalesce = function(previous) {
+  this._send('formActivated', eventData, 0, function(previous) {
     return this.type === previous.type;
-  };
-
-  this.session.sendEvent(event);
+  });
 };

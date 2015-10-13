@@ -74,7 +74,7 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
 };
 
 scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
-  this.remoteHandler(this.id, 'displayTextChanged', {
+  this._send('displayTextChanged', {
     displayText: displayText,
     whileTyping: whileTyping
   });

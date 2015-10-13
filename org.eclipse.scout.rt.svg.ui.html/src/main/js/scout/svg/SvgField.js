@@ -45,7 +45,5 @@ scout.SvgField.prototype._onAppLinkAction = function(event) {
 };
 
 scout.SvgField.prototype._sendAppLinkAction = function(ref) {
-  this.remoteHandler(this.id, 'appLinkAction', {
-    ref: ref
-  });
+  this._send('appLinkAction', {ref: ref});
 };

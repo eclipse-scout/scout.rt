@@ -705,13 +705,13 @@ scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServ
 
 scout.DateField.prototype._syncToServer = function() {
   if (this._hasUiErrorStatus()) {
-    this.remoteHandler(this.id, 'parsingError', {
+    this._send('parsingError', {
       invalidDisplayText: this.errorStatus.invalidDisplayText,
       invalidDateText: this.errorStatus.invalidDateText,
       invalidTimeText: this.errorStatus.invalidTimeText
     });
   } else {
-    this.remoteHandler(this.id, 'timestampChanged', {
+    this._send('timestampChanged', {
       timestamp: this.timestamp
     });
   }

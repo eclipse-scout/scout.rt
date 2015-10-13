@@ -432,18 +432,18 @@ scout.Calendar.prototype._sendModelChanged = function() {
     selectedDate: scout.dates.toJsonDate(this.selectedDate),
     displayMode: this.displayMode
   };
-  this.remoteHandler(this.id, 'modelChanged', data);
+  this._send('modelChanged', data);
 };
 
 scout.Calendar.prototype._sendViewRangeChanged = function() {
-  this.remoteHandler(this.id, 'viewRangeChanged', {
+  this._send('viewRangeChanged', {
     viewRange: this._jsonViewRange()
   });
 };
 
 scout.Calendar.prototype._sendSelectionChanged = function() {
   var selectedComponentId = this.selectedComponent ? this.selectedComponent.id : null;
-  this.remoteHandler(this.id, 'selectionChanged', {
+  this._send('selectionChanged', {
     date: scout.dates.toJsonDate(this.selectedDate),
     componentId: selectedComponentId
   });

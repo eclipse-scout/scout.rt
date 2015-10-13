@@ -106,8 +106,8 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem
     });
-    menu.remoteHandler = function(target, type) {
-      if ('doAction' === type) {
+    menu.remoteHandler = function(event) {
+      if ('doAction' === event.type) {
         $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
         tabBox._selectTab(tabItem);
       }

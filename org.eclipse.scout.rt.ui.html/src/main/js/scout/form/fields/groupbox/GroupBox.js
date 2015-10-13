@@ -285,9 +285,7 @@ scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {
 scout.GroupBox.prototype.setGroupBoxExpanded = function(expanded) {
   if (this.expanded !== expanded) {
     this.expanded = expanded;
-    this.remoteHandler(this.id, 'expanded', {
-      expanded: expanded
-    });
+    this._send('expanded', {expanded: expanded});
   }
   if (this.rendered) {
     this._renderExpanded(expanded);

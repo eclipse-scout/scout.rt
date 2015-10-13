@@ -184,8 +184,8 @@ scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
       text: tab.getMenuText(),
       tab: tab
     });
-    menu.remoteHandler = function(target, type) {
-      if ('doAction' === type) {
+    menu.remoteHandler = function(event) {
+      if ('doAction' === event.type) {
         $.log.debug('(DesktopTaskBarLayout#_onMouseDownOverflow) tab=' + this);
         desktop.viewTabsController.selectViewTab(this);
       }

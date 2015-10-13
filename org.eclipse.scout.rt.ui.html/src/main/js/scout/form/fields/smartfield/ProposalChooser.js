@@ -80,5 +80,5 @@ scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {
 
 scout.ProposalChooser.prototype._onActiveFilterChanged = function(event) {
   var value = $(event.target).val();
-  this.remoteHandler(this.id, 'activeFilterChanged', {state: value});
+  this._send('activeFilterChanged', {state: value});
 };

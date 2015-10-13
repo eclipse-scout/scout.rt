@@ -75,9 +75,7 @@ scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
 };
 
 scout.SearchOutline.prototype._sendSearch = function() {
-  this.remoteHandler(this.id, 'search', {
-    query: this.searchQuery
-  });
+  this._send('search', {query: this.searchQuery});
 };
 
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {

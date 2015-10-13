@@ -60,7 +60,7 @@ describe('SmartField', function() {
 
     beforeEach(function() {
       smartField.$field.val('foo');
-      smartField.remoteHandler = function(target, type, event) {
+      smartField.remoteHandler = function(event, delay) {
         events[0] = event;
       };
     });

@@ -15,18 +15,22 @@ describe('Session', function() {
     return sandboxSession({'userAgent':userAgent});
   }
 
+  function send(session, target, type, data, delay) {
+    session.sendEvent(new scout.Event(target, type, data), delay);
+  }
+
   describe('send', function() {
 
     it('sends multiple async events in one call', function() {
       var session = createSession();
 
-      session.send(1, 'nodeClicked');
+      send(session, 1, 'nodeClicked');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      session.send(1, 'nodeSelected');
+      send(session, 1, 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      session.send(1, 'nodeExpanded');
+      send(session, 1, 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls();
@@ -43,17 +47,17 @@ describe('Session', function() {
       var session = createSession();
 
       // send first event delayed (in 500 ms)
-      session.send(1, 'nodeClicked', '', 500);
+      send(session, 1, 'nodeClicked', '', 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
       sendQueuedAjaxCalls('', 100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
-      session.send(1, 'nodeSelected');
+      send(session, 1, 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      session.send(1, 'nodeExpanded');
+      send(session, 1, 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls('', 1000);
@@ -70,17 +74,17 @@ describe('Session', function() {
       var session = createSession();
 
       // send first event delayed (in 500 ms)
-      session.send(1, 'nodeClicked', '', 500);
+      send(session, 1, 'nodeClicked', '', 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
       sendQueuedAjaxCalls('', 100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
-      session.send(1, 'nodeSelected');
+      send(session, 1, 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      session.send(1, 'nodeExpanded');
+      send(session, 1, 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls('', 0);
@@ -145,7 +149,7 @@ describe('Session', function() {
       var session = createSession();
 
       // send first request
-      session.send(1, 'nodeSelected');
+      send(session, 1, 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
@@ -154,7 +158,7 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
 
-      session.send(1, 'nodeClicked');
+      send(session, 1, 'nodeClicked');
 
       // trigger sending of second request
       jasmine.clock().tick(0);
@@ -183,7 +187,7 @@ describe('Session', function() {
       var session = createSession();
 
       // send first request
-      session.send(1, 'nodeSelected');
+      send(session, 1, 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
@@ -193,7 +197,7 @@ describe('Session', function() {
       expect(session.areRequestsPending()).toBe(true);
 
       // send second request delayed
-      session.send(1, 'nodeClicked', '', 300);
+      send(session, 1, 'nodeClicked', '', 300);
 
       // trigger sending of second request
       jasmine.clock().tick(0);
@@ -240,7 +244,7 @@ describe('Session', function() {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Start user request
-      session.send(1, 'nodeSelected');
+      send(session, 1, 'nodeSelected');
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
@@ -281,7 +285,7 @@ describe('Session', function() {
       expect(requestData.startup).toBe(true);
 
       //don't send it on subsequent requests
-      session.send(1, 'nodeClicked');
+      send(session, 1, 'nodeClicked');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
@@ -299,7 +303,7 @@ describe('Session', function() {
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       //don't send it on subsequent requests
-      session.send(1, 'nodeClicked');
+      send(session, 1, 'nodeClicked');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();

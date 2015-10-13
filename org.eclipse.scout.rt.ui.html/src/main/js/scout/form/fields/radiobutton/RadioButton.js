@@ -26,7 +26,7 @@ scout.RadioButton.prototype._toggleChecked = function() {
   } else {
     this.selected = true;
     this.$field.toggleClass('checked', true);
-    this.remoteHandler(this.id, 'selected');
+    this._send('selected');
     this.$field.focus();
   }
 };

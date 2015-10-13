@@ -605,12 +605,12 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
     sortAscending: column.sortAscending
   };
   if (sorted) {
-    this.remoteHandler(this.id, 'rowsSorted', data);
+    this._send('rowsSorted', data);
     this._renderRowOrderChanges();
     this._triggerRowOrderChanged();
   } else {
     // Delegate sorting to server when it is not possible on client side
-    this.remoteHandler(this.id, 'sortRows', data);
+    this._send('sortRows', data);
   }
 };
 
@@ -1133,7 +1133,7 @@ scout.Table.prototype._sendRowClicked = function($row, mouseButton, columnId) {
   if (columnId !== undefined) {
     data.columnId = columnId;
   }
-  this.remoteHandler(this.id, 'rowClicked', data);
+  this._send('rowClicked', data);
 };
 
 /**
@@ -1152,21 +1152,21 @@ scout.Table.prototype._sendPrepareCellEdit = function(rowId, columnId) {
     rowId: rowId,
     columnId: columnId
   };
-  this.remoteHandler(this.id, 'prepareCellEdit', data);
+  this._send('prepareCellEdit', data);
 };
 
 scout.Table.prototype._sendCompleteCellEdit = function(fieldId) {
   var data = {
     fieldId: fieldId
   };
-  this.remoteHandler(this.id, 'completeCellEdit', data);
+  this._send('completeCellEdit', data);
 };
 
 scout.Table.prototype._sendCancelCellEdit = function(fieldId) {
   var data = {
     fieldId: fieldId
   };
-  this.remoteHandler(this.id, 'cancelCellEdit', data);
+  this._send('cancelCellEdit', data);
 };
 
 scout.Table.prototype._sendRowsChecked = function(rows) {
@@ -1181,49 +1181,45 @@ scout.Table.prototype._sendRowsChecked = function(rows) {
     });
   }
 
-  this.remoteHandler(this.id, 'rowsChecked', data);
+  this._send('rowsChecked', data);
 };
 
 scout.Table.prototype._sendRowsSelected = function(rowIds, debounceSend) {
-  var event = new scout.Event(this.id, 'rowsSelected', {
+  var eventData = {
     rowIds: rowIds
-  });
-
-  // Only send the latest selection changed event for a field
-  event.coalesce = function(previous) {
-    return this.id === previous.id && this.type === previous.type;
   };
 
   // send delayed to avoid a lot of requests while selecting
-  this.session.sendEvent(event, debounceSend ? 250 : 0);
+  // coalesce: only send the latest selection changed event for a field
+  this._send('rowsSelected', eventData, debounceSend ? 250 : 0, function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  });
 };
 
 scout.Table.prototype._sendRowsFiltered = function(rowIds) {
-  var event = new scout.Event(this.id, 'rowsFiltered');
-
-  // only send last event
-  event.coalesce = function(previous) {
-    return this.id === previous.id && this.type === previous.type;
-  };
-
+  var eventData = {};
   if (rowIds.length === this.rows.length) {
-    event.remove = true;
+    eventData.remove = true;
   } else {
-    event.rowIds = rowIds;
+    eventData.rowIds = rowIds;
   }
+
   // send with timeout, mainly for incremental load of a large table
-  this.session.sendEvent(event, 250);
+  // coalesce: only send last event
+  this._send('rowsFiltered', eventData, 250, function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  });
 };
 
 scout.Table.prototype._sendRowAction = function(row, column) {
-  this.remoteHandler(this.id, 'rowAction', {
+  this._send('rowAction', {
     rowId: row.id,
     columnId: column.id
   });
 };
 
 scout.Table.prototype._sendAppLinkAction = function(columnId, ref) {
-  this.remoteHandler(this.id, 'appLinkAction', {
+  this._send('appLinkAction', {
     columnId: columnId,
     ref: ref
   });
@@ -1237,12 +1233,12 @@ scout.Table.prototype._sendReload = function() {
       parent: this,
       axis: 'both'
     });
-    this.remoteHandler(this.id, 'reload');
+    this._send('reload');
   }
 };
 
 scout.Table.prototype._sendExportToClipboard = function() {
-  this.remoteHandler(this.id, 'exportToClipboard');
+  this._send('exportToClipboard');
 };
 
 scout.Table.prototype.cell = function(column, row) {
@@ -1539,13 +1535,13 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
     groupAscending: column.sortAscending
   };
   if (sorted) {
-    this.remoteHandler(this.id, 'rowsGrouped', data);
+    this._send('rowsGrouped', data);
     this._renderRowOrderChanges();
     this._triggerRowOrderChanged();
     this._group();
   } else {
     // Delegate sorting to server when it is not possible on client side
-    this.remoteHandler(this.id, 'groupRows', data);
+    this._send('groupRows', data);
   }
 };
 
@@ -2259,7 +2255,7 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   this._filterMap[key] = filter;
 
   if (notifyServer && filter instanceof scout.TableUserFilter) {
-    this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
+    this._send('addFilter', filter.createAddFilterEventData());
   }
   this.trigger('addFilter', {
     filter: filter
@@ -2282,7 +2278,7 @@ scout.Table.prototype.removeFilterByKey = function(key, notifyServer) {
   delete this._filterMap[key];
 
   if (notifyServer && filter instanceof scout.TableUserFilter) {
-    this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
+    this._send('removeFilter', filter.createRemoveFilterEventData());
   }
   this.trigger('removeFilter', {
     filter: filter
@@ -2374,18 +2370,16 @@ scout.Table.prototype._sendColumnResized = function(column) {
     return;
   }
 
-  var event = new scout.Event(this.id, 'columnResized', {
+  var eventData = {
     columnId: column.id,
     width: column.width
-  });
-
-  // Only send the latest resize event for a column
-  event.coalesce = function(previous) {
-    return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
   };
 
   // send delayed to avoid a lot of requests while resizing
-  this.session.sendEvent(event, 750);
+  // coalesce: only send the latest resize event for a column
+  this._send('columnResized', eventData, 750, function(previous) {
+    return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
+  });
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
@@ -2413,7 +2407,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
     columnId: column.id,
     index: index
   };
-  this.remoteHandler(this.id, 'columnMoved', data);
+  this._send('columnMoved', data);
 
   if (this.header) {
     this.header.onColumnMoved(column, oldPos, newPos, dragged);

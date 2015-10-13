@@ -115,9 +115,7 @@ scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
   var $wizardStep = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
   var targetStepIndex = this._wizardStepIndex($wizardStep);
   if (targetStepIndex >= 0 && targetStepIndex !== this.activeWizardStepIndex) {
-    this.remoteHandler(this.id, 'doWizardStepAction', {
-      stepIndex: targetStepIndex
-    });
+    this._send('doWizardStepAction', {stepIndex: targetStepIndex});
   }
 };
 

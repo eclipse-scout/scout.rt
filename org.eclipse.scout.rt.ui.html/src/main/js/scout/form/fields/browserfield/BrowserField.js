@@ -57,7 +57,7 @@ scout.BrowserField.prototype._renderSandbox = function() {
 
 scout.BrowserField.prototype._onPostMessage = function(event) {
   $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
-  this.remoteHandler(this.id, 'postMessage',  {
+  this._send('postMessage', {
     data: event.data,
     origin: event.origin});
 };

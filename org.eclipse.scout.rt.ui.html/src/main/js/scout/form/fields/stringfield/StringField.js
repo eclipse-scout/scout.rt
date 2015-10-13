@@ -171,7 +171,7 @@ scout.StringField.prototype._renderGridData = function() {
 scout.StringField.prototype._onIconClick = function(event) {
   this.acceptInput();
   scout.StringField.parent.prototype._onIconClick.call(this, event);
-  this.remoteHandler(this.id, 'callAction');
+  this._send('callAction');
 };
 
 scout.StringField.prototype._onSelect = function(event) {
@@ -181,16 +181,14 @@ scout.StringField.prototype._onSelect = function(event) {
 };
 
 scout.StringField.prototype._sendSelectionChanged = function() {
-  var event = new scout.Event(this.id, 'selectionChanged', {
+  var eventData = {
     selectionStart: this.$field[0].selectionStart,
     selectionEnd: this.$field[0].selectionEnd
-  });
-
-  // Only send the latest selection changed event for a field
-  event.coalesce = function(previous) {
-    return this.id === previous.id && this.type === previous.type;
   };
 
   // send delayed to avoid a lot of requests while selecting
-  this.session.sendEvent(event, 500);
+  // coalesce: only send the latest selection changed event for a field
+  this._send('selectionChanged', eventData, 500, function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  });
 };

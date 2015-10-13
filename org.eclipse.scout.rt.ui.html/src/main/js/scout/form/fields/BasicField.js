@@ -101,14 +101,14 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
     return;
   }
 
-  var fieldId = this.id;
+  var field = this;
   var menu = scout.create('Menu', {
     parent: this,
     text: this.session.text('ui.copy')
   });
-  menu.remoteHandler = function(target, type) {
-    if ('doAction' === type) {
-      this.session.send(fieldId, 'exportToClipboard');
+  menu.remoteHandler = function(event) {
+    if ('doAction' === event.type) {
+      field._send('exportToClipboard');
     }
   };
 

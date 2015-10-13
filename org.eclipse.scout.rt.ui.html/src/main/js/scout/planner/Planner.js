@@ -1204,13 +1204,13 @@ scout.Planner.prototype._updateResources = function(resources) {
 };
 
 scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {
-  this.remoteHandler(this.id, 'setDisplayMode', {
+  this._send('setDisplayMode', {
     displayMode: displayMode
   });
 };
 
 scout.Planner.prototype._sendSetViewRange = function(viewRange) {
-  this.remoteHandler(this.id, 'setViewRange', {
+  this._send('setViewRange', {
     viewRange: scout.dates.toJsonDateRange(viewRange)
   });
 };
@@ -1220,7 +1220,7 @@ scout.Planner.prototype._sendSetSelection = function() {
     resourceIds = this.selectedResources.map(function(r) {
       return r.id;
     });
-  this.remoteHandler(this.id, 'setSelection', {
+  this._send('setSelection', {
     resourceIds: resourceIds,
     selectionRange: selectionRange
   });

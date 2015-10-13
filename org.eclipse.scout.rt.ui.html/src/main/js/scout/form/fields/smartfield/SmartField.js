@@ -307,9 +307,7 @@ scout.SmartField.prototype._proposalTyped = function() {
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
     $.log.debug('(SmartField#_proposalTyped) send searchText=' + searchText);
-    this.remoteHandler(this.originalId(), 'proposalTyped', {
-      searchText: searchText
-    });
+    this._send('proposalTyped', {searchText: searchText});
   }.bind(this), this.DEBOUNCE_DELAY);
 };
 
@@ -397,7 +395,7 @@ scout.SmartField.prototype._readSearchText = function() {
 scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, forceClose) {
   this.displayText = searchText;
   this._oldSearchText = searchText;
-  this.remoteHandler(this.originalId(), 'acceptProposal', {
+  this._send('acceptProposal', {
     searchText: searchText,
     chooser: chooser,
     forceClose: forceClose
@@ -426,7 +424,7 @@ scout.SmartField.prototype._closeProposal = function(notifyServer) {
 };
 
 scout.SmartField.prototype._sendCancelProposal = function() {
-  this.remoteHandler(this.originalId(), 'cancelProposal');
+  this._send('cancelProposal');
 };
 
 /**
@@ -451,7 +449,7 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
   } else {
     this._requestedProposal = true;
     $.log.debug('(SmartField#_openProposal) send openProposal. searchText=' + searchText + ' selectCurrentValue=' + selectCurrentValue);
-    this.remoteHandler(this.originalId(), 'openProposal', {
+    this._send('openProposal', {
       searchText: searchText,
       selectCurrentValue: selectCurrentValue
     });

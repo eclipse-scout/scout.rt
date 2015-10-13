@@ -68,6 +68,6 @@ scout.FileChooserField.prototype._onIconClick = function(event) {
 };
 
 scout.FileChooserField.prototype.openFileChooser = function() {
-  this.remoteHandler(this.id, 'chooseFile');
+  this._send('chooseFile');
 };
 

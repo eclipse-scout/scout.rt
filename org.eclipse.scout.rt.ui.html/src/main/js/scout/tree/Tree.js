@@ -399,7 +399,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     node.expandedLazy = lazy;
 
     if (notifyServer) {
-      this.remoteHandler(this.id, 'nodeExpanded', {
+      this._send('nodeExpanded', {
         nodeId: node.id,
         expanded: expanded,
         expandedLazy: lazy
@@ -533,17 +533,15 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
   this.selectedNodes = nodes;
   if (notifyServer) {
-    var event = new scout.Event(this.id, 'nodesSelected', {
+    var eventData = {
       nodeIds: this._nodesToIds(nodes)
-    });
-
-    // Only send the latest selection changed event for a field
-    event.coalesce = function(previous) {
-      return this.id === previous.id && this.type === previous.type;
     };
 
     // send delayed to avoid a lot of requests while selecting
-    this.session.sendEvent(event, debounceSend ? 250 : 0);
+    // coalesce: only send the latest selection changed event for a field
+    this._send('nodesSelected', eventData, debounceSend ? 250 : 0,  function(previous) {
+      return this.id === previous.id && this.type === previous.type;
+    });
   }
 
   // In breadcrumb mode selected node has to expanded
@@ -1148,11 +1146,11 @@ scout.Tree.prototype._sendNodesChecked = function(nodes) {
     });
   }
 
-  this.remoteHandler(this.id, 'nodesChecked', data);
+  this._send('nodesChecked', data);
 };
 
 scout.Tree.prototype._sendBreadCrumbEnabled = function() {
-  this.remoteHandler(this.id, 'breadcrumbEnabled', {
+  this._send('breadcrumbEnabled', {
     breadcrumbEnabled: this.breadcrumbEnabled
   });
 };
@@ -1238,7 +1236,7 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
   var $node = $(event.currentTarget);
   var node = $node.data('node');
 
-  this.remoteHandler(this.id, 'nodeClicked', {
+  this._send('nodeClicked', {
     nodeId: node.id
   });
   return true;
@@ -1257,7 +1255,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     return;
   }
 
-  this.remoteHandler(this.id, 'nodeAction', {
+  this._send('nodeAction', {
     nodeId: node.id
   });
 

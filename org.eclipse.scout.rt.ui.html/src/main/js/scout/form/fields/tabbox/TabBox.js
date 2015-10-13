@@ -110,9 +110,7 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
     var oldSelectedTab = this.selectedTab;
     this.selectedTab = tabIndex;
     if (scout.helpers.nvl(notifyServer, true)) {
-      this.remoteHandler(this.id, 'selected', {
-        tabIndex: tabIndex
-      });
+      this._send('selected', {tabIndex: tabIndex});
     }
 
     this.tabItems[oldSelectedTab].setTabActive(false);

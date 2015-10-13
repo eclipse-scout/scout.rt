@@ -223,7 +223,7 @@ scout.Action.prototype.prepareDoAction = function(event) {
 
 scout.Action.prototype.sendDoAction = function() {
   this.beforeSendDoAction();
-  this.remoteHandler(this.originalId(), 'doAction');
+  this._send('doAction');
   this.afterSendDoAction();
 };
 
@@ -255,9 +255,7 @@ scout.Action.prototype.setSelected = function(selected) {
 };
 
 scout.Action.prototype.sendSelected = function() {
-  this.remoteHandler(this.originalId(), 'selected', {
-    selected: this.selected
-  });
+  this._send('selected', {selected: this.selected});
 };
 
 scout.Action._syncKeyStroke = function(keyStroke) {

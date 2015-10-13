@@ -239,10 +239,6 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
   return adapters;
 };
 
-scout.Session.prototype.send = function(target, type, data, delay) {
-  this.sendEvent(new scout.Event(target, type, data), delay);
-};
-
 /**
  * Sends the request asynchronously and processes the response later.<br>
  * Furthermore, the request is sent delayed. If send is called multiple times
@@ -678,8 +674,8 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   };
 
   var messageBox = scout.create('MessageBox', model);
-  messageBox.remoteHandler = function(target, type, event) {
-    if ('action' === type) {
+  messageBox.remoteHandler = function(event) {
+    if ('action' === event.type) {
       delete this._fatalMessagesOnScreen[errorCode];
       messageBox.remove();
       var option = event.option;
