@@ -22,10 +22,10 @@ scout.TableTooltip.prototype._render = function($parent) {
       this.position();
     }
   }.bind(this);
-  this.table.events.on(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
+  this.table.events.on('rowOrderChanged', this._rowOrderChangedFunc);
 };
 
 scout.TableTooltip.prototype._remove = function() {
   scout.TableTooltip.parent.prototype._remove.call(this);
-  this.table.events.off(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
+  this.table.events.off('rowOrderChanged', this._rowOrderChangedFunc);
 };

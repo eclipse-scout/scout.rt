@@ -31,7 +31,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     yAxis,
     that = this;
 
-  this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+  this._filterResetListener = this.table.on('filterResetted', function(event) {
     that.$contentContainer.find('.main-chart.selected').removeClassSVG('selected');
   });
 

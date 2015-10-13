@@ -1,5 +1,12 @@
 scout.TableFooter = function() {
   scout.TableFooter.parent.call(this);
+
+  this._tableRowsDrawnHandler = this._onTableRowsDrawn.bind(this);
+  this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
+  this._tableAddFilterHandler = this._onTableAddFilter.bind(this);
+  this._tableRemoveFilterHandler = this._onTableRemoveFilter.bind(this);
+  this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
+  this._tableStatusChangedHandler = this._onTableStatusChanged.bind(this);
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
@@ -80,71 +87,28 @@ scout.TableFooter.prototype._render = function($parent) {
   this._renderInfo();
   this._updateInfoVisibility();
 
-  this.table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
-    this._renderInfoLoad();
-  }.bind(this));
-
-  this.table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
-    this._renderInfoFilter();
-  }.bind(this));
-
-  this.table.events.on('addFilter', function(event) {
-    this._renderInfoFilter();
-    this._updateInfoFilterVisibility();
-    if (event.filter.filterType === scout.TableTextUserFilter.Type) {
-      this._$textFilter.val(event.filter.text);
-    }
-  }.bind(this));
-
-  this.table.events.on('removeFilter', function(event) {
-    this._renderInfoFilter();
-    this._updateInfoFilterVisibility();
-    if (event.filter.filterType === scout.TableTextUserFilter.Type) {
-      this._$textFilter.val('');
-    }
-  }.bind(this));
-
-  this.table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
-    var numRows = 0;
-    if (event.rows) {
-      numRows = event.rows.length;
-    }
-    this._renderInfoSelection(numRows, event.allSelected);
-  }.bind(this));
-
-  this.table.events.on(scout.Table.GUI_EVENT_STATUS_CHANGED, function(event) {
-    this._renderInfoTableStatus();
-    this._updateInfoTableStatusVisibility();
-  }.bind(this));
+  this.table.on('rowsDrawn', this._tableRowsDrawnHandler);
+  this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
+  this.table.on('addFilter',this._tableAddFilterHandler);
+  this.table.on('removeFilter', this._tableRemoveFilterHandler);
+  this.table.on('rowsSelected', this._tableRowsSelectedHandler);
+  this.table.on('statusChanged', this._tableStatusChangedHandler);
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 
 scout.TableFooter.prototype._remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
-  scout.TableFooter.parent.prototype._remove.call(this);
   this._hideTableStatusTooltip();
-};
 
-scout.TableFooter.prototype._onFilterInput = function(event) {
-  var filter,
-    $input = $(event.currentTarget),
-    filterText = $input.val();
+  this.table.off('rowsDrawn', this._tableRowsDrawnHandler);
+  this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
+  this.table.off('addFilter',this._tableAddFilterHandler);
+  this.table.off('removeFilter', this._tableRemoveFilterHandler);
+  this.table.off('rowsSelected', this._tableRowsSelectedHandler);
+  this.table.off('statusChanged', this._tableStatusChangedHandler);
 
-  if (filterText) {
-    filter = scout.create('TableTextUserFilter', {
-      session: this.session,
-      table: this.table
-    });
-    filter.text = filterText.toLowerCase();
-    this.table.addFilter(filter);
-  } else if (!filterText) {
-    this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
-  }
-
-  this.table.filter();
-  this.validateLayoutTree();
-  event.stopPropagation();
+  scout.TableFooter.parent.prototype._remove.call(this);
 };
 
 scout.TableFooter.prototype._renderControls = function() {
@@ -331,30 +295,6 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
   }
 };
 
-scout.TableFooter.prototype._onInfoLoadClick = function() {
-  if (this._compactStyle) {
-    this._toggleTableInfoTooltip(this._$infoLoad, scout.TableInfoLoadTooltip);
-  } else {
-    this.table.reload();
-  }
-};
-
-scout.TableFooter.prototype._onInfoFilterClick = function() {
-  if (this._compactStyle) {
-    this._toggleTableInfoTooltip(this._$infoFilter, scout.TableInfoFilterTooltip);
-  } else {
-    this.table.resetFilter();
-  }
-};
-
-scout.TableFooter.prototype._onInfoSelectionClick = function() {
-  if (this._compactStyle) {
-    this._toggleTableInfoTooltip(this._$infoSelection, scout.TableInfoSelectionTooltip);
-  } else {
-    this.table.toggleSelection();
-  }
-};
-
 scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipClass) {
   if (this._tableInfoTooltip && this._tableInfoTooltip.rendered) {
     this._tableInfoTooltip.remove();
@@ -427,7 +367,6 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
   }.bind(this));
 
   this.open = false;
-
 };
 
 scout.TableFooter.prototype._addResizer = function($parent) {
@@ -458,23 +397,6 @@ scout.TableFooter.prototype._addResizer = function($parent) {
     }
 
     return false;
-  }
-};
-
-scout.TableFooter.prototype.onResize = function() {
-  this.table.tableControls.forEach(function(control) {
-    control.onResize();
-  });
-};
-
-scout.TableFooter.prototype._onStatusMousedown = function(event) {
-  // Toggle tooltip
-  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
-    this.table.tableStatus.uiState = 'user-hidden';
-    this._hideTableStatusTooltip();
-  } else {
-    this.table.tableStatus.uiState = 'user-shown';
-    this._showTableStatusTooltip();
   }
 };
 
@@ -528,4 +450,103 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
       this._hideTableStatusTooltip();
     }.bind(this), 5000);
   }
+};
+
+scout.TableFooter.prototype.onResize = function() {
+  this.table.tableControls.forEach(function(control) {
+    control.onResize();
+  });
+};
+
+scout.TableFooter.prototype._onStatusMousedown = function(event) {
+  // Toggle tooltip
+  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    this.table.tableStatus.uiState = 'user-hidden';
+    this._hideTableStatusTooltip();
+  } else {
+    this.table.tableStatus.uiState = 'user-shown';
+    this._showTableStatusTooltip();
+  }
+};
+
+scout.TableFooter.prototype._onFilterInput = function(event) {
+  var filter,
+    $input = $(event.currentTarget),
+    filterText = $input.val();
+
+  if (filterText) {
+    filter = scout.create('TableTextUserFilter', {
+      session: this.session,
+      table: this.table
+    });
+    filter.text = filterText.toLowerCase();
+    this.table.addFilter(filter);
+  } else if (!filterText) {
+    this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
+  }
+
+  this.table.filter();
+  this.validateLayoutTree();
+  event.stopPropagation();
+};
+
+scout.TableFooter.prototype._onInfoLoadClick = function() {
+  if (this._compactStyle) {
+    this._toggleTableInfoTooltip(this._$infoLoad, scout.TableInfoLoadTooltip);
+  } else {
+    this.table.reload();
+  }
+};
+
+scout.TableFooter.prototype._onInfoFilterClick = function() {
+  if (this._compactStyle) {
+    this._toggleTableInfoTooltip(this._$infoFilter, scout.TableInfoFilterTooltip);
+  } else {
+    this.table.resetFilter();
+  }
+};
+
+scout.TableFooter.prototype._onInfoSelectionClick = function() {
+  if (this._compactStyle) {
+    this._toggleTableInfoTooltip(this._$infoSelection, scout.TableInfoSelectionTooltip);
+  } else {
+    this.table.toggleSelection();
+  }
+};
+
+scout.TableFooter.prototype._onTableRowsDrawn = function(event) {
+  this._renderInfoLoad();
+};
+
+scout.TableFooter.prototype._onTableRowsFiltered = function(event) {
+  this._renderInfoFilter();
+};
+
+scout.TableFooter.prototype._onTableAddFilter = function(event) {
+  this._renderInfoFilter();
+  this._updateInfoFilterVisibility();
+  if (event.filter.filterType === scout.TableTextUserFilter.Type) {
+    this._$textFilter.val(event.filter.text);
+  }
+};
+
+scout.TableFooter.prototype._onTableRemoveFilter = function(event) {
+  this._renderInfoFilter();
+  this._updateInfoFilterVisibility();
+  if (event.filter.filterType === scout.TableTextUserFilter.Type) {
+    this._$textFilter.val('');
+  }
+};
+
+scout.TableFooter.prototype._onTableRowsSelected = function(event) {
+  var numRows = 0;
+  if (event.rows) {
+    numRows = event.rows.length;
+  }
+  this._renderInfoSelection(numRows, event.allSelected);
+};
+
+scout.TableFooter.prototype._onTableStatusChanged = function(event) {
+  this._renderInfoTableStatus();
+  this._updateInfoTableStatusVisibility();
 };

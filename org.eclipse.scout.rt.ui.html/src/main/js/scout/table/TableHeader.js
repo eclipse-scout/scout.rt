@@ -4,6 +4,8 @@
 scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
 
+  this._dataScrollHandler = this._onDataScroll.bind(this);
+  this._tableAddRemoveFilterHandler = this._onTableAddRemoveFilter.bind(this);
   this.dragging = false;
 };
 scout.inherits(scout.TableHeader, scout.Widget);
@@ -34,9 +36,6 @@ scout.TableHeader.prototype._render = function($parent) {
       }
     };
   this.$container = table.$data.beforeDiv('table-header');
-
-  this._dataScrollHandler = this._onDataScroll.bind(this);
-  table.$data.on('scroll', this._dataScrollHandler);
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
@@ -80,8 +79,9 @@ scout.TableHeader.prototype._render = function($parent) {
   this.updateMenuBar();
   this._reconcileScrollPos();
 
-  this.table.on('addFilter', this._onTableAddRemoveFilter.bind(this));
-  this.table.on('removeFilter', this._onTableAddRemoveFilter.bind(this));
+  table.$data.on('scroll', this._dataScrollHandler);
+  this.table.on('addFilter', this._tableAddRemoveFilterHandler);
+  this.table.on('removeFilter', this._tableAddRemoveFilterHandler);
 
   function resizeHeader(event) {
     var startX = event.pageX,
@@ -223,16 +223,11 @@ scout.TableHeader.prototype._render = function($parent) {
 };
 
 scout.TableHeader.prototype._remove = function() {
-  scout.TableHeader.parent.prototype._remove.call(this);
   this.table.$data.off('scroll', this._dataScrollHandler);
-};
+  this.table.off('addFilter', this._tableAddRemoveFilterHandler);
+  this.table.off('removeFilter', this._tableAddRemoveFilterHandler);
 
-scout.TableHeader.prototype.onColumnResized = function(column) {
-  var lastColumn = this.table.columns[this.table.columns.length - 1];
-  this.resizeHeaderItem(column);
-  if (lastColumn !== column) {
-    this.resizeHeaderItem(lastColumn);
-  }
+  scout.TableHeader.parent.prototype._remove.call(this);
 };
 
 scout.TableHeader.prototype.resizeHeaderItem = function(column) {
@@ -267,35 +262,6 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     .css('max-width', width);
 };
 
-scout.TableHeader.prototype._onHeaderItemClick = function(event) {
-  var $headerItem = $(event.currentTarget),
-    column = $headerItem.data('column');
-
-  if (column.disallowHeaderMenu) {
-    return;
-  }
-
-  if (this.dragging || this.columnMoved) {
-    this.dragging = false;
-    this.columnMoved = false;
-  } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey)) {
-    this.table.removeColumnGrouping();
-    this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-  } else if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
-    this.closeTableHeaderMenu();
-  } else {
-    this.openTableHeaderMenu(column);
-  }
-
-  return false;
-};
-
-scout.TableHeader.prototype._onDataScroll = function() {
-  scout.scrollbars.fix(this._$menuBar);
-  this._reconcileScrollPos();
-  this._fixTimeout = scout.scrollbars.unfix(this._$menuBar, this._fixTimeout);
-};
-
 scout.TableHeader.prototype._reconcileScrollPos = function() {
   // When scrolling horizontally scroll header as well
   var scrollLeft = this.table.$data.scrollLeft(),
@@ -304,54 +270,6 @@ scout.TableHeader.prototype._reconcileScrollPos = function() {
   this.resizeHeaderItem(lastColumn);
   this.$container.scrollLeft(scrollLeft);
   this._$menuBar.cssRight(-1 * scrollLeft);
-};
-
-scout.TableHeader.prototype.onSortingChanged = function() {
-  for (var i = 0; i < this.table.columns.length; i++) {
-    var column = this.table.columns[i];
-    this._renderColumnState(column);
-  }
-};
-
-scout.TableHeader.prototype.onFilterChanged = function(column) {
-  this._renderColumnState(column);
-};
-
-scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dragged) {
-  var $header = column.$header,
-    $headers = this.findHeaderItems(),
-    $moveHeader = $headers.eq(oldPos),
-    $moveResize = $moveHeader.next(),
-    lastColumnPos = this.table.columns.length - 1;
-
-  // store old position of header
-  $headers.each(function() {
-    $(this).data('old-pos', $(this).offset().left);
-  });
-
-  // change order in dom of header
-  if (newPos < oldPos) {
-    $headers.eq(newPos).before($moveHeader);
-    $headers.eq(newPos).before($moveResize);
-  } else {
-    $headers.eq(newPos).after($moveHeader);
-    $headers.eq(newPos).after($moveResize);
-  }
-
-  // Update header size due to header menu items if moved from or to last position
-  if (oldPos === lastColumnPos || newPos === lastColumnPos) {
-    this.table.columns.forEach(function(column) {
-      this.resizeHeaderItem(column);
-    }.bind(this));
-  }
-
-  // move to old position and then animate
-  if (dragged) {
-    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
-      .animateAVCSD('left', 0);
-  } else {
-    this._arrangeHeaderItems($headers);
-  }
 };
 
 scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
@@ -393,28 +311,6 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
 scout.TableHeader.prototype.closeTableHeaderMenu = function() {
   this._tableHeaderMenu.remove();
   this._tableHeaderMenu = null;
-};
-
-scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
-  var column, i, $header, $headerResize;
-  var $headers = this.findHeaderItems();
-
-  // store old position of headers
-  $headers.each(function() {
-    $(this).data('old-pos', $(this).offset().left);
-  });
-
-  // change order in dom of header
-  for (i = 0; i < this.table.columns.length; i++) {
-    column = this.table.columns[i];
-    $header = column.$header;
-    $headerResize = $header.next('.table-header-resize');
-
-    this.$container.append($header);
-    this.$container.append($headerResize);
-  }
-
-  this._arrangeHeaderItems($headers);
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {
@@ -498,6 +394,109 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
 scout.TableHeader.prototype.updateMenuBar = function() {
   var menuItems = this.table._filterMenus(['Table.Header']);
   this.menuBar.updateItems(menuItems);
+};
+
+scout.TableHeader.prototype.onColumnResized = function(column) {
+  var lastColumn = this.table.columns[this.table.columns.length - 1];
+  this.resizeHeaderItem(column);
+  if (lastColumn !== column) {
+    this.resizeHeaderItem(lastColumn);
+  }
+};
+
+scout.TableHeader.prototype.onSortingChanged = function() {
+  for (var i = 0; i < this.table.columns.length; i++) {
+    var column = this.table.columns[i];
+    this._renderColumnState(column);
+  }
+};
+
+scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dragged) {
+  var $header = column.$header,
+    $headers = this.findHeaderItems(),
+    $moveHeader = $headers.eq(oldPos),
+    $moveResize = $moveHeader.next(),
+    lastColumnPos = this.table.columns.length - 1;
+
+  // store old position of header
+  $headers.each(function() {
+    $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  if (newPos < oldPos) {
+    $headers.eq(newPos).before($moveHeader);
+    $headers.eq(newPos).before($moveResize);
+  } else {
+    $headers.eq(newPos).after($moveHeader);
+    $headers.eq(newPos).after($moveResize);
+  }
+
+  // Update header size due to header menu items if moved from or to last position
+  if (oldPos === lastColumnPos || newPos === lastColumnPos) {
+    this.table.columns.forEach(function(column) {
+      this.resizeHeaderItem(column);
+    }.bind(this));
+  }
+
+  // move to old position and then animate
+  if (dragged) {
+    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
+      .animateAVCSD('left', 0);
+  } else {
+    this._arrangeHeaderItems($headers);
+  }
+};
+
+scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
+  var column, i, $header, $headerResize;
+  var $headers = this.findHeaderItems();
+
+  // store old position of headers
+  $headers.each(function() {
+    $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  for (i = 0; i < this.table.columns.length; i++) {
+    column = this.table.columns[i];
+    $header = column.$header;
+    $headerResize = $header.next('.table-header-resize');
+
+    this.$container.append($header);
+    this.$container.append($headerResize);
+  }
+
+  this._arrangeHeaderItems($headers);
+};
+
+scout.TableHeader.prototype._onHeaderItemClick = function(event) {
+  var $headerItem = $(event.currentTarget),
+    column = $headerItem.data('column');
+
+  if (column.disallowHeaderMenu) {
+    return;
+  }
+
+  if (this.dragging || this.columnMoved) {
+    this.dragging = false;
+    this.columnMoved = false;
+  } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey)) {
+    this.table.removeColumnGrouping();
+    this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
+  } else if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
+    this.closeTableHeaderMenu();
+  } else {
+    this.openTableHeaderMenu(column);
+  }
+
+  return false;
+};
+
+scout.TableHeader.prototype._onDataScroll = function() {
+  scout.scrollbars.fix(this._$menuBar);
+  this._reconcileScrollPos();
+  this._fixTimeout = scout.scrollbars.unfix(this._$menuBar, this._fixTimeout);
 };
 
 scout.TableHeader.prototype._onTableAddRemoveFilter = function(event) {

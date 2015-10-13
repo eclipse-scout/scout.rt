@@ -36,14 +36,6 @@ scout.Table = function(model) {
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
-scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
-scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
-scout.Table.GUI_EVENT_ROWS_UPDATED = 'rowsUpdated';
-scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
-scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
-scout.Table.GUI_EVENT_ROW_ORDER_CHANGED = 'rowOrderChanged';
-scout.Table.GUI_EVENT_STATUS_CHANGED = 'statusChanged';
-
 scout.Table.COLUMN_MIN_WIDTH = 30;
 
 scout.Table.prototype._init = function(model) {
@@ -363,7 +355,7 @@ scout.Table.prototype._renderTableStatusVisible = function() {
 };
 
 scout.Table.prototype._renderTableStatus = function() {
-  this.trigger(scout.Table.GUI_EVENT_STATUS_CHANGED);
+  this.trigger('statusChanged');
 };
 
 scout.Table.prototype._initCells = function(row) {
@@ -2462,7 +2454,7 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
 };
 
 scout.Table.prototype._triggerRowsDrawn = function($rows) {
-  var type = scout.Table.GUI_EVENT_ROWS_DRAWN;
+  var type = 'rowsDrawn';
   var event = {
     $rows: $rows
   };
@@ -2477,7 +2469,7 @@ scout.Table.prototype._triggerRowsSelected = function() {
     allSelected = this.selectedRows.length === rowCount;
   }
 
-  var type = scout.Table.GUI_EVENT_ROWS_SELECTED;
+  var type = 'rowsSelected';
   var event = {
     rows: this.selectedRows,
     allSelected: allSelected
@@ -2486,11 +2478,11 @@ scout.Table.prototype._triggerRowsSelected = function() {
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
-  this.events.trigger(scout.Table.GUI_EVENT_ROWS_FILTERED);
+  this.events.trigger('rowsFiltered');
 };
 
 scout.Table.prototype._triggerFilterResetted = function() {
-  this.events.trigger(scout.Table.GUI_EVENT_FILTER_RESETTED);
+  this.events.trigger('filterResetted');
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
@@ -2498,7 +2490,7 @@ scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
     row: row,
     animating: animating
   };
-  this.events.trigger(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, event);
+  this.events.trigger('rowOrderChanged', event);
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {

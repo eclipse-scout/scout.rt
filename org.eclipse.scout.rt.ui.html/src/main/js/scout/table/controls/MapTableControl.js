@@ -24,7 +24,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
   }
   tableCountries = this._findCountries();
 
-  this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+  this._filterResetListener = this.table.on('filterResetted', function(event) {
     that.$contentContainer.find('.map-item.selected').removeClassSVG('selected');
   });
 
