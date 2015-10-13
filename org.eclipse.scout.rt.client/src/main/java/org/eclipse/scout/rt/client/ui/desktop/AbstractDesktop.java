@@ -1228,7 +1228,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         for (ITreeNode node : children) {
           if (node.isVisible() && node.isEnabled()) {
             m_outline.selectNode(node, false);
-            fireOutlineContentActivate();
             break;
           }
         }
