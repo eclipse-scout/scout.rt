@@ -590,7 +590,6 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   // update grouping if group by column is active
   this._group();
 
-
   this.renderSelection();
 };
 
@@ -671,7 +670,7 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
     groupColCount = this._groupColumns() ? this._groupColumns().length : 0;
     sortColCount = 0;
     this.columns.forEach(function(c) {
-      if(c.sortActive){
+      if (c.sortActive) {
         sortColCount++;
       }
     });
@@ -686,10 +685,9 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
     });
 
     //special case: if it is the only sort column and also grouped, do not remove grouped property.
-    if(sortColCount === 1 && groupColCount === 1){
+    if (sortColCount === 1 && groupColCount === 1) {
       //do not remove grouping property
-    }
-    else{
+    } else {
       column.grouped = false;
     }
 
@@ -706,29 +704,28 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
   }
 };
 
-scout.Table.prototype._isGroupingPossible = function(column){
+scout.Table.prototype._isGroupingPossible = function(column) {
   var possible = true;
 
   //TODO: incorporate this logic into visibility of grouping buttons on column header
 
-  if(this._permanentHeadSortColumns && this._permanentHeadSortColumns.length === 0){
+  if (this._permanentHeadSortColumns && this._permanentHeadSortColumns.length === 0) {
     //no permanent head sort columns. grouping ok.
     return true;
   }
 
-
-  if(!column.initialAlwaysIncludeSortAtBegin && !column.initialAlwaysIncludeSortAtEnd){
+  if (!column.initialAlwaysIncludeSortAtBegin && !column.initialAlwaysIncludeSortAtEnd) {
     //col itself is not a head or tail sort column. therefore, all head sort columns must be grouped.
-    this._permanentHeadSortColumns.forEach(function(c){
+    this._permanentHeadSortColumns.forEach(function(c) {
       possible &= c.grouped;
     });
     return possible;
   }
 
-  if(column.initialAlwaysIncludeSortAtEnd){
+  if (column.initialAlwaysIncludeSortAtEnd) {
     possible = true;
-    scout.arrays.eachSibling(this._permanentHeadSortColumns, column, function(c){
-      if(c.sortIndex < column.sortIndex){
+    scout.arrays.eachSibling(this._permanentHeadSortColumns, column, function(c) {
+      if (c.sortIndex < column.sortIndex) {
         possible &= c.grouped;
       }
     });
@@ -738,20 +735,19 @@ scout.Table.prototype._isGroupingPossible = function(column){
   //else: it is a tail sort column. grouping does not make sense.
   return false;
 
-
 };
 
-scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove){
+scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove) {
   var sortIndex = -1,
-  deviation;
+    deviation;
 
   if (remove) {
     column.grouped = false;
 
-    if(column.initialAlwaysIncludeSortAtBegin){
+    if (column.initialAlwaysIncludeSortAtBegin) {
       //head sort case: remove all groupings after this column.
-      this.columns.forEach(function(c){
-        if(c.sortIndex >= column.sortIndex){
+      this.columns.forEach(function(c) {
+        if (c.sortIndex >= column.sortIndex) {
           c.grouped = false;
         }
       });
@@ -760,7 +756,7 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
     return this._updateSortColumns(column, direction, multiGroup, remove);
   }
 
-  if(!this._isGroupingPossible(column)){
+  if (!this._isGroupingPossible(column)) {
     return;
   }
 
@@ -772,14 +768,13 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
         return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped) ? -1 : c.sortIndex;
       })));
 
-
       if (!column.sortActive) {
         // column was not yet present: insert at determined position
         // and move all subsequent nodes by one.
         // add just after all other grouping columns in column set.
         column.sortIndex = sortIndex + 1;
         scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-          if(siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex > sortIndex){
+          if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex > sortIndex) {
             siblingColumn.sortIndex++;
           }
         });
@@ -788,14 +783,13 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
         this._permanentTailSortColumns.forEach(function(c) {
           c.sortIndex++;
         });
-      } else{
+      } else {
         //column already sorted, update position:
         //move all sort columns between the newly determined sortindex and the old sortindex by one.
         scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-          if(siblingColumn.sortActive &&
-              !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
-               (siblingColumn.sortIndex > sortIndex) &&
-               (siblingColumn.sortIndex < column.sortIndex)){
+          if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
+            (siblingColumn.sortIndex > sortIndex) &&
+            (siblingColumn.sortIndex < column.sortIndex)) {
             siblingColumn.sortIndex++;
           }
         });
@@ -803,42 +797,40 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
       }
     } else {
       //no multigroup:
-        sortIndex = this._permanentHeadSortColumns.length;
+      sortIndex = this._permanentHeadSortColumns.length;
 
-        if(column.sortActive){
+      if (column.sortActive) {
         //column already sorted, update position:
-          //move all sort columns between the newly determined sortindex and the old sortindex by one.
-          scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-            if(siblingColumn.sortActive &&
-                !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
-                 (siblingColumn.sortIndex >= sortIndex) &&
-                 (siblingColumn.sortIndex < column.sortIndex)){
-              siblingColumn.sortIndex++;
-            }
-          });
-          column.sortIndex = sortIndex;
-        }
-        else{ //not sorted yet
-          scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-            if(siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex){
-              siblingColumn.sortIndex++;
-            }
-          });
-
-          column.sortIndex = sortIndex;
-
-          // increase sortIndex for all permanent tail columns (a column has been added in front of them)
-          this._permanentTailSortColumns.forEach(function(c) {
-            c.sortIndex++;
-          });
-        }
-
-        //remove all other grouped properties:
+        //move all sort columns between the newly determined sortindex and the old sortindex by one.
         scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-          if(siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex){
-            siblingColumn.grouped = false;
+          if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
+            (siblingColumn.sortIndex >= sortIndex) &&
+            (siblingColumn.sortIndex < column.sortIndex)) {
+            siblingColumn.sortIndex++;
           }
         });
+        column.sortIndex = sortIndex;
+      } else { //not sorted yet
+        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+          if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
+            siblingColumn.sortIndex++;
+          }
+        });
+
+        column.sortIndex = sortIndex;
+
+        // increase sortIndex for all permanent tail columns (a column has been added in front of them)
+        this._permanentTailSortColumns.forEach(function(c) {
+          c.sortIndex++;
+        });
+      }
+
+      //remove all other grouped properties:
+      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
+          siblingColumn.grouped = false;
+        }
+      });
 
     }
 
@@ -847,7 +839,7 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
 
   } else {
 
-    if(column.initialAlwaysIncludeSortAtBegin){
+    if (column.initialAlwaysIncludeSortAtBegin) {
       //do not change order or direction. just set grouped to true.
       column.grouped = true;
     }
@@ -856,7 +848,6 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
 
   column.grouped = true;
 };
-
 
 scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelected, followingRowSelected) {
   var rowWidth = this._rowWidth;
@@ -1431,7 +1422,7 @@ scout.Table.prototype._group = function(update) {
 
       if (column.type === 'number') {
         sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
-        if(this.grouped){
+        if (this.grouped) {
           totalSum[c] = (totalSum[c] || 0) + (value === '' || !useRow ? 0 : value);
         }
       }
@@ -1445,12 +1436,12 @@ scout.Table.prototype._group = function(update) {
     skip = skip || this._isNewGroup(groupColumns, row, nextRow);
     // if group is finished: add group row
 
-    if(skip){
+    if (skip) {
       //append total sum first, otherwise column of last group will be bottom.
-      if((r === rows.length - 1) && totalSum.length > 0){
+      if ((r === rows.length - 1) && totalSum.length > 0) {
         this._appendSumRow(totalSum, row, true, update);
       }
-      if(sum.length > 0){
+      if (sum.length > 0) {
         this._appendSumRow(sum, row, false, update);
         sum = []; //reset after group
       }
@@ -1459,18 +1450,19 @@ scout.Table.prototype._group = function(update) {
 };
 
 scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
-  var i, col, newRow = false, hasCellTextForGroupingFunction;
+  var i, col, newRow = false,
+    hasCellTextForGroupingFunction;
 
-  if(!nextRow){
+  if (!nextRow) {
     return true; //row is last row
   }
 
-  for(i=0; i<groupedColumns.length;i++){
+  for (i = 0; i < groupedColumns.length; i++) {
     col = groupedColumns[i];
     hasCellTextForGroupingFunction = col && col.cellTextForGrouping && typeof col.cellTextForGrouping === 'function';
     newRow = newRow || (hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow));
     newRow = newRow || (!hasCellTextForGroupingFunction && this.cellText(col, row) !== this.cellText(col, nextRow));
-    if(newRow){
+    if (newRow) {
       return true;
     }
   }
@@ -1478,7 +1470,9 @@ scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
 };
 
 scout.Table.prototype._groupColumns = function() {
-  return this.columns.filter(function(col) {return col.grouped;});
+  return this.columns.filter(function(col) {
+    return col.grouped;
+  });
 };
 
 scout.Table.prototype._groupColumn = function() {
@@ -1536,21 +1530,7 @@ scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
 
 };
 
-scout.Table.prototype.removeGrouping = function(column) {
-  if(column){
-    this.groupColumn(column, false, 'asc', true);
-  }
-  else{
-    this.grouped = false;
-    for (var i = 0; i < this.columns.length; i++) {
-      this.columns[i].grouped = false;
-    }
-    this._group();
-  }
-
-};
-
-scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove){
+scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove) {
   var data, sorted;
 
   this._updateSortColumnsForGrouping(column, direction, multiGroup, remove);
@@ -1575,15 +1555,26 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
     // Delegate sorting to server when it is not possible on client side
     this.remoteHandler(this.id, 'groupRows', data);
   }
-
 };
 
-scout.Table.prototype.groupTable = function(){
+scout.Table.prototype.removeColumnGrouping = function(column) {
+  if (column) {
+    this.groupColumn(column, false, 'asc', true);
+  } else {
+    this.grouped = false;
+    for (var i = 0; i < this.columns.length; i++) {
+      this.columns[i].grouped = false;
+    }
+    this._group();
+  }
+};
+
+scout.Table.prototype.group = function() {
   this.grouped = true;
   this._group();
 };
 
-scout.Table.prototype.removeTableGrouping = function(){
+scout.Table.prototype.removeGrouping = function() {
   this.grouped = false;
   this._group();
 };

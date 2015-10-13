@@ -119,10 +119,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
         .click(this.remove.bind(this))
         .click(groupSort);
 
-
       var $groupColumnAdditional = $commandGroup.appendDiv('header-command group-column-additional')
         .data('label', session.text('ui.grouped')) //TODO fko: text
-        .click(this.remove.bind(this))
+      .click(this.remove.bind(this))
         .click(groupSortAdditional);
     }
 
@@ -258,7 +257,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   function sort(direction, multiSort, remove) {
-//    table.removeGrouping();
     table.sort(column, direction, multiSort, remove);
 
     sortSelect();
@@ -271,7 +269,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
     var addIcon = '\uF067',
       sortCount = getSortColumnCount();
-
 
     $('.header-command', $commandSort).removeClass('selected');
 
@@ -350,9 +347,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   function doGroup($command) {
     if ($command.isSelected()) {
-      table.removeTableGrouping();
+      table.removeGrouping();
     } else {
-      table.groupTable();
+      table.group();
     }
 
     sortSelect();
@@ -361,7 +358,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   function groupSelect() {
 
-    var  iconPlus = '\uF067',
+    var iconPlus = '\uF067',
       groupCount = getGroupColumnCount();
 
     $groupAll.removeClass('selected');
@@ -369,7 +366,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       $groupColumn.removeClass('selected');
     }
 
-    if($groupColumnAdditional) {
+    if ($groupColumnAdditional) {
       $groupColumnAdditional.removeClass('selected');
     }
 
@@ -377,16 +374,15 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       $groupAll.addClass('selected');
     }
 
-    if($groupColumnAdditional){
-      if(groupCount === 0 || column.grouped){
+    if ($groupColumnAdditional) {
+      if (groupCount === 0 || column.grouped) {
         $groupColumnAdditional.hide();
-      }
-      else{
+      } else {
         $groupColumnAdditional.show().attr('data-icon', iconPlus);
       }
     }
 
-    if($groupColumn && column.grouped){
+    if ($groupColumn && column.grouped) {
       $groupColumn.addClass('selected');
       $groupColumn.show().attr('data-icon', column.sortIndex + 1);
     }
