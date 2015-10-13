@@ -207,12 +207,12 @@ public class BeanManagerImplementor implements IBeanManager {
   }
 
   @Internal
-  protected IBeanScopeEvaluator getScopeEvaluator() {
+  public IBeanScopeEvaluator getScopeEvaluator() {
     return m_scopeEvaluator;
   }
 
   @Internal
-  protected void setScopeEvaluator(IBeanScopeEvaluator scopeEvaluator) {
+  public void setScopeEvaluator(IBeanScopeEvaluator scopeEvaluator) {
     m_scopeEvaluator = scopeEvaluator;
   }
 

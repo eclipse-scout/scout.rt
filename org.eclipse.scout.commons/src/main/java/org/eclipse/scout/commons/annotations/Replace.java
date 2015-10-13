@@ -15,8 +15,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  * <p/>
  * <h3>Usage on Beans</h3> If this annotation is added to a bean this means that the original bean is no longer
  * available in the Scout bean manager and only the new child class is returned.<br>
- * If the super class of the replaced bean has an {@link Order} defined, this order is inherited to the replacing bean.
- * <br>
+ * If the replaced bean has an {@link Order} defined, this order is inherited to the replacing bean. <br>
  * <br>
  * <b>Example:</b> The CustomFileSystemUserPreferencesStorageService replaces the
  * FileSystemUserPreferencesStorageService already present in Scout with some custom behavior:

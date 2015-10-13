@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 
 /**
@@ -69,7 +68,7 @@ public final class BEANS {
    * @return All instances of this type ordered by {@link Order} annotation value. Never returns <code>null</code>.
    */
   public static <T> List<T> all(Class<T> beanClazz) {
-    return BEANS.all(beanClazz, new AlwaysFilter<T>());
+    return BEANS.all(beanClazz, null);
   }
 
   /**

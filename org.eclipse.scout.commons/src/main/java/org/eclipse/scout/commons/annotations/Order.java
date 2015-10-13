@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * <br>
  * For all other objects (e.g. Scout beans) the order describes which beans win against others in the Scout bean manager
  * or in which order they are returned when querying multiple beans. See the scout bean manager for more details. On a
- * bean the default order is <code>0</code>.
+ * bean the default order is <code>5000</code>.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
