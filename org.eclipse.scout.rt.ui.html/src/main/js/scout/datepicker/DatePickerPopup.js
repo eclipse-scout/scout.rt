@@ -15,9 +15,6 @@ scout.DatePickerPopup.prototype._init = function(options) {
 };
 
 scout.DatePickerPopup.prototype._render = function($parent) {
-  if (!$parent) {
-    $parent = this.session.$entryPoint;
-  }
   this.picker.render($parent);
   this.$container = this.picker.$container;
   this.$container

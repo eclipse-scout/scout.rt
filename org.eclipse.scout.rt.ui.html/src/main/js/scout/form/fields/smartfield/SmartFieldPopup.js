@@ -12,9 +12,6 @@ scout.SmartFieldPopup.prototype._init = function(options) {
 
 scout.SmartFieldPopup.prototype._render = function($parent) {
   var popupLayout, fieldBounds, initialPopupSize;
-  if (!$parent) {
-    $parent = this.session.$entryPoint;
-  }
 
   this.$container = $.makeDiv('smart-field-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this))

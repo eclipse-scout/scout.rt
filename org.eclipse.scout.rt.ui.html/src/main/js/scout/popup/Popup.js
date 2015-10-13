@@ -45,11 +45,11 @@ scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Popup.prototype.render = function($parent, event) {
   this.openEvent = event;
-  scout.Popup.parent.prototype.render.call(this, $parent);
+  scout.Popup.parent.prototype.render.call(this, $parent || this.session.$entryPoint);
 };
 
 scout.Popup.prototype._render = function($parent) {
-  this.$container = $.makeDiv('popup').appendTo($parent || this.session.$entryPoint);
+  this.$container = $.makeDiv('popup').appendTo($parent);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
 
   // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
@@ -132,6 +132,14 @@ scout.Popup.prototype._detachCloseHandler = function() {
 };
 
 scout.Popup.prototype._onMouseDown = function(event) {
+  // in some cases the mousedown handler is executed although it has been already
+  // detached on the _remove() method. However, since we're in the middle of
+  // processing the mousedown event, it's too late to detach the event and we must
+  // deal with that situation by checking the rendered flag. Otherwise we would
+  // run into an error later, since the $container is not available anymore.
+  if (!this.rendered) {
+    return;
+  }
   if (this._isMouseDownOutside(event)) {
     this._onMouseDownOutside(event);
   }

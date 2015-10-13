@@ -540,6 +540,8 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
  *   target parameter for calls to the remote-handler, so the original adapter
  *   will receive the event.
  */
+// FIXME AWE: remove originalId() move send-logic to model-adapter so we don't have to pass this.id everywhere
+// refactor remoteHandler and existing sendEvent methods
 scout.ModelAdapter.prototype.originalId = function() {
   if (this.cloneOf) {
     return this.cloneOf;

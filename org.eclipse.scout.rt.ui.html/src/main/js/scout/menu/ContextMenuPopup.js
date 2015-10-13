@@ -56,10 +56,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
       return;
     }
     if (this.options.cloneMenuItems) {
-      menuClone = this._cloneMenuItem(menu);
-      this.session.registerAdapterClone(menu, menuClone);
-      menu.hasClone = true;
-      menu = menuClone;
+      menu = menu.cloneAdapter({parent: this});
     }
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
@@ -81,35 +78,13 @@ scout.ContextMenuPopup.prototype._remove = function() {
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
   this._getMenuItems().forEach(function(menu) {
     if (this.options.cloneMenuItems) {
-      if (menu.hasClone) {
+      if (this.session.hasClones(menu)) {
         this.session.unregisterAllAdapterClones(menu);
-        menu.hasClone = false;
       }
     } else {
       menu.remove();
     }
   }, this);
-};
-
-/**
- * Creates a shallow copy of the given menu instance, all references to DOM elements are removed
- * and the rendered property is set to false. Thus the method can be used to render an already rendered
- * menu again, as required when a pop-up menu is opened in a table or in a tree (where the same item
- * is already rendered in the menu-bar).
- *
- * @param menuItem can be a Button or a Menu instance.
- */
-scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
-  var clone = $.extend({}, menuItem);
-  clone.rendered = false;
-  clone.$container = null;
-  clone.$text = null;
-  clone.setParent(this);
-
-  clone._addKeyStrokeContextSupport();
-  clone._initKeyStrokeContext(clone.keyStrokeContext);
-
-  return clone;
 };
 
 /**
@@ -119,7 +94,7 @@ scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
 scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
   var $firstMenuItem, $lastMenuItem;
 
-  //TODO CGU after refactoring of menu-item to context-menu-item we can use last/first instead of a fully qualified name. We also could move this function to jquery-scout to make it reusable.
+  // TODO CGU after refactoring of menu-item to context-menu-item we can use last/first instead of a fully qualified name. We also could move this function to jquery-scout to make it reusable.
   this.$body.children('.menu-item').each(function() {
     var $menuItem = $(this);
     $menuItem.removeClass('context-menu-item-first context-menu-item-last');

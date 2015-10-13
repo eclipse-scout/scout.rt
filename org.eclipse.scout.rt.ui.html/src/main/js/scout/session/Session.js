@@ -157,6 +157,9 @@ scout.Session.prototype._initObjectFactory = function(objectFactories) {
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
   delete this.modelAdapterRegistry[modelAdapter.id];
+  if (this.hasClones(modelAdapter)) {
+    this.unregisterAllAdapterClones(modelAdapter);
+  }
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
@@ -1119,6 +1122,10 @@ scout.Session.prototype.registerAdapterClone = function(adapter, clone) {
 scout.Session.prototype.getAdapterClones = function(adapter) {
   var entry = this._clonedModelAdapterRegistry[adapter.id];
   return scout.arrays.ensure(entry);
+};
+
+scout.Session.prototype.hasClones = function(adapter) {
+  return this.getAdapterClones(adapter).length > 0;
 };
 
 scout.Session.prototype.unregisterAllAdapterClones = function(adapter) {

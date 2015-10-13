@@ -27,7 +27,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     column = $headerItem.data('column'),
     pos = table.columns.indexOf(column);
 
-  $parent = $parent || this.session.$entryPoint,
   this.$parent = $parent;
   $headerItem.select(true);
 

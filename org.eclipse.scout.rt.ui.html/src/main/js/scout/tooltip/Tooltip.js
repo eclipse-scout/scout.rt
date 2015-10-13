@@ -174,6 +174,9 @@ scout.Tooltip.prototype.position = function() {
 };
 
 scout.Tooltip.prototype._onDocumentMousedown = function(event) {
+  if (!this.rendered) {
+    return false;
+  }
   if (this._isMousedownOutside(event)) {
     this._onMousedownOutside(event);
   }

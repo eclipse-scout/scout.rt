@@ -176,23 +176,16 @@ scout.SmartField.prototype._onClick = function(event) {
   // note: the INPUT element does not process the click event when the field is disabled
   // however, the DIV element used in mobile-mode does process the event anyway, that's
   // why this check is required.
-  if (!this.enabled) {
+  if (!this.enabled || this.embedded || this._popup.rendered) {
     return;
   }
 
-  // FIXME AWE: (popups) beautify this if/else mess
-  if (this.embedded) {
-    // NOP
+  if (this.mobile) {
+    this._popup.render();
+    this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+    return false;
   } else {
-    if (!this._popup.rendered) {
-      if (this.mobile) {
-        this._popup.render();
-        this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
-        return false;
-      } else {
-        this._openProposal(true);
-      }
-    }
+    this._openProposal(true);
   }
 };
 
@@ -476,7 +469,7 @@ scout.SmartField.prototype._renderPopup = function() {
  * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function(whileTyping) {
-  if (this.mode !== scout.FormField.MODE_CELLEDITOR) {
+  if (this.mode !== scout.FormField.MODE_CELLEDITOR && !this.embedded) {
     this._acceptProposal(true);
   }
 };

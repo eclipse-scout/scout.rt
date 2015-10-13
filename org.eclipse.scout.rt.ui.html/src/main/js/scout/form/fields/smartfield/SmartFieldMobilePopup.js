@@ -54,12 +54,6 @@ scout.SmartFieldMobilePopup.prototype.prefSize = function($container) {
 };
 
 scout.SmartFieldMobilePopup.prototype._render = function($parent) {
-  if (!$parent) { // FIXME AWE: (popups) was für einen grund gibt es für dieses if? (siehe auch SmartFieldPopup)
-    // wahrscheinlich haben wir ja dann nie einen $parent gesetzt, wenn man explizit das field als parent setzt
-    // kommt es sowieso nicht gut wegen der z-order (popup wird verdeckt von anderen fields).
-    $parent = this.session.$entryPoint;
-  }
-
   this.$container = $.makeDiv('smart-field-popup mobile')
     .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME AWE: (popups) is this line required?
     .appendTo($parent);
