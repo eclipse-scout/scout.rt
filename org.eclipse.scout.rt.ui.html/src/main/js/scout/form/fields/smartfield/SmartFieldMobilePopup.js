@@ -7,31 +7,23 @@ scout.SmartFieldMobilePopup = function() {
 };
 scout.inherits(scout.SmartFieldMobilePopup, scout.Popup);
 
-scout.SmartFieldMobilePopup.MARGIN = 45; // FIXME AWE: (popups) replace this with center position / max width
+scout.SmartFieldMobilePopup.TOP_MARGIN = 45;
 
 scout.SmartFieldMobilePopup.prototype._init = function(options) {
   scout.SmartFieldMobilePopup.parent.prototype._init.call(this, options);
   this._mobileSmartField = options.smartField;
 
+  // FIXME AWE: (popups) SFMpopup sollte nicht im init vom smartfield erzeugt werden, sondern erst wenn man drauf klickt
+
   // clone original mobile smart-field
-  var model = this._mobileSmartField.extractModel();
-  model.parent = this;
-  model.labelPosition = scout.FormField.LABEL_POSITION_ON_FIELD;
-  model.embedded = true;
-  model.mobile = false;
-
-  this._smartField = scout.create(model);
-
-  // DEEP CLONE!? how? problem ist, dass die menus noch auf das alte smartField zeigen
-  // man darf nun aber nicht einfach
-  this._smartField.children.forEach(function(child) {
-    child.setParent(this._smartField);
-  }, this);
-
-  // mobile smart-field and embedded smart-field point to the same popup instance
-  this._smartField._popup = this;
-  // embedded smart-field should receive all events adressed to the original mobile smart-field
-  this.session.registerAdapterClone(this._mobileSmartField, this._smartField);
+  // original and clone both point to the same _popup instance
+  this._smartField = this._mobileSmartField.cloneAdapter({
+    parent: this,
+    _popup: this,
+    labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
+    embedded: true,
+    mobile: false
+  });
 };
 
 /**
@@ -40,8 +32,8 @@ scout.SmartFieldMobilePopup.prototype._init = function(options) {
 scout.SmartFieldMobilePopup.prototype.prefLocation = function($container, openingDirectionY) {
   var popupSize = this.prefSize($container),
     screenWidth = $(document).width(),
-    x = (screenWidth - popupSize.width) / 2;
-  return new scout.Point(x, scout.SmartFieldMobilePopup.MARGIN);
+    x = Math.max(0, (screenWidth - popupSize.width) / 2);
+  return new scout.Point(x, scout.SmartFieldMobilePopup.TOP_MARGIN);
 };
 
 /**
@@ -51,12 +43,10 @@ scout.SmartFieldMobilePopup.prototype.prefSize = function($container) {
   var screenWidth = $(document).width(),
     screenHeight = $(document).height(),
     minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
-    maxPopupWidth = scout.HtmlEnvironment.formColumnWidth,
     maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
-    popupWidth = screenWidth - 2 * scout.SmartFieldMobilePopup.MARGIN,
-    popupHeight = screenHeight / 2 - scout.SmartFieldMobilePopup.MARGIN;
+    popupWidth = scout.HtmlEnvironment.formColumnWidth,
+    popupHeight = screenHeight / 2 - scout.SmartFieldMobilePopup.TOP_MARGIN;
 
-  popupWidth = Math.min(popupWidth, maxPopupWidth);
   popupWidth = Math.max(popupWidth, minPopupWidth);
   popupHeight = Math.min(popupHeight, maxPopupHeight);
 

@@ -111,11 +111,9 @@ scout.create = function(vararg, options) {
  * when it is not provided by the model.
  */
 scout._createLocalObject = function(model) {
-  var session;
   if (typeof model !== 'object') {
     throw new Error('model must be an object');
   }
-  session = model.session || model.parent.session;
   if (!model.objectType) {
     throw new Error('missing property objectType');
   }
@@ -123,6 +121,7 @@ scout._createLocalObject = function(model) {
     model.id = scout.createUniqueId();
   }
   model._register = false;
+  var session = model.session || model.parent.session;
   return session.objectFactory.create(model);
 };
 

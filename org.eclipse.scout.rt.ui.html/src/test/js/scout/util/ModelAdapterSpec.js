@@ -250,6 +250,47 @@ describe("ModelAdapter", function() {
 
   });
 
+  describe('cloneAdapter', function() {
+
+    var model, adapter, expectedProperties = ['id', 'session', 'objectType', 'parent', 'label'];
+
+    beforeEach(function() {
+      model = createSimpleModel('Button', session);
+      model.label = 'bar';
+      adapter = createModelAdapter(model);
+      adapter.$container = 'dummy container property';
+    });
+
+    it('clones only model properties', function() {
+      var adapterClone = adapter.cloneAdapter();
+      // should contain the following properties:
+      expectedProperties.forEach(function(propertyName) {
+        expect(adapterClone[propertyName]).not.toBe(undefined);
+      });
+      // but not the $container property (which has been added later)
+      expect(adapterClone.$container).toBe(undefined);
+    });
+
+    it('\'label\' must be recognized as model property, but not \'$container\'', function() {
+      expect(adapter._isModelProperty('label')).toBe(true);
+      expect(adapter._isModelProperty('$container')).toBe(false);
+    });
+
+    it('prefers properties passed as modelOverride', function() {
+      var adapterClone = adapter.cloneAdapter({label: 'foo'});
+      expect(adapterClone.label).toBe('foo');
+    });
+
+    it('must register clone in adapter registry', function() {
+      var adapterClone = adapter.cloneAdapter();
+      expect(adapterClone.cloneOf).toBe(adapter.id);
+      // registry may contain multiple clones for a given adapter ID
+      // that's why we access index 0 here
+      expect(session._clonedModelAdapterRegistry[adapter.id][0]).toBe(adapterClone);
+    });
+
+  });
+
   describe('onModelPropertyChange', function() {
 
     describe('adapter', function() {
@@ -290,27 +331,6 @@ describe("ModelAdapter", function() {
 
         expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapter);
         expect(session.getModelAdapter(model1.id)).toBeFalsy();
-      });
-
-    });
-
-    describe('extractModel', function() {
-
-      it('returns only model properties', function() {
-        var model = createSimpleModel('FooBar', session),
-          adapter = createModelAdapter(model),
-          expectedProperties = ['id', 'session', 'objectType', 'parent'];
-
-        adapter.$container = 'dummy container property';
-        var extractedModel = adapter.extractModel();
-
-        // should contain the following properties:
-        expectedProperties.forEach(function(propertyName) {
-          expect(extractedModel[propertyName]).not.toBe(undefined);
-        });
-
-        // but not the $container property (which has been added later)
-        expect(extractedModel.$container).toBe(undefined);
       });
 
     });

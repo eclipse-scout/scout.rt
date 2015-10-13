@@ -485,17 +485,75 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
 };
 
 /**
- * Returns an object which contains only the 'model' properties of this ModelAdapter instance.
- * Other properties like $container, etc. are not included in the result.
+ * Creates a deep clone of the current adapter instance. For each adapter a local object is created.
+ * The 'cloneOf' property of the local-object points to the original adapter. You should use the
+ * originalId() in place of 'this.id' when you're calling a remote-handler, so the event will be
+ * sent to the original adapter on the UI server.
  */
-scout.ModelAdapter.prototype.extractModel = function() {
-  // FIXME AWE: (popups) solve problem for already resolved adapter properties
-  // when we extract a model, we always want the ID not the adapter object for these properties
-  var model = {};
+scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
+  var cloneProperty, cloneAdapter, adapterProperty,
+    cloneModel = modelOverride || {};
+
+  // #1 - clone model (excl. all adapter properties since they require a parent instance
   this._modelProperties.forEach(function(propertyName) {
-    model[propertyName] = this[propertyName];
+    if (cloneModel.hasOwnProperty(propertyName)) {
+      // NOP - when property is already set by modelOverride
+    } else if ('id' === propertyName) {
+      // must set ID to undefined - so scout#_createLocalObject will
+      // create a new unique ID for the cloned adapter. You can still
+      // pass an ID by the modelOverride argument.
+      cloneModel[propertyName] = undefined;
+    } else if (this._isAdapterProperty(propertyName)) {
+      // NOP - we deal with adapter properties below
+    } else if (this.hasOwnProperty(propertyName)) {
+      cloneModel[propertyName] = this[propertyName];
+    }
   }, this);
-  return model;
+
+  cloneAdapter = scout.create(cloneModel);
+
+  // #2 - create child adapters, use cloneAdapter as parent
+  this._adapterProperties.forEach(function(propertyName) {
+    if (cloneModel.hasOwnProperty(propertyName)) {
+      // NOP - when property is already set by modelOverride
+    } else if (this.hasOwnProperty(propertyName)) {
+      adapterProperty = this[propertyName];
+      if (Array.isArray(adapterProperty)) {
+        cloneProperty = [];
+        adapterProperty.forEach(function(adapterPropertyElement) {
+          cloneProperty.push(adapterPropertyElement.cloneAdapter({parent: cloneAdapter}));
+        }, this);
+      } else {
+        cloneProperty = adapterProperty.cloneAdapter({parent: cloneAdapter});
+      }
+      cloneAdapter[propertyName] = cloneProperty;
+    }
+  }, this);
+
+  this.session.registerAdapterClone(this, cloneAdapter);
+  return cloneAdapter;
+};
+
+/**
+ * @returns the ID of the model adapter or if the instance is a clone of another
+ *   model adapter instance, the ID of the original adapter. Use this method as
+ *   target parameter for calls to the remote-handler, so the original adapter
+ *   will receive the event.
+ */
+scout.ModelAdapter.prototype.originalId = function() {
+  if (this.cloneOf) {
+    return this.cloneOf;
+  } else {
+    return this.id;
+  }
+};
+
+scout.ModelAdapter.prototype._isModelProperty = function(propertyName) {
+  return this._modelProperties.indexOf(propertyName) > -1;
+};
+
+scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
+  return this._adapterProperties.indexOf(propertyName) > -1;
 };
 
 scout.ModelAdapter.prototype.toString = function() {
