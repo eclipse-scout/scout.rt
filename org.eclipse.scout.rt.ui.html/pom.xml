@@ -78,6 +78,9 @@
       <plugin>
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
+        <configuration>
+          <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
+        </configuration>
         <executions>
           <execution>
             <goals>
