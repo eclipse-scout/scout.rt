@@ -15,8 +15,6 @@ import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.junit.Test;
@@ -838,33 +836,7 @@ public class HTMLUtilityTest {
     assertEquals("Before\n \nAfter", HTMLUtility.toPlainTextWithTable(in5));
     assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in6));
     assertEquals("Sehr geehrte Damen und Herren\nKeine\n \nEine", HTMLUtility.toPlainTextWithTable(in7));
-    assertEquals("Test\n \n\nVon: Bla, Bla Inc\nGesendet: Mittwoch, 14. Oktober 2015 14:01\nAn: Peter Muster, blub\nBetreff: Test Betreff\n\n \n-----Ursprüngliche Nachricht-----\nVon: peter.muster@bla.ch\nGesendet: 14.10.15 13:52\nAn: blablub < blablub.bla@hotmail.com >\nBetreff: Test E-Mail\n \nHallo\n\nDas ist ein Testmail\nKeine Leerzeile vor dieser Zeile\n\nVor dieser Zeile hats 1 Leerzeile\n\n \nDavor 2\n\n \n \nDavor 3\n\nMal schauen was passiert", cleanPlainText(HTMLUtility.toPlainTextWithTable(in8)));
-  }
-
-  public static String cleanPlainText(String text) {
-    if (StringUtility.isNullOrEmpty(text)) {
-      return null;
-    }
-    // trim body anyway; '\u00A0' = non-breaking space
-    String s = text;
-    // trim leading whitespace
-    Matcher matcher = Pattern.compile("^[\\s\u00A0]*", Pattern.DOTALL).matcher(s);
-    if (matcher.find()) {
-      s = matcher.replaceAll("");
-    }
-    // trim trailing whitespace
-    matcher = Pattern.compile("[\\s\u00A0]*$", Pattern.DOTALL).matcher(s);
-    if (matcher.find()) {
-      s = matcher.replaceAll("");
-    }
-    // ticket 158053: cleanup-operations are needed because of outlook-msg-line-endings
-    matcher = Pattern.compile("\r\n\u00A0\r\n").matcher(s);
-    if (matcher.find()) {
-      // this is probably an outlook email - remove double-linebreaks
-      s = s.replaceAll("\r\n\r\n", "\n");
-      s = s.replaceAll("\n\u00A0\n", "\n\n");
-    }
-    return s;
+    assertEquals("Test\n \n\nVon: Bla, Bla Inc\nGesendet: Mittwoch, 14. Oktober 2015 14:01\nAn: Peter Muster, blub\nBetreff: Test Betreff\n\n \n-----Ursprüngliche Nachricht-----\nVon: peter.muster@bla.ch\nGesendet: 14.10.15 13:52\nAn: blablub < blablub.bla@hotmail.com >\nBetreff: Test E-Mail\n \nHallo\n\nDas ist ein Testmail\nKeine Leerzeile vor dieser Zeile\n\nVor dieser Zeile hats 1 Leerzeile\n\n \nDavor 2\n\n \n \nDavor 3\n\nMal schauen was passiert", HTMLUtility.toPlainTextWithTable(in8));
   }
 
   /**
