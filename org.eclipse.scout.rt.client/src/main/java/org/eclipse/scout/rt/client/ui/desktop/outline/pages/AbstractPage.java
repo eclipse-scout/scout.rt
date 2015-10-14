@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -776,6 +777,18 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected void onVirtualChildNodeResolved(ITreeNode resolvedNode) {
     super.onVirtualChildNodeResolved(resolvedNode);
     firePageChanged((IPage) resolvedNode);
+  }
+
+  @Override
+  public List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
+    ITableRow row = parentTablePage.getTableRowFor(this);
+    if (row == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+
+    ITable table = parentTablePage.getTable();
+    table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
+    return ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
   }
 
   @Override

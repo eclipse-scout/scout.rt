@@ -36,9 +36,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtensio
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -593,34 +591,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     if (activePage instanceof IPageWithTable<?>) {
       // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) activePage;
-      if (pageWithTable.isShowEmptySpaceMenus()) {
-        ITable table = pageWithTable.getTable();
-        List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
-            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
-        if (emptySpaceMenus.size() > 0) {
-          for (IMenu menu : emptySpaceMenus) {
-            menus.add(menu);
-          }
-        }
-      }
+      menus.addAll(pageWithTable.computeTableEmptySpaceMenus());
     }
 
     // in case of a page with nodes add the single selection menus of its parent table for the current node/row.
     IPage<?> parentPage = activePage.getParentPage();
     if (parentPage instanceof IPageWithTable<?>) {
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) parentPage;
-      ITableRow row = pageWithTable.getTableRowFor(activePage);
-      ITable table = pageWithTable.getTable();
-      if (row != null) {
-        table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-        List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
-        if (parentTableMenus.size() > 0) {
-          for (IMenu menu : parentTableMenus) {
-            menus.add(menu);
-          }
-        }
-      }
+      IPageWithTable<?> parentTablePage = (IPageWithTable<?>) parentPage;
+      menus.addAll(activePage.computeParentTablePageMenus(parentTablePage));
     }
+
     return menus;
   }
 

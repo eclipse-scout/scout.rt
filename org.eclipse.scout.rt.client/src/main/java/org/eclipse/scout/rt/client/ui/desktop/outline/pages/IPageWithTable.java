@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -55,11 +56,9 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
    */
   SearchFilter getSearchFilter();
 
-  boolean isShowTableRowMenus();
+  /**
+   * @return A list (non-null) of empty space menus.
+   */
+  List<IMenu> computeTableEmptySpaceMenus();
 
-  void setShowTableRowMenus(boolean showTableRowMenus);
-
-  boolean isShowEmptySpaceMenus();
-
-  void setShowEmptySpaceMenus(boolean showEmptySpaceMenus);
 }

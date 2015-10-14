@@ -39,6 +39,9 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTa
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -78,8 +81,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private boolean m_searchRequired;
   private boolean m_searchActive;
   private boolean m_limitedResult;
-  private boolean m_showEmptySpaceMenus;
-  private boolean m_showTableRowMenus;
 
   public AbstractPageWithTable() {
     this(true, null);
@@ -153,44 +154,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Order(100)
   protected boolean getConfiguredSearchRequired() {
     return false;
-  }
-
-  /**
-   * Configures the visibility of empty space menus on this page's table. Empty space menus are typically available
-   * anywhere in a table field where no table rows are present (in the 'empty space'), as well as on the table header.
-   * Typical empty space menus will affect no (existing) row (for example a 'New row...' menu), or all rows in the table
-   * (for example a 'Clear all rows' menu).
-   * <p>
-   * Note that setting this property to {@code false} will effectively stop all empty space menus from being displayed
-   * on the GUI. However, if this property is set to {@code true}, single menus can still individually be set to
-   * invisible.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   *
-   * @return {@code true} if empty space menus should generally be visible, {@code false} otherwise
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(110)
-  protected boolean getConfiguredShowEmptySpaceMenus() {
-    return true;
-  }
-
-  /**
-   * Configures the visibility of table row menus on this page's table. Table row menus are typically available on each
-   * existing row. Typical table row menus will affect exactly one existing row (for example an 'Edit row...' menu or a
-   * 'Delete row' menu).
-   * <p>
-   * Note that setting this property to {@code false} will effectively stop all table row menus from being displayed on
-   * the GUI. However, if this property is set to {@code true}, single menus can still individually be set to invisible.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   *
-   * @return {@code true} if table row menus should generally be visible, {@code false} otherwise
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(120)
-  protected boolean getConfiguredShowTableRowMenus() {
-    return true;
   }
 
   /**
@@ -397,8 +360,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     super.initConfig();
     m_searchActive = true;
     setSearchRequired(getConfiguredSearchRequired());
-    setShowEmptySpaceMenus(getConfiguredShowEmptySpaceMenus());
-    setShowTableRowMenus(getConfiguredShowTableRowMenus());
   }
 
   @Override
@@ -614,26 +575,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       ensureInitialized();
     }
     return (T) super.getTable();
-  }
-
-  @Override
-  public boolean isShowEmptySpaceMenus() {
-    return m_showEmptySpaceMenus;
-  }
-
-  @Override
-  public void setShowEmptySpaceMenus(boolean showEmptySpaceMenus) {
-    m_showEmptySpaceMenus = showEmptySpaceMenus;
-  }
-
-  @Override
-  public boolean isShowTableRowMenus() {
-    return m_showTableRowMenus;
-  }
-
-  @Override
-  public void setShowTableRowMenus(boolean showTableRowMenus) {
-    m_showTableRowMenus = showTableRowMenus;
   }
 
   @Override
@@ -894,6 +835,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Override
   public List<IPage<?>> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows) {
     return getChildPagesFor(tableRows, true);
+  }
+
+  @Override
+  public List<IMenu> computeTableEmptySpaceMenus() {
+    return ActionUtility.getActions(getTable().getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
   }
 
   /**

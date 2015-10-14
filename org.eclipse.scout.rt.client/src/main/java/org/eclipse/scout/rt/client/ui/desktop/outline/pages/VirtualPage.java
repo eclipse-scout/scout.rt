@@ -95,6 +95,11 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
+  public List computeParentTablePageMenus(IPageWithTable parentTablePage) {
+    return CollectionUtility.emptyArrayList();
+  }
+
+  @Override
   public boolean isTableVisible() {
     return false;
   }

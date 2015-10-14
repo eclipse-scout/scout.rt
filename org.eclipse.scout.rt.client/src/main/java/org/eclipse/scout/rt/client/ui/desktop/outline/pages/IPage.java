@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -158,4 +159,15 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   ITableRow getTableRowFor(ITreeNode treeNode);
 
   List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> treeNodes);
+
+  /**
+   * The default implementation returns the single selection menus from the parent table page.
+   * <p>
+   * If this behavior is not desired return an empty list instead.
+   *
+   * @param parentTablePage
+   *          Parent table page
+   * @return A list (non-null) of single selection menus.
+   */
+  List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage);
 }
