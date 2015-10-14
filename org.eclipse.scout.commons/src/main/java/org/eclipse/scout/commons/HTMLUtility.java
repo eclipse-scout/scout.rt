@@ -625,7 +625,7 @@ public final class HTMLUtility {
     }
 
     //replace newlines:
-    s = s.replaceAll("\n", " ");
+    s = s.replace("\n", " ").replace("\r", "");
 
     //strip <p> and <br> from table cells (td, th):
     Pattern pattern = Pattern.compile("(<t[dh][^>]*>((?!</?\\s*(p|t[dh])).)*)</?\\s*p[^>]*>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -636,7 +636,9 @@ public final class HTMLUtility {
     }
 
     // handle <p></p> same as <p/>
-    s = Pattern.compile("<p>\\s*</p>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("<p/>");
+    s = Pattern.compile("<p[^>]*>\\s*</p>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("<p/>");
+    // handle ...</p><p>...</p> same as <p/>
+    s = Pattern.compile("</p>\\s*<p[^>]*>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("<p/>");
     //create new lines:
     s = Pattern.compile("<br\\s*/?\\s*>|</?p/?[^>]*>|</tr\\s*>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("\n");
     //table column
