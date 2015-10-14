@@ -334,7 +334,6 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
     $header.addClass('disabled');
   }
   this._renderColumnText(column);
-  this._renderColumnState(column);
 };
 
 scout.TableHeader.prototype._renderColumnText = function(column) {
@@ -350,8 +349,7 @@ scout.TableHeader.prototype._renderColumnText = function(column) {
     $header.removeClass('empty');
   }
 
-  // Create state div
-  $header.data('state', $header.appendSpan('table-header-item-state'));
+  this._renderColumnState(column);
 };
 
 scout.TableHeader.prototype._renderColumnState = function(column) {
@@ -360,6 +358,8 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
     $state = $header.data('state'),
     filtered = this.table.getFilter(column.id);
 
+  $header.find('.table-header-item-state').remove();
+  $state = $header.appendSpan('table-header-item-state');
   $state.empty();
   $header.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
   $state.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
