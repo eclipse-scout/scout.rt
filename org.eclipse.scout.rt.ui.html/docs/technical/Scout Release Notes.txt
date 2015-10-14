@@ -541,3 +541,11 @@ Outline: Having a selected page is not mandatory anymore.
 An outline overview or the default detail form will be displayed if no page is selected.
 Therefore activating an outline does not automatically select the first page anymore.
 If the previous behavior is still wanted, one can implemented IDesktop#execOutlineChanged and call activateFirstPage if active page is null
+
+SME 14.10.2015
+Removed getConfiguredShowEmptySpaceMenus
+Replacement: if return value was false, override computeTableEmptySpaceMenus and return an empty list instead
+
+SME 14.10.2015
+Removed getConfiguredShowTableRowMenus
+Replacement: none (no functionality was provided)
