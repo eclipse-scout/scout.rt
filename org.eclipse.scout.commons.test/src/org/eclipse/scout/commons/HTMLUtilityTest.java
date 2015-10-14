@@ -15,6 +15,8 @@ import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.junit.Test;
@@ -739,7 +741,7 @@ public class HTMLUtilityTest {
   }
 
   @Test
-  public void testNewLinesToPlainTextWithTable() {
+  public void testToPlainTextWithTableNewLines() {
     String in1 = "<html>" +
         "<head><title>Title</title></head>" +
         "<body>Before<p />After</body>" +
@@ -747,22 +749,22 @@ public class HTMLUtilityTest {
 
     String in2 = "<html>" +
         "<head><title>Title</title></head>" +
-        "<body>Before<p></p>After</body>" +
+        "<body>Before<p class=\"test\"></p>After</body>" +
         "</html>";
 
     String in3 = "<html>" +
         "<head><title>Title</title></head>" +
-        "<body>Before<p>InBetween</p>After</body>" +
+        "<body>Before<p class=\"test\">InBetween</p>After</body>" +
         "</html>";
 
     String in4 = "<html>" +
         "<head><title>Title</title></head>" +
-        "<body>Before<p>   \t\n</p>After</body>" +
+        "<body>Before<p class=\"test\">   \t\n</p>After</body>" +
         "</html>";
 
     String in5 = "<html>" +
         "<head><title>Title</title></head>" +
-        "<body>Before<p>&nbsp;</p>After</body>" +
+        "<body>Before<p class=\"test\">&nbsp;</p>After</body>" +
         "</html>";
 
     String in6 = "<html>" +
@@ -770,12 +772,99 @@ public class HTMLUtilityTest {
         "<body>Before<p/>After</body>" +
         "</html>";
 
+    String in7 = "<html>" +
+        "<head><title>Title</title></head><body>" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;mso-fareast-language:FR-CH\">Sehr geehrte Damen und Herren<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;mso-fareast-language:FR-CH\">Keine<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;mso-fareast-language:FR-CH\"><o:p>&nbsp;</o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;mso-fareast-language:FR-CH\">Eine<o:p></o:p></span></p>" +
+        "</body></html>";
+
+    String in8 = "<html xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns:m=\"http://schemas.microsoft.com/office/2004/12/omml\" xmlns=\"http://www.w3.org/TR/REC-html40\">\n" +
+        "<head>\n" +
+        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n" +
+        "<meta name=\"Generator\" content=\"Microsoft Word 14 (filtered medium)\">\n" +
+        "<!--[if gte mso 9]><xml>\n" +
+        "<o:shapedefaults v:ext=\"edit\" spidmax=\"1026\" />\n" +
+        "</xml><![endif]--><!--[if gte mso 9]><xml>\n" +
+        "<o:shapelayout v:ext=\"edit\">\n" +
+        "<o:idmap v:ext=\"edit\" data=\"1\" />\n" +
+        "</o:shapelayout></xml><![endif]-->\n" +
+        "</head>\n" +
+        "<body lang=\"DE-CH\" link=\"blue\" vlink=\"purple\">\n" +
+        "<div class=\"WordSection1\">\n" +
+        "<p class=\"MsoNormal\"><span lang=\"FR-CH\" style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:#1F497D\">Test<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span lang=\"FR-CH\"><o:p>&nbsp;</o:p></span></p>\n" +
+        "<div>\n" +
+        "<div style=\"border:none;border-top:solid #B5C4DF 1.0pt;padding:3.0pt 0cm 0cm 0cm\">\n" +
+        "<p class=\"MsoNormal\"><b><span lang=\"DE\" style=\"font-family:&quot;Tahoma&quot;,&quot;sans-serif&quot;;mso-fareast-language:DE-CH\">Von:</span></b><span lang=\"DE\" style=\"font-family:&quot;Tahoma&quot;,&quot;sans-serif&quot;;mso-fareast-language:DE-CH\"> Bla, Bla Inc\n\r" +
+        "<br>\n\r" +
+        "<b>Gesendet:</b> Mittwoch, 14. Oktober 2015 14:01<br>\n\r" +
+        "<b>An:</b> Peter Muster, blub<br>\n\r" +
+        "<b>Betreff:</b> Test Betreff<o:p></o:p></span></p>\n\r" +
+        "</div>\n" +
+        "</div>\n" +
+        "<p class=\"MsoNormal\"><span lang=\"FR-CH\"><o:p>&nbsp;</o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">-----Ursprüngliche Nachricht-----<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Von: <a href=\"mailto:blablub.bla@hotmail.com\">\n" +
+        "peter.muster@bla.ch</a><o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Gesendet: 14.10.15 13:52<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">An: blablub &lt;<a href=\"mailto:blablub.bla@hotmail.com\">blablub.bla@hotmail.com</a>&gt;<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Betreff: Test E-Mail<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\"><o:p>&nbsp;</o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Hallo<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\"><o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Das ist ein Testmail<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Keine Leerzeile vor dieser Zeile<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\"><o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Vor dieser Zeile hats 1 Leerzeile<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\"><o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">&nbsp;<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Davor 2<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\"><o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">&nbsp;<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">&nbsp;<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Davor 3<o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\"><o:p></o:p></span></p>\n" +
+        "<p class=\"MsoNormal\"><span style=\"font-family:&quot;Arial&quot;,&quot;sans-serif&quot;\">Mal schauen was passiert<o:p></o:p></span></p>\n" +
+        "</div>\n" +
+        "</body>\n" +
+        "</html>\n";
+
     assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in1));
     assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in2));
     assertEquals("Before\nInBetween\nAfter", HTMLUtility.toPlainTextWithTable(in3));
     assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in4));
     assertEquals("Before\n \nAfter", HTMLUtility.toPlainTextWithTable(in5));
     assertEquals("Before\nAfter", HTMLUtility.toPlainTextWithTable(in6));
+    assertEquals("Sehr geehrte Damen und Herren\nKeine\n \nEine", HTMLUtility.toPlainTextWithTable(in7));
+    assertEquals("Test\n \n\nVon: Bla, Bla Inc\nGesendet: Mittwoch, 14. Oktober 2015 14:01\nAn: Peter Muster, blub\nBetreff: Test Betreff\n\n \n-----Ursprüngliche Nachricht-----\nVon: peter.muster@bla.ch\nGesendet: 14.10.15 13:52\nAn: blablub < blablub.bla@hotmail.com >\nBetreff: Test E-Mail\n \nHallo\n\nDas ist ein Testmail\nKeine Leerzeile vor dieser Zeile\n\nVor dieser Zeile hats 1 Leerzeile\n\n \nDavor 2\n\n \n \nDavor 3\n\nMal schauen was passiert", cleanPlainText(HTMLUtility.toPlainTextWithTable(in8)));
+  }
+
+  public static String cleanPlainText(String text) {
+    if (StringUtility.isNullOrEmpty(text)) {
+      return null;
+    }
+    // trim body anyway; '\u00A0' = non-breaking space
+    String s = text;
+    // trim leading whitespace
+    Matcher matcher = Pattern.compile("^[\\s\u00A0]*", Pattern.DOTALL).matcher(s);
+    if (matcher.find()) {
+      s = matcher.replaceAll("");
+    }
+    // trim trailing whitespace
+    matcher = Pattern.compile("[\\s\u00A0]*$", Pattern.DOTALL).matcher(s);
+    if (matcher.find()) {
+      s = matcher.replaceAll("");
+    }
+    // ticket 158053: cleanup-operations are needed because of outlook-msg-line-endings
+    matcher = Pattern.compile("\r\n\u00A0\r\n").matcher(s);
+    if (matcher.find()) {
+      // this is probably an outlook email - remove double-linebreaks
+      s = s.replaceAll("\r\n\r\n", "\n");
+      s = s.replaceAll("\n\u00A0\n", "\n\n");
+    }
+    return s;
   }
 
   /**
@@ -790,8 +879,8 @@ public class HTMLUtilityTest {
         "  <tr>\n" +
         "    <th class=\"xxx\">My <p>Header 1</th>\n" +
         "    <th>My <p>Header</p> 2</th >\n" +
-        "  </tr>\n" +
-        "  <tr>\n" +
+        "  </tr>\n\r" +
+        "  <tr>\n\r" +
         "    <td>row 1 p,<p> column</ P> 1</td>\n" +
         "    <td>\nrow 1,< P> column\n < p >2</td>\n" +
         "  </tr>\n" +
@@ -799,7 +888,7 @@ public class HTMLUtilityTest {
         "    <td >row td 2,<p/> column 1</td>\n" +
         "    <td valign=\"top\"><p >row 2, </p   >column 2</td>\n" +
         "  </tr>\n" +
-        "  <tr>\n" +
+        "  <tr>\n\r" +
         "    <td>row <P>3th,</p> column 1</td>\n" +
         "    <td>row 3th, <p>column </p> 2</td>\n" +
         "  </tr>\n" +
