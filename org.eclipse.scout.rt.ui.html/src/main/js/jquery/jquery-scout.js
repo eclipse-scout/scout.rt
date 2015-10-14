@@ -15,15 +15,20 @@
    */
   function elemVisible(elem) {
     // Check if element itself is hidden by its own style attribute
-    if (_isHidden(elem.style)) {
+    if (isHidden(elem.style)) {
       return false;
     }
     // Check if element itself is hidden by external style-sheet
-    return !_isHidden(window.getComputedStyle(elem));
+    if (isHidden(window.getComputedStyle(elem))) {
+      return false;
+    }
+    // Else visible
+    return true;
 
-    function _isHidden(style) {
-      return 'none' === style.display ||
-             'hidden' === style.visibility;
+    // ----- Helper functions -----
+
+    function isHidden(style) {
+      return style.display === 'none' || style.visibility === 'hidden';
     }
   }
 
@@ -261,6 +266,12 @@
     });
   };
 
+  $.fn.removeAttrSVG = function(attributeName) {
+    return this.each(function() {
+      this.removeAttribute(attributeName);
+    });
+  };
+
   $.fn.attrXLINK = function(attributeName, value) {
     return this.each(function() {
       this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
@@ -271,7 +282,7 @@
     return this.each(function() {
       if (!$(this).hasClassSVG(cssClass)) {
         var old = this.getAttribute('class');
-        this.setAttribute('class', old + ' ' + cssClass);
+        this.setAttribute('class', scout.strings.join(' ', old, cssClass));
       }
     });
   };
@@ -279,13 +290,13 @@
   $.fn.removeClassSVG = function(cssClass) {
     return this.each(function() {
       var old = ' ' + this.getAttribute('class') + ' ';
-      this.setAttribute('class', old.replace(' ' + cssClass + ' ', ' '));
+      this.setAttribute('class', old.replace(' ' + cssClass + ' ', ' ').trim());
     });
   };
 
   $.fn.hasClassSVG = function(cssClass) {
     var old = ' ' + this.attr('class') + ' ';
-    return old.indexOf(' ' + cssClass + ' ') > -1;
+    return old.indexOf(' ' + cssClass + ' ') !== -1;
   };
 
   // select one and deselect siblings
