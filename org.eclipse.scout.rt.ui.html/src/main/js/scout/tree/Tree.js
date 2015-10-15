@@ -773,13 +773,13 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
     deletedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, false);
 
-    //remove children from node map
+    // remove children from node map
     this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
   }
 
-  //remove node from html document
+  // remove node from html document
   if (this.rendered) {
-    this._removeNodes(deletedNodes, parentNodeId);
+    this._removeNodes(deletedNodes, parentNode);
   }
 };
 
@@ -803,7 +803,7 @@ scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
 
   // remove node from html document
   if (this.rendered) {
-    this._removeNodes(nodes, parentNodeId);
+    this._removeNodes(nodes, parentNode);
   }
 
   // --- Helper functions ---
@@ -909,32 +909,26 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
 };
 
 /**
- * @param parentNodeId optional. If provided, this node's state will be updated (e.g. it will be collapsed)
- * @param $parentNode optional. If not provided, parentNodeId will be used to find $parentNode.
+ * @param parentNode optional. If provided, this node's state will be updated (e.g. it will be collapsed)
  */
-scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
+scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
   if (nodes.length === 0) {
     return;
   }
 
-  for (var i = 0; i < nodes.length; i++) {
-    var node = nodes[i];
+  nodes.forEach(function(node) {
     if (node.childNodes.length > 0) {
-      this._removeNodes(node.childNodes, node.id, node.$node);
+      this._removeNodes(node.childNodes, node);
     }
     if (node.$node) {
       node.$node.remove();
       delete node.$node;
     }
-  }
+  }, this);
 
   //If every child node was deleted mark node as collapsed (independent of the model state)
   //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
-  var parentNode;
-  if (!$parentNode && parentNodeId >= 0) {
-    parentNode = this.nodesMap[parentNodeId];
-    $parentNode = (parentNode ? parentNode.$node : undefined);
-  }
+  var $parentNode = (parentNode ? parentNode.$node : undefined);
   if ($parentNode) {
     if (!parentNode) {
       parentNode = $parentNode.data('node');
@@ -956,7 +950,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
 
   $predecessor = $predecessor || $parent;
   var parentNode = ($parent ? $parent.data('node') : null);
-  var hasHiddenNodes = false;
 
   for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
@@ -967,7 +960,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     // way to retain most of the state when the page is reloaded).
     if (!node.expanded && parentNode && parentNode.expandedLazy) {
       $node.addClass('hidden');
-      hasHiddenNodes = true;
     }
     // append first node and successors
     if ($predecessor) {
@@ -982,10 +974,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     } else {
       $predecessor = $node;
     }
-  }
-  // Set the 'show-all' state on the parent node when not all child nodes are visible.
-  if (parentNode) {
-    parentNode.$node.toggleClass('show-all', hasHiddenNodes && parentNode.expanded);
   }
 
   this.invalidateLayoutTree();
