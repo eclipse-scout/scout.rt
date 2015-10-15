@@ -28,6 +28,7 @@ scout.FormField = function() {
   this.mode = scout.FormField.MODE_DEFAULT;
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
+  this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT; // (currently?) an UI-only property
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -36,6 +37,9 @@ scout.FormField.LABEL_POSITION_LEFT = 1;
 scout.FormField.LABEL_POSITION_ON_FIELD = 2;
 scout.FormField.LABEL_POSITION_RIGHT = 3;
 scout.FormField.LABEL_POSITION_TOP = 4;
+
+scout.FormField.STATUS_POSITION_DEFAULT = 'default';
+scout.FormField.STATUS_POSITION_TOP = 'top';
 
 /**
  * Indicates the field to be used in default mode, e.g. in a Form.

@@ -59,12 +59,24 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
   if (this._isStatusVisible()) {
     formField.$status
-      .cssTop(top)
       .cssRight(right)
       .cssWidth(statusWidth)
       .cssHeight(this.rowHeight)
       .cssLineHeight(this.rowHeight);
-    right += statusWidth + formField.$status.cssMarginX();
+    // If both status and label position is "top", pull status up (without margin on the right side)
+    if (formField.statusPosition === scout.FormField.STATUS_POSITION_TOP && labelHasFieldWidth) {
+      // Calculate distance from top border to label line
+      var h = containerPadding.top + formField.$label.outerHeight(false);
+      // Vertically center status between lines
+      var statusTop = Math.floor(h / 2) - (this.rowHeight / 2);
+      formField.$status
+        .cssTop(statusTop);
+    } else {
+      // Default status position
+      formField.$status
+        .cssTop(top);
+      right += statusWidth + formField.$status.cssMarginX();
+    }
   }
 
   if (formField.$fieldContainer) {
