@@ -27,8 +27,9 @@ public final class CODES {
   }
 
   /**
-   * use {@link BEANS#get(Class)} or {@link BEANS#get(Class)} directly
+   * @deprecated use {@link BEANS#get(Class)} or {@link BEANS#get(Class)} directly. Will be removed in Scout 6.1
    */
+  @Deprecated
   public static <T extends ICodeType<?, ?>> T getCodeType(Class<T> type) {
     return BEANS.get(ICodeService.class).getCodeType(type);
   }
