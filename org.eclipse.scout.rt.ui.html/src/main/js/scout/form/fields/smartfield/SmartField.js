@@ -111,11 +111,7 @@ scout.SmartField.prototype._syncDisplayText = function(displayText) {
  * @override ValueField.js
  */
 scout.SmartField.prototype._renderDisplayText = function(displayText) {
-  if (this.mobile) {
-    this.$field.text(displayText);
-  } else {
-    scout.SmartField.parent.prototype._renderDisplayText.call(this, displayText);
-  }
+  scout.fields.valOrText(this, this.$field, displayText);
 };
 
 /**

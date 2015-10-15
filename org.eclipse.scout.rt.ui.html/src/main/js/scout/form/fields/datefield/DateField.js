@@ -642,12 +642,12 @@ scout.DateField.prototype.renderDate = function(date) {
 };
 
 scout.DateField.prototype._setDateDisplayText = function(displayText) {
-  this.$dateField.val(displayText);
+  scout.fields.valOrText(this, this.$dateField, displayText);
   this._updateDisplayTextProperty();
 };
 
 scout.DateField.prototype._setTimeDisplayText = function(displayText) {
-  this.$timeField.val(displayText);
+  scout.fields.valOrText(this, this.$timeField, displayText);
   this._updateDisplayTextProperty();
 };
 

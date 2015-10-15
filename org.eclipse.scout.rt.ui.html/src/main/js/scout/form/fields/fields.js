@@ -16,6 +16,14 @@ scout.fields = {
     field.embedded = scout.helpers.nvl(model.embedded, false);
     // when 'mobile' is not set explicitly, check the device
     field.mobile = scout.helpers.nvl(model.mobile, scout.device.type !== scout.Device.Type.DESKTOP);
+  },
+
+  valOrText: function(field, $field, text) {
+    if (field.mobile) {
+      $field.text(text);
+    } else {
+      $field.val(text);
+    }
   }
 
 };

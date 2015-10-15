@@ -13,6 +13,11 @@ scout.inherits(scout.DatePickerLayout, scout.AbstractLayout);
 scout.DatePickerLayout.COLUMNS = 7;
 scout.DatePickerLayout.ROWS = 6; // rows excl. weekday row
 scout.DatePickerLayout.MIN_DAY_SIZE = 28;
+scout.DatePickerLayout.SIDE_RATIO = 1.3918;
+
+// FIXME AWE: seitenverhältnis vom date-picker verbessern (nicht quadratisch, sondern leicht rechteckig)
+// FIXME AWE: animation verbessern
+// FIXME AWE: kreise um days sehen noch nicht gut aus
 
 scout.DatePickerLayout.prototype.layout = function($container) {
   var
