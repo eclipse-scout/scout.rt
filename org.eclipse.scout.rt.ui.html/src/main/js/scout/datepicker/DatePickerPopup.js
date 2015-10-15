@@ -14,7 +14,7 @@ scout.DatePickerPopup.prototype._init = function(options) {
   });
 };
 
-scout.Popup.prototype._createLayout = function() {
+scout.DatePickerPopup.prototype._createLayout = function() {
   return new scout.NullLayout(this);
 };
 

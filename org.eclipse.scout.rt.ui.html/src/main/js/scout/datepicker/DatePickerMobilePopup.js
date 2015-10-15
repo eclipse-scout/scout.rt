@@ -1,6 +1,7 @@
-// FIXME AWE: common base clase for mobile popup
-scout.DatePickerMobilePopup = function() {
-  scout.DatePickerMobilePopup.parent.call(this);
+// FIXME AWE: (popups) common base clase for mobile popup
+// FIXME AWE: (popups) swipe für month shift
+scout.DatePickerMobilePopup = function(popup) {
+  scout.DatePickerMobilePopup.parent.call(this, popup);
 };
 scout.inherits(scout.DatePickerMobilePopup, scout.Popup);
 
@@ -28,6 +29,10 @@ scout.DatePickerMobilePopup.prototype._init = function(options) {
   });
 };
 
+scout.DatePickerMobilePopup.prototype._createLayout = function() {
+  return new scout.DatePickerMobilePopupLayout(this);
+};
+
 scout.DatePickerMobilePopup.prototype._render = function($parent) {
   this.$container = $.makeDiv('smart-field-popup mobile')
     .appendTo($parent);
@@ -42,7 +47,7 @@ scout.DatePickerMobilePopup.prototype._render = function($parent) {
   this.picker.render(this.$datePickerContainer);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.DatePickerMobilePopupLayout(this));
+  this.htmlComp.setLayout(this._createLayout());
 };
 
 /**

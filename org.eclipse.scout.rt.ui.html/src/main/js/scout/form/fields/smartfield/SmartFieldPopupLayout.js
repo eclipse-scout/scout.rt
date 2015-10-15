@@ -3,9 +3,7 @@
  * when the autoSize flag is set to true. Otherwise it uses the given size, like a regular
  * layout. The autoSize feature is used, when a child of the SmartFieldPopupLayout invalidates the
  * tree up to the popup. Since the popup is a validate root it must re-layout itself.
- * However: the size of the popup dependes on the field it belongs to. That's why we
- * can inject a function adjustAutoSize() into the SmartFieldPopupLayout, to provide the bounds
- * of the field, when layout is re-calculated.
+ * However: the size of the popup dependes on the field it belongs to.
  *
  *  The proposal-chooser DIV is not always present.
  */
@@ -34,13 +32,8 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
 };
 
 /**
- * Gives a chance to override the default preferred size of the popup when autoSize is enabled.
- * The default implementation simply returns the given prefSize.
+ * @override AbstractLayout.js
  */
-scout.SmartFieldPopupLayout.prototype.adjustAutoSize = function(prefSize) {
-  return prefSize;
-};
-
 scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize,
     htmlProposalChooser = this._htmlProposalChooser($container),

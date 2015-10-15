@@ -24,6 +24,14 @@ scout.fields = {
     } else {
       $field.val(text);
     }
+  },
+
+  inputOrDiv: function(field) {
+    if (field.mobile) {
+      return $.makeDiv('input-field');
+    } else {
+      return scout.fields.new$TextField();
+    }
   }
 
 };

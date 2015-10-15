@@ -289,6 +289,3 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
 // ------------ Singleton ----------------
 
 scout.device = new scout.Device(navigator.userAgent);
-
-scout.device.type = scout.Device.Type.TABLET; // XXX AWE: do not check in
-scout.device.focusManagerActive = false;

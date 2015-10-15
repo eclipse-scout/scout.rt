@@ -55,17 +55,15 @@ scout.SmartField.prototype._render = function($parent) {
   this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
   this.addLabel();
 
-  var $field;
-  if (this.mobile) {
-    $field = $.makeDiv('input-field');
-  } else {
-    $field = scout.fields.new$TextField()
+  var $field = scout.fields.inputOrDiv(this)
+    .click(this._onClick.bind(this));
+  if (!this.mobile) {
+    $field
       .blur(this._onFieldBlur.bind(this))
       .focus(this._onFocus.bind(this))
       .keyup(this._onKeyUp.bind(this))
       .keydown(this._onKeyDown.bind(this));
   }
-  $field.click(this._onClick.bind(this));
   this.addField($field);
 
   if (!this.embedded) {

@@ -40,9 +40,11 @@ scout.DateField.prototype._syncErrorStatus = function(errorStatus) {
 scout.DateField.prototype._render = function($parent) {
   this.addContainer($parent, 'date-field');
   this.addLabel();
-  this.addMandatoryIndicator();
   this.addField($.makeDiv('date-time-composite'));
   this.addStatus(this.$field);
+  if (!this.embedded) {
+    this.addMandatoryIndicator();
+  }
 
   this.htmlDateTimeComposite = new scout.HtmlComponent(this.$field, this.session);
   this.htmlDateTimeComposite.setLayout(new scout.DateTimeCompositeLayout(this));
@@ -83,18 +85,17 @@ scout.DateField.prototype._remove = function() {
 scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
-    if (this.mobile) {
-      this.$dateField = $.makeDiv('input-field');
-    } else {
-      this.$dateField = scout.fields.new$TextField()
+    this.$dateField = scout.fields.inputOrDiv(this)
+      .addClass('date')
+      .on('mousedown', this._onDateFieldClick.bind(this))
+      .appendTo(this.$field);
+    if (!this.mobile) {
+      this.$dateField
         .on('keydown', this._onDateFieldKeydown.bind(this))
         .on('input', this._onDateFieldInput.bind(this))
         .on('blur', this._onDateFieldBlur.bind(this));
     }
-    this.$dateField
-      .addClass('date')
-      .on('mousedown', this._onDateFieldClick.bind(this))
-      .appendTo(this.$field);
+
     new scout.HtmlComponent(this.$dateField, this.session);
 
     this.$dateFieldIcon = scout.fields.new$Icon()
@@ -118,12 +119,16 @@ scout.DateField.prototype._renderHasDate = function() {
 scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
-    this.$timeField = scout.fields.new$TextField()
+    this.$timeField = scout.fields.inputOrDiv(this)
       .addClass('time')
-      .on('keydown', this._onTimeFieldKeydown.bind(this))
-      .on('input', this._onTimeFieldInput.bind(this))
-      .on('blur', this._onTimeFieldBlur.bind(this))
+      .on('mousedown', this._onTimeFieldClick.bind(this))
       .appendTo(this.$field);
+    if (!this.mobile) {
+      this.$timeField
+        .on('keydown', this._onTimeFieldKeydown.bind(this))
+        .on('input', this._onTimeFieldInput.bind(this))
+        .on('blur', this._onTimeFieldBlur.bind(this));
+    }
     this.$timeFieldIcon = scout.fields.new$Icon()
       .addClass('time')
       .on('mousedown', this._onTimeIconClick.bind(this))
@@ -256,8 +261,7 @@ scout.DateField.prototype._onDateFieldClick = function() {
   }
 
   if (this.mobile) {
-    this._datePickerPopup.render();
-    this._datePickerPopup.htmlComp.validateLayout();
+    this._datePickerPopup.open();
     this._openDatePicker(this.timestampAsDate);
   } else {
     this._openDatePicker(this.timestampAsDate);
@@ -270,8 +274,7 @@ scout.DateField.prototype._onDateIconClick = function(event) {
   }
 
   if (this.mobile) {
-    this._datePickerPopup.render();
-    this._datePickerPopup.htmlComp.validateLayout();
+    this._datePickerPopup.open();
     this._openDatePicker(this.timestampAsDate);
   } else {
     this.$dateField.focus();
@@ -279,8 +282,21 @@ scout.DateField.prototype._onDateIconClick = function(event) {
   }
 };
 
+scout.DateField.prototype._onTimeFieldClick = function(event) {
+  this._onTimeIconClick(event);
+};
+
 scout.DateField.prototype._onTimeIconClick = function(event) {
-  this.$timeField.focus();
+  if (!this.enabled || this.embedded || this._datePickerPopup.rendered) {
+    return;
+  }
+
+  if (this.mobile) {
+    this._datePickerPopup.open();
+    this._openDatePicker(this.timestampAsDate);
+  } else {
+    this.$timeField.focus();
+  }
 };
 
 scout.DateField.prototype._onDateFieldBlur = function() {

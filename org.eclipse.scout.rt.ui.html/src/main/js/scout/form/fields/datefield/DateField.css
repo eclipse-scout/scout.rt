@@ -1,6 +1,6 @@
 .date-field > .field {
 
-  & > input {
+  & > input, .input-field {
     position: absolute;
 
     &.date {
