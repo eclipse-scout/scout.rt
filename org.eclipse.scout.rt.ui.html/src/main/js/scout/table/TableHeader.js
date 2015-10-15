@@ -27,14 +27,8 @@ scout.TableHeader.prototype._render = function($parent) {
   var column, $header, alignment, $defaultCheckedColumHeader, $separator,
     that = this,
     columns = this.columns,
-    table = this.table,
-    tooltipFunction = function(col) {
-      if (col.data('column') && scout.strings.hasText(col.data('column').headerTooltip)) {
-        return col.data('column').headerTooltip;
-      } else if (col.isContentTruncated() || (col.width() + col.position().left) > col.parent().width()) {
-        return col.text();
-      }
-    };
+    table = this.table;
+
   this.$container = table.$data.beforeDiv('table-header');
 
   for (var i = 0; i < columns.length; i++) {
@@ -52,7 +46,7 @@ scout.TableHeader.prototype._render = function($parent) {
 
     scout.tooltips.install($header, {
       parent: this,
-      tooltipText: tooltipFunction
+      tooltipText: this._headerItemTooltip.bind(this)
     });
 
     this._decorateHeader(column);
@@ -297,6 +291,17 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
   });
 };
 
+scout.TableHeader.prototype._headerItemTooltip = function($col) {
+  var column = $col.data('column');
+  if (column && scout.strings.hasText(column.headerTooltip)) {
+    return column.headerTooltip;
+  } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
+    $col = $col.clone();
+    $col.find('.table-header-item-state').remove();
+    return $col.text();
+  }
+};
+
 scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
   var $header = column.$header;
   this._tableHeaderMenu = scout.create(scout.TableHeaderMenu, {
@@ -353,9 +358,8 @@ scout.TableHeader.prototype._renderColumnText = function(column) {
 };
 
 scout.TableHeader.prototype._renderColumnState = function(column) {
-  var sortDirection,
+  var sortDirection, $state,
     $header = column.$header,
-    $state = $header.data('state'),
     filtered = this.table.getFilter(column.id);
 
   $header.find('.table-header-item-state').remove();
