@@ -153,8 +153,8 @@
 @tooltip-info-background-color: @tooltip-background-color;
 @tooltip-info-border-color: @tooltip-border-color;
 @tooltip-warning-color: @tooltip-color;
-@tooltip-warning-background-color: @palette-orange-0;
-@tooltip-warning-border-color: @palette-orange-3;
+@tooltip-warning-background-color: @palette-blue-0;
+@tooltip-warning-border-color: @palette-blue-3;
 @view-button-tab-color: @palette-gray-7;
 @view-button-tab-active-background-color: @navigation-background-color;
 @view-button-tab-active-color: @active-inverted-color;
