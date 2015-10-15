@@ -37,7 +37,7 @@
   color: @view-button-tab-color;
   border-right: solid 1px @border-color;
   white-space: nowrap;
-  min-width: 50px;
+  min-width: 60px;
   position: relative;
   vertical-align: top;
   text-align: center;

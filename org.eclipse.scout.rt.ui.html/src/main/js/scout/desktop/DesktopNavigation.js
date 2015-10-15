@@ -11,7 +11,7 @@ scout.DesktopNavigation = function(desktop) {
   this.viewMenuTab;
 };
 
-scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 200; // Same value as in sizes.css // FIXME AWE: make dynamic (min. breadcrumb width)
+scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 240; // Same value as in sizes.css // FIXME AWE: make dynamic (min. breadcrumb width)
 scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
 
 scout.DesktopNavigation.prototype.render = function($parent) {
