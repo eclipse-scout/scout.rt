@@ -19,6 +19,7 @@ scout.DatePickerMobilePopup.prototype._init = function(options) {
     parent: this,
     _datePickerPopup: this,
     labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
+    statusVisible: false,
     embedded: true,
     mobile: false
   });
@@ -54,27 +55,10 @@ scout.DatePickerMobilePopup.prototype._render = function($parent) {
  * @override Popup.js
  */
 scout.DatePickerMobilePopup.prototype.prefLocation = function($container, openingDirectionY) {
-  var popupSize = this.prefSize($container),
+  var popupSize = this.htmlComp._layout.preferredLayoutSize($container),
     screenWidth = $(document).width(),
     x = Math.max(0, (screenWidth - popupSize.width) / 2);
   return new scout.Point(x, scout.DatePickerMobilePopup.TOP_MARGIN);
-};
-
-/**
- * @override Popup.js
- */
-scout.DatePickerMobilePopup.prototype.prefSize = function($container) {
-  var screenWidth = $(document).width(),
-    screenHeight = $(document).height(),
-    minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
-    maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
-    popupWidth = scout.HtmlEnvironment.formColumnWidth,
-    popupHeight = screenHeight / 2 - scout.DatePickerMobilePopup.TOP_MARGIN;
-
-  popupWidth = Math.max(popupWidth, minPopupWidth);
-  popupHeight = Math.min(popupHeight, maxPopupHeight);
-
-  return new scout.Dimension(popupWidth, popupHeight);
 };
 
 scout.DatePickerMobilePopup.prototype.preselectDate = function(date, animated) {

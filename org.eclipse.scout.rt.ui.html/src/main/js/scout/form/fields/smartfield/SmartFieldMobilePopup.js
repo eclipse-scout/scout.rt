@@ -21,6 +21,7 @@ scout.SmartFieldMobilePopup.prototype._init = function(options) {
     parent: this,
     _popup: this,
     labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
+    statusVisible: false,
     embedded: true,
     mobile: false
   });
@@ -30,27 +31,14 @@ scout.SmartFieldMobilePopup.prototype._init = function(options) {
  * @override Popup.js
  */
 scout.SmartFieldMobilePopup.prototype.prefLocation = function($container, openingDirectionY) {
-  var popupSize = this.prefSize($container),
+  var popupSize = this.htmlComp._layout.preferredLayoutSize($container),
     screenWidth = $(document).width(),
     x = Math.max(0, (screenWidth - popupSize.width) / 2);
   return new scout.Point(x, scout.SmartFieldMobilePopup.TOP_MARGIN);
 };
 
-/**
- * @override Popup.js
- */
-scout.SmartFieldMobilePopup.prototype.prefSize = function($container) {
-  var screenWidth = $(document).width(),
-    screenHeight = $(document).height(),
-    minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
-    maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
-    popupWidth = scout.HtmlEnvironment.formColumnWidth,
-    popupHeight = screenHeight / 2 - scout.SmartFieldMobilePopup.TOP_MARGIN;
-
-  popupWidth = Math.max(popupWidth, minPopupWidth);
-  popupHeight = Math.min(popupHeight, maxPopupHeight);
-
-  return new scout.Dimension(popupWidth, popupHeight);
+scout.SmartFieldMobilePopup.prototype._createLayout = function() {
+  return new scout.SmartFieldMobilePopupLayout(this);
 };
 
 scout.SmartFieldMobilePopup.prototype._render = function($parent) {
@@ -66,7 +54,7 @@ scout.SmartFieldMobilePopup.prototype._render = function($parent) {
   this._smartField.render(this.$container);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SmartFieldMobilePopupLayout(this));
+  this.htmlComp.setLayout(this._createLayout());
 };
 
 scout.SmartFieldMobilePopup.prototype._postRender = function() {

@@ -12,7 +12,7 @@ scout.inherits(scout.DatePickerLayout, scout.AbstractLayout);
 
 scout.DatePickerLayout.COLUMNS = 7;
 scout.DatePickerLayout.ROWS = 6; // rows excl. weekday row
-scout.DatePickerLayout.MIN_DAY_SIZE = 28;
+scout.DatePickerLayout.MIN_DAY_SIZE = 26;
 scout.DatePickerLayout.SIDE_RATIO = 1.3918;
 
 // FIXME AWE: seitenverhältnis vom date-picker verbessern (nicht quadratisch, sondern leicht rechteckig)
@@ -83,7 +83,9 @@ scout.DatePickerLayout.prototype._layoutMonth = function($month) {
 
   // layout weekdays and days
   $month.find('.date-picker-weekday, .date-picker-day').each(function() {
-    var $element = $(this);
+    var $element = $(this),
+      dayInMonth = $element.data('dayInMonth');
+
     if ($element.hasClass('date-picker-day')) {
       // days
       $element
@@ -91,6 +93,10 @@ scout.DatePickerLayout.prototype._layoutMonth = function($month) {
         .css('padding-top', cache.dayPaddingTop)
         .cssWidth(cache.cssDaySize)
         .cssHeight(cache.cssDaySize);
+      // helps to center days between 10 and 19 nicer (especially when website is zoomed > 100%)
+      if (dayInMonth > 9 && dayInMonth < 20) {
+        $element.css('padding-right', 2);
+      }
     } else {
       // weekdays: only set width, the rest is defined by CSS
       $element.cssWidth(cache.daySize);

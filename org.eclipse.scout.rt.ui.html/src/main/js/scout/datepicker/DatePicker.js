@@ -232,14 +232,10 @@ scout.DatePicker.prototype._build$DateBox = function() {
       cl += ' date-picker-selected';
     }
 
-    // adjust position for days between 10 and 19 (because "1" is narrower than "0" or "2")
-    if (dayInMonth > 9 && dayInMonth < 20) {
-      cl += ' center-nice';
-    }
-
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box
       .appendDiv('date-picker-day' + cl, day)
+      .data('dayInMonth', dayInMonth)
       .data('date', new Date(start));
   }
 

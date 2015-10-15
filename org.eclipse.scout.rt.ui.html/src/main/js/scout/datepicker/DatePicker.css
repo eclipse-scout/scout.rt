@@ -25,36 +25,20 @@
 /* necessary for animation */
 .date-picker-month {
   display: inline-block;
-  /* Set fixed width (7 * width of one day) to prevent wrapping of days when */
-  /* browser zoom is set to != 100%. */
-/*   width: 238px; */
 }
 
 /* weekday header */
 .date-picker-weekday {
-/*   width: 34px; */
-/*   height: 30px; */
-/*   line-height: 30px; */
   padding: 8px 0;
   float: left;
   text-align: center;
 }
 
 .date-picker-day {
-/*   width: 26px; */
-/*   margin: 1px 4px 1px 4px; */
-/*   height: 26px; */
-/*   line-height: 25px; */
   float: left;
   text-align: center;
   border-radius: 50%;
-/*   border: 1px solid transparent; */
   #scout.vendor(transition; border-color 0.2s, background-color 0.1s); /* use semicolon as first separator to allow comma separated second argument */
-
-  /* helps to center days between 10 and 19 nicer */
-  &.center-nice {
-/*     padding-right: 2px; */
-  }
 
   &:hover {
     border-color: @item-selection-border-color;

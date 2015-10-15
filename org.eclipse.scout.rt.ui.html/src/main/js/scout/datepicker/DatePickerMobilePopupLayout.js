@@ -24,5 +24,15 @@ scout.DatePickerMobilePopupLayout.prototype.layout = function($container) {
  * @override AbstractLayout.js
  */
 scout.DatePickerMobilePopupLayout.prototype.preferredLayoutSize = function($container) {
-  return new scout.Dimension(400, 400);
+  var screenWidth = $(document).width(),
+    screenHeight = $(document).height(),
+    minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
+    maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
+    popupWidth = scout.HtmlEnvironment.formColumnWidth,
+    popupHeight = screenHeight / 2 - scout.SmartFieldMobilePopup.TOP_MARGIN;
+
+  popupWidth = Math.max(popupWidth, minPopupWidth);
+  popupHeight = Math.min(popupHeight, maxPopupHeight);
+
+  return new scout.Dimension(popupWidth, popupHeight);
 };
