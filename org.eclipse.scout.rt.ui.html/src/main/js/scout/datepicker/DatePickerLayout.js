@@ -1,5 +1,12 @@
 scout.DatePickerLayout = function(datePicker) {
   this._datePicker = datePicker;
+  this._cache = {
+    monthWidth: 0,
+    daySize: 0,
+    cssDaySize: 0,
+    dayMargin: 0,
+    dayPaddingTop: 0
+  };
 };
 scout.inherits(scout.DatePickerLayout, scout.AbstractLayout);
 
@@ -13,7 +20,7 @@ scout.DatePickerLayout.prototype.layout = function($container) {
     $header = $container.find('.date-picker-header'),
     $scrollable = $container.find('.date-picker-scrollable'),
     $month = $container.find('.date-picker-month'),
-    $firstDay = $container.find('.date-picker-day').first(),
+    $firstDay = $month.find('.date-picker-day').first(),
     // Calculate dimensions
     htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.getSize().subtract(htmlContainer.getInsets()),
@@ -49,22 +56,39 @@ scout.DatePickerLayout.prototype.layout = function($container) {
     .height(monthHeight)
     .css('margin-left', monthMarginLeftRight);
 
+  // store results in cache (so the can be access during animation, without recalculating the whole layout)
+  this._cache.monthWidth = monthWidth;
+  this._cache.daySize = daySize;
+  this._cache.cssDaySize = cssDaySize;
+  this._cache.dayMargin = dayMargin;
+  this._cache.dayPaddingTop = dayPaddingTop;
+
+  this._layoutMonth($month);
+};
+
+/**
+ * This functions is used to layout a month separately from the rest of the date-picker container
+ * it is used to layout the month box during the animation.
+ */
+scout.DatePickerLayout.prototype._layoutMonth = function($month) {
+  var cache = this._cache;
+
   // month: only set width, height is given by the popup-size
-  $month.width(monthWidth);
+  $month.width(cache.monthWidth);
 
   // layout weekdays and days
-  $container.find('.date-picker-weekday, .date-picker-day').each(function() {
+  $month.find('.date-picker-weekday, .date-picker-day').each(function() {
     var $element = $(this);
     if ($element.hasClass('date-picker-day')) {
       // days
       $element
-        .css('margin', dayMargin)
-        .css('padding-top', dayPaddingTop)
-        .cssWidth(cssDaySize)
-        .cssHeight(cssDaySize);
+        .css('margin', cache.dayMargin)
+        .css('padding-top', cache.dayPaddingTop)
+        .cssWidth(cache.cssDaySize)
+        .cssHeight(cache.cssDaySize);
     } else {
       // weekdays: only set width, the rest is defined by CSS
-      $element.cssWidth(daySize);
+      $element.cssWidth(cache.daySize);
     }
   });
 };
