@@ -112,17 +112,13 @@
         display: none;
       }
 
-      &.lazy::before {
-        content: '+';
-        padding-right: 5px;
-      }
-
       &.selected {
         background-color: @outline-selection-background-color;
         color: @outline-selection-color;
         cursor: default;
       }
 
+      /* arrow is created using ::before and ::after*/
       &.parent::before,
       &.parent::after,
       &.selected::before {

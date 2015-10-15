@@ -606,6 +606,46 @@ describe("Tree", function() {
     });
   });
 
+  describe("selectNodes", function() {
+
+    it("also expands the node if bread crumb mode is enabled", function() {
+      var model = createModelFixture(1, 1);
+      var node0 = model.nodes[0];
+
+      var tree = createTree(model);
+      tree.breadcrumbEnabled = true;
+      tree.render(session.$entryPoint);
+
+      tree.selectNodes(node0);
+
+      expect(tree.selectedNodes.indexOf(node0) > -1).toBe(true);
+      expect(node0.expanded).toBe(true);
+    });
+  });
+
+  describe("collapseNode", function() {
+
+    it("prevents collapsing in bread crumb mode if node is selected", function() {
+      var model = createModelFixture(1, 1);
+      var node0 = model.nodes[0];
+
+      var tree = createTree(model);
+      tree.breadcrumbEnabled = true;
+      tree.render(session.$entryPoint);
+
+      tree.selectNodes(node0);
+
+      expect(tree.selectedNodes.indexOf(node0) > -1).toBe(true);
+      expect(node0.expanded).toBe(true);
+
+      tree.collapseNode(node0);
+
+      // Still true
+      expect(node0.expanded).toBe(true);
+    });
+  });
+
+
   describe("updateItemPath", function() {
     var model, tree, node1, child1, grandchild1, nodes;
 

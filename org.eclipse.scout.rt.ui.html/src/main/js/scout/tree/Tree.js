@@ -376,8 +376,11 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   var notifyServer = scout.helpers.nvl(opts.notifyServer, true);
 
   if (this.breadcrumbEnabled) {
-    // Never use lazy expanding in bread crumb mode
-    lazy = false;
+    // Do not allow to collapse a selected node
+    if (!expanded && this.selectedNodes.indexOf(node) > -1) {
+      this.setNodeExpanded(node, true, opts);
+      return;
+    }
   }
 
   // Optionally collapse all children (recursively)
