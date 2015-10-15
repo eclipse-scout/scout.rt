@@ -19,6 +19,7 @@ scout.Tree = function() {
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
+  this.lazyExpandingEnabled = true;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -374,6 +375,11 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
   var lazy = scout.helpers.nvl(opts.lazy, node.lazyExpandingEnabled);
   var notifyServer = scout.helpers.nvl(opts.notifyServer, true);
+
+  // Never do lazy expansion if it is disabled on the tree
+  if (!this.lazyExpandingEnabled) {
+    lazy = false;
+  }
 
   if (this.breadcrumbEnabled) {
     // Do not allow to collapse a selected node

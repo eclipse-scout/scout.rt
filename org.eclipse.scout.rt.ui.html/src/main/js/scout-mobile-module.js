@@ -87,9 +87,14 @@ __include("scout/util/tooltips.js");
 __include("scout/action/Action.js");
 __include("scout/action/ActionKeyStroke.js");
 __include("scout/popup/Popup.js");
+__include("scout/popup/PopupLayout.js");
 __include("scout/popup/PopupWithHead.js");
+__include("scout/popup/PopupWithHeadLayout.js");
 __include("scout/datepicker/DatePicker.js");
+__include("scout/datepicker/DatePickerLayout.js");
 __include("scout/datepicker/DatePickerPopup.js");
+__include("scout/datepicker/DatePickerMobilePopup.js");
+__include("scout/datepicker/DatePickerMobilePopupLayout.js");
 __include("scout/menu/menus.js");
 __include("scout/menu/Menu.js");
 __include("scout/menu/MenuKeyStroke.js");
@@ -124,6 +129,7 @@ __include("scout/table/TableInfoLoadTooltip.js");
 __include("scout/table/TableInfoSelectionTooltip.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");
+__include("scout/table/TableHeaderMenuLayout.js");
 __include("scout/table/TableLayout.js");
 __include("scout/table/TableSelectionHandler.js");
 __include("scout/table/TableTooltip.js");
@@ -282,6 +288,9 @@ __include("scout/form/fields/treefield/TreeField.js");
 __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
+// Graph elements
+__include("scout/graph/Graph.js"); // requires Widget.js
+__include("scout/graph/NetworkGraph.js"); //requires Widget.js
 // More misc. elements
 __include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");
