@@ -1,5 +1,10 @@
 describe("scout.defaultValues", function() {
 
+  afterEach(function() {
+    // Reload default values to not influence other tests
+    scout.defaultValues.bootstrap();
+  });
+
   describe("_loadDefaultsConfiguration", function() {
 
     it("can load invalid configurations", function() {

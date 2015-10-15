@@ -10,9 +10,6 @@ scout.defaultValues = {
    */
   _objectTypeHierarchyFlat: {},
 
-  /**
-   * @memberOf scout.defaultValues
-   */
   bootstrap: function() {
     var that = this;
     // Load default value configuration from server (and cache it)

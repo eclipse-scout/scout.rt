@@ -645,7 +645,6 @@ describe("Tree", function() {
     });
   });
 
-
   describe("updateItemPath", function() {
     var model, tree, node1, child1, grandchild1, nodes;
 

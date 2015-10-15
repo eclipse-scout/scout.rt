@@ -16,9 +16,10 @@ function sandboxSession(options) {
   options.suppressErrors = true;
   session = new scout.Session($('#sandbox'), options);
   session.locale = new LocaleSpecHelper().createLocale('de');
-  session.desktop = new scout.Widget();
-  session.desktop.session = session;
-  session.desktop._addEventSupport();
+  session.desktop = scout.create('Desktop', {
+    parent: session.rootAdapter
+  });
+  session._renderDesktop();
   session.focusManager = new scout.FocusManager(session);
 
   return session;
@@ -320,7 +321,9 @@ var jasmineScoutMatchers = {
           actual = [actual];
         }
         var result = {
-          pass: actual.every(function($elem) { return $elem.hasClass(expected); })
+          pass: actual.every(function($elem) {
+            return $elem.hasClass(expected);
+          })
         };
 
         if (!result.pass) {
@@ -347,7 +350,9 @@ var jasmineScoutMatchers = {
           actual = [actual];
         }
         var result = {
-            pass: actual.some(function($elem) { return $elem.hasClass(expected); })
+          pass: actual.some(function($elem) {
+            return $elem.hasClass(expected);
+          })
         };
 
         if (!result.pass) {
@@ -389,7 +394,6 @@ $.fn.triggerKeyUp = function(key, modifier) {
   extendEventWithModifier(event, modifier);
   this.trigger(event);
 };
-
 
 $.fn.triggerKeyDown = function(key, modifier) {
   var event = new jQuery.Event("keydown");

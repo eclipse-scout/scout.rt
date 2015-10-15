@@ -49,24 +49,27 @@
   <script type="text/javascript" src="src/main/js/scout/table/MobileTable.js"></script>
 
   <script type="text/javascript">
-    <!-- This is usually done in index.html, but here, we have to do it manually -->
+    <!-- This is usually done in main.js, but here, we have to do it manually -->
     scout.logging.bootstrap();
+    scout.defaultValues.bootstrap = function loadDefaultValues() {
+      jQuery.ajax({
+        async: false,
+        type: 'GET',
+        dataType: 'text',
+        contentType: 'text/plain; charset=UTF-8',
+        cache: false,
+        url: 'src/main/resources/WebContent/res/defaultValues.json',
+        data: ''
+      }).done(function(data) {
+        var dataWithoutComments = stripCommentsFromJson(data),
+          dataObj = JSON.parse(dataWithoutComments);
+        scout.defaultValues._loadDefaultsConfiguration(dataObj);
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        throw new Error('Error while loading default values: ' + errorThrown);
+      });
+    }
+    scout.defaultValues.bootstrap();
 
-    jQuery.ajax({
-      async: false,
-      type: 'GET',
-      dataType: 'text',
-      contentType: 'text/plain; charset=UTF-8',
-      cache: false,
-      url: 'src/main/resources/WebContent/res/defaultValues.json',
-      data: ''
-    }).done(function(data) {
-      var dataWithoutComments = stripCommentsFromJson(data),
-        dataObj = JSON.parse(dataWithoutComments);
-      scout.defaultValues._loadDefaultsConfiguration(dataObj);
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      throw new Error('Error while loading default values: ' + errorThrown);
-    });
   </script>
 
   $specScriptTags$

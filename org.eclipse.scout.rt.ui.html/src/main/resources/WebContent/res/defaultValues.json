@@ -127,6 +127,8 @@
       "tableStatusVisible": false
     },
     "Desktop": {
+      "actions": [],
+      "addOns": [],
       "dialogs": [],
       "views": [],
       "viewButtons": [],

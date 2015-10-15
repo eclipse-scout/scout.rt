@@ -19,7 +19,7 @@ describe("Outline", function() {
   }
 
   function createModel(nodes) {
-    var model = createSimpleModel('Tree', session);
+    var model = createSimpleModel('Outline', session);
 
     if (nodes) {
       model.nodes = nodes;
@@ -118,6 +118,28 @@ describe("Outline", function() {
       expect(tree._onNodeDeleted.calls.count()).toBe(26);
     });
 
+  });
+
+  describe("navigateToTop", function() {
+
+    it("collapses all nodes in bread crumb mode", function() {
+      var model = createModelFixture(1, 1);
+      var node0 = model.nodes[0];
+
+      var tree = createOutline(model);
+      tree.breadcrumbEnabled = true;
+      tree.render(session.$entryPoint);
+
+      tree.selectNodes(node0);
+
+      expect(tree.selectedNodes.indexOf(node0) > -1).toBe(true);
+      expect(node0.expanded).toBe(true);
+
+      tree.navigateToTop();
+
+      expect(tree.selectedNodes.length).toBe(0);
+      expect(node0.expanded).toBe(false);
+    });
   });
 
   describe("onModelAction", function() {
