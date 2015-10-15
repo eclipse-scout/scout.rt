@@ -709,7 +709,11 @@
    * Default fade-out duration is 150 ms.
    */
   $.fn.fadeOutAndRemove = function(duration, callback) {
-    duration = (duration !== undefined) ? duration : 150;
+    if (callback === undefined && typeof duration === 'function') {
+      callback = duration;
+      duration = undefined;
+    }
+    duration = scout.helpers.nvl(duration, 150);
     this.stop(true).fadeOut(duration, function() {
       $(this).remove();
       if (callback) {
