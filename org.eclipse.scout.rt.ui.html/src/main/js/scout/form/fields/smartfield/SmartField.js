@@ -47,10 +47,7 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
  */
 scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
-  this.embedded = scout.helpers.nvl(model.embedded, false);
-  // when 'mobile' is not set explicitly, check the device
-  this.mobile = scout.helpers.nvl(model.mobile, scout.device.type !== scout.Device.Type.DESKTOP);
-  $.log.debug('(SmartField#init) embedded=' + this.embedded + ' mobile=' + this.mobile);
+  scout.fields.initMobile(this, model);
 };
 
 scout.SmartField.prototype._render = function($parent) {
@@ -189,19 +186,15 @@ scout.SmartField.prototype._onClick = function(event) {
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
-  if (!this.enabled) {
+  if (!this.enabled || this.embedded || this._popup.rendered) {
     return;
   }
 
-  if (this.embedded) {
-    // NOP
-  } else if (this.mobile) {
+  if (this.mobile) {
     this._popup.open();
   } else {
     scout.SmartField.parent.prototype._onIconClick.call(this, event);
-    if (!this._popup.rendered) {
-      this._openProposal(true);
-    }
+    this._openProposal(true);
   }
 };
 

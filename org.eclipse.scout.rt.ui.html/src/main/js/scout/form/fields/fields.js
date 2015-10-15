@@ -10,6 +10,12 @@ scout.fields = {
   new$Icon: function() {
     return $('<span>')
       .addClass('icon');
+  },
+
+  initMobile: function(field, model) {
+    field.embedded = scout.helpers.nvl(model.embedded, false);
+    // when 'mobile' is not set explicitly, check the device
+    field.mobile = scout.helpers.nvl(model.mobile, scout.device.type !== scout.Device.Type.DESKTOP);
   }
 
 };

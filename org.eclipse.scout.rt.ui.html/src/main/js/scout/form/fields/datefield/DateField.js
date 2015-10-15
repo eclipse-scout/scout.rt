@@ -28,6 +28,7 @@ scout.DateField.prototype._createKeyStrokeContext = function() {
 
 scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
+  scout.fields.initMobile(this, model);
   this._syncErrorStatus(this.errorStatus);
 };
 
@@ -47,9 +48,11 @@ scout.DateField.prototype._render = function($parent) {
   this.htmlDateTimeComposite.setLayout(new scout.DateTimeCompositeLayout(this));
 
   // Create date picker popup
-  this._datePickerPopup = scout.create(scout.DatePickerPopup, {
+  var popupType = this.mobile ? scout.DatePickerMobilePopup : scout.DatePickerPopup;
+  this._datePickerPopup = scout.create(popupType, {
     parent: this,
-    $anchor: this.$field
+    $anchor: this.$field,
+    dateField: this
   });
   this._datePickerPopup.picker
     .on('dateSelect', this._onDatePickerDateSelected.bind(this));
@@ -80,12 +83,17 @@ scout.DateField.prototype._remove = function() {
 scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
-    this.$dateField = scout.fields.new$TextField()
+    if (this.mobile) {
+      this.$dateField = $.makeDiv('input-field');
+    } else {
+      this.$dateField = scout.fields.new$TextField()
+        .on('keydown', this._onDateFieldKeydown.bind(this))
+        .on('input', this._onDateFieldInput.bind(this))
+        .on('blur', this._onDateFieldBlur.bind(this));
+    }
+    this.$dateField
       .addClass('date')
-      .on('keydown', this._onDateFieldKeydown.bind(this))
-      .on('input', this._onDateFieldInput.bind(this))
       .on('mousedown', this._onDateFieldClick.bind(this))
-      .on('blur', this._onDateFieldBlur.bind(this))
       .appendTo(this.$field);
     new scout.HtmlComponent(this.$dateField, this.session);
 
@@ -243,12 +251,32 @@ scout.DateField.prototype._renderBackgroundColor = function() {
 };
 
 scout.DateField.prototype._onDateFieldClick = function() {
-  this._openDatePicker(this.timestampAsDate);
+  if (!this.enabled || this.embedded || this._datePickerPopup.rendered) {
+    return;
+  }
+
+  if (this.mobile) {
+    this._datePickerPopup.render();
+    this._datePickerPopup.htmlComp.validateLayout();
+    this._openDatePicker(this.timestampAsDate);
+  } else {
+    this._openDatePicker(this.timestampAsDate);
+  }
 };
 
 scout.DateField.prototype._onDateIconClick = function(event) {
-  this.$dateField.focus();
-  this._openDatePicker(this.timestampAsDate);
+  if (!this.enabled || this.embedded || this._datePickerPopup.rendered) {
+    return;
+  }
+
+  if (this.mobile) {
+    this._datePickerPopup.render();
+    this._datePickerPopup.htmlComp.validateLayout();
+    this._openDatePicker(this.timestampAsDate);
+  } else {
+    this.$dateField.focus();
+    this._openDatePicker(this.timestampAsDate);
+  }
 };
 
 scout.DateField.prototype._onTimeIconClick = function(event) {
@@ -721,7 +749,7 @@ scout.DateField.prototype._syncToServer = function() {
  * Opens picker and selects date
  *
  * @param date
- *          optional, Date to pass to the date picker. If no date is specified, the refernece date
+ *          optional, Date to pass to the date picker. If no date is specified, the reference date
  *          is preselected (not selected!).
  */
 scout.DateField.prototype._openDatePicker = function(date) {

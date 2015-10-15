@@ -26,6 +26,9 @@ scout.DatePicker.prototype._render = function($parent) {
   this.$container = $.makeDiv('date-picker')
     .appendTo($parent);
 
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.DatePickerLayout(this));
+
   this._$header = this._build$Header().appendTo(this.$container);
   this._$header.find('.date-picker-left-y, .date-picker-left-m, .date-picker-right-m, .date-picker-right-y').mousedown(this._onNavigationMouseDown.bind(this));
 
@@ -81,6 +84,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
       this.$currentBox.remove();
     }
     $box.appendTo(this.$scrollable);
+    this.htmlComp.revalidateLayout();
 
     // Measure box size for the animation
     if (!this._boxWidth) {
@@ -232,9 +236,9 @@ scout.DatePicker.prototype._build$DateBox = function() {
     }
 
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
-    $day = $box.
-    appendDiv('date-picker-day' + cl, day).
-    data('date', new Date(start));
+    $day = $box
+      .appendDiv('date-picker-day' + cl, day)
+      .data('date', new Date(start));
   }
 
   return $box;
