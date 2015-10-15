@@ -63,6 +63,11 @@ describe("ValueField", function() {
       formField.init(model);
     });
 
+    afterEach(function() {
+      // Close context menus
+      $('body').triggerClick();
+    });
+
     it("context menu only shows visible menus", function() {
       var menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1),

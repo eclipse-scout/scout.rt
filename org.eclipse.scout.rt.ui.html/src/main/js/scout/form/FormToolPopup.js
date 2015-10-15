@@ -15,10 +15,13 @@ scout.FormToolPopup.prototype._init = function(options) {
   this.form.rootGroupBox.menuBar.bottom();
 };
 
+scout.FormToolPopup.prototype._createLayout = function() {
+  return new scout.FormToolPopupLayout(this);
+};
+
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
   this.$container.addClass('form-tool-popup');
-  this.htmlComp.setLayout(new scout.FormToolPopupLayout(this));
 
   this.form.renderInitialFocusEnabled = false;
   this.form.render(this.$body);

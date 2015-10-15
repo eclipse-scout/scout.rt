@@ -28,21 +28,10 @@ scout.ContextMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeConte
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
+  scout.scrollbars.install(this.$body, {
+    parent: this
+  });
   this._renderMenuItems();
-};
-
-/**
- * @override PopupWithHead.js
- */
-scout.ContextMenuPopup.prototype._modifyBody = function() {
-  this.$body.addClass('context-menu');
-};
-
-/**
- * Override this method to return menu items or actions used to render menu items.
- */
-scout.ContextMenuPopup.prototype._getMenuItems = function() {
-  return this.menuItems;
 };
 
 scout.ContextMenuPopup.prototype._renderMenuItems = function() {
@@ -75,7 +64,6 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
  * @override Widget.js
  */
 scout.ContextMenuPopup.prototype._remove = function() {
-  scout.ContextMenuPopup.parent.prototype._remove.call(this);
   this._getMenuItems().forEach(function(menu) {
     if (this.options.cloneMenuItems) {
       if (this.session.hasClones(menu)) {
@@ -85,6 +73,23 @@ scout.ContextMenuPopup.prototype._remove = function() {
       menu.remove();
     }
   }, this);
+  scout.scrollbars.uninstall(this.$body, this.session);
+  scout.ContextMenuPopup.parent.prototype._remove.call(this);
+};
+
+
+/**
+ * @override PopupWithHead.js
+ */
+scout.ContextMenuPopup.prototype._modifyBody = function() {
+  this.$body.addClass('context-menu');
+};
+
+/**
+ * Override this method to return menu items or actions used to render menu items.
+ */
+scout.ContextMenuPopup.prototype._getMenuItems = function() {
+  return this.menuItems;
 };
 
 /**

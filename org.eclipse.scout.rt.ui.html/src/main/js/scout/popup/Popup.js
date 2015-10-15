@@ -14,6 +14,8 @@ scout.Popup = function() {
   this.withFocusContext;
   this.initialFocus;
   this.focusableContainer;
+  this.openingDirectionX;
+  this.openingDirectionY;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -32,6 +34,8 @@ scout.Popup.prototype._init = function(options) {
   this.$anchor = options.$anchor;
   this.windowPaddingX = scout.helpers.nvl(options.windowPaddingX, 10);
   this.windowPaddingY = scout.helpers.nvl(options.windowPaddingY, 5);
+  this.openingDirectionX = options.openingDirectionX || 'right';
+  this.openingDirectionY = options.openingDirectionY || 'down';
   this.withFocusContext = scout.helpers.nvl(options.installFocusContext, true);
   this.initialFocus = scout.helpers.nvl(options.initialFocus, function() {
     return scout.focusRule.AUTO;
@@ -43,6 +47,30 @@ scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   keyStrokeContext.registerKeyStroke(new scout.CloseKeyStroke(this));
 };
 
+scout.Popup.prototype._createLayout = function() {
+  return new scout.PopupLayout(this);
+};
+
+scout.Popup.prototype.open = function($parent, event) {
+  this._open($parent, event);
+
+  // Focus the popup
+  // It is important that this happens after layouting and positioning, otherwise we'd focus an element
+  // that is currently not on the screen. Which would cause the whole desktop to
+  // be shifted for a few pixels.
+  if (this.withFocusContext) {
+    this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
+  }
+
+  this._triggerPopupOpenEvent();
+};
+
+scout.Popup.prototype._open = function($parent, event) {
+  this.render($parent, event);
+  this.revalidateLayout();
+  this.position();
+};
+
 scout.Popup.prototype.render = function($parent, event) {
   this.openEvent = event;
   scout.Popup.parent.prototype.render.call(this, $parent || this.session.$entryPoint);
@@ -51,6 +79,8 @@ scout.Popup.prototype.render = function($parent, event) {
 scout.Popup.prototype._render = function($parent) {
   this.$container = $.makeDiv('popup').appendTo($parent);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.validateRoot = true;
+  this.htmlComp.setLayout(this._createLayout());
 
   // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
   if (this.withFocusContext && this.focusableContainer) {
@@ -59,17 +89,8 @@ scout.Popup.prototype._render = function($parent) {
 };
 
 scout.Popup.prototype._postRender = function() {
-  // position must be set _before_ focus is installed, otherwise we'd focus an element
-  // that is currently not on the screen. Which would cause the whole desktop to
-  // be shifted for a few pixels.
   this.size();
-  this.position();
 
-  if (this.withFocusContext) {
-    this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
-  }
-
-  this._triggerPopupOpenEvent();
   this._attachCloseHandler();
 };
 
@@ -182,19 +203,17 @@ scout.Popup.prototype._onPopupOpen = function(event) {
 };
 
 scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
-  var x, y, anchorBounds, height;
+  var x, y, anchorBounds, height, openingDirectionX;
   if (!this.anchorBounds && !this.$anchor) {
     return;
   }
-  openingDirectionY = openingDirectionY || 'down';
-  $container.removeClass('up down');
-  $container.addClass(openingDirectionY + ' right'); // always use right as openingDirectionX
+  openingDirectionX = 'right'; // always use right at the moment
+  openingDirectionY = openingDirectionY || this.openingDirectionY;
+  $container.removeClass('up down left right');
+  $container.addClass(openingDirectionY + ' ' + openingDirectionX);
   height = $container.outerHeight(true),
 
-  anchorBounds = this.anchorBounds;
-  if (!anchorBounds) {
-    anchorBounds = this.$anchor && scout.graphics.offsetBounds(this.$anchor);
-  }
+  anchorBounds = this.getAnchorBounds();
 
   x = anchorBounds.x;
   y = anchorBounds.y;
@@ -204,26 +223,18 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
     y += anchorBounds.height;
   }
 
-  // FIXME AWE/CGU: for smartfield-popups we must adjust the popup-size
-  // so the popup fits into the available space. It's simple to calculate
-  // the correct size, but it's not so easy to resize the popup-container
-  // since this method here is called in the middle of a layout-operation
-  // of the SmartfieldPopupLayout. When we resize the contaienr here it
-  // will result in an endless loop. We should:
-  // 1. calc the pref. size of the popup
-  // 2. find the right position for the popup (up, down)
-  // 3. check if the popup size is small enough to be completely visible
-  //    in the current window
-  // 4. if required reduce the popup-size, so it will fit into the window
-  // 5. finally set the size and layout the popup and its children.
-  //
-  // To avoid that the popup switches between up and down position while
-  // typing, we could always find the position by using the max. popup
-  // size instead by checking against the current size.
   return {
     x: x,
     y: y
   };
+};
+
+scout.Popup.prototype.getAnchorBounds = function() {
+  var anchorBounds = this.anchorBounds;
+  if (!anchorBounds) {
+    anchorBounds = this.$anchor && scout.graphics.offsetBounds(this.$anchor);
+  }
+  return anchorBounds;
 };
 
 scout.Popup.prototype.overlap = function($container, location) {
@@ -244,11 +255,12 @@ scout.Popup.prototype.overlap = function($container, location) {
   };
 };
 
-scout.Popup.prototype.adjustLocation = function($container, location, anchorBounds) {
+scout.Popup.prototype.adjustLocation = function($container, location, switchIfNecessary) {
   var openingDirection, left, top,
     overlap = this.overlap($container, location);
 
-  if (overlap.y > 0) {
+  switchIfNecessary = scout.helpers.nvl(switchIfNecessary, true);
+  if (overlap.y > 0 && switchIfNecessary) {
     // switch opening direction
     openingDirection = 'up';
     location = this.prefLocation($container, openingDirection);
@@ -277,16 +289,16 @@ scout.Popup.prototype.prefSize = function($container) {
   return null;
 };
 
-scout.Popup.prototype.position = function() {
-  this._position(this.$container);
+scout.Popup.prototype.position = function(switchIfNecessary) {
+  this._position(this.$container, switchIfNecessary);
 };
 
-scout.Popup.prototype._position = function($container) {
+scout.Popup.prototype._position = function($container, switchIfNecessary) {
   var location = this.prefLocation($container);
   if (!location) {
     return;
   }
-  location = this.adjustLocation($container, location);
+  location = this.adjustLocation($container, location, switchIfNecessary);
   this.setLocation(location);
 };
 

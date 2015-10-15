@@ -298,7 +298,7 @@ scout.Table.prototype.onContextMenu = function(event) {
           },
           $anchor: this.$data
         });
-        popup.render(undefined, event);
+        popup.open(undefined, event);
       }
     }
   };

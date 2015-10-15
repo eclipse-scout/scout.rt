@@ -20,14 +20,21 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.$headerItem = this.$anchor;
 };
 
+scout.TableHeaderMenu.prototype._createLayout = function() {
+  return new scout.TableHeaderMenuLayout(this);
+};
+
 scout.TableHeaderMenu.prototype._render = function($parent) {
   var table = this.table,
     session = this.session,
     $headerItem = this.$anchor,
     column = $headerItem.data('column'),
-    pos = table.columns.indexOf(column);
+    pos = table.columns.indexOf(column),
+    that = this;
 
   this.$parent = $parent;
+  this.column = column;
+
   $headerItem.select(true);
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
@@ -35,45 +42,48 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // create container
   var $menuHeader = $parent.appendDiv('table-header-menu');
   this.$container = $menuHeader;
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(this._createLayout());
   this.$whiter = $menuHeader.appendDiv('table-header-menu-whiter');
 
-  // create buttons in command for order
-  if (table.header.columns.length > 1) {
-    var $commandMove = $menuHeader.appendDiv('header-group');
-    $commandMove.appendDiv('header-text')
-      .data('label', session.text('ui.Move'));
-
-    $commandMove.appendDiv('header-command move-top')
-      .data('label', session.text('ui.toBegin'))
-      .click(moveTop);
-    $commandMove.appendDiv('header-command move-up')
-      .data('label', session.text('ui.forward'))
-      .click(moveUp);
-    $commandMove.appendDiv('header-command move-down')
-      .data('label', session.text('ui.backward'))
-      .click(moveDown);
-    $commandMove.appendDiv('header-command move-bottom')
-      .data('label', session.text('ui.toEnd'))
-      .click(moveBottom);
-  }
   if (this.withFocusContext && this.focusableContainer) {
     this.$container.attr('tabindex', -1);
   }
 
+  // create buttons in command for order
+  if (table.header.columns.length > 1) {
+    this.$moving = $menuHeader.appendDiv('header-group');
+    this.$moving.appendDiv('header-text')
+      .data('label', session.text('ui.Move'));
+
+    this.$moving.appendDiv('header-command move-top')
+      .data('label', session.text('ui.toBegin'))
+      .click(moveTop);
+    this.$moving.appendDiv('header-command move-up')
+      .data('label', session.text('ui.forward'))
+      .click(moveUp);
+    this.$moving.appendDiv('header-command move-down')
+      .data('label', session.text('ui.backward'))
+      .click(moveDown);
+    this.$moving.appendDiv('header-command move-bottom')
+      .data('label', session.text('ui.toEnd'))
+      .click(moveBottom);
+  }
+
+  // create buttons in command for sorting
   if (table.sortEnabled) {
-    // create buttons in command for sorting
-    var $commandSort = $menuHeader.appendDiv('header-group');
-    $commandSort.appendDiv('header-text')
+    this.$sorting = $menuHeader.appendDiv('header-group');
+    this.$sorting.appendDiv('header-text')
       .data('label', session.text('ColumnSorting'));
 
     if (!table.hasPermanentHeadOrTailSortColumns()) {
-      var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
+      var $sortAsc = this.$sorting.appendDiv('header-command sort-asc')
         .data('label', session.text('ui.ascending'))
         .click(this.remove.bind(this))
         .click(function() {
           sort('asc', false, $(this).hasClass('selected'));
         });
-      var $sortDesc = $commandSort.appendDiv('header-command sort-desc')
+      var $sortDesc = this.$sorting.appendDiv('header-command sort-desc')
         .data('label', session.text('ui.descending'))
         .click(this.remove.bind(this))
         .click(function() {
@@ -81,13 +91,13 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
         });
     }
 
-    var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
+    var $sortAscAdd = this.$sorting.appendDiv('header-command sort-asc-add')
       .data('label', session.text('ui.ascendingAdditionally'))
       .click(this.remove.bind(this))
       .click(function() {
         sort('asc', true, $(this).hasClass('selected'));
       });
-    var $sortDescAdd = $commandSort.appendDiv('header-command sort-desc-add')
+    var $sortDescAdd = this.$sorting.appendDiv('header-command sort-desc-add')
       .data('label', session.text('ui.descendingAdditionally'))
       .click(this.remove.bind(this))
       .click(function() {
@@ -103,22 +113,22 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   });
 
   if (containsNumberColumn) {
-    var $commandGroup = $menuHeader.appendDiv('header-group');
-    $commandGroup.appendDiv('header-text')
+    this.$grouping = $menuHeader.appendDiv('header-group');
+    this.$grouping.appendDiv('header-text')
       .data('label', session.text('ui.Sum'));
 
-    var $groupAll = $commandGroup.appendDiv('header-command group-all')
+    var $groupAll = this.$grouping.appendDiv('header-command group-all')
       .data('label', session.text('ui.overEverything'))
       .click(this.remove.bind(this))
       .click(groupAll);
 
     if (column.type !== 'number') {
-      var $groupColumn = $commandGroup.appendDiv('header-command group-column')
+      var $groupColumn = this.$grouping.appendDiv('header-command group-column')
         .data('label', session.text('ui.grouped'))
         .click(this.remove.bind(this))
         .click(groupSort);
 
-      var $groupColumnAdditional = $commandGroup.appendDiv('header-command group-column-additional')
+      var $groupColumnAdditional = this.$grouping.appendDiv('header-command group-column-additional')
         .data('label', session.text('ui.grouped')) //TODO fko: text
       .click(this.remove.bind(this))
         .click(groupSortAdditional);
@@ -129,76 +139,45 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   // create buttons in command for coloring
   if (column.type === 'number') {
-    var $commandColor = $menuHeader.appendDiv('header-group');
-    $commandColor.appendDiv('header-text')
+    this.$coloring = $menuHeader.appendDiv('header-group');
+    this.$coloring.appendDiv('header-text')
       .data('label', session.text('ui.ColorCells'));
 
-    $commandColor.appendDiv('header-command color-red')
+    this.$coloring.appendDiv('header-command color-red')
       .data('label', session.text('ui.fromRedToGreen'))
       .click(this.remove.bind(this))
       .click(colorRed);
-    $commandColor.appendDiv('header-command color-green')
+    this.$coloring.appendDiv('header-command color-green')
       .data('label', session.text('ui.fromGreenToRed'))
       .click(this.remove.bind(this))
       .click(colorGreen);
-    $commandColor.appendDiv('header-command color-bar')
+    this.$coloring.appendDiv('header-command color-bar')
       .data('label', session.text('ui.withBarGraph'))
       .click(this.remove.bind(this))
       .click(colorBar);
-    $commandColor.appendDiv('header-command color-remove')
+    this.$coloring.appendDiv('header-command color-remove')
       .data('label', session.text('ui.remove'))
       .click(this.remove.bind(this))
       .click(colorRemove);
   }
 
   // filter
-  var $headerFilter = $menuHeader.appendDiv('header-group-filter');
-  $headerFilter.appendDiv('header-text')
-    .data('label', session.text('ui.FilterBy'));
-
-  var filter = table.getFilter(column.id);
-  if (!filter) {
-    filter = scout.create('ColumnUserFilter', {
+  this.filter = this.table.getFilter(this.column.id);
+  if (!this.filter) {
+    this.filter = scout.create('ColumnUserFilter', {
       session: this.session,
-      table: table,
-      column: column
+      table: this.table,
+      column: this.column
     });
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
-  filter.calculateCube();
-
-  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
-  filter.availableValues.forEach(function(availableValue, index, arr) {
-    var $filterItem = $headerFilterContainer.appendDiv('header-filter').text(availableValue.text)
-      .data('key', availableValue.key)
-      .on('click', onFilterClick);
-
-    if (filter.selectedValues.indexOf(availableValue.key) > -1) {
-      $filterItem.addClass('selected');
-    }
-    if (index === arr.length - 1) {
-      // mark last element
-      $filterItem.addClass('last');
-    }
-  });
-
-  this.$headerFilterContainer = $headerFilterContainer;
-  scout.scrollbars.install($headerFilterContainer, {
-    parent: this
-  });
-
-  var containerHeight = $headerFilterContainer.get(0).offsetHeight,
-    scrollHeight = $headerFilterContainer.get(0).scrollHeight;
-
-  if (containerHeight >= scrollHeight) {
-    $headerFilterContainer.css('height', 'auto');
-    scrollHeight = $headerFilterContainer.get(0).offsetHeight;
-    $headerFilterContainer.css('height', scrollHeight);
-  }
+  this.filter.calculateCube();
+  this._renderFilterGroup();
 
   // name all label elements
-  $('.header-text').each(function() {
-    $(this).text($(this).data('label'));
+  $('.header-text').each(function(i, elem) {
+    var $elem = $(elem);
+    $elem.text($elem.data('label'));
   });
 
   // set events to buttons
@@ -216,8 +195,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   if ($headerItem.hasClass('filter')) {
     $menuHeader.addClass('filter');
   }
-
-  var that = this;
 
   // event handling
   function enterCommand() {
@@ -269,7 +246,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     var addIcon = '\uF067',
       sortCount = getSortColumnCount();
 
-    $('.header-command', $commandSort).removeClass('selected');
+    $('.header-command', that.$sorting).removeClass('selected');
 
     //TODO: fko cgu: use column properties instead of css class?
     if (sortCount === 1 && !table.hasPermanentHeadOrTailSortColumns()) {
@@ -403,32 +380,38 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     table.colorData(column, 'remove');
   }
 
-  function onFilterClick(event) {
-    var $clicked = $(this);
-    $clicked.select(!$clicked.isSelected());
-
-    // find selected values
-    filter.selectedValues = [];
-    $headerFilter.find('.selected').each(function() {
-      filter.selectedValues.push($(this).data('key'));
-    });
-
-    if (filter.selectedValues.length > 0) {
-      table.addFilter(filter);
-    } else {
-      table.removeFilterByKey(column.id);
-    }
-
-    // callback to table
-    table.filter();
-  }
 };
 
 scout.TableHeaderMenu.prototype._remove = function() {
-  scout.TableHeaderMenu.parent.prototype._remove.call(this);
-  scout.scrollbars.uninstall(this.$headerFilterContainer, this.session);
+  scout.scrollbars.uninstall(this.$filteringContainer, this.session);
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
+  scout.TableHeaderMenu.parent.prototype._remove.call(this);
+};
+
+scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
+  this.$filtering = this.$container.appendDiv('header-group-filter');
+  this.$filtering.appendDiv('header-text')
+    .data('label', this.session.text('ui.FilterBy'));
+
+  this.$filteringContainer = this.$filtering.appendDiv('header-filter-container');
+  this.filter.availableValues.forEach(function(availableValue, index, arr) {
+    var $filteringItem = this.$filteringContainer.appendDiv('header-filter').text(availableValue.text)
+      .data('key', availableValue.key)
+      .on('click', this._onFilterClick.bind(this));
+
+    if (this.filter.selectedValues.indexOf(availableValue.key) > -1) {
+      $filteringItem.addClass('selected');
+    }
+    if (index === arr.length - 1) {
+      // mark last element
+      $filteringItem.addClass('last');
+    }
+  }, this);
+
+  scout.scrollbars.install(this.$filteringContainer, {
+    parent: this
+  });
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
@@ -493,4 +476,24 @@ scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
 
 scout.TableHeaderMenu.prototype._onAnchorScroll = function(event) {
   this.position();
+};
+
+scout.TableHeaderMenu.prototype._onFilterClick = function(event) {
+  var $clicked = $(event.currentTarget);
+  $clicked.select(!$clicked.isSelected());
+
+  // find selected values
+  this.filter.selectedValues = [];
+  this.$filtering.find('.selected').each(function(i, elem) {
+    this.filter.selectedValues.push($(elem).data('key'));
+  }.bind(this));
+
+  if (this.filter.selectedValues.length > 0) {
+    this.table.addFilter(this.filter);
+  } else {
+    this.table.removeFilterByKey(this.column.id);
+  }
+
+  // callback to table
+  this.table.filter();
 };

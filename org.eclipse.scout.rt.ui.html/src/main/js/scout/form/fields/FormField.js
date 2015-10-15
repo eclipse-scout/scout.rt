@@ -352,7 +352,7 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
           cloneMenuItems: false,
           $anchor: this.$status
         });
-        this.contextPopup.render(undefined, event);
+        this.contextPopup.open(undefined, event);
       }
     }.bind(this);
 

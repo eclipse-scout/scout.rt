@@ -59,6 +59,11 @@ describe("CellEditor", function() {
   describe("mouse click", function() {
     var table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
 
+    afterEach(function() {
+      // Close popups
+      $('body').triggerClick();
+    });
+
     beforeEach(function() {
       model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);

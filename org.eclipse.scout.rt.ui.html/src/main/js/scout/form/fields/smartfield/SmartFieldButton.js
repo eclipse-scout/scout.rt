@@ -56,8 +56,7 @@ scout.SmartFieldButton.prototype._removeProposalChooser = function() {
 
 scout.SmartFieldButton.prototype._onClick = function(e) {
   if (!this._popup.rendered) {
-    this._popup.render();
-    this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+    this._popup.open();
   }
 };
 

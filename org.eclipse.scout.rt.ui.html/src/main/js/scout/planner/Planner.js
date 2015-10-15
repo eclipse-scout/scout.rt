@@ -269,7 +269,7 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
       },
       $anchor: $part
     });
-    popup.render();
+    popup.open();
   }.bind(this);
 
   scout.menus.showContextMenuWithWait(this.session, func, event, allowedType);

@@ -153,8 +153,7 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
     cell: cell
   });
   popup.$anchor = $cell;
-  popup.render(this.table.$data);
-  popup.pack();
+  popup.open(this.table.$data);
   return popup;
 };
 

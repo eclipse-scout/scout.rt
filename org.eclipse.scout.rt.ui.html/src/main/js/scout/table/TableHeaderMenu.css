@@ -234,8 +234,8 @@
 .header-filter-container {
   position: relative;
   overflow:hidden;
-  height: 226px;
-  padding: 0px;
+  max-height: 226px;
+  padding: 0;
 }
 
 .header-filter-container > .scrollbar {

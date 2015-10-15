@@ -150,7 +150,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
     breadcrumbEnabled: this._breadcrumbEnabled
   });
   popup.headText = this.text;
-  popup.render();
+  popup.open();
   return popup;
 };
 

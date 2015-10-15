@@ -14,37 +14,43 @@ scout.DatePickerPopup.prototype._init = function(options) {
   });
 };
 
+scout.Popup.prototype._createLayout = function() {
+  return new scout.NullLayout(this);
+};
+
 scout.DatePickerPopup.prototype._render = function($parent) {
   this.picker.render($parent);
   this.$container = this.picker.$container;
   this.$container
     .addClass('date-picker-popup');
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(this._createLayout());
 };
 
 scout.DatePickerPopup.prototype.preselectDate = function(date, animated) {
   if (!this.isOpen()) {
-    this.render();
+    this.open();
   }
   this.picker.preselectDate(date, animated);
 };
 
 scout.DatePickerPopup.prototype.selectDate = function(date, animated) {
   if (!this.isOpen()) {
-    this.render();
+    this.open();
   }
   this.picker.selectDate(date, animated);
 };
 
 scout.DatePickerPopup.prototype.shiftViewDate = function(years, months, days) {
   if (!this.isOpen()) {
-    this.render();
+    this.open();
   }
   this.picker.shiftViewDate(years, months, days);
 };
 
 scout.DatePickerPopup.prototype.shiftSelectedDate = function(years, months, days) {
   if (!this.isOpen()) {
-    this.render();
+    this.open();
   }
   this.picker.shiftSelectedDate(years, months, days);
 };

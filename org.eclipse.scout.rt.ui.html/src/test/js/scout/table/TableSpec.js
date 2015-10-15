@@ -900,6 +900,11 @@ describe("Table", function() {
 
   describe("right click on row", function() {
 
+    afterEach(function() {
+      // Close context menus
+      $('body').triggerClick();
+    });
+
     it("opens context menu", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);

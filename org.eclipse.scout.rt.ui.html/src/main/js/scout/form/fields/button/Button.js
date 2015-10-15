@@ -134,7 +134,7 @@ scout.Button.prototype._openPopup = function() {
     parent: this,
     menu: this
   });
-  popup.render();
+  popup.open();
   return popup;
 };
 

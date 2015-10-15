@@ -181,8 +181,7 @@ scout.SmartField.prototype._onClick = function(event) {
   }
 
   if (this.mobile) {
-    this._popup.render();
-    this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+    this._popup.open();
     return false;
   } else {
     this._openProposal(true);
@@ -197,8 +196,7 @@ scout.SmartField.prototype._onIconClick = function(event) {
   if (this.embedded) {
     // NOP
   } else if (this.mobile) {
-    this._popup.render();
-    this._popup.htmlComp.validateLayout(); // FIXME AWE: (popups) review mit C.GU - sollten wir auch in Popup.js machen (siehe auch size())
+    this._popup.open();
   } else {
     scout.SmartField.parent.prototype._onIconClick.call(this, event);
     if (!this._popup.rendered) {
@@ -460,7 +458,7 @@ scout.SmartField.prototype._renderPopup = function() {
   if (this._popup.rendered) {
     return;
   }
-  this._popup.render();
+  this._popup.open();
 };
 
 /**

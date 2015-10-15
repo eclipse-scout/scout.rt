@@ -52,7 +52,6 @@
   border: solid 1px @popup-border-color;
   border-radius:  @border-radius;
   overflow: hidden;
-  margin-top: 5px;
   background-color: @palette-white;
   #scout.drop-shadow();
   #scout.focus-border();

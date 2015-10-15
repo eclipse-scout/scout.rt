@@ -3,17 +3,12 @@ scout.PopupWithHead = function() {
   this.$head;
   this.$body;
   this.$deco;
-  this.openingDirectionX;
-  this.openingDirectionY;
   this._headVisible = true;
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);
 
-scout.PopupWithHead.prototype._init = function(options) {
-  scout.PopupWithHead.parent.prototype._init.call(this, options);
-
-  this.openingDirectionX = options.openingDirectionX || 'right';
-  this.openingDirectionY = options.openingDirectionY || 'down';
+scout.PopupWithHead.prototype._createLayout = function() {
+  return new scout.PopupWithHeadLayout(this);
 };
 
 scout.PopupWithHead.prototype._render = function($parent) {
@@ -104,31 +99,34 @@ scout.PopupWithHead.prototype.addClassToBody = function(clazz) {
 /**
  * @override Popup.js
  */
-scout.PopupWithHead.prototype._position = function($container) {
+scout.PopupWithHead.prototype._position = function($container, switchIfNecessary) {
   var openingDirectionX, openingDirectionY, left, top, overlap, pos;
   if (!this._headVisible) {
     // If head is not visible, use default implementation
     scout.PopupWithHead.parent.prototype._position.call(this, $container);
     return;
   }
-
   this._positionImpl();
-  pos = $container.offset();
-  overlap = this.overlap($container, {
-    x: pos.left,
-    y: pos.top
-  });
-  if (overlap.y > 0) {
-    // switch opening direction
-    openingDirectionY = 'up';
-  }
-  if (overlap.x > 0) {
-    // switch opening direction
-    openingDirectionX = 'left';
-  }
-  if (openingDirectionX || openingDirectionY) {
-    // Align again if openingDirection has to be switched
-    this._positionImpl(openingDirectionX, openingDirectionY);
+
+  switchIfNecessary = scout.helpers.nvl(switchIfNecessary, true);
+  if (switchIfNecessary) {
+    pos = $container.offset();
+    overlap = this.overlap($container, {
+      x: pos.left,
+      y: pos.top
+    });
+    if (overlap.y > 0) {
+      // switch opening direction
+      openingDirectionY = 'up';
+    }
+    if (overlap.x > 0) {
+      // switch opening direction
+      openingDirectionX = 'left';
+    }
+    if (openingDirectionX || openingDirectionY) {
+      // Align again if openingDirection has to be switched
+      this._positionImpl(openingDirectionX, openingDirectionY);
+    }
   }
 };
 

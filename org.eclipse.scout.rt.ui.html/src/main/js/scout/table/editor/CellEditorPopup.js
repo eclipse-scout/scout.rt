@@ -16,8 +16,12 @@ scout.CellEditorPopup.prototype._init = function(options) {
   this.cell = options.cell;
 };
 
+scout.CellEditorPopup.prototype._createLayout = function() {
+  return new scout.CellEditorPopupLayout(this);
+};
+
 /**
- * @override Popup.js
+ * @override
  */
 scout.CellEditorPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.CellEditorPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
@@ -29,6 +33,15 @@ scout.CellEditorPopup.prototype._initKeyStrokeContext = function(keyStrokeContex
   ]);
 };
 
+/**
+ * @override
+ */
+scout.CellEditorPopup.prototype._open = function($parent, event) {
+  this.render($parent, event);
+  this.position();
+  this.pack();
+};
+
 scout.CellEditorPopup.prototype._render = function($parent) {
   scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
 
@@ -38,8 +51,6 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   if (firstCell) {
     this.$container.addClass('first');
   }
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
   var field = this.cell.field;
   field.mode = scout.FormField.MODE_CELLEDITOR; // hint that this field is used within a cell-editor

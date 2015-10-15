@@ -305,7 +305,7 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
     $anchor: $header,
     focusableContainer: true
   });
-  this._tableHeaderMenu.render();
+  this._tableHeaderMenu.open();
 };
 
 scout.TableHeader.prototype.closeTableHeaderMenu = function() {

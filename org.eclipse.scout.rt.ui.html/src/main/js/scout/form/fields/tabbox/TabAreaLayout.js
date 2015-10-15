@@ -124,5 +124,5 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       y: event.pageY
     }
   });
-  popup.render();
+  popup.open();
 };

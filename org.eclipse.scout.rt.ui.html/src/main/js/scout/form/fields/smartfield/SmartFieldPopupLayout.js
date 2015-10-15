@@ -11,29 +11,26 @@
  */
 scout.SmartFieldPopupLayout = function(popup) {
   scout.SmartFieldPopupLayout.parent.call(this);
-  this._popup = popup;
-  this.autoSize = true;
+  this.popup = popup;
 };
-scout.inherits(scout.SmartFieldPopupLayout, scout.AbstractLayout);
+scout.inherits(scout.SmartFieldPopupLayout, scout.PopupLayout);
 
 scout.SmartFieldPopupLayout.prototype.layout = function($container) {
   var size, prefSize, popupSize,
     htmlProposalChooser = this._htmlProposalChooser($container);
-  if (this.autoSize) {
-    prefSize = this.preferredLayoutSize($container);
-    popupSize = this.adjustAutoSize(prefSize);
-    // don't use setSize() here because this would invalidate the popup and trigger layout() again
-    scout.graphics.setSize(this._popup.htmlComp.$comp, popupSize);
-  } else {
-    popupSize = this._popup.htmlComp.getSize();
-  }
 
+  scout.SmartFieldPopupLayout.parent.prototype.layout.call(this, $container);
+
+  popupSize = this.popup.htmlComp.getSize();
   if (htmlProposalChooser) {
-    size = popupSize.subtract(this._popup.htmlComp.getInsets());
+    size = popupSize.subtract(this.popup.htmlComp.getInsets());
     htmlProposalChooser.setSize(size);
   }
   // Reposition because opening direction may have to be switched if popup gets bigger
-  this._popup.position();
+  // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
+  if (this.popup.htmlComp.layouted) {
+    this.popup.position();
+  }
 };
 
 /**
@@ -45,8 +42,10 @@ scout.SmartFieldPopupLayout.prototype.adjustAutoSize = function(prefSize) {
 };
 
 scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlProposalChooser = this._htmlProposalChooser($container),
-    prefSize;
+  var prefSize,
+    htmlProposalChooser = this._htmlProposalChooser($container),
+    fieldBounds = this.popup.smartField._fieldBounds();
+
   if (htmlProposalChooser) {
     prefSize = htmlProposalChooser.getPreferredSize();
   } else {
@@ -54,6 +53,9 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
       scout.HtmlEnvironment.formColumnWidth,
       scout.HtmlEnvironment.formRowHeight * 2);
   }
+
+  prefSize.width = Math.max(fieldBounds.width, prefSize.width);
+  prefSize.height = Math.min(350, prefSize.height);
 
   // hack, remove double selection border
   return prefSize.add({top: 0, right: 0, bottom: -1, left: 0});

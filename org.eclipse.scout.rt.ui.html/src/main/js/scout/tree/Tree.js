@@ -1203,7 +1203,7 @@ scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
       },
       $anchor: $part
     });
-    popup.render();
+    popup.open();
   }.bind(this);
 
   scout.menus.showContextMenuWithWait(this.session, func, event, allowedTypes);

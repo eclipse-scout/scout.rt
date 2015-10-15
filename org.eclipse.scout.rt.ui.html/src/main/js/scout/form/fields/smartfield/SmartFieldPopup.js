@@ -7,48 +7,26 @@ scout.SmartFieldPopup.prototype._init = function(options) {
   options.installFocusContext = false;
   scout.SmartFieldPopup.parent.prototype._init.call(this, options);
 
-  this._smartField = options.smartField;
+  this.smartField = options.smartField;
+};
+
+scout.SmartFieldPopup.prototype._createLayout = function() {
+  return new scout.SmartFieldPopupLayout(this);
 };
 
 scout.SmartFieldPopup.prototype._render = function($parent) {
-  var popupLayout, fieldBounds, initialPopupSize;
-
   this.$container = $.makeDiv('smart-field-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this))
     .appendTo($parent);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  popupLayout = new scout.SmartFieldPopupLayout(this);
-  fieldBounds = this._smartField._fieldBounds();
-  initialPopupSize = new scout.Dimension(0, scout.HtmlEnvironment.formRowHeight);
+  this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;
-  popupLayout.adjustAutoSize = function(prefSize) {
-    // must re-evaluate _fieldBounds() for each call, since smart-field is not laid out at this point.
-    return this._popupSize(this._smartField._fieldBounds(), prefSize);
-  }.bind(this);
-  this.htmlComp.setLayout(popupLayout);
-  popupLayout.autoSize = false;
-  this.htmlComp.setSize(this._popupSize(fieldBounds, initialPopupSize));
-  popupLayout.autoSize = true;
-};
-
-scout.SmartFieldPopup.prototype._popupSize = function(fieldBounds, prefSize) {
-  return new scout.Dimension(
-    Math.max(fieldBounds.width, prefSize.width),
-    Math.min(350, prefSize.height));
 };
 
 scout.SmartFieldPopup.prototype.resize = function() {
-  var htmlPopup = this.htmlComp,
-    popupLayout = htmlPopup.layoutManager,
-    prefSize = htmlPopup.getPreferredSize(),
-    size = this._popupSize(this._smartField._fieldBounds(), prefSize);
-  $.log.debug('SmartFieldPopup resize size=' + size + ' prefSize=' + prefSize);
-  // Invalidate is required, when the popup is already opened and the proposal chooser is rendered later
-  // when the popup size is the same as before, the proposal chooser would not layout its children (like
-  // the table) without invalidate.
-  htmlPopup.invalidateLayout();
-  htmlPopup.setSize(size);
+  // Revalidate is required when the popup is already opened and the proposal chooser is rendered later
+  this.revalidateLayout();
 };
 
 /**

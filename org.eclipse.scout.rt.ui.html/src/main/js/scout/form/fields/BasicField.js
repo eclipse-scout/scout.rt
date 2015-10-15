@@ -122,7 +122,7 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
     },
     $anchor: this._$disabledOverlay
   });
-  popup.render();
+  popup.open();
 };
 
 scout.BasicField.prototype._remove = function() {
