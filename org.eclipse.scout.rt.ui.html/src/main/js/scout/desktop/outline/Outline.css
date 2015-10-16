@@ -1,7 +1,7 @@
 @breadcrumb-border-color: @outline-selection-background-color;
 @outline-title-border-color: @outline-selection-background-color;
 @outline-title-margin-left: 12px;
-@outline-title-margin-right: 17px;
+@outline-title-margin-right: 12px;
 @outline-title-margin-bottom: 12px;
 
 /* we have to combine this with .outline, otherwise the definition would not be specific enough */
