@@ -12,17 +12,14 @@ scout.TableField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
-  if (this.table) {
-    this._renderTable();
-  }
+  this._renderTable();
 };
 
-/**
- * Will also be called by model adapter on property change event
- */
 scout.TableField.prototype._renderTable = function() {
-  this.table.render(this.$container);
-  this.addField(this.table.$container);
+  if (this.table) {
+    this.table.render(this.$container);
+    this.addField(this.table.$container);
+  }
 };
 
 scout.TableField.prototype._removeTable = function(oldTable) {
