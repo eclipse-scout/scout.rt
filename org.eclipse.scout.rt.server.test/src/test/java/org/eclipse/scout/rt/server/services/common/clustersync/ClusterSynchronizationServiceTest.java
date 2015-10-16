@@ -21,10 +21,10 @@ import java.util.List;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
-import org.eclipse.scout.rt.server.services.common.security.AccessControlClusterNotification;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
+import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClientNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -139,8 +139,8 @@ public class ClusterSynchronizationServiceTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testTransactionalWithCoalesce() throws Exception {
-    m_svc.publishTransactional(new AccessControlClusterNotification());
-    m_svc.publishTransactional(new AccessControlClusterNotification());
+    m_svc.publishTransactional(new BookmarkChangedClientNotification());
+    m_svc.publishTransactional(new BookmarkChangedClientNotification());
     m_svc.publishTransactional(new InvalidateCacheNotification("TEST", new AllCacheEntryFilter<>()));
     ITransaction.CURRENT.get().commitPhase1();
     ITransaction.CURRENT.get().commitPhase2();

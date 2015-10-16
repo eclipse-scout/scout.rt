@@ -16,10 +16,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 import java.security.BasicPermission;
+import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -33,20 +35,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * JUnit test for {@link AbstractSharedAccessControlService}
+ * JUnit test for {@link AbstractAccessControlService}
  */
 @RunWith(PlatformTestRunner.class)
 public class SharedAccessControlServiceTest {
   private static final String TEST_USER = "user372";
-  private IAccessControlService m_accessControlService;
+  private P_SharedAccessControlService m_accessControlService;
   private List<IBean<?>> m_registerServices;
 
-  /**
-   * @throws java.lang.Exception
-   */
   @Before
   public void setUp() throws Exception {
-
     m_accessControlService = BeanInstanceUtil.create(P_SharedAccessControlService.class);
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
@@ -56,9 +54,6 @@ public class SharedAccessControlServiceTest {
             .withApplicationScoped(true));
   }
 
-  /**
-   * @throws java.lang.Exception
-   */
   @After
   public void tearDown() throws Exception {
     TestingUtility.unregisterBeans(m_registerServices);
@@ -66,7 +61,7 @@ public class SharedAccessControlServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccessControlService#getUserIdOfCurrentSubject()}
+   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService#getUserIdOfCurrentSubject()}
    * .
    */
   @Test
@@ -77,7 +72,7 @@ public class SharedAccessControlServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccessControlService#checkPermission(java.security.Permission)}
+   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService#checkPermission(java.security.Permission)}
    * .
    */
   @Test
@@ -92,7 +87,7 @@ public class SharedAccessControlServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccessControlService#getPermissionLevel(java.security.Permission)}
+   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService#getPermissionLevel(java.security.Permission)}
    * .
    */
   @Test
@@ -107,57 +102,57 @@ public class SharedAccessControlServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccessControlService#getPermissions()}.
+   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService#getPermissions()}.
    */
   @Test
   public void testGetPermissions() {
-    Permissions permissions = m_accessControlService.getPermissions();
+    PermissionCollection permissions = m_accessControlService.getPermissions();
     assertNotNull(permissions);
   }
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccessControlService#clearCache()}.
+   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService#clearCache()}.
    */
   @Test
-  public void testClearCache() {
-    Permissions p1 = m_accessControlService.getPermissions();
-    Permissions p2 = m_accessControlService.getPermissions();
+  public void testClearCache() throws ProcessingException {
+    PermissionCollection p1 = m_accessControlService.getPermissions();
+    PermissionCollection p2 = m_accessControlService.getPermissions();
     assertSame(p1, p2);
     m_accessControlService.clearCache();
-    Permissions p3 = m_accessControlService.getPermissions();
+    PermissionCollection p3 = m_accessControlService.getPermissions();
     assertNotSame(p1, p3);
   }
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccessControlService#clearCacheOfUserIds(java.util.Collection)}
+   * {@link org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService#clearCacheOfUserIds(java.util.Collection)}
    * .
    */
   @Test
-  public void testClearCacheOfUserIds() {
-    Permissions p1 = m_accessControlService.getPermissions();
-    Permissions p2 = m_accessControlService.getPermissions();
+  public void testClearCacheOfUserIds() throws ProcessingException {
+    PermissionCollection p1 = m_accessControlService.getPermissions();
+    PermissionCollection p2 = m_accessControlService.getPermissions();
     assertSame(p1, p2);
-    m_accessControlService.clearCacheOfUserIds(Collections.<String> emptyList());
-    Permissions p3 = m_accessControlService.getPermissions();
+    m_accessControlService.clearCache(Collections.<String> emptyList());
+    PermissionCollection p3 = m_accessControlService.getPermissions();
     assertSame(p1, p3);
-    m_accessControlService.clearCacheOfUserIds(Collections.<String> singletonList(null));
-    Permissions p4 = m_accessControlService.getPermissions();
+    m_accessControlService.clearCache(Collections.<String> singletonList(null));
+    PermissionCollection p4 = m_accessControlService.getPermissions();
     assertSame(p1, p4);
-    m_accessControlService.clearCacheOfUserIds(Collections.singletonList(TEST_USER));
-    Permissions p5 = m_accessControlService.getPermissions();
-    Permissions p6 = m_accessControlService.getPermissions();
+    m_accessControlService.clearCache(Collections.singletonList(TEST_USER));
+    PermissionCollection p5 = m_accessControlService.getPermissions();
+    PermissionCollection p6 = m_accessControlService.getPermissions();
     assertNotSame(p1, p5);
     assertNotSame(p1, p6);
     assertSame(p5, p6);
   }
 
   @IgnoreBean
-  private static class P_SharedAccessControlService extends AbstractSharedAccessControlService {
+  private static class P_SharedAccessControlService extends UserIdAccessControlService {
 
     @Override
-    protected Permissions execLoadPermissions() {
+    protected PermissionCollection execLoadPermissions(String userId) {
       Permissions permissions = new Permissions();
       permissions.add(new SomePermission1());
       return permissions;

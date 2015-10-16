@@ -15,10 +15,15 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.shared.cache.ICache;
+import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 
 /**
  * Cluster notification for access control changes for a set of users.
+ *
+ * @deprecated replaced with {@link InvalidateCacheNotification}. Will be removed in Scout 6.1. See {@link ICache}
  */
+@Deprecated
 public class AccessControlClusterNotification implements Serializable {
 
   private static final long serialVersionUID = 128460814967537176L;

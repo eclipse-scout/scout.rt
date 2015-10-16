@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +31,14 @@ public class LogoutService implements ILogoutService {
 
   @Override
   public void logout() {
-    HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    HttpServletResponse httpResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-
-    BEANS.get(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
-    BEANS.get(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
     try {
+      BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
+
+      HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+      HttpServletResponse httpResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+
+      BEANS.get(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
+      BEANS.get(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
       HttpSession session = httpRequest.getSession();
       session.invalidate();
     }

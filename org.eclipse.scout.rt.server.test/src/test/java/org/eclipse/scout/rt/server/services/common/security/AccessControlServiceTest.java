@@ -11,15 +11,12 @@
 package org.eclipse.scout.rt.server.services.common.security;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.io.Serializable;
+import java.security.PermissionCollection;
 import java.security.Permissions;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -29,12 +26,13 @@ import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationBlockingTimeOut;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
+import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
+import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlService;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -53,7 +51,6 @@ import org.junit.runner.RunWith;
 public class AccessControlServiceTest {
   private TestAccessControlService m_accessControlService;
   private List<IBean<?>> m_registerServices;
-  private static final String TEST_USER = "testuser";
 
   @Before
   public void setup() {
@@ -75,100 +72,37 @@ public class AccessControlServiceTest {
   }
 
   /**
-   * Tests that a client notification of {@link AccessControlChangedNotification} is sent when permissions are loaded
-   * {@link AbstractAccessControlService#getPermissions()}
+   * Tests that a client notification of {@link InvalidateCacheNotification} is sent when the cache is cleared:
+   * {@link IAccessControlService#clearCache()}
    */
   @Test
-  @RunWithSubject("testuser")
-  public void testClientNotificationSentForGetPermissions() {
-    m_accessControlService.getPermissions();
-    commit();
-
-    assertSingleNotificationWithPermissions();
-  }
-
-  /**
-   * Tests that a client notification of {@link ResetAccessControlChangedNotification} is sent when the cache is
-   * cleared: {@link AbstractAccessControlService#clearCache()}
-   */
-  @Test
-  public void testClientNotificationSentForClearCache() {
+  public void testClientNotificationSentForClearCache() throws ProcessingException {
     m_accessControlService.clearCache();
     commit();
 
-    assertSingleNotification(ResetAccessControlChangedNotification.class);
+    assertSingleNotification();
   }
 
   /**
-   * Tests that no client notification at all is sent when the cache is cleared:
-   * {@link AbstractAccessControlService#clearCacheNoFire()}
+   * Tests that a client notification of {@link InvalidateCacheNotification} is sent when the cache is cleared:
+   * {@link IAccessControlService#clearCacheOfCurrentUser()}
    */
   @Test
-  public void testClientNotificationSentForClearCacheNoFire() {
-    m_accessControlService.callClearCacheNoFire();
+  public void testClientNotificationSentForClearCacheOfCurrentUser() throws ProcessingException {
+    m_accessControlService.clearCacheOfCurrentUser();
     commit();
 
-    assertNoNotification();
-  }
-
-  /**
-   * Tests that a client notification of {@link AccessControlChangedNotification} is sent when the cache is cleared:
-   * {@link AbstractAccessControlService#clearCacheOfUserIds(Collection)}
-   */
-  @Test
-  public void testClientNotificationSentForClearCacheOfUserIds() {
-    Set<String> testUsers = Collections.singleton(TEST_USER);
-    m_accessControlService.clearCacheOfUserIds(testUsers);
-    commit();
-
-    assertSingleNotification(AccessControlChangedNotification.class);
-  }
-
-  /**
-   * Tests that no client notification at all is sent when the cache is cleared:
-   * {@link AbstractAccessControlService#clearCacheOfUserIdsNoFire(Collection)}
-   */
-  @Test
-  public void testClientNotificationSentForClearCacheOfUserIdsNoFire() {
-    Set<String> testUsers = Collections.singleton(TEST_USER);
-    m_accessControlService.callClearCacheOfUserIdsNoFire(testUsers);
-    commit();
-
-    assertNoNotification();
-  }
-
-  /**
-   * Tests that no client notification at all is sent when the cache is cleared (no users):
-   * {@link AbstractAccessControlService#clearCacheOfUserIds(Collection)}
-   */
-  @Test
-  public void testClientNotificationSentForClearCacheNoUsers() {
-    m_accessControlService.clearCacheOfUserIds(Collections.<String> emptySet());
-    commit();
-    assertNoNotification();
+    assertSingleNotification();
   }
 
   private void commit() {
     ITransaction.CURRENT.get().commitPhase2();
   }
 
-  private void assertSingleNotificationWithPermissions() {
+  private void assertSingleNotification() {
     final List<ClientNotificationMessage> notifications = getNotifications();
     assertEquals(1, notifications.size());
-    assertTrue(notifications.get(0).getNotification() instanceof AccessControlChangedNotification);
-    AccessControlChangedNotification n = (AccessControlChangedNotification) notifications.get(0).getNotification();
-    assertEquals(m_accessControlService.getPermissions(), n.getPermissions());
-  }
-
-  private void assertSingleNotification(Class<? extends Serializable> notificationClass) {
-    final List<ClientNotificationMessage> notifications = getNotifications();
-    assertEquals(1, notifications.size());
-    assertEquals(notificationClass, notifications.get(0).getNotification().getClass());
-  }
-
-  private void assertNoNotification() {
-    final List<ClientNotificationMessage> notifications = getNotifications();
-    assertTrue(notifications.isEmpty());
+    assertEquals(InvalidateCacheNotification.class, notifications.get(0).getNotification().getClass());
   }
 
   private List<ClientNotificationMessage> getNotifications() {
@@ -179,24 +113,14 @@ public class AccessControlServiceTest {
    * An access control service with {@link TestPermission1} for testing
    */
   @IgnoreBean
-  private static class TestAccessControlService extends AbstractAccessControlService {
-    /**
-     * Loads a test permission
-     */
+  private static class TestAccessControlService extends UserIdAccessControlService {
+
     @Override
-    protected Permissions execLoadPermissions() {
+    protected PermissionCollection execLoadPermissions(String userId) {
       Permissions permissions = new Permissions();
       permissions.add(new TestPermission1());
       permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
       return permissions;
-    }
-
-    public void callClearCacheNoFire() {
-      clearCacheNoFire();
-    }
-
-    public void callClearCacheOfUserIdsNoFire(Collection<String> userIds) {
-      clearCacheOfUserIdsNoFire(userIds);
     }
   }
 

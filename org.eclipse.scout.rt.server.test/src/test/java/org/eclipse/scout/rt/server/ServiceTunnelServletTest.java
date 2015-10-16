@@ -47,9 +47,7 @@ import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -86,11 +84,6 @@ public class ServiceTunnelServletTest {
 
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(StickySessionCacheService.class)
-            .withOrder(TEST_SERVICE_ORDER)
-            .withApplicationScoped(true),
-        new BeanMetaData(IAccessControlService.class)
-            .withInitialInstance(new AbstractAccessControlService() {
-            })
             .withOrder(TEST_SERVICE_ORDER)
             .withApplicationScoped(true),
         new BeanMetaData(ServerSessionProvider.class)

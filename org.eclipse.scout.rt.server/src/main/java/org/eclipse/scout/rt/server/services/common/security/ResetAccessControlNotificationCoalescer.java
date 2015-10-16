@@ -14,8 +14,15 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.server.notification.ICoalescer;
+import org.eclipse.scout.rt.shared.cache.ICache;
+import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 
+/**
+ * @deprecated replaced with {@link InvalidateCacheNotification}. Will be removed in Scout 6.1. See {@link ICache}
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class ResetAccessControlNotificationCoalescer implements ICoalescer<ResetAccessControlChangedNotification> {
 
   @Override

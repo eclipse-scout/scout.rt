@@ -10,80 +10,67 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.session;
 
-import java.security.Principal;
-import java.util.Collection;
-import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.LRUCache;
-import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.ConcurrentExpiringMap;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
  * Provider for server sessions. A server session is only created if not contained in the session cache.
  */
 public class ServerSessionProviderWithCache extends ServerSessionProvider {
 
-  private final LRUCache<CompositeObject, IServerSession> m_cache;
+  private final ConcurrentMap<CompositeObject, IServerSession> m_cache;
 
   public ServerSessionProviderWithCache() {
-    m_cache = new LRUCache<>(1000, CONFIG.getPropertyValue(ServerSessionCacheExpirationProperty.class));
+    m_cache = createCacheMap();
+  }
+
+  protected ConcurrentMap<CompositeObject, IServerSession> createCacheMap() {
+    long ttl = NumberUtility.nvl(CONFIG.getPropertyValue(ServerSessionCacheExpirationProperty.class), 0L);
+    return new ConcurrentExpiringMap<CompositeObject, IServerSession>(ttl, TimeUnit.MILLISECONDS, 1000);
   }
 
   @Override
   public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext, String sessionId) {
-    final Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
-    final Set<Principal> principals = subject.getPrincipals();
-    Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
-
-    SESSION serverSession = getFromCache(principals, BEANS.get(IServerSession.class).getClass());
+    CompositeObject cacheKey = newCacheKey(runContext, sessionId);
+    @SuppressWarnings("unchecked")
+    SESSION serverSession = (SESSION) m_cache.get(cacheKey);
     if (serverSession != null) {
       return serverSession;
     }
     else {
       // create and initialize a new session; use optimistic locking because initializing the session is a long-running operation.
-      final SESSION newServerSession = super.provide(runContext, sessionId);
+      serverSession = super.provide(runContext, sessionId);
 
-      synchronized (m_cache) {
-        serverSession = getFromCache(principals, newServerSession.getClass()); // optimistic locking: check, whether another thread already created and cached the session.
-        if (serverSession != null) {
-          return serverSession;
-        }
-        else {
-          return putToCache(principals, newServerSession);
-        }
+      @SuppressWarnings("unchecked")
+      SESSION oldServerSession = (SESSION) m_cache.putIfAbsent(cacheKey, serverSession);
+      if (oldServerSession != null) {
+        // optimistic locking: check, whether another thread already created and cached the session.
+        return oldServerSession;
       }
+      return serverSession;
     }
   }
 
-  @Internal
-  protected <SESSION extends IServerSession> SESSION getFromCache(final Collection<Principal> principals, final Class<? extends IServerSession> serverSessionClass) {
-    for (final Principal principal : principals) {
-      final IServerSession serverSession = m_cache.get(newCacheKey(serverSessionClass, principal));
-      if (serverSession != null) {
-        return ServerSessionProvider.cast(serverSession);
-      }
-    }
-    return null;
-  }
-
-  @Internal
-  protected <SESSION extends IServerSession> SESSION putToCache(final Collection<Principal> principals, final SESSION serverSession) {
-    for (final Principal principal : principals) {
-      m_cache.put(newCacheKey(serverSession.getClass(), principal), serverSession);
-    }
-    return serverSession;
-  }
-
-  @Internal
-  protected CompositeObject newCacheKey(final Class<? extends IServerSession> serverSessionClass, final Principal principal) {
-    return new CompositeObject(serverSessionClass, principal);
+  protected CompositeObject newCacheKey(ServerRunContext runContext, String sessionId) {
+    Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
+    Class<? extends IServerSession> serverSessionClass = BEANS.get(IServerSession.class).getClass();
+    String userId = BEANS.get(IAccessControlService.class).getUserId(subject);
+    // if userId can not be determined, use sessionId as key and force therefore to create
+    // and return a new session.
+    return new CompositeObject(serverSessionClass, StringUtility.nvl(userId, sessionId));
   }
 }

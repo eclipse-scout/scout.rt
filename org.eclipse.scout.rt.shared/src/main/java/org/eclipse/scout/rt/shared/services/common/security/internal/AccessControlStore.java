@@ -17,6 +17,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
@@ -32,7 +33,9 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
  * </p>
  *
  * @since 4.3.0 (Mars-M5)
+ * @deprecated replaced with {@link ICache}. Will be removed in Scout 6.1.
  */
+@Deprecated
 public class AccessControlStore {
   /**
    * the internal store, the {@link String} used as key is always lower case

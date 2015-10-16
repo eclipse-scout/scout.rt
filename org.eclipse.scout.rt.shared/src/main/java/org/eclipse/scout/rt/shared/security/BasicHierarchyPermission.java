@@ -16,15 +16,35 @@ import java.security.BasicPermission;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.commons.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.shared.SharedConfigProperties;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.PermissionLevelCheckCacheTimeToLiveProperty;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Basic abstract class for hierarchical permissions. It allows to defer calculation of a concrete permission level to a
+ * special function. To use this you have to override {@link #execCalculateLevel(BasicHierarchyPermission)}.
+ * <p>
+ * For example you could imagine a ModifyCompanyPermission. This permission has an additional property
+ * <tt>companyKey</tt> and it defines an additional level <tt>'OWN'</tt>. Now a user has in his permission collection
+ * the level 'OWN' granted. The application wants to check
+ * {@code ACCESS.check(new ModifyCompanyPermission(myCompanyKey))}. Internally, {@link #implies(Permission)} detects
+ * that it has to calculate the level of the permission in test. If the implementation of
+ * {@link #execCalculateLevel(BasicHierarchyPermission)} does not return an higher required permission level than 'OWN',
+ * the access is granted.
+ * <p>
+ * With the property {@link SharedConfigProperties.PermissionLevelCheckCacheTimeToLiveProperty} a caching can be
+ * configured in order to reduce the calls to {@link #execCalculateLevel(BasicHierarchyPermission)}.
+ */
 public abstract class BasicHierarchyPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(BasicHierarchyPermission.class);
@@ -32,20 +52,13 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
   public static final int LEVEL_UNDEFINED = -1;
   public static final int LEVEL_NONE = 0;
   public static final int LEVEL_ALL = 100;
-  private static long cacheTimeout = 60000L;
 
-  public static long getCacheTimeoutMillis() {
-    return cacheTimeout;
-  }
-
-  public static void setCacheTimeoutMillis(long t) {
-    cacheTimeout = t;
-  }
-
-  private boolean m_readOnly;
-  private int m_level;
+  private volatile boolean m_readOnly;
+  private volatile int m_level;
   // cache
-  private List<Integer> m_validLevels;
+  private final List<Integer> m_validLevels;
+  // lazy created in order to ensure caches are only created if permission instance belongs to a PermissionCollection (else cache is not required)
+  private transient volatile Map<BasicHierarchyPermission, Boolean> m_levelPermissionCheckCache;
 
   public BasicHierarchyPermission(String name) {
     this(name, LEVEL_UNDEFINED);
@@ -53,12 +66,11 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
 
   public BasicHierarchyPermission(String name, int level) {
     super(name);
-    buildLevelCache();
+    m_validLevels = buildLevelCache();
     setLevel(level);
   }
 
-  @SuppressWarnings("boxing")
-  private void buildLevelCache() {
+  private List<Integer> buildLevelCache() {
     TreeSet<Integer> set = new TreeSet<Integer>();
     Field[] f = getClass().getFields();
     for (int i = 0; i < f.length; i++) {
@@ -76,7 +88,27 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
         }
       }
     }
-    m_validLevels = new ArrayList<Integer>(set);
+    return new ArrayList<Integer>(set);
+  }
+
+  protected Map<BasicHierarchyPermission, Boolean> getLevelPermissionCheckCache() {
+    if (m_levelPermissionCheckCache == null) {
+      // note: in case of an unlucky timing the cache would be created twice and previously cached values
+      // will get lost. We accept this in order to preserve performance / readability / transient
+      m_levelPermissionCheckCache = createLevelPermissionCheckCache();
+    }
+    return m_levelPermissionCheckCache;
+  }
+
+  /**
+   * @return a cache for recent level permission checks or null if no caching should be used
+   */
+  protected Map<BasicHierarchyPermission, Boolean> createLevelPermissionCheckCache() {
+    Long timeToLiveDuration = CONFIG.getPropertyValue(PermissionLevelCheckCacheTimeToLiveProperty.class);
+    if (timeToLiveDuration == null) {
+      return null;
+    }
+    return new ConcurrentExpiringMap<BasicHierarchyPermission, Boolean>(timeToLiveDuration, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -90,7 +122,6 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
     return m_level;
   }
 
-  @SuppressWarnings("boxing")
   public final void setLevel(int level) {
     if (m_readOnly) {
       throw new SecurityException("Permission is read-only");
@@ -107,29 +138,23 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof BasicHierarchyPermission) {
-      BasicHierarchyPermission other = (BasicHierarchyPermission) obj;
-      if (this.m_level == other.m_level) {
-        if (super.equals(obj)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return super.equals(obj) && this.m_level == ((BasicHierarchyPermission) obj).m_level;
   }
 
   @Override
   public int hashCode() {
-    return super.hashCode() ^ m_level;
-  }
-
-  protected String getConfiguredId() {
-    return null;
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + m_level;
+    return result;
   }
 
   /**
-   * when p.level has value {@link #LEVEL_UNDEFINED} and also {@link #calculateLevel(int)} returns #
-   * {@link #LEVEL_UNDEFINED} then set p.level to the maximum of its level
+   * @return false if permission <tt>p</tt> requires a greater permission level than this permission has (or super
+   *         implementation returns false). If permission <tt>p</tt> has the level {@link #LEVEL_UNDEFINED} the level
+   *         has to be calculated for the given permission <tt>p</tt>. By default
+   *         {@link IAccessControlService#calculateBasicHierarchyPermissionLevel(BasicHierarchyPermission)} is called.
+   *         Calculated levels may be cached (see {@link #createLevelPermissionCheckCache()}).
    */
   @Override
   public boolean implies(Permission p) {
@@ -149,9 +174,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
           }
           default: {
             if (other.m_level == LEVEL_UNDEFINED) {
-              if (checkLevel(other, this.m_level)) {
-                return true;
-              }
+              return checkLevel(other);
             }
             else {
               return this.m_level >= other.m_level;
@@ -163,43 +186,28 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
     return false;
   }
 
-  @SuppressWarnings("boxing")
-  private boolean checkLevel(BasicHierarchyPermission other, int level) {
-    // check if we are in the backend
-    if (BEANS.get(IAccessControlService.class).isProxyService()) {
-      throw new FineGrainedAccessCheckRequiredException();
+  protected boolean checkLevel(BasicHierarchyPermission other) {
+    Map<BasicHierarchyPermission, Boolean> cache = getLevelPermissionCheckCache();
+    Boolean b = cache != null ? cache.get(other) : null;
+    if (b == null) {
+      int requiredLevel = execCalculateLevel(other);
+      b = m_level >= requiredLevel;
+      if (cache != null) {
+        cache.put(other, b);
+      }
     }
-    try {
-      boolean b = other.execCheckLevel(level);
-      return b;
-    }
-    catch (RuntimeException e) {
-      throw new SecurityException(e);
-    }
+    return BooleanUtility.nvl(b);
   }
 
   /**
-   * Only called in the backend. Frontend uses proxy cache. Called by {@link #implies(Permission)} when level has value
-   * #LEVEL_UNDEFINED
+   * Called by {@link #implies(Permission)} when level of currently checking permission has value
+   * {@link #LEVEL_UNDEFINED} to
    *
-   * @param requiredLevel
-   *          default implementation calls {@link #execCheckLevelData(int)} and returns true if data yields rows and
-   *          first rows first value is 1
+   * @param other
+   *          permission for which level should be calculated
+   * @return required level for the given permission that this permission should have
    */
-  @SuppressWarnings("boxing")
-  protected boolean execCheckLevel(int requiredLevel) {
-    Object[][] data = execCheckLevelData(requiredLevel);
-    return data != null && data.length > 0 && TypeCastUtility.castValue(data[0][0], Boolean.class);
+  protected int execCalculateLevel(BasicHierarchyPermission other) {
+    return LEVEL_ALL; // default implementation requires level ALL; Therefore permission is only granted if user has level ALL.
   }
-
-  /**
-   * called by {@link #implies(Permission)} via execCheckLevel when level has value #LEVEL_UNDEFINED
-   *
-   * @param requiredLevel
-   * @return data with data[0][0]=1 as true
-   */
-  protected Object[][] execCheckLevelData(int requiredLevel) {
-    return null;
-  }
-
 }

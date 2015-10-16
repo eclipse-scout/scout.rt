@@ -21,19 +21,19 @@ import org.eclipse.scout.commons.CollectionUtility;
  * Special filter that accepts entries according to a set of keys.
  * <p>
  * This class is immutable.
- * 
+ *
  * @since 5.2
  */
 public final class KeyCacheEntryFilter<K, V> implements ICacheEntryFilter<K, V> {
   private static final long serialVersionUID = 1L;
   private final Set<K> m_keys;
 
-  public KeyCacheEntryFilter(Collection<K> keys) {
-    m_keys = CollectionUtility.hashSetWithoutNullElements(keys);
+  public KeyCacheEntryFilter(Collection<? extends K> keys) {
+    m_keys = Collections.unmodifiableSet(CollectionUtility.hashSetWithoutNullElements(keys));
   }
 
   public Set<K> getKeys() {
-    return Collections.unmodifiableSet(m_keys);
+    return m_keys;
   }
 
   @Override

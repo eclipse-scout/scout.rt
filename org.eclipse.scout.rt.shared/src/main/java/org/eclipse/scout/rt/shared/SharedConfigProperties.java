@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.shared.TierState.Tier;
+import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 
 public final class SharedConfigProperties {
 
@@ -191,6 +192,22 @@ public final class SharedConfigProperties {
 //TODO jgu
 //      return convertToSubject("notification-authenticator");
       return convertToSubject("system");
+    }
+  }
+
+  /**
+   * Time to Live for level permission check caching in milliseconds.
+   * <p>
+   * If calculating the permission level for a permission instance, it can be internally be cached. This caching is
+   * typically useful in a client and should be relative small (few minutes). If no value is set, no caching at all is
+   * used. As default, no time to live is set and therefore caching is disabled. Currently this property is only used in
+   * {@link BasicHierarchyPermission}.
+   */
+  public static class PermissionLevelCheckCacheTimeToLiveProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.permission.level.check.cache.ttl";
     }
   }
 }

@@ -11,50 +11,63 @@
 package org.eclipse.scout.rt.shared.services.common.security;
 
 import java.security.Permission;
-import java.security.Permissions;
-import java.util.Collection;
+import java.security.PermissionCollection;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
-import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 /**
- * Access control facility. The default implementation in
- * org.eclipse.scout.rt.shared.services.common.security.AccessControlService has service ranking low (-1) and caches
- * permissions per user principal for maximum performance when using stateless request/response patterns as in
- * webservice environments.
+ * Access control facility. You may use {@link AbstractAccessControlService} as a base for the implementation which uses
+ * internally an {@link ICache}.
  */
 public interface IAccessControlService extends IService {
 
+  /**
+   * @return current UserId extracted from current {@link Subject}
+   */
   String getUserIdOfCurrentSubject();
 
+  /**
+   * @return current UserId extracted from the provided {@link Subject}
+   */
+  String getUserId(Subject subject);
+
+  /**
+   * Checks the given permission against the current users {@link PermissionCollection}
+   *
+   * @param p
+   * @return true if the permission <tt>p</tt> is granted to the current user
+   */
   boolean checkPermission(Permission p);
 
+  /**
+   * @param p
+   * @return permission level of permission <tt>p</tt> that is granted to the current user. For permissions not
+   *         extending {@link BasicHierarchyPermission} this is either ALL or NONE depending if the permission granted
+   *         to the user or not.
+   */
   int getPermissionLevel(Permission p);
 
   /**
-   * only use this method to transfer permissions, don't use it for access control or adding permissions see also
+   * Only use this method to transfer permissions, don't use it for access control or adding permissions see also
    * {@link #checkPermission(Permission)} and {@link #getPermissionLevel(BasicHierarchyPermission)}
+   *
+   * @return PermissionCollection for the current user
    */
-  Permissions getPermissions();
-
-  /**
-   * @return true if this service is a proxy to the real access control service This property is queried by
-   *         {@link com.bsiag.security.BasicHierarchyPermission} to decide whether fine-grained access control can be
-   *         calculated right away (no proxy) or must be delegated to the real access control service in the backend
-   */
-  boolean isProxyService();
+  PermissionCollection getPermissions();
 
   /**
    * Clear all caches. This can be useful when some permissions and/or user-role mappings have changed.
    */
-  @RemoteServiceAccessDenied
-  void clearCache();
+  void clearCache() throws ProcessingException;
 
   /**
-   * Clear cache of specified userIds.<br>
-   * This can be useful when some permissions and/or user-role mappings have changed. This method is lenient.
+   * Invalidates the cached {@link PermissionCollection} of the current user.
    */
-  @RemoteServiceAccessDenied
-  void clearCacheOfUserIds(Collection<String> userIds);
+  void clearCacheOfCurrentUser() throws ProcessingException;
+
 }
