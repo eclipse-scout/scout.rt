@@ -49,28 +49,43 @@ scout.Device.Type = {
  * Also loads device specific scripts (fast click for ios devices)
  */
 scout.Device.prototype.bootstrap = function() {
-  var $deferred;
+  var deferreds = [];
 
   // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
   this.unselectableAttribute = this.getUnselectableAttribute();
   this.tableAdditionalDivRequired = this.isTableAdditionalDivRequired();
 
   if (this.isIos()) {
-    // We use fastscript to prevent the 300ms delay when touching an element.
-    // With Chrome 32 the issue is solved, so no need to load the script for other devices than ios
-    $deferred = $
-      .getCachedScript("res/fastclickmod-1.0.1.min.js")
-      .done(function(script, textStatus) {
+    // We use Fastclick to prevent the 300ms delay when touching an element.
+    // With Chrome 32 the issue is solved, so no need to load the script for other devices than iOS
+    deferreds.push(this._loadScriptDeferred('res/fastclickmod-1.0.1.min.js', function() {
         FastClick.attach(document.body);
-      });
+        $.log.info('FastClick script loaded and attached');
+      }));
   }
   if (this.hasOnScreenKeyboard()) {
     // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
     this.focusManagerActive = false;
+
+    deferreds.push(this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
+        $.log.info('JQuery Mobile script loaded');
+      }));
   }
-  return $deferred;
+  return deferreds;
 };
 
+scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
+  return $
+    .getCachedScript(scriptUrl)
+    .done(doneFunc);
+};
+
+// FIXME AWE/CGU: find a better way to check for on-screen keyboard
+// must also work for Windows Surface devices. There's an ungly solution
+// described here: http://stackoverflow.com/questions/26531016/detect-windows-8-on-screen-keyboard-with-javascript
+// Some forum post suggest that it's not possible to detect a virtual keyboard
+// properly and that the user should decide whether or not the application should run
+// in a virtual keyboard mode, or not.
 scout.Device.prototype.hasOnScreenKeyboard = function() {
   return this.isIos() || this.isAndroid();
 };
@@ -149,6 +164,7 @@ scout.Device.prototype.supportsFeature = function(property, checkFunc) {
 
 scout.Device.prototype.supportsTouch = function() {
   // Implement when needed, see https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
+  return false;
 };
 
 scout.Device.prototype.supportsFile = function() {
@@ -289,6 +305,3 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
 // ------------ Singleton ----------------
 
 scout.device = new scout.Device(navigator.userAgent);
-
-//scout.device.type = scout.Device.Type.TABLET; // FIXME AWE: do not check in
-//scout.device.focusManagerActive = false;

@@ -20,14 +20,26 @@ scout.init = function(options) {
  * Executes the default bootstrap functions and returns an array of deferred objects.<p>
  * The actual session startup begins only when every of these deferred objects are completed.
  * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
+ * The individual bootstrap functions may return null or undefined, a single deferred or multiple deferreds as an array.
  */
 scout._bootstrap = function(options) {
-  return [
-    scout.logging.bootstrap(),
-    scout.device.bootstrap(),
-    scout.defaultValues.bootstrap(),
-    scout.fonts.bootstrap(options.fonts)
+  var deferreds = [],
+    deferredValues = [
+      scout.logging.bootstrap(),
+      scout.device.bootstrap(),
+      scout.defaultValues.bootstrap(),
+      scout.fonts.bootstrap(options.fonts)
   ];
+
+  deferredValues.forEach(function(value) {
+    if (Array.isArray(value)) {
+      deferreds.concat(value);
+    } else if (value) {
+      deferreds.push(value);
+    }
+  });
+
+  return deferreds;
 };
 
 /**

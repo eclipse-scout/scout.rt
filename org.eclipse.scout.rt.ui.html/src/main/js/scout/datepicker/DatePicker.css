@@ -37,6 +37,7 @@
   float: left;
   text-align: center;
   border-radius: 50%;
+  border: 1px solid transparent;
   #scout.vendor(transition; border-color 0.2s, background-color 0.1s); /* use semicolon as first separator to allow comma separated second argument */
 
   &:hover {
@@ -92,6 +93,16 @@
   padding: 0px 18px;
   background-color: @panel-background-color;
   border-bottom: 1px solid @border-color;
+
+  /* Additional space between navigation buttons on touch devices */
+  &.touch {
+    & > .date-picker-left-m {
+      margin-left: 26px;
+    }
+    & > .date-picker-right-m {
+      margin-right: 26px;
+    }
+  }
 }
 
 .date-picker-separator {

@@ -8,7 +8,7 @@ scout.logging = {
    * @returns $.deferred
    */
   bootstrap: function() {
-    var $deferred;
+    var deferred;
     var location = new scout.URL();
     var enabled = location.getParameter('logging');
     if (enabled) {
@@ -22,7 +22,7 @@ scout.logging = {
       };
       if (typeof log4javascript === 'undefined') {
         // If log4javascript is not yet installed, dynamically load the library
-        $deferred = $.getCachedScript('res/log4javascript.min.js')
+        deferred = $.getCachedScript('res/log4javascript.min.js')
           .done(function(script, textStatus) {
             initLog4Javascript();
           });
@@ -33,7 +33,7 @@ scout.logging = {
     } else {
       $.log = new scout.NullLogger();
     }
-    return $deferred;
+    return deferred;
   },
 
   parseLevel: function(level) {

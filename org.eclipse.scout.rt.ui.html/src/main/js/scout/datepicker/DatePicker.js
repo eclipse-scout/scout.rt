@@ -90,7 +90,6 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     // Measure box size for the animation
     if (!this._boxWidth) {
       this._boxWidth = $box.width();
-      console.log('w1=' + this._boxWidth);
     }
     if (!this._boxHeight) {
       this._boxHeight = $box.height();
@@ -164,7 +163,6 @@ scout.DatePicker.prototype._onDayClick = function(event) {
 scout.DatePicker.prototype._onSwipe = function(event) {
   var direction = event.swipestop.coords[0] - event.swipestart.coords[0] >= 0 ? -1 : 1;
   this.shiftViewDate(0, direction, 0);
-  console.log('swipe swipe direction=' + direction);
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
@@ -259,8 +257,8 @@ scout.DatePicker.prototype._build$Header = function() {
     '  <div class="date-picker-right-m" data-shift="1"></div>' +
     '  <div class="date-picker-header-month"></div>' +
     '</div>';
-
-  return $(headerHtml);
+  return $(headerHtml)
+    .toggleClass('touch', scout.device.supportsTouch());
 };
 
 scout.DatePicker.prototype._updateHeader = function(viewDate) {
