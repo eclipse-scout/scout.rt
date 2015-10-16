@@ -109,13 +109,13 @@
     }
     var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
     if (cssClass) {
-      $svgElement.attr('class', cssClass);
+        $svgElement.attrSVG('class', cssClass);
     }
     if (htmlContent) {
       $svgElement.html(htmlContent);
     }
     if (id) {
-      $svgElement.attr('id', id);
+      $svgElement.attrSVG('id', id);
     }
     return $svgElement;
   };
@@ -261,33 +261,74 @@
 
   // attr and class handling for svg
   $.fn.attrSVG = function(attributeName, value) {
+    if (this.length === 0) { // shortcut for empty collections
+      return this;
+    }
+    if (this.length === 1) { // shortcut for single element collections
+      this[0].setAttribute(attributeName, value);
+      return this;
+    }
     return this.each(function() {
       this.setAttribute(attributeName, value);
     });
   };
 
   $.fn.removeAttrSVG = function(attributeName) {
+    if (this.length === 0) { // shortcut for empty collections
+      return this;
+    }
+    if (this.length === 1) { // shortcut for single element collections
+      this[0].removeAttribute(attributeName);
+      return this;
+    }
     return this.each(function() {
       this.removeAttribute(attributeName);
     });
   };
 
   $.fn.attrXLINK = function(attributeName, value) {
+    if (this.length === 0) { // shortcut for empty collections
+      return this;
+    }
+    if (this.length === 1) { // shortcut for single element collections
+      this[0].setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
+      return this;
+    }
     return this.each(function() {
       this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
     });
   };
 
   $.fn.addClassSVG = function(cssClass) {
+    var old;
+    if (this.length === 0) { // shortcut for empty collections
+      return this;
+    }
+    if (this.length === 1) { // shortcut for single element collections
+      if (!this.hasClassSVG(cssClass)) {
+        old = this[0].getAttribute('class');
+        this[0].setAttributS('class', scout.strings.join(' ', old, cssClass).trim());
+      }
+      return this;
+    }
     return this.each(function() {
       if (!$(this).hasClassSVG(cssClass)) {
-        var old = this.getAttribute('class');
-        this.setAttribute('class', scout.strings.join(' ', old, cssClass));
+        old = this.getAttribute('class');
+        this.setAttribute('class', scout.strings.join(' ', old, cssClass).trim());
       }
     });
   };
 
   $.fn.removeClassSVG = function(cssClass) {
+    var old;
+    if (this.length === 0) { // shortcut for empty collections
+      return this;
+    }
+    if (this.length === 1) { // shortcut for single element collections
+      old = ' ' + this[0].getAttribute('class') + ' ';
+      this[0].setAttribute('class', old.replace(' ' + cssClass + ' ', ' ').trim());
+      return this;
+    }
     return this.each(function() {
       var old = ' ' + this.getAttribute('class') + ' ';
       this.setAttribute('class', old.replace(' ' + cssClass + ' ', ' ').trim());
@@ -295,7 +336,7 @@
   };
 
   $.fn.hasClassSVG = function(cssClass) {
-    var old = ' ' + this.attr('class') + ' ';
+    var old = ' ' + this[0].getAttribute('class') + ' ';
     return old.indexOf(' ' + cssClass + ' ') !== -1;
   };
 
