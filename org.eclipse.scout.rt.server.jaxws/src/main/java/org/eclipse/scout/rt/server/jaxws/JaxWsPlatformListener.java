@@ -14,9 +14,9 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -36,28 +36,39 @@ public class JaxWsPlatformListener implements IPlatformListener {
 
   @Override
   public void stateChanged(final PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
-      installImplementorSpecifics(event.getSource().getBeanManager());
+    final IBeanManager beanManager = event.getSource().getBeanManager();
+
+    switch (event.getState()) {
+      case BeanManagerPrepared:
+        installImplementorSpecifics(beanManager);
+        break;
+      case BeanManagerValid:
+        logImplementorInfo(beanManager);
+        break;
     }
   }
 
-  private void installImplementorSpecifics(final IBeanManager beanManager) {
-    final String implementor = CONFIG.getPropertyValue(JaxWsImplementorProperty.class);
-    if (implementor == null) {
+  protected void installImplementorSpecifics(final IBeanManager beanManager) {
+    final String jaxwsImplementor = CONFIG.getPropertyValue(JaxWsImplementorProperty.class);
+    if (jaxwsImplementor == null) {
       return;
     }
 
     try {
-      final Class<?> implementorClazz = Class.forName(implementor);
-      Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(implementorClazz), "Implementor class must be of type '%s'.", JaxWsImplementorSpecifics.class.getName());
+      final Class<?> jaxwsImplementorClazz = Class.forName(jaxwsImplementor);
+      Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(jaxwsImplementorClazz), "Implementor class must be of type '%s'.", JaxWsImplementorSpecifics.class.getName());
 
-      beanManager.unregisterClass(implementorClazz); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
-      beanManager.registerBean(new BeanMetaData(implementorClazz).withReplace(true));
+      beanManager.unregisterClass(jaxwsImplementorClazz); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
+      beanManager.registerBean(new BeanMetaData(jaxwsImplementorClazz).withReplace(true));
 
-      LOG.info("JAX-WS implementor specific class installed: {}", implementorClazz.getName());
+      LOG.info("JAX-WS implementor specific class installed: {}", jaxwsImplementorClazz.getName());
     }
     catch (final ClassNotFoundException e) {
-      throw new PlatformException("Failed to install JAX-WS implementor specific class", e);
+      throw new PlatformException("Configured JAX-WS implementor specific class", e);
     }
+  }
+
+  protected void logImplementorInfo(final IBeanManager beanManager) {
+    LOG.info("JAX-WS implementor: " + BEANS.get(JaxWsImplementorSpecifics.class).getVersionInfo());
   }
 }

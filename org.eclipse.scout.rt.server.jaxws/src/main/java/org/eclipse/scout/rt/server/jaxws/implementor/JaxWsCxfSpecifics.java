@@ -18,6 +18,7 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * JAX-WS implementor specifics of 'JAX-WS CXF implementation'.
@@ -40,12 +41,12 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
   }
 
   @Override
-  public Integer getHttpStatusCode(Map<String, Object> responseContext) {
+  public Integer getHttpStatusCode(final Map<String, Object> responseContext) {
     return (Integer) responseContext.get("org.apache.cxf.message.Message.RESPONSE_CODE");
   }
 
   @Override
-  public void setSocketConnectTimeout(Map<String, Object> requestContext, int timeoutMillis) {
+  public void setSocketConnectTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
     if (timeoutMillis > 0) {
       requestContext.put("javax.xml.ws.client.connectionTimeout", timeoutMillis);
     }
@@ -55,7 +56,7 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
   }
 
   @Override
-  public void setSocketReadTimeout(Map<String, Object> requestContext, int timeoutMillis) {
+  public void setSocketReadTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
     if (timeoutMillis > 0) {
       requestContext.put("javax.xml.ws.client.receiveTimeout", timeoutMillis);
     }
@@ -65,12 +66,23 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
   }
 
   @Override
-  public void closeSocket(Object port, String operation) {
+  public void closeSocket(final Object port, final String operation) {
     try {
       ((Closeable) port).close();
     }
     catch (final Throwable e) {
       LOG.error(String.format("Failed to close Socket for: %s", operation), e);
+    }
+  }
+
+  @Override
+  public String getVersionInfo() {
+    try {
+      final Package pck = Class.forName("org.apache.cxf.jaxws.JaxWsClientProxy").getPackage();
+      return String.format("JAX-WS Apache CXF %s (%s)", pck.getImplementationVersion(), pck.getImplementationVendor());
+    }
+    catch (final ClassNotFoundException e) {
+      throw new PlatformException("Application configured to run with JAX-WS Apache CXF, but implementor could not be found on classpath.");
     }
   }
 }

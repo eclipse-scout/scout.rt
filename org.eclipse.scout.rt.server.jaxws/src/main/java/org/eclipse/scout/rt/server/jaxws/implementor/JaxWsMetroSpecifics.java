@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * JAX-WS implementor specifics of 'JAX-WS Metro implementation'.
@@ -54,6 +55,17 @@ public class JaxWsMetroSpecifics extends JaxWsImplementorSpecifics {
     }
     catch (final Throwable e) {
       LOG.error(String.format("Failed to close Socket for: %s", operation), e);
+    }
+  }
+
+  @Override
+  public String getVersionInfo() {
+    try {
+      final Package pck = Class.forName("com.sun.xml.ws.util.RuntimeVersion").getPackage();
+      return String.format("JAX-WS Metro %s (http://jax-ws.java.net, %s, not bundled with JRE)", pck.getImplementationVersion(), pck.getImplementationVendor());
+    }
+    catch (final ClassNotFoundException e) {
+      throw new PlatformException("Application configured to run with JAX-WS Metro (not bundled with JRE), but implementor could not be found on classpath.");
     }
   }
 }

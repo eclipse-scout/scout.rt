@@ -104,4 +104,11 @@ public class JaxWsImplementorSpecifics {
   public void closeSocket(final Object port, final String operation) {
     LOG.warn("'closeSocket' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), BEANS.get(JaxWsImplementorProperty.class).getKey());
   }
+
+  /**
+   * Returns the implementor's name and its version.
+   */
+  public String getVersionInfo() {
+    return "n/a";
+  }
 }
