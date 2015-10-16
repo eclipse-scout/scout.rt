@@ -131,35 +131,50 @@ public class JettyServer {
       public Set<String> getResourcePaths(String path) {
         Set<String> resources = new HashSet<>();
 
-        // Look for resources in the dependent JAR's resources relative to /META-INF/resources.
-        try {
-          Enumeration<URL> urls = getClassLoader().getResources("META-INF/resources" + path);
-          while (urls.hasMoreElements()) {
-            File resource = new File(urls.nextElement().getPath());
-            if (!resource.exists()) {
-              LOG.error("resource not found: " + resource);
-              continue;
-            }
+        // 1. Find resources in dependent jars.
+        resources.addAll(JettyServer.findResourcesFromDependentJars(getClassLoader(), path));
 
-            if (resource.isDirectory()) {
-              String directoryPath = (path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH);
-              for (String resourceName : resource.list()) {
-                resources.add(directoryPath + resourceName);
-              }
-            }
-            else {
-              resources.add(path);
-            }
-          }
-        }
-        catch (IOException e) {
-          LOG.error("Failed to resolve resources of JARs inside the web application's /WEB-INF/lib directory", e);
-        }
-
-        // Look for the resource in the web application's resources (higher precedence).
+        // 2. Find resource in the web application's resources (higher precedence).
         resources.addAll(super.getResourcePaths(path));
         return resources;
       }
     }
+  }
+
+  /**
+   * Finds resources which are located in other JARs.
+   *
+   * @see 'javax.servlet.ServletContext.getResourcePaths(String)' for the specification.
+   */
+  static Set<String> findResourcesFromDependentJars(ClassLoader classloader, String path) {
+    Set<String> resources = new HashSet<>();
+
+    // Look for resources in the dependent JAR's resources relative to /META-INF/resources.
+    try {
+      Enumeration<URL> urls = classloader.getResources("META-INF/resources" + path);
+      while (urls.hasMoreElements()) {
+        File resource = new File(urls.nextElement().getPath());
+        if (!resource.exists()) {
+          LOG.error("resource not found: " + resource);
+          continue;
+        }
+
+        if (resource.isDirectory()) {
+          String directoryPath = path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH;
+
+          for (File file : resource.listFiles()) {
+            resources.add(directoryPath + file.getName() + (file.isDirectory() ? URIUtil.SLASH : ""));
+          }
+        }
+        else {
+          resources.add(path);
+        }
+      }
+    }
+    catch (IOException e) {
+      LOG.error("Failed to resolve resources of JARs inside the web application's /WEB-INF/lib directory", e);
+    }
+
+    return resources;
   }
 }
