@@ -34,7 +34,16 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   }
 
   /**
-   * If set, this value is applied to the tile field's "autoColor" property.
+   * If set, this value is applied to the tile field chart's "chartType" property.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(70)
+  protected Integer getConfiguredChartType() {
+    return null;
+  }
+
+  /**
+   * If set, this value is applied to the tile field chart's "autoColor" property.
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(70)
@@ -43,11 +52,20 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   }
 
   /**
-   * If set, this value is applied to the tile field's "chartType" property.
+   * If set, this value is applied to the tile field chart's "clickable" property.
    */
-  @ConfigProperty(ConfigProperty.INTEGER)
+  @ConfigProperty(ConfigProperty.STRING)
   @Order(70)
-  protected Integer getConfiguredChartType() {
+  protected Boolean getConfiguredClickable() {
+    return null;
+  }
+
+  /**
+   * If set, this value is applied to the tile field chart's "animated" property.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(70)
+  protected Boolean getConfiguredAnimated() {
     return null;
   }
 
@@ -55,11 +73,17 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   protected void initFileFieldInternal() {
     super.initFileFieldInternal();
 
+    if (getConfiguredChartType() != null) {
+      getTileField().getChart().setChartType(getConfiguredChartType());
+    }
     if (getConfiguredAutoColor() != null) {
       getTileField().getChart().setAutoColor(getConfiguredAutoColor());
     }
-    if (getConfiguredChartType() != null) {
-      getTileField().getChart().setChartType(getConfiguredChartType());
+    if (getConfiguredClickable() != null) {
+      getTileField().getChart().setClickable(getConfiguredClickable());
+    }
+    if (getConfiguredAnimated() != null) {
+      getTileField().getChart().setAnimated(getConfiguredAnimated());
     }
   }
 

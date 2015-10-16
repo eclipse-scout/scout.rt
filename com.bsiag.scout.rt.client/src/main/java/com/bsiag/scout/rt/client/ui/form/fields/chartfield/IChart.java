@@ -22,15 +22,16 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
 
   int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
+  String PROP_CONTAINER = "chartContainer";
   String PROP_AUTO_COLOR = "autoColor";
   String PROP_CHART_TYPE = "chartType";
   String PROP_CHART_DATA = "chartData";
   String PROP_ENABLED = "enabled";
   String PROP_VISIBLE = "visible";
-  String PROP_CONTAINER = "chartContainer";
   String PROP_MAX_SEGMENTS = "maxSegments";
   String PROP_CLICKABLE = "clickable";
   String PROP_MODEL_HANDLES_CLICK = "modelHandlesClick";
+  String PROP_ANIMATED = "animated";
 
   IChartUIFacade getUIFacade();
 
@@ -79,4 +80,8 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
   void setModelHandlesClick(boolean modelHandlesClick);
 
   boolean isModelHandlesClick();
+
+  boolean isAnimated();
+
+  void setAnimated(boolean animated);
 }

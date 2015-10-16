@@ -71,6 +71,7 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
     setMaxSegments(getConfiguredMaxSegments());
     setClickable(getConfiguredClickable());
     setModelHandlesClick(getConfiguredModelHandelsClick());
+    setAnimated(getConfiguredAnimated());
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -113,6 +114,12 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   @Order(40)
   protected boolean getConfiguredClickable() {
     return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(40)
+  protected boolean getConfiguredAnimated() {
+    return true;
   }
 
   @Override
@@ -231,6 +238,16 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   @Override
   public void setModelHandlesClick(boolean modelHandlesClick) {
     propertySupport.setPropertyBool(PROP_MODEL_HANDLES_CLICK, modelHandlesClick);
+  }
+
+  @Override
+  public boolean isAnimated() {
+    return propertySupport.getPropertyBool(PROP_ANIMATED);
+  }
+
+  @Override
+  public void setAnimated(boolean animated) {
+    propertySupport.setPropertyBool(PROP_ANIMATED, animated);
   }
 
   protected class P_UIFacade implements IChartUIFacade {

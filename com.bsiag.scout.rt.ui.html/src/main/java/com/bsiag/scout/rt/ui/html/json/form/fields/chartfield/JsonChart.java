@@ -99,6 +99,12 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
         return getModel().isModelHandlesClick();
       }
     });
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_ANIMATED, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isAnimated();
+      }
+    });
   }
 
   @Override
