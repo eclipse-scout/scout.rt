@@ -140,8 +140,8 @@ scout.FormFieldLayout.prototype._layoutDisabledOverlay = function(formField) {
     $disabledOverlay
       .css('top', pos.top)
       .css('left', pos.left)
-      .width($field.width() + padding.left + padding.right)
-      .height($field.height()  + padding.top + padding.bottom);
+      .width($field.width() + padding.horizontal())
+      .height($field.height()  + padding.vertical());
   }
 };
 

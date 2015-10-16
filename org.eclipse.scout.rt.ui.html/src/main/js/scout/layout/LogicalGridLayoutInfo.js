@@ -355,8 +355,8 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) {
-  var w = this.layoutSizes(size.width - insets.left - insets.right - Math.max(0, (this.cols - 1) * this.m_hgap), this.width, this.weightX);
-  var h = this.layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (this.rows - 1) * this.m_vgap), this.height, this.weightY);
+  var w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.m_hgap), this.width, this.weightX);
+  var h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.m_vgap), this.height, this.weightY);
   this.m_cellBounds = scout.arrays.init(this.rows, null);
   var y = insets.top,
     r, x, c;

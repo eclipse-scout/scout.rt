@@ -69,8 +69,8 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
       r.height -= data.topInset;
     }
     margins = htmlComp.getMargins();
-    r.width -= (margins.left + margins.right);
-    r.height -= (margins.top + margins.bottom);
+    r.width -= margins.horizontal();
+    r.height -= margins.vertical();
     if (data.fillHorizontal && data.fillVertical) {
       // ok
     } else {
@@ -142,8 +142,8 @@ scout.LogicalGridLayout.prototype.getLayoutSize = function($parent, sizeflag) {
   }
   if (dim.width > 0 && dim.height > 0) {
     var insets = scout.HtmlComponent.get($parent).getInsets();
-    dim.width += insets.left + insets.right;
-    dim.height += insets.top + insets.bottom;
+    dim.width += insets.horizontal();
+    dim.height += insets.vertical();
   }
   return dim;
 };

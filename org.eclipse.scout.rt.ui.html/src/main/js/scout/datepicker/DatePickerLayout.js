@@ -16,7 +16,7 @@ scout.DatePickerLayout.MIN_DAY_SIZE = 26;
 scout.DatePickerLayout.SIDE_RATIO = 1.3918;
 
 // FIXME AWE: seitenverhältnis vom date-picker verbessern (nicht quadratisch, sondern leicht rechteckig)
-// FIXME AWE: animation verbessern
+// FIXME AWE: animation verbessern (links und rechts abdecken, damit DIVs die reinsliden nicht sichtbar sind)
 // FIXME AWE: kreise um days sehen noch nicht gut aus
 
 scout.DatePickerLayout.prototype.layout = function($container) {
@@ -32,7 +32,7 @@ scout.DatePickerLayout.prototype.layout = function($container) {
     // Header height is also used as height for weekdays (defined by CSS)
     headerHeight = scout.graphics.getSize($header, true).height + 1, // + 1 for separator-line
     scrollableInsets = scout.graphics.getInsets($scrollable),
-    scrollableSize = scout.graphics.getSize($scrollable).subtract(scrollableInsets),
+    scrollableSize = containerSize.subtract(scrollableInsets),
     // picker and all day-elements must be quadratic,
     // otherwise round selection would be an ellipse
     monthHeight = containerSize.height - headerHeight,
@@ -43,7 +43,7 @@ scout.DatePickerLayout.prototype.layout = function($container) {
     monthMarginLeftRight = Math.max(0, Math.floor((scrollableSize.width - monthWidth) / 2)),
     // measure first day in calendar, so we know how we must set
     // paddings and margins for each day
-    dayTextSize = scout.graphics.getSize($firstDay),
+    dayTextSize = this._measureDaySize($month),
     dayMargin = Math.max(0, (daySize - scout.DatePickerLayout.MIN_DAY_SIZE) / 2),
     cssDaySize = daySize - 2 * dayMargin,
     dayPaddingTop = Math.max(0, (cssDaySize - dayTextSize.height) / 2);
@@ -58,7 +58,8 @@ scout.DatePickerLayout.prototype.layout = function($container) {
 
   // only set left margin to center the scrollable
   $scrollable
-    .height(monthHeight)
+    .cssWidth(monthWidth + scrollableInsets.horizontal())
+    .cssHeight(monthHeight + scrollableInsets.vertical())
     .css('margin-left', monthMarginLeftRight);
 
   // store results in cache (so the can be access during animation, without recalculating the whole layout)
@@ -69,6 +70,19 @@ scout.DatePickerLayout.prototype.layout = function($container) {
   this._cache.dayPaddingTop = dayPaddingTop;
 
   this._layoutMonth($month);
+};
+
+/**
+ * Adds a temporary day DIV (without width, height, padding or margin) to the $month element,
+ * measures the size and removes the DIV immediately after measurement.
+ */
+scout.DatePickerLayout.prototype._measureDaySize = function($month) {
+  var $tmpDay = $.makeDiv('date-picker-day')
+    .text('30') // because the string 30 is wider than 11
+    .appendTo($month),
+    size = scout.graphics.getSize($tmpDay);
+  $tmpDay.remove();
+  return size;
 };
 
 /**

@@ -51,7 +51,7 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
   prefSize.height = Math.min(350, prefSize.height);
 
   // hack, remove double selection border
-  return prefSize.add({top: 0, right: 0, bottom: -1, left: 0});
+  return prefSize.add(new scout.Insets(0, 0, -1, 0));
 };
 
 scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function($container) {

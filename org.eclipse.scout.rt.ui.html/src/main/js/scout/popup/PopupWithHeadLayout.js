@@ -41,10 +41,10 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizes = function() {
   }
 
   maxWidthRight = (windowSize.width - popupBounds.x - windowPaddingX);
-  maxWidthLeft = (popupBounds.x + popupHeadSize.width - popupMargins.left - popupMargins.right - windowPaddingX);
+  maxWidthLeft = (popupBounds.x + popupHeadSize.width - popupMargins.horizontal() - windowPaddingX);
   maxHeightDown = (windowSize.height - popupBounds.y - windowPaddingY);
   // head height is irrelevant because popup has a margin as height as the header
-  maxHeightUp = (popupBounds.y - popupMargins.top - popupMargins.bottom - windowPaddingY);
+  maxHeightUp = (popupBounds.y - popupMargins.vertical() - windowPaddingY);
 
   return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
 };

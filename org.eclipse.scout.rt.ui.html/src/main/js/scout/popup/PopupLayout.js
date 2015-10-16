@@ -56,10 +56,10 @@ scout.PopupLayout.prototype._calcMaxSizes = function() {
     $window = $(window),
     windowSize = new scout.Dimension($window.width(), $window.height());
 
-  maxWidthRight = (windowSize.width - (anchorBounds.x + anchorBounds.width) - popupMargins.left - popupMargins.right - windowPaddingX);
-  maxWidthLeft = (anchorBounds.x - popupMargins.left - popupMargins.right - windowPaddingX);
-  maxHeightDown = (windowSize.height - (anchorBounds.y + anchorBounds.height) - popupMargins.top - popupMargins.bottom - windowPaddingY);
-  maxHeightUp = (anchorBounds.y - popupMargins.top - popupMargins.bottom - windowPaddingY);
+  maxWidthRight = (windowSize.width - (anchorBounds.x + anchorBounds.width) - popupMargins.horizontal() - windowPaddingX);
+  maxWidthLeft = (anchorBounds.x - popupMargins.horizontal() - windowPaddingX);
+  maxHeightDown = (windowSize.height - (anchorBounds.y + anchorBounds.height) - popupMargins.vertical() - windowPaddingY);
+  maxHeightUp = (anchorBounds.y - popupMargins.vertical() - windowPaddingY);
 
   return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
 };

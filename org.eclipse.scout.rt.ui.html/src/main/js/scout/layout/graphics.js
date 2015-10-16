@@ -278,14 +278,14 @@ scout.Dimension.prototype.equals = function(o) {
 
 scout.Dimension.prototype.subtract = function(insets) {
   return new scout.Dimension(
-    this.width - insets.left - insets.right,
-    this.height - insets.top - insets.bottom);
+    this.width - insets.horizontal(),
+    this.height - insets.vertical());
 };
 
 scout.Dimension.prototype.add = function(insets) {
   return new scout.Dimension(
-    this.width + insets.left + insets.right,
-    this.height + insets.top + insets.bottom);
+    this.width + insets.horizontal(),
+    this.height + insets.vertical());
 };
 
 /**
@@ -375,6 +375,14 @@ scout.Insets.prototype.equals = function(o) {
     this.right === o.right &&
     this.bottom === o.bottom &&
     this.left === o.left;
+};
+
+scout.Insets.prototype.horizontal = function() {
+  return this.right + this.left;
+};
+
+scout.Insets.prototype.vertical = function() {
+  return this.top + this.bottom;
 };
 
 scout.Insets.prototype.toString = function() {
