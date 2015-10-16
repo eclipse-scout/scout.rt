@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.server.jaxws.handler.LogHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
+import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsRISpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
@@ -93,6 +94,10 @@ public final class JaxWsConfigProperties {
       return "jaxws.implementor";
     }
 
+    @Override
+    protected String getDefaultValue() {
+      return JaxWsRISpecifics.class.getName();
+    }
   }
 
   /**
@@ -185,8 +190,8 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Connect timeout in seconds to abort a webservice request, if establishment of the HTTP connection takes longer than
-   * this timeout. A timeout of <code>null</code> means an infinite timeout.
+   * Connect timeout in milliseconds to abort a webservice request, if establishment of the HTTP connection takes longer
+   * than this timeout. A timeout of <code>null</code> means an infinite timeout.
    */
   public static class JaxWsConnectTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
 
@@ -202,7 +207,7 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Read timeout in seconds to abort a webservice request, if it takes longer than this timeout for data to be
+   * Read timeout in milliseconds to abort a webservice request, if it takes longer than this timeout for data to be
    * available for read. A timeout of <code>null</code> means an infinite timeout.
    */
   public static class JaxWsReadTimeoutProperty extends AbstractPositiveIntegerConfigProperty {

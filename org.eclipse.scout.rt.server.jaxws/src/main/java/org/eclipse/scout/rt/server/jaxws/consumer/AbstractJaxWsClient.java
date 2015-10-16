@@ -72,19 +72,19 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
  * <code>
  * // Obtain a context to work on a dedicated Port.
  * final InvocationContext context = BEANS.get(YourWebServiceClient.class).newInvocationContext();
- * 
+ *
  * // Optionally configure the context.
  * context.endpointUrl(&quot;http://...&quot;)
  *        .connectTimeout(1000)
  *        .readTimeout(10000)
  *        .whenRollback(new IRollbackListener() {
- * 
+ *
  *          &#064;Override
  *          public void onRollback() {
  *            invocationContext.port().webMethod_rollback();
  *          }
  *        });
- * 
+ *
  * // Invoke the port operation.
  * try {
  *   String wsResult = context.port().webMethod();
@@ -329,7 +329,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to configure the connect timeout in seconds for requests initiated by this webservice client. If the
+   * Overwrite to configure the connect timeout in milliseconds for requests initiated by this webservice client. If the
    * timeout expires before the connection can be established, the request is aborted. A timeout of null means an
    * infinite timeout.
    *
@@ -341,8 +341,9 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to configure the read timeout in seconds for requests initiated by this webservice client. If the timeout
-   * expires before data is available for read, the request is aborted. A timeout of null means an infinite timeout.
+   * Overwrite to configure the read timeout in milliseconds for requests initiated by this webservice client. If the
+   * timeout expires before data is available for read, the request is aborted. A timeout of null means an infinite
+   * timeout.
    *
    * @see JaxWsReadTimeoutProperty
    */
