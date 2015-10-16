@@ -1373,10 +1373,9 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 };
 
 scout.Table.prototype._group = function(update) {
-  var column, alignment, rows, sum, totalSum, row, value, nextRow, useRow, skip, hasCellTextForGroupingFunction, i,
+  var column, alignment, rows, sum, columnGroupingActive, totalSum, row, value, nextRow, useRow, newGroup, summaryRow, hasCellTextForGroupingFunction, i,
     that = this,
-    groupColumns = this._groupColumns(),
-    groupColumn = this._groupColumn();
+    groupColumns = this._groupColumns();
 
   // remove all sum rows
   update = update || !this.rendered;
@@ -1390,7 +1389,9 @@ scout.Table.prototype._group = function(update) {
     }, that.updateScrollbars.bind(that));
   }
 
-  if (!this.grouped && !groupColumn) {
+  columnGroupingActive = (groupColumns ? groupColumns.length > 0 : false);
+
+  if (!this.grouped && !columnGroupingActive) {
     return;
   }
 
@@ -1420,20 +1421,18 @@ scout.Table.prototype._group = function(update) {
     nextRow = rows[r + 1];
 
     // test if group is finished
-    skip = (r === rows.length - 1);
-    skip = skip || this._isNewGroup(groupColumns, row, nextRow);
+    summaryRow = (r === rows.length - 1);
+    newGroup = columnGroupingActive && (summaryRow || this._isNewGroup(groupColumns, row, nextRow));
     // if group is finished: add group row
 
-    if (skip) {
-      //append total sum first, otherwise column of last group will be bottom.
-      if ((r === rows.length - 1) && totalSum.length > 0) {
-        this._appendSumRow(totalSum, row, true, update);
-      }
-      if (sum.length > 0) {
-        this._appendSumRow(sum, row, false, update);
-        sum = []; //reset after group
-      }
+    if(summaryRow && this.grouped) {
+      this._appendSumRow(totalSum, row, true, update);
     }
+    if(newGroup){
+      this._appendSumRow(sum, row, false, update);
+      sum = []; //reset after group
+    }
+
   }
 };
 

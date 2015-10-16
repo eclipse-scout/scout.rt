@@ -728,26 +728,25 @@ describe("Table", function() {
       $header1 = $colHeaders.eq(1);
     }
 
-    //FIXME FLO group creates 2 sum rows
-//    it("creates a sum row", function() {
-//      prepareTable();
-//      render(table);
-//
-//      expect(table.$sumRows().length).toBe(0);
-//      table.group();
-//      expect(table.$sumRows().length).toBe(1);
-//    });
-//
-//    it("creates a sum row, even if there are filtered rows", function() {
-//      prepareTable();
-//      render(table);
-//
-//      expect(table.$sumRows().length).toBe(0);
-//      table.rows[2].filterAccepted = false;
-//      table._renderRowFilterAccepted(table.rows[2]);
-//      table.group();
-//      expect(table.$sumRows().length).toBe(1);
-//    });
+    it("creates a sum row", function() {
+      prepareTable();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      table.group();
+      expect(table.$sumRows().length).toBe(1);
+    });
+
+    it("creates a sum row, even if there are filtered rows", function() {
+      prepareTable();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      table.rows[2].filterAccepted = false;
+      table._renderRowFilterAccepted(table.rows[2]);
+      table.group();
+      expect(table.$sumRows().length).toBe(1);
+    });
 
     it("sums up numbers in a number column", function() {
       prepareTable();
