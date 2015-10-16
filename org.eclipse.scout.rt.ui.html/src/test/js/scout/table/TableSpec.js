@@ -797,6 +797,254 @@ describe("Table", function() {
 
   });
 
+  describe("column grouping", function() {
+    var model, table, column0, column1, column2, column3, column4, rows, columns;
+    var $colHeaders, $header0, $header1;
+
+    function prepareTable() {
+      columns = [helper.createModelColumn(null, 'col1'),
+        helper.createModelColumn(null, 'col2'),
+        helper.createModelColumn(null, 'col3'),
+        helper.createModelColumn(null, 'col4', 'number'),
+        helper.createModelColumn(null, 'col5', 'number')
+      ];
+      columns[0].index = 0;
+      columns[1].index = 1;
+      columns[2].index = 2;
+      columns[3].index = 3;
+      columns[4].index = 4;
+      rows = helper.createModelRows(5, 8);
+      model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+      column2 = model.columns[2];
+      column3 = model.columns[3];
+      column4 = model.columns[4];
+    }
+
+    function prepareContent(){
+      var column0Values = ['a', 'b'],
+      column1Values = ['c', 'd'],
+      column2Values = ['e', 'f'],
+      value, text, j;
+
+      for(var i=0; i<rows.length; i++){
+        value = column0Values[Math.floor(i/4)];
+        text = value.toString();
+        rows[i].cells[0] = helper.createModelCell(text, value);
+
+
+        value = column1Values[(Math.floor(i/2)) % 2];
+        text = value.toString();
+        rows[i].cells[1] = helper.createModelCell(text, value);
+
+        value = column2Values[i % 2];
+        text = value.toString();
+        rows[i].cells[2] = helper.createModelCell(text, value);
+
+        j = i + 1;
+        rows[i].cells[3].value = j;
+        rows[i].cells[3].text = j.toString();
+        rows[i].cells[4].value = j*3;
+        rows[i].cells[4].text = (j*3).toString();
+      }
+
+    }
+
+    function render(table) {
+      table.render(session.$entryPoint);
+      $colHeaders = table.header.$container.find('.table-header-item');
+      $header0 = $colHeaders.eq(0);
+      $header1 = $colHeaders.eq(1);
+    }
+
+    function addGrouping(table, column, multi) {
+      table.groupColumn(column, multi, 'asc', false);
+    }
+
+    function removeGrouping(table, column){
+      table.groupColumn(column, "", 'asc', true);
+    }
+
+    function assertGroupingProperty(table){
+      var i, expectGrouped = scout.arrays.init(5, false);
+      for(i=1; i<arguments.length; i++){
+        expectGrouped[arguments[i]] = true;
+      }
+
+      for(i=0; i<5; i++){
+        if(expectGrouped[i]){
+          expect(table.columns[i].grouped).toBeTruthy();
+        }
+        else{
+          expect(table.columns[i].grouped).toBeFalsy();
+        }
+      }
+    }
+
+    function assertGroupingValues(table, column, values){
+      var i, c, $sumCell;
+      c = table.columns.indexOf(column);
+      expect(table.$sumRows().length).toBe(values.length);
+
+      for(i=0; i<values.length; i++){
+        $sumCell = table.$sumRows().eq(i).children().eq(c);
+        expect($sumCell.text()).toBe(values[i]);
+      }
+    }
+
+    beforeEach(function() {
+      // generation of sumrows is animated. leads to misleading test failures.
+      $.fx.off = true;
+    });
+
+    afterEach(function() {
+      $.fx.off = false;
+    });
+
+    //group only column 0
+    it("groups column 0 only", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column0, false);
+      expect(table.$sumRows().length).toBe(2);
+      assertGroupingProperty(table, 0);
+      assertGroupingValues(table, column3, ['10', '26']);
+      assertGroupingValues(table, column4, ['30', '78']);
+      removeGrouping(table, column0);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+    });
+
+    //group only column 1
+    it("groups column 1 only", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column1, false);
+      expect(table.$sumRows().length).toBe(2);
+      assertGroupingProperty(table, 1);
+      assertGroupingValues(table, column3, ['14', '22']);
+      assertGroupingValues(table, column4, ['42', '66']);
+      removeGrouping(table, column1);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+    });
+
+    //group columns 0 and 1
+    it("groups columns 0 and 1, then whole table", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column0, false);
+      addGrouping(table, column1, true);
+      expect(table.$sumRows().length).toBe(4);
+      assertGroupingProperty(table, 0, 1);
+      assertGroupingValues(table, column3, ['3', '7', '11', '15']);
+      assertGroupingValues(table, column4, ['9', '21', '33', '45']);
+      table.group();
+      expect(table.$sumRows().length).toBe(5);
+      assertGroupingValues(table, column3, ['3', '7', '11', '15', '36']);
+      assertGroupingValues(table, column4, ['9', '21', '33', '45', '108']);
+      table.removeGrouping();
+      removeGrouping(table, column0);
+      removeGrouping(table, column1);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+
+    });
+
+    it("groups columns 0, 1 and 2", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column0, false);
+      addGrouping(table, column1, true);
+      addGrouping(table, column2, true);
+      expect(table.$sumRows().length).toBe(8);
+      assertGroupingProperty(table, 0, 1, 2);
+      assertGroupingValues(table, column3, ['1', '2', '3', '4', '5', '6', '7', '8']);
+      assertGroupingValues(table, column4, ['3', '6', '9', '12','15', '18', '21', '24']);
+      removeGrouping(table, column0);
+      removeGrouping(table, column1);
+      removeGrouping(table, column2);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+
+    });
+
+    //vary order
+    it("groups columns 2 and 1", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column2, false);
+      addGrouping(table, column1, true);
+      expect(table.$sumRows().length).toBe(4);
+      assertGroupingProperty(table, 2, 1);
+      assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
+      assertGroupingValues(table, column4, ['18', '30', '24', '36']);
+      removeGrouping(table, column1);
+      removeGrouping(table, column2);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+
+    });
+
+    //group only column 1, but group 0 first
+    it("groups column 1 only", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column0, false);
+      addGrouping(table, column2, true);
+      addGrouping(table, column1, false);
+      expect(table.$sumRows().length).toBe(2);
+      assertGroupingProperty(table, 1);
+      assertGroupingValues(table, column3, ['14', '22']);
+      assertGroupingValues(table, column4, ['42', '66']);
+      removeGrouping(table, column1);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+    });
+
+    //group only column 1, but group 0 first
+    it("groups column 1 and 2", function() {
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      addGrouping(table, column0, false);
+      addGrouping(table, column2, true);
+      addGrouping(table, column1, true);
+      removeGrouping(table, column0);
+      expect(table.$sumRows().length).toBe(4);
+      assertGroupingProperty(table, 1,2);
+      assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
+      assertGroupingValues(table, column4, ['18', '30', '24', '36']);
+      removeGrouping(table, column1);
+      removeGrouping(table, column2);
+      expect(table.$sumRows().length).toBe(0);
+      assertGroupingProperty(table);
+    });
+
+  });
+
   describe("row click", function() {
 
     function clickRowAndAssertSelection(table, $row) {
