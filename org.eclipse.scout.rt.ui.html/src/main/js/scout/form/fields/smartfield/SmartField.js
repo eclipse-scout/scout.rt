@@ -11,10 +11,10 @@
  * [default] when no flag is set, used for Desktop applications
  *     smart-field opens a popup for proposal-chooser when user
  *     clicks into input-field
- * [mobile] smart-field is only a DIV that shows the display-text
+ * [touch] smart-field is only a DIV that shows the display-text
  *     when user clicks on the DIV it opens a popup that has an
  *     embedded smart-field and a proposal-chooser.
- * [embedded] used in the popup opend by the mobile smart-field.
+ * [embedded] used in the popup opened by the touch smart-field.
  *     this type of smart-field does not react on focus / blur
  *     events.
  */
@@ -47,7 +47,7 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
  */
 scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
-  scout.fields.initMobile(this, model);
+  scout.fields.initTouch(this, model);
 };
 
 scout.SmartField.prototype._render = function($parent) {
@@ -57,7 +57,7 @@ scout.SmartField.prototype._render = function($parent) {
 
   var $field = scout.fields.inputOrDiv(this)
     .click(this._onClick.bind(this));
-  if (!this.mobile) {
+  if (!this.touch) {
     $field
       .blur(this._onFieldBlur.bind(this))
       .focus(this._onFocus.bind(this))
@@ -87,7 +87,7 @@ scout.SmartField.prototype.addSmartFieldPopup = function() {
   if (this.embedded) {
     return;
   }
-  var popupType = this.mobile ? scout.SmartFieldMobilePopup : scout.SmartFieldPopup;
+  var popupType = this.touch ? scout.SmartFieldTouchPopup : scout.SmartFieldPopup;
   this._popup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
@@ -127,18 +127,12 @@ scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
  * When popup is not rendered at this point, we render the popup.
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
-  $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser + ' mobile=' + this.mobile);
-  if (!this.proposalChooser || this.mobile) {
+  $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser + ' touch=' + this.touch);
+  if (!this.proposalChooser || this.touch) {
     return;
   }
-  if (this.embedded) { // FIXME AWE: (popups) beautify this, make more generic
-    this._popup._embedProposalChooser(this.proposalChooser);
-  } else {
-    this._renderPopup();
-    this.proposalChooser.render(this._popup.$container);
-    this.proposalChooser.setParent(this._popup);
-    this._popup.resize();
-  }
+  this._renderPopup();
+  this._popup._renderProposalChooser(this.proposalChooser);
 };
 
 /**
@@ -146,7 +140,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
  */
 scout.SmartField.prototype._removeProposalChooser = function() {
   $.log.trace('(SmartField#_removeProposalChooser) proposalChooser=' + this.proposalChooser);
-  if (this.mobile) {
+  if (this.touch) {
     return;
   }
   this._closeProposal(false);
@@ -165,13 +159,13 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 
 scout.SmartField.prototype._onClick = function(event) {
   // note: the INPUT element does not process the click event when the field is disabled
-  // however, the DIV element used in mobile-mode does process the event anyway, that's
+  // however, the DIV element used in touch-mode does process the event anyway, that's
   // why this check is required.
   if (!this.enabled || this.embedded || this._popup.rendered) {
     return;
   }
 
-  if (this.mobile) {
+  if (this.touch) {
     this._popup.open();
     return false;
   } else {
@@ -184,7 +178,7 @@ scout.SmartField.prototype._onIconClick = function(event) {
     return;
   }
 
-  if (this.mobile) {
+  if (this.touch) {
     this._popup.open();
   } else {
     scout.SmartField.parent.prototype._onIconClick.call(this, event);

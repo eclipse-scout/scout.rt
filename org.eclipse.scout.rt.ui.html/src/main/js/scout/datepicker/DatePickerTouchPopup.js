@@ -1,16 +1,16 @@
 // FIXME AWE: (popups) common base clase for mobile popup
 // FIXME AWE: (popups) swipe für month shift
-scout.DatePickerMobilePopup = function(popup) {
-  scout.DatePickerMobilePopup.parent.call(this, popup);
+scout.DatePickerTouchPopup = function(popup) {
+  scout.DatePickerTouchPopup.parent.call(this, popup);
 };
-scout.inherits(scout.DatePickerMobilePopup, scout.Popup);
+scout.inherits(scout.DatePickerTouchPopup, scout.Popup);
 
-scout.DatePickerMobilePopup.TOP_MARGIN = 45;
+scout.DatePickerTouchPopup.TOP_MARGIN = 45;
 
-scout.DatePickerMobilePopup.prototype._init = function(options) {
+scout.DatePickerTouchPopup.prototype._init = function(options) {
   options = options || {};
   options.installFocusContext = false;
-  scout.DatePickerMobilePopup.parent.prototype._init.call(this, options);
+  scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
   this._mobileDateField = options.dateField;
 
   // clone original mobile date-field
@@ -21,7 +21,7 @@ scout.DatePickerMobilePopup.prototype._init = function(options) {
     labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
     statusVisible: false,
     embedded: true,
-    mobile: false
+    touch: false
   });
 
   this.picker = scout.create(scout.DatePicker, {
@@ -30,11 +30,11 @@ scout.DatePickerMobilePopup.prototype._init = function(options) {
   });
 };
 
-scout.DatePickerMobilePopup.prototype._createLayout = function() {
-  return new scout.DatePickerMobilePopupLayout(this);
+scout.DatePickerTouchPopup.prototype._createLayout = function() {
+  return new scout.DatePickerTouchPopupLayout(this);
 };
 
-scout.DatePickerMobilePopup.prototype._render = function($parent) {
+scout.DatePickerTouchPopup.prototype._render = function($parent) {
   this.$container = $.makeDiv('smart-field-popup mobile')
     .appendTo($parent);
 
@@ -54,49 +54,49 @@ scout.DatePickerMobilePopup.prototype._render = function($parent) {
 /**
  * @override Popup.js
  */
-scout.DatePickerMobilePopup.prototype.prefLocation = function($container, openingDirectionY) {
+scout.DatePickerTouchPopup.prototype.prefLocation = function($container, openingDirectionY) {
   var popupSize = this.htmlComp._layout.preferredLayoutSize($container),
     screenWidth = $(document).width(),
     x = Math.max(0, (screenWidth - popupSize.width) / 2);
-  return new scout.Point(x, scout.DatePickerMobilePopup.TOP_MARGIN);
+  return new scout.Point(x, scout.DatePickerTouchPopup.TOP_MARGIN);
 };
 
-scout.DatePickerMobilePopup.prototype.preselectDate = function(date, animated) {
+scout.DatePickerTouchPopup.prototype.preselectDate = function(date, animated) {
   if (!this.isOpen()) {
     this.render();
   }
   this.picker.preselectDate(date, animated);
 };
 
-scout.DatePickerMobilePopup.prototype.selectDate = function(date, animated) {
+scout.DatePickerTouchPopup.prototype.selectDate = function(date, animated) {
   if (!this.isOpen()) {
     this.render();
   }
   this.picker.selectDate(date, animated);
 };
 
-scout.DatePickerMobilePopup.prototype.shiftViewDate = function(years, months, days) {
+scout.DatePickerTouchPopup.prototype.shiftViewDate = function(years, months, days) {
   if (!this.isOpen()) {
     this.render();
   }
   this.picker.shiftViewDate(years, months, days);
 };
 
-scout.DatePickerMobilePopup.prototype.shiftSelectedDate = function(years, months, days) {
+scout.DatePickerTouchPopup.prototype.shiftSelectedDate = function(years, months, days) {
   if (!this.isOpen()) {
     this.render();
   }
   this.picker.shiftSelectedDate(years, months, days);
 };
 
-scout.DatePickerMobilePopup.prototype.isOpen = function() {
+scout.DatePickerTouchPopup.prototype.isOpen = function() {
   return this.rendered;
 };
 
 /**
  * @override Popup.js
  */
-scout.DatePickerMobilePopup.prototype._onMouseDown = function(event) {
+scout.DatePickerTouchPopup.prototype._onMouseDown = function(event) {
   // when user clicks on DateField input-field, cannot prevent default
   // because text-selection would not work anymore
   if (this.$anchor.isOrHas(event.target)) {
@@ -104,9 +104,9 @@ scout.DatePickerMobilePopup.prototype._onMouseDown = function(event) {
   }
 
   // or else: clicked somewhere else on the document -> close
-  scout.DatePickerMobilePopup.parent.prototype._onMouseDown.call(this, event);
+  scout.DatePickerTouchPopup.parent.prototype._onMouseDown.call(this, event);
 };
 
-scout.DatePickerMobilePopup.prototype._onAnchorScroll = function(event) {
+scout.DatePickerTouchPopup.prototype._onAnchorScroll = function(event) {
   this.position();
 };

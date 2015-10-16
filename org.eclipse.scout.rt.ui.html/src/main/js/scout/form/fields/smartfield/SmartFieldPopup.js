@@ -24,8 +24,9 @@ scout.SmartFieldPopup.prototype._render = function($parent) {
   this.htmlComp.validateRoot = true;
 };
 
-scout.SmartFieldPopup.prototype.resize = function() {
-  // Revalidate is required when the popup is already opened and the proposal chooser is rendered later
+scout.SmartFieldPopup.prototype._renderProposalChooser = function(proposalChooser) {
+  proposalChooser.render(this.$container);
+  proposalChooser.setParent(this);
   this.revalidateLayout();
 };
 

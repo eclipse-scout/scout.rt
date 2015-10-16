@@ -28,7 +28,7 @@ scout.DateField.prototype._createKeyStrokeContext = function() {
 
 scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
-  scout.fields.initMobile(this, model);
+  scout.fields.initTouch(this, model);
   this._syncErrorStatus(this.errorStatus);
 };
 
@@ -50,7 +50,7 @@ scout.DateField.prototype._render = function($parent) {
   this.htmlDateTimeComposite.setLayout(new scout.DateTimeCompositeLayout(this));
 
   // Create date picker popup
-  var popupType = this.mobile ? scout.DatePickerMobilePopup : scout.DatePickerPopup;
+  var popupType = this.touch ? scout.DatePickerTouchPopup : scout.DatePickerPopup;
   this._datePickerPopup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
@@ -89,7 +89,7 @@ scout.DateField.prototype._renderHasDate = function() {
       .addClass('date')
       .on('mousedown', this._onDateFieldClick.bind(this))
       .appendTo(this.$field);
-    if (!this.mobile) {
+    if (!this.touch) {
       this.$dateField
         .on('keydown', this._onDateFieldKeydown.bind(this))
         .on('input', this._onDateFieldInput.bind(this))
@@ -123,7 +123,7 @@ scout.DateField.prototype._renderHasTime = function() {
       .addClass('time')
       .on('mousedown', this._onTimeFieldClick.bind(this))
       .appendTo(this.$field);
-    if (!this.mobile) {
+    if (!this.touch) {
       this.$timeField
         .on('keydown', this._onTimeFieldKeydown.bind(this))
         .on('input', this._onTimeFieldInput.bind(this))
@@ -260,7 +260,7 @@ scout.DateField.prototype._onDateFieldClick = function() {
     return;
   }
 
-  if (this.mobile) {
+  if (this.touch) {
     this._datePickerPopup.open();
     this._openDatePicker(this.timestampAsDate);
   } else {
@@ -273,7 +273,7 @@ scout.DateField.prototype._onDateIconClick = function(event) {
     return;
   }
 
-  if (this.mobile) {
+  if (this.touch) {
     this._datePickerPopup.open();
     this._openDatePicker(this.timestampAsDate);
   } else {
@@ -291,7 +291,7 @@ scout.DateField.prototype._onTimeIconClick = function(event) {
     return;
   }
 
-  if (this.mobile) {
+  if (this.touch) {
     this._datePickerPopup.open();
     this._openDatePicker(this.timestampAsDate);
   } else {

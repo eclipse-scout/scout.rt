@@ -12,22 +12,28 @@ scout.fields = {
       .addClass('icon');
   },
 
-  initMobile: function(field, model) {
+  initTouch: function(field, model) {
     field.embedded = scout.helpers.nvl(model.embedded, false);
-    // when 'mobile' is not set explicitly, check the device
-    field.mobile = scout.helpers.nvl(model.mobile, scout.device.type !== scout.Device.Type.DESKTOP);
+    // when 'touch' is not set explicitly, check the device
+    field.touch = scout.helpers.nvl(model.touch, scout.device.supportsTouch());
   },
 
+  /**
+   * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with inputOrDiv.
+   */
   valOrText: function(field, $field, text) {
-    if (field.mobile) {
+    if (field.touch) {
       $field.text(text);
     } else {
       $field.val(text);
     }
   },
 
+  /**
+   * Creates a DIV element for touch-devices and an INPUT element for all other devices.
+   */
   inputOrDiv: function(field) {
-    if (field.mobile) {
+    if (field.touch) {
       return $.makeDiv('input-field');
     } else {
       return scout.fields.new$TextField();

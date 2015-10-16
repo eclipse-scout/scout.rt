@@ -1,10 +1,10 @@
-scout.DatePickerMobilePopupLayout = function(popup) {
-  scout.DatePickerMobilePopupLayout.parent.call(this, popup);
+scout.DatePickerTouchPopupLayout = function(popup) {
+  scout.DatePickerTouchPopupLayout.parent.call(this, popup);
 };
-scout.inherits(scout.DatePickerMobilePopupLayout, scout.PopupLayout);
+scout.inherits(scout.DatePickerTouchPopupLayout, scout.PopupLayout);
 
-scout.DatePickerMobilePopupLayout.prototype.layout = function($container) {
-  scout.DatePickerMobilePopupLayout.parent.prototype.layout.call(this, $container);
+scout.DatePickerTouchPopupLayout.prototype.layout = function($container) {
+  scout.DatePickerTouchPopupLayout.parent.prototype.layout.call(this, $container);
 
   var dateField = this.popup._dateField,
     sfLeftMargin = 4,
@@ -23,13 +23,13 @@ scout.DatePickerMobilePopupLayout.prototype.layout = function($container) {
 /**
  * @override AbstractLayout.js
  */
-scout.DatePickerMobilePopupLayout.prototype.preferredLayoutSize = function($container) {
+scout.DatePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container) {
   var screenWidth = $(document).width(),
     screenHeight = $(document).height(),
     minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
     maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
     popupWidth = scout.HtmlEnvironment.formColumnWidth,
-    popupHeight = screenHeight / 2 - scout.SmartFieldMobilePopup.TOP_MARGIN;
+    popupHeight = screenHeight / 2 - scout.SmartFieldTouchPopup.TOP_MARGIN;
 
   popupWidth = Math.max(popupWidth, minPopupWidth);
   popupHeight = Math.min(popupHeight, maxPopupHeight);
