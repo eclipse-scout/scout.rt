@@ -104,8 +104,8 @@
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
       padding: 12px 2px !important;
 
-      &.parent,
-      &.children,
+      &.ancestor-of-selected,
+      &.child-of-selected,
       &.selected {
         #scout.font-text-plus();
         display: block;
@@ -123,8 +123,8 @@
       }
 
       /* arrow is created using ::before and ::after*/
-      &.parent::before,
-      &.parent::after,
+      &.ancestor-of-selected::before,
+      &.ancestor-of-selected::after,
       &.selected::before {
         position: absolute;
         left: 50%;
@@ -136,13 +136,13 @@
         z-index: 1;
       }
 
-      &.parent::before {
+      &.ancestor-of-selected::before {
         border-color: @outline-selection-background-color transparent transparent transparent;
         border-width: 8px 13px 0 13px;
         bottom: -9px;
       }
 
-      &.parent::after {
+      &.ancestor-of-selected::after {
         border-color: @outline-group-background-color transparent transparent transparent;
         border-width: 8px 13px 0 13px;
         bottom: -8px;
@@ -154,8 +154,8 @@
         bottom: -8px;
       }
 
-      &.parent.leaf::before,
-      &.parent.leaf::after,
+      &.ancestor-of-selected.leaf::before,
+      &.ancestor-of-selected.leaf::after,
       &.selected.leaf::before {
         display: none;
       }

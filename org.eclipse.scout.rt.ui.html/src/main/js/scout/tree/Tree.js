@@ -168,10 +168,7 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype._postRender = function() {
-  if (this.selectedNodes.length > 0) {
-    this._renderSelection();
-  }
-  this._updateItemPath();
+  this._renderSelection();
 };
 
 scout.Tree.prototype._remove = function() {
@@ -573,8 +570,14 @@ scout.Tree.prototype.deselectNodes = function(nodes) {
 };
 
 scout.Tree.prototype._renderSelection = function() {
-  var i, node, $node,
-    $nodes = [];
+  var i, node, $node;
+
+  // Add children class to root nodes if no nodes are selected
+  if (this.selectedNodes.length === 0) {
+    this.nodes.forEach(function(childNode) {
+      childNode.$node.addClass('child-of-selected');
+    }, this);
+  }
 
   this.selectedNodes.forEach(function(node) {
     $node = node.$node;
@@ -588,16 +591,25 @@ scout.Tree.prototype._renderSelection = function() {
       }
     }
 
-    $nodes.push($node);
-  }, this);
-
-  // render selection
-  for (i = 0; i < $nodes.length; i++) {
-    $node = $nodes[i];
     $node.select(true);
+
     // If node was previously hidden, show it!
     $node.removeClass('hidden');
-  }
+
+    // Mark all ancestor nodes, especially necessary for bread crumb mode
+    var parentNode = node.parentNode;
+    while (parentNode) {
+      parentNode.$node.addClass('ancestor-of-selected');
+      parentNode = parentNode.parentNode;
+    }
+
+    // Mark all child nodes
+    if (node.expanded) {
+      node.childNodes.forEach(function(childNode) {
+        childNode.$node.addClass('child-of-selected');
+      }, this);
+    }
+  }, this);
 
   this._updateItemPath();
   if (this.scrollToSelection) {
@@ -607,10 +619,29 @@ scout.Tree.prototype._renderSelection = function() {
 };
 
 scout.Tree.prototype._removeSelection = function() {
+  // Remove children class on root nodes if no nodes were selected
+  if (this.selectedNodes.length === 0) {
+    this.nodes.forEach(function(childNode) {
+      childNode.$node.removeClass('child-of-selected');
+    }, this);
+  }
+
   this.selectedNodes.forEach(function(node) {
     var $node = node.$node;
     if ($node) { // TODO BSH Check if $node can be undefined
       $node.select(false);
+
+      // remove ancestor and child classes
+      var parentNode = node.parentNode;
+      while (parentNode) {
+        parentNode.$node.removeClass('ancestor-of-selected');
+        parentNode = parentNode.parentNode;
+      }
+      if (node.expanded) {
+        node.childNodes.forEach(function(childNode) {
+          childNode.$node.removeClass('child-of-selected');
+        }, this);
+      }
     }
   }, this);
 };
@@ -653,7 +684,7 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
 
 scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var parentNode, $parentNode;
-  //Append continous node blocks
+  // Append continuous node blocks
 
   if (parentNodeId >= 0) {
     parentNode = this.nodesMap[parentNodeId];
@@ -690,6 +721,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
         // Otherwise render the expansion
         if ($parentNode.hasClass('expanded')) {
           this._addNodes(nodes, $parentNode, $predecessor);
+          this._updateItemPath();
         } else {
           this._renderExpansion(parentNode, $predecessor);
         }
@@ -711,6 +743,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 
     if (this.rendered) {
       this._addNodes(nodes, undefined, $predecessor);
+      this._updateItemPath();
     }
   }
 
@@ -1020,6 +1053,9 @@ scout.Tree.prototype._decorateNode = function(node) {
   if ($node.isSelected()) {
     formerClasses += ' selected';
   }
+  if ($node.hasClass('group')) {
+    formerClasses += ' group';
+  }
   $node.removeClass();
   $node.addClass(formerClasses);
   $node.addClass(node.cssClass);
@@ -1030,6 +1066,14 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.children('.tree-node-checkbox')
     .children('.check-box')
     .toggleClass('disabled', !(this.enabled && node.enabled));
+
+  if (!node.parentNode && this.selectedNodes.length === 0) {
+    // Root nodes have class child-of-selected if no node is selected
+    $node.addClass('child-of-selected');
+  }
+  else if (node.parentNode && this.selectedNodes.indexOf(node.parentNode) > -1) {
+    $node.addClass('child-of-selected');
+  }
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
@@ -1356,41 +1400,12 @@ scout.Tree.prototype._updateItemPath = function() {
     selectedNode = this.selectedNodes[0];
 
   // first remove and select selected
-  this.$data.find('.tree-node').removeClass('parent children group');
-
-  // if no selection: mark all top elements as children
-  if (this.selectedNodes.length === 0) {
-    this.$data.children().addClass('children');
-    return;
-  }
+  this.$data.find('.tree-node').removeClass('group');
 
   // find direct children
   $selectedNodes = this.$selectedNodes();
   $node = $selectedNodes.next();
   level = parseFloat($selectedNodes.attr('data-level'));
-  while ($node.length > 0) {
-    if ($node.hasClass('animation-wrapper')) {
-      $node = $node.children().first();
-    }
-    var l = parseFloat($node.attr('data-level'));
-    if (l === level + 1) {
-      $node.addClass('children');
-    } else if (l === level) {
-      break;
-    }
-    if ($node.next().length === 0 && $node.parent().hasClass('animation-wrapper')) {
-      // If there is no next node but we are inside an animationWrapper, step out the wrapper
-      $node = $node.parent();
-    }
-    $node = $node.next();
-  }
-
-  // Mark all parent nodes, especially necessary for bread crumb mode
-  var parentNode = selectedNode.parentNode;
-  while (parentNode) {
-    parentNode.$node.addClass('parent');
-    parentNode = parentNode.parentNode;
-  }
 
   // find grouping end (ultimate parent)
   var $ultimate;

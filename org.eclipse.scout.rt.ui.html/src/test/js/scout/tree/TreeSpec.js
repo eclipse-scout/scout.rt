@@ -8,12 +8,14 @@ describe("Tree", function() {
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
+    $.fx.off = true;
   });
 
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    $.fx.off = false;
   });
 
   function createModelFixture(nodeCount, depth, expanded) {
@@ -621,6 +623,100 @@ describe("Tree", function() {
       expect(tree.selectedNodes.indexOf(node0) > -1).toBe(true);
       expect(node0.expanded).toBe(true);
     });
+
+    it("sets css class ancestor-of-selected on every ancestor of the selected element", function() {
+      var model = createModelFixture(3, 3);
+      var tree = createTree(model);
+      var nodes = tree.nodes;
+      var node1 = nodes[1];
+      var child1 = node1.childNodes[1];
+      var grandchild1 = child1.childNodes[1];
+
+      tree.render(session.$entryPoint);
+
+      var $parents = tree.$data.find('.tree-node.ancestor-of-selected');
+      expect($parents.length).toBe(0);
+
+      tree.selectNodes(node1);
+      $parents = tree.$data.find('.tree-node.ancestor-of-selected');
+      expect($parents.length).toBe(0);
+
+      tree.selectNodes(child1);
+      $parents = tree.$data.find('.tree-node.ancestor-of-selected');
+      expect($parents.length).toBe(1);
+      expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
+
+      tree.selectNodes(grandchild1);
+      $parents = tree.$data.find('.tree-node.ancestor-of-selected');
+      expect($parents.length).toBe(2);
+      expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
+      expect($parents.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
+
+      tree.clearSelection();
+      $parents = tree.$data.find('.tree-node.ancestor-of-selected');
+      expect($parents.length).toBe(0);
+    });
+
+    it("sets css class child-of-selected on direct children of the selected element", function() {
+      var model = createModelFixture(3, 3, true);
+      var tree = createTree(model);
+      var nodes = tree.nodes;
+      var node1 = nodes[1];
+      var child1 = node1.childNodes[1];
+      var grandchild1 = child1.childNodes[1];
+
+      tree.render(session.$entryPoint);
+
+      var $children = tree.$data.find('.tree-node.child-of-selected');
+      expect($children.length).toBe(3);
+      expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);
+      expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
+      expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
+
+      // all nodes are expanded
+      tree.selectNodes(node1);
+      $children = tree.$data.find('.tree-node.child-of-selected');
+      expect($children.length).toBe(3);
+      expect($children.eq(0)[0]).toBe(nodes[1].childNodes[0].$node[0]);
+      expect($children.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
+      expect($children.eq(2)[0]).toBe(nodes[1].childNodes[2].$node[0]);
+
+      tree.clearSelection();
+      $children = tree.$data.find('.tree-node.child-of-selected');
+      expect($children.length).toBe(3);
+      expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);
+      expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
+      expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
+    });
+  });
+
+
+  describe("expandNode", function() {
+
+  it("sets css class child-of-selected on direct children if the expanded node is selected", function() {
+    var model = createModelFixture(3, 3);
+    var tree = createTree(model);
+    var nodes = tree.nodes;
+    var node1 = nodes[1];
+
+    tree.render(session.$entryPoint);
+
+    tree.selectNodes(node1);
+    var $children = tree.$data.find('.tree-node.child-of-selected');
+    expect($children.length).toBe(0);
+
+    tree.expandNode(node1);
+    $children = tree.$data.find('.tree-node.child-of-selected');
+    expect($children.length).toBe(3);
+    expect($children.eq(0)[0]).toBe(nodes[1].childNodes[0].$node[0]);
+    expect($children.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
+    expect($children.eq(2)[0]).toBe(nodes[1].childNodes[2].$node[0]);
+
+    tree.collapseNode(node1);
+    $children = tree.$data.find('.tree-node.child-of-selected');
+    expect($children.length).toBe(0);
+  });
+
   });
 
   describe("collapseNode", function() {
@@ -657,29 +753,6 @@ describe("Tree", function() {
       grandchild1 = child1.childNodes[1];
     });
 
-    it("Sets css class parent on every ancestor of the selected element", function() {
-      tree.render(session.$entryPoint);
-
-      tree.selectNodes([]);
-      var $parents = tree.$data.find('.tree-node.parent');
-      expect($parents.length).toBe(0);
-
-      tree.selectNodes(node1);
-      $parents = tree.$data.find('.tree-node.parent');
-      expect($parents.length).toBe(0);
-
-      tree.selectNodes(child1);
-      $parents = tree.$data.find('.tree-node.parent');
-      expect($parents.length).toBe(1);
-      expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
-
-      tree.selectNodes(grandchild1);
-      $parents = tree.$data.find('.tree-node.parent');
-      expect($parents.length).toBe(2);
-      expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
-      expect($parents.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
-    });
-
     it("Sets css class group on every element within the same group", function() {
       tree.render(session.$entryPoint);
       tree._isGroupingEnd = function(node) {
@@ -713,15 +786,6 @@ describe("Tree", function() {
   });
 
   describe("tree filter", function() {
-
-    beforeEach(function() {
-      // Disable animation
-      $.fx.off = true;
-    });
-
-    afterEach(function() {
-      $.fx.off = false;
-    });
 
     it("filters nodes when filter() is called", function() {
       var model = createModelFixture(1, 1, true);
@@ -1258,16 +1322,16 @@ describe("Tree", function() {
     });
 
     describe("nodeChanged event", function() {
-      var model;
-      var tree;
-      var node0;
-      var child0;
+      var model, tree, nodes, node0, node1, child0, child1_1;
 
       beforeEach(function() {
         model = createModelFixture(3, 3, false);
         tree = createTree(model);
-        node0 = model.nodes[0];
+        nodes = tree.nodes;
+        node0 = nodes[0];
+        node1 = nodes[1];
         child0 = node0.childNodes[0];
+        child1_1 = node1.childNodes[1];
       });
 
       it("updates the text of the model node", function() {
@@ -1336,6 +1400,86 @@ describe("Tree", function() {
         // check if other classes are still there
         expect($node0).toHaveClass('tree-node');
         expect($node0).toHaveClass('selected');
+      });
+
+      it("preserves child-of-selected when root nodes get updated", function() {
+        tree.selectedNodes = [];
+        tree.render(session.$entryPoint);
+
+        var $children = tree.$data.find('.tree-node.child-of-selected');
+        expect($children.length).toBe(3);
+        expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);
+        expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
+        expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
+
+        var event = createNodeChangedEvent(model, node1.id);
+        event.text = 'new text';
+        var message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        expect(node1.text).toBe(event.text);
+
+        $children = tree.$data.find('.tree-node.child-of-selected');
+        expect($children.length).toBe(3);
+        expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);
+        expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
+        expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
+      });
+
+      it("preserves child-of-selected when child nodes get updated", function() {
+        tree.selectedNodes = [node1];
+        node1.expanded = true;
+        tree.render(session.$entryPoint);
+
+        var $children = tree.$data.find('.tree-node.child-of-selected');
+        expect($children.length).toBe(3);
+        expect($children.eq(0)[0]).toBe(node1.childNodes[0].$node[0]);
+        expect($children.eq(1)[0]).toBe(node1.childNodes[1].$node[0]);
+        expect($children.eq(2)[0]).toBe(node1.childNodes[2].$node[0]);
+
+        var event = createNodeChangedEvent(model, child1_1.id);
+        event.text = 'new text';
+        var message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        expect(child1_1.text).toBe(event.text);
+
+        $children = tree.$data.find('.tree-node.child-of-selected');
+        expect($children.length).toBe(3);
+        expect($children.eq(0)[0]).toBe(node1.childNodes[0].$node[0]);
+        expect($children.eq(1)[0]).toBe(node1.childNodes[1].$node[0]);
+        expect($children.eq(2)[0]).toBe(node1.childNodes[2].$node[0]);
+      });
+
+      it("preserves group css class when nodes get updated", function() {
+        tree.selectedNodes = [node1];
+        node1.expanded = false;
+        tree.render(session.$entryPoint);
+
+        tree._isGroupingEnd = function(node) {
+          return node.nodeType === 'groupingParent';
+        };
+
+        var $groupNodes = tree.$data.find('.tree-node.group');
+        expect($groupNodes.length).toBe(1);
+        expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
+
+        var event = createNodeChangedEvent(model, node1.id);
+        event.text = 'new text';
+        var message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        expect(node1.text).toBe(event.text);
+
+        $groupNodes = tree.$data.find('.tree-node.group');
+        expect($groupNodes.length).toBe(1);
+        expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
       });
 
     });
