@@ -224,6 +224,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template");
     EXT_TO_MIME_TYPE_MAP.put("xlam", "application/vnd.ms-excel.addin.macroEnabled.12");
     EXT_TO_MIME_TYPE_MAP.put("xlsb", "application/vnd.ms-excel.sheet.binary.macroEnabled.12");
+    EXT_TO_MIME_TYPE_MAP.put("vsto", "application/x-ms-vsto");
     EXT_TO_MIME_TYPE_MAP.put("xml", "text/xml");
     EXT_TO_MIME_TYPE_MAP.put("xpm", "image/x-xpixmap");
     EXT_TO_MIME_TYPE_MAP.put("xwd", "image/x-xwindowdump");
