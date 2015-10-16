@@ -180,7 +180,12 @@ public class InvocationContext<PORT> {
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withUsername(final String username) {
-    getRequestContext().put(InvocationContext.PROP_USERNAME, username);
+    if (username != null) {
+      getRequestContext().put(InvocationContext.PROP_USERNAME, username);
+    }
+    else {
+      getRequestContext().remove(InvocationContext.PROP_USERNAME);
+    }
     return this;
   }
 
@@ -190,7 +195,12 @@ public class InvocationContext<PORT> {
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withPassword(final String password) {
-    getRequestContext().put(InvocationContext.PROP_PASSWORD, password);
+    if (password != null) {
+      getRequestContext().put(InvocationContext.PROP_PASSWORD, password);
+    }
+    else {
+      getRequestContext().remove(InvocationContext.PROP_PASSWORD);
+    }
     return this;
   }
 
