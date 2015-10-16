@@ -50,7 +50,7 @@ public class HtmlDocumentParser {
     replaceIncludeTags();
     replaceMessageTags();
     replaceStylesheetTags();
-    replaceScriptTags_New();
+    replaceScriptTags();
     return m_workingContent.getBytes(Encoding.UTF_8);
   }
 
@@ -120,7 +120,7 @@ public class HtmlDocumentParser {
     replaceScriptTags(PATTERN_STYLESHEET_TAG, "<link rel=\"stylesheet\" type=\"text/css\" href=\"", "\">");
   }
 
-  protected void replaceScriptTags_New() throws IOException {
+  protected void replaceScriptTags() throws IOException {
     // <scout:script src="scout-all-macro.css" />
     replaceScriptTags(PATTERN_SCRIPT_TAG, "<script src=\"", "\"></script>");
   }
