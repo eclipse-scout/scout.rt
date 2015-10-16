@@ -206,6 +206,7 @@ __include("scout/desktop/outline/OutlineTreeExpandOrDrillDownKeyStroke.js");
 __include("scout/desktop/outline/OutlineTreeNavigationDownKeyStroke.js");
 __include("scout/desktop/outline/OutlineViewButton.js");
 __include("scout/desktop/outline/SearchOutline.js");
+__include("scout/desktop/outline/SearchOutlineLayout.js");
 // Basics for form fields
 __include("scout/form/Form.js");
 __include("scout/form/FormLayout.js");

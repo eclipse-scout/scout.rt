@@ -6,12 +6,6 @@ scout.SearchOutline = function() {
 };
 scout.inherits(scout.SearchOutline, scout.Outline);
 
-scout.SearchOutline.prototype._init = function(model) {
-  scout.SearchOutline.parent.prototype._init.call(this, model);
-
-  this.titleVisible = false;
-};
-
 /**
  * @override Tree.js
  */
@@ -37,15 +31,18 @@ scout.SearchOutline.prototype._createKeyStrokeContextForSearchField = function()
 
 scout.SearchOutline.prototype._render = function($parent) {
   scout.SearchOutline.parent.prototype._render.call(this, $parent);
-  // insert the search-panel _above_ the $container
-  this.$searchPanel = $parent.prependDiv('search-panel');
+
+  // Override layout
+  this.htmlComp.setLayout(new scout.SearchOutlineLayout(this));
+
+  this.$container.addClass('search-outline');
+  this.$searchPanel = this.$container.prependDiv('search-outline-panel');
   this.$queryField = $('<input>')
-    .addClass('search-field')
-    .placeholder(this.session.text('ui.SearchFor_'))
+    .addClass('search-outline-field')
     .on('input', this._onQueryFieldInput.bind(this))
     .on('keypress', this._onQueryFieldKeyPress.bind(this))
     .appendTo(this.$searchPanel);
-  this.$searchStatus = this.$searchPanel.appendDiv('search-status');
+  this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status');
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 
@@ -62,11 +59,38 @@ scout.SearchOutline.prototype._renderProperties = function() {
   this._renderRequestFocusQueryField();
 };
 
+scout.SearchOutline.prototype._renderTitle = function() {
+  scout.SearchOutline.parent.prototype._renderTitle.call(this);
+  // Move before search panel
+  this.$title.insertBefore(this.$searchPanel);
+};
+
 scout.SearchOutline.prototype._renderSearchQuery = function(searchQuery) {
   this.$queryField.val(searchQuery);
 };
 
 scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
+  var animate = this.rendered;
+
+  if (searchStatus && !this.$searchStatus.isVisible()) {
+    if (animate) {
+      this.$searchStatus.slideDown({
+        duration: 200,
+        progress: this.revalidateLayout.bind(this)
+      });
+    } else {
+      this.$searchStatus.show();
+    }
+  } else if (!searchStatus && this.$searchStatus.isVisible()) {
+    if (animate) {
+      this.$searchStatus.slideUp({
+        duration: 200,
+        progress: this.revalidateLayout.bind(this)
+      });
+    } else {
+      this.$searchStatus.hide();
+    }
+  }
   this.$searchStatus.textOrNbsp(searchStatus);
 };
 
@@ -75,7 +99,9 @@ scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
 };
 
 scout.SearchOutline.prototype._sendSearch = function() {
-  this._send('search', {query: this.searchQuery});
+  this._send('search', {
+    query: this.searchQuery
+  });
 };
 
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {

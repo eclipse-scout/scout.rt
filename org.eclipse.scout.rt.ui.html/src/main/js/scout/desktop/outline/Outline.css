@@ -1,4 +1,8 @@
 @breadcrumb-border-color: @outline-selection-background-color;
+@outline-title-border-color: @outline-selection-background-color;
+@outline-title-margin-left: 12px;
+@outline-title-margin-right: 17px;
+@outline-title-margin-bottom: 12px;
 
 /* we have to combine this with .outline, otherwise the definition would not be specific enough */
 .outline.tree {
@@ -20,9 +24,9 @@
     cursor: pointer;
     #scout.font-text-large();
     #scout.overflow-ellipsis-nowrap();
-    padding: 13px 2px 13px 6px;
-    margin: 0 17px 12px 12px;
-    border-bottom: 1px solid @breadcrumb-border-color;
+    padding: 24px 2px 13px 6px;
+    margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
+    border-bottom: 1px solid @outline-title-border-color;
   }
 }
 

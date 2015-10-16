@@ -66,6 +66,9 @@ scout.Outline.prototype._render = function($parent) {
       this._showOutlineOverview();
     }
   }
+};
+
+scout.Outline.prototype._renderProperties = function() {
   this._renderTitleVisible();
 };
 

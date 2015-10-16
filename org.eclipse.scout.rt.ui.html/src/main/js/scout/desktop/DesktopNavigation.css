@@ -17,7 +17,6 @@
 .navigation-container {
   position: relative;
   width: 100%;
-  padding-top: 11px;
   height: calc(~'100%' - @view-buttons-height);
 }
 
