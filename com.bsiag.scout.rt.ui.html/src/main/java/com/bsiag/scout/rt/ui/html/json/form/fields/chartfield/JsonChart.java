@@ -27,19 +27,19 @@ import com.bsiag.scout.rt.shared.chart.IChartBean;
 import com.bsiag.scout.rt.shared.chart.IChartValueGroupBean;
 
 /**
- *
+ * @since 5.2
  */
 public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserver<CHART> {
+
   public static final String EVENT_VALUE_CLICKED = "valueClicked";
 
-  /**
-   * @param model
-   * @param uiSession
-   * @param id
-   * @param parent
-   */
   public JsonChart(CHART model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
+  }
+
+  @Override
+  public String getObjectType() {
+    return "Chart";
   }
 
   @Override
@@ -56,38 +56,7 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
       public Object prepareValueForToJson(Object value) {
         return MainJsonObjectFactory.get().createJsonObject(value).toJson();
       }
-
-//      @Override
-//      public Object prepareValueForToJson(Object value) {
-//        JSONObject jsonChartBean = new JSONObject();
-//        JSONArray jsonChartAxes = new JSONArray();
-//        JSONArray jsonChartValueGroups = new JSONArray();
-//        if (getModel().getChartData() != null) {
-//          if (getModel().getChartData().getAxes() != null) {
-//            for (List<String> axis : getModel().getChartData().getAxes()) {
-//              jsonChartAxes.put(axisToJson(axis));
-//            }
-//          }
-//          for (IChartValueGroupBean chartValueGroupBean : getModel().getChartData().getChartValueGroups()) {
-//            jsonChartValueGroups.put(chartValueGroupBeanToJson(chartValueGroupBean));
-//          }
-//
-//          jsonChartBean.put("customProperties", getModel().getChartData().getCustomProperties());
-//        }
-//        jsonChartBean.put("axes", jsonChartAxes);
-//        jsonChartBean.put("chartValueGroups", jsonChartValueGroups);
-//
-//        return jsonChartBean;
-//      }
     });
-
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoColor();
-      }
-    });
-
     putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
       @Override
       protected Boolean modelValue() {
@@ -118,17 +87,18 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
         return getModel().getMaxSegments();
       }
     });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_MODEL_HANDELS_CLICK, model) {
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CLICKABLE, model) {
       @Override
       protected Object modelValue() {
-        return getModel().isModelHandelsClick();
+        return getModel().isClickable();
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "Chart";
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_MODEL_HANDLES_CLICK, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isModelHandlesClick();
+      }
+    });
   }
 
   @Override
@@ -166,5 +136,4 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
     }
     return jsonAxisValues;
   }
-
 }

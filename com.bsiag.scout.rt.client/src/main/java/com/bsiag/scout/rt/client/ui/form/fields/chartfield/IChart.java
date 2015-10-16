@@ -16,9 +16,10 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import com.bsiag.scout.rt.shared.chart.IChartBean;
 
 /**
- *
+ * @since 5.2
  */
 public interface IChart extends IPropertyObserver, ITypeWithClassId {
+
   int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
   String PROP_AUTO_COLOR = "autoColor";
@@ -28,7 +29,18 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
   String PROP_VISIBLE = "visible";
   String PROP_CONTAINER = "chartContainer";
   String PROP_MAX_SEGMENTS = "maxSegments";
-  String PROP_MODEL_HANDELS_CLICK = "modelHandlesClick";
+  String PROP_CLICKABLE = "clickable";
+  String PROP_MODEL_HANDLES_CLICK = "modelHandlesClick";
+
+  IChartUIFacade getUIFacade();
+
+  void setContainerInternal(ITypeWithClassId container);
+
+  ITypeWithClassId getContainer();
+
+  void addChartListener(ChartListener listener);
+
+  void removeChartListener(ChartListener listener);
 
   void setChartType(int chartType);
 
@@ -37,12 +49,6 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
   void setAutoColor(boolean isAutoColor);
 
   boolean isAutoColor();
-
-  IChartUIFacade getUIFacade();
-
-  void addChartListener(ChartListener listener);
-
-  void removeChartListener(ChartListener listener);
 
   void setChartData(IChartBean data);
 
@@ -56,14 +62,6 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
 
   boolean isVisible();
 
-  void setContainerInternal(ITypeWithClassId container);
-
-  void setModelHandelsClick(boolean modelHandelsClick);
-
-  boolean isModelHandelsClick();
-
-  ITypeWithClassId getContainer();
-
   /**
    * used for pie charts to limit segments-> if set, smallest segments are collapsed
    */
@@ -74,4 +72,11 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
    */
   void setMaxSegments(int maxSegments);
 
+  void setClickable(boolean clickable);
+
+  boolean isClickable();
+
+  void setModelHandlesClick(boolean modelHandlesClick);
+
+  boolean isModelHandlesClick();
 }

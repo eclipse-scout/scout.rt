@@ -16,18 +16,16 @@ import java.util.EventObject;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 /**
- *
+ * @since 5.2
  */
 public class ChartEvent extends EventObject implements IModelEvent {
+  private static final long serialVersionUID = 1L;
 
   public static final int TYPE_VALUE_CLICKED = 1;
 
-  private static final long serialVersionUID = 1L;
-
   private final int m_type;
 
-  private int m_axisPosition[];
-
+  private int m_axesPosition[];
   private BigDecimal m_value;
 
   public ChartEvent(IChart source, int type) {
@@ -48,23 +46,22 @@ public class ChartEvent extends EventObject implements IModelEvent {
   /**
    * Used for TYPE_VALUE_CLICKED
    */
-  public int[] getAxisPosition() {
-    return m_axisPosition;
+  public int[] getAxesPosition() {
+    return m_axesPosition;
   }
 
   /**
    * Used for TYPE_VALUE_CLICKED
    */
-  public void setAxesPosition(int axisPosition[]) {
-    m_axisPosition = axisPosition;
+  public void setAxesPosition(int[] axesPosition) {
+    m_axesPosition = axesPosition;
   }
 
   public BigDecimal getValue() {
     return m_value;
   }
 
-  public void setValue(BigDecimal m_value) {
-    this.m_value = m_value;
+  public void setValue(BigDecimal value) {
+    m_value = value;
   }
-
 }

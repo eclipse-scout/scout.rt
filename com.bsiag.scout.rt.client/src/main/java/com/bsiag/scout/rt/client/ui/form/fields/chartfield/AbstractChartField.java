@@ -18,16 +18,16 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
- *
+ * @since 5.2
  */
 @ClassId("cee88505-5685-438d-a87d-591c54efe8d7")
 public class AbstractChartField<T extends IChart> extends AbstractFormField implements IChartField<T> {
+
   private T m_chart;
 
   public AbstractChartField() {
@@ -51,6 +51,22 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
         }
       }
     });
+  }
+
+  protected Class<? extends IChart> getConfiguredChart() {
+    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IChart>> f = ConfigurationUtility.filterClasses(dca, IChart.class);
+    if (f.size() == 1) {
+      return CollectionUtility.firstElement(f);
+    }
+    else {
+      for (Class<? extends IChart> c : f) {
+        if (c.getDeclaringClass() != AbstractChartField.class) {
+          return c;
+        }
+      }
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -88,14 +104,12 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
     if (m_chart == chart) {
       return;
     }
-    if (m_chart instanceof AbstractChart) {
-      ((AbstractChart) m_chart).setContainerInternal(null);
+    if (m_chart != null) {
+      m_chart.setContainerInternal(null);
     }
     m_chart = chart;
-    if (m_chart instanceof AbstractTable) {
-      ((AbstractChart) m_chart).setContainerInternal(this);
-    }
     if (m_chart != null) {
+      m_chart.setContainerInternal(this);
       m_chart.setEnabled(isEnabled());
     }
     boolean changed = propertySupport.setProperty(PROP_CHART, m_chart);
@@ -107,22 +121,6 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
     }
   }
 
-  protected Class<? extends IChart> getConfiguredChart() {
-    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IChart>> f = ConfigurationUtility.filterClasses(dca, IChart.class);
-    if (f.size() == 1) {
-      return CollectionUtility.firstElement(f);
-    }
-    else {
-      for (Class<? extends IChart> c : f) {
-        if (c.getDeclaringClass() != AbstractChartField.class) {
-          return c;
-        }
-      }
-      return null;
-    }
-  }
   // TODO export import
   // TODO interception
-
 }

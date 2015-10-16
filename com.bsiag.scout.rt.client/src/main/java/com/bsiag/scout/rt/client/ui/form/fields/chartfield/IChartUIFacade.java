@@ -13,13 +13,12 @@ package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 import java.math.BigDecimal;
 
 /**
- *
+ * @since 5.2
  */
 public interface IChartUIFacade {
+
   /**
    * position for all axes in IChartBean.getAxes() ordered in same order like axes.
-   *
-   * @param axisPosition
    */
   public void fireUIValueClicked(int[] axesPosition, BigDecimal value);
 }

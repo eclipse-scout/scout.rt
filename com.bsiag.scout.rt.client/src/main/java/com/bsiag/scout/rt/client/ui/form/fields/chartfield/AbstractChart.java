@@ -21,14 +21,18 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.BEANS;
 
 import com.bsiag.scout.rt.shared.chart.IChartBean;
 import com.bsiag.scout.rt.shared.chart.IChartType;
 
+/**
+ * @since 5.2
+ */
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
 public abstract class AbstractChart extends AbstractPropertyObserver implements IChart {
+  // TODO make extendable
+
   private IChartUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
 
@@ -42,8 +46,91 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
     }
   }
 
-  private void callInitializer() {
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    if (getContainer() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+    }
+    return simpleClassId;
+  }
+
+  protected void callInitializer() {
     initConfig();
+  }
+
+  /*
+   * Configuration
+   */
+  protected void initConfig() {
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+    setChartType(getConfiguredChartType());
+    setAutoColor(getConfiguredAutoColor());
+    setEnabled(getConfiguredEnabled());
+    setVisible(getConfiguredVisible());
+    setMaxSegments(getConfiguredMaxSegments());
+    setClickable(getConfiguredClickable());
+    setModelHandlesClick(getConfiguredModelHandelsClick());
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(10)
+  protected int getConfiguredChartType() {
+    return IChartType.PIE;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(20)
+  protected boolean getConfiguredAutoColor() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(20)
+  protected boolean getConfiguredEnabled() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(20)
+  protected boolean getConfiguredVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(30)
+  protected int getConfiguredMaxSegments() {
+    return DEFAULT_MAX_SEGMENTS_PIE;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(40)
+  protected boolean getConfiguredModelHandelsClick() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(40)
+  protected boolean getConfiguredClickable() {
+    return false;
+  }
+
+  @Override
+  public IChartUIFacade getUIFacade() {
+    return m_uiFacade;
+  }
+
+  /**
+   * do not use this internal method unless you are implementing a container that holds and controls an {@link IChart}
+   */
+  @Override
+  public void setContainerInternal(ITypeWithClassId container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
+  }
+
+  @Override
+  public ITypeWithClassId getContainer() {
+    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
   }
 
   @Override
@@ -54,6 +141,16 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   @Override
   public void removeChartListener(ChartListener listener) {
     m_listenerList.remove(ChartListener.class, listener);
+  }
+
+  public void fireValueClicked(int[] axesPosition, BigDecimal value) {
+    ChartEvent e = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
+    e.setAxesPosition(axesPosition);
+    e.setValue(value);
+    ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
+    for (ChartListener l : listeners) {
+      l.chartValueClicked(e);
+    }
   }
 
   @Override
@@ -87,26 +184,8 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public IChartUIFacade getUIFacade() {
-    return m_uiFacade;
-  }
-
-  @Override
   public void setEnabled(boolean enabled) {
     propertySupport.setPropertyBool(PROP_ENABLED, enabled);
-  }
-
-  /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITable}
-   */
-  @Override
-  public void setContainerInternal(ITypeWithClassId container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
-  }
-
-  @Override
-  public ITypeWithClassId getContainer() {
-    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
   }
 
   @Override
@@ -135,79 +214,30 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public boolean isModelHandelsClick() {
-    return propertySupport.getPropertyBool(PROP_MODEL_HANDELS_CLICK);
+  public boolean isClickable() {
+    return propertySupport.getPropertyBool(PROP_CLICKABLE);
   }
 
   @Override
-  public void setModelHandelsClick(boolean modelHandelsClick) {
-    propertySupport.setPropertyBool(PROP_MODEL_HANDELS_CLICK, modelHandelsClick);
+  public void setClickable(boolean clickable) {
+    propertySupport.setPropertyBool(PROP_CLICKABLE, clickable);
   }
 
-  /*
-   * Configuration
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(10)
-  protected int getConfiguredChartType() {
-    return IChartType.PIE;
+  @Override
+  public boolean isModelHandlesClick() {
+    return propertySupport.getPropertyBool(PROP_MODEL_HANDLES_CLICK);
   }
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(20)
-  protected boolean getConfiguredAutoColor() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(30)
-  protected int getConfiguredMaxSegments() {
-    return DEFAULT_MAX_SEGMENTS_PIE;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(40)
-  protected boolean getConfiguredModelHandelsClick() {
-    return false;
-  }
-
-  protected void initConfig() {
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    setChartType(getConfiguredChartType());
-    setAutoColor(getConfiguredAutoColor());
-    setMaxSegments(getConfiguredMaxSegments());
-  }
-
-  public void fireValueClicked(int[] axesPosition, BigDecimal value) {
-    ChartEvent e = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
-    e.setAxesPosition(axesPosition);
-    e.setValue(value);
-    ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
-    for (ChartListener l : listeners) {
-      l.chartValueClicked(e);
-    }
+  @Override
+  public void setModelHandlesClick(boolean modelHandlesClick) {
+    propertySupport.setPropertyBool(PROP_MODEL_HANDLES_CLICK, modelHandlesClick);
   }
 
   protected class P_UIFacade implements IChartUIFacade {
-    /**
-     * position for all axes in IChartBean.getAxes() ordered in same order like axes.
-     *
-     * @param axisPosition
-     */
+
     @Override
     public void fireUIValueClicked(int[] axesPosition, BigDecimal value) {
       fireValueClicked(axesPosition, value);
     }
   }
-
-  @Override
-  public String classId() {
-    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
-    }
-    return simpleClassId;
-  }
-
-  // TODO make extendable
 }

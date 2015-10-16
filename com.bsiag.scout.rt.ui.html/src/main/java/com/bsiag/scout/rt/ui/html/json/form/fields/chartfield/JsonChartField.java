@@ -19,16 +19,10 @@ import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChart;
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChartField;
 
 /**
- *
+ * @since 5.2
  */
 public class JsonChartField<CHART_FIELD extends IChartField<? extends IChart>> extends JsonFormField<CHART_FIELD> {
 
-  /**
-   * @param model
-   * @param uiSession
-   * @param id
-   * @param parent
-   */
   public JsonChartField(CHART_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
@@ -48,5 +42,4 @@ public class JsonChartField<CHART_FIELD extends IChartField<? extends IChart>> e
       }
     });
   }
-
 }

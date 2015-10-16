@@ -13,8 +13,9 @@ package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 import java.util.EventListener;
 
 /**
- *
+ * @since 5.2
  */
 public interface ChartListener extends EventListener {
+
   void chartValueClicked(ChartEvent e);
 }

@@ -13,7 +13,7 @@ package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- *
+ * @since 5.2
  */
 public interface IChartField<T extends IChart> extends IFormField {
 
