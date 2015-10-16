@@ -14,13 +14,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 
 import javax.jws.WebMethod;
+import javax.mail.MessageContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.BindingProvider;
 
@@ -44,11 +44,16 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * This context represents a webservice Port to interact with a webservice endpoint, and is associated with a dedicated
- * Port, meaning that it can be used concurrently among other Ports. Request properties are inherited from
- * {@link AbstractJaxWsClient}, and can be overwritten for the scope of this context. That is useful if having a port
- * with some operations require some different properties set, e.g. another read-timeout to transfer big data. Also, if
- * associated with a transaction, respective commit or rollback listeners are called upon leaving the transaction
- * boundary, e.g. to implement a <code>2-phase-commit-protocol (2PC)</code> for the webservice operations invoked.
+ * Port, meaning that it can be used concurrently among other Ports. However, this context itself is not threadsafe and
+ * therefore not to be used for concurrent webservice requests. That is due to a restriction of the JAX-WS API which
+ * does not require the Port to be threadsafe. If a webservice is to be consumed concurrently, use different
+ * {@link InvocationContext} instances instead.
+ * <p>
+ * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
+ * context. That is useful if having a port with some operations require some different properties set, e.g. another
+ * read-timeout to transfer big data. Also, if associated with a transaction, respective commit or rollback listeners
+ * are called upon leaving the transaction boundary, e.g. to implement a <code>2-phase-commit-protocol (2PC)</code> for
+ * the webservice operations invoked.
  *
  * @since 5.1
  */
@@ -64,15 +69,16 @@ public class InvocationContext<PORT> {
   protected IRollbackListener m_rollbackListener;
 
   private final String m_name;
+  protected final PORT m_port;
   protected final PORT m_portProxy;
-  protected final Map<String, Object> m_requestContext;
 
   @SuppressWarnings("unchecked")
   public InvocationContext(final PORT port, final String name) throws ProcessingException {
     m_name = name;
     m_implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
+    m_port = port;
+    // Create a dynamic Java Proxy to wrap the Port to intercept webservice requests and enable request cancellation.
     m_portProxy = (PORT) Proxy.newProxyInstance(port.getClass().getClassLoader(), port.getClass().getInterfaces(), createInvocationHandler(port));
-    m_requestContext = new HashMap<>();
 
     final ITransaction tx = ITransaction.CURRENT.get();
     if (tx != null) {
@@ -85,6 +91,24 @@ public class InvocationContext<PORT> {
    */
   public PORT getPort() {
     return m_portProxy;
+  }
+
+  /**
+   * Returns the context that is used to initialize the message context for request messages. Every subsequent operation
+   * uses this very same request context instance, meaning that values are not removed once an operation completed. Of
+   * course, values can be overwritten or removed manually.
+   */
+  public Map<String, Object> getRequestContext() {
+    return ((BindingProvider) m_port).getRequestContext();
+  }
+
+  /**
+   * Returns the context that resulted from processing a response message. The returned context is for the most recently
+   * completed operation. Subsequent operations return with another response context. The response context is
+   * <code>null</code> until the first operation returns.
+   */
+  public Map<String, Object> getResponseContext() {
+    return ((BindingProvider) m_port).getResponseContext();
   }
 
   /**
@@ -122,13 +146,32 @@ public class InvocationContext<PORT> {
   }
 
   /**
+   * Sets a request context property for this {@link InvocationContext}. That way processing related state can be shared
+   * among JAX-WS handlers and the JAX-WS implementor. See {@link MessageContext} property constants for some standard
+   * properties.
+   *
+   * @return <code>this</code> in order to support for method chaining.
+   */
+  public InvocationContext<PORT> withRequestContextProperty(final String key, final Object value) {
+    getRequestContext().put(key, value);
+    return this;
+  }
+
+  /**
    * Sets the URL of the webservice endpoint for this {@link InvocationContext}.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withEndpointUrl(final String endpointUrl) {
-    m_requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointUrl);
+    getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointUrl);
     return this;
+  }
+
+  /**
+   * Returns the URL of the webservice endpoint for this {@link InvocationContext}.
+   */
+  public String getEndpointUrl() {
+    return (String) getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
   }
 
   /**
@@ -137,7 +180,7 @@ public class InvocationContext<PORT> {
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withUsername(final String username) {
-    m_requestContext.put(InvocationContext.PROP_USERNAME, username);
+    getRequestContext().put(InvocationContext.PROP_USERNAME, username);
     return this;
   }
 
@@ -147,7 +190,7 @@ public class InvocationContext<PORT> {
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withPassword(final String password) {
-    m_requestContext.put(InvocationContext.PROP_PASSWORD, password);
+    getRequestContext().put(InvocationContext.PROP_PASSWORD, password);
     return this;
   }
 
@@ -159,7 +202,7 @@ public class InvocationContext<PORT> {
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withConnectTimeout(final Integer connectTimeout) {
-    m_implementorSpecifics.setSocketConnectTimeout(m_requestContext, (int) NumberUtility.nvl(connectTimeout, 0));
+    m_implementorSpecifics.setSocketConnectTimeout(getRequestContext(), (int) NumberUtility.nvl(connectTimeout, 0));
     return this;
   }
 
@@ -171,53 +214,49 @@ public class InvocationContext<PORT> {
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> withReadTimeout(final Integer readTimeout) {
-    m_implementorSpecifics.setSocketReadTimeout(m_requestContext, (int) NumberUtility.nvl(readTimeout, 0));
+    m_implementorSpecifics.setSocketReadTimeout(getRequestContext(), (int) NumberUtility.nvl(readTimeout, 0));
     return this;
   }
 
   /**
-   * Sets a context property for this {@link InvocationContext} to be used in JAX-WS handlers.
+   * Sets a HTTP request header with the given name and value for this {@link InvocationContext} to be sent to the
+   * endpoint.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> withContextProperty(final String key, final Object value) {
-    m_requestContext.put(key, value);
+  public InvocationContext<PORT> withHttpRequestHeader(final String name, final String value) {
+    m_implementorSpecifics.setHttpRequestHeader(getRequestContext(), name, value);
     return this;
   }
 
   /**
-   * Sets a HTTP request header for this {@link InvocationContext} to be sent to the endpoint.
-   *
-   * @return <code>this</code> in order to support for method chaining.
-   */
-  public InvocationContext<PORT> withHttpRequestHeader(final String key, final String value) {
-    m_implementorSpecifics.setHttpRequestHeader(m_requestContext, key, value);
-    return this;
-  }
-
-  /**
-   * Returns a HTTP response header of the previous webservice request, or <code>null</code> if not available.
+   * Returns the requested HTTP response header for the most recently completed operation, or <code>null</code> if not
+   * found or the operation did not complete yet.
    */
   public List<String> getHttpResponseHeader(final String key) {
-    final Map<String, Object> responseContext = ((BindingProvider) m_portProxy).getResponseContext();
+    final Map<String, Object> responseContext = getResponseContext();
     return (responseContext != null ? m_implementorSpecifics.getHttpResponseHeader(responseContext, key) : null);
   }
 
   /**
-   * Returns the HTTP status code of the previous webservice request, or <code>-1</code> if not available yet. See the
-   * constants on {@link HttpServletResponse} for valid response codes.
+   * Returns the HTTP status code for the most recently completed operation, or <code>-1</code> if not available yet.
+   * See the constants on {@link HttpServletResponse} for valid response codes.
    */
   public int getHttpStatusCode() {
-    final Map<String, Object> responseContext = ((BindingProvider) m_portProxy).getResponseContext();
+    final Map<String, Object> responseContext = getResponseContext();
     return (responseContext != null ? m_implementorSpecifics.getHttpStatusCode(responseContext).intValue() : -1);
   }
 
   /**
-   * Method invoked to apply the given 'requestContext' to the port.
+   * Returns the value for the given context property of processing the most recent completed operation, or
+   * <code>null</code> if not found, or the request did not complete yet.
+   * <p>
+   * Typically, the context contains some processing related information, either put by a JAX-WS handler or the JAX-WS
+   * implementor. See {@link MessageContext} property constants for some standard properties.
    */
-  @Internal
-  protected void applyRequestContext(final PORT port, final Map<String, Object> requestContext) {
-    ((BindingProvider) port).getRequestContext().putAll(requestContext);
+  public Object getResponseContextProperty(String key) {
+    final Map<String, Object> responseContext = getResponseContext();
+    return responseContext != null ? responseContext.get(key) : null;
   }
 
   /**
@@ -251,8 +290,7 @@ public class InvocationContext<PORT> {
         return method.invoke(m_port, args); // not a webservice method.
       }
       else {
-        Assertions.assertNotNullOrEmpty((String) m_requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY), "Endpoint URL must not be null or empty");
-        applyRequestContext(m_port, m_requestContext);
+        Assertions.assertNotNullOrEmpty(getEndpointUrl(), "Endpoint URL must not be null or empty");
         return invokeCancellableWebMethod(m_port, method, args);
       }
     }

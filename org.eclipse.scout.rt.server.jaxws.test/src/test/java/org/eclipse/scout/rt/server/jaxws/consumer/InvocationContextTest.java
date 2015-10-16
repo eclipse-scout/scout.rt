@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
@@ -34,6 +35,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -75,13 +77,13 @@ public class InvocationContextTest {
   @Before
   public void before() {
     m_port = mock(TestPort.class);
+    when(m_port.getRequestContext()).thenReturn(new HashMap<String, Object>());
     m_commitListener = mock(ICommitListener.class);
     m_rollbackListener = mock(IRollbackListener.class);
     m_implementorSpecifics = mock(JaxWsImplementorSpecifics.class);
 
     when(m_commitListener.onCommitPhase1()).thenReturn(true);
-
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(JaxWsImplementorSpecifics.class, m_implementorSpecifics).withReplace(true));
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(BEANS.get(JaxWsImplementorSpecifics.class).getClass(), m_implementorSpecifics).withReplace(true));
   }
 
   @After
@@ -102,8 +104,7 @@ public class InvocationContextTest {
         currentTransaction.setValue(ITransaction.CURRENT.get());
 
         InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-        invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
-
+        invocationContext.withEndpointUrl("http://localhost");
         invocationContext.whenCommit(m_commitListener);
         invocationContext.whenRollback(m_rollbackListener);
         invocationContext.whenInvoke(new InvocationHandler() {
@@ -150,7 +151,7 @@ public class InvocationContextTest {
           currentTransaction.setValue(ITransaction.CURRENT.get());
 
           InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-          invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+          invocationContext.withEndpointUrl("http://localhost");
 
           invocationContext.whenCommit(m_commitListener);
           invocationContext.whenRollback(m_rollbackListener);
@@ -195,7 +196,7 @@ public class InvocationContextTest {
     final BooleanHolder intercepted = new BooleanHolder(false);
 
     InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-    invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+    invocationContext.withEndpointUrl("http://localhost");
     invocationContext.whenInvoke(new InvocationHandler() {
 
       @Override
@@ -215,7 +216,7 @@ public class InvocationContextTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     final InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-    invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+    invocationContext.withEndpointUrl("http://localhost");
 
     // Make Stub.webMethod to block until cancelled.
     doAnswer(new Answer<Void>() {
@@ -246,8 +247,7 @@ public class InvocationContextTest {
       }
     });
 
-    // Run the test by
-    // Invoke the web service with a specific RunMonitor to test cancellation.
+    // Run the test by invoking the web service with a specific RunMonitor to test cancellation.
     RunContexts.empty().withRunMonitor(runMonitor).run(new IRunnable() {
 
       @Override
