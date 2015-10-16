@@ -902,9 +902,11 @@ describe("Table", function() {
     afterEach(function() {
       $.fx.off = false;
     });
-
     //group only column 0
     it("groups column 0 only", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
@@ -922,6 +924,9 @@ describe("Table", function() {
 
     //group only column 1
     it("groups column 1 only", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
@@ -939,6 +944,9 @@ describe("Table", function() {
 
     //group columns 0 and 1
     it("groups columns 0 and 1, then whole table", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
@@ -963,6 +971,9 @@ describe("Table", function() {
     });
 
     it("groups columns 0, 1 and 2", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
@@ -985,6 +996,9 @@ describe("Table", function() {
 
     //vary order
     it("groups columns 2 and 1", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
@@ -1005,6 +1019,9 @@ describe("Table", function() {
 
     //group only column 1, but group 0 first
     it("groups column 1 only", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
@@ -1024,6 +1041,9 @@ describe("Table", function() {
 
     //group only column 1, but group 0 first
     it("groups column 1 and 2", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       prepareTable();
       prepareContent();
       render(table);
