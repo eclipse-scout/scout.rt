@@ -18,7 +18,6 @@
     <version>5.2.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
   <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
   <packaging>pom</packaging>
 
@@ -35,13 +34,13 @@
     <dependencies>
       <!-- Build Dependencies -->
       <dependency>
-        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
