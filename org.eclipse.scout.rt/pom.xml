@@ -155,6 +155,12 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.jms</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
