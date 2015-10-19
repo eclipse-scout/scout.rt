@@ -117,35 +117,53 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this.$grouping.appendDiv('header-text')
       .data('label', session.text('ui.Grouping'));
 
-    var $groupAll = this.$grouping.appendDiv('header-command group-all')
-      .data('label', session.text('ui.overEverything'))
-      .click(this.remove.bind(this))
-      .click(groupAll);
-
     if (column.type !== 'number') {
       var $groupColumn = this.$grouping.appendDiv('header-command group-column')
+        .data('label', session.text('ui.groupingApply'))
         .click(this.remove.bind(this))
         .click(groupSort);
 
       var $groupColumnAdditional = this.$grouping.appendDiv('header-command group-column-additional')
-        .data('label', session.text('ui.additionally')) //TODO fko: text
-      .click(this.remove.bind(this))
+        .data('label', session.text('ui.additionally'))
+        .click(this.remove.bind(this))
         .click(groupSortAdditional);
-    }
-    else{
+    } else {
       //functions for number columns:
-      var $groupingFunctionSum = this.$grouping.appendDiv('header-command group-function')
-         .attr('data-icon', '@icon-sum')
-         .click(this.remove.bind(this))
-         .click(function() {
-           setGroupingFunction('sum');
-         });
+      var sumIcon = '\u03a3',
+        avgIcon = '\u00D8',
+        maxIcon = '\uf077',
+        minIcon = '\uf078';
 
-      var $groupingFunctionAvg = this.$grouping.appendDiv('header-command group-function')
-        .attr('data-icon', '@icon-median')
+      var $groupingFunctionSum = this.$grouping.appendDiv('header-command group-function')
+        .data('label', session.text('ui.Sum'))
+        .attr('data-icon', sumIcon)
         .click(this.remove.bind(this))
         .click(function() {
-          setGroupingFunction('avg');
+          setAggregationFunction('sum');
+        });
+
+      var $groupingFunctionAvg = this.$grouping.appendDiv('header-command group-function')
+        .data('label', session.text('ui.Average'))
+        .attr('data-icon', avgIcon)
+        .click(this.remove.bind(this))
+        .click(function() {
+          setAggregationFunction('avg');
+        });
+
+      var $groupingFunctionMin = this.$grouping.appendDiv('header-command group-function')
+        .data('label', session.text('ui.Minimum'))
+        .attr('data-icon', minIcon)
+        .click(this.remove.bind(this))
+        .click(function() {
+          setAggregationFunction('min');
+        });
+
+      var $groupingFunctionMax = this.$grouping.appendDiv('header-command group-function')
+        .data('label', session.text('ui.Maximum'))
+        .attr('data-icon', maxIcon)
+        .click(this.remove.bind(this))
+        .click(function() {
+          setAggregationFunction('max');
         });
     }
 
@@ -319,10 +337,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     return groupCount;
   }
 
-  function groupAll() {
-    doGroup($(this));
-  }
-
   function groupSort() {
     groupColumn($(this), column, 'asc', false);
   }
@@ -331,8 +345,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     groupColumn($(this), column, 'asc', true);
   }
 
-  function setGroupingFunction(func){
-    table.setGroupingFunction(column, func);
+  function setAggregationFunction(func) {
+    table.changeAggregation(column, func);
   }
 
   function groupColumn($command, column, direction, additional) {
@@ -356,17 +370,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     var iconPlus = '\uF067',
       groupCount = getGroupColumnCount();
 
-    $groupAll.removeClass('selected');
-    if ($groupColumn) {
-      $groupColumn.removeClass('selected');
-    }
-
     if ($groupColumnAdditional) {
       $groupColumnAdditional.removeClass('selected');
-    }
-
-    if (table.grouped && !table.groupedSelection) {
-      $groupAll.addClass('selected');
     }
 
     if ($groupColumnAdditional) {
@@ -379,7 +384,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
     if ($groupColumn && column.grouped) {
       $groupColumn.addClass('selected');
-//      $groupColumn.show().attr('data-icon', column.sortIndex + 1);
       $groupColumn.show();
     }
   }

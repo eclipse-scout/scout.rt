@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
@@ -85,6 +86,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String EVENT_SORT_ROWS = "sortRows";
   public static final String EVENT_ROWS_GROUPED = "rowsGrouped";
   public static final String EVENT_GROUP_ROWS = "groupRows";
+  public static final String EVENT_COLUMN_AGGR_FUNC_CHANGED = "aggregationFunctionChanged";
   public static final String EVENT_COLUMN_MOVED = "columnMoved";
   public static final String EVENT_COLUMN_RESIZED = "columnResized";
   public static final String EVENT_RELOAD = "reload";
@@ -444,6 +446,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     else if (EVENT_ROWS_FILTERED.equals(event.getType())) {
       handleUiRowsFiltered(event);
     }
+    else if (EVENT_COLUMN_AGGR_FUNC_CHANGED.equals(event.getType())) {
+      handleColumnAggregationFunctionChanged(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -552,6 +557,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       getModel().getUIFacade().fireHeaderGroupFromUI(column, multiGroup, groupAscending);
     }
 
+  }
+
+  protected void handleColumnAggregationFunctionChanged(JsonEvent event) {
+    addTableEventFilterCondition(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    IColumn column = extractColumn(event.getData());
+    getModel().getUIFacade().fireAggregationFunctionChanged(column, event.getData().getString("aggregationFunction"));
   }
 
   protected void handleUiColumnMoved(JsonEvent event) {
@@ -1010,6 +1021,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       case TableEvent.TYPE_USER_FILTER_REMOVED:
         handleModelUserFilterChanged(event);
         break;
+      case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED:
+        handleModelColumnAggregationChanged(event);
       default:
         // NOP
     }
@@ -1205,6 +1218,22 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     if (!onlyIfThereAreFilters || filters.size() > 0) {
       addPropertyChangeEvent(PROP_FILTERS, filtersToJson(filters));
     }
+  }
+
+  protected void handleModelColumnAggregationChanged(TableEvent event) {
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray eventParts = new JSONArray();
+    for (IColumn<?> c : event.getColumns()) {
+      if (!(c instanceof INumberColumn)) {
+        continue;
+      }
+      JSONObject eventPart = new JSONObject();
+      putProperty(eventPart, "columnId", c.getColumnId());
+      putProperty(eventPart, "aggregationFunction", ((INumberColumn) c).getAggregationFunction());
+      eventParts.put(eventPart);
+    }
+    putProperty(jsonEvent, "eventParts", eventParts);
+    addActionEvent(EVENT_COLUMN_AGGR_FUNC_CHANGED, jsonEvent);
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {

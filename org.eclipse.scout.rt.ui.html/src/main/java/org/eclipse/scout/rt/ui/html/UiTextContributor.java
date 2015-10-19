@@ -104,6 +104,12 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.OpenManually",
         "ui.FileChooserHint",
         "ui.Outlines",
-        "ui.NetworkError"));
+        "ui.NetworkError",
+        "ui.Grouping",
+        "ui.additionally",
+        "ui.groupingApply",
+        "ui.Average",
+        "ui.Minimum",
+        "ui.Maximum"));
   }
 }

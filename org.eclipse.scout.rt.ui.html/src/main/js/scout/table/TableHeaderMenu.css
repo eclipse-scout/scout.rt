@@ -177,7 +177,7 @@
     content: attr(data-icon);
   }
 
-  &.group-function::before {
+   &.group-function::before {
     position: relative;
     top: 0px;
     font-size: 20px;

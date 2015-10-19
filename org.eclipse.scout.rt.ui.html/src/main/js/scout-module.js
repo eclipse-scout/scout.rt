@@ -39,6 +39,7 @@ __include("scout/util/URL.js");
 __include("scout/util/GlassPaneRenderer.js");
 __include("scout/util/filters.js");
 __include("scout/util/hAlign.js");
+__include("scout/util/aggregation.js");
 // Session related
 __include("scout/session/BackgroundJobPollingSupport.js");
 __include("scout/session/BusyIndicator.js");

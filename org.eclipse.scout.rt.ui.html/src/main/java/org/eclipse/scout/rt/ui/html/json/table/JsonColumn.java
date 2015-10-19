@@ -85,6 +85,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, getColumn().isInitialAlwaysIncludeSortAtEnd());
+
     return json;
   }
 

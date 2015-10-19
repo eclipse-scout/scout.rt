@@ -730,9 +730,27 @@ scout.Table.prototype._isGroupingPossible = function(column) {
   return false;
 
 };
+scout.Table.prototype.changeAggregation = function(column, func) {
+  var data;
+  column.setAggregationFunction(func);
+  data = {
+    columnId: column.id,
+    aggregationFunction: func
+  };
+  this._group(false);
+};
 
-scout.Table.prototype.setGroupingFunction(column, func){
-  column.groupingFunc = func;
+scout.Table.prototype._onAggregationFunctionChanged = function(event) {
+  var eventParts = event.eventParts,
+    columnId, column, i, func;
+  //foreach
+  for (i = 0; i < eventParts.size; i++) {
+    columnId = eventParts[i].columnId;
+    func = eventParts[i].aggregationFunction;
+    column = this.columnById(columnId);
+    column.setAggregationFunction(func);
+  }
+  this._group(false);
 };
 
 scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove) {
@@ -1382,15 +1400,21 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   }
 };
 
-scout.Table.prototype._group = function(update) {
-  var column, alignment, rows, sum, columnGroupingActive, totalSum, row, value, nextRow, useRow, newGroup, summaryRow, hasCellTextForGroupingFunction, i,
+scout.Table.prototype._group = function(animate) {
+  var column, alignment, rows, c, states, columnGroupingActive, row, value, nextRow, newGroup, summaryRow, hasCellTextForGroupingFunction,
     that = this,
     groupColumns = this._groupColumns();
 
-  // remove all sum rows
-  update = update || !this.rendered;
-  if (update) {
-    //TODO: cgu/fko: update scroll bar?
+  if (!this.rendered) {
+    return;
+  }
+
+  if(arguments.length === 0){
+    animate = true;
+  }
+
+  if (!animate) {
+    //TODO: cgu: update scroll bar necessary here?
     this.$sumRows().remove();
   } else {
     this.$sumRows().animateAVCSD('height', 0, function() {
@@ -1401,49 +1425,57 @@ scout.Table.prototype._group = function(update) {
 
   columnGroupingActive = (groupColumns ? groupColumns.length > 0 : false);
 
-  if (!this.grouped && !columnGroupingActive) {
+  if (!columnGroupingActive) {
     return;
   }
-
   // prepare data
   rows = this.filteredRows();
-  sum = [];
-  totalSum = [];
+  states = [];
 
-  for (var r = 0; r < rows.length; r++) {
-    row = rows[r];
-    useRow = !this.groupedSelection || row.$row.isSelected();
-
-    // calculate sum per column
-    for (var c = 0; c < this.columns.length; c++) {
-      column = this.columns[c];
-      value = this.cellValue(column, row);
-
-      if (column.type === 'number') {
-        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
-        if (this.grouped) {
-          totalSum[c] = (totalSum[c] || 0) + (value === '' || !useRow ? 0 : value);
-        }
-      }
+  // pre-define functions for inline use.
+  var prepare = function(column, c) {
+    if (column.type === 'number') {
+      states[c] = column.aggrStart();
     }
+  };
+
+  var aggregate = function(row, column, c) {
+    if (column.type === 'number') {
+      value = this.cellValue(column, row);
+      states[c] = column.aggrStep(states[c], value);
+    }
+  };
+
+  var finish = function(column, c) {
+    if (column.type === 'number') {
+      states[c] = column.aggrFinish(states[c]);
+    }
+  };
+
+  // prepare columns
+  this.columns.forEach(prepare);
+
+  rows.forEach(function(row, r){
+
+    this.columns.forEach(aggregate.bind(this, row));
 
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
 
     // test if group is finished
-    summaryRow = (r === rows.length - 1);
-    newGroup = columnGroupingActive && (summaryRow || this._isNewGroup(groupColumns, row, nextRow));
+    newGroup = columnGroupingActive && ((r === rows.length - 1) || this._isNewGroup(groupColumns, row, nextRow));
     // if group is finished: add group row
 
-    if(summaryRow && this.grouped) {
-      this._appendSumRow(totalSum, row, true, update);
+    if (newGroup) {
+      //finish aggregation
+      this.columns.forEach(finish);
+      //append sum row
+      this._appendSumRow(states, row, false, animate);
+      //reset after group
+      this.columns.forEach(prepare);
     }
-    if(newGroup){
-      this._appendSumRow(sum, row, false, update);
-      sum = []; //reset after group
-    }
+  }.bind(this));
 
-  }
 };
 
 scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
@@ -1472,17 +1504,11 @@ scout.Table.prototype._groupColumns = function() {
   });
 };
 
-scout.Table.prototype._groupColumn = function() {
-  return scout.arrays.find(this.columns, function(column) {
-    return column.grouped;
-  });
-};
-
 /**
  * Appends a new sum row after row.$row
  */
-scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
-  var c, column, $cell,
+scout.Table.prototype._appendSumRow = function(sum, row, animate) {
+  var c, column, alignment, $cell,
     $sumRow = $.makeDiv('table-row-sum');
 
   if (this.groupedSelection) {
@@ -1491,23 +1517,26 @@ scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
 
   for (c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
+    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (typeof sum[c] === 'number') {
       var sumValue = sum[c];
       if (column.format) {
         var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
         sumValue = decimalFormat.format(sumValue);
       }
-      $cell = $.makeDiv('table-cell', sumValue);
-    } else if (!all && column.grouped) {
+      $cell = $.makeDiv('table-cell', "(" + column.aggrSymbol + ") " + sumValue)
+        .css('text-align', alignment);
+    } else if (column.grouped) {
       if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
-        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row));
+        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row))
+          .css('text-align', alignment);
       } else {
-        $cell = $.makeDiv('table-cell', this.cellText(column, row));
+        $cell = $.makeDiv('table-cell', this.cellText(column, row))
+          .css('text-align', alignment);
       }
     } else {
       $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
     }
-    $cell.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
     $cell.appendTo($sumRow)
       .css('min-width', column.width)
@@ -1516,7 +1545,7 @@ scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
 
   $sumRow.insertAfter(row.$row).width(this.rowWidth);
 
-  if (!update) {
+  if (animate) {
     $sumRow
       .hide()
       .slideDown(300, this.updateScrollbars.bind(this));
@@ -1987,10 +2016,6 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
       this.revealSelection();
     }
     this._updateMenuBar();
-
-    if (this.groupedSelection) {
-      this._group(true);
-    }
   }
 };
 
@@ -2374,7 +2399,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 
   this._triggerColumnResized(column);
   this._sendColumnResized(column);
-  
+
   if (column.resizingInProgress) {
     this._renderEmptyData();
   } else {
@@ -2921,6 +2946,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onRequestFocus();
   } else if (event.type === 'scrollToSelection') {
     this._onScrollToSelection();
+  } else if (event.type === 'aggregationFunctionChanged') {
+    this._onAggregationFunctionChanged(event);
   } else {
     scout.Table.parent.prototype.onModelAction.call(this, event);
   }

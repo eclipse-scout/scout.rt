@@ -18,6 +18,10 @@ scout.Column.prototype.init = function(model) {
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.helpers.nvl(this.width, 0);
   }
+
+  if(this.aggregationFunction){
+    this.setAggregationFunction(this.aggregationFunction);
+  }
 };
 
 /**
@@ -206,4 +210,32 @@ scout.Column.prototype._prepareTextForGrouping = function(text, htmlEnabled) {
   text = text.replace('\n', ' ');
   text = text.trim();
   return text;
+};
+
+scout.Column.prototype.setAggregationFunction = function(func){
+  this.aggregationFunction = func;
+  if(func === 'sum'){
+    this.aggrStart = scout.aggregation.sumStart;
+    this.aggrStep = scout.aggregation.sumStep;
+    this.aggrFinish = scout.aggregation.sumFinish;
+    this.aggrSymbol = scout.aggregation.sumSymbol;
+  }
+  else if(func === 'avg'){
+    this.aggrStart = scout.aggregation.avgStart;
+    this.aggrStep = scout.aggregation.avgStep;
+    this.aggrFinish = scout.aggregation.avgFinish;
+    this.aggrSymbol = scout.aggregation.avgSymbol;
+  }
+  else if(func === 'min'){
+    this.aggrStart = scout.aggregation.minStart;
+    this.aggrStep = scout.aggregation.minStep;
+    this.aggrFinish = scout.aggregation.minFinish;
+    this.aggrSymbol = scout.aggregation.minSymbol;
+  }
+  else if(func === 'max'){
+    this.aggrStart = scout.aggregation.maxStart;
+    this.aggrStep = scout.aggregation.maxStep;
+    this.aggrFinish = scout.aggregation.maxFinish;
+    this.aggrSymbol = scout.aggregation.maxSymbol;
+  }
 };
