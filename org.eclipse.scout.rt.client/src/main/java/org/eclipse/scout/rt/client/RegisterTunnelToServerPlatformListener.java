@@ -1,9 +1,13 @@
 package org.eclipse.scout.rt.client;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -11,6 +15,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CreateTunnelToServerBeansProperty;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -27,24 +32,53 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
         return;
       }
       //register all tunnels to server
-      for (IClassInfo ci : ClassInventory.get().getKnownAnnotatedTypes(TunnelToServer.class)) {
-        if (!ci.isInterface() || !ci.isPublic()) {
-          LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on public interfaces, not on " + ci.name());
-          continue;
-        }
-        Class<?> c;
-        try {
-          c = ci.resolveClass();
-        }
-        catch (Exception e) {
-          LOG.warn("loading class", e);
-          continue;
-        }
-        if (!event.getSource().getBeanManager().getBeans(c).isEmpty()) {
-          continue;
-        }
-        event.getSource().getBeanManager().registerBean(new BeanMetaData(c).withApplicationScoped(false));
+      final IBeanManager beanManager = event.getSource().getBeanManager();
+      final IClassInventory classInventory = ClassInventory.get();
+      registerTunnelToServerProxies(beanManager, classInventory);
+    }
+  }
+
+  protected void registerTunnelToServerProxies(final IBeanManager beanManager, final IClassInventory classInventory) {
+    for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(TunnelToServer.class)) {
+      if (!ci.isInterface() || !ci.isPublic()) {
+        LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on public interfaces, not on " + ci.name());
+        continue;
+      }
+      Class<?> c;
+      try {
+        c = ci.resolveClass();
+      }
+      catch (Exception e) {
+        LOG.warn("loading class", e);
+        continue;
+      }
+
+      if (!acceptClass(beanManager, c)) {
+        LOG.debug("ignoring class [{}]", c);
+        continue;
+      }
+
+      beanManager.registerBean(createBeanMetaData(c));
+    }
+  }
+
+  /**
+   * Returns <code>true</code> if the given class (a public interface) should be registered as bean.
+   */
+  protected boolean acceptClass(IBeanManager beanManager, Class<?> beanClass) {
+    List<? extends IBean<?>> beans = beanManager.getBeans(beanClass);
+    for (IBean<?> bean : beans) {
+      if (!bean.getBeanClazz().isInterface()) {
+        return false;
       }
     }
+    return true;
+  }
+
+  /**
+   * Creates a new {@link BeanMetaData} for the given class.
+   */
+  protected BeanMetaData createBeanMetaData(Class<?> c) {
+    return new BeanMetaData(c).withApplicationScoped(false);
   }
 }
