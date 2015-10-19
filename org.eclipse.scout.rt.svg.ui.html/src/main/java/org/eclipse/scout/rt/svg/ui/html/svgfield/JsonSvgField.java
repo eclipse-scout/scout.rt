@@ -47,7 +47,7 @@ public class JsonSvgField extends JsonFormField<ISvgField> {
     });
   }
 
-  private String svgToString(SVGDocument svg) {
+  protected String svgToString(SVGDocument svg) {
     try {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       SVGUtility.writeSVGDocument(svg, out, SVG_ENCODING);
@@ -68,7 +68,7 @@ public class JsonSvgField extends JsonFormField<ISvgField> {
     }
   }
 
-  private void handleUiAppLinkAction(JsonEvent event) {
+  protected void handleUiAppLinkAction(JsonEvent event) {
     String ref = event.getData().getString("ref");
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }

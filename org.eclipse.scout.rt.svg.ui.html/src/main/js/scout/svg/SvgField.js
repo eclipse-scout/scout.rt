@@ -21,7 +21,6 @@ scout.SvgField.prototype._renderProperties = function() {
  */
 scout.SvgField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.SvgField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
   keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
 }
 
@@ -45,5 +44,7 @@ scout.SvgField.prototype._onAppLinkAction = function(event) {
 };
 
 scout.SvgField.prototype._sendAppLinkAction = function(ref) {
-  this._send('appLinkAction', {ref: ref});
+  this._send('appLinkAction', {
+    ref: ref
+  });
 };

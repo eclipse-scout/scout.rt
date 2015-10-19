@@ -1,3 +1,7 @@
+.svg-field > .field {
+  overflow: hidden;
+}
+
 .applink:hover {
   cursor: pointer;
 }
