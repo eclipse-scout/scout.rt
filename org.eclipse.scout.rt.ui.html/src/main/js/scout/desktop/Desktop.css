@@ -79,6 +79,16 @@
       margin-right: @bench-margin-x;
     }
 
+    & .table-aggregate {
+      margin-left: @bench-margin-x;
+      margin-right: @bench-margin-x;
+
+      & > .table-cell {
+        padding-top: @desktop-table-row-padding-y;
+        padding-bottom: @desktop-table-row-padding-y;
+      }
+    }
+
     & > .table-data {
       & > .scrollbar.y-axis {
         /* 2px looks slightly better than the default which is 3px */

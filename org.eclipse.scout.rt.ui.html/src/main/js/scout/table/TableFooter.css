@@ -33,6 +33,10 @@
   z-index: 1;
   /* Reset nowrap, forms may have fields which need wrapping (e.g. label field) */
   white-space: normal;
+
+  &:not(.has-resizer) {
+    border-top: 1px solid @group-box-title-border-color;
+  }
 }
 
 .table-control-content {

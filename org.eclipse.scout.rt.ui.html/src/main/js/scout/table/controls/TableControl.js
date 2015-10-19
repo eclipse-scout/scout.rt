@@ -4,8 +4,12 @@ scout.TableControl = function() {
   this.form;
   this._addAdapterProperties('form');
   this.contentRendered = false;
+  this.height = scout.TableControl.CONTAINER_SIZE;
+  this.resizerVisible = true;
 };
 scout.inherits(scout.TableControl, scout.Action);
+
+scout.TableControl.CONTAINER_SIZE = 345;
 
 scout.TableControl.prototype._init = function(model) {
   scout.TableControl.parent.prototype._init.call(this, model);
@@ -180,7 +184,7 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
 
   if (selected) {
     this.renderContent();
-    this.tableFooter.selectedControl = this;
+    this.tableFooter.onControlSelected(this);
   } else {
 
     // Don't modify the state initially, only on property change events
@@ -189,7 +193,7 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
       if (closeWhenUnselected && this === this.tableFooter.selectedControl) {
         // Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
         this.tableFooter.closeControlContainer(this);
-        this.tableFooter.selectedControl = null;
+        this.tableFooter.onControlSelected(null);
       } else {
         this.removeContent();
       }

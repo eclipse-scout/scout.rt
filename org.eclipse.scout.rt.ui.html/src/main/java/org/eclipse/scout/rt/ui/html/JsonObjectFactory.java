@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IAggregateTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
@@ -154,6 +155,7 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonAggregateTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonGraphTableControl;
@@ -363,6 +365,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IAnalysisTableControl) { // needs to be before ITableControl
       return new JsonAnalysisTableControl<IAnalysisTableControl>((IAnalysisTableControl) model, session, id, parent);
+    }
+    if (model instanceof IAggregateTableControl) { // needs to be before ITableControl
+      return new JsonAggregateTableControl<IAggregateTableControl>((IAggregateTableControl) model, session, id, parent);
     }
     if (model instanceof ITableControl) {
       return new JsonTableControl<ITableControl>((ITableControl) model, session, id, parent);

@@ -12,7 +12,7 @@ scout.Table = function(model) {
   this.menus = [];
   this.rows = [];
   this.rowsMap = {}; // rows by id
-  this._rowWidth = 0;
+  this.rowWidth = 0;
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
@@ -842,7 +842,7 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
 };
 
 scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelected, followingRowSelected) {
-  var rowWidth = this._rowWidth;
+  var rowWidth = this.rowWidth;
   var rowClass = 'table-row';
   if (rowSelected) {
     rowClass += ' selected';
@@ -869,9 +869,9 @@ scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelec
 };
 
 scout.Table.prototype._updateRowWidth = function() {
-  this._rowWidth = 0;
+  this.rowWidth = 0;
   for (var i = 0; i < this.columns.length; i++) {
-    this._rowWidth += this.columns[i].width;
+    this.rowWidth += this.columns[i].width;
   }
 };
 
@@ -2355,13 +2355,11 @@ scout.Table.prototype.resizeColumn = function(column, width) {
     // same calculation in scout.Column.prototype.buildCell;
   }
   this.$rows(true)
-    .css('width', this._rowWidth);
+    .css('width', this.rowWidth);
 
-  if (this.header) {
-    this.header.onColumnResized(column);
-  }
-  this._renderEmptyData();
+  this._triggerColumnResized(column);
   this._sendColumnResized(column);
+  this._renderEmptyData();
 };
 
 scout.Table.prototype._sendColumnResized = function(column) {
@@ -2379,6 +2377,14 @@ scout.Table.prototype._sendColumnResized = function(column) {
   this._send('columnResized', eventData, 750, function(previous) {
     return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
   });
+};
+
+scout.Table.prototype._sendColumnMoved = function(column, index) {
+  var data = {
+    columnId: column.id,
+    index: index
+  };
+  this._send('columnMoved', data);
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
@@ -2402,15 +2408,8 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
     }
   });
 
-  var data = {
-    columnId: column.id,
-    index: index
-  };
-  this._send('columnMoved', data);
-
-  if (this.header) {
-    this.header.onColumnMoved(column, oldPos, newPos, dragged);
-  }
+  this._triggerColumnMoved(column, oldPos, newPos, dragged);
+  this._sendColumnMoved(column, index);
 
   // move cells
   this._removeRows();
@@ -2451,7 +2450,7 @@ scout.Table.prototype._triggerRowsDrawn = function($rows) {
   var event = {
     $rows: $rows
   };
-  this.events.trigger(type, event);
+  this.trigger(type, event);
 };
 
 scout.Table.prototype._triggerRowsSelected = function() {
@@ -2467,15 +2466,15 @@ scout.Table.prototype._triggerRowsSelected = function() {
     rows: this.selectedRows,
     allSelected: allSelected
   };
-  this.events.trigger(type, event);
+  this.trigger(type, event);
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
-  this.events.trigger('rowsFiltered');
+  this.trigger('rowsFiltered');
 };
 
 scout.Table.prototype._triggerFilterResetted = function() {
-  this.events.trigger('filterResetted');
+  this.trigger('filterResetted');
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
@@ -2483,7 +2482,26 @@ scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
     row: row,
     animating: animating
   };
-  this.events.trigger('rowOrderChanged', event);
+  this.trigger('rowOrderChanged', event);
+};
+
+scout.Table.prototype._triggerColumnResized = function(column) {
+  var event = {
+    column: column
+  };
+
+  this.trigger('columnResized', event);
+};
+
+scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dragged) {
+  var event = {
+    column: column,
+    oldPos: oldPos,
+    newPos: newPos,
+    dragged: dragged
+  };
+
+  this.trigger('columnMoved', event);
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {

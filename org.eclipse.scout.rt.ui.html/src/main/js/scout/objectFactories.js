@@ -67,6 +67,11 @@ scout.defaultObjectFactories = [{
     return new scout.AnalysisTableControl();
   }
 }, {
+  objectType: 'AggregateTableControl',
+  create: function() {
+    return new scout.AggregateTableControl();
+  }
+}, {
   objectType: 'Table',
   create: function() {
     return new scout.Table();

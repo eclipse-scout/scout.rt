@@ -4,8 +4,10 @@
 scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
 
-  this._dataScrollHandler = this._onDataScroll.bind(this);
+  this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
   this._tableAddRemoveFilterHandler = this._onTableAddRemoveFilter.bind(this);
+  this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
+  this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
   this.dragging = false;
 };
 scout.inherits(scout.TableHeader, scout.Widget);
@@ -73,9 +75,11 @@ scout.TableHeader.prototype._render = function($parent) {
   this.updateMenuBar();
   this._reconcileScrollPos();
 
-  table.$data.on('scroll', this._dataScrollHandler);
+  this.table.$data.on('scroll', this._tableDataScrollHandler);
   this.table.on('addFilter', this._tableAddRemoveFilterHandler);
   this.table.on('removeFilter', this._tableAddRemoveFilterHandler);
+  this.table.on('columnResized', this._tableColumnResizedHandler);
+  this.table.on('columnMoved', this._tableColumnMovedHandler);
 
   function resizeHeader(event) {
     var startX = event.pageX,
@@ -217,9 +221,11 @@ scout.TableHeader.prototype._render = function($parent) {
 };
 
 scout.TableHeader.prototype._remove = function() {
-  this.table.$data.off('scroll', this._dataScrollHandler);
+  this.table.$data.off('scroll', this._tableDataScrollHandler);
   this.table.off('addFilter', this._tableAddRemoveFilterHandler);
   this.table.off('removeFilter', this._tableAddRemoveFilterHandler);
+  this.table.off('columnResized', this._tableColumnResizedHandler);
+  this.table.off('columnMoved', this._tableColumnMovedHandler);
 
   scout.TableHeader.parent.prototype._remove.call(this);
 };
@@ -237,7 +243,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
 
   if (isLastColumn) {
-    remainingHeaderSpace = Math.max(this.$container.width() - this.table._rowWidth, 0);
+    remainingHeaderSpace = Math.max(this.$container.width() - this.table.rowWidth, 0);
     if (remainingHeaderSpace < menuBarWidth) {
       // add 1 px to make the resizer visible
       adjustment = menuBarWidth - remainingHeaderSpace + 1;
@@ -400,8 +406,9 @@ scout.TableHeader.prototype.updateMenuBar = function() {
   this.menuBar.updateItems(menuItems);
 };
 
-scout.TableHeader.prototype.onColumnResized = function(column) {
-  var lastColumn = this.table.columns[this.table.columns.length - 1];
+scout.TableHeader.prototype._onTableColumnResized = function(event) {
+  var column = event.column,
+    lastColumn = this.table.columns[this.table.columns.length - 1];
   this.resizeHeaderItem(column);
   if (lastColumn !== column) {
     this.resizeHeaderItem(lastColumn);
@@ -415,8 +422,11 @@ scout.TableHeader.prototype.onSortingChanged = function() {
   }
 };
 
-scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dragged) {
-  var $header = column.$header,
+scout.TableHeader.prototype._onTableColumnMoved = function(event) {
+  var column = event.column,
+    oldPos = event.oldPos,
+    newPos = event.newPos,
+    $header = column.$header,
     $headers = this.findHeaderItems(),
     $moveHeader = $headers.eq(oldPos),
     $moveResize = $moveHeader.next(),
@@ -444,7 +454,7 @@ scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dra
   }
 
   // move to old position and then animate
-  if (dragged) {
+  if (event.dragged) {
     $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
       .animateAVCSD('left', 0);
   } else {
@@ -497,7 +507,7 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   return false;
 };
 
-scout.TableHeader.prototype._onDataScroll = function() {
+scout.TableHeader.prototype._onTableDataScroll = function() {
   scout.scrollbars.fix(this._$menuBar);
   this._reconcileScrollPos();
   this._fixTimeout = scout.scrollbars.unfix(this._$menuBar, this._fixTimeout);

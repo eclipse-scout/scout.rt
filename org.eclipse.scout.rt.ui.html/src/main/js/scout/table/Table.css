@@ -38,6 +38,10 @@
   padding-top: 1px;
 }
 
+.table-aggregate {
+  overflow: hidden;
+}
+
 .table-row,
 .table-row-sum {
   position:relative;
@@ -91,7 +95,8 @@
   #scout.overflow-ellipsis();
   vertical-align: top; /* for multiline text */
 
-  .table-row-sum > & {
+  .table-row-sum > &,
+  .table-aggregate > & {
     font-weight: bold;
   }
 

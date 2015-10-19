@@ -90,11 +90,12 @@ __include("scout/popup/Popup.js");
 __include("scout/popup/PopupLayout.js");
 __include("scout/popup/PopupWithHead.js");
 __include("scout/popup/PopupWithHeadLayout.js");
+__include("scout/popup/TouchPopup.js");
+__include("scout/popup/TouchPopupLayout.js");
 __include("scout/datepicker/DatePicker.js");
 __include("scout/datepicker/DatePickerLayout.js");
 __include("scout/datepicker/DatePickerPopup.js");
 __include("scout/datepicker/DatePickerTouchPopup.js");
-__include("scout/datepicker/DatePickerTouchPopupLayout.js");
 __include("scout/menu/menus.js");
 __include("scout/menu/Menu.js");
 __include("scout/menu/MenuKeyStroke.js");
@@ -139,6 +140,7 @@ __include("scout/table/columns/CheckBoxColumn.js"); // requires Column.js
 __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");
+__include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
 __include("scout/table/controls/AnalysisTableControl.js"); // requires TableControl.js
 __include("scout/table/controls/ChartTableControl.js"); // requires TableControl.js
 __include("scout/table/controls/ChartTableControlMatrix.js"); // requires TableControl.js
@@ -263,7 +265,6 @@ __include("scout/form/fields/richtextfield/RichTextField.js");
 __include("scout/form/fields/sequencebox/SequenceBox.js");
 __include("scout/form/fields/smartfield/SmartField.js");
 __include("scout/form/fields/smartfield/SmartFieldTouchPopup.js");
-__include("scout/form/fields/smartfield/SmartFieldTouchPopupLayout.js");
 __include("scout/form/fields/smartfield/SmartFieldLayout.js");
 __include("scout/form/fields/smartfield/SmartFieldPopup.js");
 __include("scout/form/fields/smartfield/SmartFieldPopupLayout.js");

@@ -10,8 +10,6 @@ scout.TableFooter = function() {
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
-scout.TableFooter.CONTAINER_SIZE = 345;
-
 scout.TableFooter.prototype._init = function(options) {
   scout.TableFooter.parent.prototype._init.call(this, options);
   this.table = options.table;
@@ -37,7 +35,6 @@ scout.TableFooter.prototype._render = function($parent) {
 
   // --- container for an open control ---
   this.$controlContainer = this.$container.appendDiv('table-control-container').hide();
-  this._addResizer(this.$controlContainer);
   this.$controlContent = this.$controlContainer.appendDiv('table-control-content');
 
   // --- table controls section ---
@@ -109,6 +106,51 @@ scout.TableFooter.prototype._remove = function() {
   this.table.off('statusChanged', this._tableStatusChangedHandler);
 
   scout.TableFooter.parent.prototype._remove.call(this);
+};
+
+scout.TableFooter.prototype._renderResizerVisible = function() {
+  if (this.selectedControl.resizerVisible) {
+    this._renderResizer();
+    this.$controlContainer.addClass('has-resizer');
+  } else if (this.$resizer) {
+    this.$resizer.remove();
+    this.$resizer = null;
+    this.$controlContainer.removeClass('has-resizer');
+  }
+};
+
+scout.TableFooter.prototype._renderResizer = function() {
+  if (this.$resizer) {
+    return;
+  }
+  this.$resizer = this.$controlContainer.prependDiv('table-control-resize')
+    .on('mousedown', '', resize.bind(this));
+
+  function resize(event) {
+    $(window)
+      .on('mousemove.tablefooter', resizeMove.bind(this))
+      .one('mouseup', resizeEnd.bind(this));
+    $('body').addClass('row-resize');
+
+    function resizeMove(event) {
+      var newHeight = this.table.$container.height() - event.pageY;
+      this.$controlContainer.height(newHeight);
+      this.$controlContent.outerHeight(newHeight);
+      this._revalidateTableLayout();
+      this.onResize();
+    }
+
+    function resizeEnd() {
+      if (this.$controlContainer.height() < 100) {
+        this.selectedControl.setSelected(false);
+      }
+
+      $(window).off('mousemove.tablefooter');
+      $('body').removeClass('row-resize');
+    }
+
+    return false;
+  }
 };
 
 scout.TableFooter.prototype._renderControls = function() {
@@ -334,7 +376,7 @@ scout.TableFooter.prototype._revalidateTableLayout = function() {
 
 scout.TableFooter.prototype.openControlContainer = function(control) {
   var insets = scout.graphics.getInsets(this.$controlContainer),
-    contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom;
+    contentHeight = control.height - insets.top - insets.bottom;
 
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
@@ -342,7 +384,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   // open container, stop existing (close) animations before
   // use delay to make sure form is rendered and layouted with new size
   this.$controlContainer.stop(true).show().delay(1).animate({
-    height: scout.TableFooter.CONTAINER_SIZE
+    height: control.height
   }, {
     duration: this.rendered ? 500 : 0,
     progress: this._revalidateTableLayout.bind(this),
@@ -367,37 +409,6 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
   }.bind(this));
 
   this.open = false;
-};
-
-scout.TableFooter.prototype._addResizer = function($parent) {
-  this._$controlResize = $parent.appendDiv('table-control-resize')
-    .on('mousedown', '', resize.bind(this));
-
-  function resize(event) {
-    $(window)
-      .on('mousemove.tablefooter', resizeMove.bind(this))
-      .one('mouseup', resizeEnd.bind(this));
-    $('body').addClass('row-resize');
-
-    function resizeMove(event) {
-      var newHeight = this.table.$container.height() - event.pageY;
-      this.$controlContainer.height(newHeight);
-      this.$controlContent.outerHeight(newHeight);
-      this._revalidateTableLayout();
-      this.onResize();
-    }
-
-    function resizeEnd() {
-      if (this.$controlContainer.height() < 100) {
-        this.selectedControl.setSelected(false);
-      }
-
-      $(window).off('mousemove.tablefooter');
-      $('body').removeClass('row-resize');
-    }
-
-    return false;
-  }
 };
 
 scout.TableFooter.prototype._hideTableStatusTooltip = function() {
@@ -456,6 +467,18 @@ scout.TableFooter.prototype.onResize = function() {
   this.table.tableControls.forEach(function(control) {
     control.onResize();
   });
+};
+
+scout.TableFooter.prototype.onControlSelected = function(control) {
+  var previousControl = this.selectedControl;
+  this.selectedControl = control;
+
+  if (control) {
+    this._renderResizerVisible();
+    if (previousControl && previousControl.height !== control.height) {
+      this.openControlContainer(control);
+    }
+  }
 };
 
 scout.TableFooter.prototype._onStatusMousedown = function(event) {

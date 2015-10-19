@@ -140,6 +140,7 @@ __include("scout/table/columns/CheckBoxColumn.js"); // requires Column.js
 __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");
+__include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
 __include("scout/table/controls/AnalysisTableControl.js"); // requires TableControl.js
 __include("scout/table/controls/ChartTableControl.js"); // requires TableControl.js
 __include("scout/table/controls/ChartTableControlMatrix.js"); // requires TableControl.js
