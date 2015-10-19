@@ -24,7 +24,7 @@ public class JettyServerTest {
    */
   @Test
   public void testFindResourcesFromDependentJars1() {
-    Set<String> resources = JettyServer.findResourcesFromDependentJars(getClass().getClassLoader(), "/");
+    Set<String> resources = JettyServer.getResourcePathsFromDependentJars(getClass().getClassLoader(), "/");
     assertEquals(CollectionUtility.hashSet(
         "/welcome.html",
         "/catalog/",
@@ -37,7 +37,7 @@ public class JettyServerTest {
    */
   @Test
   public void testFindResourcesFromDependentJars2() {
-    Set<String> resources = JettyServer.findResourcesFromDependentJars(getClass().getClassLoader(), "/catalog/");
+    Set<String> resources = JettyServer.getResourcePathsFromDependentJars(getClass().getClassLoader(), "/catalog/");
     assertEquals(CollectionUtility.hashSet(
         "/catalog/index.html",
         "/catalog/products.html",
@@ -50,7 +50,7 @@ public class JettyServerTest {
    */
   @Test
   public void testFindResourcesFromDependentJars3() {
-    Set<String> resources = JettyServer.findResourcesFromDependentJars(getClass().getClassLoader(), "/catalog/moreOffers");
+    Set<String> resources = JettyServer.getResourcePathsFromDependentJars(getClass().getClassLoader(), "/catalog/moreOffers/");
     assertEquals(CollectionUtility.hashSet(
         "/catalog/moreOffers/books.html"), resources); // located in dependent JAR 'org.eclipse.scout.dev.jetty.test.affix'.
   }

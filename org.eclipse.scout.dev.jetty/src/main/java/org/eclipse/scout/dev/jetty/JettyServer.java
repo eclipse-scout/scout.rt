@@ -13,11 +13,16 @@ package org.eclipse.scout.dev.jetty;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.URIUtil;
@@ -122,8 +127,8 @@ public class JettyServer {
       /**
        * Overwritten to enable resolution of resources contained in other JARs. That is according to the method's
        * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current context
-       * root, or relative to the /META-INF/resources directory of a JAR file inside the web application's /WEB-INF/lib
-       * directory.</>
+       * root, or relative to the '/META-INF/resources' directory of a JAR file inside the web application's
+       * '/WEB-INF/lib' directory.</>
        *
        * @see javax.servlet.ServletContext#getResourcePaths(String)
        */
@@ -131,8 +136,8 @@ public class JettyServer {
       public Set<String> getResourcePaths(String path) {
         Set<String> resources = new HashSet<>();
 
-        // 1. Find resources in dependent jars.
-        resources.addAll(JettyServer.findResourcesFromDependentJars(getClassLoader(), path));
+        // 1. Find resources contained in other, dependent JARs.
+        resources.addAll(JettyServer.getResourcePathsFromDependentJars(getClassLoader(), path));
 
         // 2. Find resource in the web application's resources (higher precedence).
         resources.addAll(super.getResourcePaths(path));
@@ -142,37 +147,75 @@ public class JettyServer {
   }
 
   /**
-   * Finds resources which are located in other JARs.
+   * Returns a directory-like listing of all the paths to resources which are located in other (dependent) JAR files.
+   * Those JAR files are placed in the web application's '/WEB-INF/lib' directory, and their resources located in the
+   * '/META-INF/resources' folder.
+   * <p>
+   * This method works for both, packed and unpacked JAR files, which is crucial when running the application from
+   * within the IDE.
    *
    * @see 'javax.servlet.ServletContext.getResourcePaths(String)' for the specification.
    */
-  static Set<String> findResourcesFromDependentJars(ClassLoader classloader, String path) {
+  static Set<String> getResourcePathsFromDependentJars(ClassLoader classloader, String path) {
+    path = path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH;
+
     Set<String> resources = new HashSet<>();
 
     // Look for resources in the dependent JAR's resources relative to /META-INF/resources.
     try {
-      Enumeration<URL> urls = classloader.getResources("META-INF/resources" + path);
-      while (urls.hasMoreElements()) {
-        File resource = new File(urls.nextElement().getPath());
-        if (!resource.exists()) {
-          LOG.error("resource not found: " + resource);
-          continue;
-        }
+      Enumeration<URL> resourceUrls = classloader.getResources("META-INF/resources" + path);
+      while (resourceUrls.hasMoreElements()) {
+        URL resourceUrl = resourceUrls.nextElement();
+        String absoluteResourcePath = resourceUrl.getPath();
 
-        if (resource.isDirectory()) {
-          String directoryPath = path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH;
-
-          for (File file : resource.listFiles()) {
-            resources.add(directoryPath + file.getName() + (file.isDirectory() ? URIUtil.SLASH : ""));
-          }
+        if (resourceUrl.toURI().getScheme().equals("jar")) {
+          // The resource is located within a packed JAR. (e.g. located in Maven repository)
+          resources.addAll(JettyServer.listFilesFromJar(absoluteResourcePath, path));
         }
         else {
-          resources.add(path);
+          // The resource is located within an unpacked JAR, which typically applies when running the server from within the IDE.
+          resources.addAll(JettyServer.listFilesFromDirectory(absoluteResourcePath, path));
         }
       }
     }
-    catch (IOException e) {
-      LOG.error("Failed to resolve resources of JARs inside the web application's /WEB-INF/lib directory", e);
+    catch (URISyntaxException | IOException e) {
+      LOG.error("Failed to get resource paths", e);
+    }
+
+    return resources;
+  }
+
+  /**
+   * Returns all direct files contained in the directory 'absoluteDirectoryPath'.
+   */
+  private static Set<String> listFilesFromDirectory(String absoluteDirectoryPath, String relativeDirectorySearchPath) {
+    Set<String> resources = new HashSet<>();
+
+    for (File file : new File(absoluteDirectoryPath).listFiles()) {
+      resources.add(relativeDirectorySearchPath + file.getName() + (file.isDirectory() ? URIUtil.SLASH : ""));
+    }
+
+    return resources;
+  }
+
+  /**
+   * Returns all direct files contained in a JAR in the directory 'absoluteDirectoryPath'.
+   */
+  private static Set<String> listFilesFromJar(String absoluteDirectoryPath, String relativeDirectorySearchPath) throws IOException {
+    Set<String> resources = new HashSet<>();
+
+    String absoluteJarFilePath = absoluteDirectoryPath.substring(0, absoluteDirectoryPath.indexOf('!')); // path to the JAR file.
+
+    Pattern childResourcePattern = Pattern.compile("^META-INF/resources(?<resourcePath>" + relativeDirectorySearchPath + "[^/]+)(?<slashIfDirectory>/?)$");
+    try (JarFile jarFile = new JarFile(new URL(absoluteJarFilePath).getFile())) {
+      Enumeration<? extends JarEntry> jarEntries = jarFile.entries();
+      while (jarEntries.hasMoreElements()) {
+        final JarEntry entry = jarEntries.nextElement();
+        Matcher matcher = childResourcePattern.matcher(entry.getName());
+        if (matcher.find()) {
+          resources.add(matcher.group("resourcePath") + matcher.group("slashIfDirectory"));
+        }
+      }
     }
 
     return resources;
