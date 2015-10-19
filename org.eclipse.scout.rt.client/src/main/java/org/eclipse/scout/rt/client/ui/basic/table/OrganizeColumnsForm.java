@@ -85,6 +85,9 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   private final ITable m_table;
 
+  protected P_TableState m_oldTableState;
+  protected boolean m_loading;
+
   public OrganizeColumnsForm(ITable table) throws ProcessingException {
     super(false);
     m_table = table;
@@ -1489,8 +1492,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   }
 
-  protected P_TableState m_oldTableState;
-
   public void persistConfig() throws ProcessingException {
     // TODO ASA obsolete?
     IPreferences clientPreferences = ClientUIPreferences.getClientPreferences(ClientSessionProvider.currentSession());
@@ -1500,11 +1501,22 @@ public class OrganizeColumnsForm extends AbstractForm {
   }
 
   public void reload() throws ProcessingException {
-    // Back-up the current columns so we may restore them if
-    // the "organize columns" form is canceled:
-    m_oldTableState = createTableStateSnpashot();
-    getColumnsTableField().reloadTableData();
-    getNamedConfigTableField().reloadTableData();
+    m_loading = true;
+    try {
+      // Back-up the current columns so we may restore them if
+      // the "organize columns" form is canceled:
+      m_oldTableState = createTableStateSnpashot();
+      getColumnsTableField().reloadTableData();
+      getNamedConfigTableField().reloadTableData();
+    }
+    finally {
+      m_loading = false;
+    }
+  }
+
+  @Override
+  public boolean isFormLoading() {
+    return super.isFormLoading() || m_loading;
   }
 
   protected P_TableState createTableStateSnpashot() throws ProcessingException {
