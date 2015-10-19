@@ -41,13 +41,6 @@ scout.DatePickerPopup.prototype.selectDate = function(date, animated) {
   this.picker.selectDate(date, animated);
 };
 
-scout.DatePickerPopup.prototype.shiftViewDate = function(years, months, days) {
-  if (!this.isOpen()) {
-    this.open();
-  }
-  this.picker.shiftViewDate(years, months, days);
-};
-
 scout.DatePickerPopup.prototype.shiftSelectedDate = function(years, months, days) {
   if (!this.isOpen()) {
     this.open();
@@ -55,8 +48,12 @@ scout.DatePickerPopup.prototype.shiftSelectedDate = function(years, months, days
   this.picker.shiftSelectedDate(years, months, days);
 };
 
-scout.DatePickerPopup.prototype.isOpen = function() {
-  return this.rendered;
+scout.DatePickerPopup.prototype._onDateSelect = function(callback) {
+  this.picker.on('dateSelect', callback);
+};
+
+scout.DatePickerPopup.prototype._dateFormat = function(dateFormat) {
+  this.picker.dateFormat = dateFormat;
 };
 
 /**

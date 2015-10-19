@@ -17,7 +17,6 @@ scout.DatePickerLayout.SIDE_RATIO = 1.3918;
 
 // FIXME AWE: seitenverhältnis vom date-picker verbessern (nicht quadratisch, sondern leicht rechteckig)
 // FIXME AWE: animation verbessern (links und rechts abdecken, damit DIVs die reinsliden nicht sichtbar sind)
-// FIXME AWE: kreise um days sehen noch nicht gut aus
 
 scout.DatePickerLayout.prototype.layout = function($container) {
   var

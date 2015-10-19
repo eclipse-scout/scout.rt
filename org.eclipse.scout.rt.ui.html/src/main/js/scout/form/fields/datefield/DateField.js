@@ -54,10 +54,9 @@ scout.DateField.prototype._render = function($parent) {
   this._datePickerPopup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
-    dateField: this
+    field: this
   });
-  this._datePickerPopup.picker
-    .on('dateSelect', this._onDatePickerDateSelected.bind(this));
+  this._datePickerPopup._onDateSelect(this._onDatePickerDateSelected.bind(this));
 };
 
 scout.DateField.prototype._renderProperties = function() {
@@ -150,7 +149,7 @@ scout.DateField.prototype._renderHasTime = function() {
 
 scout.DateField.prototype._renderDateFormatPattern = function() {
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
-  this._datePickerPopup.picker.dateFormat = this.isolatedDateFormat;
+  this._datePickerPopup._dateFormat(this.isolatedDateFormat);
   if (this.rendered) {
     this._renderTimestamp();
   }

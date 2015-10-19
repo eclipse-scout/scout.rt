@@ -1,69 +1,17 @@
-// FIXME AWE: (popups) play animation when popup opens?
 scout.SmartFieldTouchPopup = function() {
   scout.SmartFieldTouchPopup.parent.call(this);
-
-  this.$proposalChooserContainer;
-  this.proposalChooserContainerHtmlComp;
 };
-scout.inherits(scout.SmartFieldTouchPopup, scout.Popup);
-
-scout.SmartFieldTouchPopup.TOP_MARGIN = 45;
-
-scout.SmartFieldTouchPopup.prototype._init = function(options) {
-  scout.SmartFieldTouchPopup.parent.prototype._init.call(this, options);
-  this._mobileSmartField = options.smartField;
-
-  // clone original mobile smart-field
-  // original and clone both point to the same _popup instance
-  this._smartField = this._mobileSmartField.cloneAdapter({
-    parent: this,
-    _popup: this,
-    labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
-    statusVisible: false,
-    embedded: true,
-    touch: false
-  });
-};
-
-/**
- * @override Popup.js
- */
-scout.SmartFieldTouchPopup.prototype.prefLocation = function($container, openingDirectionY) {
-  var popupSize = this.htmlComp._layout.preferredLayoutSize($container),
-    screenWidth = $(document).width(),
-    x = Math.max(0, (screenWidth - popupSize.width) / 2);
-  return new scout.Point(x, scout.SmartFieldTouchPopup.TOP_MARGIN);
-};
-
-scout.SmartFieldTouchPopup.prototype._createLayout = function() {
-  return new scout.SmartFieldTouchPopupLayout(this);
-};
-
-scout.SmartFieldTouchPopup.prototype._render = function($parent) {
-  this.$container = $.makeDiv('smart-field-popup mobile')
-    .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME AWE: (popups) is this line required?
-    .appendTo($parent);
-
-  this.$proposalChooserContainer = $.makeDiv('proposal-chooser-container')
-    .appendTo(this.$container);
-  this.proposalChooserContainerHtmlComp = new scout.HtmlComponent(this.$proposalChooserContainer, this.session);
-  this.proposalChooserContainerHtmlComp.setLayout(new scout.SingleLayout());
-
-  this._smartField.render(this.$container);
-
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(this._createLayout());
-};
+scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
 scout.SmartFieldTouchPopup.prototype._postRender = function() {
   scout.SmartFieldTouchPopup.parent.prototype._postRender.call(this);
-  this._smartField._openProposal(true);
+  this._field._openProposal(true);
 };
 
 scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function(proposalChooser) {
-  proposalChooser.render(this.$proposalChooserContainer);
+  proposalChooser.render(this._$widgetContainer);
   proposalChooser.setParent(this);
-  this.proposalChooserContainerHtmlComp.revalidateLayout();
+  this._widgetContainerHtmlComp.revalidateLayout();
 };
 
 /**
@@ -100,7 +48,6 @@ scout.SmartFieldTouchPopup.prototype._onContainerMouseDown = function(event) {
  * @override Popup.js
  */
 scout.SmartFieldTouchPopup.prototype.close = function(event) {
-  this._smartField._sendCancelProposal();
+  this._field._sendCancelProposal();
   scout.SmartFieldTouchPopup.parent.prototype.close.call(this);
 };
-

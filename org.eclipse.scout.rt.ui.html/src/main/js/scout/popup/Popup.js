@@ -325,3 +325,7 @@ scout.Popup.prototype._triggerPopupOpenEvent = function() {
 scout.Popup.prototype.belongsTo = function($anchor) {
   return this.$anchor[0] === $anchor[0];
 };
+
+scout.Popup.prototype.isOpen = function() {
+  return this.rendered;
+};

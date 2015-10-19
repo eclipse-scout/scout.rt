@@ -164,7 +164,7 @@ scout.Device.prototype.supportsFeature = function(property, checkFunc) {
 
 scout.Device.prototype.supportsTouch = function() {
   // Implement when needed, see https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
-  return false;
+  return this.hasOnScreenKeyboard();
 };
 
 scout.Device.prototype.supportsFile = function() {

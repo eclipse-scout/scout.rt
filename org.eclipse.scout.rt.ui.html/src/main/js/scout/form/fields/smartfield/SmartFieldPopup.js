@@ -6,8 +6,7 @@ scout.inherits(scout.SmartFieldPopup, scout.Popup);
 scout.SmartFieldPopup.prototype._init = function(options) {
   options.installFocusContext = false;
   scout.SmartFieldPopup.parent.prototype._init.call(this, options);
-
-  this.smartField = options.smartField;
+  this._field = options.field;
 };
 
 scout.SmartFieldPopup.prototype._createLayout = function() {

@@ -37,7 +37,7 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
 scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize,
     htmlProposalChooser = this._htmlProposalChooser($container),
-    fieldBounds = this.popup.smartField._fieldBounds();
+    fieldBounds = this.popup._field._fieldBounds();
 
   if (htmlProposalChooser) {
     prefSize = htmlProposalChooser.getPreferredSize();

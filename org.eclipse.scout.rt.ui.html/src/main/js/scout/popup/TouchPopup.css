@@ -1,0 +1,29 @@
+.touch-popup {
+  position: absolute;
+  border: solid 1px @popup-border-color;
+  border-radius:  @border-radius;
+  overflow: hidden;
+  background-color: @table-header-background-color;
+  #scout.drop-shadow();
+  #scout.focus-border();
+
+  &.down {
+    margin-top: 5px;
+  }
+
+  &.up {
+    margin-bottom: 5px;
+  }
+
+  & > .widget-container {
+    position: absolute;
+    border-top: solid 1px @border-color;
+    background-color: @control-background-color;
+
+    & > .proposal-chooser > .table {
+      overflow: inherit;
+    }
+  }
+}
+
+

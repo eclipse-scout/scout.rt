@@ -164,12 +164,8 @@
   content: @icon-angle-right;
 }
 
-.date-picker-container {
-  position: absolute;
-
+.widget-container {
   & > .date-picker {
     border: none;
-    border-top: solid 1px @border-color;
   }
-
 }

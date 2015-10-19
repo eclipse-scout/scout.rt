@@ -64,7 +64,7 @@
     margin-bottom: 5px;
   }
 
-  &.mobile {
+  &.touch {
     background-color: @table-header-background-color;
   }
 }
@@ -108,16 +108,6 @@
 
   & .table-row:last-of-type, & .tree-node:last-of-type {
     border-bottom-color: transparent;
-  }
-}
-
-.proposal-chooser-container {
-  position: absolute;
-  border-top: solid 1px @border-color;
-  background-color: @control-background-color;
-
-  & > .proposal-chooser > .table {
-    overflow: inherit;
   }
 }
 
