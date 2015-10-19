@@ -283,7 +283,7 @@ describe("ModelAdapter", function() {
 
     it('must register clone in adapter registry', function() {
       var adapterClone = adapter.cloneAdapter();
-      expect(adapterClone.cloneOf).toBe(adapter.id);
+      expect(adapterClone.cloneOf).toBe(adapter);
       // registry may contain multiple clones for a given adapter ID
       // that's why we access index 0 here
       expect(session._clonedModelAdapterRegistry[adapter.id][0]).toBe(adapterClone);

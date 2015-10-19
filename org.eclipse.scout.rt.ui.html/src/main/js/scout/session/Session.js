@@ -1106,7 +1106,7 @@ scout.Session.prototype.textExists = function(textKey) {
 };
 
 scout.Session.prototype.registerAdapterClone = function(adapter, clone) {
-  clone.cloneOf = adapter.id;
+  clone.cloneOf = adapter;
   var entry = this._clonedModelAdapterRegistry[adapter.id];
   if (entry) {
     entry.push(clone);

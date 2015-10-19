@@ -77,7 +77,15 @@ scout.ModelAdapter.prototype._init = function(model) {
  * @param coalesceFunc (optional) coalesce function added to event-object
  */
 scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
-  var adapterId = this.cloneOf || this.id;
+  var adapter = this,
+    adapterId = this.id;
+
+  // If adapter is a clone, get original adapter and get its id
+  while (adapter.cloneOf) {
+    adapter = adapter.cloneOf;
+    adapterId = adapter.id;
+  }
+
   var event = new scout.Event(adapterId, type, data);
   if (coalesceFunc) {
     event.coalesce = coalesceFunc;
