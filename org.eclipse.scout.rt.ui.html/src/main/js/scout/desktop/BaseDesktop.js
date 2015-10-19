@@ -9,11 +9,13 @@ scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
 scout.BaseDesktop.prototype._renderProperties = function() {
   scout.BaseDesktop.parent.prototype._renderProperties.call(this);
-
   this._renderTitle(this.title);
 };
 
 scout.BaseDesktop.prototype._renderTitle = function(title) {
+  if (title === undefined || title === null) {
+    return;
+  }
   var $scoutDivs = $('div.scout');
   if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
     document.title = title;

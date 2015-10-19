@@ -7,6 +7,7 @@ scout.scrollbars = {
    * creates a new scrollbar.js. For native scrollbars we
    * must set some additional CSS styles.
    *
+   * @memberOf scout.scrollbars
    */
   install: function($container, options) {
     var scrollbars, scrollbar, nativeScrollbars,

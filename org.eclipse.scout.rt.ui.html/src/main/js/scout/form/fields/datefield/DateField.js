@@ -1046,8 +1046,8 @@ scout.DateField.prototype.onCellEditorRendered = function(options) {
  * @override FormField.js
  */
 scout.DateField.prototype.prepareForCellEdit = function(opts) {
-  scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
   opts = opts || {};
+  scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
 
   this.$field.removeClass('cell-editor-field first');
   if (this.$dateField) {
