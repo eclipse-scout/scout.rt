@@ -307,6 +307,6 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
 scout.device = new scout.Device(navigator.userAgent);
 
 //XXX AWE: do not check in
-//scout.device.system = scout.Device.System.IOS;
-//scout.device.type = scout.Device.Type.TABLET;
-//scout.device.focusManagerActive = false;
+scout.device.system = scout.Device.System.IOS;
+scout.device.type = scout.Device.Type.TABLET;
+scout.device.focusManagerActive = false;

@@ -158,31 +158,24 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 };
 
 scout.SmartField.prototype._onClick = function(event) {
-  // note: the INPUT element does not process the click event when the field is disabled
-  // however, the DIV element used in touch-mode does process the event anyway, that's
-  // why this check is required.
-  if (!this.enabled || this.embedded || this._popup.rendered) {
-    return;
-  }
-
-  if (this.touch) {
-    this._popup.open();
-    return false;
-  } else {
-    this._openProposal(true);
+  if (scout.fields.handleOnClick(this)) {
+    if (this.touch) {
+      this._popup.open();
+      return false;
+    } else {
+      this._openProposal(true);
+    }
   }
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
-  if (!this.enabled || this.embedded || this._popup.rendered) {
-    return;
-  }
-
-  if (this.touch) {
-    this._popup.open();
-  } else {
-    scout.SmartField.parent.prototype._onIconClick.call(this, event);
-    this._openProposal(true);
+  if (scout.fields.handleOnClick(this)) {
+    if (this.touch) {
+      this._popup.open();
+    } else {
+      scout.SmartField.parent.prototype._onIconClick.call(this, event);
+      this._openProposal(true);
+    }
   }
 };
 

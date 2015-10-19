@@ -262,47 +262,37 @@ scout.DateField.prototype._renderBackgroundColor = function() {
 };
 
 scout.DateField.prototype._onDateFieldClick = function() {
-  if (!this.enabled || this.embedded || this._popup.isOpen()) {
-    return;
+  if (scout.fields.handleOnClick(this)) {
+    this._openDatePicker(this.timestampAsDate);
   }
-
-  this._openDatePicker(this.timestampAsDate);
 };
 
 scout.DateField.prototype._onDateIconClick = function(event) {
-  if (!this.enabled || this.embedded || this._popup.isOpen()) {
-    return;
+  if (scout.fields.handleOnClick(this)) {
+    this.$dateField.focus();
+    this._openDatePicker(this.timestampAsDate);
   }
-
-  this.$dateField.focus();
-  this._openDatePicker(this.timestampAsDate);
 };
 
 scout.DateField.prototype._onTimeFieldClick = function(event) {
-  if (!this.enabled || this.embedded || this._popup.isOpen()) {
-    return;
-  }
-
-  if (this.touch) {
+  if (scout.fields.handleOnClick(this) && this.touch) {
     this._openDatePicker(this.timestampAsDate);
   }
 };
 
 scout.DateField.prototype._onTimeIconClick = function(event) {
-  if (!this.enabled || this.embedded || this._popup.isOpen()) {
-    return;
-  }
-
-  this.$timeField.focus();
-
-  if (this.touch) {
-    this._openDatePicker(this.timestampAsDate);
+  if (scout.fields.handleOnClick(this)) {
+    this.$timeField.focus();
+    if (this.touch) {
+      this._openDatePicker(this.timestampAsDate);
+    }
   }
 };
 
 scout.DateField.prototype._onDateFieldBlur = function() {
   // Close picker and update model
   if (!this.embedded) {
+    // in embedded mode we must update the date prediction but not close the popup
     this._closeDatePicker();
   }
   this._acceptDateTimePrediction(true, false);
@@ -367,7 +357,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     return;
   }
 
-  if (!this.embedded && event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
+  if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     // Move cursor one right and apply next char of the prediction
     if (prediction) {
       this._setDateDisplayText(prediction.substring(0, displayText.length + 1));
@@ -375,7 +365,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     return;
   }
 
-  if (!this.embedded && (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN)) {
+  if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
     if (!displayText || !this._isDateValid()) {
       // If input is empty or invalid, set picker to reference date
       pickerStartDate = this._referenceDate();
@@ -398,7 +388,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     return;
   }
 
-  if (!this.embedded && (event.which === scout.keys.UP || event.which === scout.keys.DOWN)) {
+  if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     delta = (event.which === scout.keys.UP ? -1 : 1);
     if (event.ctrlKey && modifierCount === 1) { // only ctrl
       diffYears = delta;
@@ -513,6 +503,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
       // Accept the current prediction (if available)
       this._tempTimeDate = null;
       this._acceptDateTimePrediction(false, true); // accept time part
+      // in embedded mode, we want to close the whole popup when user presses enter and time field is focused
       if (this.embedded) {
         this._closeDatePicker();
       }
@@ -521,7 +512,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     return;
   }
 
-  if (!this.embedded && event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
+  if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     // Move cursor one right and apply next char of the prediction
     if (prediction) {
       this._setTimeDisplayText(prediction.substring(0, displayText.length + 1));
@@ -529,7 +520,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     return;
   }
 
-  if (!this.embedded && (event.which === scout.keys.UP || event.which === scout.keys.DOWN)) {
+  if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     delta = (event.which === scout.keys.UP ? -1 : 1);
     if (event.ctrlKey && modifierCount === 1) { // only ctrl
       diffSeconds = delta;
@@ -610,7 +601,9 @@ scout.DateField.prototype._onDatePickerDateSelected = function(event) {
   if (!event.shifting) {
     // close popup and write to model
     this.updateTimestamp(this._newTimestampAsDate(event.date, this.timestampAsDate));
-    if (!this.touch) {
+    // closeDatePicker is set to false when date-field is in touch-mode
+    // since popup will be closed by the embedded date-field
+    if (scout.helpers.nvl(event.closeDatePicker, true)) {
       this._closeDatePicker();
     }
   }
@@ -787,7 +780,9 @@ scout.DateField.prototype._openDatePicker = function(date) {
   if (!this._popupCloseHandler) {
     this._popupCloseHandler = function() {
       if (this.touch) {
-        this._onDatePickerDateSelected({date: this._popup._field.timestampAsDate});
+        this._onDatePickerDateSelected({
+          date: this._popup._field.timestampAsDate,
+          closeDatePicker: false});
       } else {
         this.getDatePicker().off('dateSelect', this._datePickerDateSelectedHandler);
         this._datePickerDateSelectedHandler = null;

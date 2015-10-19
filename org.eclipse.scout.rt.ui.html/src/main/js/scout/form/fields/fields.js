@@ -38,6 +38,13 @@ scout.fields = {
     } else {
       return scout.fields.new$TextField();
     }
+  },
+
+  // note: the INPUT element does not process the click event when the field is disabled
+  // however, the DIV element used in touch-mode does process the event anyway, that's
+  // why this check is required.
+  handleOnClick: function(field) {
+    return field.enabled && !field.embedded && !field._popup.isOpen();
   }
 
 };
