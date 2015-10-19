@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.net.URI;
 import java.util.Locale;
 
 import javax.security.auth.Subject;
@@ -52,6 +53,12 @@ public interface IClientSession extends ISession, IPropertyObserver {
    *          {@link UserAgent} to be set.
    */
   void setUserAgent(UserAgent userAgent);
+
+  /**
+   * @return the public {@link URI} in the browser which hosts this application (typically ending in /index.html or
+   *         similar)
+   */
+  URI getBrowserURI();
 
   /**
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'

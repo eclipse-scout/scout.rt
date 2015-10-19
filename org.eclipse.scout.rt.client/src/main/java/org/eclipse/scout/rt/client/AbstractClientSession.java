@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +56,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobFutureFilters.Filter;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -98,6 +101,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
+  private URI m_browserUri;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_eventListeners = new EventListenerList();
@@ -209,6 +213,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
+  public URI getBrowserURI() {
+    return m_browserUri;
+  }
+
+  @Override
   public boolean isActive() {
     return m_active;
   }
@@ -256,6 +265,16 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_virtualDesktop = new VirtualDesktop();
     String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
     setMemoryPolicy(memPolicyValue);
+
+    if (PropertyMap.CURRENT.get() != null) {
+      String urlText = (String) PropertyMap.CURRENT.get().get("url");
+      try {
+        m_browserUri = urlText != null ? new URI(urlText) : null;
+      }
+      catch (URISyntaxException e) {
+        LOG.warn("Cannot read browser url: " + urlText, e);
+      }
+    }
   }
 
   private void setMemoryPolicy(String policy) {
