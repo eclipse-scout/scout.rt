@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
@@ -42,6 +43,11 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * Method</i> and <i>Authenticator</i>. The <i>Authentication Method</i> challenges the client to provide credentials,
  * whereas the <i>Authenticator</i> validates the provided credentials against a data source. This handler is installed
  * as very first handler in the handler chain.
+ * <p>
+ * By annotating the {@link IAuthenticator} with {@link RunWithServerRunContext}-annotation,
+ * {@link IAuthenticator#authenticate(String, String)} will be invoked on behalf of a {@link ServerRunContext} with the
+ * user as configured in {@link JaxWsAuthenticatorSubjectProperty}. That allows to authenticate webservice requests
+ * against a data source which require a session.
  *
  * @since 5.1
  */
@@ -61,7 +67,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
     m_requestRunContextProvider = BEANS.get(ClazzUtil.resolve(authenticationAnnotation.runContextProvider(), ServerRunContextProvider.class, "@Authentication.runContextProvider"));
 
     final RunWithServerRunContext authenticateWithRunContext = m_authenticator.getClass().getAnnotation(RunWithServerRunContext.class);
-    m_authenticatorRunContextProvider = (authenticateWithRunContext != null ? BEANS.get(authenticateWithRunContext.provider()) : null);
+    m_authenticatorRunContextProvider = (authenticateWithRunContext != null ? BEANS.get(authenticateWithRunContext.value()) : null);
   }
 
   @Override

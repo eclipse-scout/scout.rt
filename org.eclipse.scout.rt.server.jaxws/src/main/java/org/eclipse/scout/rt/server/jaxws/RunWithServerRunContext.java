@@ -30,5 +30,5 @@ public @interface RunWithServerRunContext {
   /**
    * The provider to be used to obtain a {@link ServerRunContext}. By default, {@link ServerRunContextProvider} is used.
    */
-  Class<? extends ServerRunContextProvider> provider() default ServerRunContextProvider.class;
+  Class<? extends ServerRunContextProvider> value() default ServerRunContextProvider.class;
 }

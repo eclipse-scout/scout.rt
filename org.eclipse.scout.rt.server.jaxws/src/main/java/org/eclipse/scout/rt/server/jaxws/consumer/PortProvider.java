@@ -116,7 +116,7 @@ public class PortProvider<SERVICE extends Service, PORT> {
     }
 
     // Proxy the handler to run on behalf of a RunContext when being invoked.
-    final ServerRunContextProvider serverRunContextProvider = BEANS.get(runWithRunContext.provider());
+    final ServerRunContextProvider serverRunContextProvider = BEANS.get(runWithRunContext.value());
 
     return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
 
