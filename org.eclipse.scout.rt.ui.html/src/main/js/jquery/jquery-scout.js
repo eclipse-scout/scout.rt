@@ -307,7 +307,7 @@
     if (this.length === 1) { // shortcut for single element collections
       if (!this.hasClassSVG(cssClass)) {
         old = this[0].getAttribute('class');
-        this[0].setAttributS('class', scout.strings.join(' ', old, cssClass).trim());
+        this[0].setAttribute('class', scout.strings.join(' ', old, cssClass).trim());
       }
       return this;
     }
