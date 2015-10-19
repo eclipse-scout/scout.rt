@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +31,7 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
-import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaderFactory;
+import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
 
 /**
  * This handler contributes to the {@link UiServlet} as the default GET handler for
@@ -44,7 +46,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   // Remember bean instances to save lookups on each GET request
-  private ResourceLoaderFactory m_resourceLoaderFactory = BEANS.get(ResourceLoaderFactory.class);
+  private List<IResourceLoaderFactory> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(IResourceLoaderFactory.class));
   private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
 
   @Override
@@ -52,7 +54,17 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     String resourcePath = resolveResourcePath(req);
 
     // Create loader for the requested resource type
-    IResourceLoader resourceLoader = m_resourceLoaderFactory.createResourceLoader(req, resourcePath);
+    IResourceLoader resourceLoader = null;
+    for (IResourceLoaderFactory f : m_resourceLoaderFactoryList) {
+      resourceLoader = f.createResourceLoader(req, resourcePath);
+      if (resourceLoader != null) {
+        break;
+      }
+    }
+
+    if (resourceLoader == null) {
+      return false;
+    }
 
     // Create cache key for resource and check if resource exists in cache
     HttpCacheKey cacheKey = resourceLoader.createCacheKey(resourcePath, NlsLocale.get(false));
@@ -115,8 +127,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected ResourceLoaderFactory resourceLoaderFactory() {
-    return m_resourceLoaderFactory;
+  protected List<IResourceLoaderFactory> resourceLoaderFactoryList() {
+    return m_resourceLoaderFactoryList;
   }
 
   protected IHttpCacheControl httpCacheControl() {

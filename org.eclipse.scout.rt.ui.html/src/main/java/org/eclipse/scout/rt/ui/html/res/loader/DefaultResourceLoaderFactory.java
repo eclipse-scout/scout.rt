@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 @ApplicationScoped
-public class ResourceLoaderFactory {
+public class DefaultResourceLoaderFactory implements IResourceLoaderFactory {
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -31,6 +31,7 @@ public class ResourceLoaderFactory {
     return m_scriptProcessor;
   }
 
+  @Override
   public IResourceLoader createResourceLoader(HttpServletRequest req, String resourcePath) {
     if (resourcePath.matches("^/icon/.*")) {
       return new IconLoader(req);
