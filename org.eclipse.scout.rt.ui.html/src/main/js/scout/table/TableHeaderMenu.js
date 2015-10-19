@@ -115,7 +115,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   if (containsNumberColumn) {
     this.$grouping = $menuHeader.appendDiv('header-group');
     this.$grouping.appendDiv('header-text')
-      .data('label', session.text('ui.Sum'));
+      .data('label', session.text('ui.Grouping'));
 
     var $groupAll = this.$grouping.appendDiv('header-command group-all')
       .data('label', session.text('ui.overEverything'))
@@ -124,14 +124,29 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
     if (column.type !== 'number') {
       var $groupColumn = this.$grouping.appendDiv('header-command group-column')
-        .data('label', session.text('ui.grouped'))
         .click(this.remove.bind(this))
         .click(groupSort);
 
       var $groupColumnAdditional = this.$grouping.appendDiv('header-command group-column-additional')
-        .data('label', session.text('ui.grouped')) //TODO fko: text
+        .data('label', session.text('ui.additionally')) //TODO fko: text
       .click(this.remove.bind(this))
         .click(groupSortAdditional);
+    }
+    else{
+      //functions for number columns:
+      var $groupingFunctionSum = this.$grouping.appendDiv('header-command group-function')
+         .attr('data-icon', '@icon-sum')
+         .click(this.remove.bind(this))
+         .click(function() {
+           setGroupingFunction('sum');
+         });
+
+      var $groupingFunctionAvg = this.$grouping.appendDiv('header-command group-function')
+        .attr('data-icon', '@icon-median')
+        .click(this.remove.bind(this))
+        .click(function() {
+          setGroupingFunction('avg');
+        });
     }
 
     groupSelect();
@@ -316,6 +331,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     groupColumn($(this), column, 'asc', true);
   }
 
+  function setGroupingFunction(func){
+    table.setGroupingFunction(column, func);
+  }
+
   function groupColumn($command, column, direction, additional) {
     var remove = $command.isSelected();
     table.groupColumn(column, additional, direction, remove);
@@ -360,7 +379,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
     if ($groupColumn && column.grouped) {
       $groupColumn.addClass('selected');
-      $groupColumn.show().attr('data-icon', column.sortIndex + 1);
+//      $groupColumn.show().attr('data-icon', column.sortIndex + 1);
+      $groupColumn.show();
     }
   }
 

@@ -731,6 +731,10 @@ scout.Table.prototype._isGroupingPossible = function(column) {
 
 };
 
+scout.Table.prototype.setGroupingFunction(column, func){
+  column.groupingFunc = func;
+};
+
 scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove) {
   var sortIndex = -1,
     deviation;
