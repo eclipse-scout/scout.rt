@@ -1263,7 +1263,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                 @Override
                 protected void execAction() throws ProcessingException {
                   String configName = getConfigNameColumn().getSelectedValue();
-                  m_table.getColumnSet().applySorting(configName);
+                  m_table.getColumnSet().applySortingAndGrouping(configName);
                   getColumnsTableField().reloadTableData();
                 }
 
@@ -1573,7 +1573,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   protected void applyAll(String configName) throws ProcessingException {
     applyViewForConfig(configName);
-    m_table.getColumnSet().applySorting(configName);
+    m_table.getColumnSet().applySortingAndGrouping(configName);
   }
 
   protected void applyViewForConfig(String configName) throws ProcessingException {

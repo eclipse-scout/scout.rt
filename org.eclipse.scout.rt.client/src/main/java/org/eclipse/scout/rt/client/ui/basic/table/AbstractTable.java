@@ -3588,35 +3588,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     //Sorting & Grouping
     if (sorting) {
 
-      //Sorting
-      TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
-      int index = 0;
-      for (IColumn<?> col : getColumns()) {
-        if (col.getInitialSortIndex() >= 0) {
-          sortMap.put(new CompositeObject(col.getInitialSortIndex(), index), col);
-        }
-        index++;
-      }
-      //
-      getColumnSet().clearSortColumns();
-      getColumnSet().clearPermanentHeadSortColumns();
-      getColumnSet().clearPermanentTailSortColumns();
-      for (IColumn<?> col : sortMap.values()) {
-        if (col.isInitialAlwaysIncludeSortAtBegin()) {
-          getColumnSet().addPermanentHeadSortColumn(col, col.isInitialSortAscending());
-        }
-        else if (col.isInitialAlwaysIncludeSortAtEnd()) {
-          getColumnSet().addPermanentTailSortColumn(col, col.isInitialSortAscending());
-        }
-        else {
-          getColumnSet().addSortColumn(col, col.isInitialSortAscending());
-        }
-      }
-
-      //Grouping
-
-      //TODO: fko: delegate to ColumnSet?
-      getColumnSet().applyGrouping(null);
+      getColumnSet().resetSortingAndGrouping();
 
     }
     //Widths
