@@ -175,6 +175,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private boolean m_actionRunning;
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
+  private int m_valueChangeTriggerEnabled = 1;// >=1 is true
 
   public AbstractTable() {
     this(true);
@@ -1004,11 +1005,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           case TableEvent.TYPE_ROWS_DELETED:
           case TableEvent.TYPE_ROWS_INSERTED:
           case TableEvent.TYPE_ROWS_UPDATED: {
-            try {
-              interceptContentChanged();
-            }
-            catch (ProcessingException ex) {
-              BEANS.get(ExceptionHandler.class).handle(ex);
+            if (isValueChangeTriggerEnabled()) {
+              try {
+                interceptContentChanged();
+              }
+              catch (ProcessingException ex) {
+                BEANS.get(ExceptionHandler.class).handle(ex);
+              }
             }
             break;
           }
@@ -4945,5 +4948,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableDragChain chain = new TableDragChain(extensions);
     return chain.execDrag(rows);
+  }
+
+  @Override
+  public boolean isValueChangeTriggerEnabled() {
+    return m_valueChangeTriggerEnabled >= 1;
+  }
+
+  @Override
+  public void setValueChangeTriggerEnabled(boolean b) {
+    if (b) {
+      m_valueChangeTriggerEnabled++;
+    }
+    else {
+      m_valueChangeTriggerEnabled--;
+    }
   }
 }

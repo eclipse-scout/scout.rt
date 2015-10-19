@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
@@ -1111,5 +1112,19 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setReloadHandler(IReloadHandler reloadHandler);
 
   void ensureInvalidColumnsVisible();
+
+  /**
+   * Corresponds to {@link IFormField#isValueChangeTriggerEnabled()}
+   *
+   * @since 5.2.0
+   */
+  boolean isValueChangeTriggerEnabled();
+
+  /**
+   * Corresponds to {@link IFormField#setValueChangeTriggerEnabled(boolean)}
+   *
+   * @since 5.2.0
+   */
+  void setValueChangeTriggerEnabled(boolean b);
 
 }

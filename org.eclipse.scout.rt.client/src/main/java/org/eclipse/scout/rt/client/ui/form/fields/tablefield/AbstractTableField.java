@@ -632,4 +632,12 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     TableFieldSaveChain<T> chain = new TableFieldSaveChain<T>(extensions);
     chain.execSave(insertedRows, updatedRows, deletedRows);
   }
+
+  @Override
+  public void setValueChangeTriggerEnabled(boolean b) {
+    super.setValueChangeTriggerEnabled(b);
+    if (isInitialized()) {
+      getTable().setValueChangeTriggerEnabled(b);
+    }
+  }
 }
