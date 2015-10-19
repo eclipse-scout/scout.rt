@@ -76,5 +76,4 @@ public class MainJsonObjectFactory implements IJsonObjectFactory {
   public static MainJsonObjectFactory get() {
     return BEANS.get(MainJsonObjectFactory.class);
   }
-
 }

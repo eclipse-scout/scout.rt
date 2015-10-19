@@ -85,9 +85,9 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.JsonByteArray;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDataModel;
@@ -165,7 +165,7 @@ import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
 @Bean
 @Order(1000)
-public class JsonObjectFactory implements IJsonObjectFactory {
+public class JsonObjectFactory extends AbstractJsonObjectFactory {
 
   @SuppressWarnings("unchecked")
   @Override
@@ -326,7 +326,12 @@ public class JsonObjectFactory implements IJsonObjectFactory {
       return new JsonTree<ITree>((ITree) model, session, id, parent);
     }
     if (model instanceof ITable) {
-      return createTable((ITable) model, session, id, parent);
+      ITable table = (ITable) model;
+      IPage page = (IPage) table.getProperty(JsonOutlineTable.PROP_PAGE);
+      if (page != null) {
+        return new JsonOutlineTable<ITable>(table, session, id, parent, page);
+      }
+      return new JsonTable<ITable>(table, session, id, parent);
     }
     if (model instanceof IClientSession) {
       return new JsonClientSession<IClientSession>((IClientSession) model, session, id, parent);
@@ -363,14 +368,6 @@ public class JsonObjectFactory implements IJsonObjectFactory {
       return new JsonTableControl<ITableControl>((ITableControl) model, session, id, parent);
     }
     return null;
-  }
-
-  protected IJsonAdapter<?> createTable(ITable table, IUiSession session, String id, IJsonAdapter<?> parent) {
-    IPage page = (IPage) table.getProperty(JsonOutlineTable.PROP_PAGE);
-    if (page != null) {
-      return new JsonOutlineTable<ITable>(table, session, id, parent, page);
-    }
-    return new JsonTable<ITable>(table, session, id, parent);
   }
 
   @SuppressWarnings("unchecked")
