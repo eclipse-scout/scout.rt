@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.server.jaxws.handler.LogHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsRISpecifics;
+import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsMetroSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
@@ -85,7 +85,10 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Qualified name of the {@link JaxWsImplementorSpecifics} to use.
+   * Qualified name of the {@link JaxWsImplementorSpecifics JAX-WS implementor} to use.
+   * <p>
+   * By default, JAX-WS Metro (not bundled with JRE) is used. For that to work, add a Maven project dependency to JAX-WS
+   * Metro to your server application's pom like <code>com.sun.xml.ws:jaxws-rt:2.2.10</code>.
    */
   public static class JaxWsImplementorProperty extends AbstractStringConfigProperty {
 
@@ -96,7 +99,7 @@ public final class JaxWsConfigProperties {
 
     @Override
     protected String getDefaultValue() {
-      return JaxWsRISpecifics.class.getName();
+      return JaxWsMetroSpecifics.class.getName();
     }
   }
 
