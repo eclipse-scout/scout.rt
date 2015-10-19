@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -390,6 +391,11 @@ public final class BookmarkUtility {
       colState.setDisplayable(c.isDisplayable());
       colState.setVisible(c.isDisplayable() && c.isVisible());
       colState.setWidth(c.getWidth());
+
+      if (c instanceof INumberColumn) {
+        colState.setAggregationFunction(((INumberColumn) c).getAggregationFunction());
+      }
+
       if (columnSet.isUserSortColumn(c) && c.isSortExplicit()) {
         int sortOrder = columnSet.getSortColumnIndex(c);
         if (sortOrder >= 0) {
@@ -436,6 +442,17 @@ public final class BookmarkUtility {
       if (!existingVisibleCols.equals(visibleColumns)) {
         columnSet.setVisibleColumns(visibleColumns);
       }
+
+      //aggregation functions:
+      for (TableColumnState colState : oldColumns) {
+        if (colState.getAggregationFunction() != null) {
+          IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
+          if (col instanceof INumberColumn) {
+            ((INumberColumn) col).setAggregationFunction(colState.getAggregationFunction());
+          }
+        }
+      }
+
       //sort order (only respect visible and user-sort columns)
       boolean userSortValid = true;
       TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();

@@ -64,6 +64,8 @@ public interface ITableUIFacade {
 
   void fireHeaderGroupFromUI(IColumn<?> c, boolean multiGroup, boolean ascending);
 
+  void fireAggregationFunctionChanged(IColumn<?> c, String function);
+
   void setSelectedRowsFromUI(List<? extends ITableRow> rows);
 
   /**

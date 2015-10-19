@@ -38,6 +38,9 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   // initConfig()
   private boolean m_validateOnAnyKey;
 
+  private String m_initialAggregationFunction;
+  private String m_aggregationFunction;
+
   public AbstractNumberColumn() {
     super();
   }
@@ -112,6 +115,10 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     return true;
   }
 
+  protected String getConfiguredAggregationFunction() {
+    return AGGREGATION_FUNCTION_SUM;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -121,6 +128,8 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
     setMaxValue(getConfiguredMaxValue());
     setMinValue(getConfiguredMinValue());
+    setInitialAggregationFunction(getConfiguredAggregationFunction());
+    setAggregationFunction(getConfiguredAggregationFunction());
   }
 
   protected void initFormat() {
@@ -241,6 +250,26 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   @Override
   public NUMBER getMinValue() {
     return (NUMBER) propertySupport.getProperty(PROP_MIN_VALUE);
+  }
+
+  @Override
+  public String getInitialAggregationFunction() {
+    return m_initialAggregationFunction;
+  }
+
+  @Override
+  public void setInitialAggregationFunction(String f) {
+    m_initialAggregationFunction = f;
+  }
+
+  @Override
+  public String getAggregationFunction() {
+    return propertySupport.getPropertyString(PROP_AGGREGATION_FUNCTION);
+  }
+
+  @Override
+  public void setAggregationFunction(String f) {
+    propertySupport.setPropertyString(PROP_AGGREGATION_FUNCTION, f);
   }
 
   @Override

@@ -14,8 +14,26 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
 public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, INumberValueContainer<NUMBER> {
 
+  public static final String AGGREGATION_FUNCTION_SUM = "sum";
+  public static final String AGGREGATION_FUNCTION_AVG = "avg";
+  public static final String AGGREGATION_FUNCTION_MIN = "min";
+  public static final String AGGREGATION_FUNCTION_MAX = "max";
+
+  /**
+   * type String
+   */
+  String PROP_AGGREGATION_FUNCTION = "aggregationFunction";
+
   void setValidateOnAnyKey(boolean b);
 
   boolean isValidateOnAnyKey();
+
+  String getInitialAggregationFunction();
+
+  void setInitialAggregationFunction(String f);
+
+  String getAggregationFunction();
+
+  void setAggregationFunction(String f);
 
 }

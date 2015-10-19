@@ -23,6 +23,7 @@ public class TableColumnState implements Serializable, Cloneable {
   private Boolean m_visible;
   private byte[] m_columnFilterData;
   private boolean m_groupingActive;
+  private String m_aggregationFunction;
 
   public TableColumnState() {
   }
@@ -36,6 +37,7 @@ public class TableColumnState implements Serializable, Cloneable {
     this.m_visible = state.m_visible;
     this.m_columnFilterData = state.m_columnFilterData;
     this.m_groupingActive = state.m_groupingActive;
+    this.m_aggregationFunction = state.m_aggregationFunction;
   }
 
   public String getClassName() {
@@ -105,6 +107,14 @@ public class TableColumnState implements Serializable, Cloneable {
 
   public void setGroupingActive(boolean b) {
     m_groupingActive = b;
+  }
+
+  public String getAggregationFunction() {
+    return m_aggregationFunction;
+  }
+
+  public void setAggregationFunction(String aggregationFunction) {
+    m_aggregationFunction = aggregationFunction;
   }
 
 }

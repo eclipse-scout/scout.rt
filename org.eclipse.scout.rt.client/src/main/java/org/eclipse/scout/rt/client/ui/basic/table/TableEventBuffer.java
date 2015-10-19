@@ -429,6 +429,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       case TableEvent.TYPE_ROWS_INSERTED:
       case TableEvent.TYPE_ROWS_DELETED:
       case TableEvent.TYPE_ROWS_CHECKED:
+      case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED:
       case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
         return true;
       }

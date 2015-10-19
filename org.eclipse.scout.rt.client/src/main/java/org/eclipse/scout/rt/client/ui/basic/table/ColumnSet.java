@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.SortSpec;
 
@@ -92,6 +93,10 @@ public class ColumnSet {
         }
         if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
           resetColumnsViewOrder();
+          return;
+        }
+        if (INumberColumn.PROP_AGGREGATION_FUNCTION.equals(e.getPropertyName())) {
+          fireColumnAggregationChanged(c);
           return;
         }
         if (c.isGroupingActive() && IColumn.PROP_VISIBLE.equals(e.getPropertyName())) {
@@ -172,6 +177,7 @@ public class ColumnSet {
     private boolean m_ascending;
     private boolean m_grouped;
     private Boolean m_sortExplicit;
+    private String m_aggregationFunction;
 
     public int getSortIndex() {
       return m_sortIndex;
@@ -205,6 +211,14 @@ public class ColumnSet {
       m_sortExplicit = sortExplicit;
     }
 
+    public String getAggregationFunction() {
+      return m_aggregationFunction;
+    }
+
+    public void setAggregationFunction(String aggregationFunction) {
+      m_aggregationFunction = aggregationFunction;
+    }
+
   }
 
   private P_SortingAndGroupingConfig createSortingAndGroupingConfig(IColumn<?> col, String configName) {
@@ -217,6 +231,9 @@ public class ColumnSet {
     config.setAscending(prefs.getTableColumnSortAscending(col, col.isInitialSortAscending(), configName));
     config.setGrouped(prefs.getTableColumnGrouped(col, col.isInitialGrouped(), configName));
     config.setSortExplicit(prefs.getTableColumnSortExplicit(col, configName));
+    if (col instanceof INumberColumn) {
+      config.setAggregationFunction(prefs.getTableColumnAggregationFunction(col, ((INumberColumn) col).getInitialAggregationFunction(), configName));
+    }
     return config;
   }
 
@@ -226,6 +243,9 @@ public class ColumnSet {
     config.setAscending(col.isInitialSortAscending());
     config.setGrouped(col.isInitialGrouped());
     config.setSortExplicit(null);
+    if (col instanceof INumberColumn) {
+      config.setAggregationFunction(((INumberColumn) col).getInitialAggregationFunction());
+    }
     return config;
   }
 
@@ -253,6 +273,12 @@ public class ColumnSet {
       if (sortIndex >= 0) {
         sortMap.put(new CompositeObject(sortIndex, index), col);
       }
+
+      //aggregation function:
+      if (col instanceof INumberColumn) {
+        ((INumberColumn) col).setAggregationFunction(columnConfigs.get(col).getAggregationFunction());
+      }
+
       index++;
     }
 
@@ -785,7 +811,6 @@ public class ColumnSet {
 
     //all head sort cols are grouped and visible.
     return col.isVisible();
-
   }
 
   /**
@@ -812,7 +837,6 @@ public class ColumnSet {
     finally {
       m_table.setTableChanging(false);
     }
-
   }
 
   public boolean isGroupingColumn(IColumn<?> col) {
@@ -997,6 +1021,10 @@ public class ColumnSet {
       removeSortColumn(col);
     }
 
+  }
+
+  public void setAggregationFunction(INumberColumn<?> col, String f) {
+    col.setAggregationFunction(f);
   }
 
   public int getSortColumnCount() {
@@ -1445,6 +1473,15 @@ public class ColumnSet {
 
   private void fireColumnOrderChanged() {
     TableEvent e = new TableEvent(m_table, TableEvent.TYPE_COLUMN_ORDER_CHANGED);
+    m_table.fireTableEventInternal(e);
+  }
+
+  private void fireColumnAggregationChanged(IColumn<?> c) {
+    if (!(c instanceof INumberColumn)) {
+      return;
+    }
+    TableEvent e = new TableEvent(m_table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    e.setColumns(CollectionUtility.arrayList(c));
     m_table.fireTableEventInternal(e);
   }
 

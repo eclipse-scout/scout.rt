@@ -94,6 +94,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
@@ -4409,6 +4410,24 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             sort();
           }
         }
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireAggregationFunctionChanged(IColumn<?> c, String function) {
+
+      try {
+        pushUIProcessor();
+        //
+
+        if (!(c instanceof INumberColumn)) {
+          LOG.warn("Aggregation can only be specified on numeric columns");
+          return;
+        }
+        getColumnSet().setAggregationFunction((INumberColumn) c, function);
       }
       finally {
         popUIProcessor();

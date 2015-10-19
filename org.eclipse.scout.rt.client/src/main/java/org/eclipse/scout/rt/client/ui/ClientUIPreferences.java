@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
@@ -70,6 +71,7 @@ public class ClientUIPreferences {
   private static final String TABLE_COLUMN_VISIBLE = "table.column.visible.";
   private static final String TABLE_COLUMN_SORT_INDEX = "table.column.sortIndex.";
   private static final String TABLE_COLUMN_GROUPED = "table.column.grouped.";
+  private static final String TABLE_COLUMN_AGGR_FUNCTION = "table.column.aggr.function.";
   private static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   private static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
   private static final String APPLICATION_WINDOW_MAXIMIZED = "application.window.maximized";
@@ -342,6 +344,11 @@ public class ClientUIPreferences {
     boolean grouped = col.isGroupingActive();
     boolean sortUp = col.isSortAscending();
     boolean sortExplicit = col.isSortExplicit();
+    String aggregationFunction = null;
+    if (col instanceof INumberColumn) {
+      aggregationFunction = ((INumberColumn) col).getAggregationFunction();
+    }
+
     //
     if (viewIndex >= 0) {
       m_prefs.put(key, "" + viewIndex);
@@ -397,7 +404,14 @@ public class ClientUIPreferences {
     else {
       m_prefs.put(key, "false");
     }
-
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION);
+    if (aggregationFunction != null) {
+      m_prefs.put(key, aggregationFunction);
+    }
+    else {
+      m_prefs.remove(key);
+    }
     if (flush) {
       flush();
     }
@@ -692,6 +706,20 @@ public class ClientUIPreferences {
     if (value != null) {
       Boolean b = TypeCastUtility.castValue(value, Boolean.class);
       return b != null ? b.booleanValue() : defaultValue;
+    }
+    return defaultValue;
+  }
+
+  public String getTableColumnAggregationFunction(IColumn col, String defaultValue, String configName) {
+    if (m_prefs == null) {
+      return defaultValue;
+    }
+
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION);
+    String value = m_prefs.get(key, null);
+    if (value != null) {
+      String s = TypeCastUtility.castValue(value, String.class);
+      return s;
     }
     return defaultValue;
   }
