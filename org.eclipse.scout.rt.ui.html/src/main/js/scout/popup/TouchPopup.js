@@ -24,8 +24,7 @@ scout.TouchPopup.prototype._init = function(options) {
   // original and clone both point to the same _popup instance
   this._field = this._touchField.cloneAdapter({
     parent: this,
-    _datePickerPopup: this, // FIXME dynamic name for this property! or rename _datePickerPopup in DateField
-    _popup: this,
+    popup: this,
     labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
     statusVisible: false,
     embedded: true,

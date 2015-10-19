@@ -29,7 +29,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
     .appendTo(this.$fieldContainer);
 
   this.addStatus();
-  this.addSmartFieldPopup();
+  this.addPopup();
 };
 
 /**

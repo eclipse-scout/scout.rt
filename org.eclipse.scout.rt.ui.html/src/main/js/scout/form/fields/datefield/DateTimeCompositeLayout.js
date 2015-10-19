@@ -98,7 +98,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
       scout.graphics.setSize($predictTimeField, timeFieldSize);
     }
   }
-  var popup = this._dateField._datePickerPopup;
+  var popup = this._dateField._popup;
   if (popup && popup.rendered) {
     // Make sure the popup is correctly positioned (especially necessary for cell editor)
     popup.position();

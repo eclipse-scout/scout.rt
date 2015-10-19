@@ -329,3 +329,9 @@ scout.Popup.prototype.belongsTo = function($anchor) {
 scout.Popup.prototype.isOpen = function() {
   return this.rendered;
 };
+
+scout.Popup.prototype.ensureOpen = function() {
+  if (!this.isOpen()) {
+    this.open();
+  }
+};

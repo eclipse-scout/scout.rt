@@ -48,6 +48,18 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
 scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
+  this._popup = model.popup;
+};
+
+scout.SmartField.prototype.addPopup = function() {
+  if (!this._popup) {
+    var popupType = this.touch ? scout.SmartFieldTouchPopup : scout.SmartFieldPopup;
+    this._popup = scout.create(popupType, {
+      parent: this,
+      $anchor: this.$field,
+      field: this
+    });
+  }
 };
 
 scout.SmartField.prototype._render = function($parent) {
@@ -71,7 +83,7 @@ scout.SmartField.prototype._render = function($parent) {
   }
   this.addIcon();
   this.addStatus();
-  this.addSmartFieldPopup();
+  this.addPopup();
 };
 
 /**
@@ -81,18 +93,6 @@ scout.SmartField.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {
     this._onClick();
   }
-};
-
-scout.SmartField.prototype.addSmartFieldPopup = function() {
-  if (this.embedded) {
-    return;
-  }
-  var popupType = this.touch ? scout.SmartFieldTouchPopup : scout.SmartFieldPopup;
-  this._popup = scout.create(popupType, {
-    parent: this,
-    $anchor: this.$field,
-    field: this
-  });
 };
 
 scout.SmartField.prototype._renderProperties = function() {

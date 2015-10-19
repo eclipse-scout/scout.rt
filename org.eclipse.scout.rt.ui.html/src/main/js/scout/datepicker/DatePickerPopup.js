@@ -10,7 +10,7 @@ scout.DatePickerPopup.prototype._init = function(options) {
 
   this.picker = scout.create(scout.DatePicker, {
     parent: this,
-    dateFoFormat: options.dateFormat
+    dateFormat: options.dateFormat
   });
 };
 
@@ -25,35 +25,6 @@ scout.DatePickerPopup.prototype._render = function($parent) {
     .addClass('date-picker-popup');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-};
-
-scout.DatePickerPopup.prototype.preselectDate = function(date, animated) {
-  if (!this.isOpen()) {
-    this.open();
-  }
-  this.picker.preselectDate(date, animated);
-};
-
-scout.DatePickerPopup.prototype.selectDate = function(date, animated) {
-  if (!this.isOpen()) {
-    this.open();
-  }
-  this.picker.selectDate(date, animated);
-};
-
-scout.DatePickerPopup.prototype.shiftSelectedDate = function(years, months, days) {
-  if (!this.isOpen()) {
-    this.open();
-  }
-  this.picker.shiftSelectedDate(years, months, days);
-};
-
-scout.DatePickerPopup.prototype._onDateSelect = function(callback) {
-  this.picker.on('dateSelect', callback);
-};
-
-scout.DatePickerPopup.prototype._dateFormat = function(dateFormat) {
-  this.picker.dateFormat = dateFormat;
 };
 
 /**
@@ -72,4 +43,11 @@ scout.DatePickerPopup.prototype._onMouseDown = function(event) {
 
 scout.DatePickerPopup.prototype._onAnchorScroll = function(event) {
   this.position();
+};
+
+/**
+ * @implements DatePickerPopup
+ */
+scout.DatePickerPopup.prototype.getDatePicker = function() {
+  return this.picker;
 };
