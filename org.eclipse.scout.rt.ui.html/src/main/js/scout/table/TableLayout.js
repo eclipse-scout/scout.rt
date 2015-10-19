@@ -66,7 +66,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
     currentWidth = 0,
     totalInitialWidth = 0,
     minWidthAdjustment = 0,
-    availableWidth = this.table.$data.outerWidth();
+    availableWidth = this.table.$data.outerWidth() - this.table.rowBorderWidth;
 
   columns.forEach(function(column) {
     if (column.fixedWidth) {
@@ -93,8 +93,8 @@ scout.TableLayout.prototype._layoutColumns = function() {
       weight = column.initialWidth / totalInitialWidth;
     }
     newWidth = weight * availableWidth;
-    if (newWidth < scout.Table.COLUMN_MIN_WIDTH) {
-      newWidth = scout.Table.COLUMN_MIN_WIDTH;
+    if (newWidth < column.minWidth) {
+      newWidth = column.minWidth;
       minWidthAdjustment += newWidth;
       totalInitialWidth -= column.initialWidth;
       scout.arrays.remove(relevantColumns, column);

@@ -100,10 +100,10 @@
     background-color: @item-selection-background-color;
     border-color: @item-selection-border-color;
   }
-}
 
-.right-aligned {
-  float: right;
+  &.right-aligned {
+    float: right;
+  }
 }
 
 .menu-textandicon > .icon {

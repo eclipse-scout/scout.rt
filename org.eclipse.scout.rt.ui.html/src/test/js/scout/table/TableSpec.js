@@ -372,8 +372,8 @@ describe("Table", function() {
       // Triggers TableLayout._layoutColumns()
       session.layoutValidator.validate();
 
-      expect(table.columns[0].width).toBe(420);
-      expect(table.columns[1].width).toBe(scout.Table.COLUMN_MIN_WIDTH);
+      expect(table.columns[0].width).toBe(370); // 450 - scout.Column.DEFAULT_MIN_WIDTH
+      expect(table.columns[1].width).toBe(scout.Column.DEFAULT_MIN_WIDTH);
     });
 
   });

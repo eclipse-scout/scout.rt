@@ -13,6 +13,14 @@
   padding: @table-row-padding-y @table-cell-padding-right - 1px @table-row-padding-y @table-cell-padding-left - 1px;
   border-radius: 0;
 
+  &.halign-right {
+    padding-right: @table-cell-padding-left - 1px;
+    padding-left: @table-cell-padding-right - 1px;
+  }
+  &.halign-center {
+    padding-right: @table-cell-padding-left - 1px;
+  }
+
   &:focus {
     box-shadow: none;
   }

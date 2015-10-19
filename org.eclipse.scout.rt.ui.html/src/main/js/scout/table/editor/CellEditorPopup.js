@@ -56,8 +56,7 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   field.mode = scout.FormField.MODE_CELLEDITOR; // hint that this field is used within a cell-editor
   field.render(this.$container);
   field.prepareForCellEdit({
-    firstCell: firstCell,
-    cellHorizontalAlignment: scout.Table.parseHorizontalAlignment(this.cell.horizontalAlignment)
+    firstCell: firstCell
   });
   field.setParent(this);
 

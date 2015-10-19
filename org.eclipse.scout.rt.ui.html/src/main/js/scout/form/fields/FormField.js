@@ -601,9 +601,6 @@ scout.FormField.prototype.prepareForCellEdit = function(opts) {
   if (this.$container) {
     this.$container.addClass('cell-editor-form-field');
   }
-  if (this.$fieldContainer) {
-    this.$fieldContainer.css('text-align', opts.cellHorizontalAlignment);
-  }
   if (this.$field) {
     this.$field.addClass('cell-editor-field');
     if (opts.firstCell) {

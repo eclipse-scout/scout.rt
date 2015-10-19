@@ -43,18 +43,38 @@ describe("Column", function() {
     var $cells0 = $rows.eq(0).find('.table-cell');
     var $cells1 = $rows.eq(1).find('.table-cell');
 
-    //Default is different in every browser... (start chrome, webkit-auto phantomjs, left IE)
-    expect($headerItem0.css('text-align')).toMatch('start|webkit-auto|left');
-    expect($cells0.eq(0).css('text-align')).toMatch('start|webkit-auto|left');
-    expect($cells1.eq(0).css('text-align')).toMatch('start|webkit-auto|left');
+    // Left
+    expect($headerItem0).toHaveClass('halign-left');
+    expect($headerItem0).not.toHaveClass('halign-center');
+    expect($headerItem0).not.toHaveClass('halign-right');
+    expect($cells0.eq(0)).toHaveClass('halign-left');
+    expect($cells0.eq(0)).not.toHaveClass('halign-center');
+    expect($cells0.eq(0)).not.toHaveClass('halign-right');
+    expect($cells1.eq(0)).toHaveClass('halign-left');
+    expect($cells1.eq(0)).not.toHaveClass('halign-center');
+    expect($cells1.eq(0)).not.toHaveClass('halign-right');
 
-    expect($headerItem1.css('text-align')).toBe('center');
-    expect($cells0.eq(1).css('text-align')).toBe('center');
-    expect($cells1.eq(1).css('text-align')).toBe('center');
+    // Center
+    expect($headerItem1).not.toHaveClass('halign-left');
+    expect($headerItem1).toHaveClass('halign-center');
+    expect($headerItem1).not.toHaveClass('halign-right');
+    expect($cells0.eq(1)).not.toHaveClass('halign-left');
+    expect($cells0.eq(1)).toHaveClass('halign-center');
+    expect($cells0.eq(1)).not.toHaveClass('halign-right');
+    expect($cells1.eq(1)).not.toHaveClass('halign-left');
+    expect($cells1.eq(1)).toHaveClass('halign-center');
+    expect($cells1.eq(1)).not.toHaveClass('halign-right');
 
-    expect($headerItem2.css('text-align')).toBe('right');
-    expect($cells0.eq(2).css('text-align')).toBe('right');
-    expect($cells1.eq(2).css('text-align')).toBe('right');
+    // Right
+    expect($headerItem2).not.toHaveClass('halign-left');
+    expect($headerItem2).not.toHaveClass('halign-center');
+    expect($headerItem2).toHaveClass('halign-right');
+    expect($cells0.eq(2)).not.toHaveClass('halign-left');
+    expect($cells0.eq(2)).not.toHaveClass('halign-center');
+    expect($cells0.eq(2)).toHaveClass('halign-right');
+    expect($cells1.eq(2)).not.toHaveClass('halign-left');
+    expect($cells1.eq(2)).not.toHaveClass('halign-center');
+    expect($cells1.eq(2)).toHaveClass('halign-right');
   });
 
   it("considers custom css class of a column", function() {

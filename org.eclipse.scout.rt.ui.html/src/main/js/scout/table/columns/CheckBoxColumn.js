@@ -4,6 +4,7 @@
  */
 scout.CheckBoxColumn = function() {
   scout.CheckBoxColumn.parent.call(this);
+  this.minWidth = scout.Column.NARROW_MIN_WIDTH;
 };
 scout.inherits(scout.CheckBoxColumn, scout.Column);
 
@@ -13,8 +14,8 @@ scout.CheckBoxColumn.prototype.buildCell = function(row) {
   cell = this.table.cell(this, row);
   checked = cell.value;
   enabled = enabled && cell.editable;
-  style = this.table.cellStyle(this, cell);
-  cssClass = this._cssClass(row, cell);
+  cssClass = this._cellCssClass(cell);
+  style = this._cellStyle(cell);
   if (!enabled) {
     cssClass +=' disabled';
   }
@@ -38,8 +39,8 @@ scout.CheckBoxColumn.prototype.$checkBox = function($row) {
   return $cell.children('.check-box');
 };
 
-scout.CheckBoxColumn.prototype._cssClass = function(row, cell) {
-  var cssClass = scout.CheckBoxColumn.parent.prototype._cssClass.call(this, row, cell);
+scout.CheckBoxColumn.prototype._cellCssClass = function(cell) {
+  var cssClass = scout.CheckBoxColumn.parent.prototype._cellCssClass.call(this, cell);
   cssClass = cssClass.replace(' editable', '');
   cssClass += ' checkable';
   return cssClass;

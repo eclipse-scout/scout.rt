@@ -1,4 +1,9 @@
-scout.Column = function() {};
+scout.Column = function() {
+  this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
+};
+
+scout.Column.DEFAULT_MIN_WIDTH = 80;
+scout.Column.NARROW_MIN_WIDTH = 30; // for columns without text (icon, check box)
 
 scout.Column.prototype.init = function(model) {
   this.session = model.session;
@@ -55,10 +60,10 @@ scout.Column.prototype.buildCell = function(row) {
   }
   var iconId = cell.iconId;
   var icon = this._icon(row, iconId, !! text) || '';
-  var cssClass = this._cssClass(row, cell);
+  var cssClass = this._cellCssClass(cell);
+  var style = this._cellStyle(cell);
   var tooltipText = this.table.cellTooltipText(this, row);
   var tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
-  var style = this.table.cellStyle(this, cell);
 
   if (cell.errorStatus) {
     row.hasError = true;
@@ -106,7 +111,7 @@ scout.Column.prototype._icon = function(row, iconId, hasText) {
   }
 };
 
-scout.Column.prototype._cssClass = function(row, cell) {
+scout.Column.prototype._cellCssClass = function(cell) {
   var cssClass = 'table-cell';
   if (this.mandatory) {
     cssClass += ' mandatory';
@@ -120,6 +125,7 @@ scout.Column.prototype._cssClass = function(row, cell) {
   if (cell.errorStatus) {
     cssClass += ' has-error';
   }
+  cssClass += ' halign-' + scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
 
   //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {
@@ -128,6 +134,19 @@ scout.Column.prototype._cssClass = function(row, cell) {
     cssClass += ' ' + this.cssClass;
   }
   return cssClass;
+};
+
+scout.Column.prototype._cellStyle = function(cell) {
+  var style,
+    width = this.width;
+
+  if (width === 0) {
+    return 'display: none;';
+  }
+
+  style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
+  style += scout.helpers.legacyStyle(cell);
+  return style;
 };
 
 scout.Column.prototype.onMouseUp = function(event, $row) {
@@ -146,6 +165,9 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
     $cell = this.table.$cell(this, $row);
 
   cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
+  // Override field alignment with the cell's alignment
+  cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
+
   popup = scout.create(scout.CellEditorPopup, {
     parent: this.table,
     column: this,

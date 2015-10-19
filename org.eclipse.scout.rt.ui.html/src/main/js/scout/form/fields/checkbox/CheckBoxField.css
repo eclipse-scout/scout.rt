@@ -23,6 +23,21 @@
     color: @control-disabled-color;
   }
 
+  &.has-inner-alignment {
+
+    &.halign-left {
+      text-align: left;
+    }
+
+    &.halign-center {
+      text-align: center;
+    }
+
+    &.halign-right {
+      text-align: right;
+    }
+  }
+
   & > .check-box {
 
     &:focus {
@@ -58,8 +73,8 @@
     /* generate an invisible border to make it easier to work with, since other fields have a border too */
     border: 1px solid transparent;
     padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment;
-    padding-left: @table-cell-padding-left;
-    padding-right: @table-cell-padding-left;
+    padding-left: @table-cell-padding-left - 1px;
+    padding-right: @table-cell-padding-left - 1px;
 
     & > .check-box::before {
       position: static;

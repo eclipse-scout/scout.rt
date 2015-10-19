@@ -91,3 +91,9 @@ scout.CheckBoxField.prototype._renderLabel = function(label) {
     this.$checkBoxLabel.text(label || '');
   }
 };
+
+scout.CheckBoxField.prototype._renderGridData = function() {
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};

@@ -26,7 +26,7 @@ scout.TableHeader.prototype._init = function(options) {
 };
 
 scout.TableHeader.prototype._render = function($parent) {
-  var column, $header, alignment, $defaultCheckedColumHeader, $separator,
+  var column, $header, $defaultCheckedColumHeader, $separator,
     that = this,
     columns = this.columns,
     table = this.table;
@@ -35,10 +35,20 @@ scout.TableHeader.prototype._render = function($parent) {
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
+    var columnWidth = column.width;
+    var isFirstColumn = (i === 0);
+    var isLastColumn = (i === columns.length - 1);
+
+    if (isFirstColumn) {
+      columnWidth += table.rowBorderLeftWidth;
+    } else if (isLastColumn) {
+      columnWidth += table.rowBorderRightWidth;
+    }
+
     $header = this.$container.appendDiv('table-header-item')
       .data('column', column)
-      .css('min-width', column.width + 'px')
-      .css('max-width', column.width + 'px')
+      .css('min-width', columnWidth + 'px')
+      .css('max-width', columnWidth + 'px')
       .on('click', this._onHeaderItemClick.bind(this))
       .on('mousedown', dragHeader);
     $header.toggleAttr('data-modelclass', !! column.modelClass, column.modelClass);
@@ -52,10 +62,7 @@ scout.TableHeader.prototype._render = function($parent) {
     });
 
     this._decorateHeader(column);
-    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-    if (alignment !== 'left') {
-      $header.css('text-align', alignment);
-    }
+    $header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
     if (!column.fixedWidth) {
       $separator = this.$container.appendDiv('table-header-resize');
@@ -82,9 +89,22 @@ scout.TableHeader.prototype._render = function($parent) {
   this.table.on('columnMoved', this._tableColumnMovedHandler);
 
   function resizeHeader(event) {
-    var startX = event.pageX,
+    var startX = Math.floor(event.pageX),
       $header = $(this).prev(),
-      headerWidth = parseFloat($header.css('min-width'));
+      column = $header.data('column'),
+      headerWidth = column.width;
+
+    column.resizingInProgress = true;
+
+    // Install resize helpers. Those helpers make sure the header and the data element keep their
+    // current width until the resizing has finished. Otherwise, make a column smaller while the
+    // table has been horizontally scrolled to the right would behave very strange.
+    that.$headerColumnResizeHelper = $.makeDiv('table-column-resize-helper')
+      .css('width', table.rowWidth + table.rowBorderWidth)
+      .appendTo(that.$container);
+    that.$dataColumnResizeHelper = $.makeDiv('table-column-resize-helper')
+      .css('width', table.rowWidth)
+      .appendTo(table.$data);
 
     $(window)
       .on('mousemove.tableheader', resizeMove)
@@ -95,29 +115,40 @@ scout.TableHeader.prototype._render = function($parent) {
     event.preventDefault();
 
     function resizeMove(event) {
-      var diff = event.pageX - startX,
+      var diff = Math.floor(event.pageX) - startX,
         wHeader = headerWidth + diff;
 
-      if (wHeader > 80 || diff > 0) {
-        that.table.resizeColumn($header.data('column'), wHeader);
+      wHeader = Math.max(wHeader, column.minWidth);
+      if (wHeader !== column.width) {
+        that.table.resizeColumn(column, wHeader);
       }
     }
 
     function resizeEnd(event) {
+      delete column.resizingInProgress;
+
+      // Remove resize helpers
+      that.$headerColumnResizeHelper.remove();
+      that.$headerColumnResizeHelper = null;
+      that.$dataColumnResizeHelper.remove();
+      that.$dataColumnResizeHelper = null;
+
       $(window).off('mousemove.tableheader');
       $('body').removeClass('col-resize');
+
+      that.table.resizeColumn(column, column.width);
     }
   }
 
   function dragHeader(event) {
     var diff = 0,
-      startX = event.pageX,
+      startX = Math.floor(event.pageX),
       $header = $(this),
       column = $header.data('column'),
       oldPos = that.table.columns.indexOf(column),
       newPos = oldPos,
       move = $header.outerWidth(),
-      $otherHeaders = $header.siblings('.table-header-item');
+      $otherHeaders = $header.siblings('.table-header-item:not(.filler)');
 
     that.dragging = false;
     // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
@@ -129,7 +160,7 @@ scout.TableHeader.prototype._render = function($parent) {
       .one('mouseup', '', dragEnd);
 
     function dragMove(event) {
-      diff = event.pageX - startX;
+      diff = Math.floor(event.pageX) - startX;
       if (diff === 0) {
         return;
       }
@@ -147,7 +178,7 @@ scout.TableHeader.prototype._render = function($parent) {
       var middle = realMiddle($header);
 
       $otherHeaders.each(function(i) {
-        var m = realMiddle($($otherHeaders[i]));
+        var m = realMiddle($(this));
 
         if (middle < m && i < oldPos) {
           $(this).css('left', move);
@@ -173,7 +204,7 @@ scout.TableHeader.prototype._render = function($parent) {
     }
 
     function realMiddle($div) {
-      if ($div.css('text-align') === 'right') {
+      if ($div.hasClass('halign-right')) {
         return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
       } else {
         return $div.offset().left + realWidth($div) / 2;
@@ -238,28 +269,34 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
     $headerResize,
-    width = column.width,
+    columnWidth = column.width,
     menuBarWidth = this._$menuBar.outerWidth(),
+    isFirstColumn = this.table.columns.indexOf(column) === 0,
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
 
-  if (isLastColumn) {
+  if (isFirstColumn) {
+    columnWidth += this.table.rowBorderLeftWidth;
+  } else if (isLastColumn) {
+    columnWidth += this.table.rowBorderRightWidth;
     remainingHeaderSpace = Math.max(this.$container.width() - this.table.rowWidth, 0);
-    if (remainingHeaderSpace < menuBarWidth) {
-      // add 1 px to make the resizer visible
-      adjustment = menuBarWidth - remainingHeaderSpace + 1;
-      width -= adjustment;
-      width = Math.max(width, scout.Table.COLUMN_MIN_WIDTH);
-
-      this.$filler.cssWidth(column.width - width);
-    }
-
-    // adjust visibility of last resize item (avoid unnecessary scroll bars) (e.g. COLUMN_MIN_WIDTH has been used).
+    remainingHeaderSpace = this.$container.width() - this.table.rowWidth;
     $headerResize = $header.next('.table-header-resize');
-    $headerResize.css('display', (remainingHeaderSpace > menuBarWidth || column.width - width >= adjustment) ? '' : 'none');
+
+    if (remainingHeaderSpace < menuBarWidth) {
+      adjustment = menuBarWidth;
+      adjustment += $headerResize.width();
+      if (remainingHeaderSpace > 0) {
+        adjustment -= remainingHeaderSpace;
+      }
+
+      var origColumnWidth = columnWidth;
+      columnWidth = Math.max(columnWidth - adjustment, column.minWidth - adjustment);
+      this.$filler.cssWidth(origColumnWidth - columnWidth);
+    }
   }
   $header
-    .css('min-width', width)
-    .css('max-width', width);
+    .css('min-width', columnWidth)
+    .css('max-width', columnWidth);
 };
 
 scout.TableHeader.prototype._reconcileScrollPos = function() {

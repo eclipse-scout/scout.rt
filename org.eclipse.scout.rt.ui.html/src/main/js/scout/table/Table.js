@@ -13,6 +13,9 @@ scout.Table = function(model) {
   this.rows = [];
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
+  this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
+  this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
+  this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
@@ -35,8 +38,6 @@ scout.Table = function(model) {
   this.attached = false; // Indicates whether this table is currently visible to the user.
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
-
-scout.Table.COLUMN_MIN_WIDTH = 30;
 
 scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
@@ -84,7 +85,6 @@ scout.Table.prototype._initColumns = function() {
     this._insertRowIconColumn();
   }
   this._syncCheckable(this.checkable);
-  this._updateRowWidth();
 
   // Sync head and tail sort columns
   this._syncHeadAndTailSortColumns();
@@ -140,7 +140,7 @@ scout.Table.prototype._insertCheckBoxColumn = function() {
     fixedPosition: true,
     guiOnly: true,
     disallowHeaderMenu: true,
-    width: scout.Table.COLUMN_MIN_WIDTH,
+    width: scout.Column.NARROW_MIN_WIDTH,
     table: this
   });
 
@@ -150,13 +150,13 @@ scout.Table.prototype._insertCheckBoxColumn = function() {
 
 scout.Table.prototype._insertRowIconColumn = function() {
   var position = 0,
-    column = scout.create('Column', {
+    column = scout.create('IconColumn', {
       session: this.session,
       fixedWidth: true,
       fixedPosition: true,
       guiOnly: true,
       disallowHeaderMenu: true,
-      width: scout.Table.COLUMN_MIN_WIDTH,
+      width: scout.Column.NARROW_MIN_WIDTH,
       table: this
     });
   if (this.columns[0] === this.checkableColumn) {
@@ -219,6 +219,8 @@ scout.Table.prototype._render = function($parent) {
     test.remove();
   }
 
+  this._calculateRowBorderWidth();
+  this._updateRowWidth();
   this._renderRows();
 
   //----- inline methods: --------
@@ -868,8 +870,16 @@ scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelec
   return rowDiv;
 };
 
+scout.Table.prototype._calculateRowBorderWidth = function() {
+  var $tableRowDummy = this.$data.appendDiv('table-row');
+  this.rowBorderLeftWidth = $tableRowDummy.cssBorderLeftWidth();
+  this.rowBorderRightWidth = $tableRowDummy.cssBorderRightWidth();
+  this.rowBorderWidth = this.rowBorderLeftWidth + this.rowBorderRightWidth;
+  $tableRowDummy.remove();
+};
+
 scout.Table.prototype._updateRowWidth = function() {
-  this.rowWidth = 0;
+  this.rowWidth = this.rowBorderWidth;
   for (var i = 0; i < this.columns.length; i++) {
     this.rowWidth += this.columns[i].width;
   }
@@ -1029,17 +1039,27 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
  */
 scout.Table.prototype._columnAtX = function(x) {
   var columnOffsetRight = 0,
-    columnOffsetLeft = this.$data.offset().left,
+    columnOffsetLeft = this.$data.offset().left + this.rowBorderLeftWidth,
     scrollLeft = this.$data.scrollLeft();
 
+  if (x < columnOffsetLeft) {
+    // Clicked left of first column (on selection border) --> return first column
+    return this.columns[0];
+  }
+
   columnOffsetLeft -= scrollLeft;
-  return scout.arrays.find(this.columns, function(column) {
+  var column = scout.arrays.find(this.columns, function(column) {
     columnOffsetRight = columnOffsetLeft + column.width;
     if (x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
     }
     columnOffsetLeft = columnOffsetRight;
   });
+  if (!column) {
+    // No column found (clicked right of last column, on selection border) --> return last column
+    column = this.columns[this.columns.length - 1];
+  }
+  return column;
 };
 
 /**
@@ -1286,20 +1306,6 @@ scout.Table.prototype.cellText = function(column, row) {
   return cell.text || '';
 };
 
-scout.Table.prototype.cellStyle = function(column, cell) {
-  var style, hAlign,
-    width = column.width;
-
-  if (width === 0) {
-    return 'display: none;';
-  }
-
-  style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-  style += scout.helpers.legacyStyle(cell);
-  hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
-  return style + (hAlign === 'left' || !hAlign ? '' : 'text-align: ' + hAlign + '; ');
-};
-
 scout.Table.prototype.cellTooltipText = function(column, row) {
   var cell = row.cells[column.index];
   if (typeof cell === 'object' && cell !== null && scout.strings.hasText(cell.tooltipText)) {
@@ -1472,7 +1478,7 @@ scout.Table.prototype._groupColumn = function() {
  * Appends a new sum row after row.$row
  */
 scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
-  var c, column, alignment, $cell,
+  var c, column, $cell,
     $sumRow = $.makeDiv('table-row-sum');
 
   if (this.groupedSelection) {
@@ -1481,33 +1487,30 @@ scout.Table.prototype._appendSumRow = function(sum, row, all, update) {
 
   for (c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
-    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (typeof sum[c] === 'number') {
       var sumValue = sum[c];
       if (column.format) {
         var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
         sumValue = decimalFormat.format(sumValue);
       }
-      $cell = $.makeDiv('table-cell', sumValue)
-        .css('text-align', alignment);
+      $cell = $.makeDiv('table-cell', sumValue);
     } else if (!all && column.grouped) {
       if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
-        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row))
-          .css('text-align', alignment);
+        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row));
       } else {
-        $cell = $.makeDiv('table-cell', this.cellText(column, row))
-          .css('text-align', alignment);
+        $cell = $.makeDiv('table-cell', this.cellText(column, row));
       }
     } else {
       $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
     }
+    $cell.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
     $cell.appendTo($sumRow)
       .css('min-width', column.width)
       .css('max-width', column.width);
   }
 
-  $sumRow.insertAfter(row.$row).width(this._rowWidth);
+  $sumRow.insertAfter(row.$row).width(this.rowWidth);
 
   if (!update) {
     $sumRow
@@ -2336,7 +2339,15 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
 };
 
 /**
- * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
+ * While resizing a column, this method is called for each change of the width. As long as the resizing is in
+ * progress (e.g. the mouse button has not been released), the column is marked with the flag "resizingInProgress".
+ * When the resizing has finished, this method has to be called again without the flag "resizingInProgress" to
+ * correctly set the width of the "empty data" div.
+ *
+ * @param column
+ *          (required) column to resize
+ * @param width
+ *          (required) new column size
  */
 scout.Table.prototype.resizeColumn = function(column, width) {
   if (column.fixedWidth) {
@@ -2359,7 +2370,12 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 
   this._triggerColumnResized(column);
   this._sendColumnResized(column);
-  this._renderEmptyData();
+  
+  if (column.resizingInProgress) {
+    this._renderEmptyData();
+  } else {
+    this._renderEmptyData(this.rowWidth - this.rowBorderWidth);
+  }
 };
 
 scout.Table.prototype._sendColumnResized = function(column) {
@@ -2636,15 +2652,20 @@ scout.Table.prototype._removeTableHeader = function() {
   }
 };
 
-scout.Table.prototype._renderEmptyData = function() {
+/**
+ * @param width optional width of emptyData, if omitted the width is set to the header's scrollWidth.
+ */
+scout.Table.prototype._renderEmptyData = function(width) {
   if (this.header && this.rows.length === 0) {
     if (!this.$emptyData) {
       this.$emptyData = $.makeDiv()
         .html('&nbsp;')
         .appendTo(this.$data);
     }
-    this.$emptyData.css('min-width', this.header.$container[0].scrollWidth)
-      .css('max-width', this.header.$container[0].scrollWidth);
+    var headerWidth = scout.helpers.nvl(width, this.header.$container[0].scrollWidth);
+    this.$emptyData
+      .css('min-width', headerWidth)
+      .css('max-width', headerWidth);
   }
   this.updateScrollbars();
 };

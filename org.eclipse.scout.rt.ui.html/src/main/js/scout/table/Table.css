@@ -1,7 +1,6 @@
 @table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
 @table-cell-padding-right: 4px;  /* also used in scout.Column.prototype.buildCell */
 @table-row-padding-y: 7px;
-@table-row-padding-left: @table-cell-padding-left;
 /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline cells) */
 @checkable-cell-padding-adjustment: 2px;
 
@@ -21,8 +20,8 @@
 
   & > .menubar {
     &:not(.main-menubar) {
-      padding-left: @table-row-padding-left;
-      padding-right: @table-row-padding-left;
+      padding-left: @table-cell-padding-left;
+      padding-right: @table-cell-padding-right;
     }
   }
 }
@@ -165,6 +164,16 @@
   & > .check-box.disabled::before,
   .table.disabled > .table-data > .table-row > & > .check-box::before {
     #scout.checkbox-before-disabled();
+  }
+
+  &.halign-right {
+    text-align: right;
+    padding-right: @table-cell-padding-left;
+    padding-left: @table-cell-padding-right;
+  }
+  &.halign-center {
+    text-align: center;
+    padding-right: @table-cell-padding-left;
   }
 }
 

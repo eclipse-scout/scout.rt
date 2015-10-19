@@ -1,5 +1,8 @@
 @table-header-padding-y: @table-row-padding-y;
-@table-header-padding-left: @table-row-padding-left;
+@table-header-padding-left: @table-cell-padding-left;
+@table-header-padding-right: @table-cell-padding-right;
+@table-header-sort-icon-size-1: 12px;
+@table-header-sort-icon-size-2: @table-header-sort-icon-size-1 + 12px; /* bigger space when multiple icons are displayed */
 
 .table-header {
   position: relative;
@@ -40,7 +43,7 @@
   position: relative;
   display: inline-block;
   #scout.font-text-normal(@bold);
-  padding: @table-header-padding-y 6px @table-header-padding-y @table-header-padding-left;
+  padding: @table-header-padding-y @table-header-padding-right @table-header-padding-y @table-header-padding-left;
   #scout.overflow-ellipsis-nowrap();
   /* Vertical align is necessary for 2 things:
     1. Alignment in case of multiline headers.
@@ -59,10 +62,36 @@
     text-overflow: clip;
   }
 
+  &.halign-right {
+    text-align: right;
+    padding-right: @table-cell-padding-left;
+    padding-left: @table-cell-padding-right;
+  }
+  &.halign-center {
+    text-align: center;
+    padding-right: @table-cell-padding-left;
+  }
+
+  &.sorted,
+  &.filtered {
+    /* make room for icon */
+    padding-right: @table-header-padding-right + @table-header-sort-icon-size-1;
+
+    &.halign-right,
+    &.halign-center {
+      padding-right: @table-cell-padding-left + @table-header-sort-icon-size-1;
+    }
+  }
+
   &.sorted.grouped,
   &.sorted.filtered {
-    /* make some more room*/
-    padding-right: 25px;
+    /* make some more room */
+    padding-right: @table-header-padding-right + @table-header-sort-icon-size-2;
+
+    &.halign-right,
+    &.halign-center {
+      padding-right: @table-cell-padding-left + @table-header-sort-icon-size-2;
+    }
   }
 
   &:hover, &.header-move {
@@ -113,6 +142,7 @@
     color: @palette-gray-6;
     font-size: 16px;
     padding-left: 3px;
+    padding-right: 3px;
     vertical-align: top;
   }
 
@@ -146,4 +176,14 @@
   .menu-open + &.table-header-resize {
     background-color: @panel-background-color;
   }
+}
+
+/* Temporary element inserted in header and data area during resizing of a column */
+.table-column-resize-helper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  height: 1px;
+  /* width is set dynamically by TableHeader.js */
 }
