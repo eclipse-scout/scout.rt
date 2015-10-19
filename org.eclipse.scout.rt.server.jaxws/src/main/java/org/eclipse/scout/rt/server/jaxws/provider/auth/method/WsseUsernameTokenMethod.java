@@ -60,7 +60,7 @@ public class WsseUsernameTokenMethod implements IAuthenticationMethod {
   public Subject authenticate(final SOAPMessageContext context, final IAuthenticator authenticator) throws Exception {
     final Entry<String, String> credentials = readWsseCredentials(context);
     if (credentials == null) {
-      m_implementorSpecifics.setHttpStatusCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+      m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
       return null;
     }
 
@@ -69,7 +69,7 @@ public class WsseUsernameTokenMethod implements IAuthenticationMethod {
       return new Subject(true, Collections.singleton(new SimplePrincipal(username)), Collections.emptySet(), Collections.emptySet());
     }
     else {
-      m_implementorSpecifics.setHttpStatusCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+      m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
       return null;
     }
   }

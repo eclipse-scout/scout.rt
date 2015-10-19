@@ -254,7 +254,7 @@ public class InvocationContext<PORT> {
    */
   public int getHttpStatusCode() {
     final Map<String, Object> responseContext = getResponseContext();
-    return (responseContext != null ? m_implementorSpecifics.getHttpStatusCode(responseContext).intValue() : -1);
+    return (responseContext != null ? m_implementorSpecifics.getHttpResponseCode(responseContext).intValue() : -1);
   }
 
   /**
@@ -314,9 +314,16 @@ public class InvocationContext<PORT> {
       final Holder<Object> wsResult = new Holder<>();
       final Holder<Throwable> wsError = new Holder<>();
 
-      final String operation = String.format("client=%s, operation=%s.%s", m_name, method.getDeclaringClass().getSimpleName(), method.getName());
+      // Reset the HTTP response code.
+      Map<String, Object> responseContext = getResponseContext();
+      if (responseContext != null) {
+        m_implementorSpecifics.clearHttpResponseCode(getResponseContext());
+      }
 
+      final String operation = String.format("client=%s, operation=%s.%s", m_name, method.getDeclaringClass().getSimpleName(), method.getName());
       final ServerRunContext currentRunContext = ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRED);
+
+      // Invoke the web method in a separate, blocking job to allow cancellation.
       final IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
         @Override

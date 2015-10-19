@@ -59,7 +59,7 @@ public class BasicAuthenticationMethod implements IAuthenticationMethod {
     if (authHeaders.isEmpty()) {
       // Challenge the client to provide credentials.
       m_implementorSpecifics.setHttpResponseHeader(context, AUTH_BASIC_AUTHENTICATE, "Basic realm=\"" + m_realm + "\"");
-      m_implementorSpecifics.setHttpStatusCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+      m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
       return null;
     }
 
@@ -73,7 +73,7 @@ public class BasicAuthenticationMethod implements IAuthenticationMethod {
       }
     }
 
-    m_implementorSpecifics.setHttpStatusCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+    m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
     return null;
   }
 

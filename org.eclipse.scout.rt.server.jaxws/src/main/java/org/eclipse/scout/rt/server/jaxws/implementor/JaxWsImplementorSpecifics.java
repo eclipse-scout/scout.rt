@@ -10,18 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.implementor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 
 /**
  * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.
@@ -32,83 +31,127 @@ import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorP
 @ApplicationScoped
 public class JaxWsImplementorSpecifics {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JaxWsImplementorSpecifics.class);
+  public static final String PROP_HTTP_REQUEST_HEADERS = "org.eclipse.scout.jaxws.http.request.headers";
+  public static final String PROP_HTTP_RESPONSE_HEADERS = "org.eclipse.scout.jaxws.http.response.headers";
+  public static final String PROP_HTTP_RESPONSE_CODE = "org.eclipse.scout.jaxws.http.response.code";
+  public static final String PROP_SOCKET_CONNECT_TIMEOUT = "org.eclipse.scout.jaxws.timeout.connect";
+  public static final String PROP_SOCKET_READ_TIMEOUT = "org.eclipse.scout.jaxws.timeout.read";
 
-  /**
-   * Returns the HTTP request header, or an empty <code>List</code> if not found.
-   */
-  public List<String> getHttpRequestHeader(final MessageContext context, final String key) {
-    @SuppressWarnings("unchecked")
-    final Map<String, List<String>> headerMap = (Map<String, List<String>>) context.get(MessageContext.HTTP_REQUEST_HEADERS);
-    return CollectionUtility.arrayList(CollectionUtility.getObject(headerMap, key));
-  }
+  protected final Map<String, String> m_properties = new HashMap<>();
 
-  /**
-   * Sets the given HTTP request header.
-   */
-  public void setHttpRequestHeader(final Map<String, Object> context, final String key, final String value) {
-    @SuppressWarnings("unchecked")
-    final Map<String, List<String>> headerMap = (Map<String, List<String>>) context.get(MessageContext.HTTP_REQUEST_HEADERS);
-    context.put(MessageContext.HTTP_REQUEST_HEADERS, CollectionUtility.putObject(headerMap, key, CollectionUtility.appendList(CollectionUtility.getObject(headerMap, key), value)));
-  }
-
-  /**
-   * Returns the HTTP response header, or an empty <code>List</code> if not found.
-   */
-  public List<String> getHttpResponseHeader(final Map<String, Object> context, final String key) {
-    @SuppressWarnings("unchecked")
-    final Map<String, List<String>> headerMap = (Map<String, List<String>>) context.get(MessageContext.HTTP_RESPONSE_HEADERS);
-    return CollectionUtility.arrayList(CollectionUtility.getObject(headerMap, key));
-  }
-
-  /**
-   * Sets the given HTTP response header.
-   */
-  public void setHttpResponseHeader(final MessageContext context, final String key, final String value) {
-    @SuppressWarnings("unchecked")
-    final Map<String, List<String>> headerMap = (Map<String, List<String>>) context.get(MessageContext.HTTP_RESPONSE_HEADERS);
-    context.put(MessageContext.HTTP_RESPONSE_HEADERS, CollectionUtility.putObject(headerMap, key, CollectionUtility.appendList(CollectionUtility.getObject(headerMap, key), value)));
-  }
-
-  /**
-   * Returns the HTTP status code.
-   */
-  public Integer getHttpStatusCode(final Map<String, Object> responseContext) {
-    return (Integer) responseContext.get(MessageContext.HTTP_RESPONSE_CODE);
-  }
-
-  /**
-   * Sets the given HTTP status code.
-   */
-  public void setHttpStatusCode(final MessageContext context, final int httpStatusCode) {
-    context.put(MessageContext.HTTP_RESPONSE_CODE, httpStatusCode);
-  }
-
-  /**
-   * Sets the given socket connect timeout [ms].
-   */
-  public void setSocketConnectTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
-    LOG.warn("'socketConnectTimeout' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), BEANS.get(JaxWsImplementorProperty.class).getKey());
-  }
-
-  /**
-   * Sets the given socket read timeout [ms].
-   */
-  public void setSocketReadTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
-    LOG.warn("'socketReadTimeout' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), BEANS.get(JaxWsImplementorProperty.class).getKey());
-  }
-
-  /**
-   * Closes the Socket for the given port.
-   */
-  public void closeSocket(final Object port, final String operation) {
-    LOG.warn("'closeSocket' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), BEANS.get(JaxWsImplementorProperty.class).getKey());
+  @PostConstruct
+  protected void initConfig() {
+    m_properties.put(PROP_HTTP_REQUEST_HEADERS, MessageContext.HTTP_REQUEST_HEADERS);
+    m_properties.put(PROP_HTTP_RESPONSE_HEADERS, MessageContext.HTTP_RESPONSE_HEADERS);
+    m_properties.put(PROP_HTTP_RESPONSE_CODE, MessageContext.HTTP_RESPONSE_CODE);
+    m_properties.put(PROP_SOCKET_CONNECT_TIMEOUT, null /* implementor specific */);
+    m_properties.put(PROP_SOCKET_READ_TIMEOUT, null /* implementor specific */);
   }
 
   /**
    * Returns the implementor's name and its version.
    */
   public String getVersionInfo() {
-    return "n/a";
+    return "unknown";
+  }
+
+  /**
+   * Returns the HTTP request header, or an empty <code>List</code> if not found.
+   */
+  public List<String> getHttpRequestHeader(final Map<String, Object> ctx, final String key) {
+    return getHttpHeader(valueOf(PROP_HTTP_REQUEST_HEADERS), ctx, key);
+  }
+
+  /**
+   * Sets the given HTTP request header.
+   */
+  public void setHttpRequestHeader(final Map<String, Object> ctx, final String key, final String value) {
+    setHttpHeader(valueOf(PROP_HTTP_REQUEST_HEADERS), ctx, key, value);
+  }
+
+  /**
+   * Returns the HTTP response header, or an empty <code>List</code> if not found.
+   */
+  public List<String> getHttpResponseHeader(final Map<String, Object> ctx, final String key) {
+    return getHttpHeader(valueOf(PROP_HTTP_RESPONSE_HEADERS), ctx, key);
+  }
+
+  /**
+   * Sets the given HTTP response header.
+   */
+  public void setHttpResponseHeader(final Map<String, Object> ctx, final String key, final String value) {
+    setHttpHeader(valueOf(PROP_HTTP_RESPONSE_HEADERS), ctx, key, value);
+  }
+
+  /**
+   * Returns the HTTP response code.
+   */
+  public Integer getHttpResponseCode(final Map<String, Object> ctx) {
+    return (Integer) ctx.get(valueOf(PROP_HTTP_RESPONSE_CODE));
+  }
+
+  /**
+   * Sets the given HTTP status code.
+   */
+  public void setHttpResponseCode(final Map<String, Object> ctx, final int httpResponseCode) {
+    ctx.put(valueOf(PROP_HTTP_RESPONSE_CODE), httpResponseCode);
+  }
+
+  /**
+   * Clears the HTTP status code.
+   */
+  public void clearHttpResponseCode(final Map<String, Object> ctx) {
+    ctx.remove(valueOf(PROP_HTTP_RESPONSE_CODE));
+  }
+
+  /**
+   * Sets the given socket connect timeout [ms].
+   */
+  public void setSocketConnectTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
+    if (timeoutMillis > 0) {
+      requestContext.put(valueOf(PROP_SOCKET_CONNECT_TIMEOUT), timeoutMillis);
+    }
+    else {
+      requestContext.remove(valueOf(PROP_SOCKET_CONNECT_TIMEOUT));
+    }
+  }
+
+  /**
+   * Sets the given socket read timeout [ms].
+   */
+  public void setSocketReadTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
+    if (timeoutMillis > 0) {
+      requestContext.put(valueOf(PROP_SOCKET_READ_TIMEOUT), timeoutMillis);
+    }
+    else {
+      requestContext.remove(valueOf(PROP_SOCKET_READ_TIMEOUT));
+    }
+  }
+
+  /**
+   * Closes the Socket for the given port.
+   */
+  public void closeSocket(final Object port, final String operation) {
+    // NOOP
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void setHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key, final String value) {
+    final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
+    ctx.put(headerProperty, CollectionUtility.putObject(headers, key, CollectionUtility.appendList(CollectionUtility.getObject(headers, key), value)));
+  }
+
+  @SuppressWarnings("unchecked")
+  protected List<String> getHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key) {
+    final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
+    return CollectionUtility.arrayList(CollectionUtility.getObject(headers, key));
+  }
+
+  protected String valueOf(final String property) {
+    final String jaxwsProperty = m_properties.get(property);
+    if (StringUtility.isNullOrEmpty(jaxwsProperty)) {
+      throw new UnsupportedOperationException(String.format("Functionality '%s' not supported by the JAX-WS implementor '%s'", property, getClass().getSimpleName()));
+    }
+    return jaxwsProperty;
   }
 }

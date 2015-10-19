@@ -90,7 +90,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
     }
     catch (final Exception e) {
       LOG.error("Unexpected error during webservice request authentication.", e);
-      BEANS.get(JaxWsImplementorSpecifics.class).setHttpStatusCode(messageContext, HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // do not send cause to the client
+      BEANS.get(JaxWsImplementorSpecifics.class).setHttpResponseCode(messageContext, HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // do not send cause to the client
       return false;
     }
   }
