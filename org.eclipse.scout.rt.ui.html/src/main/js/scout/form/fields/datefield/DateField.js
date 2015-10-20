@@ -688,16 +688,28 @@ scout.DateField.prototype.acceptInput = function(whileTyping) {
  * @override ValueField.js
  */
 scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
-  var eventOnDateField = this.$dateField ? this.$dateField.isOrHas(target) : false;
-  var eventOnTimeField = this.$timeField ? this.$timeField.isOrHas(target) : false;
-  var eventOnPopup = this._popup.isOpen() && this._popup.$container.isOrHas(target);
+  var dateFieldActive, timeFieldActive, eventOnDatePicker,
+    eventOnDateField = this.$dateField ? this.$dateField.isOrHas(target) : false,
+    eventOnTimeField = this.$timeField ? this.$timeField.isOrHas(target) : false,
+    eventOnPopup = this._popup.isOpen() && this._popup.$container.isOrHas(target);
 
   if (!eventOnDateField && !eventOnTimeField && !eventOnPopup) {
     // event outside this field.
-    var dateFieldActive = $(document.activeElement).is(this.$dateField);
-    var timeFieldActive = $(document.activeElement).is(this.$timeField);
+    dateFieldActive = scout.focusUtils.isActiveElement(this.$dateField);
+    timeFieldActive = scout.focusUtils.isActiveElement(this.$timeField);
     // Accept only the currently focused part (the other one cannot have a pending change)
     this._acceptDateTimePrediction(dateFieldActive, timeFieldActive);
+    return;
+  }
+
+  // when date-field is embedded, time-prediction must be accepted before
+  // the date-picker triggers the 'dateSelect' event.
+  if (this.embedded) {
+    eventOnDatePicker = this.getDatePicker().$container.isOrHas(target);
+    timeFieldActive = scout.focusUtils.isActiveElement(this.$timeField);
+    if (eventOnDatePicker && timeFieldActive) {
+      this._acceptDateTimePrediction(false, true);
+    }
   }
 };
 
@@ -775,8 +787,6 @@ scout.DateField.prototype._openDatePicker = function(date) {
   } else {
     this.selectDate(date);
   }
-
-  // FIXME AWE : improv... move to init?
 
   // Add popup close handler
   if (!this._popupCloseHandler) {

@@ -4,7 +4,7 @@
 scout.focusUtils = {
 
   /**
-   * Returns whether the given element is focusable by mouse.
+   * @return whether the given element is focusable by mouse.
    */
   isFocusableByMouse: function(element) {
     var $element = $(element);
@@ -12,7 +12,7 @@ scout.focusUtils = {
   },
 
   /**
-   * Returns whether the given element has a parent which is focusable by mouse.
+   * @return whether the given element has a parent which is focusable by mouse.
    */
   containsParentFocusableByMouse: function(element, entryPoint) {
     var $focusableParentElements = $(element)
@@ -25,7 +25,7 @@ scout.focusUtils = {
   },
 
   /**
-   * Returns whether the given element contains content which is selectable to the user, e.g. to be copied into clipboard.
+   * @return whether the given element contains content which is selectable to the user, e.g. to be copied into clipboard.
    * It also returns true for disabled text-fields, because the user must be able to select and copy text from these text-fields.
    */
   isSelectableText: function(element) {
@@ -45,6 +45,13 @@ scout.focusUtils = {
       .text()
       .trim();
     return (text.length > 0);
+  },
+
+  /**
+   * @return true when the given element is the document.activeElement, otherwise false.
+   */
+  isActiveElement: function(element) {
+    return $(document.activeElement).is(element);
   }
 
 };
