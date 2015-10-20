@@ -9,37 +9,90 @@ import java.io.Serializable;
 public class GraphEdge implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final GraphNode m_source;
-  private final GraphNode m_target;
-  private final String m_label;
-  private final GraphLineStyle m_style;
-  private final boolean m_directed;
+  private GraphNode m_source;
+  private GraphNode m_target;
+  private String m_label;
+  private GraphLineStyle m_style;
+  private boolean m_directed;
 
-  public GraphEdge(GraphNode start, GraphNode end, String label, GraphLineStyle style, boolean directed) {
-    m_source = start;
-    m_target = end;
-    m_label = label;
-    m_style = style;
-    m_directed = directed;
+  protected GraphEdge() {
+  }
+
+  public static GraphEdge create() {
+    return new GraphEdge();
+  }
+
+  public static GraphEdge create(GraphNode source, GraphNode target, String label, GraphLineStyle style, boolean directed) {
+    return create()
+        .withSource(source)
+        .withTarget(target)
+        .withLabel(label)
+        .withStyle(style)
+        .withDirected(directed);
+  }
+
+  public GraphEdge withSource(GraphNode source) {
+    setSource(source);
+    return this;
+  }
+
+  public GraphEdge withTarget(GraphNode target) {
+    setTarget(target);
+    return this;
+  }
+
+  public GraphEdge withLabel(String label) {
+    setLabel(label);
+    return this;
+  }
+
+  public GraphEdge withStyle(GraphLineStyle style) {
+    setStyle(style);
+    return this;
+  }
+
+  public GraphEdge withDirected(boolean directed) {
+    setDirected(directed);
+    return this;
   }
 
   public GraphNode getSource() {
     return m_source;
   }
 
+  protected void setSource(GraphNode source) {
+    m_source = source;
+  }
+
   public GraphNode getTarget() {
     return m_target;
+  }
+
+  protected void setTarget(GraphNode target) {
+    m_target = target;
   }
 
   public String getLabel() {
     return m_label;
   }
 
+  protected void setLabel(String label) {
+    m_label = label;
+  }
+
   public GraphLineStyle getStyle() {
     return m_style;
   }
 
+  protected void setStyle(GraphLineStyle style) {
+    m_style = style;
+  }
+
   public boolean isDirected() {
     return m_directed;
+  }
+
+  protected void setDirected(boolean directed) {
+    m_directed = directed;
   }
 }

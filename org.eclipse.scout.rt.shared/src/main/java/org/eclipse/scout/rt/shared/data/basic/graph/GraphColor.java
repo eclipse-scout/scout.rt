@@ -9,19 +9,45 @@ import java.io.Serializable;
 public class GraphColor implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final String m_foreground;
-  private final String m_background;
+  private String m_foreground;
+  private String m_background;
 
-  public GraphColor(String foreground, String background) {
-    m_foreground = foreground;
-    m_background = background;
+  protected GraphColor() {
+  }
+
+  public static GraphColor create() {
+    return new GraphColor();
+  }
+
+  public static GraphColor create(String foreground, String background) {
+    return create()
+        .withForeground(foreground)
+        .withBackground(background);
+  }
+
+  public GraphColor withForeground(String foreground) {
+    setForeground(foreground);
+    return this;
+  }
+
+  public GraphColor withBackground(String background) {
+    setBackground(background);
+    return this;
   }
 
   public String getForeground() {
     return m_foreground;
   }
 
+  protected void setForeground(String foreground) {
+    m_foreground = foreground;
+  }
+
   public String getBackground() {
     return m_background;
+  }
+
+  protected void setBackground(String background) {
+    m_background = background;
   }
 }

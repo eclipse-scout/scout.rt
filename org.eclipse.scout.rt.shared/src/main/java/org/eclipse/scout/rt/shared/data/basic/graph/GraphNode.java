@@ -9,55 +9,135 @@ import java.io.Serializable;
 public class GraphNode implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final String m_label;
-  private final String m_url;
-  private final GraphShape m_shape;
-  private final GraphColor m_color;
-  private final GraphNodeSize m_size;
-  private final GraphCoordinate m_location;
-  private final Long m_order;
-  private final String m_cssClass;
+  private String m_label;
+  private String m_url;
+  private GraphShape m_shape;
+  private GraphColor m_color;
+  private String m_cssClass;
+  private GraphNodeSize m_size;
+  private GraphCoordinate m_location;
+  private Long m_order;
 
-  public GraphNode(String label, String url, GraphShape shape, GraphColor color, String cssClass, GraphNodeSize size, GraphCoordinate location, Long order) {
-    m_label = label;
-    m_url = url;
-    m_shape = shape;
-    m_color = color;
-    m_cssClass = cssClass;
-    m_size = size;
-    m_location = location;
-    m_order = order;
+  protected GraphNode() {
+  }
+
+  public static GraphNode create() {
+    return new GraphNode();
+  }
+
+  public static GraphNode create(String label, String url, GraphShape shape, GraphColor color, String cssClass, GraphNodeSize size, GraphCoordinate location, Long order) {
+    return create()
+        .withLabel(label)
+        .withUrl(url)
+        .withShape(shape)
+        .withColor(color)
+        .withCssClass(cssClass)
+        .withSize(size)
+        .withLocation(location)
+        .withOrder(order);
+  }
+
+  public GraphNode withLabel(String label) {
+    setLabel(label);
+    return this;
+  }
+
+  public GraphNode withUrl(String url) {
+    setUrl(url);
+    return this;
+  }
+
+  public GraphNode withShape(GraphShape shape) {
+    setShape(shape);
+    return this;
+  }
+
+  public GraphNode withColor(GraphColor color) {
+    setColor(color);
+    return this;
+  }
+
+  public GraphNode withCssClass(String cssClass) {
+    setCssClass(cssClass);
+    return this;
+  }
+
+  public GraphNode withSize(GraphNodeSize size) {
+    setSize(size);
+    return this;
+  }
+
+  public GraphNode withLocation(GraphCoordinate location) {
+    setLocation(location);
+    return this;
+  }
+
+  public GraphNode withOrder(Long order) {
+    setOrder(order);
+    return this;
   }
 
   public String getLabel() {
     return m_label;
   }
 
+  protected void setLabel(String label) {
+    m_label = label;
+  }
+
   public String getUrl() {
     return m_url;
+  }
+
+  protected void setUrl(String url) {
+    m_url = url;
   }
 
   public GraphShape getShape() {
     return m_shape;
   }
 
+  protected void setShape(GraphShape shape) {
+    m_shape = shape;
+  }
+
   public GraphColor getColor() {
     return m_color;
+  }
+
+  protected void setColor(GraphColor color) {
+    m_color = color;
+  }
+
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  protected void setCssClass(String cssClass) {
+    m_cssClass = cssClass;
   }
 
   public GraphNodeSize getSize() {
     return m_size;
   }
 
+  protected void setSize(GraphNodeSize size) {
+    m_size = size;
+  }
+
   public GraphCoordinate getLocation() {
     return m_location;
+  }
+
+  protected void setLocation(GraphCoordinate location) {
+    m_location = location;
   }
 
   public Long getOrder() {
     return m_order;
   }
 
-  public String getCssClass() {
-    return m_cssClass;
+  protected void setOrder(Long order) {
+    m_order = order;
   }
 }
