@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.prefs;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -53,6 +54,41 @@ public interface IPreferences extends Serializable {
    *           If the <code>key</code> is <code>null</code>.
    */
   String get(String key, String def);
+
+  /**
+   * Associates the specified values with the specified <code>key</code> in this node. This method is intended for use
+   * in conjunction with {@link #getList(String, List)} method.
+   *
+   * @param key
+   *          Key with which the value is to be associated. Must not be <code>null</code>.
+   * @param values
+   *          Values that are to be associated with <code>key</code>.
+   * @return <code>true</code> if this preference node has been changed. <code>false</code> otherwise.
+   * @throws IllegalArgumentException
+   *           If either the <code>key</code> or <code>values</code> is <code>null</code>.
+   * @see #getList(String, List)
+   * @since 5.2
+   */
+  boolean putList(String key, List<String> values);
+
+  /**
+   * Returns the values associated with the specified <code>key</code> in this node.<br>
+   * Returns the specified default if there is no value associated with the <code>key</code>. This method is intended
+   * for use in conjunction with the {@link #putList(String, List)} method.
+   *
+   * @param key
+   *          Key whose associated value is to be returned as a <code>long</code>. Must not be <code>null</code>.
+   * @param defaultValues
+   *          The value to be returned in case that this node has no value associated with <code>key</code> or the
+   *          associated value cannot be interpreted as a <code>long</code>.
+   * @return The list with values associated with <code>key</code> in this node, or <code>def</code> if the associated
+   *         value does not exist or cannot be interpreted as a <code>long</code> type.
+   * @throws IllegalArgumentException
+   *           If the <code>key</code> is <code>null</code>.
+   * @see #putList(String, List)
+   * @since 5.2
+   */
+  List<String> getList(String key, List<String> defaultValues);
 
   /**
    * Removes the value associated with the specified <code>key</code> in this node, if any.

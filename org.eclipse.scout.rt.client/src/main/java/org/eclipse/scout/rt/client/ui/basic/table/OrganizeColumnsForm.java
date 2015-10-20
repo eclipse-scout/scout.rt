@@ -16,10 +16,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -73,7 +73,6 @@ import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
-import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
 public class OrganizeColumnsForm extends AbstractForm {
 
@@ -403,7 +402,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             public class UpKeyStroke extends AbstractKeyStroke {
               @Override
               protected String getConfiguredKeyStroke() {
-                return "alt-up";
+                return combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.UP);
               }
 
               @Override
@@ -416,7 +415,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             public class DownKeyStroke extends AbstractKeyStroke {
               @Override
               protected String getConfiguredKeyStroke() {
-                return "alt-down";
+                return combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.DOWN);
               }
 
               @Override
@@ -1219,6 +1218,11 @@ public class OrganizeColumnsForm extends AbstractForm {
                 }
 
                 @Override
+                protected String getConfiguredKeyStroke() {
+                  return IKeyStroke.ENTER;
+                }
+
+                @Override
                 protected void execAction() throws ProcessingException {
                   if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
                     doResetAction(ResetAllMenu.class);
@@ -1311,6 +1315,11 @@ public class OrganizeColumnsForm extends AbstractForm {
               @Override
               protected String getConfiguredText() {
                 return TEXTS.get("DeleteMenu");
+              }
+
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return IKeyStroke.DELETE;
               }
 
               @Override
@@ -1490,14 +1499,6 @@ public class OrganizeColumnsForm extends AbstractForm {
       m_data = data;
     }
 
-  }
-
-  public void persistConfig() throws ProcessingException {
-    // TODO ASA obsolete?
-    IPreferences clientPreferences = ClientUIPreferences.getClientPreferences(ClientSessionProvider.currentSession());
-    if (clientPreferences != null) {
-      clientPreferences.flush();
-    }
   }
 
   public void reload() throws ProcessingException {

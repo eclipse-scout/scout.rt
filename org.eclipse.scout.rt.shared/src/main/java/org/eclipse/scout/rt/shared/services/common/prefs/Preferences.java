@@ -10,14 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.prefs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -30,6 +34,8 @@ import org.eclipse.scout.rt.shared.ISession;
  * @since 5.1
  */
 public class Preferences implements IPreferences {
+
+  private static final String DELIM = "#delim#";
 
   /**
    * Specifies a {@link PreferenceChangeEvent} that the full preference node has been cleared (all preferences have been
@@ -121,6 +127,28 @@ public class Preferences implements IPreferences {
       return defaultValue;
     }
     return value;
+  }
+
+  @Override
+  public boolean putList(String key, List<String> values) {
+    if (values == null) {
+      throw new IllegalArgumentException("null as values is not allowed.");
+    }
+    StringBuilder sb = new StringBuilder();
+    for (String v : values) {
+      sb.append(v).append(DELIM);
+    }
+    String property = sb.toString();
+    return putInternal(key, property);
+  }
+
+  @Override
+  public List<String> getList(String key, List<String> defaultValues) {
+    String existingPref = getInternal(key);
+    if (!StringUtility.isNullOrEmpty(existingPref)) {
+      return new ArrayList<String>(Arrays.asList(existingPref.split(DELIM)));
+    }
+    return defaultValues;
   }
 
   @Override

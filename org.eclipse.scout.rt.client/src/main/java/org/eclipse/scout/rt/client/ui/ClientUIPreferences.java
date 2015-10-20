@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -538,44 +537,21 @@ public class ClientUIPreferences {
   }
 
   public Set<String> getAllTableColumnsConfigs(ITable table) {
+    if (m_prefs == null) {
+      return null;
+    }
     String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
-    return new LinkedHashSet<String>(getPropertyStringList(key, new ArrayList<String>()));
-  }
-
-  // TODO ASA unittest
-  public List<String> getPropertyStringList(String key, List<String> defaultValue) {
-    if (m_prefs == null) {
-      return defaultValue;
-    }
-    String existingPref = m_prefs.get(key, "");
-    if (!existingPref.isEmpty()) {
-      return new ArrayList<String>(Arrays.asList(existingPref.split(";")));
-    }
-    return defaultValue;
-  }
-
-  // TODO ASA unittest
-  public void setPropertyStringList(String key, List<String> values) {
-    if (m_prefs == null) {
-      return;
-    }
-    StringBuilder sb = new StringBuilder();
-    for (String v : values) {
-      sb.append(v).append(";");
-    }
-    String property = sb.toString();
-    if (values.size() > 0) {
-      property = property.substring(0, property.length() - 1);
-    }
-    m_prefs.put(key, property);
-    flush();
+    return new LinkedHashSet<String>(m_prefs.getList(key, new ArrayList<String>()));
   }
 
   public void removeTableColumnsConfig(ITable table, String name) {
+    if (m_prefs == null) {
+      return;
+    }
     String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
     Set<String> configs = getAllTableColumnsConfigs(table);
     configs.remove(name);
-    setPropertyStringList(key, new ArrayList<String>(configs));
+    m_prefs.putList(key, new ArrayList<String>(configs));
     removeAllTableColumnPreferences(table, true, true, true, true, name);
     removeTableCustomizerData(table, name);
   }
@@ -587,7 +563,7 @@ public class ClientUIPreferences {
     String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
     Set<String> configs = getAllTableColumnsConfigs(table);
     configs.add(name);
-    setPropertyStringList(key, new ArrayList<String>(configs));
+    m_prefs.putList(key, new ArrayList<String>(configs));
   }
 
   /**

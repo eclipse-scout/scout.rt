@@ -53,9 +53,6 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsF
     if (selected) {
       getForm().reload();
     }
-    else {
-      getForm().persistConfig();
-    }
   }
 
   @Override

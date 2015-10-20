@@ -15,8 +15,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -82,6 +84,71 @@ public class PreferencesTest {
     }
     assertFalse(prefs.isDirty());
     assertTrue(svc.m_flushed);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testPutNullKey() throws Exception {
+    Preferences prefs = new Preferences("X", null);
+    prefs.put(null, "Any");
+  }
+
+  @Test
+  public void testPutEmptyKey() throws Exception {
+    Preferences prefs = new Preferences("X", null);
+    prefs.put("", "Any");
+    assertEquals("Any", prefs.get("", null));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testListNullKey() {
+    Preferences prefs = new Preferences("X", null);
+    prefs.putList(null, new ArrayList<String>());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testListNullValue() {
+    Preferences prefs = new Preferences("X", null);
+    prefs.putList("l1", null);
+  }
+
+  public void testList() {
+    Preferences prefs = new Preferences("X", null);
+    ArrayList<String> defaultList = new ArrayList<String>();
+    defaultList.add("default");
+
+    ArrayList<String> list = new ArrayList<String>();
+    list.add("eins");
+    list.add("zwei");
+    list.add("drei");
+    list.add("bbb;ccc");
+
+    assertCollectionEquals(defaultList, prefs.getList("l1", defaultList));
+    prefs.putList("l1", list);
+    assertCollectionEquals(list, prefs.getList("l1", defaultList));
+    prefs.remove("l1");
+    assertCollectionEquals(defaultList, prefs.getList("l1", defaultList));
+
+    // put update
+    list.add("vier");
+    prefs.putList("l1", list);
+    assertCollectionEquals(list, prefs.getList("l1", defaultList));
+  }
+
+  private static void assertCollectionEquals(ArrayList<String> expected, List<String> actual) {
+    assertTrue("expected: " + expected.toString() + " actual: " + actual, CollectionUtility.equalsCollection(expected, actual));
+  }
+
+  @Test
+  public void testListDelimInValue() {
+    Preferences prefs = new Preferences("X", null);
+    ArrayList<String> defaultList = new ArrayList<String>();
+    defaultList.add("default");
+
+    ArrayList<String> list = new ArrayList<String>();
+    list.add("aaa");
+
+    prefs.putList("l1", list);
+    assertCollectionEquals(list, prefs.getList("l1", defaultList));
   }
 
   private static final class TestingUserPreferencesStorageService implements IUserPreferencesStorageService {
