@@ -2,6 +2,7 @@ scout.Menu = function() {
   scout.Menu.parent.call(this);
   this.childActions = [];
   this._addAdapterProperties('childActions');
+  this._addModelProperties('overflow');
   this.popup;
   this.excludedByFilter = false;
 
@@ -42,10 +43,11 @@ scout.Menu.prototype._renderItem = function($parent) {
     this.$container.addClass(this._customCssClasses);
   }
 
+  var mouseEventHandler = this._onMouseEvent.bind(this);
   this.$container
-    .on('mousedown', '', this._onMouseEvent.bind(this))
-    .on('contextmenu', '', this._onMouseEvent.bind(this))
-    .on('click', '', this._onMouseEvent.bind(this));
+    .on('mousedown', mouseEventHandler)
+    .on('contextmenu', mouseEventHandler)
+    .on('click', mouseEventHandler);
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }

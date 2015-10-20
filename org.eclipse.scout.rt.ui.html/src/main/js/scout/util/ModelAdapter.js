@@ -122,10 +122,25 @@ scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
  * @param properties String or String-array with property names.
  */
 scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
+  this._addProperties('_adapterProperties', properties);
+};
+
+/**
+ * Adds property name(s) of model properties. They're used when a model adpater is cloned (see #cloneAdapter()).
+ * You only need to call this method for UI-only properties. Properties from the server-side model are automatically
+ * added in the _init method of the model adpater.
+ *
+ * @param properties String or String-array with property names.
+ */
+scout.ModelAdapter.prototype._addModelProperties = function(properties) {
+  this._addProperties('_modelProperties', properties);
+};
+
+scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
   if (Array.isArray(properties)) {
-    this._adapterProperties = this._adapterProperties.concat(properties);
+    this[propertyName] = this[propertyName].concat(properties);
   } else {
-    this._adapterProperties.push(properties);
+    this[propertyName].push(properties);
   }
 };
 

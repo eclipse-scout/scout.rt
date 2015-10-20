@@ -46,6 +46,8 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     }
     if (this.options.cloneMenuItems) {
       menu = menu.cloneAdapter({parent: this});
+    } else {
+      menu.setParent(this);
     }
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
