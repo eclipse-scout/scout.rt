@@ -90,7 +90,6 @@ scout.Popup.prototype._render = function($parent) {
 
 scout.Popup.prototype._postRender = function() {
   this.size();
-
   this._attachCloseHandler();
 };
 
@@ -195,9 +194,10 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
  * Method invoked once a popup is opened.
  */
 scout.Popup.prototype._onPopupOpen = function(event) {
-  // Make sure child popups don't close the parent popup
+  // Make sure child popups don't close the parent popup, we must check parent hierarchy in both directions
   // Use case: Opening of a context menu or cell editor in a form popup
-  if (!this.isOrHasWidget(event.popup)) {
+  if (!this.isOrHasWidget(event.popup) &&
+      !event.popup.isOrHasWidget(this)) {
     this.close(event);
   }
 };
