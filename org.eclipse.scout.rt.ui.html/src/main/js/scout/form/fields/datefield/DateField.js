@@ -776,6 +776,8 @@ scout.DateField.prototype._openDatePicker = function(date) {
     this.selectDate(date);
   }
 
+  // FIXME AWE : improv... move to init?
+
   // Add popup close handler
   if (!this._popupCloseHandler) {
     this._popupCloseHandler = function() {
