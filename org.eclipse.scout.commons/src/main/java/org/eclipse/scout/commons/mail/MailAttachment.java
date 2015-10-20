@@ -44,11 +44,11 @@ public class MailAttachment {
     m_contentId = contentId;
   }
 
-  public MailAttachment(BinaryResource binaryResource) throws IOException {
+  public MailAttachment(BinaryResource binaryResource) {
     this(binaryResource, null);
   }
 
-  public MailAttachment(BinaryResource binaryResource, String contentId) throws IOException {
+  public MailAttachment(BinaryResource binaryResource, String contentId) {
     this(new BinaryResourceDataSource(binaryResource), binaryResource.getContentType(), binaryResource.getFilename(), contentId);
     m_content = binaryResource.getContent();
   }

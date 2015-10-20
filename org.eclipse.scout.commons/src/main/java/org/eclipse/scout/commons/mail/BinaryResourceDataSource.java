@@ -18,7 +18,7 @@ public class BinaryResourceDataSource implements DataSource {
   private final BinaryResource m_binaryResource;
   private final String m_contentType;
 
-  public BinaryResourceDataSource(BinaryResource binaryResource) throws IOException {
+  public BinaryResourceDataSource(BinaryResource binaryResource) {
     if (binaryResource == null) {
       throw new IllegalArgumentException("Binary resource is missing");
     }
