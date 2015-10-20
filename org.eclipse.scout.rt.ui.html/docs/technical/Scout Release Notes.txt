@@ -549,3 +549,9 @@ Replacement: if return value was false, override computeTableEmptySpaceMenus and
 SME 14.10.2015
 Removed getConfiguredShowTableRowMenus
 Replacement: none (no functionality was provided)
+
+ASA 20.10.2015
+Behavior change of Table in AbstractTableField:
+Do not execute AbstractTable.execContentChanged() when
+valueChageTriggers flag on IFormField is false.
+--> see Ticket #159469 importFormFieldData auf TableField execContentChanged getriggered obwohl valueChangeTriggersEnabled=false
