@@ -12,7 +12,6 @@ scout.MenuBarPopup = function() {
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
 scout.MenuBarPopup.prototype._init = function(options) {
-  options = options || {};
   options.$anchor = options.menu.$container;
   scout.MenuBarPopup.parent.prototype._init.call(this, options);
 

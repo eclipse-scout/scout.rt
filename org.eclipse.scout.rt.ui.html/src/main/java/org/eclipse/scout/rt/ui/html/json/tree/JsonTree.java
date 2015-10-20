@@ -16,9 +16,12 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -34,6 +37,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -149,13 +155,23 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         return getModel().getDropMaximumSize();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<ITree>(ITable.PROP_KEY_STROKES, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+      }
+
+      @Override
+      protected List<IKeyStroke> modelValue() {
+        return getModel().getKeyStrokes();
+      }
+    });
   }
 
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
-    attachAdapters(getModel().getKeyStrokes());
     attachNodes(getTopLevelNodes(), true);
   }
 
@@ -233,7 +249,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODES, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
     putContextMenu(json);
-    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
     return json;
   }
 

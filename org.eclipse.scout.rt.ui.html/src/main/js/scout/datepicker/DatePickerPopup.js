@@ -4,7 +4,6 @@ scout.DatePickerPopup = function() {
 scout.inherits(scout.DatePickerPopup, scout.Popup);
 
 scout.DatePickerPopup.prototype._init = function(options) {
-  options = options || {};
   options.installFocusContext = false;
   scout.DatePickerPopup.parent.prototype._init.call(this, options);
 

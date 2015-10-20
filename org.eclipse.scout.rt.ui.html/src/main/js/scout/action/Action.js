@@ -23,6 +23,11 @@ scout.Action.ActionStyle = {
   BUTTON: 1
 };
 
+scout.Action.prototype._init = function(model) {
+  scout.Action.parent.prototype._init.call(this, model);
+  this._syncKeyStroke(this.keyStroke);
+};
+
 scout.Action.prototype._renderProperties = function() {
   scout.Action.parent.prototype._renderProperties.call(this);
 
@@ -34,11 +39,6 @@ scout.Action.prototype._renderProperties = function() {
   this._renderSelected();
   this._renderVisible();
   this._renderTabbable();
-};
-
-scout.Action.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Action.parent.prototype._initKeyStrokeContext(this, keyStrokeContext);
-  this.actionKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };
 
 scout.Action.prototype._remove = function() {
@@ -258,7 +258,7 @@ scout.Action.prototype.sendSelected = function() {
   this._send('selected', {selected: this.selected});
 };
 
-scout.Action._syncKeyStroke = function(keyStroke) {
+scout.Action.prototype._syncKeyStroke = function(keyStroke) {
   this.keyStroke = keyStroke;
   this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
 };

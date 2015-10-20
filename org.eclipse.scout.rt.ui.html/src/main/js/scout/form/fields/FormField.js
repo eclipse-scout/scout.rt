@@ -22,7 +22,6 @@ scout.FormField = function() {
    * The status label is used for error-status, tooltip-icon and menus.
    */
   this.$status;
-  this.keyStrokes = [];
   this._addAdapterProperties(['keyStrokes', 'menus']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
@@ -425,10 +424,6 @@ scout.FormField.prototype.getForm = function() {
     parent = parent.parent;
   }
   return parent;
-};
-
-scout.FormField.prototype.rootKeyStrokeContext = function() {
-  return this.getForm().keyStrokeContext;
 };
 
 scout.FormField.prototype._goOffline = function() {

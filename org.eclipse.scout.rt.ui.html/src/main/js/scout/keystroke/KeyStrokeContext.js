@@ -90,7 +90,7 @@ scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
   scout.arrays.ensure(keyStroke)
     .map(this._resolveKeyStroke)
     .filter(function(ks) {
-      return this.keyStrokes.indexOf(ks) === -1; // must be not registered yet
+      return this.keyStrokes.indexOf(ks) === -1; // must not be registered yet
     }.bind(this))
     .forEach(function(ks) {
       this.keyStrokes.push(ks);

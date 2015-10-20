@@ -16,7 +16,6 @@ scout.inherits(scout.TouchPopup, scout.Popup);
 scout.TouchPopup.TOP_MARGIN = 45;
 
 scout.TouchPopup.prototype._init = function(options) {
-  options = options || {};
   scout.TouchPopup.parent.prototype._init.call(this, options);
   this._touchField = options.field;
 

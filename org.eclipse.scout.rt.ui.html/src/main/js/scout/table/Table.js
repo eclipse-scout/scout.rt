@@ -55,6 +55,7 @@ scout.Table.prototype._init = function(model) {
 
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
+  this._syncKeyStrokes(this.keyStrokes);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -2617,6 +2618,10 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
 
 scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+};
+
+scout.Table.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
+  this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
 };
 
 scout.Table.prototype._syncFilters = function(filters) {

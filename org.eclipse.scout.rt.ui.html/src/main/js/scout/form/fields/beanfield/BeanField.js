@@ -18,10 +18,6 @@ scout.BeanField.prototype._renderProperties = function() {
   this._renderValue(this.value);
 };
 
-scout.BeanField.prototype._init = function(model) {
-  scout.BeanField.parent.prototype._init.call(this, model);
-};
-
 /**
  * @override FormField.js
  */

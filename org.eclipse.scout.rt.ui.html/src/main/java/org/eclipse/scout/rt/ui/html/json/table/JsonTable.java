@@ -32,6 +32,8 @@ import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -64,6 +66,8 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableUserFilter;
@@ -261,13 +265,23 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         return getModel().isUiSortPossible();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+      }
+
+      @Override
+      protected List<IKeyStroke> modelValue() {
+        return getModel().getKeyStrokes();
+      }
+    });
   }
 
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
-    attachAdapters(getModel().getKeyStrokes());
     attachColumns();
   }
 
@@ -363,7 +377,6 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putProperty(json, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
-    putAdapterIdsProperty(json, ITable.PROP_KEY_STROKES, getModel().getKeyStrokes());
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : getModel().getRows()) {
       if (!isRowAccepted(row)) {

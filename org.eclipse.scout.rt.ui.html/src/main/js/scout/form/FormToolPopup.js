@@ -4,7 +4,6 @@ scout.FormToolPopup = function() {
 scout.inherits(scout.FormToolPopup, scout.PopupWithHead);
 
 scout.FormToolPopup.prototype._init = function(options) {
-  options = options || {};
   this.formToolButton = options.formToolButton;
   options.initialFocus = this.formToolButton.form._initialFocusElement.bind(this.formToolButton.form);
   scout.FormToolPopup.parent.prototype._init.call(this, options);

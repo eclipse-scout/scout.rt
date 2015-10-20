@@ -12,13 +12,17 @@ describe("TabBox", function() {
   function createTabBox(tabItems) {
     var model = helper.createFieldModel('TabBox');
 
+    // Form is necessary to make keystrokes work
+    var form = helper.createFormWithOneField();
+    form.render(session.$entryPoint);
+
     model.tabItems = [];
     for (var i=0; i < tabItems.length; i++) {
       model.tabItems.push(tabItems[i].id);
     }
     model.selectedTab = 0;
-    model.owner = session.rootAdapter.id;
-
+    model.owner = form.id;
+    model.parent = form;
     return createAdapter(model, session, tabItems);
   }
 

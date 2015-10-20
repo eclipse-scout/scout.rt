@@ -33,6 +33,7 @@ scout.Tree.prototype._init = function(model) {
   });
   this.menuBar.bottom();
   this._syncBreadcrumbEnabled('', this.breadcrumbEnabled);
+  this._syncKeyStrokes(this.keyStrokes);
 };
 
 /**
@@ -71,6 +72,10 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Tree.prototype._syncMenus = function(newMenus, oldMenus) {
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+};
+
+scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
+  this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
 };
 
 scout.Tree.prototype._syncBreadcrumbEnabled = function(oldValue, newValue) {

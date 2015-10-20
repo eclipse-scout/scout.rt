@@ -32,8 +32,11 @@ scout.GroupBox.prototype._init = function(model) {
  * @override ModelAdapter.js
  */
 scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  this.keyStrokeContext = this.getForm().keyStrokeContext; // keystrokes on a group box are always registered on form level.
   scout.GroupBox.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
+  this.keyStrokeContext.$bindTarget = function() {
+    // keystrokes on a group box have form scope
+    return this.getForm().$container;
+  }.bind(this);
 };
 
 scout.GroupBox.prototype._render = function($parent) {

@@ -13,10 +13,11 @@ describe("FormToolButton", function() {
   });
 
   function createAction(model) {
+    model.form = helper.createFormWithOneField();
+    model.desktop = desktop;
+
     var action = new scout.FormToolButton();
     action.init(model);
-    action.desktop = desktop;
-    action.form = helper.createFormWithOneField();
     action.position = function() {};
     return action;
   }

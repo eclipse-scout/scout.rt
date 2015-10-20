@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -20,7 +24,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
-import org.json.JSONObject;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 
 public abstract class JsonFormField<FORM_FIELD extends IFormField> extends AbstractJsonPropertyObserver<FORM_FIELD> {
 
@@ -159,6 +163,17 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().isLoading();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<FORM_FIELD>(IFormField.PROP_KEY_STROKES, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+      }
+
+      @Override
+      protected List<IKeyStroke> modelValue() {
+        return getModel().getKeyStrokes();
+      }
+    });
   }
 
   @Override
@@ -166,16 +181,4 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
     return "FormField";
   }
 
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapters(getModel().getKeyStrokes());
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
-    return json;
-  }
 }

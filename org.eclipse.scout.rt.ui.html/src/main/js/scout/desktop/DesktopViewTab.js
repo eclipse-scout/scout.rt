@@ -29,7 +29,6 @@ scout.inherits(scout.DesktopViewTab, scout.Widget);
 
 scout.DesktopViewTab.prototype._init = function(options) {
   scout.DesktopViewTab.parent.prototype._init.call(this, options);
-  options = options || {};
   this._view = options.view;
   this._view.setParent(this);
   this.viewTabController = options.viewTabController;

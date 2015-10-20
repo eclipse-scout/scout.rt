@@ -26,7 +26,7 @@ scout.Button.DisplayStyle = {
 
 scout.Button.prototype._init = function(model) {
   scout.Button.parent.prototype._init.call(this, model);
-  this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
+  this._syncKeyStroke(this.keyStroke);
 };
 
 /**
@@ -39,6 +39,13 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
     new scout.ButtonKeyStroke(this, 'ENTER'),
     new scout.ButtonKeyStroke(this, 'SPACE')
   ]);
+
+  this.formKeyStrokeContext = new scout.KeyStrokeContext();
+  this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
+  this.formKeyStrokeContext.$bindTarget = function() {
+    // keystrokes have form scope
+    return this.getForm().$container;
+  }.bind(this);
 };
 
 /**
@@ -84,7 +91,7 @@ scout.Button.prototype._render = function($parent) {
     }
   }
   $button.unfocusable();
-  this.rootKeyStrokeContext().registerKeyStroke(this.buttonKeyStroke);
+  this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 };
 
 scout.Button.prototype._onClick = function() {
@@ -95,7 +102,7 @@ scout.Button.prototype._onClick = function() {
 
 scout.Button.prototype._remove = function() {
   scout.Button.parent.prototype._remove.call(this);
-  this.rootKeyStrokeContext().unregisterKeyStroke(this.buttonKeyStroke);
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
 };
 
 /**

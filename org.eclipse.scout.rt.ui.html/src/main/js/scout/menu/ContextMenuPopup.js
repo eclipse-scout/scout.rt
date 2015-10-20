@@ -7,7 +7,6 @@ scout.ContextMenuPopup = function() {
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
 scout.ContextMenuPopup.prototype._init = function(options) {
-  options = options || {};
   options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
