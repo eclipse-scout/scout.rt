@@ -641,6 +641,20 @@ scout.DateFormat = function(locale, pattern) {
       applyMatchFunction: function(parseContext, match) {
         parseContext.dateInfo.minutes = Number(match);
         parseContext.matchInfo.minutes = match;
+      },
+      parseFunction: function(parseContext) {
+        // Special case! When regexp did not match, check if input + '0' would make a
+        // valid minutes value. If yes, predict this value.
+        if (parseContext.analyze) {
+          if (scout.helpers.isOneOf(parseContext.inputString, '0', '1', '2', '3', '4', '5')) {
+            var tenMinutes = parseContext.inputString + '0';
+            parseContext.dateInfo.minutes = Number(tenMinutes);
+            parseContext.matchInfo.minutes = tenMinutes;
+            parseContext.inputString = '';
+            return parseContext.inputString;
+          }
+        }
+        return null; // no match found
       }
     }),
     new DateFormatPatternDefinition({
@@ -1061,9 +1075,7 @@ scout.DateFormat.prototype._prepareStartDate = function(startDate) {
     // It is important that we don't alter the argument 'startDate', but create an independent copy!
     return new Date(startDate.getTime());
   }
-  startDate = new Date();
-  startDate.setHours(0, 0, 0, 0); // clear time
-  return startDate;
+  return scout.dates.trunc(new Date()); // clear time
 };
 
 /**

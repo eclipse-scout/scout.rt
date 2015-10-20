@@ -81,8 +81,8 @@ describe("DateField", function() {
       var model = createModel();
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
-      // Set current date, so result is reliable for testing
-      dateField.timestampAsDate = new Date(2015, 10, 1);
+      // Set reference date, so result is reliable for testing
+      dateField.autoTimestampAsDate = new Date(2015, 10, 1);
       dateField.$dateField.val('02');
 
       dateField._onDateFieldBlur();

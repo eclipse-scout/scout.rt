@@ -447,12 +447,6 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
   // Predict date
   var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
   if (datePrediction) {
-    // If the resulting date is null (because the input was empty), reset the "date" part of
-    // the internal time stamp, but do _not_ sync to server yet. This allows selecting a new
-    // date based on "today" without leaving the field first.
-    if (!datePrediction.date) {
-      this.updateTimestamp(this._newTimestampAsDate(null, this.timestampAsDate), false);
-    }
     this._$predictDateField.val(datePrediction.text);
     this._openDatePicker(datePrediction.date);
   } else {
@@ -580,12 +574,6 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
   // Predict time
   var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
   if (timePrediction) {
-    // If the resulting date is null (because the input was empty), reset the "time" part of
-    // the internal time stamp, but do _not_ sync to server yet. This allows selecting a new
-    // time based on "today" without leaving the field first.
-    if (!timePrediction.date) {
-      this.updateTimestamp(this._newTimestampAsDate(this.timestampAsDate, null), false);
-    }
     this._$predictTimeField.val(timePrediction.text);
   } else {
     // No valid prediction!
@@ -746,7 +734,7 @@ scout.DateField.prototype._newTimestampAsDate = function(date, time) {
  * - the current date/time
  */
 scout.DateField.prototype._referenceDate = function() {
-  return this.autoTimestampAsDate || new Date();
+  return this.autoTimestampAsDate || scout.dates.trunc(new Date());
 };
 
 scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServer) {
@@ -882,7 +870,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     };
   }
 
-  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this.timestampAsDate || this.autoTimestampAsDate);
+  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this._referenceDate());
   if (analyzeInfo.error) {
     this._setDateValid(false, inputText);
     return null;
@@ -921,7 +909,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
 scout.DateField.prototype._predictTime = function(inputText) {
   inputText = inputText || '';
 
-  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this.timestampAsDate || this.autoTimestampAsDate);
+  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this._referenceDate());
   if (analyzeInfo.error) {
     this._setTimeValid(false, inputText);
     return null;

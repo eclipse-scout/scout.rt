@@ -435,5 +435,25 @@ scout.dates = {
     date.setMonth(1);
     date.setDate(29);
     return (date.getDate() === 29);
+  },
+
+  /**
+   * Returns the given date with time set to midnight (hours, minutes, seconds, milliseconds = 0).
+   *
+   * @param date (required)
+   *          The date to truncate.
+   * @param createCopy (optional)
+   *          If this flag is true, a copy of the given date is returned (the input date is not
+   *          altered). If the flag is false, the given object is changed and then returned.
+   *          The default value for this flag is "true".
+   */
+  trunc: function(date, createCopy) {
+    if (date) {
+      if (scout.helpers.nvl(createCopy, true)) {
+        date = new Date(date.getTime());
+      }
+      date.setHours(0, 0, 0, 0); // clear time
+    }
+    return date;
   }
 };
