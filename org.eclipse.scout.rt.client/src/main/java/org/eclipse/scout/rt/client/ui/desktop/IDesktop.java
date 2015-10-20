@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
@@ -655,41 +656,23 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Opens the given URI (http:, tel:, mailto:, etc.).
-   */
-  void openUri(String uri);
-
-  /**
-   * Opens the given URI (http:, tel:, mailto:, etc.).
    *
    * @param openUriHint
    *          A hint for the UI that may influence the method used to open the URI (e.g. if a new window should be
-   *          opened or not). Optional (may be <code>null</code>).
+   *          opened or not).
    */
   void openUri(String uri, IOpenUriHint openUriHint);
-
-  /**
-   * Downloads the resource provided by the given download handler.
-   *
-   * @param target
-   *          used to specify where the url should be opened. Only considered by the web ui.
-   */
-  void downloadResource(IDownloadHandler handler);
 
   /**
    * Downloads the given binary resource. Download handler is valid for 1 minute.
    *
    * @param binaryResource
+   *          that should be opened using a temporary {@link URI}
+   * @param openUriHint
+   *          A hint for the UI that may influence the method used to open the URI (e.g. if a new window should be
+   *          opened or not).
    */
-  void downloadResource(BinaryResource binaryResource);
-
-  /**
-   * Downloads the given binary resource. Download handler is valid for the given time in milliseconds.
-   *
-   * @param binaryResource
-   * @param validDuration
-   *          milliseconds
-   */
-  void downloadResource(BinaryResource binaryResource, long validDuration);
+  void openUri(BinaryResource binaryResource, IOpenUriHint openUriHint);
 
   /**
    * Prints the desktop

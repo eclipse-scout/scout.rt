@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -98,17 +99,11 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_FILE_CHOOSER_HIDE = 915;
 
   /**
-   * Opens a given URI.
+   * Opens a given URI using {@link #getUri()} or {@link #getBinaryResource()}.
    *
-   * @see IDesktop#openUri(String)
+   * @see IDesktop#openUri(String, IOpenUriHint)
    */
   public static final int TYPE_OPEN_URI = 920;
-  /**
-   * Downloads a resource using a given download handler.
-   *
-   * @see IDesktop#downloadResource(IDownloadHandler)
-   */
-  public static final int TYPE_DOWNLOAD_RESOURCE = 921;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus The listener can store the result using
    * {@link #setFocusedField()} The event waits some time to give asynchronous jobs a chance to complete (default is
@@ -147,7 +142,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
   private IOpenUriHint m_openUriHint;
-  private IDownloadHandler m_downloadHandler;
+  private BinaryResource m_binaryResource;
 
   public DesktopEvent(IDesktop source, int type) {
     super(source);
@@ -185,17 +180,17 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     m_openUriHint = openUriHint;
   }
 
+  public DesktopEvent(IDesktop source, int type, BinaryResource res, IOpenUriHint openUriHint) {
+    this(source, type);
+    m_binaryResource = res;
+    m_openUriHint = openUriHint;
+  }
+
   public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
     super(source);
     m_type = type;
     m_printDevice = printDevice;
     m_printParameters = printParameters;
-  }
-
-  public DesktopEvent(IDesktop source, int type, IDownloadHandler handler) {
-    super(source);
-    m_type = type;
-    m_downloadHandler = handler;
   }
 
   public IDesktop getDesktop() {
@@ -231,8 +226,8 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     return m_openUriHint;
   }
 
-  public IDownloadHandler getDownloadHandler() {
-    return m_downloadHandler;
+  public BinaryResource getBinaryResource() {
+    return m_binaryResource;
   }
 
   public IMessageBox getMessageBox() {

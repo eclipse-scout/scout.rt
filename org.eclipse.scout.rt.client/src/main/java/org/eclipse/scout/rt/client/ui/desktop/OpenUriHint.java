@@ -21,7 +21,7 @@ public enum OpenUriHint implements IOpenUriHint {
    * external application to handle the URI. The handler is registered with the browser, usually using a special URI
    * protocol (such as "tel:...", "mailto:..." etc.)
    */
-  OPEN_APPLICATION("open-application"),
+  OPEN("open"),
   /**
    * The URI represents content that is displayable by the browser's rendering engine. A new window or tab should be
    * opened to show this content. Note that this may be prevented by a popup blocker.

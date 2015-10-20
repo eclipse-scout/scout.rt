@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -1533,28 +1532,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void openUri(String url) {
-    openUri(url, null);
-  }
-
-  @Override
   public void openUri(String url, IOpenUriHint openUriHint) {
     fireOpenUri(url, openUriHint);
   }
 
   @Override
-  public void downloadResource(IDownloadHandler handler) {
-    fireDownloadResource(handler);
-  }
-
-  @Override
-  public void downloadResource(final BinaryResource binaryResource, final long ttl) {
-    downloadResource(new DownloadHandler(binaryResource, ttl));
-  }
-
-  @Override
-  public void downloadResource(BinaryResource binaryResource) {
-    downloadResource(binaryResource, TimeUnit.MINUTES.toMillis(1));
+  public void openUri(BinaryResource res, IOpenUriHint openUriHint) {
+    fireOpenUri(res, openUriHint);
   }
 
   @Override
@@ -1837,8 +1821,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireDownloadResource(IDownloadHandler handler) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_DOWNLOAD_RESOURCE, handler);
+  private void fireOpenUri(BinaryResource res, IOpenUriHint openUriHint) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, res, openUriHint);
     fireDesktopEvent(e);
   }
 

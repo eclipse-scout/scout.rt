@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
-import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriHint;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -283,25 +282,13 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void openUri(String url) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public void openUri(String url, IOpenUriHint openUriHint) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void downloadResource(IDownloadHandler handler) {
-  }
-
-  @Override
-  public void downloadResource(BinaryResource binaryResource, long validDuration) {
-  }
-
-  @Override
-  public void downloadResource(BinaryResource binaryResource) {
+  public void openUri(BinaryResource binaryResource, IOpenUriHint openUriHint) {
+    throw createUnsupportedOperationException();
   }
 
   @SuppressWarnings("deprecation")
