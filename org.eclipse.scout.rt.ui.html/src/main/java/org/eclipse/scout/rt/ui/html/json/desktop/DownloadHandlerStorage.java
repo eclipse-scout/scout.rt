@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
+import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
@@ -23,12 +24,16 @@ import org.eclipse.scout.rt.platform.job.Jobs;
  * This class manages downloadable items. Each item has a TTL, after that time the item is removed automatically. When
  * the item is removed before the timeout occurs, the scheduled removal-job will be canceled.
  */
+@Bean
 public class DownloadHandlerStorage {
-
-  private final Map<String, IDownloadHandler> m_valueMap = new HashMap<>();
+  private final Map<String, BinaryResource> m_valueMap = new HashMap<>();
   private final Map<String, IFuture> m_futureMap = new HashMap<>();
 
-  protected Map<String, IDownloadHandler> valueMap() {
+  public DownloadHandlerStorage() {
+
+  }
+
+  protected Map<String, BinaryResource> valueMap() {
     return m_valueMap;
   }
 
@@ -36,16 +41,17 @@ public class DownloadHandlerStorage {
     return m_futureMap;
   }
 
+  protected long getTTLForResource(BinaryResource res) {
+    return TimeUnit.MINUTES.toMillis(1);
+  }
+
   /**
    * Put a downloadable item in the storage, after the given TTL has passed the item is removed automatically.
    */
-  public void put(String key, IDownloadHandler downloadHandler) {
-    long ttl = downloadHandler.getTTL();
-    if (ttl <= 0) {
-      throw new IllegalArgumentException("TTL must be > 0");
-    }
+  public void put(String key, BinaryResource res) {
+    long ttl = getTTLForResource(res);
     synchronized (m_valueMap) {
-      m_valueMap.put(key, downloadHandler);
+      m_valueMap.put(key, res);
       scheduleRemoval(key, ttl);
     }
   }
@@ -70,7 +76,7 @@ public class DownloadHandlerStorage {
   /**
    * Remove a downloadable item from the storage.
    */
-  public IDownloadHandler remove(String key) {
+  public BinaryResource remove(String key) {
     IFuture future = m_futureMap.remove(key);
     if (future != null) {
       future.cancel(false);

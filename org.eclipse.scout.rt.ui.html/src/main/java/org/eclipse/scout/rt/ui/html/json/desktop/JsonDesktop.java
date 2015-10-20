@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -26,12 +27,12 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop.DesktopStyle;
-import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriHint;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriHint;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -68,8 +69,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(desktop, uiSession, id, parent);
-    m_downloads = new DownloadHandlerStorage();
-    m_desktopEventFilter = new DesktopEventFilter();
+    m_downloads = BEANS.get(DownloadHandlerStorage.class);
+    m_desktopEventFilter = BEANS.get(DesktopEventFilter.class);
   }
 
   @Override
@@ -256,10 +257,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         handleModelFileChooserHide(event.getFileChooser());
         break;
       case DesktopEvent.TYPE_OPEN_URI:
-        handleModelOpenUri(event.getUri(), event.getOpenUriHint());
-        break;
-      case DesktopEvent.TYPE_DOWNLOAD_RESOURCE:
-        handleModelDownloadResource(event.getDownloadHandler());
+        if (event.getUri() != null) {
+          handleModelOpenUri(event.getUri(), event.getOpenUriHint());
+        }
+        else if (event.getBinaryResource() != null) {
+          handleModelOpenUri(event.getBinaryResource(), event.getOpenUriHint());
+        }
         break;
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
@@ -285,28 +288,24 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     addActionEvent("openUri", json);
   }
 
-  /**
-   * Target for download URL is AUTO because it depends on the type of browser if the browser opens a new window for the
-   * downloaded resource or if the download is processed in the same window as the Scout application.
-   */
-  protected void handleModelDownloadResource(IDownloadHandler handler) {
-    String filename = handler.getResource().getFilename();
+  protected void handleModelOpenUri(BinaryResource res, IOpenUriHint openUriHint) {
+    String filename = res.getFilename();
 
     // add another path segment to filename to distinguish between different resources
     // with the same filename
     long counter = RESOURCE_COUNTER.getAndIncrement();
     filename = counter + "/" + filename;
 
-    m_downloads.put(filename, handler);
+    m_downloads.put(filename, res);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filename);
     handleModelOpenUri(downloadUrl, OpenUriHint.DOWNLOAD);
   }
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    IDownloadHandler handler = m_downloads.remove(filename);
-    if (handler != null) {
-      return new BinaryResourceHolder(handler.getResource(), true);
+    BinaryResource res = m_downloads.remove(filename);
+    if (res != null) {
+      return new BinaryResourceHolder(res, true);
     }
     else {
       return null;

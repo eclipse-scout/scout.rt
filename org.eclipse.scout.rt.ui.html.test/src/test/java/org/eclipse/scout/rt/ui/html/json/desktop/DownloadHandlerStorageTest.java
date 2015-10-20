@@ -15,8 +15,6 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.desktop.DownloadHandler;
-import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -30,32 +28,31 @@ public class DownloadHandlerStorageTest {
 
   private static final String KEY = "foo";
 
-  private DownloadHandlerStorage storage = new DownloadHandlerStorage();
-
   @Test
   public void testRemove() {
-    IDownloadHandler handler = new P_TestHandler(100);
-    storage.put(KEY, handler);
+    DownloadHandlerStorage storage = new DownloadHandlerStorage();
+    BinaryResource res = new BinaryResource("bar.txt", null);
+    storage.put(KEY, res);
     assertEquals(1, storage.futureMap().size());
-    assertEquals(handler, storage.remove(KEY));
+    assertEquals(res, storage.remove(KEY));
     assertEquals("futureMap must be cleared when element is removed", 0, storage.futureMap().size());
     assertNull(storage.remove(KEY));
   }
 
   @Test
   public void testRemove_AfterTimeout() {
-    P_TestHandler handler = new P_TestHandler(1);
-    storage.put(KEY, handler);
-    sleepSafe(20);
+    DownloadHandlerStorage storage = new DownloadHandlerStorage() {
+      @Override
+      protected long getTTLForResource(BinaryResource res) {
+        return 10L;
+      }
+    };
+    BinaryResource res = new BinaryResource("bar.txt", null);
+    storage.put(KEY, res);
+    sleepSafe(100);
     // FIXME AWE Improve this test (it fails sometimes because of timing issues)
     assertNull(storage.remove(KEY));
     assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testPut_InvalidTTL() {
-    P_TestHandler handler = new P_TestHandler(0);
-    storage.put(KEY, handler);
   }
 
   private static void sleepSafe(long sleepTime) {
@@ -67,10 +64,4 @@ public class DownloadHandlerStorageTest {
     }
   }
 
-  private class P_TestHandler extends DownloadHandler {
-
-    public P_TestHandler(long ttl) {
-      super(new BinaryResource("bar.txt", null), ttl);
-    }
-  }
 }

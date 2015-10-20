@@ -17,8 +17,8 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.desktop.DownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.OpenUriHint;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
@@ -300,7 +300,7 @@ public class JsonDesktopTest {
     IDesktop desktop = new DesktopWithNonDisplayableOutline();
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
-    jsonDesktop.handleModelDownloadResource(new DownloadHandler(new BinaryResource("foo.txt", null), 100));
+    jsonDesktop.handleModelOpenUri(new BinaryResource("foo.txt", null), OpenUriHint.DOWNLOAD);
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
     JSONObject data = events.get(0).getData();
     assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run

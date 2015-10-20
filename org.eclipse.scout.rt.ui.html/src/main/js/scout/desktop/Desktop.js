@@ -515,13 +515,13 @@ scout.Desktop.prototype._onModelOpenUri = function(event) {
     return;
   }
 
-  if (!event.hint && event.uri.match(/^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel):/)) {
-    event.hint = 'open-application';
+  if (event.uri.match(/^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel):/)) {
+    event.hint = 'open';
   }
 
   if (event.hint === 'download') {
     this._openUriInIFrame(event.uri);
-  } else if (event.hint === 'open-application') {
+  } else if (event.hint === 'open') {
     // TODO BSH Does that really work on all platforms?
     this._openUriInIFrame(event.uri);
   } else {
