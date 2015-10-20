@@ -533,32 +533,39 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void resetOutline() throws ProcessingException {
-    if (getRootNode() != null) {
-      try {
+    if (getRootNode() == null) {
+      return;
+    }
+
+    ClientRunContexts.copyCurrent().withOutline(this).withForm(null).run(new IRunnable() {
+      @Override
+      public void run() throws Exception {
         setTreeChanging(true);
-        //
-        selectNode(null);
-        unloadNode(getRootNode());
-        getRootNode().ensureChildrenLoaded();
-      }
-      finally {
-        setTreeChanging(false);
-      }
-      ITreeNode root = getRootNode();
-      if (root instanceof IPageWithTable) {
-        ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
-        if (searchForm != null) {
-          searchForm.doReset();
+        try {
+          selectNode(null);
+          unloadNode(getRootNode());
+          getRootNode().ensureChildrenLoaded();
+        }
+        finally {
+          setTreeChanging(false);
+        }
+
+        ITreeNode root = getRootNode();
+        if (root instanceof IPageWithTable) {
+          ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
+          if (searchForm != null) {
+            searchForm.doReset();
+          }
+        }
+        if (!isRootNodeVisible()) {
+          root.setExpanded(true);
+        }
+        selectFirstNode();
+        if (getSelectedNode() instanceof IPageWithTable) {
+          getSelectedNode().setExpanded(true);
         }
       }
-      if (!isRootNodeVisible()) {
-        root.setExpanded(true);
-      }
-      selectFirstNode();
-      if (getSelectedNode() instanceof IPageWithTable) {
-        getSelectedNode().setExpanded(true);
-      }
-    }
+    });
   }
 
   @Override
