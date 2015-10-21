@@ -741,6 +741,7 @@ scout.Table.prototype.changeAggregation = function(column, func) {
     columnId: column.id,
     aggregationFunction: func
   };
+  this._send('aggregationFunctionChanged', data);
   this._group();
   if (this.rendered) {
     this._renderAggregationRows(false);
