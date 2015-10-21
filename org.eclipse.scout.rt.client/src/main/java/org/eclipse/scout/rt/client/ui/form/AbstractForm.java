@@ -1787,6 +1787,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
+   * @return the validate content descriptor set by the previous call to {@link #validateForm()} (<code>null</code> when
+   *         no invalid content has been detected).
+   */
+  protected IValidateContentDescriptor getCurrentValidateContentDescriptor() {
+    return m_currentValidateContentDescriptor;
+  }
+
+  /**
    * attach a statement (mode) that is executed every interval
    *
    * @since Build 195 09.02.2005, imo
