@@ -657,7 +657,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * Combine a key stroke consisting of multiple keys.
    */
-  public String combineKeyStrokes(String... keys) {
+  public static String combineKeyStrokes(String... keys) {
     StringBuilder builder = new StringBuilder();
 
     for (String key : keys) {

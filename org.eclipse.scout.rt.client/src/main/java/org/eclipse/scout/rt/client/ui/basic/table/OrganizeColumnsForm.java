@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUti
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -398,32 +398,6 @@ public class OrganizeColumnsForm extends AbstractForm {
               validateButtons();
             }
 
-            @Order(20.0)
-            public class UpKeyStroke extends AbstractKeyStroke {
-              @Override
-              protected String getConfiguredKeyStroke() {
-                return combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.UP);
-              }
-
-              @Override
-              protected void execAction() throws ProcessingException {
-                moveUp(getSelectedRow());
-              }
-            }
-
-            @Order(30.0)
-            public class DownKeyStroke extends AbstractKeyStroke {
-              @Override
-              protected String getConfiguredKeyStroke() {
-                return combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.DOWN);
-              }
-
-              @Override
-              protected void execAction() throws ProcessingException {
-                moveDown(getSelectedRow());
-              }
-            }
-
             @Order(10.0)
             public class KeyColumn extends AbstractColumn<IColumn<?>> {
 
@@ -572,6 +546,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
+          protected String getConfiguredKeyStroke() {
+            return AbstractAction.combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.UP);
+          }
+
+          @Override
           protected void execClickAction() throws ProcessingException {
             moveUp(getColumnsTableField().getTable().getSelectedRow());
           }
@@ -589,6 +568,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           @Override
           protected boolean getConfiguredProcessButton() {
             return false;
+          }
+
+          @Override
+          protected String getConfiguredKeyStroke() {
+            return AbstractAction.combineKeyStrokes(IKeyStroke.ALT, IKeyStroke.DOWN);
           }
 
           @Override

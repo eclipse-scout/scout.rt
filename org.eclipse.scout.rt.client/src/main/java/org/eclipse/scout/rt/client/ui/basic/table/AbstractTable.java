@@ -99,7 +99,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
@@ -817,7 +817,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          the end.
    */
   protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
-    menus.addLast(new TableOrganizeMenu(this));
+    menus.addLast(new OrganizeColumnsMenu(this));
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {

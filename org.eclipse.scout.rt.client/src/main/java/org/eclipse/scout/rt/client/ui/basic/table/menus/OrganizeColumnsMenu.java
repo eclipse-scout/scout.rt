@@ -19,18 +19,15 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsForm> {
   private final ITable m_table;
 
   public OrganizeColumnsMenu(ITable table) {
     m_table = table;
-  }
-
-  @Override
-  protected String getConfiguredText() {
-    return ScoutTexts.get("OrganizeTableColumnsMenu");
   }
 
   @Override
@@ -58,6 +55,35 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsF
   @Override
   protected OrganizeColumnsForm createForm() throws ProcessingException {
     return new OrganizeColumnsForm(m_table);
+  }
+
+  @Override
+  protected String getConfiguredIconId() {
+    return AbstractIcons.Gear;
+  }
+
+  @Override
+  protected String getConfiguredTooltipText() {
+    return TEXTS.get("TableOrganize");
+  }
+
+  /**
+   * Whether or not development menus must be displayed (copy columns width).
+   *
+   * @return
+   */
+  public boolean isDevelopment() {
+    // FIXME AWE/CGU: (dev-mode) send this flag with JsonSession - global
+    return Platform.get().inDevelopmentMode();
+  }
+
+  /**
+   * Whether or not new, delete or modify menus for custom columns must be displayed.
+   *
+   * @return
+   */
+  public boolean isColumnsCustomizable() {
+    return getTable().getTableCustomizer() != null;
   }
 
 }
