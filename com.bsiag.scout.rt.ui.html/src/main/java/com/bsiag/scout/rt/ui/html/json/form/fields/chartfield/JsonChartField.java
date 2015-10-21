@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChart;
+import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChartField;
 
 /**

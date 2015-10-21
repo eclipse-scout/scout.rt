@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChart;
-import com.bsiag.scout.rt.shared.chart.IChartBean;
-import com.bsiag.scout.rt.shared.chart.IChartValueGroupBean;
+import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartValueGroupBean;
 
 /**
  * @since 5.2

@@ -15,7 +15,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 
-import com.bsiag.scout.rt.client.ui.form.fields.chartfield.AbstractChart;
+import com.bsiag.scout.rt.client.ui.basic.chart.AbstractChart;
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.AbstractChartField;
 import com.bsiag.scout.rt.client.ui.form.fields.tile.AbstractChartTile.ChartField;
 import com.bsiag.scout.rt.client.ui.form.fields.tile.AbstractChartTile.ChartField.Chart;

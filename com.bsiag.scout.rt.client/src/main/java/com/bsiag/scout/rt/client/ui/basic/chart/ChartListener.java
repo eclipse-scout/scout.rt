@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,20 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
+package com.bsiag.scout.rt.client.ui.basic.chart;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-
-import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
+import java.util.EventListener;
 
 /**
  * @since 5.2
  */
-public interface IChartField<T extends IChart> extends IFormField {
+public interface ChartListener extends EventListener {
 
-  String PROP_CHART = "chart";
-
-  void setChart(T newChart);
-
-  T getChart();
+  void chartValueClicked(ChartEvent e);
 }

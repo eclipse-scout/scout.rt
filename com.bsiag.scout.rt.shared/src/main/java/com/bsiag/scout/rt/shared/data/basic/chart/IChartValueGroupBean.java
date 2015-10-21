@@ -8,20 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
+package com.bsiag.scout.rt.shared.data.basic.chart;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-
-import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @since 5.2
  */
-public interface IChartField<T extends IChart> extends IFormField {
+public interface IChartValueGroupBean extends Serializable {
 
-  String PROP_CHART = "chart";
+  String getGroupName();
 
-  void setChart(T newChart);
+  void setGroupName(String groupName);
 
-  T getChart();
+  List<BigDecimal> getValues();
+
+  String getColorHexValue();
+
+  void setColorHexValue(String colorHexValue);
 }

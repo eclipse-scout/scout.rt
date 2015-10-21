@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
+import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
+
 /**
  * @since 5.2
  */
