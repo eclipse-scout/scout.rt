@@ -216,4 +216,39 @@
   .triangle-top-left-color(@color) {
     border-color: @color transparent transparent transparent;
   }
+
+  /* Font Mixins */
+
+  .font-text-small(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-small;
+  }
+
+  .font-text-normal(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-normal;
+  }
+
+  .font-text-plus(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-plus;
+  }
+
+  .font-text-large(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-large;
+  }
+
+  .font-icon {
+    font-family: scoutIcons, @font-default-family;
+    font-weight: @font-weight-normal;
+    speak: none;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }

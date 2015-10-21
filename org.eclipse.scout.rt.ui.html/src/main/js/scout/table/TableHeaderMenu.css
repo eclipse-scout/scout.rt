@@ -42,7 +42,7 @@
 }
 
 .header-text {
-  #scout.font-text-normal(@bold);
+  #scout.font-text-normal(@font-weight-bold);
   font-weight:bold;
   color: @text-color;
   line-height: 22px;

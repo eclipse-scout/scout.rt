@@ -42,7 +42,7 @@
 .table-header-item {
   position: relative;
   display: inline-block;
-  #scout.font-text-normal(@bold);
+  #scout.font-text-normal(@font-weight-bold);
   padding: @table-header-padding-y @table-header-padding-right @table-header-padding-y @table-header-padding-left;
   #scout.overflow-ellipsis-nowrap();
   /* Vertical align is necessary for 2 things:

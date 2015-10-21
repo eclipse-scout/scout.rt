@@ -1,6 +1,7 @@
-/* ------------------------------------------------ */
-/* Color Palette Definition for Eclipse Scout (OSS) */
-/* ------------------------------------------------ */
+/* -------------------------------- */
+/* Default color palette definition */
+/* -------------------------------- */
+
 @palette-black: #000;
 @palette-white: #fff;
 
@@ -48,10 +49,9 @@
 @palette-orange-3: #FDAD4F;
 @palette-orange-4: #FE9915;
 
-
-/* ------------------------ */
-/* Global Colors      */
-/* ------------------------ */
+/* ------------- */
+/* Global colors */
+/* ------------- */
 
 @active-color: @palette-blue-6;
 @active-inverted-color: @palette-white;
@@ -90,9 +90,9 @@
 @text-selection-disabled-background-color: @palette-gray-6;
 @title-color: @palette-gray-9;
 
-/* --------------------------- */
-/* Component Specific Colors   */
-/* --------------------------- */
+/* ------------------------- */
+/* Component specific colors */
+/* ------------------------- */
 
 @applink-color: @palette-blue-6;
 @button-background-color: @palette-gray-2;

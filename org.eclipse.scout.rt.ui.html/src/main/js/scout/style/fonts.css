@@ -11,53 +11,17 @@ Try these to switch between fonts:
 @defaultFont: 'Open Sans', OpenSans, Arial, sans-serif;
 @defaultFont: Arial, sans-serif;
  */
-@defaultFont: Arial, sans-serif;
-@normal:normal;
-@bold:bold;
+@font-default-family: Arial, sans-serif;
+@font-weight-normal: normal;
+@font-weight-bold: bold;
+
+@font-size-small: 11px;
+@font-size-normal: 13px;
+@font-size-plus: 14px;
+@font-size-large: 16px;
 
 @font-face {
   font-family: scoutIcons;
   font-weight: normal;
   src: url('scoutIcons.woff') format('woff');
-}
-
-/* Font Mixins */
-#scout {
-
-  .font-text-small() {
-    font-family: @defaultFont;
-    font-weight: normal;
-    font-size: 11px;
-  }
-
-  .font-text-normal(@fontWeight:@normal) {
-    font-family: @defaultFont;
-    font-weight: @fontWeight;
-    font-size: 13px;
-  }
-
-  .font-text-plus(@fontWeight:@normal) {
-    font-family: @defaultFont;
-    font-weight: @fontWeight;
-    font-size: 14px;
-  }
-
-  .font-text-large() {
-    font-family: @defaultFont;
-    font-weight: normal;
-    font-size: 16px;
-  }
-
-  .font-icon {
-    font-family: scoutIcons, @defaultFont;
-    font-weight: normal;
-    speak: none;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .make-bold {
-    font-weight: bold;
-  }
 }

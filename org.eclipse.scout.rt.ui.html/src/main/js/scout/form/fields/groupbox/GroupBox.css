@@ -88,7 +88,7 @@
   }
 
   & > span {
-    #scout.font-text-normal(@bold);
+    #scout.font-text-normal(@font-weight-bold);
     color: @title-color;
   }
 

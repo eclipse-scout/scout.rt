@@ -145,7 +145,7 @@
   }
 
   &.default-menu:not(.disabled) {
-    #scout.font-text-normal(@bold);
+    #scout.font-text-normal(@font-weight-bold);
     background-color: @default-button-background-color;
     color: @default-button-color;
     border-width: 0;
