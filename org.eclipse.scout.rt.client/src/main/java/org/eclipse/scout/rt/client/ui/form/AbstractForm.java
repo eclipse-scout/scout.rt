@@ -96,7 +96,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.OpenUriHint;
+import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -2374,7 +2374,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, Encoding.UTF_8)) {
       XmlUtility.wellformDocument(storeToXml(), w);
       BinaryResource res = new BinaryResource("form.xml", bos.toByteArray());
-      getDesktop().openUri(res, OpenUriHint.DOWNLOAD);
+      getDesktop().openUri(res, OpenUriAction.DOWNLOAD);
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException(ScoutTexts.get("FormExportXml") + " " + getTitle(), e));

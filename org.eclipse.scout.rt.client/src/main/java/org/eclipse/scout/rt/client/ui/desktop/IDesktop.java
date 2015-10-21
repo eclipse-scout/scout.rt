@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeListener;
-import java.net.URI;
 import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
@@ -657,22 +656,22 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /**
    * Opens the given URI (http:, tel:, mailto:, etc.).
    *
-   * @param openUriHint
-   *          A hint for the UI that may influence the method used to open the URI (e.g. if a new window should be
-   *          opened or not).
+   * @param uri
+   *          URI to handle on the UI using the given action. Must not be <code>null</code>.
+   * @param openUriAction
+   *          The action to be performed on the UI for the URI. Must not be <code>null</code>.
    */
-  void openUri(String uri, IOpenUriHint openUriHint);
+  void openUri(String uri, IOpenUriAction openUriAction);
 
   /**
    * Downloads the given binary resource. Download handler is valid for 1 minute.
    *
    * @param binaryResource
-   *          that should be opened using a temporary {@link URI}
-   * @param openUriHint
-   *          A hint for the UI that may influence the method used to open the URI (e.g. if a new window should be
-   *          opened or not).
+   *          The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
+   * @param openUriAction
+   *          The action to be performed on the UI for the URI. Must not be <code>null</code>.
    */
-  void openUri(BinaryResource binaryResource, IOpenUriHint openUriHint);
+  void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction);
 
   /**
    * Prints the desktop

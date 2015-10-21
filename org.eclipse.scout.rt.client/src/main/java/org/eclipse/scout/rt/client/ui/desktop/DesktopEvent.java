@@ -101,7 +101,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   /**
    * Opens a given URI using {@link #getUri()} or {@link #getBinaryResource()}.
    *
-   * @see IDesktop#openUri(String, IOpenUriHint)
+   * @see IDesktop#openUri(String, IOpenUriAction)
    */
   public static final int TYPE_OPEN_URI = 920;
   /**
@@ -141,7 +141,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
-  private IOpenUriHint m_openUriHint;
+  private IOpenUriAction m_openUriAction;
   private BinaryResource m_binaryResource;
 
   public DesktopEvent(IDesktop source, int type) {
@@ -174,16 +174,16 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     m_fileChooser = fc;
   }
 
-  public DesktopEvent(IDesktop source, int type, String uri, IOpenUriHint openUriHint) {
+  public DesktopEvent(IDesktop source, int type, String uri, IOpenUriAction openUriAction) {
     this(source, type);
     m_uri = uri;
-    m_openUriHint = openUriHint;
+    m_openUriAction = openUriAction;
   }
 
-  public DesktopEvent(IDesktop source, int type, BinaryResource res, IOpenUriHint openUriHint) {
+  public DesktopEvent(IDesktop source, int type, BinaryResource res, IOpenUriAction openUriAction) {
     this(source, type);
     m_binaryResource = res;
-    m_openUriHint = openUriHint;
+    m_openUriAction = openUriAction;
   }
 
   public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
@@ -222,8 +222,8 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     return m_uri;
   }
 
-  public IOpenUriHint getOpenUriHint() {
-    return m_openUriHint;
+  public IOpenUriAction getOpenUriAction() {
+    return m_openUriAction;
   }
 
   public BinaryResource getBinaryResource() {

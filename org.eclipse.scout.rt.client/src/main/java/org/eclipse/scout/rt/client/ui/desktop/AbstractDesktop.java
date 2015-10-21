@@ -1532,13 +1532,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void openUri(String url, IOpenUriHint openUriHint) {
-    fireOpenUri(url, openUriHint);
+  public void openUri(String url, IOpenUriAction openUriAction) {
+    fireOpenUri(url, openUriAction);
   }
 
   @Override
-  public void openUri(BinaryResource res, IOpenUriHint openUriHint) {
-    fireOpenUri(res, openUriHint);
+  public void openUri(BinaryResource res, IOpenUriAction openUriAction) {
+    fireOpenUri(res, openUriAction);
   }
 
   @Override
@@ -1816,13 +1816,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireOpenUri(String uri, IOpenUriHint openUriHint) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, uri, openUriHint);
+  private void fireOpenUri(String uri, IOpenUriAction openUriAction) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, uri, openUriAction);
     fireDesktopEvent(e);
   }
 
-  private void fireOpenUri(BinaryResource res, IOpenUriHint openUriHint) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, res, openUriHint);
+  private void fireOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, res, openUriAction);
     fireDesktopEvent(e);
   }
 

@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
-import org.eclipse.scout.rt.client.ui.desktop.IOpenUriHint;
+import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -282,12 +282,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void openUri(String url, IOpenUriHint openUriHint) {
+  public void openUri(String url, IOpenUriAction openUriAction) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void openUri(BinaryResource binaryResource, IOpenUriHint openUriHint) {
+  public void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction) {
     throw createUnsupportedOperationException();
   }
 
