@@ -110,6 +110,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.groupingApply",
         "ui.Average",
         "ui.Minimum",
-        "ui.Maximum"));
+        "ui.Maximum",
+        "ui.Aggregation"));
   }
 }

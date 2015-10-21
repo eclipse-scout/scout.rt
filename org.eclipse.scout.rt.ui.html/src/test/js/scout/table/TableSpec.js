@@ -802,11 +802,11 @@ describe("Table", function() {
     var $colHeaders, $header0, $header1;
 
     function prepareTable() {
-      columns = [helper.createModelColumn(null, 'col1'),
+      columns = [helper.createModelColumn(null, 'col0'),
+        helper.createModelColumn(null, 'col1'),
         helper.createModelColumn(null, 'col2'),
-        helper.createModelColumn(null, 'col3'),
-        helper.createModelColumn(null, 'col4', 'number'),
-        helper.createModelColumn(null, 'col5', 'number')
+        helper.createModelColumn(null, 'col3', 'number'),
+        helper.createModelColumn(null, 'col4', 'number')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -821,6 +821,8 @@ describe("Table", function() {
       column2 = model.columns[2];
       column3 = model.columns[3];
       column4 = model.columns[4];
+      column3.setAggregationFunction('sum');
+      column4.setAggregationFunction('sum');
     }
 
     function prepareContent(){
@@ -890,7 +892,7 @@ describe("Table", function() {
 
       for(i=0; i<values.length; i++){
         $sumCell = table.$sumRows().eq(i).children().eq(c);
-        expect($sumCell.text()).toBe(values[i]);
+        expect($sumCell.text()).toBe("(" + column.aggrSymbol + ") " + values[i]);
       }
     }
 
@@ -943,26 +945,21 @@ describe("Table", function() {
     });
 
     //group columns 0 and 1
-    it("groups columns 0 and 1, then whole table", function() {
+    it("groups columns 0 (avg) and 1 (sum)", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
       }
       prepareTable();
       prepareContent();
       render(table);
-
+      column3.setAggregationFunction('avg');
       expect(table.$sumRows().length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column1, true);
       expect(table.$sumRows().length).toBe(4);
       assertGroupingProperty(table, 0, 1);
-      assertGroupingValues(table, column3, ['3', '7', '11', '15']);
+      assertGroupingValues(table, column3, ['1.5', '3.5', '5.5', '7.5']);
       assertGroupingValues(table, column4, ['9', '21', '33', '45']);
-      table.group();
-      expect(table.$sumRows().length).toBe(5);
-      assertGroupingValues(table, column3, ['3', '7', '11', '15', '36']);
-      assertGroupingValues(table, column4, ['9', '21', '33', '45', '108']);
-      table.removeGrouping();
       removeGrouping(table, column0);
       removeGrouping(table, column1);
       expect(table.$sumRows().length).toBe(0);

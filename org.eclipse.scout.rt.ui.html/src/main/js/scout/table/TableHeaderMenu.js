@@ -77,13 +77,13 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       .data('label', session.text('ColumnSorting'));
 
     if (!table.hasPermanentHeadOrTailSortColumns()) {
-      var $sortAsc = this.$sorting.appendDiv('header-command sort-asc')
+      var $sortAsc = this.$sorting.appendDiv('header-command toggle sort-asc')
         .data('label', session.text('ui.ascending'))
         .click(this.remove.bind(this))
         .click(function() {
           sort('asc', false, $(this).hasClass('selected'));
         });
-      var $sortDesc = this.$sorting.appendDiv('header-command sort-desc')
+      var $sortDesc = this.$sorting.appendDiv('header-command toggle sort-desc')
         .data('label', session.text('ui.descending'))
         .click(this.remove.bind(this))
         .click(function() {
@@ -91,13 +91,13 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
         });
     }
 
-    var $sortAscAdd = this.$sorting.appendDiv('header-command sort-asc-add')
+    var $sortAscAdd = this.$sorting.appendDiv('header-command toggle sort-asc-add')
       .data('label', session.text('ui.ascendingAdditionally'))
       .click(this.remove.bind(this))
       .click(function() {
         sort('asc', true, $(this).hasClass('selected'));
       });
-    var $sortDescAdd = this.$sorting.appendDiv('header-command sort-desc-add')
+    var $sortDescAdd = this.$sorting.appendDiv('header-command toggle sort-desc-add')
       .data('label', session.text('ui.descendingAdditionally'))
       .click(this.remove.bind(this))
       .click(function() {
@@ -113,28 +113,34 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   });
 
   if (containsNumberColumn) {
-    this.$grouping = $menuHeader.appendDiv('header-group');
-    this.$grouping.appendDiv('header-text')
+    if (column.type !== 'number') {
+
+      this.$grouping = $menuHeader.appendDiv('header-group');
+      this.$grouping.appendDiv('header-text')
       .data('label', session.text('ui.Grouping'));
 
-    if (column.type !== 'number') {
-      var $groupColumn = this.$grouping.appendDiv('header-command group-column')
+      var $groupColumn = this.$grouping.appendDiv('header-command toggle group-column')
         .data('label', session.text('ui.groupingApply'))
         .click(this.remove.bind(this))
         .click(groupSort);
 
-      var $groupColumnAdditional = this.$grouping.appendDiv('header-command group-column-additional')
+      var $groupColumnAdditional = this.$grouping.appendDiv('header-command toggle group-column-additional')
         .data('label', session.text('ui.additionally'))
         .click(this.remove.bind(this))
         .click(groupSortAdditional);
     } else {
+
+      this.$aggregation = $menuHeader.appendDiv('header-group');
+      this.$aggregation.appendDiv('header-text')
+      .data('label', session.text('ui.Aggregation'));
+
       //functions for number columns:
       var sumIcon = '\u03a3',
         avgIcon = '\u00D8',
         maxIcon = '\uf077',
         minIcon = '\uf078';
 
-      var $groupingFunctionSum = this.$grouping.appendDiv('header-command group-function')
+      var $aggregationFunctionSum = this.$aggregation.appendDiv('header-command group-function')
         .data('label', session.text('ui.Sum'))
         .attr('data-icon', sumIcon)
         .click(this.remove.bind(this))
@@ -142,7 +148,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
           setAggregationFunction('sum');
         });
 
-      var $groupingFunctionAvg = this.$grouping.appendDiv('header-command group-function')
+      var $aggregationFunctionAvg = this.$aggregation.appendDiv('header-command group-function')
         .data('label', session.text('ui.Average'))
         .attr('data-icon', avgIcon)
         .click(this.remove.bind(this))
@@ -150,7 +156,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
           setAggregationFunction('avg');
         });
 
-      var $groupingFunctionMin = this.$grouping.appendDiv('header-command group-function')
+      var $aggregationFunctionMin = this.$aggregation.appendDiv('header-command group-function')
         .data('label', session.text('ui.Minimum'))
         .attr('data-icon', minIcon)
         .click(this.remove.bind(this))
@@ -158,7 +164,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
           setAggregationFunction('min');
         });
 
-      var $groupingFunctionMax = this.$grouping.appendDiv('header-command group-function')
+      var $aggregationFunctionMax = this.$aggregation.appendDiv('header-command group-function')
         .data('label', session.text('ui.Maximum'))
         .attr('data-icon', maxIcon)
         .click(this.remove.bind(this))
@@ -233,7 +239,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   function enterCommand() {
     var $command = $(this),
       $text = $command.siblings('.header-text'),
-      text = $command.hasClass('selected') ? session.text('ui.remove') : $command.data('label');
+      text = ($command.hasClass('selected') && $command.hasClass('toggle')) ? session.text('ui.remove') : $command.data('label');
 
     $text.text($text.data('label') + ' ' + text);
   }
@@ -368,7 +374,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   function groupSelect() {
 
     var iconPlus = '\uF067',
-      groupCount = getGroupColumnCount();
+      groupCount = getGroupColumnCount(),
+      func = column.aggregationFunction;
 
     if ($groupColumnAdditional) {
       $groupColumnAdditional.removeClass('selected');
@@ -386,6 +393,22 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       $groupColumn.addClass('selected');
       $groupColumn.show();
     }
+
+    if(func){
+      if(func === 'sum'){
+        $aggregationFunctionSum.addClass('selected');
+      }
+      else if(func === 'avg'){
+        $aggregationFunctionAvg.addClass('selected');
+      }
+      else if(func === 'min'){
+        $aggregationFunctionMin.addClass('selected');
+      }
+      else if(func === 'max'){
+        $aggregationFunctionMax.addClass('selected');
+      }
+    }
+
   }
 
   function colorRed() {
