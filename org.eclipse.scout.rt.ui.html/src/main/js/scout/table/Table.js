@@ -52,6 +52,7 @@ scout.Table.prototype._init = function(model) {
     menuOrder: new scout.MenuItemsOrder(this.session, 'Table')
   });
   this.menuBar.bottom();
+  this._aggregationRows = [];
 
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
@@ -583,7 +584,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   // update grouping if group by column is active
-  this._group();
+  //  this._group();
 
   this.renderSelection();
 };
@@ -609,7 +610,9 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   };
   if (sorted) {
     this._send('rowsSorted', data);
+    this._group();
     this._renderRowOrderChanges();
+    this._renderAggregationRows();
     this._triggerRowOrderChanged();
   } else {
     // Delegate sorting to server when it is not possible on client side
@@ -662,7 +665,7 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
 
   if (!multiSort) {
 
-    groupColCount = this._groupColumns() ? this._groupColumns().length : 0;
+    groupColCount = this._groupedColumns() ? this._groupedColumns().length : 0;
     sortColCount = 0;
     this.columns.forEach(function(c) {
       if (c.sortActive) {
@@ -738,7 +741,10 @@ scout.Table.prototype.changeAggregation = function(column, func) {
     columnId: column.id,
     aggregationFunction: func
   };
-  this._group(false);
+  this._group();
+  if (this.rendered) {
+    this._renderAggregationRows(false);
+  }
 };
 
 scout.Table.prototype._onAggregationFunctionChanged = function(event) {
@@ -751,7 +757,10 @@ scout.Table.prototype._onAggregationFunctionChanged = function(event) {
     column = this.columnById(columnId);
     column.setAggregationFunction(func);
   }
-  this._group(false);
+  this._group();
+  if (this.rendered) {
+    this._renderAggregationRows(false);
+  }
 };
 
 scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove) {
@@ -1023,6 +1032,7 @@ scout.Table.prototype._installRows = function($rows) {
 
   // update grouping if data was grouped
   this._group();
+  this._renderAggregationRows();
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
@@ -1151,10 +1161,6 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
   }
   this._triggerRowsSelected();
   this._updateMenuBar();
-
-  if (this.groupedSelection) {
-    this._group(true);
-  }
 };
 
 // Only necessary if the table is a root html comp (outline table)
@@ -1401,28 +1407,12 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   }
 };
 
-scout.Table.prototype._group = function(animate) {
+scout.Table.prototype._group = function() {
   var column, alignment, rows, c, states, columnGroupingActive, row, value, nextRow, newGroup, summaryRow, hasCellTextForGroupingFunction,
     that = this,
-    groupColumns = this._groupColumns();
+    groupColumns = this._groupedColumns();
 
-  if (!this.rendered) {
-    return;
-  }
-
-  if(arguments.length === 0){
-    animate = true;
-  }
-
-  if (!animate) {
-    //TODO: cgu: update scroll bar necessary here?
-    this.$sumRows().remove();
-  } else {
-    this.$sumRows().animateAVCSD('height', 0, function() {
-      $.removeThis.call(this);
-      that.renderSelection();
-    }, that.updateScrollbars.bind(that));
-  }
+  this._removeAggregationRows();
 
   columnGroupingActive = (groupColumns ? groupColumns.length > 0 : false);
 
@@ -1456,7 +1446,7 @@ scout.Table.prototype._group = function(animate) {
   // prepare columns
   this.columns.forEach(prepare);
 
-  rows.forEach(function(row, r){
+  rows.forEach(function(row, r) {
 
     this.columns.forEach(aggregate.bind(this, row));
 
@@ -1471,7 +1461,7 @@ scout.Table.prototype._group = function(animate) {
       //finish aggregation
       this.columns.forEach(finish);
       //append sum row
-      this._appendSumRow(states, row, false, animate);
+      this._addAggregationRow(states, row);
       //reset after group
       this.columns.forEach(prepare);
     }
@@ -1499,10 +1489,84 @@ scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
   return false;
 };
 
-scout.Table.prototype._groupColumns = function() {
+scout.Table.prototype._groupedColumns = function() {
   return this.columns.filter(function(col) {
     return col.grouped;
   });
+};
+
+scout.Table.prototype._addAggregationRow = function(contents, afterRow) {
+  this._aggregationRows.push({
+    contents: contents.slice(),
+    row: afterRow
+  });
+};
+
+scout.Table.prototype._removeAggregationRows = function() {
+  this._aggregationRows.length = 0;
+};
+
+scout.Table.prototype._renderAggregationRows = function(animate) {
+
+  var c, r, column, row, contents, alignment, $cell, $aggregationRow, that = this;
+
+  if (!arguments.length) {
+    animate = true;
+  }
+
+  if (!animate) {
+    //TODO: cgu: update scroll bar necessary here?
+    this.$aggregationRows().remove();
+  } else {
+    this.$aggregationRows().animateAVCSD('height', 0, function() {
+      $.removeThis.call(this);
+      that.renderSelection();
+    }, that.updateScrollbars.bind(that));
+  }
+
+  for (r = 0; r < this._aggregationRows.length; r++) {
+    $aggregationRow = $.makeDiv('table-row-sum');
+
+    row = this._aggregationRows[r].row;
+    contents = this._aggregationRows[r].contents;
+
+    for (c = 0; c < this.columns.length; c++) {
+      column = this.columns[c];
+      alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+      if (typeof contents[c] === 'number') {
+        var sumValue = contents[c];
+        if (column.format) {
+          var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
+          sumValue = decimalFormat.format(sumValue);
+        }
+        $cell = $.makeDiv('table-cell', "(" + column.aggrSymbol + ") " + sumValue)
+          .css('text-align', alignment);
+      } else if (column.grouped) {
+        if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
+          $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row))
+            .css('text-align', alignment);
+        } else {
+          $cell = $.makeDiv('table-cell', this.cellText(column, row))
+            .css('text-align', alignment);
+        }
+      } else {
+        $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
+      }
+
+      $cell.appendTo($aggregationRow)
+        .css('min-width', column.width)
+        .css('max-width', column.width);
+    }
+
+    $aggregationRow.insertAfter(row.$row).width(this.rowWidth);
+
+    if (animate) {
+      $aggregationRow
+        .hide()
+        .slideDown(300, this.updateScrollbars.bind(this));
+    }
+  }
+
 };
 
 /**
@@ -1572,6 +1636,7 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
     this._renderRowOrderChanges();
     this._triggerRowOrderChanged();
     this._group();
+    this._renderAggregationRows();
   } else {
     // Delegate sorting to server when it is not possible on client side
     this._send('groupRows', data);
@@ -1581,23 +1646,7 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
 scout.Table.prototype.removeColumnGrouping = function(column) {
   if (column) {
     this.groupColumn(column, false, 'asc', true);
-  } else {
-    this.grouped = false;
-    for (var i = 0; i < this.columns.length; i++) {
-      this.columns[i].grouped = false;
-    }
-    this._group();
   }
-};
-
-scout.Table.prototype.group = function() {
-  this.grouped = true;
-  this._group();
-};
-
-scout.Table.prototype.removeGrouping = function() {
-  this.grouped = false;
-  this._group();
 };
 
 scout.Table.prototype.colorData = function(column, mode) {
@@ -2092,7 +2141,7 @@ scout.Table.prototype.$nextFilteredRows = function($row, includeSumRows) {
   return $row.nextAll(this.newFilteredRowsSelector(includeSumRows));
 };
 
-scout.Table.prototype.$sumRows = function() {
+scout.Table.prototype.$aggregationRows = function() {
   return this.$data.find('.table-row-sum');
 };
 
@@ -2133,7 +2182,7 @@ scout.Table.prototype.filter = function() {
     rowsToHide = [],
     rowsToShow = [];
 
-  this.$sumRows().hide();
+  this.$sumAggregationRows().hide();
 
   // Filter rows
   this.rows.forEach(function(row) {
@@ -2165,6 +2214,7 @@ scout.Table.prototype.filter = function() {
     this._rowsFiltered(rowsToHide);
     $(':animated', that.$data).promise().done(function() {
       that._group();
+      that._renderAggregationRows();
       that.renderSelection();
     });
   }
@@ -2811,9 +2861,11 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
     rows[newPos] = row;
   }
   this.rows = rows;
+  this._group();
 
   if (this.rendered) {
     this._renderRowOrderChanges();
+    this._renderAggregationRows();
   }
   this._triggerRowOrderChanged();
 };
