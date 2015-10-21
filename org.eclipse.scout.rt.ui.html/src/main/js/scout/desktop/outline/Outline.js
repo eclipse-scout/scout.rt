@@ -298,7 +298,9 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
 };
 
 scout.Outline.prototype._renderDefaultDetailForm = function() {
-  this._showDefaultDetailForm();
+  if (!this.inBackground) {
+    this._showDefaultDetailForm();
+  }
 };
 
 scout.Outline.prototype._showDefaultDetailForm = function() {
