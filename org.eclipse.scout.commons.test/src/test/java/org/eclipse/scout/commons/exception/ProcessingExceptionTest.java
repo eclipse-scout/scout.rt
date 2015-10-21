@@ -14,9 +14,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.status.IStatus;
 import org.junit.Test;
 
@@ -79,9 +88,9 @@ public class ProcessingExceptionTest {
     p.consume();
     final String exText = p.toString();
     assertContainsExceptionAttributes(exText);
-    assertTrue(exText.contains(m_title));
+    assertFalse(exText.contains(m_title));
     assertTrue(exText.contains(m_body));
-    assertTrue(exText.contains("VetoException"));
+    assertFalse(exText.contains("VetoException"));
     assertTrue(exText.contains("consumed"));
     assertTrue(exText.contains("[context2,context1]"));
   }
@@ -106,10 +115,55 @@ public class ProcessingExceptionTest {
     assertEquals(Arrays.asList("position=1", "position=2", "position=3"), e.getStatus().getContextMessages());
   }
 
+  @Test
+  public void testStackTraceNoCause() {
+    ProcessingException pe = new ProcessingException();
+    assertUniqueLinesOnStackTrace(pe);
+  }
+
+  @Test
+  public void testStackTraceCausedByNullPointerException() {
+    // processing exception references processing status and vice versa
+    ProcessingException pe = new ProcessingException("message", new NullPointerException());
+    assertUniqueLinesOnStackTrace(pe);
+  }
+
+  @Test
+  public void testStackTraceCausedByAnotherProcessingException() {
+    // pe1 references status of pe1 and vice versa
+    // pe2 references status of pe2, but status of pe2 references pe1
+    ProcessingException pe1 = new ProcessingException("pe1");
+    ProcessingException pe2 = new ProcessingException("pe2", pe1);
+    assertUniqueLinesOnStackTrace(pe2);
+  }
+
+  private void assertUniqueLinesOnStackTrace(Throwable t) {
+    StringWriter writer = new StringWriter();
+    PrintWriter pw = new PrintWriter(writer);
+    t.printStackTrace(pw);
+    String stackTrace = writer.toString();
+
+    Set<String> processedLines = new HashSet<>();
+    List<String> duplicateLines = new ArrayList<>();
+    for (String line : StringUtility.getLines(stackTrace)) {
+      String trimmedLine = StringUtility.trim(line);
+      if (trimmedLine.startsWith("...")) {
+        // ignore omitted line counter
+        continue;
+      }
+      if (!processedLines.add(trimmedLine) && !duplicateLines.contains(trimmedLine)) {
+        duplicateLines.add(trimmedLine);
+      }
+    }
+
+    if (!duplicateLines.isEmpty()) {
+      fail("given string contains duplicate entries:\n" + CollectionUtility.format(duplicateLines, "\n"));
+    }
+  }
+
   private void assertContainsExceptionAttributes(String exText) {
     assertTrue(exText.contains(m_body));
     assertTrue(exText.contains("ERROR"));
     assertTrue(exText.contains("0"));
   }
-
 }

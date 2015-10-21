@@ -144,7 +144,7 @@ public class ProcessingException extends Exception implements Serializable {
   public String toString() {
     ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("message", getLocalizedMessage(), false);
-    if (m_status != null && m_status.getException() == this) { // to omit recursion
+    if (m_status != null && (m_status.getException() == this || m_status.getException() == getCause())) { // to omit recursion
       builder.attr("severity", m_status.getSeverityName());
       builder.attr("code", m_status.getCode());
       builder.attr("context", m_status.getContextMessages(), false);
