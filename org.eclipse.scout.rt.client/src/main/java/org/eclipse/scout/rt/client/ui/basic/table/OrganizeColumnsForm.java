@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.DiscardChangesButton;
@@ -32,11 +31,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.WithoutButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ConfigBox.NamedConfigTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.RemoveFilterButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetAllButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetSortingButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.AddCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.DeselectAllButton;
@@ -49,11 +43,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetAllMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetFiltersMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetSortingMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetViewMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
@@ -132,10 +123,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(DeselectAllButton.class);
   }
 
-  public RemoveFilterButton getRemoveFilterButton() {
-    return getFieldByClass(RemoveFilterButton.class);
-  }
-
   public GroupBox getGroupBox() {
     return getFieldByClass(GroupBox.class);
   }
@@ -158,22 +145,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   public RemoveCustomColumnButton getRemoveCustomColumnButton() {
     return getFieldByClass(RemoveCustomColumnButton.class);
-  }
-
-  public ResetAllButton getResetAllButton() {
-    return getFieldByClass(ResetAllButton.class);
-  }
-
-  public ResetBox getResetBox() {
-    return getFieldByClass(ResetBox.class);
-  }
-
-  public ResetSortingButton getResetSortingButton() {
-    return getFieldByClass(ResetSortingButton.class);
-  }
-
-  public ResetViewButton getResetViewButton() {
-    return getFieldByClass(ResetViewButton.class);
   }
 
   public SelectAllButton getSelectAllButton() {
@@ -206,6 +177,464 @@ public class OrganizeColumnsForm extends AbstractForm {
       @Override
       protected int getConfiguredGridColumnCount() {
         return 6;
+      }
+
+      @Order(5.0)
+      public class ConfigBox extends AbstractGroupBox {
+
+        @Override
+        protected int getConfiguredGridColumnCount() {
+          return 1;
+        }
+
+        @Override
+        protected int getConfiguredGridW() {
+          return 1;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Configurations");
+        }
+
+        @Order(10.0)
+        public class NamedConfigTableField extends AbstractTableField<NamedConfigTableField.Table> {
+
+          @Override
+          protected int getConfiguredGridH() {
+            return 3;
+          }
+
+          @Override
+          protected int getConfiguredGridW() {
+            return 1;
+          }
+
+          @Override
+          protected int getConfiguredLabelPosition() {
+            return LABEL_POSITION_TOP;
+          }
+
+          @Override
+          protected boolean getConfiguredLabelVisible() {
+            return false;
+          }
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Configurations");
+          }
+
+          @Override
+          protected void execReloadTableData() throws ProcessingException {
+            List<ITableRow> rowList = new ArrayList<ITableRow>();
+            ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+
+            // create default config rows
+            TableRow row = new TableRow(getTable().getColumnSet());
+            getTable().getConfigNameColumn().setValue(row, TEXTS.get("Default"));
+            getTable().getConfigTypeColumn().setValue(row, ConfigType.DEFAULT);
+            rowList.add(row);
+
+            // create custom config rows
+            if (prefs != null) {
+              Set<String> configs = prefs.getAllTableColumnsConfigs(m_table);
+              for (String config : configs) {
+                row = new TableRow(getTable().getColumnSet());
+                getTable().getConfigNameColumn().setValue(row, config);
+                getTable().getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
+                rowList.add(row);
+              }
+            }
+
+            try {
+              getTable().setTableChanging(true);
+              getTable().discardAllRows();
+              rowList = getTable().addRows(rowList);
+              for (ITableRow customRow : getTable().getRows()) {
+                if (customRow.getCell(getTable().getConfigTypeColumn()).getValue() != ConfigType.NEW) {
+                  customRow.getCellForUpdate(getTable().getConfigNameColumn()).setEditable(false);
+                }
+              }
+            }
+            finally {
+              getTable().setTableChanging(false);
+            }
+
+          }
+
+          protected void resetAll() throws ProcessingException {
+            try {
+              m_table.setTableChanging(true);
+              //
+              m_table.resetDisplayableColumns();
+              TableUserFilterManager m = m_table.getUserFilterManager();
+              if (m != null) {
+                m.reset();
+              }
+              ITableCustomizer cst = m_table.getTableCustomizer();
+              if (cst != null) {
+                cst.removeAllColumns();
+              }
+            }
+            finally {
+              m_table.setTableChanging(false);
+            }
+            getColumnsTableField().reloadTableData();
+          }
+
+          protected void resetView() throws ProcessingException {
+            try {
+              m_table.setTableChanging(true);
+              //
+              m_table.resetColumnVisibilities();
+              m_table.resetColumnWidths();
+              m_table.resetColumnOrder();
+              ITableCustomizer cst = m_table.getTableCustomizer();
+              if (cst != null) {
+                cst.removeAllColumns();
+              }
+            }
+            finally {
+              m_table.setTableChanging(false);
+            }
+            getColumnsTableField().reloadTableData();
+          }
+
+          private void ensureNewConfigRowExists() throws ProcessingException {
+            for (ITableRow row : getTable().getRows()) {
+              if (getTable().getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
+                return;
+              }
+            }
+            TableRow newRow = new TableRow(getTable().getColumnSet());
+            getTable().getConfigTypeColumn().setValue(newRow, ConfigType.NEW);
+            try {
+              getTable().setTableChanging(true);
+              getTable().addRow(newRow);
+            }
+            finally {
+              getTable().setTableChanging(false);
+            }
+          }
+
+          @Order(10.0)
+          public class Table extends AbstractTable {
+
+            @Override
+            protected boolean getConfiguredHeaderVisible() {
+              return false;
+            }
+
+            @Override
+            protected boolean getConfiguredAutoResizeColumns() {
+              return true;
+            }
+
+            public ConfigNameColumn getConfigNameColumn() {
+              return getColumnSet().getColumnByClass(ConfigNameColumn.class);
+            }
+
+            public ConfigTypeColumn getConfigTypeColumn() {
+              return getColumnSet().getColumnByClass(ConfigTypeColumn.class);
+            }
+
+            @Override
+            protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+              getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected());
+              getMenuByClass(RenameMenu.class).setVisible(isOnlyCustomConfigsSelected());
+
+              boolean newConfigRowSingleSelected = getSelectedRowCount() == 1 && getSelectedRow().getCell(getConfigTypeColumn()).getValue() == ConfigType.NEW;
+              getMenuByClass(ApplyMenu.class).setVisible(!newConfigRowSingleSelected);
+            }
+
+            @Order(10.0)
+            public class ConfigNameColumn extends AbstractStringColumn {
+              @Override
+              protected boolean getConfiguredEditable() {
+                return true;
+              }
+
+              @Override
+              protected int getConfiguredSortIndex() {
+                return 1;
+              }
+
+              @Override
+              protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
+                IStringField field = (IStringField) super.execPrepareEdit(row);
+                if (getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
+                  field.setValue(null);
+                }
+                return field;
+              }
+
+              @Override
+              protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
+                String oldValue = getConfigNameColumn().getValue(row);
+                super.execCompleteEdit(row, editingField);
+                String newValue = ((IStringField) editingField).getValue();
+                if (!StringUtility.isNullOrEmpty(newValue)) {
+                  switch (getConfigTypeColumn().getValue(row)) {
+                    case NEW:
+                      storeCurrentStateAsConfig(newValue);
+                      getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
+                      break;
+                    case CUSTOM:
+                      P_TableState tableStateBackup = createTableStateSnpashot();
+                      applyAll(oldValue);
+                      deleteConfig(oldValue);
+                      storeCurrentStateAsConfig(newValue);
+                      restoreTableState(tableStateBackup);
+                      break;
+                    case DEFAULT:
+                    default:
+                      throw new IllegalStateException("Rows of configType " + getConfigTypeColumn().getValue(row).name() + " should never be editable.");
+                  }
+                }
+                else {
+                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
+                    getConfigNameColumn().setValue(row, oldValue);
+                  }
+                }
+                row.getCellForUpdate(getConfigNameColumn()).setEditable(getConfigTypeColumn().getValue(row) == ConfigType.NEW);
+                getTable().sort();
+              }
+
+            }
+
+            @Order(20.0)
+            public class ConfigTypeColumn extends AbstractColumn<ConfigType> {
+              @Override
+              protected boolean getConfiguredDisplayable() {
+                return false;
+              }
+
+              @Override
+              protected int getConfiguredSortIndex() {
+                return 0;
+              }
+
+            }
+
+            @Order(10.0)
+            public class NewMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("New");
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                ensureNewConfigRowExists();
+              }
+
+            }
+
+            @Order(20.0)
+            public class ApplyMenu extends AbstractMenu {
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("Apply");
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return IKeyStroke.ENTER;
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
+                  resetAll();
+                }
+                else {
+                  String configName = getConfigNameColumn().getSelectedValue();
+                  applyAll(configName);
+                  getColumnsTableField().reloadTableData();
+                }
+              }
+
+            }
+
+            @Order(20.0)
+            public class ApplyMenuOld extends AbstractMenu {
+              // FIXME ASA delete once decision is definitive
+
+              @Override
+              protected boolean getConfiguredEnabled() {
+                return false;
+              }
+
+              @Override
+              protected boolean getConfiguredVisible() {
+                return false;
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("Apply");
+              }
+
+              @Order(10.0)
+              public class ApplyAllMenu extends AbstractMenu {
+
+                @Override
+                protected String getConfiguredText() {
+                  return TEXTS.get("AllCollumnConfigs");
+                }
+
+                @Override
+                protected String getConfiguredKeyStroke() {
+                  return IKeyStroke.ENTER;
+                }
+
+                @Override
+                protected void execAction() throws ProcessingException {
+                  if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
+                    resetAll();
+                  }
+                  else {
+                    String configName = getConfigNameColumn().getSelectedValue();
+                    applyAll(configName);
+                    getColumnsTableField().reloadTableData();
+                  }
+                }
+
+              }
+
+              @Order(20.0)
+              public class ApplyViewMenu extends AbstractMenu {
+                @Override
+                protected String getConfiguredText() {
+                  return TEXTS.get("OnlyView");
+                }
+
+                @Override
+                protected void execAction() throws ProcessingException {
+                  if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
+                    resetView();
+                  }
+                  else {
+                    applyViewForConfig(getConfigNameColumn().getSelectedValue());
+                    getColumnsTableField().reloadTableData();
+                  }
+                }
+
+              }
+
+              @Order(30.0)
+              public class ApplySortOrderMenu extends AbstractMenu {
+
+                @Override
+                protected String getConfiguredText() {
+                  return TEXTS.get("OnlySortOrder");
+                }
+
+                @Override
+                protected void execAction() throws ProcessingException {
+                  String configName = getConfigNameColumn().getSelectedValue();
+                  m_table.getColumnSet().applySortingAndGrouping(configName);
+                  getColumnsTableField().reloadTableData();
+                }
+
+              }
+            }
+
+            @Order(30.0)
+            public class RenameMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("Rename");
+              }
+
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.ENTER);
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
+                // FIXME ASA open and focus cell for edit, once it is supported.
+              }
+
+            }
+
+            protected boolean isOnlyCustomConfigsSelected() {
+              for (ITableRow row : getSelectedRows()) {
+                if (row.getCell(getConfigTypeColumn()).getValue() != ConfigType.CUSTOM) {
+                  return false;
+                }
+              }
+              return true;
+            }
+
+            protected boolean isDefaultConfigSelected() {
+              for (ITableRow row : getSelectedRows()) {
+                if (row.getCell(getConfigTypeColumn()).getValue() == ConfigType.DEFAULT) {
+                  return true;
+                }
+              }
+              return false;
+            }
+
+            @Order(40.0)
+            public class DeleteMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.MultiSelection, TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("DeleteMenu");
+              }
+
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return IKeyStroke.DELETE;
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                List<ITableRow> rows = getSelectedRows();
+                deleteRows(rows);
+                for (ITableRow row : rows) {
+                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
+                    String config = getConfigNameColumn().getValue(row);
+                    deleteConfig(config);
+                  }
+                }
+              }
+            }
+          }
+
+        }
       }
 
       @Order(10.0)
@@ -854,473 +1283,6 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
       }
 
-      @Order(50.0)
-      public class ResetBox extends AbstractGroupBox {
-
-        @Override
-        protected int getConfiguredGridColumnCount() {
-          return 1;
-        }
-
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
-
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("FormReset");
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          // TODO ASA cleanup: delete ResetBox and its contents once it's removal is definitively decided
-          return false;
-        }
-
-        @Order(10.0)
-        public class ResetAllButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("ResetTableColumnsAll");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            doResetAction(ResetAllMenu.class);
-          }
-
-        }
-
-        @Order(20.0)
-        public class RemoveFilterButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Filter");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            doResetAction(ResetFiltersMenu.class);
-          }
-
-        }
-
-        @Order(30.0)
-        public class ResetViewButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("ResetTableColumnsView");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            doResetAction(ResetViewMenu.class);
-          }
-
-        }
-
-        @Order(40.0)
-        public class ResetSortingButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("ColumnSorting");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            doResetAction(ResetSortingMenu.class);
-          }
-
-        }
-      }
-
-      @Order(60.0)
-      public class ConfigBox extends AbstractGroupBox {
-
-        @Override
-        protected int getConfiguredGridColumnCount() {
-          return 1;
-        }
-
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
-
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Configurations");
-        }
-
-        @Order(10.0)
-        public class NamedConfigTableField extends AbstractTableField<NamedConfigTableField.Table> {
-
-          @Override
-          protected int getConfiguredGridH() {
-            return 3;
-          }
-
-          @Override
-          protected int getConfiguredGridW() {
-            return 1;
-          }
-
-          @Override
-          protected int getConfiguredLabelPosition() {
-            return LABEL_POSITION_TOP;
-          }
-
-          @Override
-          protected boolean getConfiguredLabelVisible() {
-            return false;
-          }
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Configurations");
-          }
-
-          @Override
-          protected void execReloadTableData() throws ProcessingException {
-            List<ITableRow> rowList = new ArrayList<ITableRow>();
-            ClientUIPreferences prefs = ClientUIPreferences.getInstance();
-
-            // create default config rows
-            TableRow row = new TableRow(getTable().getColumnSet());
-            getTable().getConfigNameColumn().setValue(row, TEXTS.get("Default"));
-            getTable().getConfigTypeColumn().setValue(row, ConfigType.DEFAULT);
-            rowList.add(row);
-
-            // create custom config rows
-            if (prefs != null) {
-              Set<String> configs = prefs.getAllTableColumnsConfigs(m_table);
-              for (String config : configs) {
-                row = new TableRow(getTable().getColumnSet());
-                getTable().getConfigNameColumn().setValue(row, config);
-                getTable().getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
-                rowList.add(row);
-              }
-            }
-
-            try {
-              getTable().setTableChanging(true);
-              getTable().discardAllRows();
-              rowList = getTable().addRows(rowList);
-              for (ITableRow customRow : getTable().getRows()) {
-                if (customRow.getCell(getTable().getConfigTypeColumn()).getValue() != ConfigType.NEW) {
-                  customRow.getCellForUpdate(getTable().getConfigNameColumn()).setEditable(false);
-                }
-              }
-            }
-            finally {
-              getTable().setTableChanging(false);
-            }
-
-          }
-
-          private void ensureNewConfigRowExists() throws ProcessingException {
-            for (ITableRow row : getTable().getRows()) {
-              if (getTable().getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
-                return;
-              }
-            }
-            TableRow newRow = new TableRow(getTable().getColumnSet());
-            getTable().getConfigTypeColumn().setValue(newRow, ConfigType.NEW);
-            try {
-              getTable().setTableChanging(true);
-              getTable().addRow(newRow);
-            }
-            finally {
-              getTable().setTableChanging(false);
-            }
-          }
-
-          @Order(10.0)
-          public class Table extends AbstractTable {
-
-            @Override
-            protected boolean getConfiguredHeaderVisible() {
-              return false;
-            }
-
-            @Override
-            protected boolean getConfiguredAutoResizeColumns() {
-              return true;
-            }
-
-            public ConfigNameColumn getConfigNameColumn() {
-              return getColumnSet().getColumnByClass(ConfigNameColumn.class);
-            }
-
-            public ConfigTypeColumn getConfigTypeColumn() {
-              return getColumnSet().getColumnByClass(ConfigTypeColumn.class);
-            }
-
-            @Override
-            protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
-              boolean onlyCustomConfigsSelected = isOnlyCustomConfigsSelected();
-              getMenuByClass(DeleteMenu.class).setVisible(onlyCustomConfigsSelected);
-              getMenuByClass(RenameMenu.class).setVisible(onlyCustomConfigsSelected);
-
-              boolean newConfigRowSingleSelected = getSelectedRowCount() == 1 && getSelectedRow().getCell(getConfigTypeColumn()).getValue() == ConfigType.NEW;
-              getMenuByClass(ApplyMenu.class).setVisible(!newConfigRowSingleSelected);
-            }
-
-            @Order(10.0)
-            public class ConfigNameColumn extends AbstractStringColumn {
-              @Override
-              protected boolean getConfiguredEditable() {
-                return true;
-              }
-
-              @Override
-              protected int getConfiguredSortIndex() {
-                return 1;
-              }
-
-              @Override
-              protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
-                IStringField field = (IStringField) super.execPrepareEdit(row);
-                if (getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
-                  field.setValue(null);
-                }
-                return field;
-              }
-
-              @Override
-              protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
-                String oldValue = getConfigNameColumn().getValue(row);
-                super.execCompleteEdit(row, editingField);
-                String newValue = ((IStringField) editingField).getValue();
-                if (!StringUtility.isNullOrEmpty(newValue)) {
-                  switch (getConfigTypeColumn().getValue(row)) {
-                    case NEW:
-                      storeCurrentStateAsConfig(newValue);
-                      getConfigTypeColumn().setValue(row, ConfigType.CUSTOM);
-                      break;
-                    case CUSTOM:
-                      P_TableState tableStateBackup = createTableStateSnpashot();
-                      applyAll(oldValue);
-                      deleteConfig(oldValue);
-                      storeCurrentStateAsConfig(newValue);
-                      restoreTableState(tableStateBackup);
-                      break;
-                    case DEFAULT:
-                    default:
-                      throw new IllegalStateException("Rows of configType " + getConfigTypeColumn().getValue(row).name() + " should never be editable.");
-                  }
-                }
-                else {
-                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
-                    getConfigNameColumn().setValue(row, oldValue);
-                  }
-                }
-                row.getCellForUpdate(getConfigNameColumn()).setEditable(getConfigTypeColumn().getValue(row) == ConfigType.NEW);
-                getTable().sort();
-              }
-
-            }
-
-            @Order(20.0)
-            public class ConfigTypeColumn extends AbstractColumn<ConfigType> {
-              @Override
-              protected boolean getConfiguredDisplayable() {
-                return false;
-              }
-
-              @Override
-              protected int getConfiguredSortIndex() {
-                return 0;
-              }
-
-            }
-
-            @Order(10.0)
-            public class NewMenu extends AbstractMenu {
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
-              }
-
-              @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("New");
-              }
-
-              @Override
-              protected void execAction() throws ProcessingException {
-                ensureNewConfigRowExists();
-              }
-
-            }
-
-            @Order(20.0)
-            public class ApplyMenu extends AbstractMenu {
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
-              }
-
-              @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("Apply");
-              }
-
-              @Order(10.0)
-              public class ApplyAllMenu extends AbstractMenu {
-
-                @Override
-                protected String getConfiguredText() {
-                  return TEXTS.get("AllCollumnConfigs");
-                }
-
-                @Override
-                protected String getConfiguredKeyStroke() {
-                  return IKeyStroke.ENTER;
-                }
-
-                @Override
-                protected void execAction() throws ProcessingException {
-                  if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
-                    doResetAction(ResetAllMenu.class);
-                  }
-                  else {
-                    String configName = getConfigNameColumn().getSelectedValue();
-                    applyAll(configName);
-                    getColumnsTableField().reloadTableData();
-                  }
-                }
-
-              }
-
-              @Order(20.0)
-              public class ApplyViewMenu extends AbstractMenu {
-                @Override
-                protected String getConfiguredText() {
-                  return TEXTS.get("OnlyView");
-                }
-
-                @Override
-                protected void execAction() throws ProcessingException {
-                  if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
-                    doResetAction(ResetViewMenu.class);
-                  }
-                  else {
-                    applyViewForConfig(getConfigNameColumn().getSelectedValue());
-                    getColumnsTableField().reloadTableData();
-                  }
-                }
-
-              }
-
-              @Order(30.0)
-              public class ApplySortOrderMenu extends AbstractMenu {
-
-                @Override
-                protected String getConfiguredText() {
-                  return TEXTS.get("OnlySortOrder");
-                }
-
-                @Override
-                protected void execAction() throws ProcessingException {
-                  String configName = getConfigNameColumn().getSelectedValue();
-                  m_table.getColumnSet().applySortingAndGrouping(configName);
-                  getColumnsTableField().reloadTableData();
-                }
-
-              }
-            }
-
-            @Order(30.0)
-            public class RenameMenu extends AbstractMenu {
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
-              }
-
-              @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("Rename");
-              }
-
-              @Override
-              protected void execAction() throws ProcessingException {
-                getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
-                // FIXME ASA open and focus cell for edit, once it is supported.
-              }
-
-            }
-
-            protected boolean isOnlyCustomConfigsSelected() {
-              for (ITableRow row : getSelectedRows()) {
-                if (row.getCell(getConfigTypeColumn()).getValue() != ConfigType.CUSTOM) {
-                  return false;
-                }
-              }
-              return true;
-            }
-
-            @Order(40.0)
-            public class DeleteMenu extends AbstractMenu {
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.MultiSelection, TableMenuType.SingleSelection);
-              }
-
-              @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("DeleteMenu");
-              }
-
-              @Override
-              protected String getConfiguredKeyStroke() {
-                return IKeyStroke.DELETE;
-              }
-
-              @Override
-              protected void execAction() throws ProcessingException {
-                List<ITableRow> rows = getSelectedRows();
-                deleteRows(rows);
-                for (ITableRow row : rows) {
-                  String config = getConfigNameColumn().getValue(row);
-                  deleteConfig(config);
-                }
-              }
-            }
-          }
-
-        }
-      }
-
     }
 
     @Order(20.0)
@@ -1382,7 +1344,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
     boolean selectedRowExists = selectedRow != null;
     boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
-    boolean filterActive = m_table.getUserFilterManager() != null && !m_table.getUserFilterManager().isEmpty();
     boolean sortEnabled = m_table.isSortEnabled();
     getModifyCustomColumnButton().setEnabled(isCustomColumn);
     getRemoveCustomColumnButton().setEnabled(isCustomColumn);
@@ -1394,18 +1355,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     getDescendingButton().setEnabled(sortEnabled && selectedRowExists);
     getWithoutButton().setEnabled(sortEnabled && selectedRowExists);
 
-    getRemoveFilterButton().setEnabled(filterActive);
-  }
-
-  private void doResetAction(Class<? extends IMenu> action) throws ProcessingException {
-    ResetColumnsMenu menu = new ResetColumnsMenu(m_table);
-    List<IMenu> children = menu.getChildActions();
-    for (IMenu child : children) {
-      if (child.getClass().equals(action)) {
-        child.doAction();
-      }
-    }
-    getColumnsTableField().reloadTableData();
   }
 
   private void setSort(Boolean ascending) throws ProcessingException {
