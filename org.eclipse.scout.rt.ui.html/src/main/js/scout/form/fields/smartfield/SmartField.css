@@ -40,11 +40,6 @@
       background-color: @control-disabled-background-color;
     }
   }
-
-   & input.multiline ~ .icon {
-    margin-right: -15px;
-    top: 0;
-  }
 }
 
 .smart-field-popup {
@@ -125,3 +120,4 @@
 .delay-0 { #scout.animation-delay(0ms); }
 .delay-1 { #scout.animation-delay(200ms); }
 .delay-2 { #scout.animation-delay(400ms); }
+

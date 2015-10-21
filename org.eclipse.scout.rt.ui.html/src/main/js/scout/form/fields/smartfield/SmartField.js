@@ -161,7 +161,7 @@ scout.SmartField.prototype._onClick = function(event) {
   if (scout.fields.handleOnClick(this)) {
     if (this.touch) {
       this._popup.open();
-      return false;
+      return false; // FIXME AWE: braucht es das return false wirklich?
     } else {
       this._openProposal(true);
     }

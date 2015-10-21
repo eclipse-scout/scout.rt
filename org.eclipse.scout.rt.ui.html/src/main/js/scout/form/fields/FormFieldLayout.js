@@ -111,9 +111,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   // Icon is placed inside the field (as overlay)
   if (formField.$icon && formField.$field) {
-    formField.$icon
-      .cssRight(formField.$field.cssBorderRightWidth() + right)
-      .cssTop(top);
+    this._layoutIcon(formField, right, top);
   }
 
   // Make sure tooltip is at correct position after layouting, if there is one
@@ -201,6 +199,12 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   height = Math.max(height, prefSize.height);
 
   return new scout.Dimension(width, height);
+};
+
+scout.FormFieldLayout.prototype._layoutIcon = function(formField, right, top) {
+  formField.$icon
+    .cssRight(formField.$field.cssBorderRightWidth() + right)
+    .cssTop(top);
 };
 
 /**

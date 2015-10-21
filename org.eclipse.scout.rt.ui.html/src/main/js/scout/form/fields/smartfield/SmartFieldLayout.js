@@ -9,8 +9,12 @@ scout.inherits(scout.SmartFieldLayout, scout.FormFieldLayout);
 
 scout.SmartFieldLayout.prototype.layout = function($container) {
   scout.SmartFieldLayout.parent.prototype.layout.call(this, $container);
+
+  // when embedded smart-field layout must not validate the popup
+  // since this would lead to an endless recursion because the smart-field
+  // is a child of the popup.
   if (this._smartField.embedded) {
-    return; // FIXME AWE: (popups) beautify this
+    return;
   }
 
   var popup = this._smartField._popup;
@@ -19,4 +23,18 @@ scout.SmartFieldLayout.prototype.layout = function($container) {
     popup.position();
     popup.validateLayout();
   }
+};
+
+
+/**
+ * Layout for icon in multiline smart-field works a bit different because the icon here is _inside_
+ * an additional field container, which contains the INPUT field and the icon.
+ *
+ * @override FormFieldLayout.js
+ */
+scout.SmartFieldLayout.prototype._layoutIcon = function(formField, right, top) {
+  var multiline = formField instanceof scout.SmartFieldMultiline;
+  formField.$icon
+    .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
+    .cssTop(top);
 };

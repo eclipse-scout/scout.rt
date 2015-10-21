@@ -19,13 +19,20 @@ scout.fields = {
   },
 
   /**
-   * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with inputOrDiv.
+   * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #inputOrDiv().
+   * Works as setter when called with 3 arguments, works a getter when called with 2 arguments.
+   *
+   * @return when called with 2 arguments: $field.text() or $field.val()
    */
   valOrText: function(field, $field, text) {
-    if (field.touch) {
-      $field.text(text);
+    if (arguments.length === 3) {
+      if (field.touch) {
+        $field.text(text);
+      } else {
+        $field.val(text);
+      }
     } else {
-      $field.val(text);
+      return field.touch ? $field.text() : $field.val();
     }
   },
 

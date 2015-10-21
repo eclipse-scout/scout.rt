@@ -10,24 +10,29 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
 
   this.addContainer($parent, 'smart-field', new scout.SmartFieldLayout(this));
   this.addLabel();
-  this.addMandatoryIndicator();
   this.addFieldContainer($('<div>'));
   htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 
-  $field = scout.fields.new$TextField().
-      addClass('multiline').
-      blur(this._onFieldBlur.bind(this)).
-      click(this._onClick.bind(this)).
-      focus(this._onFocus.bind(this)).
-      keyup(this._onKeyUp.bind(this)).
-      keydown(this._onKeyDown.bind(this)).
-      appendTo(this.$fieldContainer);
+  $field = scout.fields.inputOrDiv(this)
+    .addClass('multiline')
+    .click(this._onClick.bind(this))
+    .appendTo(this.$fieldContainer);
+  if (!this.touch) {
+    $field
+      .blur(this._onFieldBlur.bind(this))
+      .focus(this._onFocus.bind(this))
+      .keyup(this._onKeyUp.bind(this))
+      .keydown(this._onKeyDown.bind(this));
+  }
   this.addField($field);
-  this.addIcon(this.$fieldContainer);
   this._$multilineField = $.makeDiv('multiline-field')
     .appendTo(this.$fieldContainer);
 
+  if (!this.embedded) {
+    this.addMandatoryIndicator();
+  }
+  this.addIcon(this.$fieldContainer);
   this.addStatus();
   this.addPopup();
 };
@@ -39,7 +44,7 @@ scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
   var tmp = displayText.split('\n'),
     firstLine = tmp.shift(),
     additionalLines = tmp.join('<br/>');
-  this.$field.val(firstLine);
+  scout.fields.valOrText(this, this.$field, firstLine);
   this._$multilineField.html(additionalLines);
 };
 
@@ -61,7 +66,7 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
  */
 scout.SmartFieldMultiline.prototype._readSearchText = function() {
   var i,
-    firstLine = this.$field.val(),
+    firstLine = scout.fields.valOrText(this, this.$field),
     newDisplayText = [firstLine],
     oldDisplayText = this.displayText.split('\n');
   for (i = 1; i < oldDisplayText.length; i++) {
