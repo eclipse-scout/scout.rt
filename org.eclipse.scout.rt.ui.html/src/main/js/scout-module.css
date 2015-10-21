@@ -65,6 +65,7 @@
 //@include("scout/table/TableFooter.css")
 //@include("scout/table/TableHeader.css")
 //@include("scout/table/TableHeaderMenu.css")
+//@include("scout/table/controls/AggregateTableControl.css")
 //@include("scout/table/controls/AnalysisTableControl.css")
 //@include("scout/table/controls/ChartTableControl.css")
 //@include("scout/table/controls/GraphTableControl.css")

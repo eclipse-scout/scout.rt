@@ -8,10 +8,12 @@ scout.CheckBoxColumn = function() {
 };
 scout.inherits(scout.CheckBoxColumn, scout.Column);
 
-scout.CheckBoxColumn.prototype.buildCell = function(row) {
-  var cell, style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
+/**
+ * @override
+ */
+scout.CheckBoxColumn.prototype.buildCell = function(cell, row) {
+  var style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
   var enabled = row.enabled;
-  cell = this.table.cell(this, row);
   checked = cell.value;
   enabled = enabled && cell.editable;
   cssClass = this._cellCssClass(cell);
@@ -19,7 +21,7 @@ scout.CheckBoxColumn.prototype.buildCell = function(row) {
   if (!enabled) {
     cssClass +=' disabled';
   }
-  tooltipText = this.table.cellTooltipText(this, row);
+  tooltipText = cell.tooltipText;
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
   checkBoxCssClass = 'check-box';

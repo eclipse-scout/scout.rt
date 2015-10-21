@@ -20,7 +20,7 @@
 @palette-blue-1: #D2DDE6;
 @palette-blue-2: #BAC9D5;
 @palette-blue-3: #8CA1B1;
-@palette-blue-4: #4E8DC5;
+@palette-blue-4: #2B73B3;
 @palette-blue-5: #576B7C;
 @palette-blue-6: #465A6A;
 @palette-blue-7: #2F3C45;
@@ -126,7 +126,7 @@
 @outline-selection-background-color: @background-color;
 @outline-group-background-color: @palette-blue-6;
 @outline-control-button-background-color: @palette-blue-6;
-@outline-in-background-selection-background-color: @palette-blue-4;
+@outline-in-background-selection-background-color: @palette-blue-5;
 @panel-background-color: @palette-gray-2;
 @planner-timeline-background-color: @panel-background-color;
 @planner-mode-active-text-color: @palette-blue-7;
@@ -140,6 +140,7 @@
 @table-header-cmd-active-background-color: @active-inverted-background-color;
 @table-header-cmd-active-border-color: @active-inverted-background-color;
 @table-aggregate-cell-selection-color: @palette-blue-4;
+@table-aggregate-row-background-color: @palette-gray-1;
 @table-info-color: @palette-gray-5;
 @table-info-hover-color: @palette-gray-6;
 @table-info-warning-color: @palette-blue-4;

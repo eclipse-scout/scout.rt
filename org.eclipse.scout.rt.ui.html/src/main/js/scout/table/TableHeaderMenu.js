@@ -134,39 +134,31 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
       this.$aggregation.appendDiv('header-text')
       .data('label', session.text('ui.Aggregation'));
 
-      //functions for number columns:
-      var sumIcon = '\u03a3',
-        avgIcon = '\u00D8',
-        maxIcon = '\uf077',
-        minIcon = '\uf078';
+      // functions for number columns:
 
-      var $aggregationFunctionSum = this.$aggregation.appendDiv('header-command group-function')
+      var $aggregationFunctionSum = this.$aggregation.appendDiv('header-command group-function sum')
         .data('label', session.text('ui.Sum'))
-        .attr('data-icon', sumIcon)
         .click(this.remove.bind(this))
         .click(function() {
           setAggregationFunction('sum');
         });
 
-      var $aggregationFunctionAvg = this.$aggregation.appendDiv('header-command group-function')
+      var $aggregationFunctionAvg = this.$aggregation.appendDiv('header-command group-function avg')
         .data('label', session.text('ui.Average'))
-        .attr('data-icon', avgIcon)
         .click(this.remove.bind(this))
         .click(function() {
           setAggregationFunction('avg');
         });
 
-      var $aggregationFunctionMin = this.$aggregation.appendDiv('header-command group-function')
+      var $aggregationFunctionMin = this.$aggregation.appendDiv('header-command group-function min')
         .data('label', session.text('ui.Minimum'))
-        .attr('data-icon', minIcon)
         .click(this.remove.bind(this))
         .click(function() {
           setAggregationFunction('min');
         });
 
-      var $aggregationFunctionMax = this.$aggregation.appendDiv('header-command group-function')
+      var $aggregationFunctionMax = this.$aggregation.appendDiv('header-command group-function max')
         .data('label', session.text('ui.Maximum'))
-        .attr('data-icon', maxIcon)
         .click(this.remove.bind(this))
         .click(function() {
           setAggregationFunction('max');

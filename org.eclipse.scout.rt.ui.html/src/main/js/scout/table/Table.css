@@ -196,11 +196,20 @@
   }
 }
 
+.table-row-sum {
+  background-color: @table-aggregate-row-background-color;
+
+  & > .table-cell-icon {
+    color: @text-color;
+  }
+}
+
 .table-aggregate-cell {
   font-weight: bold;
 
   /* if aggregation is based on selected rows */
-  &.selection {
+  &.selection,
+  &.selection > .table-cell-icon {
     color: @table-aggregate-cell-selection-color;
   }
 }

@@ -1,6 +1,5 @@
 /* default font icons (sans-serif, arial) */
 @icon-nbsp: '\00a0';
-@icon-sum: '\03a3';
 @icon-median: '\2300';
 @icon-count: '\2317';
 @icon-arial-long-arrow-down: '\2193';
@@ -21,6 +20,10 @@
 @icon-chart: '\E022';
 @icon-graph: '\E023';
 @icon-category: '\E024';
+@icon-sum: '\E025';
+@icon-avg: '\E026';
+@icon-max: '\E027';
+@icon-min: '\E028';
 @icon-detach: '\E030';
 @icon-gear: '\E031';
 @icon-star: '\E032';

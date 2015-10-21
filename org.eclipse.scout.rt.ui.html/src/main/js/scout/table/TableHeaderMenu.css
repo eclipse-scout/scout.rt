@@ -182,7 +182,22 @@
     top: 0px;
     font-size: 20px;
     line-height: 20px;
-    content: attr(data-icon);
+  }
+
+  &.sum.group-function::before {
+    content: @icon-sum;
+  }
+
+  &.avg.group-function::before {
+    content: @icon-avg;
+  }
+
+  &.max.group-function::before {
+    content: @icon-max;
+  }
+
+  &.min.group-function::before {
+    content: @icon-min;
   }
 
   &.sort-asc-add::after,

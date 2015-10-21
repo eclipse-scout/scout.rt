@@ -896,7 +896,7 @@ scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelec
   }
   var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   for (var c = 0; c < this.columns.length; c++) {
-    rowDiv += this.columns[c].buildCell(row);
+    rowDiv += this.columns[c].buildCellForRow(row);
   }
   rowDiv += '</div>';
 
@@ -1336,14 +1336,6 @@ scout.Table.prototype.cellText = function(column, row) {
   return cell.text || '';
 };
 
-scout.Table.prototype.cellTooltipText = function(column, row) {
-  var cell = row.cells[column.index];
-  if (typeof cell === 'object' && cell !== null && scout.strings.hasText(cell.tooltipText)) {
-    return cell.tooltipText;
-  }
-  return '';
-};
-
 /**
  *
  * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
@@ -1508,9 +1500,7 @@ scout.Table.prototype._removeAggregationRows = function() {
 };
 
 scout.Table.prototype._renderAggregationRows = function(animate) {
-
-  var c, r, column, row, contents, alignment, $cell, $aggregationRow, that = this;
-
+  var c, cell, r, column, row, contents, alignment, $cell, $aggregationRow, that = this;
   if (!arguments.length) {
     animate = true;
   }
@@ -1534,26 +1524,28 @@ scout.Table.prototype._renderAggregationRows = function(animate) {
     for (c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
       if (typeof contents[c] === 'number') {
-        var sumValue = contents[c];
+        var aggrValue = contents[c];
         if (column.format) {
           var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
-          sumValue = decimalFormat.format(sumValue);
+          aggrValue = decimalFormat.format(aggrValue);
         }
-        $cell = $.makeDiv('table-cell', "(" + column.aggrSymbol + ") " + sumValue);
+        cell = {
+            text: aggrValue,
+            iconId: column.aggrSymbol,
+            horizontalAlignment: column.horizontalAlignment,
+            cssClass: 'table-aggregate-cell'
+          };
       } else if (column.grouped) {
-        if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
-          $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row));
-        } else {
-          $cell = $.makeDiv('table-cell', this.cellText(column, row));
-        }
+        cell = {
+          text: column.cellTextForGrouping(row),
+          horizontalAlignment: column.horizontalAlignment
+        };
       } else {
-        $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
+        cell = {};
       }
-      $cell.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
-      $cell.appendTo($aggregationRow)
-        .css('min-width', column.width)
-        .css('max-width', column.width);
+      $cell = $(column.buildCell(cell));
+      $cell.appendTo($aggregationRow);
     }
 
     $aggregationRow.insertAfter(row.$row).width(this.rowWidth);
@@ -1564,7 +1556,6 @@ scout.Table.prototype._renderAggregationRows = function(animate) {
         .slideDown(300, this.updateScrollbars.bind(this));
     }
   }
-
 };
 
 scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove) {
@@ -2392,7 +2383,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   if (scout.device.tableAdditionalDivRequired) {
     this.$cellsForColIndexWidthFix(colNum, true)
       .css('max-width', (width - this.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ));
-    // same calculation in scout.Column.prototype.buildCell;
+    // same calculation in scout.Column.prototype.buildCellForRow;
   }
   this.$rows(true)
     .css('width', this.rowWidth);

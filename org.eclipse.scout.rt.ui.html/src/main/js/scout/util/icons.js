@@ -6,6 +6,10 @@ scout.icons = {
   ELLIPSIS_V: 'font:\uE040',
   COLLAPSE: 'font:\uE600',
   HOME: 'font:\uE601',
+  SUM: 'font:\ue025',
+  AVG: 'font:\ue026',
+  MAX: 'font:\ue027',
+  MIN: 'font:\ue028',
 
   /**
    * Returns an Icon object with structured info contained in the iconId string.

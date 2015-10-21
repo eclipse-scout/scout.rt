@@ -3,9 +3,9 @@ scout.BeanColumn = function() {
 };
 scout.inherits(scout.BeanColumn, scout.Column);
 
-scout.BeanColumn.prototype.buildCell = function(row) {
+scout.BeanColumn.prototype.buildCellForRow = function(row) {
   var $cell, value;
-  $cell = $(scout.BeanColumn.parent.prototype.buildCell.call(this, row));
+  $cell = $(scout.BeanColumn.parent.prototype.buildCellForRow.call(this, row));
   // Clear any content (e.g. nbsp due to empty text)
   $cell.empty();
   $cell.removeClass('empty');
@@ -20,7 +20,7 @@ scout.BeanColumn.prototype.buildCell = function(row) {
 
 /**
  * Override to render the value.<p>
- * If you have a large table you should consider overriding buildCell instead and create the html as string instead of using jquery.
+ * If you have a large table you should consider overriding buildCellForRow instead and create the html as string instead of using jquery.
  */
 scout.BeanColumn.prototype._renderValue = function($cell, value) {
   // to be implemented by the subclass

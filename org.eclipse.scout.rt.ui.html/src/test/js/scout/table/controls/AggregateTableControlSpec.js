@@ -84,6 +84,7 @@ describe("AggregateTableControl", function() {
 
       column0 = model.columns[0];
       column1 = model.columns[1];
+      column1.setAggregationFunction('sum');
     }
 
     function render(table) {
@@ -109,6 +110,7 @@ describe("AggregateTableControl", function() {
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(0).text()).toBe(' ');
       expect($aggrCells.eq(1).text()).toBe('6');
     });
@@ -127,6 +129,7 @@ describe("AggregateTableControl", function() {
       table.filter();
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(0).text()).toBe(' ');
       expect($aggrCells.eq(1).text()).toBe('3');
     });
@@ -141,6 +144,7 @@ describe("AggregateTableControl", function() {
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCell = $aggrRow.children('.table-cell').eq(1);
+      $aggrCell.children('.table-cell-icon').remove();
       expect($aggrCell.text()).toBe('4000.00');
     });
 

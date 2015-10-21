@@ -4,8 +4,7 @@ scout.IconColumn = function() {
 };
 scout.inherits(scout.IconColumn, scout.Column);
 
-scout.IconColumn.prototype.buildCell = function(row) {
-  var cell = this.table.cell(this, row);
+scout.IconColumn.prototype.buildCell = function(cell, row) {
   cell.iconId = cell.value || cell.iconId;
-  return scout.IconColumn.parent.prototype.buildCell.call(this, row);
+  return scout.IconColumn.parent.prototype.buildCell.call(this, cell, row);
 };

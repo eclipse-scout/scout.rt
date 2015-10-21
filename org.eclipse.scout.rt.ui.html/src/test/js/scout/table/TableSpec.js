@@ -704,99 +704,6 @@ describe("Table", function() {
 
   });
 
-  describe("group", function() {
-    var model, table, column0, column1, rows, columns;
-    var $colHeaders, $header0, $header1;
-
-    function prepareTable() {
-      columns = [helper.createModelColumn(null, 'col1'),
-        helper.createModelColumn(null, 'col2', 'number')
-      ];
-      columns[0].index = 0;
-      columns[1].index = 1;
-      rows = helper.createModelRows(2, 3);
-      model = helper.createModel(columns, rows);
-      table = helper.createTable(model);
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-    }
-
-    function render(table) {
-      table.render(session.$entryPoint);
-      $colHeaders = table.header.$container.find('.table-header-item');
-      $header0 = $colHeaders.eq(0);
-      $header1 = $colHeaders.eq(1);
-    }
-
-    it("creates a sum row", function() {
-      prepareTable();
-      render(table);
-
-      expect(table.$aggregationRows().length).toBe(0);
-      table.group();
-      expect(table.$aggregationRows().length).toBe(1);
-    });
-
-    it("creates a sum row, even if there are filtered rows", function() {
-      prepareTable();
-      render(table);
-
-      expect(table.$aggregationRows().length).toBe(0);
-      table.rows[2].filterAccepted = false;
-      table._renderRowFilterAccepted(table.rows[2]);
-      table.group();
-      expect(table.$aggregationRows().length).toBe(1);
-    });
-
-    it("sums up numbers in a number column", function() {
-      prepareTable();
-      rows[0].cells[1].value = 1;
-      rows[1].cells[1].value = 2;
-      rows[2].cells[1].value = 3;
-      render(table);
-
-      table.group();
-      var $sumCell = table.$aggregationRows().eq(0).children().eq(1);
-      expect($sumCell.text()).toBe('6');
-    });
-
-    it("sums up numbers in a number column but only on filtered rows", function() {
-      prepareTable();
-      rows[0].cells[1].value = 1;
-      rows[1].cells[1].value = 2;
-      rows[2].cells[1].value = 3;
-      render(table);
-
-      var filter = {
-        accept: function($row) {
-          return $row.data('row').id !== table.rows[2].id;
-        },
-        createKey: function() {
-          return 1; // dummy value
-        }
-      };
-      table.addFilter(filter);
-      table.filter();
-      table.group();
-      var $sumCell = table.$aggregationRows().eq(0).children().eq(1);
-      expect($sumCell.text()).toBe('3');
-    });
-
-    it("sums up numbers in a number column and considers format pattern", function() {
-      prepareTable();
-      rows[0].cells[1].value = 1000;
-      rows[1].cells[1].value = 1000;
-      rows[2].cells[1].value = 2000;
-      render(table);
-      column1.format = '#.00';
-
-      table.group();
-      var $sumCell = table.$aggregationRows().eq(0).children().eq(1);
-      expect($sumCell.text()).toBe('4000.00');
-    });
-
-  });
-
   describe("column grouping", function() {
     var model, table, column0, column1, column2, column3, column4, rows, columns;
     var $colHeaders, $header0, $header1;
@@ -892,7 +799,8 @@ describe("Table", function() {
 
       for(i=0; i<values.length; i++){
         $sumCell = table.$aggregationRows().eq(i).children().eq(c);
-        expect($sumCell.text()).toBe("(" + column.aggrSymbol + ") " + values[i]);
+        $sumCell.find('.table-cell-icon').remove();
+        expect($sumCell.text()).toBe(values[i]);
       }
     }
 

@@ -10,7 +10,7 @@ scout.AggregateTableControl = function() {
   this.cssClass = 'aggregate';
   this.height = 42;
   this.resizerVisible = false;
-  this.aggregate;
+  this.aggregateRow;
 };
 scout.inherits(scout.AggregateTableControl, scout.TableControl);
 
@@ -39,35 +39,36 @@ scout.AggregateTableControl.prototype._removeContent = function() {
 };
 
 scout.AggregateTableControl.prototype._renderAggregate = function() {
-  var $cell,
-    aggregate = this.aggregate;
-
   this.table.columns.forEach(function(column, c) {
-    var aggregateValue, decimalFormat;
+    var aggregateValue, decimalFormat, cell, $cell;
 
-    if (aggregate[c] === undefined) {
-      $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
+    aggregateValue = this.aggregateRow[c];
+    if (aggregateValue === undefined) {
+      cell = {};
     } else {
-      aggregateValue = aggregate[c];
       if (column.format) {
         decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
         aggregateValue = decimalFormat.format(aggregateValue);
       }
-      $cell = $.makeDiv('table-cell table-aggregate-cell', aggregateValue);
-
-      // If aggregation is based on the selection and not on all rows -> mark it
-      if (aggregate.selection) {
-        $cell.addClass('selection');
-      }
+      cell = {
+        text: aggregateValue,
+        iconId: column.aggrSymbol,
+        horizontalAlignment: column.horizontalAlignment,
+        cssClass: 'table-aggregate-cell'
+      };
     }
-    $cell.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
-    $cell.appendTo(this.$contentContainer)
-      .css('min-width', column.width)
-      .css('max-width', column.width);
+    $cell = $(column.buildCell(cell));
+
+    // If aggregation is based on the selection and not on all rows -> mark it
+    if (this.aggregateRow.selection) {
+      $cell.addClass('selection');
+    }
+
+    $cell.appendTo(this.$contentContainer);
   }, this);
 
-  if (aggregate.selection) {
+  if (this.aggregateRow.selection) {
     this.$contentContainer.addClass('selection');
   }
 };
@@ -79,30 +80,45 @@ scout.AggregateTableControl.prototype._rerenderAggregate = function() {
 
 scout.AggregateTableControl.prototype._aggregate = function() {
   var value, rows,
-    aggregate = [],
+    columns = this.table.columns,
+    aggregateRow = [],
     selectedRows = this.table.selectedRows;
 
   if (selectedRows.length > 1) {
     rows = selectedRows;
-    aggregate.selection = true;
+    aggregateRow.selection = true;
   } else {
     rows = this.table.filteredRows();
   }
 
-  this.table.columns.forEach(function(column, c) {
-    rows.forEach(function(row) {
+  var prepare = function(column, c) {
+    if (column.type === 'number') {
+      aggregateRow[c] = column.aggrStart();
+    }
+  };
+
+  var aggregateFunc = function(row, column, c) {
+    if (column.type === 'number') {
       value = this.table.cellValue(column, row);
+      aggregateRow[c] = column.aggrStep(aggregateRow[c], value);
+    }
+  };
 
-      if (column.type === 'number') {
-        value = value || 0;
-        aggregate[c] = aggregate[c] || 0;
+  var finish = function(column, c) {
+    if (column.type === 'number') {
+      aggregateRow[c] = column.aggrFinish(aggregateRow[c]);
+    }
+  };
 
-        aggregate[c] += value;
-      }
-    }, this);
-  }, this);
+  columns.forEach(prepare);
 
-  this.aggregate = aggregate;
+  rows.forEach(function(row, r) {
+    columns.forEach(aggregateFunc.bind(this, row));
+  }.bind(this));
+
+  columns.forEach(finish);
+
+  this.aggregateRow = aggregateRow;
 };
 
 scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
