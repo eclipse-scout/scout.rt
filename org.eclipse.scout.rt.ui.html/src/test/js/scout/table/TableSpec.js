@@ -704,6 +704,99 @@ describe("Table", function() {
 
   });
 
+  describe("group", function() {
+    var model, table, column0, column1, rows, columns;
+    var $colHeaders, $header0, $header1;
+
+    function prepareTable() {
+      columns = [helper.createModelColumn(null, 'col1'),
+        helper.createModelColumn(null, 'col2', 'number')
+      ];
+      columns[0].index = 0;
+      columns[1].index = 1;
+      rows = helper.createModelRows(2, 3);
+      model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+    }
+
+    function render(table) {
+      table.render(session.$entryPoint);
+      $colHeaders = table.header.$container.find('.table-header-item');
+      $header0 = $colHeaders.eq(0);
+      $header1 = $colHeaders.eq(1);
+    }
+
+    it("creates a sum row", function() {
+      prepareTable();
+      render(table);
+
+      expect(table.$aggregationRows().length).toBe(0);
+      table.group();
+      expect(table.$aggregationRows().length).toBe(1);
+    });
+
+    it("creates a sum row, even if there are filtered rows", function() {
+      prepareTable();
+      render(table);
+
+      expect(table.$aggregationRows().length).toBe(0);
+      table.rows[2].filterAccepted = false;
+      table._renderRowFilterAccepted(table.rows[2]);
+      table.group();
+      expect(table.$aggregationRows().length).toBe(1);
+    });
+
+    it("sums up numbers in a number column", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      render(table);
+
+      table.group();
+      var $sumCell = table.$aggregationRows().eq(0).children().eq(1);
+      expect($sumCell.text()).toBe('6');
+    });
+
+    it("sums up numbers in a number column but only on filtered rows", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      render(table);
+
+      var filter = {
+        accept: function($row) {
+          return $row.data('row').id !== table.rows[2].id;
+        },
+        createKey: function() {
+          return 1; // dummy value
+        }
+      };
+      table.addFilter(filter);
+      table.filter();
+      table.group();
+      var $sumCell = table.$aggregationRows().eq(0).children().eq(1);
+      expect($sumCell.text()).toBe('3');
+    });
+
+    it("sums up numbers in a number column and considers format pattern", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1000;
+      rows[1].cells[1].value = 1000;
+      rows[2].cells[1].value = 2000;
+      render(table);
+      column1.format = '#.00';
+
+      table.group();
+      var $sumCell = table.$aggregationRows().eq(0).children().eq(1);
+      expect($sumCell.text()).toBe('4000.00');
+    });
+
+  });
+
   describe("column grouping", function() {
     var model, table, column0, column1, column2, column3, column4, rows, columns;
     var $colHeaders, $header0, $header1;
@@ -795,10 +888,10 @@ describe("Table", function() {
     function assertGroupingValues(table, column, values){
       var i, c, $sumCell;
       c = table.columns.indexOf(column);
-      expect(table.$sumRows().length).toBe(values.length);
+      expect(table.$aggregationRows().length).toBe(values.length);
 
       for(i=0; i<values.length; i++){
-        $sumCell = table.$sumRows().eq(i).children().eq(c);
+        $sumCell = table.$aggregationRows().eq(i).children().eq(c);
         expect($sumCell.text()).toBe("(" + column.aggrSymbol + ") " + values[i]);
       }
     }
@@ -820,14 +913,14 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column0, false);
-      expect(table.$sumRows().length).toBe(2);
+      expect(table.$aggregationRows().length).toBe(2);
       assertGroupingProperty(table, 0);
       assertGroupingValues(table, column3, ['10', '26']);
       assertGroupingValues(table, column4, ['30', '78']);
       removeGrouping(table, column0);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
     });
 
@@ -840,14 +933,14 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column1, false);
-      expect(table.$sumRows().length).toBe(2);
+      expect(table.$aggregationRows().length).toBe(2);
       assertGroupingProperty(table, 1);
       assertGroupingValues(table, column3, ['14', '22']);
       assertGroupingValues(table, column4, ['42', '66']);
       removeGrouping(table, column1);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
     });
 
@@ -860,16 +953,16 @@ describe("Table", function() {
       prepareContent();
       render(table);
       column3.setAggregationFunction('avg');
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column1, true);
-      expect(table.$sumRows().length).toBe(4);
+      expect(table.$aggregationRows().length).toBe(4);
       assertGroupingProperty(table, 0, 1);
       assertGroupingValues(table, column3, ['1.5', '3.5', '5.5', '7.5']);
       assertGroupingValues(table, column4, ['9', '21', '33', '45']);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
 
     });
@@ -882,18 +975,18 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column1, true);
       addGrouping(table, column2, true);
-      expect(table.$sumRows().length).toBe(8);
+      expect(table.$aggregationRows().length).toBe(8);
       assertGroupingProperty(table, 0, 1, 2);
       assertGroupingValues(table, column3, ['1', '2', '3', '4', '5', '6', '7', '8']);
       assertGroupingValues(table, column4, ['3', '6', '9', '12','15', '18', '21', '24']);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
 
     });
@@ -907,16 +1000,16 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column2, false);
       addGrouping(table, column1, true);
-      expect(table.$sumRows().length).toBe(4);
+      expect(table.$aggregationRows().length).toBe(4);
       assertGroupingProperty(table, 2, 1);
       assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
       assertGroupingValues(table, column4, ['18', '30', '24', '36']);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
 
     });
@@ -930,16 +1023,16 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column2, true);
       addGrouping(table, column1, false);
-      expect(table.$sumRows().length).toBe(2);
+      expect(table.$aggregationRows().length).toBe(2);
       assertGroupingProperty(table, 1);
       assertGroupingValues(table, column3, ['14', '22']);
       assertGroupingValues(table, column4, ['42', '66']);
       removeGrouping(table, column1);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
     });
 
@@ -952,18 +1045,18 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column2, true);
       addGrouping(table, column1, true);
       removeGrouping(table, column0);
-      expect(table.$sumRows().length).toBe(4);
+      expect(table.$aggregationRows().length).toBe(4);
       assertGroupingProperty(table, 1,2);
       assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
       assertGroupingValues(table, column4, ['18', '30', '24', '36']);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
-      expect(table.$sumRows().length).toBe(0);
+      expect(table.$aggregationRows().length).toBe(0);
       assertGroupingProperty(table);
     });
 
