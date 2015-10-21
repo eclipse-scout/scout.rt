@@ -25,11 +25,20 @@ scout.GraphField.prototype._renderDisplayText = function() {
 };
 
 scout.GraphField.prototype._renderValue = function() {
+  if (this.graphImpl) {
+    this.graphImpl.remove();
+    this.graphImpl = null;
+  }
   this.$field.empty();
+
   if (!this.value) {
     return;
   }
-  // XXX scout.PhonebookColumn.renderPhoneBookEntry(this.$field, value);
+
+  var model = $.extend({}, this.value);
+  model.parent = this;
+  this.graphImpl = scout.create(scout.Graph, model);
+  this.graphImpl.render(this.$field);
 };
 
 scout.GraphField.prototype._renderLoading = function(loading) {

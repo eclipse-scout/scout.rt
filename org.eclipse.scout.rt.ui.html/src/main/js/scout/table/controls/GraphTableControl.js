@@ -11,12 +11,15 @@ scout.inherits(scout.GraphTableControl, scout.TableControl);
 scout.GraphTableControl.prototype._renderContent = function($parent) {
   var model = $.extend({}, this.graph);
   model.parent = this;
-  this.graphImpl = scout.create(scout.NetworkGraph, model);
+  this.graphImpl = scout.create(scout.Graph, model);
 
   this.graphImpl.render($parent);
 };
 
 scout.GraphTableControl.prototype._renderGraph = function(graph) {
+  if (this.contentRendered) {
+    this.removeContent();
+  }
   this.renderContent();
 };
 
@@ -33,4 +36,3 @@ scout.GraphTableControl.prototype.onResize = function() {
     this.graphImpl.onResize();
   }
 };
-

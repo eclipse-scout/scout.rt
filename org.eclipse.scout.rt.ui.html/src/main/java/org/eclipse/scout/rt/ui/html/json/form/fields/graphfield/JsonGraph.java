@@ -127,4 +127,10 @@ public class JsonGraph implements IJsonObject {
     }
   }
 
+  public static Object toJson(GraphModel model) {
+    if (model == null) {
+      return null;
+    }
+    return new JsonGraph(model).toJson();
+  }
 }
