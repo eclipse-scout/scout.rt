@@ -1518,26 +1518,23 @@ scout.Table.prototype._appendSumRow = function(sum, row, animate) {
 
   for (c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
-    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (typeof sum[c] === 'number') {
       var sumValue = sum[c];
       if (column.format) {
         var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
         sumValue = decimalFormat.format(sumValue);
       }
-      $cell = $.makeDiv('table-cell', "(" + column.aggrSymbol + ") " + sumValue)
-        .css('text-align', alignment);
+      $cell = $.makeDiv('table-cell', "(" + column.aggrSymbol + ") " + sumValue);
     } else if (column.grouped) {
       if (column.cellTextForGrouping && typeof column.cellTextForGrouping === 'function') {
-        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row))
-          .css('text-align', alignment);
+        $cell = $.makeDiv('table-cell', column.cellTextForGrouping(row));
       } else {
-        $cell = $.makeDiv('table-cell', this.cellText(column, row))
-          .css('text-align', alignment);
+        $cell = $.makeDiv('table-cell', this.cellText(column, row));
       }
     } else {
       $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
     }
+    $cell.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
     $cell.appendTo($sumRow)
       .css('min-width', column.width)

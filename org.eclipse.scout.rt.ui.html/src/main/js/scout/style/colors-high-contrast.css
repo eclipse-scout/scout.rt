@@ -142,8 +142,13 @@
 @table-header-cmd-active-color: @active-inverted-color;
 @table-header-cmd-active-background-color: @active-inverted-background-color;
 @table-header-cmd-active-border-color: @active-inverted-background-color;
+@table-aggregate-cell-selection-color: @palette-blue-5;
 @table-info-color: @palette-gray-9;
-@table-info-active-color: @palette-gray-6;
+@table-info-hover-color: @palette-gray-6;
+@table-info-warning-color: @palette-blue-4;
+@table-info-warning-hover-color: @palette-blue-6;
+@table-info-error-color: @error-color;
+@table-info-error-hover-color: @palette-red-4;
 @table-row-border-color: @palette-gray-4;
 @text-field-icon-color: @palette-gray-5;
 @text-field-icon-error-color: @error-border-color;

@@ -94,8 +94,7 @@
   #scout.overflow-ellipsis();
   vertical-align: top; /* for multiline text */
 
-  .table-row-sum > &,
-  .table-aggregate > & {
+  .table-row-sum > & {
     font-weight: bold;
   }
 
@@ -194,6 +193,15 @@
 
   .with-text& {
     margin-right: 8px;
+  }
+}
+
+.table-aggregate-cell {
+  font-weight: bold;
+
+  /* if aggregation is based on selected rows */
+  &.selection {
+    color: @table-aggregate-cell-selection-color;
   }
 }
 

@@ -157,7 +157,7 @@
   color: @table-info-color;
 
   &:hover {
-    color: @table-info-active-color;
+    color: @table-info-hover-color;
   }
 
   /* normal */
@@ -184,11 +184,11 @@
   }
 
   &.has-error.tooltip-active {
-    color: @error-color;
+    color: @table-info-error-color;
   }
 
   &.has-error.tooltip-active:hover {
-    color: @palette-red-4;
+    color: @table-info-error-hover-color;
   }
 
   /* warning */
@@ -198,10 +198,10 @@
   }
 
   &.has-warning.tooltip-active {
-    color: @palette-blue-4;
+    color: @table-info-warning-color;
   }
 
   &.has-warning.tooltip-active:hover {
-    color: @palette-blue-6;
+    color: @table-info-warning-hover-color;
   }
 }
