@@ -304,6 +304,6 @@ public class JsonDesktopTest {
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
     JSONObject data = events.get(0).getData();
     assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run
-    assertEquals("download", data.getString("hint"));
+    assertEquals("download", data.getString("action"));
   }
 }
