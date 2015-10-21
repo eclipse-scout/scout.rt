@@ -27,8 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop.DesktopStyle;
-import org.eclipse.scout.rt.client.ui.desktop.IOpenUriHint;
-import org.eclipse.scout.rt.client.ui.desktop.OpenUriHint;
+import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -258,10 +257,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         break;
       case DesktopEvent.TYPE_OPEN_URI:
         if (event.getUri() != null) {
-          handleModelOpenUri(event.getUri(), event.getOpenUriHint());
+          handleModelOpenUri(event.getUri(), event.getOpenUriAction());
         }
         else if (event.getBinaryResource() != null) {
-          handleModelOpenUri(event.getBinaryResource(), event.getOpenUriHint());
+          handleModelOpenUri(event.getBinaryResource(), event.getOpenUriAction());
         }
         break;
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
@@ -279,16 +278,14 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  protected void handleModelOpenUri(String uri, IOpenUriHint openUriHint) {
+  protected void handleModelOpenUri(String uri, IOpenUriAction openUriAction) {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "uri", uri);
-    if (openUriHint != null) {
-      putProperty(json, "hint", openUriHint.getIdentifier());
-    }
+    putProperty(json, "action", openUriAction.getIdentifier());
     addActionEvent("openUri", json);
   }
 
-  protected void handleModelOpenUri(BinaryResource res, IOpenUriHint openUriHint) {
+  protected void handleModelOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
     String filename = res.getFilename();
 
     // add another path segment to filename to distinguish between different resources
@@ -298,7 +295,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
     m_downloads.put(filename, res);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filename);
-    handleModelOpenUri(downloadUrl, OpenUriHint.DOWNLOAD);
+    handleModelOpenUri(downloadUrl, openUriAction);
   }
 
   @Override

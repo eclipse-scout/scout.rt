@@ -510,22 +510,17 @@ scout.Desktop.prototype._onModelFileChooserHide = function(event) {
 };
 
 scout.Desktop.prototype._onModelOpenUri = function(event) {
-  $.log.debug('(Desktop#_onModelOpenUri) uri=' + event.uri + ' openUriHint=' + event.openUriHint);
+  $.log.debug('(Desktop#_onModelOpenUri) uri=' + event.uri + ' action=' + event.action);
   if (!event.uri) {
     return;
   }
 
-  if (event.uri.match(/^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel):/)) {
-    event.hint = 'open';
-  }
-
-  if (event.hint === 'download') {
+  if (event.action === 'download') {
     this._openUriInIFrame(event.uri);
-  } else if (event.hint === 'open') {
+  } else if (event.action === 'open') {
     // TODO BSH Does that really work on all platforms?
     this._openUriInIFrame(event.uri);
-  } else {
-    // 'new-window' -> Open popup
+  } else if (event.action === 'new-window') {
     this._openUriAsNewWindow(event.uri);
   }
 };

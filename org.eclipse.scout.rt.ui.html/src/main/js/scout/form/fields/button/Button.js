@@ -183,6 +183,8 @@ scout.Button.prototype._renderSelected = function() {
  */
 scout.Button.prototype._renderLabel = function(label) {
   this._$label.textOrNbsp(scout.strings.removeAmpersand(label));
+  // Invalidate layout because button may now be longer or shorter
+  this.htmlComp.invalidateLayoutTree();
 };
 
 /**
@@ -194,6 +196,8 @@ scout.Button.prototype._renderIconId = function() {
     var $icon = this.$field.data('$icon');
     $icon.toggleClass('with-label', !! this.label);
   }
+  // Invalidate layout because button may now be longer or shorter
+  this.htmlComp.invalidateLayoutTree();
 };
 
 scout.Button.prototype._syncKeyStroke = function(keyStroke) {
