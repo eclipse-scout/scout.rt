@@ -25,10 +25,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.DiscardChangesButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.AscendingButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.DescendingButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.WithoutButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ConfigBox.NamedConfigTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox;
@@ -99,24 +95,12 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(AddCustomColumnButton.class);
   }
 
-  public AscendingButton getAscendingButton() {
-    return getFieldByClass(AscendingButton.class);
-  }
-
-  public ColumnSortingBox getColumnSortingBox() {
-    return getFieldByClass(ColumnSortingBox.class);
-  }
-
   public ColumnsTableField getColumnsTableField() {
     return getFieldByClass(ColumnsTableField.class);
   }
 
   public NamedConfigTableField getNamedConfigTableField() {
     return getFieldByClass(NamedConfigTableField.class);
-  }
-
-  public DescendingButton getDescendingButton() {
-    return getFieldByClass(DescendingButton.class);
   }
 
   public DeselectAllButton getDeselectAllButton() {
@@ -153,10 +137,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   public ViewBox getViewBox() {
     return getFieldByClass(ViewBox.class);
-  }
-
-  public WithoutButton getWithoutButton() {
-    return getFieldByClass(WithoutButton.class);
   }
 
   public DiscardChangesButton getDiscardChangesButton() {
@@ -697,15 +677,17 @@ public class OrganizeColumnsForm extends AbstractForm {
                     row.setFont(FontSpec.parse("ITALIC"));
                   }
                   getTable().getTitleColumn().setValue(row, columnTitle);
-                  if (Platform.get().inDevelopmentMode() && col.isSortActive()) {
-                    getTable().getTitleColumn().setValue(row, columnTitle + " (" + col.getSortIndex() + ")");
-                  }
 
-                  // Sorting
-                  getTable().getSortingColumn().setValue(row, col);
+                  // grouping and sorting
+                  StringBuilder sb = new StringBuilder();
                   if (col.isSortActive()) {
-                    row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(col.isSortAscending() ? AbstractIcons.TableSortAsc : AbstractIcons.TableSortDesc);
+                    sb.append(col.isSortAscending() ? "\u2191" : "\u2193");
+                    sb.append(col.getSortIndex() + 1);
                   }
+                  if (col.isGroupingActive()) {
+                    sb.append("G");
+                  }
+                  getTable().getGroupAndSortColumn().setValue(row, sb.toString());
 
                   rowList.add(row);
                 }
@@ -791,8 +773,8 @@ public class OrganizeColumnsForm extends AbstractForm {
               return getColumnSet().getColumnByClass(KeyColumn.class);
             }
 
-            public SortingColumn getSortingColumn() {
-              return getColumnSet().getColumnByClass(SortingColumn.class);
+            public GroupAndSortColumn getGroupAndSortColumn() {
+              return getColumnSet().getColumnByClass(GroupAndSortColumn.class);
             }
 
             public FilterColumn getFilterColumn() {
@@ -827,6 +809,28 @@ public class OrganizeColumnsForm extends AbstractForm {
               validateButtons();
             }
 
+            protected void sortSelectedColumn(boolean ascending) throws ProcessingException {
+              ITableRow row = getColumnsTableField().getTable().getSelectedRow();
+              try {
+                getColumnsTableField().getTable().setTableChanging(true);
+                IColumn selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(row);
+                if ((ascending && selectedCol.isSortActive() && selectedCol.isSortAscending())
+                    || (!ascending && selectedCol.isSortActive() && !selectedCol.isSortAscending())) {
+                  m_table.getColumnSet().removeSortColumn(selectedCol);
+                }
+                else {
+                  m_table.getColumnSet().handleSortEvent(selectedCol, true, ascending);
+                }
+                m_table.sort();
+
+                getColumnsTableField().reloadTableData();
+                getColumnsTableField().getTable().selectRow(row.getRowIndex());
+              }
+              finally {
+                getColumnsTableField().getTable().setTableChanging(false);
+              }
+            }
+
             @Order(10.0)
             public class KeyColumn extends AbstractColumn<IColumn<?>> {
 
@@ -857,16 +861,11 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
 
             @Order(40.0)
-            public class SortingColumn extends AbstractSortOrderColumn {
-
-              @Override
-              protected String getConfiguredHeaderText() {
-                return TEXTS.get("ColumnSorting");
-              }
+            public class GroupAndSortColumn extends AbstractStringColumn {
 
               @Override
               protected int getConfiguredWidth() {
-                return 20;
+                return 40;
               }
 
             }
@@ -896,6 +895,53 @@ public class OrganizeColumnsForm extends AbstractForm {
 
             }
 
+            @Order(10.0)
+            public class SortAscMenu extends AbstractMenu {
+
+              @Override
+              protected boolean getConfiguredEnabled() {
+                return m_table.isSortEnabled();
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.LongArrowUp;
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                sortSelectedColumn(true);
+              }
+            }
+
+            @Order(10.0)
+            public class SortDescMenu extends AbstractMenu {
+
+              @Override
+              protected boolean getConfiguredEnabled() {
+                return m_table.isSortEnabled();
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.LongArrowDown;
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                sortSelectedColumn(false);
+              }
+            }
           }
         }
       }
@@ -1204,85 +1250,6 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
       }
 
-      @Order(30.0)
-      public class ColumnSortingBox extends AbstractGroupBox {
-
-        @Override
-        protected int getConfiguredGridColumnCount() {
-          return 1;
-        }
-
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
-
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("ColumnSorting");
-        }
-
-        @Order(10.0)
-        public class AscendingButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Ascending");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            setSort(true);
-          }
-
-        }
-
-        @Order(20.0)
-        public class DescendingButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Descending");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            setSort(false);
-          }
-
-        }
-
-        @Order(30.0)
-        public class WithoutButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("WithoutUpperCase");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            setSort(null);
-          }
-
-        }
-      }
-
     }
 
     @Order(20.0)
@@ -1344,42 +1311,12 @@ public class OrganizeColumnsForm extends AbstractForm {
     ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
     boolean selectedRowExists = selectedRow != null;
     boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
-    boolean sortEnabled = m_table.isSortEnabled();
     getModifyCustomColumnButton().setEnabled(isCustomColumn);
     getRemoveCustomColumnButton().setEnabled(isCustomColumn);
 
     getMoveDownButton().setEnabled(selectedRowExists);
     getMoveUpButton().setEnabled(selectedRowExists);
 
-    getAscendingButton().setEnabled(sortEnabled && selectedRowExists);
-    getDescendingButton().setEnabled(sortEnabled && selectedRowExists);
-    getWithoutButton().setEnabled(sortEnabled && selectedRowExists);
-
-  }
-
-  private void setSort(Boolean ascending) throws ProcessingException {
-    ITableRow row = getColumnsTableField().getTable().getSelectedRow();
-    if (row == null) {
-      return;
-    }
-
-    try {
-      getColumnsTableField().getTable().setTableChanging(true);
-      IColumn selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(row);
-      if (ascending == null) {
-        m_table.getColumnSet().removeSortColumn(selectedCol);
-      }
-      else {
-        m_table.getColumnSet().handleSortEvent(selectedCol, true, ascending);
-      }
-      m_table.sort();
-
-      getColumnsTableField().reloadTableData();
-      getColumnsTableField().getTable().selectRow(row.getRowIndex());
-    }
-    finally {
-      getColumnsTableField().getTable().setTableChanging(false);
-    }
   }
 
   @Override

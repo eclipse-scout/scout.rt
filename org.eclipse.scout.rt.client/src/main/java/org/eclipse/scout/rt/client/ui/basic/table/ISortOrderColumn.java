@@ -13,7 +13,8 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 /**
- * The sort state of the column is displayed as icon in each cell. Usage in {@link OrganizeColumnsForm}
+ * The sort state of the column is displayed as icon in each cell. Usage in {@link OrganizeColumnsForm} FIXME ASA don't
+ * FIME ASA do not use anymore and deprecate (or even remove)
  */
 public interface ISortOrderColumn extends IColumn<IColumn> {
 
