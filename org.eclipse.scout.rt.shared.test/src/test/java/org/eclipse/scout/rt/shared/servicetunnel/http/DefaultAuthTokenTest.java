@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.HexUtility;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
@@ -116,12 +115,6 @@ public class DefaultAuthTokenTest {
   }
 
   private static String toUtf8Hex(String s) {
-    try {
-      return HexUtility.encode(s.getBytes(Encoding.UTF_8));
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    return HexUtility.encode(s.getBytes(StandardCharsets.UTF_8));
   }
-
 }

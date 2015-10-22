@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -142,13 +143,13 @@ public class DefaultAuthToken {
 
   protected byte[] createUnsignedData() {
     try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); HexOutputStream hex = new HexOutputStream(bytes)) {
-      hex.write(m_userId.getBytes(Encoding.UTF_8));
+      hex.write(m_userId.getBytes(StandardCharsets.UTF_8));
       bytes.write(partsDelimiter());
       bytes.write(Long.toHexString(m_validUntil).getBytes());
       if (m_customArgs != null) {
         for (String arg : m_customArgs) {
           bytes.write(partsDelimiter());
-          hex.write(arg.getBytes(Encoding.UTF_8));
+          hex.write(arg.getBytes(StandardCharsets.UTF_8));
         }
       }
       return bytes.toByteArray();

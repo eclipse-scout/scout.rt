@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.consumer.auth.handler;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -41,7 +41,7 @@ public class BasicAuthenticationHandler implements SOAPHandler<SOAPMessageContex
 
   protected static final String AUTH_BASIC_PREFIX = "Basic ";
   protected static final String AUTH_BASIC_AUTHORIZATION = "authorization";
-  protected static final String BASIC_ENCODING = "ISO-8859-1";
+  protected static final Charset BASIC_ENCODING = StandardCharsets.ISO_8859_1;
 
   private final JaxWsImplementorSpecifics m_implementorSpecifics;
 
@@ -57,14 +57,9 @@ public class BasicAuthenticationHandler implements SOAPHandler<SOAPMessageContex
 
     final String username = StringUtility.valueOf(context.get(InvocationContext.PROP_USERNAME));
     final String password = StringUtility.valueOf(context.get(InvocationContext.PROP_PASSWORD));
-    try {
-      final String credentials = Base64Utility.encode(StringUtility.join(":", username, password).getBytes(BASIC_ENCODING));
-      m_implementorSpecifics.setHttpRequestHeader(context, AUTH_BASIC_AUTHORIZATION, AUTH_BASIC_PREFIX + credentials);
-      return true;
-    }
-    catch (final UnsupportedEncodingException e) {
-      throw new WebServiceException("Failed to encode Basic authentication header", e);
-    }
+    final String credentials = Base64Utility.encode(StringUtility.join(":", username, password).getBytes(BASIC_ENCODING));
+    m_implementorSpecifics.setHttpRequestHeader(context, AUTH_BASIC_AUTHORIZATION, AUTH_BASIC_PREFIX + credentials);
+    return true;
   }
 
   @Override

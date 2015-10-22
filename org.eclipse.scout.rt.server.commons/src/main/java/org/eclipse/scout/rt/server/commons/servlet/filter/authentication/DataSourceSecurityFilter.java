@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -196,9 +196,9 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     }
 
     try {
-      return Base64Utility.encode(SecurityUtility.hash(pass.getBytes(Encoding.UTF_8), DEFAULT_SALT));
+      return Base64Utility.encode(SecurityUtility.hash(pass.getBytes(UTF_8), DEFAULT_SALT));
     }
-    catch (ProcessingException | UnsupportedEncodingException e) {
+    catch (ProcessingException e) {
       throw new ServletException("Unable to hash password", e);
     }
   }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
@@ -20,7 +22,7 @@ public class SecurityUtilityTest {
 
   private static final boolean IS_JAVA_18_OR_NEWER = CompareUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
   private static final int KEY_LEN = 128;
-  private static final String ENCODING = Encoding.UTF_8;
+  private static final Charset ENCODING = StandardCharsets.UTF_8;
   private static final String PASSWORD = "insecure";
 
   @Test
@@ -84,7 +86,7 @@ public class SecurityUtilityTest {
 
   @Test
   public void testHash() throws Exception {
-    final byte[] data = "testdata".getBytes(Encoding.UTF_8);
+    final byte[] data = "testdata".getBytes(ENCODING);
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
     byte[] hash = SecurityUtility.hash(data, salt, 1);

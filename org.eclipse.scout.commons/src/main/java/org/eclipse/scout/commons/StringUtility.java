@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.util.Collection;
 import java.util.HashSet;
@@ -1537,7 +1538,7 @@ public final class StringUtility {
       int len;
       while ((len = in.read(c)) > 0) {
         String str = new String(c, 0, len);
-        byte[] b = str.getBytes(Encoding.UTF_8);
+        byte[] b = str.getBytes(StandardCharsets.UTF_8);
         deflaterOutputStream.write(b, 0, b.length);
       }
     }

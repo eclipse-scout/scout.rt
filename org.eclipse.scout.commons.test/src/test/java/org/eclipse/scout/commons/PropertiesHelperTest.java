@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -161,7 +162,7 @@ public class PropertiesHelperTest {
 
         @Override
         public InputStream getInputStream() throws IOException {
-          return new ByteArrayInputStream(m_configPropertiesContent.getBytes(Encoding.UTF_8));
+          return new ByteArrayInputStream(m_configPropertiesContent.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override
