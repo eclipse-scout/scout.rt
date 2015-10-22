@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
@@ -26,7 +25,7 @@ public class Outline extends AbstractOutline {
   }
 
   @Override
-  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) {
     for (IPage page : m_pages) {
       pageList.add(page);
     }

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -79,7 +78,7 @@ public class JsonTableFieldTest {
   }
 
   @Test
-  public void testPreventTableDisposal() throws ProcessingException {
+  public void testPreventTableDisposal() {
     // Create tablePage
     IPageWithTable<?> tablePage = createTablePageAndSelectNode();
     ITable tablePageTable = tablePage.getTable();
@@ -108,7 +107,7 @@ public class JsonTableFieldTest {
   }
 
   @Test
-  public void testPreventTableDisposal2() throws ProcessingException {
+  public void testPreventTableDisposal2() {
     // Create tablePage
     IPageWithTable<?> tablePage = createTablePageAndSelectNode();
     ITable tablePageTable = tablePage.getTable();

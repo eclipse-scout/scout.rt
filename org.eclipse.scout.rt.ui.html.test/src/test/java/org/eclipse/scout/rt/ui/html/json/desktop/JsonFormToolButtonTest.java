@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -43,7 +42,7 @@ public class JsonFormToolButtonTest {
    * Form disposal is controlled by the model and must not be triggered by the parent
    */
   @Test
-  public void testPreventFormDisposal() throws ProcessingException {
+  public void testPreventFormDisposal() {
     FormToolButton button = new FormToolButton();
     FormWithOneField form = new FormWithOneField();
     form.start();

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.form;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -236,7 +235,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   protected class P_FormListener implements FormListener {
 
     @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
+    public void formChanged(FormEvent e) {
       handleModelFormChanged(e);
     }
   }

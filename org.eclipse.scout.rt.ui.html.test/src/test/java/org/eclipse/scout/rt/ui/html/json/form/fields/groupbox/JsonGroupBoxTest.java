@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -91,7 +90,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     public class NonDisplayableField extends AbstractStringField {
 
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         setVisibleGranted(false);
       }
     }

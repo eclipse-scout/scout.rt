@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -46,7 +45,7 @@ public class JsonTableControlTest {
   }
 
   @Test
-  public void testLazyLoadingForm_onModelSelectionChanged() throws ProcessingException, JSONException {
+  public void testLazyLoadingForm_onModelSelectionChanged() throws JSONException {
     FormWithOneField form = new FormWithOneField();
     form.setShowOnStart(false);
     TableControl control = new TableControl();
@@ -99,7 +98,7 @@ public class JsonTableControlTest {
   }
 
   @Test
-  public void testLazyLoadingForm_onModelFormChanged() throws ProcessingException, JSONException {
+  public void testLazyLoadingForm_onModelFormChanged() throws JSONException {
     FormWithOneField form = new FormWithOneField();
     form.setShowOnStart(false);
     TableControl control = new TableControl();
@@ -129,7 +128,7 @@ public class JsonTableControlTest {
   }
 
   @Test
-  public void testNonLazyLoadingFormWhenSelected() throws ProcessingException, JSONException {
+  public void testNonLazyLoadingFormWhenSelected() throws JSONException {
     FormWithOneField form = new FormWithOneField();
     TableControl control = new TableControl();
     control.setTable(new Table());

@@ -13,14 +13,13 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.junit.Test;
 
 public class JsonUtilityTest {
 
   @Test
-  public void testJsonWithComments() throws ProcessingException {
+  public void testJsonWithComments() {
     // null string
     assertEquals(null, JsonUtility.stripCommentsFromJson(null));
     // empty string

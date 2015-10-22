@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -64,7 +63,7 @@ public class JsonOutlineTest {
    * Tests whether the adapters for the detail forms get created
    */
   @Test
-  public void testChildAdaptersCreated() throws ProcessingException {
+  public void testChildAdaptersCreated() {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
     NodePageWithForm nodePage = new NodePageWithForm();
 
@@ -88,7 +87,7 @@ public class JsonOutlineTest {
   }
 
   @Test
-  public void testPageDisposal() throws ProcessingException {
+  public void testPageDisposal() {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
     NodePage nodePage = new NodePage();
 
@@ -131,7 +130,7 @@ public class JsonOutlineTest {
    * Node.detailTable must not be sent if node.tableVisible is set to false to reduce response size.
    */
   @Test
-  public void testTableNotSentIfInvisible() throws ProcessingException, JSONException {
+  public void testTableNotSentIfInvisible() throws JSONException {
     NodePageWithForm nodePage = new NodePageWithForm();
     nodePage.setTableVisible(false);
 
@@ -165,7 +164,7 @@ public class JsonOutlineTest {
    * Tests that no events are fired during page initialization
    */
   @Test
-  public void testNoEventsFiredOnChildPageCreation() throws ProcessingException, JSONException {
+  public void testNoEventsFiredOnChildPageCreation() throws JSONException {
     final Holder<Integer> initPageCounter = new Holder<>(Integer.class);
     initPageCounter.setValue(0);
 
@@ -174,10 +173,10 @@ public class JsonOutlineTest {
     };
     IPage page2 = new AbstractPageWithNodes() {
       @Override
-      protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+      protected void execCreateChildPages(List<IPage<?>> pageList) {
         pageList.add(new AbstractPageWithNodes() {
           @Override
-          protected void execInitPage() throws ProcessingException {
+          protected void execInitPage() {
             // Change some properties (this would normally fire events, but we are inside execInitPage())
             setLeaf(!isLeaf());
             getCellForUpdate().setText("Test");

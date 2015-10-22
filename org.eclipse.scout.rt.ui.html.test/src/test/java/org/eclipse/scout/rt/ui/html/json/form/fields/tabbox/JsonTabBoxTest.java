@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 import java.util.Arrays;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
@@ -106,7 +105,7 @@ public class JsonTabBoxTest {
     public class NonDisplayableGroup extends AbstractGroupBox {
 
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         setVisibleGranted(false);
       }
     }

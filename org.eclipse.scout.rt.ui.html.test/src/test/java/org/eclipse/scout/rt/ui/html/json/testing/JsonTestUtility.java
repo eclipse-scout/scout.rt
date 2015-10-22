@@ -137,7 +137,7 @@ public final class JsonTestUtility {
     return getEvent(json, index).getJSONObject("properties");
   }
 
-  public static void initField(ICompositeField compositeField) throws ProcessingException {
+  public static void initField(ICompositeField compositeField) {
     InitFieldVisitor visitor = new InitFieldVisitor();
     compositeField.visitFields(visitor, 0);
     visitor.handleResult();
@@ -165,7 +165,7 @@ public final class JsonTestUtility {
       return true;
     }
 
-    public void handleResult() throws ProcessingException {
+    public void handleResult() {
       if (m_firstEx != null) {
         throw m_firstEx;
       }

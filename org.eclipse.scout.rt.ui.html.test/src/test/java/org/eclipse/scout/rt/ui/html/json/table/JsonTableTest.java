@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -79,7 +78,7 @@ public class JsonTableTest {
    * Tests whether the model row gets correctly selected
    */
   @Test
-  public void testSelectionEvent() throws ProcessingException, JSONException {
+  public void testSelectionEvent() throws JSONException {
     Table table = createTableFixture(5);
 
     assertNull(table.getSelectedRow());
@@ -100,7 +99,7 @@ public class JsonTableTest {
    * Tests whether the model rows get correctly unselected
    */
   @Test
-  public void testClearSelectionEvent() throws ProcessingException, JSONException {
+  public void testClearSelectionEvent() throws JSONException {
     Table table = createTableFixture(5);
     ITableRow row1 = table.getRow(1);
 
@@ -124,7 +123,7 @@ public class JsonTableTest {
    * Response must not contain the selection event if the selection was triggered by the request
    */
   @Test
-  public void testIgnorableSelectionEvent() throws ProcessingException, JSONException {
+  public void testIgnorableSelectionEvent() throws JSONException {
     Table table = createTableFixture(5);
 
     ITableRow row = table.getRow(2);
@@ -145,10 +144,10 @@ public class JsonTableTest {
    * If the selection event triggers the selection of another row, the selection event must not be ignored.
    */
   @Test
-  public void testIgnorableSelectionEvent2() throws ProcessingException, JSONException {
+  public void testIgnorableSelectionEvent2() throws JSONException {
     Table table = new Table() {
       @Override
-      protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+      protected void execRowsSelected(List<? extends ITableRow> rows) {
         selectRow(4);
       }
     };
@@ -185,10 +184,10 @@ public class JsonTableTest {
    * Same as {@link #testIgnorableSelectionEvent2()} but with an empty selection
    */
   @Test
-  public void testIgnorableSelectionEvent3() throws ProcessingException, JSONException {
+  public void testIgnorableSelectionEvent3() throws JSONException {
     Table table = new Table() {
       @Override
-      protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+      protected void execRowsSelected(List<? extends ITableRow> rows) {
         if (rows.size() == 0) {
           selectRow(4);
         }
@@ -225,7 +224,7 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testColumnOrderChangedEvent() throws ProcessingException, JSONException {
+  public void testColumnOrderChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
@@ -253,7 +252,7 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testColumnOrderChangedEvent_assertCellOrder() throws ProcessingException, JSONException {
+  public void testColumnOrderChangedEvent_assertCellOrder() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
@@ -285,7 +284,7 @@ public class JsonTableTest {
    * hasn't changed
    */
   @Test
-  public void testIgnorableColumnOrderChangedEvent() throws ProcessingException, JSONException {
+  public void testIgnorableColumnOrderChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
@@ -309,7 +308,7 @@ public class JsonTableTest {
    * Sends header update event if header cell has changed, but only for visible columns.
    */
   @Test
-  public void testColumnHeadersUpdatedEvent() throws ProcessingException, JSONException {
+  public void testColumnHeadersUpdatedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
@@ -342,7 +341,7 @@ public class JsonTableTest {
    * If column structure changes, we need to resend every row including its new cells.
    */
   @Test
-  public void testColumnStructureChangedEvent() throws ProcessingException, JSONException {
+  public void testColumnStructureChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
@@ -369,7 +368,7 @@ public class JsonTableTest {
    * If column structure changes, old columns are disposed and the new ones attached
    */
   @Test
-  public void testColumnStructureChangedEvent_dispose() throws ProcessingException, JSONException {
+  public void testColumnStructureChangedEvent_dispose() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
@@ -435,7 +434,7 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testMenuDisposalOnPropertyChange() throws ProcessingException, JSONException {
+  public void testMenuDisposalOnPropertyChange() throws JSONException {
     ITable table = new TableWithoutMenus();
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
@@ -458,7 +457,7 @@ public class JsonTableTest {
    * Tests whether it is possible to dispose (or replace) menus if at least one menu is not displayable.<br>
    */
   @Test
-  public void testMenuDisposalOnPropertyChangeWithNonDisplayableMenu() throws ProcessingException, JSONException {
+  public void testMenuDisposalOnPropertyChangeWithNonDisplayableMenu() throws JSONException {
     ITable table = new TableWithNonDisplayableMenu();
     table.initTable();
 
@@ -483,7 +482,7 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testTableControlDisposalOnPropertyChange() throws ProcessingException, JSONException {
+  public void testTableControlDisposalOnPropertyChange() throws JSONException {
     ITable table = new TableWithoutMenus();
     table.initTable();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
@@ -501,7 +500,7 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testMultipleTableControlDisposallOnPropertyChange() throws ProcessingException, JSONException {
+  public void testMultipleTableControlDisposallOnPropertyChange() throws JSONException {
     ITable table = new TableWithoutMenus();
     table.initTable();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
@@ -531,7 +530,7 @@ public class JsonTableTest {
    * @see TableSpec.js
    */
   @Test
-  public void testTextualSortingWithCollator() throws ProcessingException, JSONException {
+  public void testTextualSortingWithCollator() throws JSONException {
     String[] data = {"Österreich", "Italien", "Zypern"};
 
     Arrays.sort(data, new TextSortComparator(true, new Locale("de")));
@@ -579,7 +578,7 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testRowFilter() throws ProcessingException, JSONException {
+  public void testRowFilter() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
@@ -673,7 +672,7 @@ public class JsonTableTest {
    * delete event must be sent -> gui knows which rows are filtered and keeps the invisible rows in memory
    */
   @Test
-  public void testUserRowFilter() throws ProcessingException, JSONException {
+  public void testUserRowFilter() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
@@ -706,7 +705,7 @@ public class JsonTableTest {
    * If toJson is called and a user filter is active, every row must be returned and not only the filtered ones
    */
   @Test
-  public void testUserRowFilter_toJson() throws ProcessingException, JSONException {
+  public void testUserRowFilter_toJson() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
@@ -792,7 +791,7 @@ public class JsonTableTest {
    * deleted in the ui.
    */
   @Test
-  public void testUserRowFilter_AndAnotherRowFilter() throws ProcessingException, JSONException {
+  public void testUserRowFilter_AndAnotherRowFilter() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
@@ -834,7 +833,7 @@ public class JsonTableTest {
    * the row has been filtered by the user.
    */
   @Test
-  public void testUserRowFilter_preventAllRowsDeleted() throws ProcessingException, JSONException {
+  public void testUserRowFilter_preventAllRowsDeleted() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(2);
@@ -868,7 +867,7 @@ public class JsonTableTest {
    * filter is active, otherwise table generates a all rows deleted event by itself
    */
   @Test
-  public void testAllRowsDeleted_whenFilterActive() throws ProcessingException, JSONException {
+  public void testAllRowsDeleted_whenFilterActive() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(2);
@@ -1093,7 +1092,7 @@ public class JsonTableTest {
     jsonTable.getTableRow("foo");
   }
 
-  public static Table createTableFixture(int numRows) throws ProcessingException {
+  public static Table createTableFixture(int numRows) {
     Table table = new Table();
     table.fill(numRows);
     table.initTable();

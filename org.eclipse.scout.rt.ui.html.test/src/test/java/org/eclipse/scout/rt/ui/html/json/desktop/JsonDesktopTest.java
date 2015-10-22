@@ -12,7 +12,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -65,14 +64,14 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testDisposeWithForms() throws ProcessingException {
+  public void testDisposeWithForms() {
     DesktopWithOutlineForms desktop = new DesktopWithOutlineForms();
     desktop.initDesktop();
     testDispose(desktop);
   }
 
   @Test
-  public void testDisposeWithoutForms() throws ProcessingException {
+  public void testDisposeWithoutForms() {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.initDesktop();
     testDispose(desktop);
@@ -87,7 +86,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormAddedAndRemoved() throws ProcessingException, JSONException {
+  public void testFormAddedAndRemoved() throws JSONException {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -139,7 +138,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormOpenedAndClosedInSameRequest() throws ProcessingException, JSONException {
+  public void testFormOpenedAndClosedInSameRequest() throws JSONException {
     JsonAdapterRegistryTest.testFormOpenedAndClosedInSameRequest(m_uiSession);
   }
 
@@ -183,7 +182,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormClosedBeforeRemovedInSameRequest() throws ProcessingException, JSONException {
+  public void testFormClosedBeforeRemovedInSameRequest() throws JSONException {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);

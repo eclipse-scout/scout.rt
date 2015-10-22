@@ -72,7 +72,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
     return new DefaultValuesFilter(lastModified, defaultValuesConfig.getJSONObject("defaults"), defaultValuesConfig.getJSONObject("objectTypeHierarchy"));
   }
 
-  protected void ensureLoaded() throws ProcessingException {
+  protected void ensureLoaded() {
     DefaultValuesFilter filter = m_filter;
     if (filter != null && Platform.get().inDevelopmentMode()) {
       long time = System.currentTimeMillis();
@@ -98,7 +98,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
     }
   }
 
-  protected synchronized void loadFilter() throws ProcessingException {
+  protected synchronized void loadFilter() {
     try {
       URL url = getDefaultValuesJsonUrl();
       URLConnection conn = url.openConnection();

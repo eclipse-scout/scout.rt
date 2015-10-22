@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.form.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -20,7 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField.MainBox.
 
 public class FormWithOneField extends AbstractForm {
 
-  public FormWithOneField() throws ProcessingException {
+  public FormWithOneField() {
     super();
   }
 
@@ -33,17 +32,17 @@ public class FormWithOneField extends AbstractForm {
   }
 
   @Override
-  public void start() throws ProcessingException {
+  public void start() {
     startInternal(new FormHandler());
   }
 
   public class FormHandler extends AbstractFormHandler {
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
     }
 
     @Override
-    protected void execPostLoad() throws ProcessingException {
+    protected void execPostLoad() {
       super.execPostLoad();
       getFieldByClass(StringField.class).requestFocus();
     }

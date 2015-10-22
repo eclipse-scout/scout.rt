@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -42,7 +41,7 @@ public class TableWithNonDisplayableMenu extends AbstractTable {
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       setVisibleGranted(false);
     }
   }

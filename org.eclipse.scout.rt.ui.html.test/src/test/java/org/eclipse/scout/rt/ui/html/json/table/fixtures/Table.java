@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
@@ -27,7 +26,7 @@ public class Table extends AbstractTable {
 
   }
 
-  public void fill(int rowCount) throws ProcessingException {
+  public void fill(int rowCount) {
     Object[][] rows = new Object[rowCount][1];
     for (int i = 0; i < rowCount; i++) {
       rows[i][0] = new Object[]{"cell" + i};

@@ -1,13 +1,12 @@
 package org.eclipse.scout.rt.ui.html.json.tree.fixtures;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 public class TreeWith3Levels extends AbstractTree {
 
   @Override
-  protected void execInitTree() throws ProcessingException {
+  protected void execInitTree() {
     super.execInitTree();
     ITreeNode node0 = new TreeNode();
     addChildNode(getRootNode(), node0);

@@ -11,13 +11,12 @@
 package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 
 public class DesktopWithOutlineForms extends DesktopWithOneOutline {
 
   @Override
-  protected void execOpened() throws ProcessingException {
+  protected void execOpened() {
     IOutline firstOutline = CollectionUtility.firstElement(getAvailableOutlines());
     setOutline(firstOutline);
   }

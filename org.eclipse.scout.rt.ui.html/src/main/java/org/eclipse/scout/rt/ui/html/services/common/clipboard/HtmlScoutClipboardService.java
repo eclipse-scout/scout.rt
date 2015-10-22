@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 public class HtmlScoutClipboardService implements IClipboardService {
 
   @Override
-  public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) throws ProcessingException {
+  public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(mimeTypes);
     form.startPaste();
@@ -40,7 +40,7 @@ public class HtmlScoutClipboardService implements IClipboardService {
   }
 
   @Override
-  public void setContents(final TransferObject transferObject) throws ProcessingException {
+  public void setContents(final TransferObject transferObject) {
     if (transferObject instanceof TextTransferObject) {
       setTextContents(((TextTransferObject) transferObject).getPlainText());
       return;
@@ -49,7 +49,7 @@ public class HtmlScoutClipboardService implements IClipboardService {
   }
 
   @Override
-  public void setTextContents(String textContents) throws ProcessingException {
+  public void setTextContents(String textContents) {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(MimeType.TEXT_PLAIN);
     BinaryResource binaryResource;

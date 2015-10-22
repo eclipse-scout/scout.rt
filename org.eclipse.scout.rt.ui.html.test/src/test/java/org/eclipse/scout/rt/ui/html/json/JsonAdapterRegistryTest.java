@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -60,7 +59,7 @@ public class JsonAdapterRegistryTest {
     assertEquals(0, session.currentJsonResponse().eventList().size());
   }
 
-  public static void testFormOpenedAndClosedInSameRequest(UiSession uiSession) throws ProcessingException, JSONException {
+  public static void testFormOpenedAndClosedInSameRequest(UiSession uiSession) throws JSONException {
     JsonDesktop<IDesktop> jsonDesktop = uiSession.newJsonAdapter(uiSession.getClientSession().getDesktop(), null);
     FormWithOneField form = new FormWithOneField();
 

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.basic.planner;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
@@ -47,7 +46,7 @@ public class JsonPlannerTest {
    * Tests whether the id maps are correctly cleaned up
    */
   @Test
-  public void testDeleteResources() throws ProcessingException, JSONException {
+  public void testDeleteResources() throws JSONException {
     P_Planner planner = createPlanner();
     Resource<Integer> resource = createResource(1);
     Activity<Resource<Integer>, Integer> activity = createActivity(resource, 2);
@@ -89,7 +88,7 @@ public class JsonPlannerTest {
   /**
    * Creates an empty planner.
    */
-  private P_Planner createPlanner() throws ProcessingException {
+  private P_Planner createPlanner() {
     P_Planner planner = new P_Planner();
     planner.initPlanner();
     return planner;

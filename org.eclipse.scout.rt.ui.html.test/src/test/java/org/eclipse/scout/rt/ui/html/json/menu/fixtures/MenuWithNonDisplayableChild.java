@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.menu.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 
 public class MenuWithNonDisplayableChild extends AbstractMenu {
@@ -24,7 +23,7 @@ public class MenuWithNonDisplayableChild extends AbstractMenu {
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       setVisibleGranted(false);
     }
   }

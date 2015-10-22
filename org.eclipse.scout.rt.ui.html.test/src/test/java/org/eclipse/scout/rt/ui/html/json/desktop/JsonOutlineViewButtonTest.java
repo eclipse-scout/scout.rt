@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Collections;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -49,7 +48,7 @@ public class JsonOutlineViewButtonTest {
   }
 
   @Test
-  public void testLazyLoadingOutline_onModelSelectionChanged() throws ProcessingException, JSONException {
+  public void testLazyLoadingOutline_onModelSelectionChanged() throws JSONException {
     OutlineWithOneNode outline = new OutlineWithOneNode();
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
@@ -86,7 +85,7 @@ public class JsonOutlineViewButtonTest {
   }
 
   @Test
-  public void testNonLazyLoadingOutlineWhenSelected() throws ProcessingException, JSONException {
+  public void testNonLazyLoadingOutlineWhenSelected() throws JSONException {
     OutlineWithOneNode outline = new OutlineWithOneNode();
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));

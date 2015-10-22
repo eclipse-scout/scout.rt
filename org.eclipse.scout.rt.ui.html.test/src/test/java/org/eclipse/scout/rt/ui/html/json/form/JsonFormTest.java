@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -49,7 +48,7 @@ public class JsonFormTest {
    * Form disposal is controlled by the model and must not be triggered by the parent
    */
   @Test
-  public void testFormDisposalOnClose() throws ProcessingException {
+  public void testFormDisposalOnClose() {
     FormWithOneField form = new FormWithOneField();
     m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter());
 
@@ -65,7 +64,7 @@ public class JsonFormTest {
    * {@link AbstractFormHandler#execPostLoad()} must set <i>initialFocus</i> property.
    */
   @Test
-  public void testRequestFocusInPostLoad() throws ProcessingException {
+  public void testRequestFocusInPostLoad() {
     FormWithOneField form = new FormWithOneField();
     IJsonAdapter<?> adapter = m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter());
     form.start();

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
@@ -38,7 +37,7 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       setVisibleGranted(false);
     }
   }
@@ -51,7 +50,7 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
   public class NonDisplayableFormToolButton extends AbstractFormToolButton {
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       setVisibleGranted(false);
     }
   }

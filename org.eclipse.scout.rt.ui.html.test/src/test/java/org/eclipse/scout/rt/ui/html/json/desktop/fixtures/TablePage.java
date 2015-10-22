@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -34,7 +33,7 @@ public class TablePage extends AbstractPageWithTable<Table> {
   }
 
   @Override
-  protected void execLoadData(SearchFilter filter) throws ProcessingException {
+  protected void execLoadData(SearchFilter filter) {
     getTable().fill(m_numRows);
   }
 
@@ -44,7 +43,7 @@ public class TablePage extends AbstractPageWithTable<Table> {
   }
 
   @Override
-  protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateChildPage(ITableRow row) {
     if (m_nodePageFactory == null) {
       return null;
     }

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -68,7 +67,7 @@ public class JsonTreeTest {
    * Tests whether the model node gets correctly selected
    */
   @Test
-  public void testSelectionEvent() throws ProcessingException, JSONException {
+  public void testSelectionEvent() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
@@ -85,7 +84,7 @@ public class JsonTreeTest {
    * Response must not contain the selection event if the selection was triggered by the request
    */
   @Test
-  public void testIgnorableSelectionEvent() throws ProcessingException, JSONException {
+  public void testIgnorableSelectionEvent() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
 
@@ -104,7 +103,7 @@ public class JsonTreeTest {
    */
   //FIXME CGU Test fails due to scout model bug: selectNode puts first selection event AFTER this new selection event -> gets filtered in processEventBuffers. With table it works though.
 //  @Test
-//  public void testIgnorableSelectionEvent2() throws ProcessingException, JSONException {
+//  public void testIgnorableSelectionEvent2() throws JSONException {
 //    List<ITreeNode> nodes = new LinkedList<>();
 //    final TreeNode firstNode = new TreeNode();
 //    final TreeNode secondNode = new TreeNode();
@@ -114,7 +113,7 @@ public class JsonTreeTest {
 //    ITree tree = createTree(nodes) {
 //
 //      @Override
-//      protected void execNodesSelected(TreeEvent e) throws ProcessingException {
+//      protected void execNodesSelected(TreeEvent e) {
 //        if (e.getNode().equals(secondNode)) {
 //          selectNode(firstNode);
 //        }
@@ -144,7 +143,7 @@ public class JsonTreeTest {
    * Response must not contain the expansion event if the expansion was triggered by the request
    */
   @Test
-  public void testIgnorableExpansionEvent() throws ProcessingException, JSONException {
+  public void testIgnorableExpansionEvent() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
 
@@ -168,7 +167,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testDispose() throws ProcessingException {
+  public void testDispose() {
     ITree tree = new TreeWith3Levels();
     tree.initTree();
     JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null);
@@ -181,7 +180,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testMenuDisposalOnPropertyChange() throws ProcessingException, JSONException {
+  public void testMenuDisposalOnPropertyChange() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
@@ -199,7 +198,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testMultipleMenuDisposallOnPropertyChange() throws ProcessingException, JSONException {
+  public void testMultipleMenuDisposallOnPropertyChange() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
@@ -226,7 +225,7 @@ public class JsonTreeTest {
    * Tests whether a menus property change event gets sent for the json tree if the context menu changes
    */
   @Test
-  public void testMenusChangedEvent() throws ProcessingException, JSONException {
+  public void testMenusChangedEvent() throws JSONException {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
@@ -252,7 +251,7 @@ public class JsonTreeTest {
    * Tests whether a deletion event with correct node id gets sent whenever a node gets deleted.
    */
   @Test
-  public void testNodesDeletedEvent() throws ProcessingException, JSONException {
+  public void testNodesDeletedEvent() throws JSONException {
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -273,7 +272,7 @@ public class JsonTreeTest {
    * Tests whether the node gets removed from the maps after deletion (m_treeNodes, m_treeNodeIds)
    */
   @Test
-  public void testNodeDisposal() throws ProcessingException, JSONException {
+  public void testNodeDisposal() throws JSONException {
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -293,7 +292,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testNodeFilter() throws ProcessingException, JSONException {
+  public void testNodeFilter() throws JSONException {
     TreeNode nodeToFilter = new TreeNode();
     nodeToFilter.setEnabled(false);
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
@@ -322,7 +321,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testGetVsOpt() throws ProcessingException {
+  public void testGetVsOpt() {
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -358,7 +357,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testNodeFilter_events() throws ProcessingException, JSONException {
+  public void testNodeFilter_events() throws JSONException {
     TreeNode nodeToFilter = new TreeNode();
     nodeToFilter.setEnabled(false);
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
@@ -392,7 +391,7 @@ public class JsonTreeTest {
   }
 
 //  @Test
-//  public void testNodeAndUserFilter() throws ProcessingException, JSONException {
+//  public void testNodeAndUserFilter() throws JSONException {
 //    TreeNode node0 = new TreeNode();
 //    TreeNode node1 = new TreeNode();
 //    TreeNode node2 = new TreeNode();
@@ -433,7 +432,7 @@ public class JsonTreeTest {
    * Tests whether the child nodes gets removed from the maps after deletion (m_treeNodes, m_treeNodeIds)
    */
   @Test
-  public void testNodeDisposalRec() throws ProcessingException, JSONException {
+  public void testNodeDisposalRec() throws JSONException {
     ITree tree = new TreeWith3Levels();
     tree.initTree();
 
@@ -465,7 +464,7 @@ public class JsonTreeTest {
    * Tests whether an all nodes deleted event gets sent whenever all children of a node get deleted.
    */
   @Test
-  public void testAllNodesDeletedEvent() throws ProcessingException, JSONException {
+  public void testAllNodesDeletedEvent() throws JSONException {
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -486,7 +485,7 @@ public class JsonTreeTest {
    * return null).
    */
   @Test
-  public void testGetOrCreateNodeIdWithNull() throws ProcessingException, JSONException {
+  public void testGetOrCreateNodeIdWithNull() throws JSONException {
     ITree tree = createTreeWithOneNode();
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     Assert.assertNull(jsonTree.getOrCreateNodeId(null));
@@ -611,7 +610,7 @@ public class JsonTreeTest {
    * Tests that events are ignored when nodes are not yet inserted.
    */
   @Test
-  public void testWrongEventOrder() throws ProcessingException, JSONException {
+  public void testWrongEventOrder() throws JSONException {
     List<ITreeNode> nodes = new ArrayList<ITreeNode>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -670,13 +669,13 @@ public class JsonTreeTest {
     return new JsonEvent("", JsonTree.EVENT_NODE_EXPANDED, data);
   }
 
-  protected TreeWithOneNode createTreeWithOneNode() throws ProcessingException {
+  protected TreeWithOneNode createTreeWithOneNode() {
     TreeWithOneNode tree = new TreeWithOneNode();
     tree.initTree();
     return tree;
   }
 
-  protected Tree createTree(List<ITreeNode> nodes) throws ProcessingException {
+  protected Tree createTree(List<ITreeNode> nodes) {
     Tree tree = new Tree(nodes);
     tree.initTree();
     return tree;

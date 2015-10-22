@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +22,7 @@ import org.junit.Test;
 
 public class DefaultValuesFilterTest {
 
-  protected JSONObject readJsonFile(String filename) throws ProcessingException {
+  protected JSONObject readJsonFile(String filename) {
     String content = IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream(filename));
     return new JSONObject(JsonUtility.stripCommentsFromJson(content));
   }

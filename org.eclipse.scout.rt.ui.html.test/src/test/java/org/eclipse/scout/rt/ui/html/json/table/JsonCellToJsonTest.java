@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -23,7 +22,6 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithBooleanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithLongColumn;
@@ -50,7 +48,7 @@ public class JsonCellToJsonTest {
    * Don't generate a cell object if text is the only property.
    */
   @Test
-  public void testStringColumn() throws ProcessingException, JSONException {
+  public void testStringColumn() throws JSONException {
     TableWithStringColumn table = new TableWithStringColumn();
     table.initTable();
     ITableRow row = table.addRow(table.createRow());
@@ -65,7 +63,7 @@ public class JsonCellToJsonTest {
    * Don't send value and text if they are equal.
    */
   @Test
-  public void testLongColumn() throws ProcessingException, JSONException {
+  public void testLongColumn() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
     table.initTable();
     ITableRow row = table.addRow(table.createRow());
@@ -81,7 +79,7 @@ public class JsonCellToJsonTest {
    * Don't generate a cell object if text is the only property.
    */
   @Test
-  public void testLongColumn_leftAlignment() throws ProcessingException, JSONException {
+  public void testLongColumn_leftAlignment() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
     table.getColumn().setHorizontalAlignment(-1);
     table.initTable();
@@ -94,7 +92,7 @@ public class JsonCellToJsonTest {
   }
 
   @Test
-  public void testDateColumn() throws ProcessingException, JSONException {
+  public void testDateColumn() throws JSONException {
     TableWithDateColumn table = new TableWithDateColumn();
     table.initTable();
     ITableRow row = table.addRow(table.createRow());
@@ -113,7 +111,7 @@ public class JsonCellToJsonTest {
    * {@link JsonDate}.
    */
   @Test
-  public void testDateColumn_jsonDatePattern() throws ProcessingException, JSONException {
+  public void testDateColumn_jsonDatePattern() throws JSONException {
     TableWithDateColumn table = new TableWithDateColumn();
     table.initTable();
     ITableRow row = table.addRow(table.createRow());
@@ -127,7 +125,7 @@ public class JsonCellToJsonTest {
   }
 
   @Test
-  public void testBooleanColumn() throws ProcessingException, JSONException {
+  public void testBooleanColumn() throws JSONException {
     TableWithBooleanColumn table = new TableWithBooleanColumn();
     table.initTable();
     ITableRow row = table.addRow(table.createRow());
