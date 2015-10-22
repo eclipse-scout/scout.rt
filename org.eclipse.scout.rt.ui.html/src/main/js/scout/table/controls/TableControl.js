@@ -40,7 +40,7 @@ scout.TableControl.prototype._createKeyStrokeContextForTableControl = function()
 scout.TableControl.prototype._render = function($parent) {
   var classes = 'table-control ';
   if (this.cssClass) {
-    classes += this.cssClass;
+    classes += this.cssClass + '-table-control';
   }
   this.$container = $parent.appendDiv(classes)
     .data('control', this);
@@ -78,7 +78,8 @@ scout.TableControl.prototype.removeContent = function() {
   if (this.contentRendered) {
     this._removeContent();
     if (this.cssClass) {
-      this.tableFooter.$controlContent.removeClass('table-control-content-' + this.cssClass);
+      this.tableFooter.$controlContainer.removeClass(this.cssClass + '-table-control-container');
+      this.tableFooter.$controlContent.removeClass(this.cssClass + '-table-control-content');
     }
     this.contentRendered = false;
   }
@@ -105,38 +106,56 @@ scout.TableControl.prototype.renderContent = function() {
 
   if (!this.contentRendered) {
     if (this.cssClass) {
-      this.tableFooter.$controlContent.addClass('table-control-content-' + this.cssClass);
+      this.tableFooter.$controlContainer.addClass(this.cssClass + '-table-control-container');
+      this.tableFooter.$controlContent.addClass(this.cssClass + '-table-control-content');
     }
     this._renderContent(this.tableFooter.$controlContent);
     this.contentRendered = true;
   }
 };
 
-scout.TableControl.prototype.onControlContainerOpened = function() {
-  if (this.form) {
-    // TODO [dwi] temporary solution; set focus to last known position
-    this.form.renderInitialFocus();
-  }
-};
-
-
-scout.TableControl.prototype.onControlContainerClosed = function() {
-  this.removeContent();
-};
-
 scout.TableControl.prototype._removeForm = function() {
   this.removeContent();
 };
 
-scout.TableControl.prototype._syncForm = function(form) {
-  if (form) {
-    form.rootGroupBox.menuBar.bottom();
-  }
-  this.form = form;
-};
-
 scout.TableControl.prototype._renderForm = function(form) {
   this.renderContent();
+};
+
+scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
+  selected = scout.helpers.nvl(selected, this.selected);
+  closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
+
+  this.$container.select(selected);
+
+  if (selected) {
+    this.tableFooter.onControlSelected(this);
+    this.renderContent();
+  } else {
+
+    // Don't modify the state initially, only on property change events
+    if (this.rendered) {
+
+      if (closeWhenUnselected && this === this.tableFooter.selectedControl) {
+        // Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
+        this.tableFooter.onControlSelected(null);
+        this.tableFooter.closeControlContainer(this);
+      } else {
+        this.removeContent();
+      }
+
+    }
+  }
+};
+
+scout.TableControl.prototype._renderEnabled = function(enabled) {
+  enabled = scout.helpers.nvl(enabled, this.enabled);
+  if (enabled) {
+    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
+  } else {
+    this.$container.off('mousedown');
+  }
+  this.$container.setEnabled(enabled);
 };
 
 /**
@@ -146,9 +165,6 @@ scout.TableControl.prototype.isContentAvailable = function() {
   return !!this.form;
 };
 
-scout.TableControl.prototype._onMouseDown = function() {
-  this.toggle();
-};
 
 scout.TableControl.prototype.toggle = function() {
   if (this.tableFooter.selectedControl === this) {
@@ -176,46 +192,17 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.sendSelected();
 };
 
-scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
-  selected = scout.helpers.nvl(selected, this.selected);
-  closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
-
-  this.$container.select(selected);
-
-  if (selected) {
-    this.renderContent();
-    this.tableFooter.onControlSelected(this);
-  } else {
-
-    // Don't modify the state initially, only on property change events
-    if (this.rendered) {
-
-      if (closeWhenUnselected && this === this.tableFooter.selectedControl) {
-        // Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
-        this.tableFooter.closeControlContainer(this);
-        this.tableFooter.onControlSelected(null);
-      } else {
-        this.removeContent();
-      }
-
-    }
-  }
-};
-
-scout.TableControl.prototype._renderEnabled = function(enabled) {
-  enabled = scout.helpers.nvl(enabled, this.enabled);
-  if (enabled) {
-    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
-  } else {
-    this.$container.off('mousedown');
-  }
-  this.$container.setEnabled(enabled);
-};
-
 scout.TableControl.prototype._configureTooltip = function() {
   var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
   options.cssClass = 'table-control-tooltip';
   return options;
+};
+
+scout.TableControl.prototype._syncForm = function(form) {
+  if (form) {
+    form.rootGroupBox.menuBar.bottom();
+  }
+  this.form = form;
 };
 
 scout.TableControl.prototype._goOffline = function() {
@@ -234,6 +221,21 @@ scout.TableControl.prototype.onResize = function() {
   if (this.form && this.form.rendered) {
     this.form.onResize();
   }
+};
+
+scout.TableControl.prototype._onMouseDown = function() {
+  this.toggle();
+};
+
+scout.TableControl.prototype.onControlContainerOpened = function() {
+  if (this.form) {
+    // TODO [dwi] temporary solution; set focus to last known position
+    this.form.renderInitialFocus();
+  }
+};
+
+scout.TableControl.prototype.onControlContainerClosed = function() {
+  this.removeContent();
 };
 
 /**

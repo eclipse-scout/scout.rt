@@ -1,6 +1,6 @@
-.table-control.aggregate.selected {
+.aggregate-table-control.selected {
   background-color: @table-aggregate-row-background-color;
 }
-.table-control-content-aggregate {
+.aggregate-table-control-container {
   background-color: @table-aggregate-row-background-color;
 }
