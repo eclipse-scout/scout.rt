@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
@@ -34,6 +33,6 @@ interface IBindInput {
 
   void setNextBatchIndex(int i);
 
-  SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException;
+  SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle);
 
 }

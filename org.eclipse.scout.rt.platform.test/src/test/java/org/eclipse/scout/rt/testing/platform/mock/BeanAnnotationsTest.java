@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.testing.platform.mock;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.junit.Test;
@@ -25,7 +24,7 @@ import org.mockito.Mock;
 public class BeanAnnotationsTest {
 
   @Test
-  public void testNoFields() throws ProcessingException {
+  public void testNoFields() {
     BeanAnnotations ba = new BeanAnnotations();
     NoFieldsFixture a = new NoFieldsFixture();
     ba.init(a);
@@ -34,7 +33,7 @@ public class BeanAnnotationsTest {
   }
 
   @Test
-  public void testPrivateBeanField() throws ProcessingException {
+  public void testPrivateBeanField() {
     BeanAnnotations ba = new BeanAnnotations();
     BeanFieldFixture a = new BeanFieldFixture();
     ba.init(a);
@@ -43,7 +42,7 @@ public class BeanAnnotationsTest {
   }
 
   @Test
-  public void testRegistrationCleared() throws ProcessingException {
+  public void testRegistrationCleared() {
     BeanAnnotations ba = new BeanAnnotations();
     BeanFieldFixture a = new BeanFieldFixture();
     ba.init(a);

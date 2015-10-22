@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -117,7 +116,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
     BENCH
   }
 
-  void initDesktop() throws ProcessingException;
+  void initDesktop();
 
   /**
    * Returns the first {@link Form} which is of the given type or a sub type of the given type.
@@ -469,7 +468,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    *
    * @param page
    */
-  void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException;
+  void afterTablePageLoaded(IPageWithTable<?> page);
 
   /**
    * Unload and release unused pages in all outlines, such as closed and non-selected nodes
@@ -691,7 +690,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
-  void activateBookmark(Bookmark bm) throws ProcessingException;
+  void activateBookmark(Bookmark bm);
 
   /**
    * Activates a {@link Bookmark} on this desktop.
@@ -703,25 +702,25 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
-  void activateBookmark(Bookmark bm, boolean activateOutline) throws ProcessingException;
+  void activateBookmark(Bookmark bm, boolean activateOutline);
 
   /**
    * Creates a bookmark of the active page
    */
-  Bookmark createBookmark() throws ProcessingException;
+  Bookmark createBookmark();
 
   /**
    * Creates a bookmark of the given page
    *
    * @since 3.8.0
    */
-  Bookmark createBookmark(IPage<?> page) throws ProcessingException;
+  Bookmark createBookmark(IPage<?> page);
 
   /**
    * do not use this internal method.<br>
    * for closing scout see <code>ClientScoutSession.getSession().close()</code>
    */
-  void closeInternal() throws ProcessingException;
+  void closeInternal();
 
   IDesktopUIFacade getUIFacade();
 

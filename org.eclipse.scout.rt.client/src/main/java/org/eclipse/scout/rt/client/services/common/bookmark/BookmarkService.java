@@ -17,7 +17,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Client;
@@ -116,20 +115,20 @@ public class BookmarkService implements IBookmarkService {
   }
 
   @Override
-  public void loadBookmarks() throws ProcessingException {
+  public void loadBookmarks() {
     IBookmarkStorageService storageService = BEANS.get(IBookmarkStorageService.class);
     importBookmarks(storageService.getBookmarkData());
   }
 
   @Override
-  public void storeBookmarks() throws ProcessingException {
+  public void storeBookmarks() {
     ServiceState state = getServiceState();
     IBookmarkStorageService storageService = BEANS.get(IBookmarkStorageService.class);
     importBookmarks(storageService.storeBookmarkData(state.m_model));
   }
 
   @Override
-  public void setStartBookmark() throws ProcessingException {
+  public void setStartBookmark() {
     ServiceState state = getServiceState();
     Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
     if (b != null) {
@@ -139,7 +138,7 @@ public class BookmarkService implements IBookmarkService {
   }
 
   @Override
-  public void deleteStartBookmark() throws ProcessingException {
+  public void deleteStartBookmark() {
     ServiceState state = getServiceState();
     state.m_model.getUserBookmarks().setStartupBookmark(null);
   }
@@ -161,7 +160,7 @@ public class BookmarkService implements IBookmarkService {
   }
 
   @Override
-  public void activate(Bookmark b) throws ProcessingException {
+  public void activate(Bookmark b) {
     if (b != null) {
       try {
         ClientSessionProvider.currentSession().getDesktop().activateBookmark(b);
@@ -173,7 +172,7 @@ public class BookmarkService implements IBookmarkService {
   }
 
   @Override
-  public void updateBookmark(Bookmark bm) throws ProcessingException {
+  public void updateBookmark(Bookmark bm) {
 
     // Create a new bookmark from the current view:
     Bookmark newBookmark = ClientSessionProvider.currentSession().getDesktop().createBookmark();
@@ -224,7 +223,7 @@ public class BookmarkService implements IBookmarkService {
     }
   }
 
-  private void importBookmarks(BookmarkData model) throws ProcessingException {
+  private void importBookmarks(BookmarkData model) {
     ServiceState state = getServiceState();
     state.m_model.setUserBookmarks(model.getUserBookmarks());
     state.m_model.setGlobalBookmarks(model.getGlobalBookmarks());

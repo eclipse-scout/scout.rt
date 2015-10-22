@@ -208,7 +208,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(5)
-  protected IWizardContainerForm execCreateContainerForm() throws ProcessingException {
+  protected IWizardContainerForm execCreateContainerForm() {
     DefaultWizardContainerForm containerForm = new DefaultWizardContainerForm(this);
     decorateWizardContainerForm(containerForm);
     return containerForm;
@@ -229,7 +229,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(6)
-  protected void execActiveStepChanged() throws ProcessingException {
+  protected void execActiveStepChanged() {
   }
 
   /**
@@ -240,7 +240,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(10)
   @ConfigOperation
-  protected void execStart() throws ProcessingException {
+  protected void execStart() {
     List<IWizardStep<? extends IForm>> steps = getAvailableSteps();
     setSteps(steps);
     if (steps.size() > 0) {
@@ -253,7 +253,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(20)
   @ConfigOperation
-  protected void execNextStep() throws ProcessingException {
+  protected void execNextStep() {
     IWizardStep<? extends IForm> step = getNextStep();
     activateStep(step);
   }
@@ -263,7 +263,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(30)
   @ConfigOperation
-  protected void execPreviousStep() throws ProcessingException {
+  protected void execPreviousStep() {
     IWizardStep<? extends IForm> step = getPreviousStep();
     activateStep(step);
   }
@@ -273,7 +273,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(40)
   @ConfigOperation
-  protected void execFinish() throws ProcessingException {
+  protected void execFinish() {
     activateStep(null);
     close();
   }
@@ -283,7 +283,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(50)
   @ConfigOperation
-  protected void execCancel() throws ProcessingException {
+  protected void execCancel() {
     close();
   }
 
@@ -292,7 +292,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(60)
   @ConfigOperation
-  protected void execSuspend() throws ProcessingException {
+  protected void execSuspend() {
     close();
   }
 
@@ -301,7 +301,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Order(65)
   @ConfigOperation
-  protected void execReset() throws ProcessingException {
+  protected void execReset() {
   }
 
   /**
@@ -310,7 +310,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(70)
-  protected void execAnyFieldChanged(IFormField source) throws ProcessingException {
+  protected void execAnyFieldChanged(IFormField source) {
   }
 
   /**
@@ -320,7 +320,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(80)
-  protected void execRefreshButtonPolicy() throws ProcessingException {
+  protected void execRefreshButtonPolicy() {
     IWizardStep<? extends IForm> prev = getPreviousStep();
     IWizardStep<? extends IForm> next = getNextStep();
     //
@@ -353,7 +353,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(230)
   @Deprecated
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected void execHyperlinkAction(URL url, String path, boolean local) {
     LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
   }
 
@@ -364,7 +364,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(10)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
     //FIXME CGU remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
@@ -387,7 +387,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(10)
-  protected void execWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+  protected void execWizardStepAction(IWizardStep<? extends IForm> wizardStep) {
     int stepKindex = getStepKind(getActiveStep(), wizardStep);
     activateStep(wizardStep, (stepKindex == IWizardStep.STEP_NEXT), (stepKindex == IWizardStep.STEP_PREVIOUS));
   }
@@ -799,12 +799,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void activateStep(IWizardStep<? extends IForm> step) throws ProcessingException {
+  public void activateStep(IWizardStep<? extends IForm> step) {
     activateStep(step, false, false);
   }
 
   @Override
-  public void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward) throws ProcessingException {
+  public void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward) {
     if (m_activeStep != step) {
       try {
         int kind = getStepKind(m_activeStep, step);
@@ -1035,7 +1035,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void start() throws ProcessingException {
+  public void start() {
     assertClosed();
     if (m_blockingCondition.isBlocking()) {
       throw new ProcessingException("The wizard " + getClass().getSimpleName() + " has already been started");
@@ -1059,7 +1059,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void close() throws ProcessingException {
+  public void close() {
     if (!isClosed()) {
       // close container form
       try {
@@ -1094,7 +1094,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void waitFor() throws ProcessingException {
+  public void waitFor() {
     // check if the desktop is observing this process
     IDesktop desktop = getDesktop();
     if (desktop == null || !desktop.isOpened()) {
@@ -1126,7 +1126,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * next step The default implementation calls {@link #interceptNextStep()}
    */
   @Override
-  public void doNextStep() throws ProcessingException {
+  public void doNextStep() {
     if (isOpen()) {
       try {
         interceptNextStep();
@@ -1144,7 +1144,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * previous step The default implementation calls {@link #interceptPreviousStep()}
    */
   @Override
-  public void doPreviousStep() throws ProcessingException {
+  public void doPreviousStep() {
     if (isOpen()) {
       try {
         interceptPreviousStep();
@@ -1162,7 +1162,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * finish The default implementation calls {@link #interceptFinish()}
    */
   @Override
-  public void doFinish() throws ProcessingException {
+  public void doFinish() {
     if (isOpen()) {
       CloseType oldType = getCloseType();
       try {
@@ -1184,7 +1184,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * cancel The default implementation calls {@link #interceptCancel()}
    */
   @Override
-  public void doCancel() throws ProcessingException {
+  public void doCancel() {
     if (isOpen()) {
       CloseType oldType = getCloseType();
       try {
@@ -1206,7 +1206,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * suspend The default implementation calls {@link #interceptSuspend()}
    */
   @Override
-  public void doSuspend() throws ProcessingException {
+  public void doSuspend() {
     if (isOpen()) {
       CloseType oldType = getCloseType();
       try {
@@ -1228,7 +1228,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * reset The default implementation calls {@link #interceptReset()}
    */
   @Override
-  public void doReset() throws ProcessingException {
+  public void doReset() {
     try {
       interceptReset();
     }
@@ -1242,27 +1242,27 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @SuppressWarnings("deprecation")
   @Override
-  public void doHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  public void doHyperlinkAction(URL url, String path, boolean local) {
     if (isOpen()) {
       execHyperlinkAction(url, path, local);
     }
   }
 
   @Override
-  public void doAppLinkAction(String ref) throws ProcessingException {
+  public void doAppLinkAction(String ref) {
     if (isOpen()) {
       interceptAppLinkAction(ref);
     }
   }
 
   @Override
-  public void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+  public void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) {
     if (isOpen()) {
       interceptWizardStepAction(wizardStep);
     }
   }
 
-  private void assertClosed() throws ProcessingException {
+  private void assertClosed() {
     if (!isClosed()) {
       throw new ProcessingException("wizard is already started");
     }
@@ -1279,7 +1279,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public IWizardContainerForm createContainerForm() throws ProcessingException {
+  public IWizardContainerForm createContainerForm() {
     return interceptCreateContainerForm();
   }
 
@@ -1304,145 +1304,145 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
 
     @Override
-    public void execActiveStepChanged(WizardActiveStepChangedChain chain) throws ProcessingException {
+    public void execActiveStepChanged(WizardActiveStepChangedChain chain) {
       getOwner().execActiveStepChanged();
     }
 
     @Override
-    public void execSuspend(WizardSuspendChain chain) throws ProcessingException {
+    public void execSuspend(WizardSuspendChain chain) {
       getOwner().execSuspend();
     }
 
     @Override
-    public void execRefreshButtonPolicy(WizardRefreshButtonPolicyChain chain) throws ProcessingException {
+    public void execRefreshButtonPolicy(WizardRefreshButtonPolicyChain chain) {
       getOwner().execRefreshButtonPolicy();
     }
 
     @Override
-    public void execCancel(WizardCancelChain chain) throws ProcessingException {
+    public void execCancel(WizardCancelChain chain) {
       getOwner().execCancel();
     }
 
     @Override
-    public void execStart(WizardStartChain chain) throws ProcessingException {
+    public void execStart(WizardStartChain chain) {
       getOwner().execStart();
     }
 
     @Override
-    public IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain) throws ProcessingException {
+    public IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain) {
       return getOwner().execCreateContainerForm();
     }
 
     @Override
-    public void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source) throws ProcessingException {
+    public void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source) {
       getOwner().execAnyFieldChanged(source);
     }
 
     @Override
-    public void execReset(WizardResetChain chain) throws ProcessingException {
+    public void execReset(WizardResetChain chain) {
       getOwner().execReset();
     }
 
     @Override
-    public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException {
+    public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
 
     @Override
-    public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+    public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) {
       getOwner().execWizardStepAction(wizardStep);
     }
 
     @Override
-    public void execPreviousStep(WizardPreviousStepChain chain) throws ProcessingException {
+    public void execPreviousStep(WizardPreviousStepChain chain) {
       getOwner().execPreviousStep();
     }
 
     @Override
-    public void execNextStep(WizardNextStepChain chain) throws ProcessingException {
+    public void execNextStep(WizardNextStepChain chain) {
       getOwner().execNextStep();
     }
 
     @Override
-    public void execFinish(WizardFinishChain chain) throws ProcessingException {
+    public void execFinish(WizardFinishChain chain) {
       getOwner().execFinish();
     }
 
   }
 
-  protected final void interceptActiveStepChanged() throws ProcessingException {
+  protected final void interceptActiveStepChanged() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardActiveStepChangedChain chain = new WizardActiveStepChangedChain(extensions);
     chain.execActiveStepChanged();
   }
 
-  protected final void interceptSuspend() throws ProcessingException {
+  protected final void interceptSuspend() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardSuspendChain chain = new WizardSuspendChain(extensions);
     chain.execSuspend();
   }
 
-  protected final void interceptRefreshButtonPolicy() throws ProcessingException {
+  protected final void interceptRefreshButtonPolicy() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardRefreshButtonPolicyChain chain = new WizardRefreshButtonPolicyChain(extensions);
     chain.execRefreshButtonPolicy();
   }
 
-  protected final void interceptCancel() throws ProcessingException {
+  protected final void interceptCancel() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardCancelChain chain = new WizardCancelChain(extensions);
     chain.execCancel();
   }
 
-  protected final void interceptStart() throws ProcessingException {
+  protected final void interceptStart() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardStartChain chain = new WizardStartChain(extensions);
     chain.execStart();
   }
 
-  protected final IWizardContainerForm interceptCreateContainerForm() throws ProcessingException {
+  protected final IWizardContainerForm interceptCreateContainerForm() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardCreateContainerFormChain chain = new WizardCreateContainerFormChain(extensions);
     return chain.execCreateContainerForm();
   }
 
-  protected final void interceptAnyFieldChanged(IFormField source) throws ProcessingException {
+  protected final void interceptAnyFieldChanged(IFormField source) {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardAnyFieldChangedChain chain = new WizardAnyFieldChangedChain(extensions);
     chain.execAnyFieldChanged(source);
   }
 
-  protected final void interceptReset() throws ProcessingException {
+  protected final void interceptReset() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardResetChain chain = new WizardResetChain(extensions);
     chain.execReset();
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardAppLinkActionChain chain = new WizardAppLinkActionChain(extensions);
     chain.execAppLinkAction(ref);
   }
 
-  protected final void interceptWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+  protected final void interceptWizardStepAction(IWizardStep<? extends IForm> wizardStep) {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardWizardStepActionChain chain = new WizardWizardStepActionChain(extensions);
     chain.execWizardStepAction(wizardStep);
   }
 
-  protected final void interceptPreviousStep() throws ProcessingException {
+  protected final void interceptPreviousStep() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardPreviousStepChain chain = new WizardPreviousStepChain(extensions);
     chain.execPreviousStep();
   }
 
-  protected final void interceptNextStep() throws ProcessingException {
+  protected final void interceptNextStep() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardNextStepChain chain = new WizardNextStepChain(extensions);
     chain.execNextStep();
   }
 
-  protected final void interceptFinish() throws ProcessingException {
+  protected final void interceptFinish() {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardFinishChain chain = new WizardFinishChain(extensions);
     chain.execFinish();

@@ -16,7 +16,6 @@ import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.ReplaceFieldTest.BaseForm.MainBox;
@@ -110,7 +109,7 @@ public class ReplaceFieldTest {
   }
 
   @Test
-  public void testExtendTemplateUsageForm() throws ProcessingException {
+  public void testExtendTemplateUsageForm() {
     TemplateReplaceForm form = new TemplateReplaceForm();
     TemplateUsageForm.MainBox mainBox = form.getMainBox();
 
@@ -161,7 +160,7 @@ public class ReplaceFieldTest {
   }
 
   public static class BaseForm extends AbstractForm {
-    public BaseForm() throws ProcessingException {
+    public BaseForm() {
     }
 
     public MainBox getMainBox() {
@@ -190,7 +189,7 @@ public class ReplaceFieldTest {
   }
 
   public static class ExtendedForm extends BaseForm {
-    public ExtendedForm() throws ProcessingException {
+    public ExtendedForm() {
     }
 
     public FirstExField getFirstExField() {
@@ -206,7 +205,7 @@ public class ReplaceFieldTest {
   }
 
   public static class ExtendedMainBoxAndFieldTopLevelForm extends BaseForm {
-    public ExtendedMainBoxAndFieldTopLevelForm() throws ProcessingException {
+    public ExtendedMainBoxAndFieldTopLevelForm() {
     }
 
     public ExMainBox getExMainBox() {
@@ -231,7 +230,7 @@ public class ReplaceFieldTest {
   }
 
   public static class ExtendedMainBoxAndFieldNestedForm extends BaseForm {
-    public ExtendedMainBoxAndFieldNestedForm() throws ProcessingException {
+    public ExtendedMainBoxAndFieldNestedForm() {
     }
 
     public ExMainBox getExMainBox() {
@@ -276,7 +275,7 @@ public class ReplaceFieldTest {
 
   public static class TemplateUsageForm extends AbstractForm {
 
-    public TemplateUsageForm() throws ProcessingException {
+    public TemplateUsageForm() {
     }
 
     public MainBox getMainBox() {
@@ -306,7 +305,7 @@ public class ReplaceFieldTest {
 
   public static class TemplateReplaceForm extends TemplateUsageForm {
 
-    public TemplateReplaceForm() throws ProcessingException {
+    public TemplateReplaceForm() {
     }
 
     @Replace
@@ -324,7 +323,7 @@ public class ReplaceFieldTest {
 
   public static class ExampleForm extends AbstractForm {
 
-    public ExampleForm() throws ProcessingException {
+    public ExampleForm() {
       super();
     }
 
@@ -344,7 +343,7 @@ public class ReplaceFieldTest {
   }
 
   public static class ExampleExForm extends ExampleForm {
-    public ExampleExForm() throws ProcessingException {
+    public ExampleExForm() {
       super();
     }
 

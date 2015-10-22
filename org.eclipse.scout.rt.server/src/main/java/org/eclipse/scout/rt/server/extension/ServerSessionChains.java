@@ -24,10 +24,10 @@ public final class ServerSessionChains {
       super(extensions);
     }
 
-    public void execLoadSession() throws ProcessingException {
+    public void execLoadSession() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IServerSessionExtension<? extends AbstractServerSession> next) throws ProcessingException {
+        protected void callMethod(IServerSessionExtension<? extends AbstractServerSession> next) {
           next.execLoadSession(ServerSessionLoadSessionChain.this);
         }
       };

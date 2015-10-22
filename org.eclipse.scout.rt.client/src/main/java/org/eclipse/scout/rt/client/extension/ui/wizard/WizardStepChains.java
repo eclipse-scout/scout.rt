@@ -25,10 +25,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execDeactivate(final int stepKind) throws ProcessingException {
+    public void execDeactivate(final int stepKind) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execDeactivate(WizardStepDeactivateChain.this, stepKind);
         }
       };
@@ -46,10 +46,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execDispose() throws ProcessingException {
+    public void execDispose() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execDispose(WizardStepDisposeChain.this);
         }
       };
@@ -67,10 +67,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execFormClosed(final boolean activation) throws ProcessingException {
+    public void execFormClosed(final boolean activation) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execFormClosed(WizardStepFormClosedChain.this, activation);
         }
       };
@@ -88,10 +88,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execActivate(final int stepKind) throws ProcessingException {
+    public void execActivate(final int stepKind) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execActivate(WizardStepActivateChain.this, stepKind);
         }
       };
@@ -109,10 +109,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execFormDiscarded(final boolean activation) throws ProcessingException {
+    public void execFormDiscarded(final boolean activation) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execFormDiscarded(WizardStepFormDiscardedChain.this, activation);
         }
       };
@@ -130,10 +130,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execFormStored(final boolean activation) throws ProcessingException {
+    public void execFormStored(final boolean activation) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execFormStored(WizardStepFormStoredChain.this, activation);
         }
       };
@@ -151,10 +151,10 @@ public final class WizardStepChains {
       super(extensions);
     }
 
-    public void execAction() throws ProcessingException {
+    public void execAction() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) {
           next.execAction(WizardStepActionChain.this);
         }
       };

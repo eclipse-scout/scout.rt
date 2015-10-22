@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractCompositeFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCheckFromToChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCreateLabelSuffixChain;
@@ -21,7 +20,7 @@ public abstract class AbstractSequenceBoxExtension<OWNER extends AbstractSequenc
   }
 
   @Override
-  public <T extends Comparable<T>> void execCheckFromTo(SequenceBoxCheckFromToChain chain, IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+  public <T extends Comparable<T>> void execCheckFromTo(SequenceBoxCheckFromToChain chain, IValueField<T>[] valueFields, int changedIndex) {
     chain.execCheckFromTo(valueFields, changedIndex);
   }
 

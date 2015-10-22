@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * @since 5.1
  */
 public interface IAppLinkCapable {
 
-  void doAppLinkAction(String ref) throws ProcessingException;
+  void doAppLinkAction(String ref);
 
 }

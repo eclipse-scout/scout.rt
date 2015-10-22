@@ -29,7 +29,7 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
   private int m_jdbcBindIndex = -1;
   private ArrayList<Object> m_accumulator;
 
-  public AbstractBeanPropertyOutput(Class beanType, String propertyName, ValueOutputToken source) throws ProcessingException {
+  public AbstractBeanPropertyOutput(Class beanType, String propertyName, ValueOutputToken source) {
     m_propertyName = propertyName;
     m_accumulator = new ArrayList<Object>();
     m_source = source;
@@ -93,7 +93,7 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
   protected abstract Object[] getFinalBeanArray();
 
   @Override
-  public void finishBatch() throws ProcessingException {
+  public void finishBatch() {
     FastPropertyDescriptor desc = null;
     Object[] beans = getFinalBeanArray();
     if (beans != null) {

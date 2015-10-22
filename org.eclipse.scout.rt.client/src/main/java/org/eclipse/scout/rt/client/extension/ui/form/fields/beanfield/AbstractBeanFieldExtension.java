@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.BeanFieldChains.BeanFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.AbstractBeanField;
@@ -12,7 +11,7 @@ public abstract class AbstractBeanFieldExtension<VALUE, OWNER extends AbstractBe
   }
 
   @Override
-  public void execAppLinkAction(BeanFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+  public void execAppLinkAction(BeanFieldAppLinkActionChain chain, String ref) {
     chain.execAppLinkAction(ref);
   }
 }

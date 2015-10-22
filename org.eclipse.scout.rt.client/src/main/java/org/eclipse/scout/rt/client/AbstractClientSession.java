@@ -313,7 +313,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * @throws ProcessingException
    *           if interrupted (and the variables are not initialized)
    */
-  protected void initializeSharedVariables(long timeout, TimeUnit unit) throws ProcessingException {
+  protected void initializeSharedVariables(long timeout, TimeUnit unit) {
     BEANS.get(IPingService.class).ping("");
     awaitSharedVariablesInitialized(timeout, unit);
   }
@@ -324,7 +324,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * @throws ProcessingException
    *           if interrupted (and the variables are not initialized)
    */
-  protected void awaitSharedVariablesInitialized(long timeout, TimeUnit unit) throws ProcessingException {
+  protected void awaitSharedVariablesInitialized(long timeout, TimeUnit unit) {
     try {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Awaiting shared variable map");
@@ -340,7 +340,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void start(String sessionId) throws ProcessingException {
+  public void start(String sessionId) {
     Assertions.assertNotNull(sessionId, "Session id must not be null");
     if (isActive()) {
       throw new IllegalStateException("session is active");
@@ -361,7 +361,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    */
   @ConfigOperation
   @Order(10)
-  protected void execLoadSession() throws ProcessingException {
+  protected void execLoadSession() {
   }
 
   /**
@@ -372,7 +372,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    */
   @ConfigOperation
   @Order(20)
-  protected void execStoreSession() throws ProcessingException {
+  protected void execStoreSession() {
   }
 
   @SuppressWarnings("deprecation")
@@ -392,7 +392,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setDesktop(IDesktop a) throws ProcessingException {
+  public void setDesktop(IDesktop a) {
     if (a == null) {
       throw new IllegalArgumentException("argument must not be null");
     }
@@ -565,14 +565,14 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
   }
 
-  public void goOnline() throws ProcessingException {
+  public void goOnline() {
     if (OfflineState.isOfflineDefault()) {
       OfflineState.setOfflineDefault(false);
     }
   }
 
   @Override
-  public void goOffline() throws ProcessingException {
+  public void goOffline() {
     final String keyName = "offline.user";
     IPreferences pref = ClientUIPreferences.getClientPreferences(this);
     if (getUserId() != null && OfflineState.isOnlineDefault() && pref != null) {
@@ -632,24 +632,24 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
 
     @Override
-    public void execStoreSession(ClientSessionStoreSessionChain chain) throws ProcessingException {
+    public void execStoreSession(ClientSessionStoreSessionChain chain) {
       getOwner().execStoreSession();
     }
 
     @Override
-    public void execLoadSession(ClientSessionLoadSessionChain chain) throws ProcessingException {
+    public void execLoadSession(ClientSessionLoadSessionChain chain) {
       getOwner().execLoadSession();
     }
 
   }
 
-  protected final void interceptStoreSession() throws ProcessingException {
+  protected final void interceptStoreSession() {
     List<? extends IClientSessionExtension<? extends AbstractClientSession>> extensions = getAllExtensions();
     ClientSessionStoreSessionChain chain = new ClientSessionStoreSessionChain(extensions);
     chain.execStoreSession();
   }
 
-  protected final void interceptLoadSession() throws ProcessingException {
+  protected final void interceptLoadSession() {
     List<? extends IClientSessionExtension<? extends AbstractClientSession>> extensions = getAllExtensions();
     ClientSessionLoadSessionChain chain = new ClientSessionLoadSessionChain(extensions);
     chain.execLoadSession();

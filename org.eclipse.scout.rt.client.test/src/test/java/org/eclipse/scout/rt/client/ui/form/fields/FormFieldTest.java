@@ -81,7 +81,7 @@ public class FormFieldTest {
    * @throws ProcessingException
    */
   @Test
-  public void testClassIdAnnotatedInForm() throws ProcessingException {
+  public void testClassIdAnnotatedInForm() {
     TestForm2 testForm = new TestForm2();
     SimpleGroupBox2 testField = testForm.getFieldByClass(TestForm2.MainBox.SimpleGroupBox2.class);
     String classId = testField.classId();
@@ -96,14 +96,14 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testClassIdWithFormClassId() throws ProcessingException {
+  public void testClassIdWithFormClassId() {
     TestFormWithClassId testForm = new TestFormWithClassId();
     TestFieldWithoutClassId field = testForm.getFieldByClass(TestFormWithClassId.MainBox.TestFieldWithoutClassId.class);
     assertEquals("class id not as expected", field.getClass().getSimpleName() + ITypeWithClassId.ID_CONCAT_SYMBOL + TEST_FORM_ID, field.classId());
   }
 
   @Test
-  public void testDuplicateClassId() throws ProcessingException {
+  public void testDuplicateClassId() {
     TestFormWithClassId testForm = new TestFormWithClassId();
     TestFieldDuplicateClassId1 field1 = testForm.getFieldByClass(TestFieldDuplicateClassId1.class);
     TestFieldDuplicateClassId2 field2 = testForm.getFieldByClass(TestFieldDuplicateClassId2.class);
@@ -117,7 +117,7 @@ public class FormFieldTest {
    * @throws ProcessingException
    */
   @Test
-  public void testClassIdInjectedFields() throws ProcessingException {
+  public void testClassIdInjectedFields() {
     verifyNoDuplicateClassIds(new TestForm().getAllFields());
   }
 
@@ -127,7 +127,7 @@ public class FormFieldTest {
    * @throws ProcessingException
    */
   @Test
-  public void testClassIdTemplateGroupBox() throws ProcessingException {
+  public void testClassIdTemplateGroupBox() {
     TestFormWithGroupBoxes form = new TestFormWithGroupBoxes();
     verifyNoDuplicateClassIds(form.getAllFields());
     String completeClassId = form.getGroupBox1().getUsingOtherTemplateBox().getText1Field().classId();
@@ -155,7 +155,7 @@ public class FormFieldTest {
   @ClassId(TEST_FORM_ID)
   class TestFormWithClassId extends AbstractForm {
 
-    public TestFormWithClassId() throws ProcessingException {
+    public TestFormWithClassId() {
       super();
     }
 
@@ -184,7 +184,7 @@ public class FormFieldTest {
     protected boolean iAmEmpty = false;
 
     @Override
-    protected boolean execIsEmpty() throws ProcessingException {
+    protected boolean execIsEmpty() {
       return iAmEmpty;
     }
   }
@@ -194,7 +194,7 @@ public class FormFieldTest {
    */
   class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -216,7 +216,7 @@ public class FormFieldTest {
    */
   class TestFormWithGroupBoxes extends AbstractForm {
 
-    public TestFormWithGroupBoxes() throws ProcessingException {
+    public TestFormWithGroupBoxes() {
       super();
     }
 
@@ -243,7 +243,7 @@ public class FormFieldTest {
   }
 
   class TestForm2 extends AbstractForm {
-    public TestForm2() throws ProcessingException {
+    public TestForm2() {
       super();
     }
 

@@ -48,7 +48,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException {
+  public void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) {
     if (!ACCESS.check(new PublishUserBookmarkPermission())) {
       throw new ProcessingException("Function denied", new SecurityException("Function denied"));
     }
@@ -75,22 +75,22 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
   }
 
   @Override
-  protected BookmarkFolder readUserFolder(Object userId) throws ProcessingException {
+  protected BookmarkFolder readUserFolder(Object userId) {
     return readBookmarkFolder(userId + ".ser");
   }
 
   @Override
-  protected BookmarkFolder readGlobalFolder() throws ProcessingException {
+  protected BookmarkFolder readGlobalFolder() {
     return readBookmarkFolder(GLOBAL_FILE_NAME + ".ser");
   }
 
   @Override
-  protected void writeUserFolder(BookmarkFolder folder, Object userId) throws ProcessingException {
+  protected void writeUserFolder(BookmarkFolder folder, Object userId) {
     writeBookmarkFolder(folder, userId + ".ser", new UpdateUserBookmarkPermission());
   }
 
   @Override
-  protected void writeGlobalFolder(BookmarkFolder folder) throws ProcessingException {
+  protected void writeGlobalFolder(BookmarkFolder folder) {
     writeBookmarkFolder(folder, GLOBAL_FILE_NAME + ".ser", new UpdateUserBookmarkPermission());
   }
 
@@ -99,7 +99,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
    *
    * @since 3.8.2
    */
-  private BookmarkFolder readBookmarkFolder(String filename) throws ProcessingException {
+  private BookmarkFolder readBookmarkFolder(String filename) {
     RemoteFile spec = new RemoteFile("bookmarks", filename, 0);
     RemoteFile f = BEANS.get(IRemoteFileService.class).getRemoteFile(spec);
     if (f.exists()) {
@@ -119,7 +119,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
    *
    * @since 3.8.2
    */
-  private void writeBookmarkFolder(BookmarkFolder folder, String filename, Permission permission) throws ProcessingException {
+  private void writeBookmarkFolder(BookmarkFolder folder, String filename, Permission permission) {
     try {
       if (ACCESS.check(permission)) {
         byte[] bytes = SerializationUtility.createObjectSerializer().serialize(folder);

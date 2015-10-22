@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -211,7 +210,7 @@ public class FindFieldByFormDataIdVisitorTest {
    */
   public static class MainForm extends AbstractForm {
 
-    public MainForm() throws ProcessingException {
+    public MainForm() {
       super();
     }
 
@@ -228,7 +227,7 @@ public class FindFieldByFormDataIdVisitorTest {
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new MainFormHandler());
     }
 
@@ -239,7 +238,7 @@ public class FindFieldByFormDataIdVisitorTest {
       public class WrappedFormField extends AbstractWrappedFormField<InnerForm> {
 
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           setInnerForm(new InnerForm());
         }
       }
@@ -255,7 +254,7 @@ public class FindFieldByFormDataIdVisitorTest {
 
   public static class InnerForm extends AbstractForm {
 
-    public InnerForm() throws ProcessingException {
+    public InnerForm() {
       super();
     }
 
@@ -276,7 +275,7 @@ public class FindFieldByFormDataIdVisitorTest {
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new InnerFormHandler());
     }
 
@@ -286,7 +285,7 @@ public class FindFieldByFormDataIdVisitorTest {
       @Order(10)
       public class WrappedFormField extends AbstractWrappedFormField<InnerInnerForm> {
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           setInnerForm(new InnerInnerForm());
         }
       }
@@ -306,7 +305,7 @@ public class FindFieldByFormDataIdVisitorTest {
 
   public static class InnerInnerForm extends AbstractForm {
 
-    public InnerInnerForm() throws ProcessingException {
+    public InnerInnerForm() {
       super();
     }
 
@@ -327,7 +326,7 @@ public class FindFieldByFormDataIdVisitorTest {
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new InnerInnerFormHandler());
     }
 

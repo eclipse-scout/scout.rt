@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.HolderToRowMapper;
@@ -77,7 +76,7 @@ public class TableRowMapper {
     }
   }
 
-  public void importRowData() throws ProcessingException {
+  public void importRowData() {
     if (m_importMappings != null) {
       try {
         m_row.setRowChanging(true);

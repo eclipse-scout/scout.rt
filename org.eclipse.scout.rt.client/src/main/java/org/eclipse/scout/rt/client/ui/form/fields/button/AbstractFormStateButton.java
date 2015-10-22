@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -36,7 +35,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
   }
 
   @Override
-  protected void execClickAction() throws ProcessingException {
+  protected void execClickAction() {
     getForm().doImportXml();
   }
 
@@ -49,7 +48,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       getForm().doExportXml(false);
     }
   }
@@ -63,7 +62,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       getForm().doExportXml(true);
     }
   }

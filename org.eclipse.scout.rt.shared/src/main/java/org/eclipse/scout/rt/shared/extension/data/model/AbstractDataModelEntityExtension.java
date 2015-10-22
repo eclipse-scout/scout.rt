@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.data.model;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
@@ -26,7 +25,7 @@ public abstract class AbstractDataModelEntityExtension<OWNER extends AbstractDat
   }
 
   @Override
-  public void execInitEntity(DataModelEntityInitEntityChain chain) throws ProcessingException {
+  public void execInitEntity(DataModelEntityInitEntityChain chain) {
     chain.execInitEntity();
   }
 

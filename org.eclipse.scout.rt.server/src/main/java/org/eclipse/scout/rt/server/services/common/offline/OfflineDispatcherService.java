@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -65,7 +64,7 @@ public class OfflineDispatcherService implements IOfflineDispatcherService {
   /**
    * Method invoked to provide a new or cached {@link IServerSession} for the current request.
    */
-  protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
+  protected IServerSession provideServerSession(final ServerRunContext serverRunContext) {
     return BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext);
   }
 

@@ -46,12 +46,12 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   /**
    * @throws ProcessingException
    */
-  void initAction() throws ProcessingException;
+  void initAction();
 
   /**
    * called to perform action
    */
-  void doAction() throws ProcessingException;
+  void doAction();
 
   Object getProperty(String name);
 

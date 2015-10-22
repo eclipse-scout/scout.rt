@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkFolderForm.MainBox.GroupBox.NameField;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class BookmarkFolderForm extends AbstractForm {
 
-  public BookmarkFolderForm() throws ProcessingException {
+  public BookmarkFolderForm() {
     super();
   }
 
@@ -32,11 +31,11 @@ public class BookmarkFolderForm extends AbstractForm {
     return ScoutTexts.get("Folders");
   }
 
-  public void startNew() throws ProcessingException {
+  public void startNew() {
     startInternal(new NewHandler());
   }
 
-  public void startModify() throws ProcessingException {
+  public void startModify() {
     startInternal(new ModifyHandler());
   }
 
@@ -77,7 +76,7 @@ public class BookmarkFolderForm extends AbstractForm {
         }
 
         @Override
-        protected String execValidateValue(String rawValue) throws ProcessingException {
+        protected String execValidateValue(String rawValue) {
           return rawValue.replaceAll("[\\/]", " ").trim();
         }
       }

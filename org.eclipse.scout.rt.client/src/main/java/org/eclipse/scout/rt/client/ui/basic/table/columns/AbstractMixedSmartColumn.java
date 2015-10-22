@@ -124,7 +124,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
 
   @SuppressWarnings("unchecked")
   @Override
-  protected VALUE_TYPE parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected VALUE_TYPE parseValueInternal(ITableRow row, Object rawValue) {
     VALUE_TYPE validValue = null;
     if (rawValue == null) {
       validValue = null;
@@ -144,7 +144,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
   }
 
   @Override
-  protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
+  protected IFormField prepareEditInternal(final ITableRow row) {
     MixedSmartEditorField f = (MixedSmartEditorField) getDefaultEditor();
     f.setRow(row);
     mapEditorFieldProperties(f);
@@ -240,7 +240,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
     }
 
     @Override
-    protected void execPrepareLookup(ILookupCall<LOOKUP_CALL_KEY_TYPE> call) throws ProcessingException {
+    protected void execPrepareLookup(ILookupCall<LOOKUP_CALL_KEY_TYPE> call) {
       AbstractMixedSmartColumn.this.interceptPrepareLookup(call, getRow());
     }
 

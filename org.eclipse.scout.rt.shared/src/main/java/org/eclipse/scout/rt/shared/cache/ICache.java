@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.IAdaptable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -70,7 +69,7 @@ public interface ICache<K, V> extends IAdaptable {
    *          is propagated to the server. In case of a server cache the invalidation is propagated to other server
    *          cluster nodes. Note that a server propagates invalidations always to its connected clients.
    */
-  void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException;
+  void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate);
 
   /**
    * @return an unmodifiable view of the map on which this cache is based on. Never null.

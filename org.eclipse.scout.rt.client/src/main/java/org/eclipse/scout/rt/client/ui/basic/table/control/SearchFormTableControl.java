@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -39,7 +38,7 @@ public class SearchFormTableControl extends AbstractTableControl {
       setEnabled(true);
       searchForm.addFormListener(new FormListener() {
         @Override
-        public void formChanged(FormEvent e) throws ProcessingException {
+        public void formChanged(FormEvent e) {
           if (e.getType() == FormEvent.TYPE_LOAD_COMPLETE) {
             setForm(e.getForm());
           }

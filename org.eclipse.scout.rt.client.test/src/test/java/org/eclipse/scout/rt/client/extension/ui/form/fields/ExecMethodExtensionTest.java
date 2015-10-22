@@ -60,12 +60,12 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
     /**
      * @throws ProcessingException
      */
-    public MyForm() throws ProcessingException {
+    public MyForm() {
       super();
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new StartHandler());
     }
 
@@ -78,7 +78,7 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
       @Order(10)
       public class NameField extends AbstractStringField {
         @Override
-        protected String execValidateValue(String rawValue) throws ProcessingException {
+        protected String execValidateValue(String rawValue) {
           if (StringUtility.equalsIgnoreCase("Bernd", rawValue)) {
             throw new VetoException("Bernd is not allowed");
           }
@@ -103,7 +103,7 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
-    public String execValidateValue(ValueFieldExecValidateChain<String> chain, String rawValue) throws ProcessingException {
+    public String execValidateValue(ValueFieldExecValidateChain<String> chain, String rawValue) {
       String retVal = chain.execValidateValue(rawValue);
       if (StringUtility.equalsIgnoreCase("berndExtension", retVal)) {
         throw new VetoException("BerndExtension is not allowed");

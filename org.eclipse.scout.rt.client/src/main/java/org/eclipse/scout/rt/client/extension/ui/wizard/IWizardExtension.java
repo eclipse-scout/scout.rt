@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActiveStepChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
@@ -36,30 +35,30 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface IWizardExtension<OWNER extends AbstractWizard> extends IExtension<OWNER> {
 
-  void execActiveStepChanged(WizardActiveStepChangedChain chain) throws ProcessingException;
+  void execActiveStepChanged(WizardActiveStepChangedChain chain);
 
-  void execSuspend(WizardSuspendChain chain) throws ProcessingException;
+  void execSuspend(WizardSuspendChain chain);
 
-  void execRefreshButtonPolicy(WizardRefreshButtonPolicyChain chain) throws ProcessingException;
+  void execRefreshButtonPolicy(WizardRefreshButtonPolicyChain chain);
 
-  void execCancel(WizardCancelChain chain) throws ProcessingException;
+  void execCancel(WizardCancelChain chain);
 
-  void execStart(WizardStartChain chain) throws ProcessingException;
+  void execStart(WizardStartChain chain);
 
-  IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain) throws ProcessingException;
+  IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain);
 
-  void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source) throws ProcessingException;
+  void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source);
 
-  void execReset(WizardResetChain chain) throws ProcessingException;
+  void execReset(WizardResetChain chain);
 
-  void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException;
+  void execAppLinkAction(WizardAppLinkActionChain chain, String ref);
 
-  void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) throws ProcessingException;
+  void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep);
 
-  void execPreviousStep(WizardPreviousStepChain chain) throws ProcessingException;
+  void execPreviousStep(WizardPreviousStepChain chain);
 
-  void execNextStep(WizardNextStepChain chain) throws ProcessingException;
+  void execNextStep(WizardNextStepChain chain);
 
-  void execFinish(WizardFinishChain chain) throws ProcessingException;
+  void execFinish(WizardFinishChain chain);
 
 }

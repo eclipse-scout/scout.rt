@@ -93,7 +93,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected void execDisposeTable() throws ProcessingException {
+  protected void execDisposeTable() {
     super.execDisposeTable();
     if (m_tableListener != null) {
       getOriginalTable().removeTableListener(m_tableListener);
@@ -160,7 +160,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+  protected void execRowsSelected(List<? extends ITableRow> rows) {
     try {
       if (!m_selectionLock.acquire()) {
         //Prevent loop which could happen because delegation of selection is done from this to original table and vice versa
@@ -186,14 +186,14 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
+  protected void execRowClick(ITableRow row, MouseButton mouseButton) {
     //Delegate to original table
     ITableRow originalRow = getRowMapColumn().getValue(row);
     getOriginalTable().getUIFacade().fireRowClickFromUI(originalRow, mouseButton);
   }
 
   @Override
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
     //Delegate to original table
     getOriginalTable().getUIFacade().fireAppLinkActionFromUI(ref);
 
@@ -202,7 +202,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     }
   }
 
-  protected void execDrillDownButtonAction() throws ProcessingException {
+  protected void execDrillDownButtonAction() {
     if (isAutoCreateTableRowForm()) {
       ITableRow originalRow = null;
       ITableRow selectedRow = getSelectedRow();
@@ -341,7 +341,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     selectRows(getRowMapColumn().findRows(getOriginalTable().getSelectedRows()));
   }
 
-  private void syncCheckedRows() throws ProcessingException {
+  private void syncCheckedRows() {
     if (!isCheckable() || getOriginalTable().getCheckedRows().isEmpty()) {
       return;
     }
@@ -359,7 +359,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   private class P_TableEventListener extends TableAdapter {
 
-    protected void init() throws ProcessingException {
+    protected void init() {
       try {
         setTableChanging(true);
 

@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -62,7 +61,7 @@ public class ModelJobTest {
   }
 
   @Test
-  public void testModelThread() throws ProcessingException {
+  public void testModelThread() {
     final AtomicBoolean modelThread = new AtomicBoolean();
 
     assertFalse(ModelJobs.isModelThread());
@@ -80,7 +79,7 @@ public class ModelJobTest {
   }
 
   @Test
-  public void testThreadName() throws ProcessingException, InterruptedException {
+  public void testThreadName() throws InterruptedException {
     ISession.CURRENT.set(m_clientSession1);
     Thread.currentThread().setName("main");
 

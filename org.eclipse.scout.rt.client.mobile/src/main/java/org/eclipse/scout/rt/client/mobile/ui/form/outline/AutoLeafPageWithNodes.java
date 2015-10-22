@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -40,7 +39,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   }
 
   @Override
-  protected void execInitPage() throws ProcessingException {
+  protected void execInitPage() {
     Cell cell = getCellForUpdate();
     if (cell.getText() == null) {
       cell.setText(findAppropriateTitle());
@@ -71,7 +70,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   }
 
   @Override
-  protected void execPageActivated() throws ProcessingException {
+  protected void execPageActivated() {
     if (getDetailForm() == null) {
       TableRowForm form = new TableRowForm(m_tableRow);
       setDetailForm(form);
@@ -80,7 +79,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   }
 
   @Override
-  protected void execDisposePage() throws ProcessingException {
+  protected void execDisposePage() {
     super.execDisposePage();
     if (getDetailForm() != null) {
       getDetailForm().doClose();

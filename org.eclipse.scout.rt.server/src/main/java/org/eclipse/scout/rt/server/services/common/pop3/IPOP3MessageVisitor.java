@@ -13,11 +13,9 @@ package org.eclipse.scout.rt.server.services.common.pop3;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IPOP3MessageVisitor {
   /**
    * @return true to continue visiting, false to break up further visiting
    */
-  boolean visit(Message m) throws ProcessingException, MessagingException;
+  boolean visit(Message m) throws MessagingException;
 }

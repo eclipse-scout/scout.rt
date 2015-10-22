@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.data.form;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.shared.data.form.fixture.TestFormData;
@@ -29,7 +28,7 @@ import org.junit.runner.RunWith;
 public class FormDataImportWithTemplatesTest {
 
   @Test
-  public void testExportImport() throws ProcessingException {
+  public void testExportImport() {
     //store some values
     TestForm f = new TestForm();
     f.getText1Field().setValue("t1");

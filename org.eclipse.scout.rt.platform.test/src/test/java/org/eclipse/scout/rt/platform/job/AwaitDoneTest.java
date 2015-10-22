@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -49,7 +48,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitAllDone() throws ProcessingException {
+  public void testAwaitAllDone() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     m_jobManager.schedule(new Callable<Void>() {
@@ -68,7 +67,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitFutureDone1() throws ProcessingException {
+  public void testAwaitFutureDone1() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final IFuture<Void> future1 = m_jobManager.schedule(new Callable<Void>() {
@@ -88,7 +87,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitFutureDone2() throws ProcessingException {
+  public void testAwaitFutureDone2() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
@@ -126,7 +125,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitDoneOrBlocked() throws ProcessingException {
+  public void testAwaitDoneOrBlocked() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition bc = m_jobManager.createBlockingCondition("bc", true);
@@ -150,7 +149,7 @@ public class AwaitDoneTest {
    * Tests that 'JobManager.awaitDone' returns once the Future is cancelled, even if that job is still runnning.
    */
   @Test
-  public void testAwaitDoneWithCancelledJob() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneWithCancelledJob() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
 

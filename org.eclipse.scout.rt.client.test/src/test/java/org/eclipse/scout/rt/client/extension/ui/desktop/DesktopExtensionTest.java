@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -24,7 +23,7 @@ import org.junit.Test;
 public class DesktopExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testExecInitExtension() throws ProcessingException {
+  public void testExecInitExtension() {
     BEANS.get(IExtensionRegistry.class).register(DesktopExt01.class, Desktop.class);
     // test code
     new Desktop().initDesktop();
@@ -37,7 +36,7 @@ public class DesktopExtensionTest extends AbstractLocalExtensionTestCase {
   private static class Desktop extends AbstractDesktop {
 
     @Override
-    protected void execInit() throws ProcessingException {
+    protected void execInit() {
       desktopExecInitCounter.incrementAndGet();
       super.execInit();
     }
@@ -52,7 +51,7 @@ public class DesktopExtensionTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
-    public void execInit(DesktopInitChain chain) throws ProcessingException {
+    public void execInit(DesktopInitChain chain) {
       ext01ExecInitCounter.incrementAndGet();
       chain.execInit();
     }

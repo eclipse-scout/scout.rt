@@ -16,7 +16,6 @@ import java.util.Calendar;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -44,7 +43,7 @@ public class SchedulerTest {
   private Ticker m_ticker;
 
   @Before
-  public void before() throws ProcessingException {
+  public void before() {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("john"));
     subject.setReadOnly();
@@ -58,7 +57,7 @@ public class SchedulerTest {
   }
 
   @Test
-  public void testRunningJobCount() throws ProcessingException, InterruptedException {
+  public void testRunningJobCount() throws InterruptedException {
     IScheduler scheduler = new Scheduler(m_ticker, m_runContext);
     scheduler.addJob(new JobAcceptTick("groupId", "jobIdAccept"));
     scheduler.addJob(new JobDontAcceptTick("groupId", "jobIdDontAccept"));
@@ -87,7 +86,7 @@ class JobAcceptTick extends AbstractSchedulerJob {
   }
 
   @Override
-  public void run(IScheduler scheduler, TickSignal signal) throws ProcessingException {
+  public void run(IScheduler scheduler, TickSignal signal) {
     try {
       Thread.sleep(200);
     }

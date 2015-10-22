@@ -86,7 +86,7 @@ public abstract class AbstractHttpSessionCacheService implements IHttpSessionCac
    *          Object to serialize
    * @return {@link String}
    */
-  protected String serializedString(Object e) throws ProcessingException {
+  protected String serializedString(Object e) {
     try {
       byte[] bytes = m_objs.serialize(e);
       return HexUtility.encode(bytes);

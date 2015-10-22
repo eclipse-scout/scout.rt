@@ -70,10 +70,10 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
    */
   @ConfigOperation
   @Order(120)
-  protected void execInitForm() throws ProcessingException {
+  protected void execInitForm() {
   }
 
-  protected IForm createForm() throws ProcessingException {
+  protected IForm createForm() {
     if (getConfiguredForm() == null) {
       return null;
     }
@@ -92,7 +92,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
    * The default uses {@link IForm#start()} and therefore expects a form handler to be previously set. Override to call
    * a custom start method or implement a {@link IForm#start()} on the detail form.
    */
-  protected void startForm() throws ProcessingException {
+  protected void startForm() {
     getForm().start();
   }
 
@@ -111,7 +111,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
   }
 
   @Override
-  protected void execSelectionChanged(boolean selected) throws ProcessingException {
+  protected void execSelectionChanged(boolean selected) {
     if (!selected) {
       return;
     }
@@ -125,7 +125,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     ensureFormStarted();
   }
 
-  public void ensureFormCreated() throws ProcessingException {
+  public void ensureFormCreated() {
     if (getForm() != null) {
       return;
     }
@@ -137,7 +137,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     }
   }
 
-  public void ensureFormStarted() throws ProcessingException {
+  public void ensureFormStarted() {
     if (getForm() == null || getForm().isFormStarted()) {
       return;
     }
@@ -153,7 +153,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     return new LocalTableControlExtension<AbstractTableControl>(this);
   }
 
-  protected final void interceptInitForm() throws ProcessingException {
+  protected final void interceptInitForm() {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     TableControlInitFormChain chain = new TableControlInitFormChain(extensions);
     chain.execInitForm();
@@ -170,7 +170,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     }
 
     @Override
-    public void execInitForm(TableControlInitFormChain chain) throws ProcessingException {
+    public void execInitForm(TableControlInitFormChain chain) {
       getOwner().execInitForm();
     }
 

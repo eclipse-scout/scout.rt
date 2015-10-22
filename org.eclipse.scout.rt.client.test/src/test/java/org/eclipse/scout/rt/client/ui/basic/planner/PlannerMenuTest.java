@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.PlannerMenuType;
@@ -59,7 +58,7 @@ public class PlannerMenuTest {
    * Tests that {@link AbstractMenu#execOwnerValueChanged} is called for resource menu
    */
   @Test
-  public void testOwnerValueOnResourceSelection() throws ProcessingException {
+  public void testOwnerValueOnResourceSelection() {
     final ContextMenuPlanner planner = createContextMenuPlanner();
     addTestMenus(planner);
     planner.selectResource(planner.getResources().get(0));
@@ -75,7 +74,7 @@ public class PlannerMenuTest {
    * Tests that {@link AbstractMenu#execOwnerValueChanged} is called for range menu
    */
   @Test
-  public void testOwnerValueOnRangeSelection() throws ProcessingException {
+  public void testOwnerValueOnRangeSelection() {
     final ContextMenuPlanner planner = createContextMenuPlanner();
     addTestMenus(planner);
     planner.selectResource(planner.getResources().get(0));
@@ -92,7 +91,7 @@ public class PlannerMenuTest {
    * Tests that {@link AbstractMenu#execOwnerValueChanged} is called for empty space menus
    */
   @Test
-  public void testOwnerValueOnEmptySpace() throws ProcessingException {
+  public void testOwnerValueOnEmptySpace() {
     final ContextMenuPlanner planner = createContextMenuPlanner();
     planner.selectResource(planner.getResources().get(0));
     addTestMenus(planner);
@@ -115,7 +114,7 @@ public class PlannerMenuTest {
     planner.addMenu(m_rangeMenu);
   }
 
-  private ContextMenuPlanner createContextMenuPlanner() throws ProcessingException {
+  private ContextMenuPlanner createContextMenuPlanner() {
     final ContextMenuPlanner planner = new ContextMenuPlanner();
     Resource<Integer> resource = createResource(1);
     Activity<Resource<Integer>, Integer> activity = createActivity(resource, 10);

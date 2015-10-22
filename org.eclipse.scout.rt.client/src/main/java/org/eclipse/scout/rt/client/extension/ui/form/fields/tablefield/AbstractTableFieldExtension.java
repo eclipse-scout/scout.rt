@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldReloadTableDataChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveChain;
@@ -20,22 +19,22 @@ public abstract class AbstractTableFieldExtension<T extends ITable, OWNER extend
   }
 
   @Override
-  public void execReloadTableData(TableFieldReloadTableDataChain<? extends ITable> chain) throws ProcessingException {
+  public void execReloadTableData(TableFieldReloadTableDataChain<? extends ITable> chain) {
     chain.execReloadTableData();
   }
 
   @Override
-  public void execSaveInsertedRow(TableFieldSaveInsertedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public void execSaveInsertedRow(TableFieldSaveInsertedRowChain<? extends ITable> chain, ITableRow row) {
     chain.execSaveInsertedRow(row);
   }
 
   @Override
-  public void execSaveUpdatedRow(TableFieldSaveUpdatedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public void execSaveUpdatedRow(TableFieldSaveUpdatedRowChain<? extends ITable> chain, ITableRow row) {
     chain.execSaveUpdatedRow(row);
   }
 
   @Override
-  public void execSaveDeletedRow(TableFieldSaveDeletedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public void execSaveDeletedRow(TableFieldSaveDeletedRowChain<? extends ITable> chain, ITableRow row) {
     chain.execSaveDeletedRow(row);
   }
 

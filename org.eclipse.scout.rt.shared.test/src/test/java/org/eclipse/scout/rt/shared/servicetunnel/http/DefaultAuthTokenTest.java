@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.HexUtility;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -54,7 +53,7 @@ public class DefaultAuthTokenTest {
   }
 
   @BeforeClass
-  public static void beforeClass() throws ProcessingException {
+  public static void beforeClass() {
     s_pair = SecurityUtility.generateKeyPair();
     s_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(AuthTokenPrivateKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPrivateKeyPropertyEx()),
@@ -67,7 +66,7 @@ public class DefaultAuthTokenTest {
   }
 
   @Test
-  public void testSimple() throws ProcessingException {
+  public void testSimple() {
     Assert.assertTrue(DefaultAuthToken.isActive());
 
     DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
@@ -96,7 +95,7 @@ public class DefaultAuthTokenTest {
   }
 
   @Test
-  public void testWithCustomToken() throws ProcessingException {
+  public void testWithCustomToken() {
     Assert.assertTrue(DefaultAuthToken.isActive());
 
     DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);

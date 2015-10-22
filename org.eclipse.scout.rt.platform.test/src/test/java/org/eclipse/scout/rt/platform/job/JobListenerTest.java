@@ -22,7 +22,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -119,7 +118,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testGlobalListener1() throws ProcessingException {
+  public void testGlobalListener1() {
     P_JobChangeListener listener = new P_JobChangeListener();
     m_jobManager.addListener(listener);
 
@@ -133,7 +132,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testGlobalListener2() throws ProcessingException, InterruptedException {
+  public void testGlobalListener2() throws InterruptedException {
     P_JobChangeListener listener = new P_JobChangeListener();
     m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SCHEDULED, JobEventType.DONE), listener);
 
@@ -147,7 +146,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testLocalListener1() throws ProcessingException {
+  public void testLocalListener1() {
     IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
 
     P_JobChangeListener listener = new P_JobChangeListener();
@@ -162,7 +161,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testLocalListener2a() throws ProcessingException {
+  public void testLocalListener2a() {
     IFuture<Void> future1 = runJob(0, TimeUnit.MILLISECONDS);
     future1.awaitDone();
 
@@ -178,7 +177,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testLocalListener2b() throws ProcessingException {
+  public void testLocalListener2b() {
     IFuture<Void> future1 = runJob(0, TimeUnit.MILLISECONDS);
     future1.awaitDone();
 
@@ -194,7 +193,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testLocalListener3() throws ProcessingException {
+  public void testLocalListener3() {
     IFuture<Void> future1 = runJob(0, TimeUnit.MILLISECONDS);
     future1.awaitDone();
 
@@ -210,7 +209,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testLocalListener4() throws ProcessingException {
+  public void testLocalListener4() {
     IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
 
     P_JobChangeListener listener = new P_JobChangeListener();
@@ -225,7 +224,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testLocalListener5() throws ProcessingException {
+  public void testLocalListener5() {
     IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
 
     P_JobChangeListener listener = new P_JobChangeListener();

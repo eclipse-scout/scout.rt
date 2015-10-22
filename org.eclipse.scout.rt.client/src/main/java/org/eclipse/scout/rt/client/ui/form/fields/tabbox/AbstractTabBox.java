@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -67,7 +66,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @ConfigOperation
   @Order(70)
-  protected void execTabSelected(IGroupBox selectedBox) throws ProcessingException {
+  protected void execTabSelected(IGroupBox selectedBox) {
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -207,7 +206,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
   }
 
-  protected final void interceptTabSelected(IGroupBox selectedBox) throws ProcessingException {
+  protected final void interceptTabSelected(IGroupBox selectedBox) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TabBoxTabSelectedChain chain = new TabBoxTabSelectedChain(extensions);
     chain.execTabSelected(selectedBox);
@@ -220,7 +219,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
 
     @Override
-    public void execTabSelected(TabBoxTabSelectedChain chain, IGroupBox selectedBox) throws ProcessingException {
+    public void execTabSelected(TabBoxTabSelectedChain chain, IGroupBox selectedBox) {
       getOwner().execTabSelected(selectedBox);
     }
   }

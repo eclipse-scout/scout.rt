@@ -61,10 +61,10 @@ public final class TreeNodeChains {
       super(extensions);
     }
 
-    public ITreeNode execResolveVirtualChildNode(final IVirtualTreeNode node) throws ProcessingException {
+    public ITreeNode execResolveVirtualChildNode(final IVirtualTreeNode node) {
       MethodInvocation<ITreeNode> methodInvocation = new MethodInvocation<ITreeNode>() {
         @Override
-        protected void callMethod(ITreeNodeExtension<? extends AbstractTreeNode> next) throws ProcessingException {
+        protected void callMethod(ITreeNodeExtension<? extends AbstractTreeNode> next) {
           setReturnValue(next.execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain.this, node));
         }
       };

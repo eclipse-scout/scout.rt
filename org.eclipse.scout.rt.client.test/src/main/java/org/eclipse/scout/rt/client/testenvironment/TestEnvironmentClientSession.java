@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.testenvironment;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -39,7 +38,7 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   }
 
   @Override
-  protected void execLoadSession() throws ProcessingException {
+  protected void execLoadSession() {
     //do not enable client notifications, do not add service tunnel
     final TestEnvironmentDesktop d = new TestEnvironmentDesktop();
     setDesktop(d);

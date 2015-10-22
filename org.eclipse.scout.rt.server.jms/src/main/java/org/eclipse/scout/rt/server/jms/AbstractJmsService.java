@@ -80,7 +80,7 @@ public abstract class AbstractJmsService<T> implements IService {
     return m_connection;
   }
 
-  protected synchronized void setupConnection() throws ProcessingException {
+  protected synchronized void setupConnection() {
     closeConnection();
     ConnectionFactory connectionFactory = getConnectionFactory();
     Connection con;
@@ -103,7 +103,7 @@ public abstract class AbstractJmsService<T> implements IService {
     m_connection = con;
   }
 
-  protected synchronized void closeConnection() throws ProcessingException {
+  protected synchronized void closeConnection() {
     Connection connection = m_connection;
     if (connection != null) {
       m_connection = null;

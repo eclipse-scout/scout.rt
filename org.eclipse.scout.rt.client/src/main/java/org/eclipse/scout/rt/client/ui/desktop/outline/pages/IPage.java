@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -41,7 +40,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
 
   T getTable();
 
-  void initPage() throws ProcessingException;
+  void initPage();
 
   /**
    * This method is used to override the bookmark identifier used for this page in case multiple instances of this page
@@ -59,7 +58,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
    * Reload this page content.<br>
    * This will first remove all child nodes, add new nodes/table rows and trigger execPageDataLoaded
    */
-  void reloadPage() throws ProcessingException;
+  void reloadPage();
 
   /**
    * @return the detail form, the detail form is not automatically started<br>

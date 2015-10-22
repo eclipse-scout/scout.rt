@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 
 public final class TestMemoryUsage {
   private final Cell[] mv;
 
-  private TestMemoryUsage(int rows, int cols) throws ProcessingException {
+  private TestMemoryUsage(int rows, int cols) {
     mv = new Cell[rows * cols];
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
@@ -29,7 +28,7 @@ public final class TestMemoryUsage {
     }
   }
 
-  public static void main(String[] args) throws ProcessingException {
+  public static void main(String[] args) {
     System.gc();
     long max0 = Runtime.getRuntime().maxMemory();
     long total0 = Runtime.getRuntime().totalMemory();

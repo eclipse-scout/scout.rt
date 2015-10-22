@@ -29,10 +29,10 @@ public final class TreeBoxChains {
       super(extensions);
     }
 
-    public void execFilterNewNode(final ITreeNode newNode, final int treeLevel) throws ProcessingException {
+    public void execFilterNewNode(final ITreeNode newNode, final int treeLevel) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) throws ProcessingException {
+        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) {
           next.execFilterNewNode(TreeBoxFilterNewNodeChain.this, newNode, treeLevel);
         }
       };
@@ -50,10 +50,10 @@ public final class TreeBoxChains {
       super(extensions);
     }
 
-    public void execLoadChildNodes(final ITreeNode parentNode) throws ProcessingException {
+    public void execLoadChildNodes(final ITreeNode parentNode) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) throws ProcessingException {
+        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) {
           next.execLoadChildNodes(TreeBoxLoadChildNodesChain.this, parentNode);
         }
       };
@@ -71,10 +71,10 @@ public final class TreeBoxChains {
       super(extensions);
     }
 
-    public void execPrepareLookup(final ILookupCall<T> call, final ITreeNode parent) throws ProcessingException {
+    public void execPrepareLookup(final ILookupCall<T> call, final ITreeNode parent) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) throws ProcessingException {
+        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) {
           next.execPrepareLookup(TreeBoxPrepareLookupChain.this, call, parent);
         }
       };
@@ -92,10 +92,10 @@ public final class TreeBoxChains {
       super(extensions);
     }
 
-    public void execFilterLookupResult(final ILookupCall<T> call, final List<ILookupRow<T>> result) throws ProcessingException {
+    public void execFilterLookupResult(final ILookupCall<T> call, final List<ILookupRow<T>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) throws ProcessingException {
+        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) {
           next.execFilterLookupResult(TreeBoxFilterLookupResultChain.this, call, result);
         }
       };

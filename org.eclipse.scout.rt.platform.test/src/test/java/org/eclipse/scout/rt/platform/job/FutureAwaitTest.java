@@ -64,7 +64,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDone_Interrupted() throws InterruptedException, ProcessingException {
+  public void testAwaitDone_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Thread> thread = new AtomicReference<>();
     final AtomicReference<Throwable> error = new AtomicReference<>();
@@ -110,7 +110,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDone_Cancelled() throws InterruptedException, ProcessingException {
+  public void testAwaitDone_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -154,7 +154,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDone_ComputationFailed() throws InterruptedException, ProcessingException {
+  public void testAwaitDone_ComputationFailed() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
@@ -205,7 +205,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneWithTimeout_Interrupted() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneWithTimeout_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Thread> thread = new AtomicReference<>();
     final AtomicReference<Throwable> error = new AtomicReference<>();
@@ -251,7 +251,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneWithTimeout_Cancelled() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneWithTimeout_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -295,7 +295,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneWithTimeout_Timeout() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneWithTimeout_Timeout() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -338,7 +338,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneWithTimeout_ComputationFailed() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneWithTimeout_ComputationFailed() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
@@ -389,7 +389,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGet_Interrupted() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGet_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Thread> thread = new AtomicReference<>();
     final AtomicReference<Throwable> error = new AtomicReference<>();
@@ -435,7 +435,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGet_Cancelled() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGet_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -480,7 +480,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGet_ComputationFailed() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGet_ComputationFailed() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
@@ -524,7 +524,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_Interrupted() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGetWithTimeout_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Thread> thread = new AtomicReference<>();
     final AtomicReference<Throwable> error = new AtomicReference<>();
@@ -570,7 +570,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_Cancelled() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGetWithTimeout_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -615,7 +615,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_ComputationFailed() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGetWithTimeout_ComputationFailed() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
@@ -659,7 +659,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_Timeout() throws InterruptedException, ProcessingException {
+  public void testAwaitDoneAndGetWithTimeout_Timeout() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -702,7 +702,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testJobManagerAwaitDone_Interrupted() throws InterruptedException, ProcessingException {
+  public void testJobManagerAwaitDone_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Thread> thread = new AtomicReference<>();
     final AtomicReference<Throwable> error = new AtomicReference<>();
@@ -748,7 +748,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testJobManagerAwaitDone_Cancelled() throws InterruptedException, ProcessingException {
+  public void testJobManagerAwaitDone_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -792,7 +792,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testJobManagerAwaitDone_Timeout() throws InterruptedException, ProcessingException {
+  public void testJobManagerAwaitDone_Timeout() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -835,7 +835,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testJobManagerAwaitDone_ComputationFailed() throws InterruptedException, ProcessingException {
+  public void testJobManagerAwaitDone_ComputationFailed() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
@@ -879,7 +879,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testBlockingConditionWaitFor_Interrupted() throws InterruptedException, ProcessingException {
+  public void testBlockingConditionWaitFor_Interrupted() throws InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
 
     final AtomicReference<Thread> thread = new AtomicReference<>();
@@ -911,7 +911,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testBlockingConditionWaitFor_Timeout() throws InterruptedException, ProcessingException {
+  public void testBlockingConditionWaitFor_Timeout() throws InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
 
     // Run test and verify

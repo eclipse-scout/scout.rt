@@ -51,7 +51,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     if (m_tabBox == null) {
       return;
     }
@@ -63,7 +63,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
     rebuildTableRows();
   }
 
-  public void rebuildTableRows() throws ProcessingException {
+  public void rebuildTableRows() {
     if (m_tabBox == null) {
       return;
     }
@@ -93,7 +93,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
   public class Table extends AbstractMobileTable {
 
     @Override
-    protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+    protected void execRowsSelected(List<? extends ITableRow> rows) {
       if (getSelectedRow() == null) {
         return;
       }

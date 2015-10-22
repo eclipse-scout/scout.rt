@@ -40,12 +40,12 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
 
   private LOOKUP_KEY m_lastSelectedKey;
 
-  public TableProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
+  public TableProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
     super(contentAssistField, allowCustomText);
   }
 
   @Override
-  protected IContentAssistFieldTable createModel() throws ProcessingException {
+  protected IContentAssistFieldTable createModel() {
     IContentAssistFieldTable<LOOKUP_KEY> table = createConfiguredOrDefaultModel(IContentAssistFieldTable.class);
     table.setMultilineText(m_contentAssistField.isMultilineText());
     table.addTableListener(new TableListener() {
@@ -70,7 +70,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   }
 
   @Override
-  protected IContentAssistFieldTable<LOOKUP_KEY> createDefaultModel() throws ProcessingException {
+  protected IContentAssistFieldTable<LOOKUP_KEY> createDefaultModel() {
     return new P_DefaultProposalTable<>();
   }
 
@@ -96,7 +96,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   }
 
   @Override
-  public void forceProposalSelection() throws ProcessingException {
+  public void forceProposalSelection() {
     m_model.selectNextRow();
   }
 
@@ -204,7 +204,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
    */
   @ConfigOperation
   @Order(130)
-  protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
+  protected void execResultTableRowClicked(ITableRow row) {
     ILookupRow<LOOKUP_KEY> lrow = m_model.getSelectedLookupRow();
     if (lrow != null && lrow.isEnabled()) {
       m_contentAssistField.acceptProposal();

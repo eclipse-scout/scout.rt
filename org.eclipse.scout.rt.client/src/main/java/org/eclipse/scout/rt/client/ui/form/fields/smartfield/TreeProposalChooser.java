@@ -62,12 +62,12 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   private IFuture<?> m_populateInitialTreeJob;
   private boolean m_modelExternallyManaged = false;
 
-  public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
+  public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
     super(contentAssistField, allowCustomText);
   }
 
   @Override
-  protected ITree createModel() throws ProcessingException {
+  protected ITree createModel() {
     m_activeNodesFilter = new P_ActiveNodesFilter();
     m_matchingNodesFilter = new P_MatchingNodesFilter();
 
@@ -77,7 +77,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   }
 
   @Override
-  protected ITree createDefaultModel() throws ProcessingException {
+  protected ITree createDefaultModel() {
     return new P_DefaultProposalTree();
   }
 
@@ -111,7 +111,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   }
 
   @Override
-  public void forceProposalSelection() throws ProcessingException {
+  public void forceProposalSelection() {
     m_model.selectNextNode();
   }
 
@@ -150,7 +150,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    * @throws ProcessingException
    */
   @Override
-  protected void init() throws ProcessingException {
+  protected void init() {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
       // do sync
       loadRootNode();
@@ -201,7 +201,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    *
    * @throws ProcessingException
    */
-  private void commitPopulateInitialTree() throws ProcessingException {
+  private void commitPopulateInitialTree() {
     updateActiveFilter();
     if (m_selectCurrentValueRequested) {
       if (m_model.getSelectedNodeCount() == 0) {
@@ -212,7 +212,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     m_contentAssistField.doSearch(m_selectCurrentValueRequested, true);
   }
 
-  private boolean selectCurrentValueInternal() throws ProcessingException {
+  private boolean selectCurrentValueInternal() {
     final LOOKUP_KEY selectedKey = m_contentAssistField.getValueAsLookupKey();
     if (selectedKey != null) {
       //check existing tree
@@ -259,7 +259,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  private ITreeNode loadNodeWithKey(LOOKUP_KEY key) throws ProcessingException {
+  private ITreeNode loadNodeWithKey(LOOKUP_KEY key) {
     ArrayList<ILookupRow<LOOKUP_KEY>> path = new ArrayList<ILookupRow<LOOKUP_KEY>>();
     LOOKUP_KEY t = key;
     while (t != null) {
@@ -291,7 +291,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     return parentNode;
   }
 
-  private ILookupRow<LOOKUP_KEY> getLookupRowFor(LOOKUP_KEY key) throws ProcessingException {
+  private ILookupRow<LOOKUP_KEY> getLookupRowFor(LOOKUP_KEY key) {
     if (key instanceof Number && ((Number) key).longValue() == 0) {
       key = null;
     }
@@ -321,7 +321,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  private void updateSubTree(ITree tree, final ITreeNode parentNode, List<ITreeNode> subTree) throws ProcessingException {
+  private void updateSubTree(ITree tree, final ITreeNode parentNode, List<ITreeNode> subTree) {
     if (tree == null || parentNode == null || subTree == null) {
       return;
     }
@@ -329,13 +329,13 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     tree.addChildNodes(parentNode, subTree);
   }
 
-  public void loadRootNode() throws ProcessingException {
+  public void loadRootNode() {
     if (m_model != null && !m_modelExternallyManaged) {
       loadChildNodes(m_model.getRootNode());
     }
   }
 
-  public void loadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  public void loadChildNodes(ITreeNode parentNode) {
     if (m_model != null && !m_modelExternallyManaged) {
       try {
         m_model.setTreeChanging(true);
@@ -348,14 +348,14 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  protected ITreeNode createTreeNode() throws ProcessingException {
+  protected ITreeNode createTreeNode() {
     return new P_InternalTreeNode();
   }
 
   @ConfigOperation
   @Order(10)
   @SuppressWarnings("unchecked")
-  protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  protected void execLoadChildNodes(ITreeNode parentNode) {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
       //show loading status
       boolean statusWasVisible = isStatusVisible();
@@ -491,7 +491,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   private class P_DefaultProposalTree extends AbstractTree {
 
     @Override
-    protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+    protected void execNodeClick(ITreeNode node, MouseButton mouseButton) {
       if (node.isEnabled()) {
         m_contentAssistField.acceptProposal();
       }
@@ -505,7 +505,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_KEY> {
     @Override
-    protected ITreeNode createEmptyTreeNode() throws ProcessingException {
+    protected ITreeNode createEmptyTreeNode() {
       ITreeNode node = TreeProposalChooser.this.createTreeNode();
       if (m_model.getDefaultIconId() != null) {
         Cell cell = node.getCellForUpdate();
@@ -521,7 +521,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   private class P_InternalTreeNode extends AbstractTreeNode {
 
     @Override
-    public void loadChildren() throws ProcessingException {
+    public void loadChildren() {
       TreeProposalChooser.this.loadChildNodes(this);
     }
   }

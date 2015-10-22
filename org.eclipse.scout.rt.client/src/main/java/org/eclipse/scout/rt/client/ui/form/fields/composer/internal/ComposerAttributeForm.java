@@ -50,7 +50,7 @@ public class ComposerAttributeForm extends AbstractForm {
    */
   private List<String> m_selectedDisplayValues;
 
-  public ComposerAttributeForm() throws ProcessingException {
+  public ComposerAttributeForm() {
     super();
   }
 
@@ -61,7 +61,7 @@ public class ComposerAttributeForm extends AbstractForm {
     return CollectionUtility.arrayList(m_validAttributes);
   }
 
-  public void setAvailableAttributes(List<? extends IDataModelAttribute> attributes0) throws ProcessingException {
+  public void setAvailableAttributes(List<? extends IDataModelAttribute> attributes0) {
     m_validAttributes = CollectionUtility.arrayListWithoutNullElements(attributes0);
     // single observer, reload attributes listbox
     getAttributeField().loadListBoxData();
@@ -201,7 +201,7 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected List<ILookupRow<IDataModelAttribute>> execLoadTableData() throws ProcessingException {
+        protected List<ILookupRow<IDataModelAttribute>> execLoadTableData() {
           List<IDataModelAttribute> a = getAvailableAttributes();
           List<ILookupRow<IDataModelAttribute>> result = new ArrayList<ILookupRow<IDataModelAttribute>>(a.size());
           for (IDataModelAttribute attribute : a) {
@@ -228,7 +228,7 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           getTable().setMultiCheck(false);
         }
 
@@ -262,7 +262,7 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected List<ILookupRow<IDataModelAttributeOp>> execLoadTableData() throws ProcessingException {
+        protected List<ILookupRow<IDataModelAttributeOp>> execLoadTableData() {
           List<IDataModelAttributeOp> ops = null;
           IDataModelAttribute att = getAttributeField().getCheckedKey();
           if (att != null) {
@@ -312,7 +312,7 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           getTable().setMultiCheck(false);
         }
       }
@@ -335,7 +335,7 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected void execChangedValue() throws ProcessingException {
+        protected void execChangedValue() {
           IComposerValueField f = getSelectedField();
           if (f == null) {
             setSelectedValuesInternal(null);
@@ -360,7 +360,7 @@ public class ComposerAttributeForm extends AbstractForm {
 
   public class NewHandler extends AbstractFormHandler {
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       getAttributeField().getTable().selectFirstRow();
       getOperatorField().getTable().selectFirstRow();
     }
@@ -368,15 +368,15 @@ public class ComposerAttributeForm extends AbstractForm {
 
   public class ModifyHandler extends AbstractFormHandler {
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
     }
   }
 
-  public void startNew() throws ProcessingException {
+  public void startNew() {
     startInternal(new NewHandler());
   }
 
-  public void startModify() throws ProcessingException {
+  public void startModify() {
     startInternal(new ModifyHandler());
   }
 

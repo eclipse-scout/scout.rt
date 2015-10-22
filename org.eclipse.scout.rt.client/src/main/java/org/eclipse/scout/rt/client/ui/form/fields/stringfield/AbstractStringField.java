@@ -211,7 +211,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    */
   @ConfigOperation
   @Order(240)
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
   }
 
   @Override
@@ -270,7 +270,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   @Override
-  protected String validateValueInternal(String rawValue) throws ProcessingException {
+  protected String validateValueInternal(String rawValue) {
     String validValue = super.validateValueInternal(rawValue);
 
     if (validValue != null) {
@@ -430,7 +430,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   // convert string to a real string
   @Override
-  protected String parseValueInternal(String text) throws ProcessingException {
+  protected String parseValueInternal(String text) {
     if (text != null && text.length() == 0) {
       text = null;
     }
@@ -478,7 +478,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   @Override
-  public void doAction() throws ProcessingException {
+  public void doAction() {
     if (isHasAction() && isEnabled() && isVisible() && isEnabledProcessingButton()) {
       try {
         interceptAction();
@@ -577,7 +577,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     }
 
     @Override
-    public void execAction(StringFieldLinkActionChain chain) throws ProcessingException {
+    public void execAction(StringFieldLinkActionChain chain) {
       getOwner().execAction();
     }
 
@@ -594,7 +594,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     chain.execDropRequest(transferObject);
   }
 
-  protected final void interceptAction() throws ProcessingException {
+  protected final void interceptAction() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     StringFieldLinkActionChain chain = new StringFieldLinkActionChain(extensions);
     chain.execAction();

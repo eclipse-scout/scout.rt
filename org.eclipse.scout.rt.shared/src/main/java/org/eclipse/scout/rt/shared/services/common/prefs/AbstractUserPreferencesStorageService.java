@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -29,7 +28,7 @@ public abstract class AbstractUserPreferencesStorageService implements IUserPref
 
   @Override
   @SuppressWarnings("unchecked")
-  public IPreferences getPreferences(ISession session, String nodeId) throws ProcessingException {
+  public IPreferences getPreferences(ISession session, String nodeId) {
     if (session == null) {
       throw new IllegalArgumentException("No user scope available.");
     }
@@ -70,5 +69,5 @@ public abstract class AbstractUserPreferencesStorageService implements IUserPref
     return "anonymous";
   }
 
-  protected abstract void load(String userScope, String nodeId, IPreferences prefsToFill) throws ProcessingException;
+  protected abstract void load(String userScope, String nodeId, IPreferences prefsToFill);
 }

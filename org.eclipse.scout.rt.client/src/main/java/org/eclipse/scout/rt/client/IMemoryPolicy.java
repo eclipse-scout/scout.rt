@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -49,26 +48,26 @@ public interface IMemoryPolicy {
    * <p>
    * For search form caching use {@link #pageSearchFormStarted(IPageWithTable)} instead.
    */
-  void pageCreated(IPage<?> page) throws ProcessingException;
+  void pageCreated(IPage<?> page);
 
   /**
    * This method is called just after a search form inside a page was started using {@link ISearchForm#startSearch()}
    */
-  void pageSearchFormStarted(IPageWithTable<?> page) throws ProcessingException;
+  void pageSearchFormStarted(IPageWithTable<?> page);
 
   /**
    * Whenever a new page is selected this method is called to give the possibility to release unused pages.
    */
-  void afterOutlineSelectionChanged(IDesktop desktop) throws ProcessingException;
+  void afterOutlineSelectionChanged(IDesktop desktop);
 
   /**
    * Before data is fetched and loaded this method is called to give the possibility to previously manipulate the table.
    */
-  void beforeTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
+  void beforeTablePageLoadData(IPageWithTable<?> page);
 
   /**
    * After data is fetched and loaded this method is called to give the possibility to manipulate the table.
    */
-  void afterTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
+  void afterTablePageLoadData(IPageWithTable<?> page);
 
 }

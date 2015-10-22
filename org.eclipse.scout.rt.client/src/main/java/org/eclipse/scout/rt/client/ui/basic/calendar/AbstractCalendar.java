@@ -180,12 +180,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   @ConfigOperation
   @Order(10)
-  protected void execInitCalendar() throws ProcessingException {
+  protected void execInitCalendar() {
   }
 
   @ConfigOperation
   @Order(15)
-  protected void execDisposeCalendar() throws ProcessingException {
+  protected void execDisposeCalendar() {
   }
 
   /**
@@ -326,7 +326,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    * This is the init of the runtime model after the table and columns are built and configured
    */
   @Override
-  public void initCalendar() throws ProcessingException {
+  public void initCalendar() {
     // init menus
     ActionUtility.initActions(getMenus());
     interceptInitCalendar();
@@ -1004,12 +1004,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
 
     @Override
-    public void execDisposeCalendar(CalendarDisposeCalendarChain chain) throws ProcessingException {
+    public void execDisposeCalendar(CalendarDisposeCalendarChain chain) {
       getOwner().execDisposeCalendar();
     }
 
     @Override
-    public void execInitCalendar(CalendarInitCalendarChain chain) throws ProcessingException {
+    public void execInitCalendar(CalendarInitCalendarChain chain) {
       getOwner().execInitCalendar();
     }
 
@@ -1021,13 +1021,13 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     chain.execFilterCalendarItems(changedProviderTypes, componentsByProvider);
   }
 
-  protected final void interceptDisposeCalendar() throws ProcessingException {
+  protected final void interceptDisposeCalendar() {
     List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
     CalendarDisposeCalendarChain chain = new CalendarDisposeCalendarChain(extensions);
     chain.execDisposeCalendar();
   }
 
-  protected final void interceptInitCalendar() throws ProcessingException {
+  protected final void interceptInitCalendar() {
     List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
     CalendarInitCalendarChain chain = new CalendarInitCalendarChain(extensions);
     chain.execInitCalendar();

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
@@ -26,12 +25,12 @@ public abstract class AbstractClientSessionExtension<OWNER extends AbstractClien
   }
 
   @Override
-  public void execStoreSession(ClientSessionStoreSessionChain chain) throws ProcessingException {
+  public void execStoreSession(ClientSessionStoreSessionChain chain) {
     chain.execStoreSession();
   }
 
   @Override
-  public void execLoadSession(ClientSessionLoadSessionChain chain) throws ProcessingException {
+  public void execLoadSession(ClientSessionLoadSessionChain chain) {
     chain.execLoadSession();
   }
 

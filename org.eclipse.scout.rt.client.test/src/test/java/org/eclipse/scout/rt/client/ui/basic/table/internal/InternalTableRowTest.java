@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -62,7 +61,7 @@ public class InternalTableRowTest {
   }
 
   @Test
-  public void testCellChange() throws ProcessingException {
+  public void testCellChange() {
     TestTable table = new TestTable();
     ITableRow row = table.createRow();
     InternalTableRow ir = new InternalTableRow(table, row);
@@ -74,7 +73,7 @@ public class InternalTableRowTest {
   }
 
   @Test
-  public void testValueChange() throws ProcessingException {
+  public void testValueChange() {
     TestTable table = new TestTable();
     ITableRow row = table.createRow();
     InternalTableRow ir = new InternalTableRow(table, row);
@@ -87,7 +86,7 @@ public class InternalTableRowTest {
   }
 
   @Test
-  public void testValueChange_NoChange() throws ProcessingException {
+  public void testValueChange_NoChange() {
     TestTable table = new TestTable();
     ITableRow row = table.createRow();
     InternalTableRow ir = new InternalTableRow(table, row);

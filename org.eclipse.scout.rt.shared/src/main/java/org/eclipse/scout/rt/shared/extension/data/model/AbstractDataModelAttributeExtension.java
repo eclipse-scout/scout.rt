@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.data.model;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains.DataModelAttributeInitAttributeChain;
@@ -28,12 +27,12 @@ public abstract class AbstractDataModelAttributeExtension<OWNER extends Abstract
   }
 
   @Override
-  public void execInitAttribute(DataModelAttributeInitAttributeChain chain) throws ProcessingException {
+  public void execInitAttribute(DataModelAttributeInitAttributeChain chain) {
     chain.execInitAttribute();
   }
 
   @Override
-  public void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call) throws ProcessingException {
+  public void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call) {
     chain.execPrepareLookup(call);
   }
 

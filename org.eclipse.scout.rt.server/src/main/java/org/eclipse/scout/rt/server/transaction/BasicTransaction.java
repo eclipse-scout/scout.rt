@@ -36,7 +36,7 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
-  public void registerMember(ITransactionMember member) throws ProcessingException {
+  public void registerMember(ITransactionMember member) {
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
       if (LOG.isDebugEnabled()) {
@@ -99,7 +99,7 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
-  public boolean commitPhase1() throws ProcessingException {
+  public boolean commitPhase1() {
     synchronized (m_memberMapLock) {
       if (m_cancelled) {
         throw new ProcessingException("Interrupted", new InterruptedException());

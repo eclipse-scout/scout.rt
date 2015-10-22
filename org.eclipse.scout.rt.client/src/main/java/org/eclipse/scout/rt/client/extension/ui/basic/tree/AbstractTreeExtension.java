@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -42,57 +41,57 @@ public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends 
   }
 
   @Override
-  public void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t) throws ProcessingException {
+  public void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t) {
     chain.execDrop(node, t);
   }
 
   @Override
-  public void execInitTree(TreeInitTreeChain chain) throws ProcessingException {
+  public void execInitTree(TreeInitTreeChain chain) {
     chain.execInitTree();
   }
 
   @Override
-  public void execDropTargetChanged(TreeDropTargetChangedChain chain, ITreeNode node) throws ProcessingException {
+  public void execDropTargetChanged(TreeDropTargetChangedChain chain, ITreeNode node) {
     chain.execDropTargetChanged(node);
   }
 
   @Override
-  public TransferObject execDrag(TreeDragNodesChain chain, Collection<ITreeNode> nodes) throws ProcessingException {
+  public TransferObject execDrag(TreeDragNodesChain chain, Collection<ITreeNode> nodes) {
     return chain.execDrag(nodes);
   }
 
   @Override
-  public void execNodeAction(TreeNodeActionChain chain, ITreeNode node) throws ProcessingException {
+  public void execNodeAction(TreeNodeActionChain chain, ITreeNode node) {
     chain.execNodeAction(node);
   }
 
   @Override
-  public void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+  public void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) {
     chain.execNodeClick(node, mouseButton);
   }
 
   @Override
-  public void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) throws ProcessingException {
+  public void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) {
     chain.execHyperlinkAction(ref);
   }
 
   @Override
-  public void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e) throws ProcessingException {
+  public void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e) {
     chain.execNodesSelected(e);
   }
 
   @Override
-  public void execDisposeTree(TreeDisposeTreeChain chain) throws ProcessingException {
+  public void execDisposeTree(TreeDisposeTreeChain chain) {
     chain.execDisposeTree();
   }
 
   @Override
-  public void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell) throws ProcessingException {
+  public void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell) {
     chain.execDecorateCell(node, cell);
   }
 
   @Override
-  public TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) throws ProcessingException {
+  public TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) {
     return chain.execDrag(node);
   }
 

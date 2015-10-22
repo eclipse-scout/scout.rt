@@ -163,7 +163,7 @@ public class ClientNotificationDispatcher {
    *
    * @throws ProcessingException
    */
-  public void waitForPendingNotifications() throws ProcessingException {
+  public void waitForPendingNotifications() {
     final Set<IFuture<?>> futures = new HashSet<>();
     synchronized (m_notificationFutures) {
       futures.addAll(m_notificationFutures);

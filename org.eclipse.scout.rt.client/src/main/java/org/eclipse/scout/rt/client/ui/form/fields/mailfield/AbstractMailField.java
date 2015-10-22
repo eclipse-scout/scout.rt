@@ -115,7 +115,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
    */
   @ConfigOperation
   @Order(230)
-  protected void execAttachementAction(File file) throws ProcessingException {
+  protected void execAttachementAction(File file) {
   }
 
   /**
@@ -127,7 +127,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
    */
   @ConfigOperation
   @Order(240)
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected void execHyperlinkAction(URL url, String path, boolean local) {
   }
 
   /**
@@ -137,7 +137,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
    */
   @ConfigOperation
   @Order(10)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
     //FIXME CGU remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
@@ -232,12 +232,12 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     return m_scrollBarEnabled;
   }
 
-  public void doAttachementAction(File file) throws ProcessingException {
+  public void doAttachementAction(File file) {
     interceptAttachementAction(file);
   }
 
   @Override
-  public void doAppLinkAction(String ref) throws ProcessingException {
+  public void doAppLinkAction(String ref) {
     interceptAppLinkAction(ref);
   }
 
@@ -278,13 +278,13 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
 
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     MailFieldHyperlinkActionChain chain = new MailFieldHyperlinkActionChain(extensions);
     chain.execHyperlinkAction(ref);
   }
 
-  protected final void interceptAttachementAction(File file) throws ProcessingException {
+  protected final void interceptAttachementAction(File file) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     MailFieldAttachementActionChain chain = new MailFieldAttachementActionChain(extensions);
     chain.execAttachementAction(file);
@@ -297,12 +297,12 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     }
 
     @Override
-    public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, String ref) throws ProcessingException {
+    public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
 
     @Override
-    public void execAttachementAction(MailFieldAttachementActionChain chain, File file) throws ProcessingException {
+    public void execAttachementAction(MailFieldAttachementActionChain chain, File file) {
       getOwner().execAttachementAction(file);
     }
   }

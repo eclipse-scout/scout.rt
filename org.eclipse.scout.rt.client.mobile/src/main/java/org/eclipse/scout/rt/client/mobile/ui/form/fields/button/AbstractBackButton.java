@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.button;
 
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 
@@ -42,7 +41,7 @@ public abstract class AbstractBackButton extends AbstractButton implements IMobi
   }
 
   @Override
-  protected void execClickAction() throws ProcessingException {
+  protected void execClickAction() {
     getForm().doOk();
   }
 

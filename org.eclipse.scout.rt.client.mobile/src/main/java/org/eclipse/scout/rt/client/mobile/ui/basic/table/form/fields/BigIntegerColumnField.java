@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigIntegerColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
 
@@ -34,7 +33,7 @@ public class BigIntegerColumnField extends AbstractBigIntegerField implements IC
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     m_propertyDelegator.dispose();
   }
 

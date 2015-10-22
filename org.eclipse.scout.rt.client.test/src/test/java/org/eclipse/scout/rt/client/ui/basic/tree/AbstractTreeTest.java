@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
@@ -69,7 +68,7 @@ public class AbstractTreeTest {
   }
 
   @Test
-  public void testNodeDropTargetChanged() throws ProcessingException {
+  public void testNodeDropTargetChanged() {
     ITreeNode a = mock(ITreeNode.class);
     ITreeNode b = mock(ITreeNode.class);
     ITreeNode c = mock(ITreeNode.class);
@@ -147,7 +146,7 @@ public class AbstractTreeTest {
     int m_execDropTargetChangedTimesCalled;
 
     @Override
-    protected void execDropTargetChanged(ITreeNode node) throws ProcessingException {
+    protected void execDropTargetChanged(ITreeNode node) {
       super.execDropTargetChanged(node);
       m_currentDropNode = node;
       m_execDropTargetChangedTimesCalled++;

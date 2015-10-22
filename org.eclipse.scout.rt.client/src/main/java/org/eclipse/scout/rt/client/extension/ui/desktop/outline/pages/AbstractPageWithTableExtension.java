@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
@@ -19,27 +18,27 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   }
 
   @Override
-  public void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
+  public void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) {
     chain.execLoadData(filter);
   }
 
   @Override
-  public IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) {
     return chain.execCreateChildPage(row);
   }
 
   @Override
-  public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) throws ProcessingException {
+  public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) {
     chain.execPopulateTable();
   }
 
   @Override
-  public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) {
     return chain.execCreateVirtualChildPage(row);
   }
 
   @Override
-  public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) throws ProcessingException {
+  public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) {
     chain.execInitSearchForm();
   }
 }

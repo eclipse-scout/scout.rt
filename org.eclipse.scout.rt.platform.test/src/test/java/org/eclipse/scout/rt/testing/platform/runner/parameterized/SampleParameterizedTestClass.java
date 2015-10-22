@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtensionTest.ParameterizedTestClassParameter;
 import org.junit.Ignore;
 import org.junit.Test;

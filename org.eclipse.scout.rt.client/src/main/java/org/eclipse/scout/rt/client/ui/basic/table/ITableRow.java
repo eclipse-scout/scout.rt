@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -78,9 +77,9 @@ public interface ITableRow {
 
   ICell getCell(int columnIndex);
 
-  void setCell(IColumn column, ICell cell) throws ProcessingException;
+  void setCell(IColumn column, ICell cell);
 
-  void setCell(int columnIndex, ICell cell) throws ProcessingException;
+  void setCell(int columnIndex, ICell cell);
 
   Cell getCellForUpdate(IColumn column);
 
@@ -94,7 +93,7 @@ public interface ITableRow {
    *
    * @return true if value was in fact changed
    */
-  boolean setCellValue(int columnIndex, Object value) throws ProcessingException;
+  boolean setCellValue(int columnIndex, Object value);
 
   /**
    * Warning: this method is not validating the new value against the corresponding table column use
@@ -102,7 +101,7 @@ public interface ITableRow {
    *
    * @return true if value was in fact changed
    */
-  boolean setCellValues(List<? extends Object> values) throws ProcessingException;
+  boolean setCellValues(List<? extends Object> values);
 
   List<Object> getKeyValues();
 
@@ -129,12 +128,12 @@ public interface ITableRow {
   /**
    * Convenience method for forced table row change
    */
-  void touch() throws ProcessingException;
+  void touch();
 
   /**
    * Convenience method for getTable().deleteRow(this);
    */
-  void delete() throws ProcessingException;
+  void delete();
 
   /**
    * Convenience method for setting background on all cells of this row

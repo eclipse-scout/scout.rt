@@ -178,7 +178,7 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
     m_serializedData = null;
   }
 
-  public byte[] getSerializedData() throws ProcessingException {
+  public byte[] getSerializedData() {
     if (m_serializedData == null) {
       try {
         m_serializedData = SerializationUtility.createObjectSerializer().serialize(this);
@@ -190,7 +190,7 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
     return m_serializedData;
   }
 
-  public void setSerializedData(byte[] data) throws ProcessingException {
+  public void setSerializedData(byte[] data) {
     try {
       Bookmark bm = SerializationUtility.createObjectSerializer().deserialize(data, Bookmark.class);
       importData(bm);

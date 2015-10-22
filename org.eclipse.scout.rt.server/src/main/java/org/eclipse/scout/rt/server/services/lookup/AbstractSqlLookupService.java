@@ -82,7 +82,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
    */
   @ConfigOperation
   @Order(10)
-  protected List<ILookupRow<T>> execLoadLookupRows(String originalSql, String preprocessedSql, ILookupCall<T> call) throws ProcessingException {
+  protected List<ILookupRow<T>> execLoadLookupRows(String originalSql, String preprocessedSql, ILookupCall<T> call) {
     Object[][] data = SQL.selectLimited(preprocessedSql, call.getMaxRowCount(), call);
     if (getConfiguredSortColumn() >= 0) {
       sortData(data, getConfiguredSortColumn());
@@ -103,13 +103,13 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
   }
 
   @Override
-  public List<ILookupRow<T>> getDataByKey(ILookupCall<T> call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByKey(ILookupCall<T> call) {
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByKey(sql), call);
   }
 
   @Override
-  public List<ILookupRow<T>> getDataByText(ILookupCall<T> call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByText(ILookupCall<T> call) {
     // change wildcards in text to db specific wildcards
     if (call.getText() != null) {
       String s = call.getText();
@@ -121,7 +121,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
   }
 
   @Override
-  public List<ILookupRow<T>> getDataByAll(ILookupCall<T> call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByAll(ILookupCall<T> call) {
     String sql = getConfiguredSqlSelect();
     if (containsRefusingAllTag(sql)) {
       throw new VetoException(ScoutTexts.get("SearchTextIsTooGeneral"));
@@ -131,7 +131,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
   }
 
   @Override
-  public List<ILookupRow<T>> getDataByRec(ILookupCall<T> call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByRec(ILookupCall<T> call) {
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByRec(sql), call);
   }

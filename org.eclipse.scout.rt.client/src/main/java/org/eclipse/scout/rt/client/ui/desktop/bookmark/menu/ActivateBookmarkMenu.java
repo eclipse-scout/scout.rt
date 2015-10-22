@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.menu;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -49,7 +48,7 @@ public class ActivateBookmarkMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (m_bookmark != null) {
       try {
         ClientSessionProvider.currentSession().getDesktop().activateBookmark(m_bookmark);

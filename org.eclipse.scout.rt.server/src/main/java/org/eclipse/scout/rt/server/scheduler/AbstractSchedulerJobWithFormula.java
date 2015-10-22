@@ -28,7 +28,7 @@ public abstract class AbstractSchedulerJobWithFormula extends AbstractSchedulerJ
   /**
    * see {@link AbstractSchedulerJobWithFormula(String, String, String, String, Object[])}
    */
-  public AbstractSchedulerJobWithFormula(String groupId, String jobId, String formula) throws ProcessingException {
+  public AbstractSchedulerJobWithFormula(String groupId, String jobId, String formula) {
     this(groupId, jobId, formula, null);
   }
 
@@ -41,7 +41,7 @@ public abstract class AbstractSchedulerJobWithFormula extends AbstractSchedulerJ
    *          (second==0) && (minute % 2 == 0) //every even minute (second==0) && (minute==0) && (hour==13) && (day==1)
    *          //every first day of each month at 13:00:00
    */
-  public AbstractSchedulerJobWithFormula(String groupId, String jobId, String formula, String action, Object... args) throws ProcessingException {
+  public AbstractSchedulerJobWithFormula(String groupId, String jobId, String formula, String action, Object... args) {
     super(groupId, jobId);
     m_action = action;
     m_args = args;
@@ -70,7 +70,7 @@ public abstract class AbstractSchedulerJobWithFormula extends AbstractSchedulerJ
     return getClass().getSimpleName() + "[" + getGroupId() + "." + getJobId() + " formula=" + m_formulaCompiled + ", action=" + m_action + ", args=" + VerboseUtility.dumpObjects(m_args) + "]";
   }
 
-  public static ISchedulingFormula createFormula(String formula) throws ProcessingException {
+  public static ISchedulingFormula createFormula(String formula) {
     try {
       return new SchedulingFormula(new FormulaParser().parse(formula));
     }

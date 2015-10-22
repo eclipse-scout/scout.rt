@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -54,7 +53,7 @@ public interface IButton extends IFormField {
   int DISPLAY_STYLE_RADIO = 2;
   int DISPLAY_STYLE_LINK = 3;
 
-  void doClick() throws ProcessingException;
+  void doClick();
 
   int getSystemType();
 

@@ -59,7 +59,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testWithCallable() throws ProcessingException {
+  public void testWithCallable() {
     IFuture<String> future = m_jobManager.schedule(new Callable<String>() {
 
       @Override
@@ -74,7 +74,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testWithRunnable() throws ProcessingException {
+  public void testWithRunnable() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
 
@@ -92,7 +92,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testProcessingExceptionWithRunnable() throws ProcessingException {
+  public void testProcessingExceptionWithRunnable() {
     final ProcessingException exception = new ProcessingException();
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -114,7 +114,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testProcessingExceptionWithCallable() throws ProcessingException {
+  public void testProcessingExceptionWithCallable() {
     final ProcessingException exception = new ProcessingException();
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -136,7 +136,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testRuntimeExceptionWithRunnable() throws ProcessingException {
+  public void testRuntimeExceptionWithRunnable() {
     final RuntimeException exception = new RuntimeException();
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -159,7 +159,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testRuntimeExceptionWithCallable() throws ProcessingException {
+  public void testRuntimeExceptionWithCallable() {
     final RuntimeException exception = new RuntimeException();
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -182,7 +182,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testExceptionExceptionWithRunnable() throws ProcessingException {
+  public void testExceptionExceptionWithRunnable() {
     final Exception exception = new Exception();
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -205,7 +205,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testExceptionExceptionWithCallable() throws ProcessingException {
+  public void testExceptionExceptionWithCallable() {
     final Exception exception = new Exception();
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -228,7 +228,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testWorkerThread() throws ProcessingException {
+  public void testWorkerThread() {
     final Set<Thread> protocol = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
     m_jobManager.schedule(new Callable<Void>() {
@@ -254,7 +254,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testThreadName() throws ProcessingException {
+  public void testThreadName() {
     Thread.currentThread().setName("main");
 
     final Holder<String> actualThreadName1 = new Holder<>();
@@ -283,7 +283,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testCurrentFuture() throws ProcessingException {
+  public void testCurrentFuture() {
     final Holder<IFuture<?>> expectedFuture1 = new Holder<>();
     final Holder<IFuture<?>> expectedFuture2 = new Holder<>();
 
@@ -324,7 +324,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testScheduleAndGet() throws ProcessingException {
+  public void testScheduleAndGet() {
     final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -378,7 +378,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testExpired() throws ProcessingException {
+  public void testExpired() {
     final AtomicBoolean executed = new AtomicBoolean(false);
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -396,7 +396,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testExpireNever() throws ProcessingException {
+  public void testExpireNever() {
     final AtomicBoolean executed = new AtomicBoolean(false);
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -413,7 +413,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testScheduleDelayed() throws ProcessingException {
+  public void testScheduleDelayed() {
     final AtomicLong tRunning = new AtomicLong();
 
     long tScheduled = System.nanoTime();
@@ -432,7 +432,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testScheduleDelayedWithMutex() throws ProcessingException {
+  public void testScheduleDelayedWithMutex() {
     final Object mutex = new Object();
 
     IFuture<String> future1 = m_jobManager.schedule(new Callable<String>() {
@@ -457,7 +457,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testScheduleWithTimeoutWithMutex() throws ProcessingException {
+  public void testScheduleWithTimeoutWithMutex() {
     final Object mutex = new Object();
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);

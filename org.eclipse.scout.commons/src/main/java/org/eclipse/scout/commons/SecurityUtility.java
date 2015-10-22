@@ -181,7 +181,7 @@ public final class SecurityUtility {
    * @throws IllegalArgumentException
    *           If the salt or key is null or empty or an unsupported keyLen has been provided.
    */
-  public static byte[] decrypt(byte[] encryptedData, String password, byte[] salt, int keyLen) throws ProcessingException {
+  public static byte[] decrypt(byte[] encryptedData, String password, byte[] salt, int keyLen) {
     return doCrypt(encryptedData, password, salt, Cipher.DECRYPT_MODE, keyLen);
   }
 
@@ -220,11 +220,11 @@ public final class SecurityUtility {
    * @throws IllegalArgumentException
    *           If the salt or key is null or empty or an unsupported keyLen has been provided.
    */
-  public static byte[] encrypt(byte[] clearTextData, String password, byte[] salt, int keyLen) throws ProcessingException {
+  public static byte[] encrypt(byte[] clearTextData, String password, byte[] salt, int keyLen) {
     return doCrypt(clearTextData, password, salt, Cipher.ENCRYPT_MODE, keyLen);
   }
 
-  protected static byte[] doCrypt(byte[] input, String password, byte[] salt, int mode, int keyLen) throws ProcessingException {
+  protected static byte[] doCrypt(byte[] input, String password, byte[] salt, int mode, int keyLen) {
     if (input == null || input.length < 1) {
       return input;
     }
@@ -275,7 +275,7 @@ public final class SecurityUtility {
    * @throws ProcessingException
    *           If the current platform does not support the SHA1PRNG number generation algorithm.
    */
-  public static byte[] createRandomBytes() throws ProcessingException {
+  public static byte[] createRandomBytes() {
     return createRandomBytes(DEFAULT_RANDOM_SIZE);
   }
 
@@ -292,7 +292,7 @@ public final class SecurityUtility {
    * @throws IllegalArgumentException
    *           if the size is less than 1.
    */
-  public static byte[] createRandomBytes(int size) throws ProcessingException {
+  public static byte[] createRandomBytes(int size) {
     if (size < 1) {
       throw new IllegalArgumentException(size + " is not a valid number for random bytes.");
     }
@@ -319,7 +319,7 @@ public final class SecurityUtility {
    *           If the current platform does not support the SHA-512 algorithm.
    * @see <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS PUB 180-4</a>
    */
-  public static byte[] hash(byte[] data, byte[] salt) throws ProcessingException {
+  public static byte[] hash(byte[] data, byte[] salt) {
     return hash(data, salt, DEFAULT_CYCLES);
   }
 
@@ -339,7 +339,7 @@ public final class SecurityUtility {
    *           If data is null.
    * @see <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS PUB 180-4</a>
    */
-  public static byte[] hash(byte[] data, byte[] salt, int iterations) throws ProcessingException {
+  public static byte[] hash(byte[] data, byte[] salt, int iterations) {
     if (data == null) {
       throw new IllegalArgumentException("no data provided");
     }
@@ -369,7 +369,7 @@ public final class SecurityUtility {
    * @throws ProcessingException
    *           When there is an error generating the new keys.
    */
-  public static KeyPairBytes generateKeyPair() throws ProcessingException {
+  public static KeyPairBytes generateKeyPair() {
     try {
       KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ASYMMETRIC_KEY_ALGORITHM, EC_ALGORITHM_PROVIDER);
       SecureRandom random = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, SUN_PROVIDER);
@@ -399,7 +399,7 @@ public final class SecurityUtility {
    * @throws ProcessingException
    *           When there is an error creating the signature.
    */
-  public static byte[] createSignature(byte[] privateKey, byte[] data) throws ProcessingException {
+  public static byte[] createSignature(byte[] privateKey, byte[] data) {
     try {
       // create private key from bytes
       KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_KEY_ALGORITHM, EC_ALGORITHM_PROVIDER);
@@ -433,7 +433,7 @@ public final class SecurityUtility {
    * @throws ProcessingException
    *           When there is an error validating the signature.
    */
-  public static boolean verifySignature(byte[] publicKey, byte[] data, byte[] signatureToVerify) throws ProcessingException {
+  public static boolean verifySignature(byte[] publicKey, byte[] data, byte[] signatureToVerify) {
     try {
       // create public key from bytes
       KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_KEY_ALGORITHM, EC_ALGORITHM_PROVIDER);

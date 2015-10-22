@@ -58,7 +58,7 @@ public class MailUtilityTest {
    *           ,MessagingException
    */
   @Test
-  public void testMimeMessageWithoutSender() throws ProcessingException, MessagingException {
+  public void testMimeMessageWithoutSender() throws MessagingException {
     MailMessage definition = new MailMessage().withBodyPlainText("Body");
     MimeMessage message = MailUtility.createMimeMessage(definition);
     assertNotNull(message);
@@ -84,7 +84,7 @@ public class MailUtilityTest {
   }
 
   @Test
-  public void testDataSourceWithoutFileExtension() throws ProcessingException, IOException, MessagingException {
+  public void testDataSourceWithoutFileExtension() throws IOException, MessagingException {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     final String fileName = "test.file";
 
@@ -103,7 +103,7 @@ public class MailUtilityTest {
   }
 
   @Test
-  public void testGetParts() throws ProcessingException, IOException, MessagingException {
+  public void testGetParts() throws IOException, MessagingException {
     final String plainText = "plain text";
     final String htmlText = "<html><body><p>plain text</p></body></html>";
     MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(htmlText);
@@ -183,7 +183,7 @@ public class MailUtilityTest {
   }
 
   @Test
-  public void testInlineAttachmentCollector() throws MessagingException, ProcessingException {
+  public void testInlineAttachmentCollector() throws MessagingException {
     CharsetSafeMimeMessage message = new CharsetSafeMimeMessage();
     MimeMultipart multiPart = new MimeMultipart();
     message.setContent(multiPart);
@@ -210,7 +210,7 @@ public class MailUtilityTest {
   }
 
   @Test
-  public void testAddAttachmentsToMimeMessage() throws ProcessingException, IOException, MessagingException {
+  public void testAddAttachmentsToMimeMessage() throws IOException, MessagingException {
     // create html mime message without attachments
     final String plainText = "plain text";
     final String html = "<html><body><p>plain text</p></html>";
@@ -245,7 +245,7 @@ public class MailUtilityTest {
   }
 
   @Test
-  public void testAddResourcesAsAttachments() throws ProcessingException, IOException, MessagingException {
+  public void testAddResourcesAsAttachments() throws IOException, MessagingException {
     // create html mime message without attachments
     final String plainText = "plain text";
     final String html = "<html><body><p>plain text</p></html>";
@@ -369,7 +369,7 @@ public class MailUtilityTest {
    * @throws IOException
    * @throws MessagingException
    */
-  private void verifyMimeMessage(MimeMessage message, String plainText, String htmlText, String... attachmentFilenames) throws ProcessingException, IOException, MessagingException {
+  private void verifyMimeMessage(MimeMessage message, String plainText, String htmlText, String... attachmentFilenames) throws IOException, MessagingException {
     if (plainText != null) {
       Assert.assertEquals("wrong plain text", plainText, MailUtility.getPlainText(message));
     }

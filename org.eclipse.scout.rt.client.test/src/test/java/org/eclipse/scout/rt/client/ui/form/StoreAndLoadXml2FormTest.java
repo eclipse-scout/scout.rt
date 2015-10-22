@@ -15,7 +15,6 @@ import static org.junit.Assert.assertArrayEquals;
 import java.io.Serializable;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
@@ -85,7 +84,7 @@ public class StoreAndLoadXml2FormTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -94,7 +93,7 @@ public class StoreAndLoadXml2FormTest {
       return "TestForm";
     }
 
-    public void startModify() throws ProcessingException {
+    public void startModify() {
       startInternal(new ModifyHandler());
     }
 
@@ -136,7 +135,7 @@ public class StoreAndLoadXml2FormTest {
           }
 
           @Override
-          protected void execReloadTableData() throws ProcessingException {
+          protected void execReloadTableData() {
             Object[][] data = TABLE_DATA;
             getTable().replaceRowsByMatrix(data);
             super.execReloadTableData();
@@ -205,7 +204,7 @@ public class StoreAndLoadXml2FormTest {
 
     public class ModifyHandler extends AbstractFormHandler {
       @Override
-      protected void execLoad() throws ProcessingException {
+      protected void execLoad() {
         getTableField().reloadTableData();
       }
     }

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -39,7 +38,7 @@ public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttri
   }
 
   @Override
-  protected List<ILookupRow<IDataModelAttributeOp>> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<IDataModelAttributeOp>> execCreateLookupRows() {
     List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>();
     List<IDataModelAttributeOp> ops = null;
     if (m_attribute != null) {

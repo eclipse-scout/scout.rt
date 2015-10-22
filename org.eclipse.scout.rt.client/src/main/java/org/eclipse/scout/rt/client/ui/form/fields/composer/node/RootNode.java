@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -69,7 +68,7 @@ public class RootNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       ITreeNode node = getComposerField().addEitherNode(RootNode.this, false);
       getComposerField().addAdditionalOrNode(node, false);
     }

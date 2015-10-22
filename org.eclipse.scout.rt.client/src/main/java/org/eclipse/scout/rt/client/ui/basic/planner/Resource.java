@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
@@ -113,7 +112,7 @@ public class Resource<RI> implements ICellObserver, IActivityObserver {
   }
 
   @Override
-  public Object validateValue(ICell cell, Object value) throws ProcessingException {
+  public Object validateValue(ICell cell, Object value) {
     return null;
   }
 

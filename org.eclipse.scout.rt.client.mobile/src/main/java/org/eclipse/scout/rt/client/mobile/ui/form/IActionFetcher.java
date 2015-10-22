@@ -12,12 +12,11 @@ package org.eclipse.scout.rt.client.mobile.ui.form;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
  * @since 3.9.0
  */
 public interface IActionFetcher {
-  List<IMenu> fetch() throws ProcessingException;
+  List<IMenu> fetch();
 }

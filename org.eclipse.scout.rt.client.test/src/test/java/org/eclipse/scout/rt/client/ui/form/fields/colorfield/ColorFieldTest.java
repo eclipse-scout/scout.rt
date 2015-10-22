@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -40,7 +39,7 @@ public class ColorFieldTest {
   protected TestForm m_form;
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     m_form = new TestForm();
     m_form.startForm();
   }
@@ -116,7 +115,7 @@ public class ColorFieldTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -125,7 +124,7 @@ public class ColorFieldTest {
       return "SmartField Form";
     }
 
-    public void startForm() throws ProcessingException {
+    public void startForm() {
       startInternal(new FormHandler());
     }
 

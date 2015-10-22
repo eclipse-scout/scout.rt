@@ -162,13 +162,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   @ConfigOperation
   @Order(500)
-  protected TransferObject execDragRequest() throws ProcessingException {
+  protected TransferObject execDragRequest() {
     return null;
   }
 
   @ConfigOperation
   @Order(510)
-  protected void execDropRequest(TransferObject transferObject) throws ProcessingException {
+  protected void execDropRequest(TransferObject transferObject) {
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -218,7 +218,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     super.initFieldInternal();
     // init actions
     ActionUtility.initActions(getMenus());
@@ -522,13 +522,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   }// end private class
 
-  protected final TransferObject interceptDragRequest() throws ProcessingException {
+  protected final TransferObject interceptDragRequest() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ImageFieldDragRequestChain chain = new ImageFieldDragRequestChain(extensions);
     return chain.execDragRequest();
   }
 
-  protected final void interceptDropRequest(TransferObject transferObject) throws ProcessingException {
+  protected final void interceptDropRequest(TransferObject transferObject) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ImageFieldDropRequestChain chain = new ImageFieldDropRequestChain(extensions);
     chain.execDropRequest(transferObject);
@@ -541,12 +541,12 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
 
     @Override
-    public TransferObject execDragRequest(ImageFieldDragRequestChain chain) throws ProcessingException {
+    public TransferObject execDragRequest(ImageFieldDragRequestChain chain) {
       return getOwner().execDragRequest();
     }
 
     @Override
-    public void execDropRequest(ImageFieldDropRequestChain chain, TransferObject transferObject) throws ProcessingException {
+    public void execDropRequest(ImageFieldDropRequestChain chain, TransferObject transferObject) {
       getOwner().execDropRequest(transferObject);
     }
   }

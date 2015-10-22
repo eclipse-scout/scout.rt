@@ -16,7 +16,6 @@ import java.util.zip.CRC32;
 
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -51,7 +50,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   private final FormListener m_formListener = new FormListener() {
     @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
+    public void formChanged(FormEvent e) {
       //auto-detach
       if (!m_active) {
         e.getForm().removeFormListener(m_formListener);
@@ -107,7 +106,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
    * Attaches listener on page contents
    */
   @Override
-  public void pageCreated(IPage<?> p) throws ProcessingException {
+  public void pageCreated(IPage<?> p) {
     if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
       return;
     }
@@ -124,7 +123,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   }
 
   @Override
-  public void pageSearchFormStarted(IPageWithTable<?> p) throws ProcessingException {
+  public void pageSearchFormStarted(IPageWithTable<?> p) {
     if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
       return;
     }
@@ -211,7 +210,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     }
   }
 
-  protected void handlePageFormEvent(FormEvent e, String pageFormIdentifier) throws ProcessingException {
+  protected void handlePageFormEvent(FormEvent e, String pageFormIdentifier) {
     switch (e.getType()) {
       case FormEvent.TYPE_LOAD_COMPLETE: {
         //store form state since it was probably reset
@@ -225,15 +224,15 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     }
   }
 
-  protected void loadSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
+  protected void loadSearchFormState(IForm f, String pageFormIdentifier) {
     //nop
   }
 
-  protected void storeSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
+  protected void storeSearchFormState(IForm f, String pageFormIdentifier) {
     //nop
   }
 
-  protected void handleTableFilterEvent(TableEvent e, String id) throws ProcessingException {
+  protected void handleTableFilterEvent(TableEvent e, String id) {
     switch (e.getType()) {
       case TableEvent.TYPE_USER_FILTER_ADDED:
       case TableEvent.TYPE_USER_FILTER_REMOVED:
@@ -243,11 +242,11 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   }
 
-  protected void storeUserFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+  protected void storeUserFilterState(ITable t, String pageTableIdentifier) {
     // nop
   }
 
-  protected void loadUserFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+  protected void loadUserFilterState(ITable t, String pageTableIdentifier) {
     // nop
   }
 

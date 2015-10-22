@@ -17,7 +17,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -100,12 +99,12 @@ public class SmartFieldSingleResultTest {
     private static final long serialVersionUID = 1;
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByAll() throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByAll() {
       return LookupRows.firstRow();
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByText() throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByText() {
       return LookupRows.firstRow();
     }
 

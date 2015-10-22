@@ -68,7 +68,7 @@ public interface IScoutLogManager {
    * @throws UnsupportedOperationException
    *           is thrown if the log implementation does not support recording of log messages
    */
-  boolean startRecording() throws ProcessingException, UnsupportedOperationException;
+  boolean startRecording() throws UnsupportedOperationException;
 
   /**
    * To stop recording log messages. If no recording is in progress, this call has no effect and null is returned.

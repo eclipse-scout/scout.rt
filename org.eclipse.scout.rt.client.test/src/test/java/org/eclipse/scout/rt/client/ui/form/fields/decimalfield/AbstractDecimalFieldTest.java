@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
@@ -88,12 +87,12 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   }
 
   @Override
-  protected BigDecimal parseValueInternal(String text) throws ProcessingException {
+  protected BigDecimal parseValueInternal(String text) {
     return parseToBigDecimalInternal(text);
   }
 
   @Test
-  public void testParseToBigDecimalInternal() throws ProcessingException {
+  public void testParseToBigDecimalInternal() {
     for (Locale locale : DecimalFormat.getAvailableLocales()) {
       DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
       df.applyPattern(getFormat().toPattern());
@@ -109,7 +108,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   }
 
   @Test
-  public void testParseValueInternalPercent() throws ProcessingException {
+  public void testParseValueInternalPercent() {
     for (Locale locale : DecimalFormat.getAvailableLocales()) {
       setPercent(false);
       setMultiplier(1);
@@ -151,7 +150,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   }
 
   @Test
-  public void testSetPercent() throws ProcessingException {
+  public void testSetPercent() {
     DecimalFormat dfPercent = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
 
     // test default

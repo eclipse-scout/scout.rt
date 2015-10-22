@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -35,5 +34,5 @@ public interface IServiceTunnel {
    * The argument array may contain IHolder values which are updated as OUT parameters when the backend call has
    * completed flags are custom flags not used by the framework itself
    */
-  Object invokeService(Class<?> serviceInterfaceClass, Method operation, Object[] args) throws ProcessingException;
+  Object invokeService(Class<?> serviceInterfaceClass, Method operation, Object[] args);
 }

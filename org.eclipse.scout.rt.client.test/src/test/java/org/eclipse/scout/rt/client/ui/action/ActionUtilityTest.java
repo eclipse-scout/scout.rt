@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -129,7 +128,7 @@ public class ActionUtilityTest {
     }
 
     @Override
-    protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+    protected void execOwnerValueChanged(Object newOwnerValue) {
 
     }
   }

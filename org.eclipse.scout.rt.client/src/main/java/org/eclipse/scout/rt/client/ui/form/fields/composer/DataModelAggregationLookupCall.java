@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -53,7 +52,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
     return m_attribute;
   }
 
-  protected void updateLookupRows() throws ProcessingException {
+  protected void updateLookupRows() {
     List<ILookupRow<Integer>> result = new ArrayList<ILookupRow<Integer>>();
     int[] ags = null;
     if (m_attribute != null) {
@@ -114,7 +113,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   }
 
   @Override
-  protected List<ILookupRow<Integer>> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<Integer>> execCreateLookupRows() {
     if (m_lookupRows != null) {
       return m_lookupRows;
     }

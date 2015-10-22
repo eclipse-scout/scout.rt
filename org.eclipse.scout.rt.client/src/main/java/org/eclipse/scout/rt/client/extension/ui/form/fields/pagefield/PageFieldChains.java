@@ -27,10 +27,10 @@ public final class PageFieldChains {
       super(extensions);
     }
 
-    public void execPageChanged(final PAGE oldPage, final PAGE newPage) throws ProcessingException {
+    public void execPageChanged(final PAGE oldPage, final PAGE newPage) {
       MethodInvocation<Void> methodInvocation = new MethodInvocation<Void>() {
         @Override
-        protected void callMethod(IPageFieldExtension<PAGE, ? extends AbstractPageField<PAGE>> next) throws ProcessingException {
+        protected void callMethod(IPageFieldExtension<PAGE, ? extends AbstractPageField<PAGE>> next) {
           next.execPageChanged(PageFieldPageChangedChain.this, oldPage, newPage);
         }
       };

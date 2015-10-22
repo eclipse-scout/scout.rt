@@ -34,8 +34,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.cache.TestHttpSession;
-import org.eclipse.scout.rt.server.commons.servlet.filter.authentication.BasicSecurityFilter;
-import org.eclipse.scout.rt.server.commons.servlet.filter.authentication.PrincipalHolder;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;

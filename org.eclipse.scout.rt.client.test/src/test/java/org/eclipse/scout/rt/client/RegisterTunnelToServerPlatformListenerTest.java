@@ -12,7 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
@@ -146,7 +145,7 @@ public class RegisterTunnelToServerPlatformListenerTest {
     protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<? extends T> queryType) {
       return new IBeanInterceptor<T>() {
         @Override
-        public Object invoke(IBeanInvocationContext<T> context) throws ProcessingException {
+        public Object invoke(IBeanInvocationContext<T> context) {
           Method method = context.getTargetMethod();
           return "return " + bean.getBeanClazz().getSimpleName() + "#" + method.getName();
         }

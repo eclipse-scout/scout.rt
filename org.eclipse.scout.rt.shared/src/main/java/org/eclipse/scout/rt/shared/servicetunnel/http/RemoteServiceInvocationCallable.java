@@ -18,7 +18,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -130,7 +129,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
     }
   }
 
-  protected Boolean sendCancelRequest(long requestSequence) throws ProcessingException, NoSuchMethodException, SecurityException {
+  protected Boolean sendCancelRequest(long requestSequence) throws NoSuchMethodException, SecurityException {
     final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class,
         IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
     final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);

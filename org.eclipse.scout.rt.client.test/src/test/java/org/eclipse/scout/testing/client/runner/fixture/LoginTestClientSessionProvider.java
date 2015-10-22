@@ -17,7 +17,6 @@ import java.util.List;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -35,7 +34,7 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   }
 
   @Override
-  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) throws ProcessingException {
+  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) {
     SESSION clientSession = super.provide(runContext);
     s_currentSession = clientSession;
     return clientSession;
@@ -64,7 +63,7 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   public static class LoginTestClientSession extends TestEnvironmentClientSession {
 
     @Override
-    public void start(String sessionId) throws ProcessingException {
+    public void start(String sessionId) {
       String runAs = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
       s_beforeStartRunAs.add(runAs);
       super.start(sessionId);

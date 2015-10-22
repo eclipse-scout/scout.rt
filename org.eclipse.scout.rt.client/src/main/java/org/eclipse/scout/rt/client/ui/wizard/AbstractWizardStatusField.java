@@ -75,7 +75,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     //automatically set wizard if the field is placed inside a wizard container form
     IForm f = getForm();
     while (f != null) {
@@ -86,7 +86,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
     }
   }
 
-  public void setWizard(IWizard wizard) throws ProcessingException {
+  public void setWizard(IWizard wizard) {
     if (m_wizard != null) {
       m_wizard.removeWizardListener(m_scoutWizardListener);
       m_wizard.removePropertyChangeListener(m_scoutWizardStepListener);
@@ -115,7 +115,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     m_dirty = false;
   }
 
@@ -136,7 +136,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
     });
   }
 
-  public void refreshStatus() throws ProcessingException {
+  public void refreshStatus() {
     m_dirty = false;
     try {
       if (m_htmlProvider == null) {

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -36,7 +35,7 @@ public class AbstractTableFieldMoveRowTest extends AbstractTableField<AbstractTa
   }
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     String[] texts = new String[]{
         LOREM, IPSUM, DOLOR
     };
@@ -48,7 +47,7 @@ public class AbstractTableFieldMoveRowTest extends AbstractTableField<AbstractTa
   }
 
   @After
-  public void tearDown() throws ProcessingException {
+  public void tearDown() {
     getTable().discardAllRows();
   }
 

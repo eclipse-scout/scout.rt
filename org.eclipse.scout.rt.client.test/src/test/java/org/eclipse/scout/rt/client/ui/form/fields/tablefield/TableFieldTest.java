@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -63,7 +62,7 @@ public class TableFieldTest {
    * Tests that there is no error when adding a {@link Status#OK_STATUS} to a cell.
    */
   @Test
-  public void testOkErrorStatus_NoError() throws ProcessingException {
+  public void testOkErrorStatus_NoError() {
     P_TableField tableField = createTableField(false);
     tableField.getTable().addRowByArray(TEST_ROW);
     Cell cell = (Cell) tableField.getTable().getCell(0, 1);
@@ -77,7 +76,7 @@ public class TableFieldTest {
    * Tests that there is an error on the field, when a table field with errors is validated.
    */
   @Test
-  public void testOkErrorStatus_ErrorText() throws ProcessingException {
+  public void testOkErrorStatus_ErrorText() {
     P_TableField tableField = createTableField(false);
     tableField.getTable().addRowByArray(TEST_ROW);
     Cell cell = (Cell) tableField.getTable().getCell(0, 1);
@@ -92,7 +91,7 @@ public class TableFieldTest {
    * Tests that there is an error on the field, when a mandatory table is not filled.
    */
   @Test
-  public void testMandatory_ErrorText() throws ProcessingException {
+  public void testMandatory_ErrorText() {
     P_TableField tableField = createTableField(false);
     tableField.getTable().addRowByArray(new Object[]{1, null, false});
     Cell cell = (Cell) tableField.getTable().getCell(0, 1);
@@ -108,7 +107,7 @@ public class TableFieldTest {
    * Tests that an invisible displayable column is shown, if there is an error.
    */
   @Test
-  public void testErrorColumn_Visible() throws ProcessingException {
+  public void testErrorColumn_Visible() {
     P_TableField tableField = createTableField(false);
     tableField.getTable().addRowByArray(TEST_ROW);
     Cell cell = (Cell) tableField.getTable().getCell(0, 1);
@@ -132,7 +131,7 @@ public class TableFieldTest {
     runImportFormFieldData(tableField2);
   }
 
-  private void runImportFormFieldData(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldData(P_TableField tableField) {
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -183,7 +182,7 @@ public class TableFieldTest {
     runImportFormFieldDataWithTableValueSet(tableField2);
   }
 
-  private void runImportFormFieldDataWithTableValueSet(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldDataWithTableValueSet(P_TableField tableField) {
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -208,7 +207,7 @@ public class TableFieldTest {
     runImportFormFieldDataWithNewRow(tableField2);
   }
 
-  private void runImportFormFieldDataWithNewRow(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldDataWithNewRow(P_TableField tableField) {
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -231,7 +230,7 @@ public class TableFieldTest {
     assertHiddenColumnValues(true, false, false, tableField);
   }
 
-  private void addNewTableRow(P_TableField tableField) throws ProcessingException {
+  private void addNewTableRow(P_TableField tableField) {
     ITableRow newRow = tableField.getTable().createRow();
 
     tableField.getTable().getKeyColumn().setValue(newRow, 4);
@@ -249,7 +248,7 @@ public class TableFieldTest {
     runImportFormFieldDataWithDeletedRow(tableField2);
   }
 
-  private void runImportFormFieldDataWithDeletedRow(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldDataWithDeletedRow(P_TableField tableField) {
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -269,17 +268,17 @@ public class TableFieldTest {
     assertHiddenColumnValues(true, false, true, tableField);
   }
 
-  private void deleteFirstTwoTableRows(P_TableField tableField) throws ProcessingException {
+  private void deleteFirstTwoTableRows(P_TableField tableField) {
     tableField.getTable().deleteRows(new int[]{0, 1});
   }
 
   @Test
-  public void testValueChangedTriggersWhileImportingFormFieldData() throws ProcessingException {
+  public void testValueChangedTriggersWhileImportingFormFieldData() {
     importFormFieldDataAndCheckExecContentChangedTriggerd(true);
     importFormFieldDataAndCheckExecContentChangedTriggerd(false);
   }
 
-  private void importFormFieldDataAndCheckExecContentChangedTriggerd(boolean valueChangeTriggersEnabled) throws ProcessingException {
+  private void importFormFieldDataAndCheckExecContentChangedTriggerd(boolean valueChangeTriggersEnabled) {
     P_TableField tableField = createTableField(false);
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, valueChangeTriggersEnabled);
@@ -295,7 +294,7 @@ public class TableFieldTest {
     runImportFormFieldDataWithUpdatedRow(tableField2);
   }
 
-  private void runImportFormFieldDataWithUpdatedRow(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldDataWithUpdatedRow(P_TableField tableField) {
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -317,7 +316,7 @@ public class TableFieldTest {
     assertHiddenColumnValues(true, false, false, tableField);
   }
 
-  private void updateThirdRow(P_TableField tableField) throws ProcessingException {
+  private void updateThirdRow(P_TableField tableField) {
     ITableRow updatedRow = tableField.getTable().getRow(2);
     updatedRow.getCellForUpdate(1).setValue("Amet");
     updatedRow.getCellForUpdate(2).setValue(true);
@@ -387,7 +386,7 @@ public class TableFieldTest {
 
   }
 
-  private void runImportFormFieldDataWithAllRowStates(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldDataWithAllRowStates(P_TableField tableField) {
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -450,7 +449,7 @@ public class TableFieldTest {
     assertEquals(0, tableField.getTable().getRowCount());
   }
 
-  private void runImportFormFieldBeanDataWithAllRowStates(P_TableField tableField) throws ProcessingException {
+  private void runImportFormFieldBeanDataWithAllRowStates(P_TableField tableField) {
     P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
@@ -536,7 +535,7 @@ public class TableFieldTest {
     public class Table extends AbstractTable {
 
       @Override
-      protected void execContentChanged() throws ProcessingException {
+      protected void execContentChanged() {
         m_execContentChangedCalled = true;
       }
 

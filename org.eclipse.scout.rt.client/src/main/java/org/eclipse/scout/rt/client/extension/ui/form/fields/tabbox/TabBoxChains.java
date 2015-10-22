@@ -27,10 +27,10 @@ public final class TabBoxChains {
       super(extensions);
     }
 
-    public void execTabSelected(final IGroupBox selectedBox) throws ProcessingException {
+    public void execTabSelected(final IGroupBox selectedBox) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITabBoxExtension<? extends AbstractTabBox> next) throws ProcessingException {
+        protected void callMethod(ITabBoxExtension<? extends AbstractTabBox> next) {
           next.execTabSelected(TabBoxTabSelectedChain.this, selectedBox);
         }
       };

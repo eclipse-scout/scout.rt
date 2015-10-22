@@ -65,7 +65,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     setDefaultDrillDownStyle(getConfiguredDefaultDrillDownStyle());
   }
 
-  protected String initHtmlCellTemplate() throws ProcessingException {
+  protected String initHtmlCellTemplate() {
     try {
       return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
     }
@@ -74,7 +74,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     }
   }
 
-  protected String initHtmlDrillDown() throws ProcessingException {
+  protected String initHtmlDrillDown() {
     try {
       return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
     }
@@ -83,7 +83,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     }
   }
 
-  protected String initHtmlDrillDownButton() throws ProcessingException {
+  protected String initHtmlDrillDownButton() {
     try {
       return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
     }
@@ -125,11 +125,11 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     return false;
   }
 
-  public void updateValue(ITableRow row, ITableRow modelRow, DrillDownStyleMap drillDownStyle) throws ProcessingException {
+  public void updateValue(ITableRow row, ITableRow modelRow, DrillDownStyleMap drillDownStyle) {
     setValue(row, computeContentColumnValue(modelRow, drillDownStyle));
   }
 
-  public void updateValue(ITableRow row, ITableRow modelRow) throws ProcessingException {
+  public void updateValue(ITableRow row, ITableRow modelRow) {
     updateValue(row, modelRow, null);
   }
 
@@ -271,7 +271,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     return false;
   }
 
-  private String computeContentColumnValue(ITableRow row, DrillDownStyleMap drillDownStyles) throws ProcessingException {
+  private String computeContentColumnValue(ITableRow row, DrillDownStyleMap drillDownStyles) {
     if (row == null) {
       return null;
     }

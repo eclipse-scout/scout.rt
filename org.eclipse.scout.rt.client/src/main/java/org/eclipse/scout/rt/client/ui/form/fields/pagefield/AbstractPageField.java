@@ -69,11 +69,11 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   }
 
   @Override
-  public void setPage(PAGE newPage) throws ProcessingException {
+  public void setPage(PAGE newPage) {
     setPageInternal(newPage);
   }
 
-  private void setPageInternal(PAGE page) throws ProcessingException {
+  private void setPageInternal(PAGE page) {
     if (m_page == page) {
       return;
     }
@@ -237,7 +237,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     }
   }
 
-  protected final void interceptPageChanged(PAGE oldPage, PAGE newPage) throws ProcessingException {
+  protected final void interceptPageChanged(PAGE oldPage, PAGE newPage) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     PageFieldPageChangedChain<PAGE> chain = new PageFieldPageChangedChain<>(extensions);
     chain.execPageChanged(oldPage, newPage);
@@ -250,7 +250,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     }
 
     @Override
-    public void execPageChanged(PageFieldPageChangedChain<T> chain, T oldPage, T newPage) throws ProcessingException {
+    public void execPageChanged(PageFieldPageChangedChain<T> chain, T oldPage, T newPage) {
       getOwner().execPageChanged(oldPage, newPage);
     }
   }

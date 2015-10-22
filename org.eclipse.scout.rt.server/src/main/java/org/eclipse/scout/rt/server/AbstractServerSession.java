@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -208,7 +207,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public final void start(String sessionId) throws ProcessingException {
+  public final void start(String sessionId) {
     Assertions.assertNotNull(sessionId, "Session id must not be null");
     m_id = sessionId;
     Assertions.assertFalse(isActive(), "Session already started");
@@ -231,7 +230,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
    */
   @ConfigOperation
   @Order(10)
-  protected void execLoadSession() throws ProcessingException {
+  protected void execLoadSession() {
   }
 
   @Override
@@ -251,13 +250,13 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     }
 
     @Override
-    public void execLoadSession(ServerSessionLoadSessionChain chain) throws ProcessingException {
+    public void execLoadSession(ServerSessionLoadSessionChain chain) {
       getOwner().execLoadSession();
     }
 
   }
 
-  protected final void interceptLoadSession() throws ProcessingException {
+  protected final void interceptLoadSession() {
     List<? extends IServerSessionExtension<? extends AbstractServerSession>> extensions = getAllExtensions();
     ServerSessionLoadSessionChain chain = new ServerSessionLoadSessionChain(extensions);
     chain.execLoadSession();

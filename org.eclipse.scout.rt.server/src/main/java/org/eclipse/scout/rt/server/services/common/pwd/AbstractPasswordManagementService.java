@@ -26,13 +26,13 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
   }
 
   @Override
-  public void changePassword(String userId, String oldPassword, String newPassword) throws ProcessingException {
+  public void changePassword(String userId, String oldPassword, String newPassword) {
     checkAccess(userId, oldPassword);
     resetPassword(userId, newPassword);
   }
 
   @Override
-  public void resetPassword(String userId, String newPassword) throws ProcessingException {
+  public void resetPassword(String userId, String newPassword) {
     getPasswordPolicy().check(userId, newPassword, getUsernameFor(userId), getHistoryIndexFor(userId, newPassword));
     resetPasswordInternal(userId, newPassword);
   }
@@ -54,18 +54,18 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
    * @throws ProcessingException
    *           when the userId/password is invalid
    */
-  protected abstract void checkAccess(String userId, String password) throws ProcessingException;
+  protected abstract void checkAccess(String userId, String password);
 
-  protected abstract String getUsernameFor(String userId) throws ProcessingException;
+  protected abstract String getUsernameFor(String userId);
 
   /**
    * @return the previous passwords of the user
    */
-  protected abstract int getHistoryIndexFor(String userId, String password) throws ProcessingException;
+  protected abstract int getHistoryIndexFor(String userId, String password);
 
   /**
    * Reset the password, all checks and verifications have already been passed.
    */
-  protected abstract void resetPasswordInternal(String userId, String newPassword) throws ProcessingException;
+  protected abstract void resetPasswordInternal(String userId, String newPassword);
 
 }

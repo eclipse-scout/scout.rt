@@ -33,6 +33,6 @@ public interface IPasswordPolicy {
    * @throws ProcessingException
    *           when newPassword does not conform to this policy
    */
-  void check(String userId, String newPassword, String userName, int historyIndex) throws ProcessingException;
+  void check(String userId, String newPassword, String userName, int historyIndex);
 
 }

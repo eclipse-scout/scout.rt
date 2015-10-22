@@ -28,10 +28,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execResourcesSelected(final List<Resource<RI>> resources) throws ProcessingException {
+    public void execResourcesSelected(final List<Resource<RI>> resources) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execResourcesSelected(PlannerResourcesSelectedChain.this, resources);
         }
       };
@@ -48,10 +48,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execSelectionRangeChanged(final Range<Date> selectionRange) throws ProcessingException {
+    public void execSelectionRangeChanged(final Range<Date> selectionRange) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execSelectionRangeChanged(PlannerSelectionRangeChangedChain.this, selectionRange);
         }
       };
@@ -68,10 +68,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execViewRangeChanged(final Range<Date> viewRange) throws ProcessingException {
+    public void execViewRangeChanged(final Range<Date> viewRange) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execViewRangeChanged(PlannerViewRangeChangedChain.this, viewRange);
         }
       };
@@ -88,10 +88,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execDisplayModeChanged(final int displayMode) throws ProcessingException {
+    public void execDisplayModeChanged(final int displayMode) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execDisplayModeChanged(PlannerDisplayModeChangedChain.this, displayMode);
         }
       };
@@ -108,10 +108,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execActivitySelected(final Activity<RI, AI> cell) throws ProcessingException {
+    public void execActivitySelected(final Activity<RI, AI> cell) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execActivitySelected(PlannerActivitySelectedChain.this, cell);
         }
       };
@@ -128,10 +128,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execDisposePlanner() throws ProcessingException {
+    public void execDisposePlanner() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execDisposePlanner(PlannerDisposePlannerChain.this);
         }
       };
@@ -148,10 +148,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execDecorateActivity(final Activity<RI, AI> cell) throws ProcessingException {
+    public void execDecorateActivity(final Activity<RI, AI> cell) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execDecorateActivityCell(PlannerDecorateActivityChain.this, cell);
         }
       };
@@ -168,10 +168,10 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execInitPlanner() throws ProcessingException {
+    public void execInitPlanner() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) {
           next.execInitPlanner(PlannerInitPlannerChain.this);
         }
       };

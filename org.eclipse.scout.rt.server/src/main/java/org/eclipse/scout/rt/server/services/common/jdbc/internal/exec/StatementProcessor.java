@@ -92,15 +92,15 @@ public class StatementProcessor implements IStatementProcessor {
   private TreeMap<Integer/* jdbcBindIndex */, SqlBind> m_currentInputBindMap;
   private int m_maxFetchMemorySize;
 
-  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases) throws ProcessingException {
+  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases) {
     this(callerService, stm, bindBases, 0);
   }
 
-  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount) throws ProcessingException {
+  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount) {
     this(callerService, stm, bindBases, maxRowCount, AbstractSqlService.DEFAULT_MEMORY_PREFETCH_SIZE);
   }
 
-  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount, int maxFetchMemorySize) throws ProcessingException {
+  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount, int maxFetchMemorySize) {
     if (stm == null) {
       throw new ProcessingException("statement is null");
     }
@@ -215,7 +215,7 @@ public class StatementProcessor implements IStatementProcessor {
     return m_maxFetchSize;
   }
 
-  protected List<Object[]> processResultRows(ResultSet rs, int maxRowCount) throws SQLException, ProcessingException {
+  protected List<Object[]> processResultRows(ResultSet rs, int maxRowCount) throws SQLException {
     boolean isDynamicPrefetch = false;
     int rowCount = 0;
     int initialFetchSize = 0;
@@ -249,7 +249,7 @@ public class StatementProcessor implements IStatementProcessor {
    * server.services.common.sql.internal.exec.PreparedStatementCache)
    */
   @Override
-  public Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
+  public Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     PreparedStatement ps = null;
     ResultSet rs = null;
     try {
@@ -307,7 +307,7 @@ public class StatementProcessor implements IStatementProcessor {
    * rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
   @Override
-  public void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
+  public void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     PreparedStatement ps = null;
     ResultSet rs = null;
     try {
@@ -355,7 +355,7 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   @Override
-  public void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler) throws ProcessingException {
+  public void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler) {
     PreparedStatement ps = null;
     ResultSet rs = null;
     ISqlStyle sqlStyle = m_callerService.getSqlStyle();
@@ -422,7 +422,7 @@ public class StatementProcessor implements IStatementProcessor {
    * .rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
   @Override
-  public int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
+  public int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     PreparedStatement ps = null;
     int rowCount = 0;
     try {
@@ -463,7 +463,7 @@ public class StatementProcessor implements IStatementProcessor {
    * scout.rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
   @Override
-  public boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
+  public boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     CallableStatement cs = null;
     boolean status = true;
     try {
@@ -505,7 +505,7 @@ public class StatementProcessor implements IStatementProcessor {
    * IStatementProcessor#createPlainText()
    */
   @Override
-  public String createPlainText() throws ProcessingException {
+  public String createPlainText() {
     for (IToken t : m_ioTokens) {
       if (t instanceof ValueInputToken) {
         ValueInputToken vt = (ValueInputToken) t;
@@ -538,7 +538,7 @@ public class StatementProcessor implements IStatementProcessor {
    * IStatementProcessor#simulate()
    */
   @Override
-  public void simulate() throws ProcessingException {
+  public void simulate() {
     while (hasNextInputBatch()) {
       nextInputBatch();
       prepareInputStatementAndBinds();
@@ -591,7 +591,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private void consumeSelectIntoRow(Object[] row) throws ProcessingException {
+  private void consumeSelectIntoRow(Object[] row) {
     int index = 0;
     for (IBindOutput out : m_outputList) {
       if (out.isSelectInto()) {
@@ -601,7 +601,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private void consumeOutputRow(CallableStatement cs) throws ProcessingException, SQLException {
+  private void consumeOutputRow(CallableStatement cs) throws SQLException {
     for (IBindOutput out : m_outputList) {
       if (out.isJdbcBind()) {
         out.consumeValue(cs.getObject(out.getJdbcBindIndex()));
@@ -609,13 +609,13 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private void finishOutputBatch() throws ProcessingException {
+  private void finishOutputBatch() {
     for (IBindOutput out : m_outputList) {
       out.finishBatch();
     }
   }
 
-  private void prepareInputStatementAndBinds() throws ProcessingException {
+  private void prepareInputStatementAndBinds() {
     // bind inputs and set replace token on inputs
     m_currentInputBindMap = new TreeMap<Integer, SqlBind>();
     ISqlStyle sqlStyle = m_callerService.getSqlStyle();
@@ -848,7 +848,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private void bindBatch(PreparedStatement ps) throws ProcessingException {
+  private void bindBatch(PreparedStatement ps) {
     try {
       // bind inputs
       if (ps instanceof PreparedStatement) {
@@ -880,7 +880,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private IBindInput createInput(IToken bindToken, Object[] bindBases) throws ProcessingException {
+  private IBindInput createInput(IToken bindToken, Object[] bindBases) {
     IBindInput o = null;
     if (bindToken instanceof ValueInputToken) {
       ValueInputToken valueInputToken = (ValueInputToken) bindToken;
@@ -906,7 +906,7 @@ public class StatementProcessor implements IStatementProcessor {
     return o;
   }
 
-  private IBindInput createInputRec(ValueInputToken bindToken, String[] path, Object bindBase, Class nullType) throws ProcessingException {
+  private IBindInput createInputRec(ValueInputToken bindToken, String[] path, Object bindBase, Class nullType) {
     boolean terminal = (path.length == 1);
     Object o = null;
     boolean found = false;
@@ -1161,7 +1161,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private IBindOutput createOutput(IToken bindToken, Object[] bindBases) throws ProcessingException {
+  private IBindOutput createOutput(IToken bindToken, Object[] bindBases) {
     IBindOutput o = null;
     if (bindToken instanceof ValueOutputToken) {
       ValueOutputToken valueOutputToken = (ValueOutputToken) bindToken;
@@ -1183,7 +1183,7 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   @SuppressWarnings("unchecked")
-  private IBindOutput createOutputRec(ValueOutputToken bindToken, String[] path, final Object bindBase) throws ProcessingException {
+  private IBindOutput createOutputRec(ValueOutputToken bindToken, String[] path, final Object bindBase) {
     boolean terminal = (path.length == 1);
     Object o = null;
     boolean found = false;
@@ -1407,7 +1407,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private IBindInput createInputTerminal(Object o, Class nullType, ValueInputToken bindToken) throws ProcessingException {
+  private IBindInput createInputTerminal(Object o, Class nullType, ValueInputToken bindToken) {
     if (o == null) {
       return new SingleInput(null, nullType, bindToken);
     }

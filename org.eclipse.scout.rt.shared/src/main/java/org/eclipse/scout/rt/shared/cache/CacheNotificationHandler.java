@@ -36,7 +36,7 @@ public class CacheNotificationHandler implements INotificationHandler<Invalidate
   }
 
   @SuppressWarnings("unchecked")
-  protected <K, V> void handleNotificationImpl(InvalidateCacheNotification notification) throws ProcessingException {
+  protected <K, V> void handleNotificationImpl(InvalidateCacheNotification notification) {
     String cacheId = notification.getCacheId();
     for (ICache<K, V> cache : BEANS.all(ICache.class)) {
       if (cache.getCacheId().equals(cacheId)) {

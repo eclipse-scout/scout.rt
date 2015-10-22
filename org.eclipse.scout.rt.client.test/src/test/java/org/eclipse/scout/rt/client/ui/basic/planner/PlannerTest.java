@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.AbstractPlannerExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
@@ -54,7 +53,7 @@ public class PlannerTest {
    * Tests that update event is fired if activities are added / removed.
    */
   @Test
-  public void testResourceUpdateEvent_CellChanged() throws ProcessingException {
+  public void testResourceUpdateEvent_CellChanged() {
     P_Planner planner = createTestPlanner();
     Resource<Integer> resource = createTestResource(0);
     planner.addResource(resource);
@@ -71,7 +70,7 @@ public class PlannerTest {
    * Tests that update event is fired if activities are added / removed.
    */
   @Test
-  public void testResourceUpdateEvent_ActivityListChanged() throws ProcessingException {
+  public void testResourceUpdateEvent_ActivityListChanged() {
     P_Planner planner = createTestPlanner();
     Resource<Integer> resource = createTestResource(0);
     planner.addResource(resource);
@@ -85,7 +84,7 @@ public class PlannerTest {
   }
 
   @Test
-  public void testSelectResources() throws ProcessingException {
+  public void testSelectResources() {
     P_Planner planner = createTestPlanner();
     Resource<Integer> resource = createTestResource(0);
     planner.addResource(resource);
@@ -100,7 +99,7 @@ public class PlannerTest {
    * Tests that selected resources are still selected if resources are replaced
    */
   @Test
-  public void testRestoreSelection() throws ProcessingException {
+  public void testRestoreSelection() {
     P_Planner planner = createTestPlanner();
     Resource<Integer> resource = createTestResource(1);
     planner.addResource(resource);
@@ -121,7 +120,7 @@ public class PlannerTest {
    * Tests that selection is cleared after replace if the previous selected resource isn't there anymore
    */
   @Test
-  public void testRestoreSelection_NoMatch() throws ProcessingException {
+  public void testRestoreSelection_NoMatch() {
     P_Planner planner = createTestPlanner();
     Resource<Integer> resource = createTestResource(1);
     planner.addResource(resource);
@@ -138,7 +137,7 @@ public class PlannerTest {
   /**
    * Creates an empty planner.
    */
-  private P_Planner createTestPlanner() throws ProcessingException {
+  private P_Planner createTestPlanner() {
     P_Planner planner = new P_Planner();
     planner.initPlanner();
     return planner;
@@ -153,86 +152,86 @@ public class PlannerTest {
   }
 
   @Test
-  public void testInterceptorExecActivitySelected() throws ProcessingException {
+  public void testInterceptorExecActivitySelected() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.ActivitySelected, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptActivitySelected(null);
       }
     });
   }
 
   @Test
-  public void testInterceptorExecDecorateActivityCell() throws ProcessingException {
+  public void testInterceptorExecDecorateActivityCell() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.DecorateActivityCell, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptDecorateActivity(null);
       }
     });
   }
 
   @Test
-  public void testInterceptorExecDisplayModeChanged() throws ProcessingException {
+  public void testInterceptorExecDisplayModeChanged() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.DisplayModeChanged, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptDisplayModeChanged(0);
       }
     });
   }
 
   @Test
-  public void testInterceptorExecDisposePlanner() throws ProcessingException {
+  public void testInterceptorExecDisposePlanner() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.DisposePlanner, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptDisposePlanner();
       }
     });
   }
 
   @Test
-  public void testInterceptorExecInitPlanner() throws ProcessingException {
+  public void testInterceptorExecInitPlanner() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.InitPlanner, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptInitPlanner();
       }
     });
   }
 
   @Test
-  public void testInterceptorExecResourcesSelected() throws ProcessingException {
+  public void testInterceptorExecResourcesSelected() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.ResourcesSelected, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptResourcesSelected(null);
       }
     });
   }
 
   @Test
-  public void testInterceptorExecSelectionRangeChanged() throws ProcessingException {
+  public void testInterceptorExecSelectionRangeChanged() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.SelectionRangeChanged, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptSelectionRangeChanged(null);
       }
     });
   }
 
   @Test
-  public void testInterceptorExecViewRangeChanged() throws ProcessingException {
+  public void testInterceptorExecViewRangeChanged() {
     callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod.ViewRangeChanged, new P_InterceptorCaller() {
       @Override
-      public void run(P_Planner p) throws ProcessingException {
+      public void run(P_Planner p) {
         p.interceptViewRangeChanged(null);
       }
     });
   }
 
-  private void callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod expectedExtensionMethodCalled, P_InterceptorCaller callPlannerInterceptor) throws ProcessingException {
+  private void callInterceptorAndAssertExtensionMethodCalled(ExtensionMethod expectedExtensionMethodCalled, P_InterceptorCaller callPlannerInterceptor) {
     P_PlannerExtension.reset();
     try {
       BEANS.get(IExtensionRegistry.class).register(P_PlannerExtension.class);
@@ -247,7 +246,7 @@ public class PlannerTest {
   }
 
   private abstract class P_InterceptorCaller {
-    abstract public void run(P_Planner p) throws ProcessingException;
+    abstract public void run(P_Planner p);
   }
 
   public enum ExtensionMethod {
@@ -274,42 +273,42 @@ public class PlannerTest {
     }
 
     @Override
-    public void execActivitySelected(PlannerActivitySelectedChain<Integer, Integer> chain, Activity<Integer, Integer> cell) throws ProcessingException {
+    public void execActivitySelected(PlannerActivitySelectedChain<Integer, Integer> chain, Activity<Integer, Integer> cell) {
       calledInterceptors.add(ExtensionMethod.ActivitySelected);
     }
 
     @Override
-    public void execDisposePlanner(PlannerDisposePlannerChain<Integer, Integer> chain) throws ProcessingException {
+    public void execDisposePlanner(PlannerDisposePlannerChain<Integer, Integer> chain) {
       calledInterceptors.add(ExtensionMethod.DisposePlanner);
     }
 
     @Override
-    public void execDecorateActivityCell(PlannerDecorateActivityChain<Integer, Integer> chain, Activity<Integer, Integer> cell) throws ProcessingException {
+    public void execDecorateActivityCell(PlannerDecorateActivityChain<Integer, Integer> chain, Activity<Integer, Integer> cell) {
       calledInterceptors.add(ExtensionMethod.DecorateActivityCell);
     }
 
     @Override
-    public void execInitPlanner(PlannerInitPlannerChain<Integer, Integer> chain) throws ProcessingException {
+    public void execInitPlanner(PlannerInitPlannerChain<Integer, Integer> chain) {
       calledInterceptors.add(ExtensionMethod.InitPlanner);
     }
 
     @Override
-    public void execResourcesSelected(PlannerResourcesSelectedChain<Integer, Integer> chain, List<Resource<Integer>> resources) throws ProcessingException {
+    public void execResourcesSelected(PlannerResourcesSelectedChain<Integer, Integer> chain, List<Resource<Integer>> resources) {
       calledInterceptors.add(ExtensionMethod.ResourcesSelected);
     }
 
     @Override
-    public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<Integer, Integer> chain, Range<Date> selectionRange) throws ProcessingException {
+    public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<Integer, Integer> chain, Range<Date> selectionRange) {
       calledInterceptors.add(ExtensionMethod.SelectionRangeChanged);
     }
 
     @Override
-    public void execViewRangeChanged(PlannerViewRangeChangedChain<Integer, Integer> chain, Range<Date> viewRange) throws ProcessingException {
+    public void execViewRangeChanged(PlannerViewRangeChangedChain<Integer, Integer> chain, Range<Date> viewRange) {
       calledInterceptors.add(ExtensionMethod.ViewRangeChanged);
     }
 
     @Override
-    public void execDisplayModeChanged(PlannerDisplayModeChangedChain<Integer, Integer> chain, int displayMode) throws ProcessingException {
+    public void execDisplayModeChanged(PlannerDisplayModeChangedChain<Integer, Integer> chain, int displayMode) {
       calledInterceptors.add(ExtensionMethod.DisplayModeChanged);
     }
 

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.IReloadHandler;
 
 /**
@@ -27,7 +26,7 @@ public class PageReloadHandler implements IReloadHandler {
   }
 
   @Override
-  public void reload() throws ProcessingException {
+  public void reload() {
     m_page.reloadPage();
   }
 

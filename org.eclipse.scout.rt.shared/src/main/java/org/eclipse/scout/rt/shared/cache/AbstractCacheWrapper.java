@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.shared.cache;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * Base wrapper class for {@link ICache}.
  *
@@ -52,7 +50,7 @@ public abstract class AbstractCacheWrapper<K, V> implements ICache<K, V> {
   }
 
   @Override
-  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException {
+  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
     m_delegate.invalidate(filter, propagate);
   }
 

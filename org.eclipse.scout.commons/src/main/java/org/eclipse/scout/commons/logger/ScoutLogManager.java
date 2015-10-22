@@ -91,7 +91,7 @@ public final class ScoutLogManager {
    * @throws UnsupportedOperationException
    *           is thrown if the log implementation does not support recording of log messages
    */
-  public static boolean startRecording() throws ProcessingException {
+  public static boolean startRecording() {
     return instance.startRecording();
   }
 

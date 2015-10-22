@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 /**
@@ -87,7 +86,7 @@ public class LocalLookupCallTest {
     runGetDataByTextFiltered(1, "°\\°", "°");
   }
 
-  private void runGetDataByTextFiltered(int expectedLength, String text, String wildcard) throws ProcessingException {
+  private void runGetDataByTextFiltered(int expectedLength, String text, String wildcard) {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     if (wildcard != null) {
       lc.setWildcard(wildcard);
@@ -107,7 +106,7 @@ public class LocalLookupCallTest {
     runGetDataByKey(0, Integer.valueOf(0));
   }
 
-  private void runGetDataByKey(int expectedLength, Integer key) throws ProcessingException {
+  private void runGetDataByKey(int expectedLength, Integer key) {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setKey(key);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByKey();
@@ -126,7 +125,7 @@ public class LocalLookupCallTest {
 
   }
 
-  private void runGetDataByRec(int expectedLength, Integer parent) throws ProcessingException {
+  private void runGetDataByRec(int expectedLength, Integer parent) {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setRec(parent);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByRec();
@@ -138,7 +137,7 @@ public class LocalLookupCallTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<ILookupRow<Integer>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Integer>> execCreateLookupRows() {
       List<ILookupRow<Integer>> rows = new ArrayList<ILookupRow<Integer>>();
       rows.add(new LookupRow<Integer>(ROW10_KEY, ROW10_TEXT));
       rows.add(new LookupRow<Integer>(ROW20_KEY, ROW20_TEXT));

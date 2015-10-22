@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * Responsible for creating {@link IProposalChooser}.
  *
@@ -19,6 +17,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  */
 public interface IProposalChooserProvider<LOOKUP_KEY> {
 
-  IProposalChooser<?, LOOKUP_KEY> createProposalChooser(IContentAssistField<?, LOOKUP_KEY> smartField, boolean allowCustomText) throws ProcessingException;
+  IProposalChooser<?, LOOKUP_KEY> createProposalChooser(IContentAssistField<?, LOOKUP_KEY> smartField, boolean allowCustomText);
 
 }

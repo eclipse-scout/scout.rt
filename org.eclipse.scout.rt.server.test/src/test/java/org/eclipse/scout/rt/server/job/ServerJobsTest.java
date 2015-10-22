@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -80,7 +79,7 @@ public class ServerJobsTest {
   }
 
   @Test
-  public void testScheduleWithoutInput() throws ProcessingException {
+  public void testScheduleWithoutInput() {
     ISession.CURRENT.set(m_serverSession);
 
     // Test schedule
@@ -133,7 +132,7 @@ public class ServerJobsTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
+  public void testScheduleWithoutInputWithoutSession() {
     ISession.CURRENT.set(null);
     ServerJobs.schedule(mock(IRunnable.class));
   }

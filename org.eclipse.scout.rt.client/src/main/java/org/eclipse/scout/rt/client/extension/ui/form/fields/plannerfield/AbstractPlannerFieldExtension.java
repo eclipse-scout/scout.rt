@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourcesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldPopulateResourcesChain;
@@ -17,12 +16,12 @@ public abstract class AbstractPlannerFieldExtension<P extends IPlanner<RI, AI>, 
   }
 
   @Override
-  public List<Resource<RI>> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
+  public List<Resource<RI>> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) {
     return chain.execLoadResourceTableData();
   }
 
   @Override
-  public void execPopulateResources(PlannerFieldPopulateResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
+  public void execPopulateResources(PlannerFieldPopulateResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) {
     chain.execPopulateResources();
   }
 

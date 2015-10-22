@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.FormFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -41,12 +40,12 @@ public class TabBoxGroupBox extends AbstractGroupBox {
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     getTableField().initField();
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     super.execDisposeField();
 
     m_propertyDelegator.dispose();

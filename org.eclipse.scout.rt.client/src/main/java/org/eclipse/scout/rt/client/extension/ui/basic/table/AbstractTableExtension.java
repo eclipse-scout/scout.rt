@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
@@ -45,77 +44,77 @@ public abstract class AbstractTableExtension<TABLE extends AbstractTable> extend
   }
 
   @Override
-  public void execAppLinkAction(TableAppLinkActionChain chain, String ref) throws ProcessingException {
+  public void execAppLinkAction(TableAppLinkActionChain chain, String ref) {
     chain.execAppLinkAction(ref);
   }
 
   @Override
-  public void execRowAction(TableRowActionChain chain, ITableRow row) throws ProcessingException {
+  public void execRowAction(TableRowActionChain chain, ITableRow row) {
     chain.execRowAction(row);
   }
 
   @Override
-  public void execContentChanged(TableContentChangedChain chain) throws ProcessingException {
+  public void execContentChanged(TableContentChangedChain chain) {
     chain.execContentChanged();
   }
 
   @Override
-  public ITableRowDataMapper execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain chain, Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+  public ITableRowDataMapper execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain chain, Class<? extends AbstractTableRowData> rowType) {
     return chain.execCreateTableRowDataMapper(rowType);
   }
 
   @Override
-  public void execInitTable(TableInitTableChain chain) throws ProcessingException {
+  public void execInitTable(TableInitTableChain chain) {
     chain.execInitTable();
   }
 
   @Override
-  public void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths) throws ProcessingException {
+  public void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths) {
     chain.execResetColumns(visibility, order, sorting, widths);
   }
 
   @Override
-  public void execDecorateCell(TableDecorateCellChain chain, Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
+  public void execDecorateCell(TableDecorateCellChain chain, Cell view, ITableRow row, IColumn<?> col) {
     chain.execDecorateCell(view, row, col);
   }
 
   @Override
-  public void execDrop(TableDropChain chain, ITableRow row, TransferObject t) throws ProcessingException {
+  public void execDrop(TableDropChain chain, ITableRow row, TransferObject t) {
     chain.execDrop(row, t);
   }
 
   @Override
-  public void execDisposeTable(TableDisposeTableChain chain) throws ProcessingException {
+  public void execDisposeTable(TableDisposeTableChain chain) {
     chain.execDisposeTable();
   }
 
   @Override
-  public void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) throws ProcessingException {
+  public void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) {
     chain.execRowClick(row, mouseButton);
   }
 
   @Override
-  public void execDecorateRow(TableDecorateRowChain chain, ITableRow row) throws ProcessingException {
+  public void execDecorateRow(TableDecorateRowChain chain, ITableRow row) {
     chain.execDecorateRow(row);
   }
 
   @Override
-  public TransferObject execCopy(TableCopyChain chain, List<? extends ITableRow> rows) throws ProcessingException {
+  public TransferObject execCopy(TableCopyChain chain, List<? extends ITableRow> rows) {
     return chain.execCopy(rows);
   }
 
   @Override
-  public void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows) throws ProcessingException {
+  public void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows) {
     chain.execRowsSelected(rows);
   }
 
   @Override
-  public void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> rows) throws ProcessingException {
+  public void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> rows) {
     chain.execRowsChecked(rows);
   }
 
   @Override
-  public TransferObject execDrag(TableDragChain chain, List<ITableRow> rows) throws ProcessingException {
+  public TransferObject execDrag(TableDragChain chain, List<ITableRow> rows) {
     return chain.execDrag(rows);
   }
 }

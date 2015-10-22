@@ -62,7 +62,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(10)
-  protected void execLoad() throws ProcessingException {
+  protected void execLoad() {
   }
 
   /**
@@ -73,7 +73,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(20)
-  protected void execPostLoad() throws ProcessingException {
+  protected void execPostLoad() {
   }
 
   /**
@@ -88,7 +88,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(40)
-  protected boolean execCheckFields() throws ProcessingException {
+  protected boolean execCheckFields() {
     return true;
   }
 
@@ -102,7 +102,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(50)
-  protected boolean execValidate() throws ProcessingException {
+  protected boolean execValidate() {
     return true;
   }
 
@@ -113,7 +113,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(40)
-  protected void execStore() throws ProcessingException {
+  protected void execStore() {
   }
 
   /**
@@ -122,7 +122,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(30)
-  protected void execDiscard() throws ProcessingException {
+  protected void execDiscard() {
   }
 
   /**
@@ -132,7 +132,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    */
   @ConfigOperation
   @Order(60)
-  protected void execFinally() throws ProcessingException {
+  protected void execFinally() {
   }
 
   /*
@@ -202,7 +202,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final void onLoad() throws ProcessingException {
+  public final void onLoad() {
     try {
       interceptLoad();
     }
@@ -215,7 +215,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final void onPostLoad() throws ProcessingException {
+  public final void onPostLoad() {
     try {
       interceptPostLoad();
     }
@@ -228,7 +228,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final boolean onCheckFields() throws ProcessingException {
+  public final boolean onCheckFields() {
     try {
       return interceptCheckFields();
     }
@@ -241,7 +241,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final boolean onValidate() throws ProcessingException {
+  public final boolean onValidate() {
     try {
       return interceptValidate();
     }
@@ -254,7 +254,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final void onStore() throws ProcessingException {
+  public final void onStore() {
     try {
       interceptStore();
     }
@@ -267,7 +267,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final void onDiscard() throws ProcessingException {
+  public final void onDiscard() {
     try {
       interceptDiscard();
     }
@@ -280,7 +280,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public final void onFinally() throws ProcessingException {
+  public final void onFinally() {
     try {
       interceptFinally();
     }
@@ -303,79 +303,79 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     }
 
     @Override
-    public void execPostLoad(FormHandlerPostLoadChain chain) throws ProcessingException {
+    public void execPostLoad(FormHandlerPostLoadChain chain) {
       getOwner().execPostLoad();
     }
 
     @Override
-    public boolean execValidate(FormHandlerValidateChain chain) throws ProcessingException {
+    public boolean execValidate(FormHandlerValidateChain chain) {
       return getOwner().execValidate();
     }
 
     @Override
-    public void execLoad(FormHandlerLoadChain chain) throws ProcessingException {
+    public void execLoad(FormHandlerLoadChain chain) {
       getOwner().execLoad();
     }
 
     @Override
-    public void execStore(FormHandlerStoreChain chain) throws ProcessingException {
+    public void execStore(FormHandlerStoreChain chain) {
       getOwner().execStore();
     }
 
     @Override
-    public void execDiscard(FormHandlerDiscardChain chain) throws ProcessingException {
+    public void execDiscard(FormHandlerDiscardChain chain) {
       getOwner().execDiscard();
     }
 
     @Override
-    public boolean execCheckFields(FormHandlerCheckFieldsChain chain) throws ProcessingException {
+    public boolean execCheckFields(FormHandlerCheckFieldsChain chain) {
       return getOwner().execCheckFields();
     }
 
     @Override
-    public void execFinally(FormHandlerFinallyChain chain) throws ProcessingException {
+    public void execFinally(FormHandlerFinallyChain chain) {
       getOwner().execFinally();
     }
 
   }
 
-  protected final void interceptPostLoad() throws ProcessingException {
+  protected final void interceptPostLoad() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerPostLoadChain chain = new FormHandlerPostLoadChain(extensions);
     chain.execPostLoad();
   }
 
-  protected final boolean interceptValidate() throws ProcessingException {
+  protected final boolean interceptValidate() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerValidateChain chain = new FormHandlerValidateChain(extensions);
     return chain.execValidate();
   }
 
-  protected final void interceptLoad() throws ProcessingException {
+  protected final void interceptLoad() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerLoadChain chain = new FormHandlerLoadChain(extensions);
     chain.execLoad();
   }
 
-  protected final void interceptStore() throws ProcessingException {
+  protected final void interceptStore() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerStoreChain chain = new FormHandlerStoreChain(extensions);
     chain.execStore();
   }
 
-  protected final void interceptDiscard() throws ProcessingException {
+  protected final void interceptDiscard() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerDiscardChain chain = new FormHandlerDiscardChain(extensions);
     chain.execDiscard();
   }
 
-  protected final boolean interceptCheckFields() throws ProcessingException {
+  protected final boolean interceptCheckFields() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerCheckFieldsChain chain = new FormHandlerCheckFieldsChain(extensions);
     return chain.execCheckFields();
   }
 
-  protected final void interceptFinally() throws ProcessingException {
+  protected final void interceptFinally() {
     List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions = getAllExtensions();
     FormHandlerFinallyChain chain = new FormHandlerFinallyChain(extensions);
     chain.execFinally();

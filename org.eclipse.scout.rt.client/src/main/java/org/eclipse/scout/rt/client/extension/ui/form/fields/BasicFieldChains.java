@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -39,7 +38,7 @@ public final class BasicFieldChains {
     public void execChangedDisplayText() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>> next) {
           next.execChangedDisplayText(BasicFieldExecChangedDisplayTextChain.this);
         }
       };

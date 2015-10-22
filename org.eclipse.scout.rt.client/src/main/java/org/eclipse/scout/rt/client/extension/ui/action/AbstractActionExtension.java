@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.action;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionActionChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitActionChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
@@ -27,17 +26,17 @@ public abstract class AbstractActionExtension<OWNER extends AbstractAction> exte
   }
 
   @Override
-  public void execSelectionChanged(ActionSelectionChangedChain chain, boolean selection) throws ProcessingException {
+  public void execSelectionChanged(ActionSelectionChangedChain chain, boolean selection) {
     chain.execSelectionChanged(selection);
   }
 
   @Override
-  public void execAction(ActionActionChain chain) throws ProcessingException {
+  public void execAction(ActionActionChain chain) {
     chain.execAction();
   }
 
   @Override
-  public void execInitAction(ActionInitActionChain chain) throws ProcessingException {
+  public void execInitAction(ActionInitActionChain chain) {
     chain.execInitAction();
   }
 

@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -134,7 +133,7 @@ public class AttributeNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       ComposerAttributeForm form = new ComposerAttributeForm();
       ITreeNode parentEntity = findParentNode(EntityNode.class);
       if (parentEntity != null) {
@@ -176,7 +175,7 @@ public class AttributeNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       getTree().selectPreviousParentNode();
       getTree().removeNode(AttributeNode.this);
     }

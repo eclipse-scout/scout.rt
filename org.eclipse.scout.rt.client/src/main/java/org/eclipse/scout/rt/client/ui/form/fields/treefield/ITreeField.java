@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.treefield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -41,10 +40,10 @@ public interface ITreeField extends IFormField {
    * 
    * @see execFilterTreeNode
    */
-  void loadRootNode() throws ProcessingException;
+  void loadRootNode();
 
-  void loadChildNodes(ITreeNode parentNode) throws ProcessingException;
+  void loadChildNodes(ITreeNode parentNode);
 
-  void doSave() throws ProcessingException;
+  void doSave();
 
 }

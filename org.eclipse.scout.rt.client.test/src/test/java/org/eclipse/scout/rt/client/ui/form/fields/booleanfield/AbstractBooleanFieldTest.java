@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -26,7 +25,7 @@ import org.junit.runner.RunWith;
 public class AbstractBooleanFieldTest extends AbstractBooleanField {
 
   @Test
-  public void testExecIsEmpty() throws ProcessingException {
+  public void testExecIsEmpty() {
 
     setValue(null);
     assertEquals("Boolean field with value null is not empty.", true, execIsEmpty());

@@ -28,10 +28,10 @@ public final class ListBoxChains {
       super(extensions);
     }
 
-    public void execPopulateTable() throws ProcessingException {
+    public void execPopulateTable() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) throws ProcessingException {
+        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) {
           next.execPopulateTable(ListBoxPopulateTableChain.this);
         }
       };
@@ -49,10 +49,10 @@ public final class ListBoxChains {
       super(extensions);
     }
 
-    public List<? extends ILookupRow<KEY>> execLoadTableData() throws ProcessingException {
+    public List<? extends ILookupRow<KEY>> execLoadTableData() {
       MethodInvocation<List<? extends ILookupRow<KEY>>> methodInvocation = new MethodInvocation<List<? extends ILookupRow<KEY>>>() {
         @Override
-        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) throws ProcessingException {
+        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) {
           setReturnValue(next.execLoadTableData(ListBoxLoadTableDataChain.this));
         }
       };
@@ -70,10 +70,10 @@ public final class ListBoxChains {
       super(extensions);
     }
 
-    public void execFilterLookupResult(final ILookupCall<KEY> call, final List<ILookupRow<KEY>> result) throws ProcessingException {
+    public void execFilterLookupResult(final ILookupCall<KEY> call, final List<ILookupRow<KEY>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) throws ProcessingException {
+        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) {
           next.execFilterLookupResult(ListBoxFilterLookupResultChain.this, call, result);
         }
       };
@@ -91,10 +91,10 @@ public final class ListBoxChains {
       super(extensions);
     }
 
-    public void execPrepareLookup(final ILookupCall<KEY> call) throws ProcessingException {
+    public void execPrepareLookup(final ILookupCall<KEY> call) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) throws ProcessingException {
+        protected void callMethod(IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> next) {
           next.execPrepareLookup(ListBoxPrepareLookupChain.this, call);
         }
       };

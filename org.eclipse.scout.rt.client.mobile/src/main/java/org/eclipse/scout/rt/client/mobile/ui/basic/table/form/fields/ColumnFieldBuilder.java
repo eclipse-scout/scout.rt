@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -50,7 +49,7 @@ public class ColumnFieldBuilder {
   private static final String PROP_PROPERTY_DELEGATOR = "propertyDelegator";
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColumnFieldBuilder.class);
 
-  public Map<IColumn<?>, IFormField> build(List<IColumn<?>> columns, ITableRow row) throws ProcessingException {
+  public Map<IColumn<?>, IFormField> build(List<IColumn<?>> columns, ITableRow row) {
     Map<IColumn<?>, IFormField> fields = new HashMap<IColumn<?>, IFormField>();
     if (columns == null) {
       return fields;
@@ -70,7 +69,7 @@ public class ColumnFieldBuilder {
   }
 
   @SuppressWarnings("unchecked")
-  protected IFormField createValueField(IColumn<?> column, ITableRow row) throws ProcessingException {
+  protected IFormField createValueField(IColumn<?> column, ITableRow row) {
     if (column.isEditable()) {
       IFormField field = createEditableField(column, row);
       if (field != null) {
@@ -136,7 +135,7 @@ public class ColumnFieldBuilder {
     return new ColumnFieldPropertyDelegator(column, formField);
   }
 
-  protected IFormField createEditableField(IColumn<?> column, ITableRow row) throws ProcessingException {
+  protected IFormField createEditableField(IColumn<?> column, ITableRow row) {
     IFormField field = column.prepareEdit(row);
     if (field != null) {
       //Revert changes which are done in AbstractColumn#prepareEdit

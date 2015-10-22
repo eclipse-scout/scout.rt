@@ -27,10 +27,10 @@ public final class SvgFieldChains {
       super(extensions);
     }
 
-    public void execClicked(final SvgFieldEvent e) throws ProcessingException {
+    public void execClicked(final SvgFieldEvent e) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ISvgFieldExtension<? extends AbstractSvgField> next) throws ProcessingException {
+        protected void callMethod(ISvgFieldExtension<? extends AbstractSvgField> next) {
           next.execClicked(SvgFieldClickedChain.this, e);
         }
       };
@@ -48,10 +48,10 @@ public final class SvgFieldChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final String ref) throws ProcessingException {
+    public void execAppLinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ISvgFieldExtension<? extends AbstractSvgField> next) throws ProcessingException {
+        protected void callMethod(ISvgFieldExtension<? extends AbstractSvgField> next) {
           next.execAppLinkAction(SvgFieldAppLinkActionChain.this, ref);
         }
       };

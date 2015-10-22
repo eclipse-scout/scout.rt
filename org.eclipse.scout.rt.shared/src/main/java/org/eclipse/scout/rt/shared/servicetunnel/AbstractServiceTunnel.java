@@ -32,7 +32,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   }
 
   @Override
-  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
+  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) {
     long t0 = System.nanoTime();
     try {
       if (callerArgs == null) {

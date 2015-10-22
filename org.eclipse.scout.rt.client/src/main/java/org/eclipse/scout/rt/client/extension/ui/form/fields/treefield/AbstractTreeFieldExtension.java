@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.treefield;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldLoadChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveChain;
@@ -24,22 +23,22 @@ public abstract class AbstractTreeFieldExtension<OWNER extends AbstractTreeField
   }
 
   @Override
-  public void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row) throws ProcessingException {
+  public void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row) {
     chain.execSaveDeletedNode(row);
   }
 
   @Override
-  public void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row) throws ProcessingException {
+  public void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row) {
     chain.execSaveUpdatedNode(row);
   }
 
   @Override
-  public void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode) throws ProcessingException {
+  public void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode) {
     chain.execLoadChildNodes(parentNode);
   }
 
   @Override
-  public void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row) throws ProcessingException {
+  public void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row) {
     chain.execSaveInsertedNode(row);
   }
 }

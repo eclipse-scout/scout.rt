@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IStringColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -186,7 +185,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   }
 
   @Override
-  protected String parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected String parseValueInternal(ITableRow row, Object rawValue) {
     String validValue = null;
     if (rawValue == null) {
       validValue = null;
@@ -205,7 +204,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * subclasses perform specific value validations here and set the default textual representation of the value
    */
   @Override
-  protected String/* validValue */ validateValueInternal(ITableRow row, String rawValue) throws ProcessingException {
+  protected String/* validValue */ validateValueInternal(ITableRow row, String rawValue) {
     String value = super.validateValueInternal(row, rawValue);
     if (value != null) {
       if (value.length() > getMaxLength()) {
@@ -216,7 +215,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   }
 
   @Override
-  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
+  protected IFormField prepareEditInternal(ITableRow row) {
     IValueField<String> f = getDefaultEditor();
     mapEditorFieldProperties((IStringField) f);
     return f;

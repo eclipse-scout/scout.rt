@@ -18,7 +18,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.IStyleable;
@@ -189,9 +188,9 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   /**
    * do not use this internal method
    */
-  void postInitConfig() throws ProcessingException;
+  void postInitConfig();
 
-  void initField() throws ProcessingException;
+  void initField();
 
   void disposeField();
 
@@ -212,22 +211,22 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * <p>
    * Do not override this method
    */
-  void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException;
+  void exportFormFieldData(AbstractFormFieldData target);
 
   /**
    * apply FormData to this form field
    * <p>
    * Do not override this method
    */
-  void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) throws ProcessingException;
+  void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled);
 
-  String storeToXmlString() throws ProcessingException;
+  String storeToXmlString();
 
-  void loadFromXmlString(String xml) throws ProcessingException;
+  void loadFromXmlString(String xml);
 
-  void storeToXml(Element x) throws ProcessingException;
+  void storeToXml(Element x);
 
-  void loadFromXml(Element x) throws ProcessingException;
+  void loadFromXml(Element x);
 
   /**
    * add verbose information to the search filter

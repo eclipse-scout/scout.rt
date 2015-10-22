@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -31,7 +30,7 @@ public class TableImportTest {
   private P_Table m_table = new P_Table();
 
   @Test
-  public void testSuccessfulImport() throws ProcessingException {
+  public void testSuccessfulImport() {
     P_TableBean tableBean = new P_TableBean();
     P_TableBean.TableBeanRowData row = tableBean.addRow();
     row.setDefault(TEST_VALUE);
@@ -47,7 +46,7 @@ public class TableImportTest {
   }
 
   @Test
-  public void testInvalidValue() throws ProcessingException {
+  public void testInvalidValue() {
     P_TableBean tableBean = new P_TableBean();
     P_TableBean.TableBeanRowData row = tableBean.addRow();
     row.setDefault("invalid");
@@ -60,7 +59,7 @@ public class TableImportTest {
    * Tests that properties are unchanged after importing data twice.
    */
   @Test
-  public void testSuccessfulImportProps() throws ProcessingException {
+  public void testSuccessfulImportProps() {
     P_TableBean tableBean = new P_TableBean();
     P_TableBean.TableBeanRowData row = tableBean.addRow();
     row.setDefault(TEST_VALUE);
@@ -102,13 +101,13 @@ public class TableImportTest {
       }
 
       @Override
-      public String execParseValue(ITableRow row, Object rawValue) throws ProcessingException {
+      public String execParseValue(ITableRow row, Object rawValue) {
         m_parseCount++;
         return super.execParseValue(row, rawValue);
       }
 
       @Override
-      protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
+      protected String execValidateValue(ITableRow row, String rawValue) {
         m_validateCount++;
         if (rawValue == "invalid") {
           throw new VetoException("invalid value");
@@ -117,7 +116,7 @@ public class TableImportTest {
       }
 
       @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+      protected void execDecorateCell(Cell cell, ITableRow row) {
         m_decorateCount++;
         super.execDecorateCell(cell, row);
       }

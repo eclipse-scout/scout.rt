@@ -124,28 +124,28 @@ public class PageTest {
 
   class PageExceptionOnActivated extends P_Page {
     @Override
-    protected void execPageActivated() throws ProcessingException {
+    protected void execPageActivated() {
       throw new ProcessingException();
     }
   }
 
   class PageRuntimeExceptionOnActivated extends P_Page {
     @Override
-    protected void execPageActivated() throws ProcessingException {
+    protected void execPageActivated() {
       throw new RuntimeException();
     }
   }
 
   class PageExceptionOnDeactivated extends P_Page {
     @Override
-    protected void execPageDeactivated() throws ProcessingException {
+    protected void execPageDeactivated() {
       throw new ProcessingException();
     }
   }
 
   class PageRuntimeExceptionOnDeactivated extends P_Page {
     @Override
-    protected void execPageDeactivated() throws ProcessingException {
+    protected void execPageDeactivated() {
       throw new RuntimeException();
     }
   }

@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -19,7 +18,7 @@ public class ToolFormCloseAction extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     MobileDesktopUtility.closeToolForm(m_form);
   }
 }

@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -36,7 +35,7 @@ public class HolidayCalendarService implements IHolidayCalendarService {
   private ConcurrentExpiringMap<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new ConcurrentExpiringMap<String, HolidayCalendarItemParser>(5, TimeUnit.MINUTES);
 
   @Override
-  public Set<? extends ICalendarItem> getItems(RemoteFile spec, Date minDate, Date maxDate) throws ProcessingException {
+  public Set<? extends ICalendarItem> getItems(RemoteFile spec, Date minDate, Date maxDate) {
     // load new items
     HolidayCalendarItemParser p = null;
     String key = spec.getPath();

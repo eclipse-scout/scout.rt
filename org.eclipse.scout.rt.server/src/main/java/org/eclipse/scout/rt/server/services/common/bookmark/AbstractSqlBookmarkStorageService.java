@@ -37,7 +37,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    */
   @ConfigOperation
   @Order(10)
-  protected Object[][] execSelectUserBookmarkFolder(Object userId) throws ProcessingException {
+  protected Object[][] execSelectUserBookmarkFolder(Object userId) {
     return new Object[0][];
   }
 
@@ -51,7 +51,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    */
   @ConfigOperation
   @Order(11)
-  protected Object[][] execSelectGlobalBookmarkFolder() throws ProcessingException {
+  protected Object[][] execSelectGlobalBookmarkFolder() {
     return new Object[0][];
   }
 
@@ -92,7 +92,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    */
   @ConfigOperation
   @Order(20)
-  protected void execStoreUserBookmarkFolder(Object userId, long id, byte[] folderData) throws ProcessingException {
+  protected void execStoreUserBookmarkFolder(Object userId, long id, byte[] folderData) {
   }
 
   /**
@@ -132,7 +132,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    */
   @ConfigOperation
   @Order(21)
-  protected void execStoreGlobalBookmarkFolder(long id, byte[] folderData) throws ProcessingException {
+  protected void execStoreGlobalBookmarkFolder(long id, byte[] folderData) {
   }
 
   /**
@@ -144,7 +144,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    */
   @ConfigOperation
   @Order(30)
-  protected BookmarkFolder execResolveBookmarkFolder(long id, Object binaryData) throws ProcessingException {
+  protected BookmarkFolder execResolveBookmarkFolder(long id, Object binaryData) {
     try {
       byte[] bytesResolved = (byte[]) binaryData;
       return SerializationUtility.createObjectSerializer().deserialize(bytesResolved, BookmarkFolder.class);
@@ -156,7 +156,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   }
 
   @Override
-  protected BookmarkFolder readUserFolder(Object userId) throws ProcessingException {
+  protected BookmarkFolder readUserFolder(Object userId) {
     Object[][] data = execSelectUserBookmarkFolder(userId);
     for (int r = 0; r < data.length; r++) {
       Object[] row = data[r];
@@ -176,7 +176,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   }
 
   @Override
-  protected BookmarkFolder readGlobalFolder() throws ProcessingException {
+  protected BookmarkFolder readGlobalFolder() {
     Object[][] data = execSelectGlobalBookmarkFolder();
     for (int r = 0; r < data.length; r++) {
       Object[] row = data[r];
@@ -196,7 +196,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   }
 
   @Override
-  protected void writeUserFolder(BookmarkFolder folder, Object userId) throws ProcessingException {
+  protected void writeUserFolder(BookmarkFolder folder, Object userId) {
     try {
       byte[] data = SerializationUtility.createObjectSerializer().serialize(folder);
       execStoreUserBookmarkFolder(userId, folder.getId(), data);
@@ -207,7 +207,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   }
 
   @Override
-  protected void writeGlobalFolder(BookmarkFolder folder) throws ProcessingException {
+  protected void writeGlobalFolder(BookmarkFolder folder) {
     try {
       byte[] data = SerializationUtility.createObjectSerializer().serialize(folder);
       execStoreGlobalBookmarkFolder(folder.getId(), data);

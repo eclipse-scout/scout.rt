@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -82,23 +81,23 @@ public class PermissionServiceTest {
   }
 
   @Test
-  public void testDefault() throws ProcessingException {
+  public void testDefault() {
     testImpl(new PermissionService_Default_Mock(), true, true);
   }
 
   @Test
-  public void testIgnoreClassName() throws ProcessingException {
+  public void testIgnoreClassName() {
     testImpl(new PermissionService_IgnoreClassName1_Mock(), false, true);
   }
 
   @Test
-  public void testIgnoreClass() throws ProcessingException {
+  public void testIgnoreClass() {
     testImpl(new PermissionService_IgnoreClass2_Mock(), true, false);
   }
 
   abstract static class AbstractPermissionServiceMock extends PermissionService {
 
-    public AbstractPermissionServiceMock() throws ProcessingException {
+    public AbstractPermissionServiceMock() {
       super();
     }
 
@@ -106,14 +105,14 @@ public class PermissionServiceTest {
 
   static class PermissionService_Default_Mock extends AbstractPermissionServiceMock {
 
-    public PermissionService_Default_Mock() throws ProcessingException {
+    public PermissionService_Default_Mock() {
       super();
     }
   }
 
   static class PermissionService_IgnoreClassName1_Mock extends AbstractPermissionServiceMock {
 
-    public PermissionService_IgnoreClassName1_Mock() throws ProcessingException {
+    public PermissionService_IgnoreClassName1_Mock() {
       super();
     }
 
@@ -125,7 +124,7 @@ public class PermissionServiceTest {
 
   static class PermissionService_IgnoreClass2_Mock extends AbstractPermissionServiceMock {
 
-    public PermissionService_IgnoreClass2_Mock() throws ProcessingException {
+    public PermissionService_IgnoreClass2_Mock() {
       super();
     }
 

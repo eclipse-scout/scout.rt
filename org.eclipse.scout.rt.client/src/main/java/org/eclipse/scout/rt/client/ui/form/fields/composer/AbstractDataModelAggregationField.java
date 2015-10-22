@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.DataModelAggregationFieldChains.DataModelAggregationFieldAttributeChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IDataModelAggregationFieldExtension;
@@ -66,7 +65,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     return ((DataModelAggregationLookupCall) getLookupCall()).getAttribute();
   }
 
-  public void setAttribute(IDataModelAttribute attribute) throws ProcessingException {
+  public void setAttribute(IDataModelAttribute attribute) {
     ((DataModelAggregationLookupCall) getLookupCall()).setAttribute(attribute);
     if (attribute != null) {
       setEnabled(true);
@@ -93,7 +92,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
    */
   @ConfigOperation
   @Order(100)
-  protected void execAttributeChanged(IDataModelAttribute attribute) throws ProcessingException {
+  protected void execAttributeChanged(IDataModelAttribute attribute) {
     Integer newAg = null;
     if (attribute != null) {
       HashSet<Integer> agSet = new HashSet<Integer>();
@@ -113,7 +112,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     setValue(newAg);
   }
 
-  protected final void interceptAttributeChanged(IDataModelAttribute attribute) throws ProcessingException {
+  protected final void interceptAttributeChanged(IDataModelAttribute attribute) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DataModelAggregationFieldAttributeChangedChain chain = new DataModelAggregationFieldAttributeChangedChain(extensions);
     chain.execAttributeChanged(attribute);
@@ -126,7 +125,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     }
 
     @Override
-    public void execAttributeChanged(DataModelAggregationFieldAttributeChangedChain chain, IDataModelAttribute attribute) throws ProcessingException {
+    public void execAttributeChanged(DataModelAggregationFieldAttributeChangedChain chain, IDataModelAttribute attribute) {
       getOwner().execAttributeChanged(attribute);
     }
   }

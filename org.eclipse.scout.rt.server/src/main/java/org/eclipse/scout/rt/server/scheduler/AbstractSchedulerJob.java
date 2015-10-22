@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -67,7 +66,7 @@ public abstract class AbstractSchedulerJob implements ISchedulerJob {
   @Override
   @ConfigOperation
   @Order(20)
-  public void run(IScheduler scheduler, TickSignal signal) throws ProcessingException {
+  public void run(IScheduler scheduler, TickSignal signal) {
   }
 
   @ConfigOperation

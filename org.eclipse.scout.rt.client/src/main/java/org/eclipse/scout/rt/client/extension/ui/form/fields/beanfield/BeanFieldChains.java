@@ -26,10 +26,10 @@ public final class BeanFieldChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final String ref) throws ProcessingException {
+    public void execAppLinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IBeanFieldExtension<VALUE, ? extends AbstractBeanField<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IBeanFieldExtension<VALUE, ? extends AbstractBeanField<VALUE>> next) {
           next.execAppLinkAction(BeanFieldAppLinkActionChain.this, ref);
         }
       };

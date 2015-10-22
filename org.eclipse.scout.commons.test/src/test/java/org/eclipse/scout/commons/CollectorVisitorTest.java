@@ -12,8 +12,6 @@ package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CollectorVisitor;
 import org.junit.Test;
 
 public class CollectorVisitorTest {

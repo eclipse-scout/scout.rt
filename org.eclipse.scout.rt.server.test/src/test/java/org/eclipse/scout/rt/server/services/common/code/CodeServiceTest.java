@@ -53,7 +53,7 @@ public class CodeServiceTest {
    * @throws ProcessingException
    */
   @Test
-  public void testReloadCodeType() throws ProcessingException {
+  public void testReloadCodeType() {
     ICodeService codeService = BEANS.get(ICodeService.class);
     codeService.reloadCodeType(SomeCodeType.class);
 
@@ -66,7 +66,7 @@ public class CodeServiceTest {
   }
 
   @Test
-  public void testReloadCodeTypes() throws ProcessingException {
+  public void testReloadCodeTypes() {
     ICodeService codeService = BEANS.get(ICodeService.class);
 
     List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();

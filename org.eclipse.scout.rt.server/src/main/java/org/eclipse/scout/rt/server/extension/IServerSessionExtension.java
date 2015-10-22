@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.extension;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -20,6 +19,6 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface IServerSessionExtension<OWNER extends AbstractServerSession> extends IExtension<OWNER> {
 
-  void execLoadSession(ServerSessionLoadSessionChain chain) throws ProcessingException;
+  void execLoadSession(ServerSessionLoadSessionChain chain);
 
 }

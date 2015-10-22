@@ -194,13 +194,13 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @ConfigOperation
   @Order(10)
-  protected void execInitAttribute() throws ProcessingException {
+  protected void execInitAttribute() {
 
   }
 
   @ConfigOperation
   @Order(20)
-  protected void execPrepareLookup(ILookupCall<?> call) throws ProcessingException {
+  protected void execPrepareLookup(ILookupCall<?> call) {
   }
 
   @Override
@@ -276,12 +276,12 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   @Override
-  public final void initAttribute() throws ProcessingException {
+  public final void initAttribute() {
     interceptInitAttribute();
   }
 
   @Override
-  public void prepareLookup(ILookupCall<?> call) throws ProcessingException {
+  public void prepareLookup(ILookupCall<?> call) {
     interceptPrepareLookup(call);
   }
 
@@ -782,24 +782,24 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     }
 
     @Override
-    public void execInitAttribute(DataModelAttributeInitAttributeChain chain) throws ProcessingException {
+    public void execInitAttribute(DataModelAttributeInitAttributeChain chain) {
       getOwner().execInitAttribute();
     }
 
     @Override
-    public void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call) throws ProcessingException {
+    public void execPrepareLookup(DataModelAttributePrepareLookupChain chain, ILookupCall<?> call) {
       getOwner().execPrepareLookup(call);
     }
 
   }
 
-  protected final void interceptInitAttribute() throws ProcessingException {
+  protected final void interceptInitAttribute() {
     List<? extends IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> extensions = getAllExtensions();
     DataModelAttributeInitAttributeChain chain = new DataModelAttributeInitAttributeChain(extensions);
     chain.execInitAttribute();
   }
 
-  protected final void interceptPrepareLookup(ILookupCall<?> call) throws ProcessingException {
+  protected final void interceptPrepareLookup(ILookupCall<?> call) {
     List<? extends IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> extensions = getAllExtensions();
     DataModelAttributePrepareLookupChain chain = new DataModelAttributePrepareLookupChain(extensions);
     chain.execPrepareLookup(call);

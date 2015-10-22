@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.ISession;
 @ApplicationScoped
 public class ServerSessionProvider {
 
-  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) throws ProcessingException {
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) {
     return provide(serverRunContext, UUID.randomUUID().toString());
   }
 
@@ -45,7 +45,7 @@ public class ServerSessionProvider {
    * @throws ProcessingException
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
-  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext, final String sessionId) throws ProcessingException {
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext, final String sessionId) {
     return serverRunContext.copy().call(new Callable<SESSION>() {
 
       @Override
@@ -95,7 +95,7 @@ public class ServerSessionProvider {
 
   @Internal
   @SuppressWarnings("unchecked")
-  protected static <SESSION extends IServerSession> SESSION cast(final IServerSession serverSession) throws ProcessingException {
+  protected static <SESSION extends IServerSession> SESSION cast(final IServerSession serverSession) {
     try {
       return (SESSION) serverSession;
     }

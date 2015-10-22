@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisplayModeChangedChain;
@@ -30,20 +29,20 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 
 public interface IPlannerExtension<RI, AI, OWNER extends AbstractPlanner<RI, AI>> extends IExtension<OWNER> {
 
-  void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException;
+  void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell);
 
-  void execDisposePlanner(PlannerDisposePlannerChain<RI, AI> chain) throws ProcessingException;
+  void execDisposePlanner(PlannerDisposePlannerChain<RI, AI> chain);
 
-  void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException;
+  void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell);
 
-  void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain) throws ProcessingException;
+  void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain);
 
-  void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> chain, List<Resource<RI>> resources) throws ProcessingException;
+  void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> chain, List<Resource<RI>> resources);
 
-  void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> chain, Range<Date> selectionRange) throws ProcessingException;
+  void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> chain, Range<Date> selectionRange);
 
-  void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> chain, Range<Date> viewRange) throws ProcessingException;
+  void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> chain, Range<Date> viewRange);
 
-  void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> chain, int displayMode) throws ProcessingException;
+  void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> chain, int displayMode);
 
 }

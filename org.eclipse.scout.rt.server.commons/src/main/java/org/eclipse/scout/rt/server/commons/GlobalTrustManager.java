@@ -61,7 +61,7 @@ public class GlobalTrustManager {
    *
    * @throws ProcessingException
    */
-  public void installGlobalTrustManager() throws ProcessingException {
+  public void installGlobalTrustManager() {
     installGlobalTrustManager("TLS", TrustManagerFactory.getDefaultAlgorithm());
   }
 
@@ -76,7 +76,7 @@ public class GlobalTrustManager {
    *          {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
    * @throws ProcessingException
    */
-  public void installGlobalTrustManager(String protocol, String tmAlgorithm) throws ProcessingException {
+  public void installGlobalTrustManager(String protocol, String tmAlgorithm) {
     X509TrustManager globalTrustManager;
     try {
       X509Certificate[] trustedCerts = getTrustedCertificates();

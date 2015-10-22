@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
@@ -102,7 +101,7 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   int SELECTION_MODE_SINGLE_RANGE = 2;
   int SELECTION_MODE_MULTI_RANGE = 3;
 
-  void initPlanner() throws ProcessingException;
+  void initPlanner();
 
   void disposePlanner();
 

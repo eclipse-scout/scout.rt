@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.svg.client.extension.svgfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
@@ -14,12 +13,12 @@ public abstract class AbstractSvgFieldExtension<OWNER extends AbstractSvgField> 
   }
 
   @Override
-  public void execClicked(SvgFieldClickedChain chain, SvgFieldEvent e) throws ProcessingException {
+  public void execClicked(SvgFieldClickedChain chain, SvgFieldEvent e) {
     chain.execClicked(e);
   }
 
   @Override
-  public void execAppLinkAction(SvgFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+  public void execAppLinkAction(SvgFieldAppLinkActionChain chain, String ref) {
     chain.execAppLinkAction(ref);
   }
 }

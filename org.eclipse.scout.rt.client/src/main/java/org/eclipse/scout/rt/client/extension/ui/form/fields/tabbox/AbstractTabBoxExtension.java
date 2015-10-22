@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractCompositeFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -13,7 +12,7 @@ public abstract class AbstractTabBoxExtension<OWNER extends AbstractTabBox> exte
   }
 
   @Override
-  public void execTabSelected(TabBoxTabSelectedChain chain, IGroupBox selectedBox) throws ProcessingException {
+  public void execTabSelected(TabBoxTabSelectedChain chain, IGroupBox selectedBox) {
     chain.execTabSelected(selectedBox);
   }
 }

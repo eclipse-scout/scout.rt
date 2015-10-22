@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
@@ -59,7 +58,7 @@ public class OrganizeColumnsFormTest {
   }
 
   @Test
-  public void testNoNPEInExecDrop() throws ProcessingException {
+  public void testNoNPEInExecDrop() {
     ITable table = mock(ITable.class);
     List<ITableRow> list = new LinkedList<ITableRow>();
     list.add(mock(ITableRow.class));
@@ -82,7 +81,7 @@ public class OrganizeColumnsFormTest {
    * @throws InterruptedException
    */
   @Test
-  public void testDiscardChanges() throws ProcessingException, InterruptedException {
+  public void testDiscardChanges() throws InterruptedException {
     TestPage page = new TestOutline().getPage();
     page.ensureChildrenLoaded();
     ITable table = page.getTable();
@@ -107,7 +106,7 @@ public class OrganizeColumnsFormTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       TestPage page = new TestPage();
       page.initPage();
       pageList.add(page);
@@ -124,7 +123,7 @@ public class OrganizeColumnsFormTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new ChildPage());
     }
   }

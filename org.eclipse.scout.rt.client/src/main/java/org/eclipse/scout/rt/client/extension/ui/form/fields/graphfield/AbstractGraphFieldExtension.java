@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.GraphFieldChains.GraphFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.graphfield.AbstractGraphField;
@@ -13,7 +12,7 @@ public abstract class AbstractGraphFieldExtension<OWNER extends AbstractGraphFie
   }
 
   @Override
-  public void execAppLinkAction(GraphFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+  public void execAppLinkAction(GraphFieldAppLinkActionChain chain, String ref) {
     chain.execAppLinkAction(ref);
   }
 }

@@ -125,11 +125,11 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   }
 
   @ConfigOperation
-  protected void execComReadyStatusChanged(boolean ready) throws ProcessingException {
+  protected void execComReadyStatusChanged(boolean ready) {
   }
 
   // main handler
-  protected Object fireDocumentFieldEventInternal(DocumentFieldEvent e) throws ProcessingException {
+  protected Object fireDocumentFieldEventInternal(DocumentFieldEvent e) {
     Object returnValue = null;
     ProcessingException exception = null;
     DocumentFieldListener[] listeners = m_listenerList.getListeners(DocumentFieldListener.class);
@@ -155,7 +155,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   }
 
   @Override
-  protected boolean execIsSaveNeeded() throws ProcessingException {
+  protected boolean execIsSaveNeeded() {
     if (!isInitialized() || getForm().isFormLoading()) {
       return false;
     }
@@ -165,17 +165,17 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   }
 
   @Override
-  public RemoteFile save() throws ProcessingException {
+  public RemoteFile save() {
     return saveAs(null, null);
   }
 
   @Override
-  public RemoteFile saveAs(String name) throws ProcessingException {
+  public RemoteFile saveAs(String name) {
     return saveAs(name, null);
   }
 
   @Override
-  public RemoteFile saveAs(String name, String format) throws ProcessingException {
+  public RemoteFile saveAs(String name, String format) {
     return (RemoteFile) fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_SAVE_AS, new SaveAsData(name, format)));
   }
 
@@ -225,7 +225,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     }
   }
 
-  protected final void interceptComReadyStatusChanged(boolean ready) throws ProcessingException {
+  protected final void interceptComReadyStatusChanged(boolean ready) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DocumentFieldComReadyStatusChangedChain chain = new DocumentFieldComReadyStatusChangedChain(extensions);
     chain.execComReadyStatusChanged(ready);
@@ -238,7 +238,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     }
 
     @Override
-    public void execComReadyStatusChanged(DocumentFieldComReadyStatusChangedChain chain, boolean ready) throws ProcessingException {
+    public void execComReadyStatusChanged(DocumentFieldComReadyStatusChangedChain chain, boolean ready) {
       getOwner().execComReadyStatusChanged(ready);
     }
   }

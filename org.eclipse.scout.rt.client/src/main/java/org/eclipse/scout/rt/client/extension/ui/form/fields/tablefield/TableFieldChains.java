@@ -28,10 +28,10 @@ public final class TableFieldChains {
       super(extensions);
     }
 
-    public void execReloadTableData() throws ProcessingException {
+    public void execReloadTableData() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) {
           next.execReloadTableData(TableFieldReloadTableDataChain.this);
         }
       };
@@ -49,10 +49,10 @@ public final class TableFieldChains {
       super(extensions);
     }
 
-    public void execSaveInsertedRow(final ITableRow row) throws ProcessingException {
+    public void execSaveInsertedRow(final ITableRow row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) {
           next.execSaveInsertedRow(TableFieldSaveInsertedRowChain.this, row);
         }
       };
@@ -70,10 +70,10 @@ public final class TableFieldChains {
       super(extensions);
     }
 
-    public void execSaveUpdatedRow(final ITableRow row) throws ProcessingException {
+    public void execSaveUpdatedRow(final ITableRow row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) {
           next.execSaveUpdatedRow(TableFieldSaveUpdatedRowChain.this, row);
         }
       };
@@ -91,10 +91,10 @@ public final class TableFieldChains {
       super(extensions);
     }
 
-    public void execSaveDeletedRow(final ITableRow row) throws ProcessingException {
+    public void execSaveDeletedRow(final ITableRow row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) {
           next.execSaveDeletedRow(TableFieldSaveDeletedRowChain.this, row);
         }
       };

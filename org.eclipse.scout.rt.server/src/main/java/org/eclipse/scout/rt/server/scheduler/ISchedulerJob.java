@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface ISchedulerJob {
 
   /**
@@ -29,7 +27,7 @@ public interface ISchedulerJob {
    */
   boolean acceptTick(TickSignal signal);
 
-  void run(IScheduler scheduler, TickSignal signal) throws ProcessingException;
+  void run(IScheduler scheduler, TickSignal signal);
 
   /**
    * the interrupted property is set to false by the scheduler every time just before the job is run the interrupted

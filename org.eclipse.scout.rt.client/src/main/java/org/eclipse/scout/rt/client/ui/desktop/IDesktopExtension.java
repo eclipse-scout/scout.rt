@@ -62,7 +62,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand initDelegate() throws ProcessingException;
+  ContributionCommand initDelegate();
 
   /**
    * Called after the core desktop was opened and displayed on the GUI.
@@ -71,7 +71,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand desktopOpenedDelegate() throws ProcessingException;
+  ContributionCommand desktopOpenedDelegate();
 
   /**
    * Called just after the core desktop receives the request to close the desktop, i.e. before the desktop gets into its
@@ -81,7 +81,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException;
+  ContributionCommand desktopBeforeClosingDelegate();
 
   /**
    * Called before the core desktop is being closed.
@@ -90,7 +90,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand desktopClosingDelegate() throws ProcessingException;
+  ContributionCommand desktopClosingDelegate();
 
   /**
    * Called after a UI has been attached to the core desktop. The desktop must not necessarily be open.
@@ -99,7 +99,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand guiAttachedDelegate() throws ProcessingException;
+  ContributionCommand guiAttachedDelegate();
 
   /**
    * Called after a UI has been detached from the core desktop. The desktop must not necessarily be open.
@@ -108,7 +108,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand guiDetachedDelegate() throws ProcessingException;
+  ContributionCommand guiDetachedDelegate();
 
   /**
    * Called whenever a new outline has been activated on the core desktop.
@@ -121,7 +121,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException;
+  ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline);
 
   /**
    * Called right before a form is shown and therefore added to the desktop. This means this method is called before any
@@ -135,7 +135,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) throws ProcessingException;
+  ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder);
 
   /**
    * Called whenever a new page has been activated (selected) on the core desktop.
@@ -148,7 +148,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException;
+  ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm);
 
   /**
    * Called whenever a new page has been activated (selected) on the core desktop.
@@ -161,7 +161,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException;
+  ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm);
 
   /**
    * Called whenever a new page has been activated (selected) on the core desktop.
@@ -174,7 +174,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) throws ProcessingException;
+  ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable);
 
   /**
    * Called after a table page was loaded or reloaded.
@@ -185,7 +185,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) throws ProcessingException;
+  ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage);
 
   /**
    * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop to find
@@ -200,7 +200,7 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
    */
-  ContributionCommand addTrayMenusDelegate(List<IMenu> menus) throws ProcessingException;
+  ContributionCommand addTrayMenusDelegate(List<IMenu> menus);
 
   /**
    * Adds the outlines configured with this extension to the {@code outlines} collection. This is a live list of

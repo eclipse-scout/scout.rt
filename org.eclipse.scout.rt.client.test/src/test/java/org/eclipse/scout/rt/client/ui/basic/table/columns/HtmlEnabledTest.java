@@ -14,7 +14,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -31,7 +30,7 @@ public class HtmlEnabledTest {
   private TestTable m_testTable;
 
   @Before
-  public void before() throws ProcessingException {
+  public void before() {
     m_testTable = new TestTable();
     Object[] rowData = {"", "", ""};
     m_testTable.addRowByArray(rowData);
@@ -65,7 +64,7 @@ public class HtmlEnabledTest {
     }
 
     @Override
-    protected void execInitTable() throws ProcessingException {
+    protected void execInitTable() {
     }
 
     @Order(10)
@@ -85,7 +84,7 @@ public class HtmlEnabledTest {
     public class Test3Column extends AbstractColumn<Object> {
 
       @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+      protected void execDecorateCell(Cell cell, ITableRow row) {
         cell.setHtmlEnabled(true);
       }
     }

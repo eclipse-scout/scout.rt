@@ -293,7 +293,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * When getConfiguredService is set then delegate call to service, otherwise returns an empty array
    */
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> getDataByKey() throws ProcessingException {
+  public List<? extends ILookupRow<KEY_TYPE>> getDataByKey() {
     if (getKey() != null && getLookupService() != null) {
       return getLookupService().getDataByKey(this);
     }
@@ -346,7 +346,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * When getConfiguredService is set then delegate call to service, otherwise return null
    */
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> getDataByText() throws ProcessingException {
+  public List<? extends ILookupRow<KEY_TYPE>> getDataByText() {
     boolean masterValid = ((!getConfiguredMasterRequired()) || getMaster() != null);
     if (masterValid && getLookupService() != null) {
       return getLookupService().getDataByText(this);
@@ -402,7 +402,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * When getConfiguredService is set then delegate call to service, otherwise return null
    */
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> getDataByAll() throws ProcessingException {
+  public List<? extends ILookupRow<KEY_TYPE>> getDataByAll() {
     boolean masterValid = ((!getConfiguredMasterRequired()) || getMaster() != null);
     if (masterValid && getLookupService() != null) {
       return getLookupService().getDataByAll(this);
@@ -458,7 +458,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * When getConfiguredService is set then delegate call to service, otherwise return null
    */
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> getDataByRec() throws ProcessingException {
+  public List<? extends ILookupRow<KEY_TYPE>> getDataByRec() {
     if (getLookupService() != null) {
       return getLookupService().getDataByRec(this);
     }

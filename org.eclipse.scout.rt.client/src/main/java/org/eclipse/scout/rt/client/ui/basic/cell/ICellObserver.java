@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface ICellObserver {
 
   /**
@@ -19,7 +17,7 @@ public interface ICellObserver {
    * 
    * @return validated value
    */
-  Object validateValue(ICell cell, Object value) throws ProcessingException;
+  Object validateValue(ICell cell, Object value);
 
   /**
    * after the fact report after a value was stored in the cell

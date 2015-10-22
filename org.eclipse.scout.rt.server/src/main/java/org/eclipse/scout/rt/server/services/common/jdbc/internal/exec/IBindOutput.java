@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 
@@ -35,10 +34,10 @@ interface IBindOutput {
 
   void setNextBatchIndex(int i);
 
-  void finishBatch() throws ProcessingException;
+  void finishBatch();
 
   void setReplaceToken(ISqlStyle style);
 
-  void consumeValue(Object value) throws ProcessingException;
+  void consumeValue(Object value);
 
 }

@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsRunContext;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;

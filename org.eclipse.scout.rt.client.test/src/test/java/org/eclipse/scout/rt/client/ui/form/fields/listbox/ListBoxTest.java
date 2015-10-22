@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -46,7 +45,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   }
 
   @Override
-  protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) {
     result.add(new LookupRow<Long>(1L, "a"));
     result.add(new LookupRow<Long>(2L, "b"));
     result.add(new LookupRow<Long>(3L, "c"));
@@ -71,7 +70,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
    * Test {@link #execIsEmpty} empty field
    */
   @Test
-  public void testEmpty() throws ProcessingException {
+  public void testEmpty() {
     assertTrue(execIsEmpty());
     assertTrue(getValue().isEmpty());
     assertEquals(0, getCheckedKeyCount());
@@ -81,7 +80,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
    * Test {@link #execIsEmpty} non empty
    */
   @Test
-  public void testNonEmpty() throws ProcessingException {
+  public void testNonEmpty() {
     setValue(m_testValue);
     assertFalse(execIsEmpty());
     ScoutAssert.assertSetEquals(m_testValue, getValue());

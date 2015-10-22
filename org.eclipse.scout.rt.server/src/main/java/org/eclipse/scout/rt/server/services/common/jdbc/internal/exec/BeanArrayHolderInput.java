@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IBeanArrayHolder;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
@@ -21,7 +20,7 @@ class BeanArrayHolderInput implements IBindInput {
   private IBeanArrayHolder m_holder;
   private BeanPropertyInput m_delegate;
 
-  public BeanArrayHolderInput(IBeanArrayHolder holder, Object[] beans, String propertyName, ValueInputToken target) throws ProcessingException {
+  public BeanArrayHolderInput(IBeanArrayHolder holder, Object[] beans, String propertyName, ValueInputToken target) {
     m_holder = holder;
     if (beans == null) {
       beans = m_holder.getBeans();
@@ -65,7 +64,7 @@ class BeanArrayHolderInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     return m_delegate.produceSqlBindAndSetReplaceToken(sqlStyle);
   }
 

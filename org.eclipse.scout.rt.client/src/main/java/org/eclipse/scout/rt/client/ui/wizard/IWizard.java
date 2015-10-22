@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -164,12 +163,12 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   /**
    * start the wizard
    */
-  void start() throws ProcessingException;
+  void start();
 
   /**
    * Convenience method to get the current desktop.
    */
-  IDesktop getDesktop() throws ProcessingException;
+  IDesktop getDesktop();
 
   /**
    * @return current wizard form or <code>null</code> if there is no current wizard form.
@@ -187,7 +186,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * If the form is non-modal this starts a sub event dispatcher that loops (and blocks) until form handling is false
    * (i.e. form has been closed)
    */
-  void waitFor() throws ProcessingException;
+  void waitFor();
 
   int WAIT_FOR_ERROR_CODE = 69218;
 
@@ -200,7 +199,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   /**
    * close wizard (forced suspend)
    */
-  void close() throws ProcessingException;
+  void close();
 
   /**
    * @return all available steps, see also {@link #getSteps()}
@@ -290,7 +289,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * on the new step if that step exists When calling {@link #activateStep(null)} with a null argument it simply calls
    * deactivate on the existing step.
    */
-  void activateStep(IWizardStep<? extends IForm> step) throws ProcessingException;
+  void activateStep(IWizardStep<? extends IForm> step);
 
   /**
    * set the current wizard state
@@ -303,60 +302,60 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    *          step The jump parameters are only relevant if the new step is not the direct previous or next step of the
    *          old step.
    */
-  void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward) throws ProcessingException;
+  void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward);
 
   IWizardStep<? extends IForm> getActiveStep();
 
   /**
    * next step
    */
-  void doNextStep() throws ProcessingException;
+  void doNextStep();
 
   /**
    * previous step
    */
-  void doPreviousStep() throws ProcessingException;
+  void doPreviousStep();
 
   /**
    * finish
    */
-  void doFinish() throws ProcessingException;
+  void doFinish();
 
   /**
    * cancel
    */
-  void doCancel() throws ProcessingException;
+  void doCancel();
 
   /**
    * suspend
    */
-  void doSuspend() throws ProcessingException;
+  void doSuspend();
 
   /**
    * reset
    */
-  void doReset() throws ProcessingException;
+  void doReset();
 
   /**
    * This is a delegate method that is normally called by the wizard status field in the {@link IWizardContainerForm}
    * whenever a link is clicked.
    */
   @Override
-  void doAppLinkAction(String ref) throws ProcessingException;
+  void doAppLinkAction(String ref);
 
   /**
    * @deprecated use {@link #doAppLinkAction(String)} instead
    */
   @Deprecated
-  void doHyperlinkAction(URL url, String path, boolean local) throws ProcessingException;
+  void doHyperlinkAction(URL url, String path, boolean local);
 
-  void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException;
+  void doWizardStepAction(IWizardStep<? extends IForm> wizardStep);
 
   /**
    * The container form is created when it does not exist already. By default the container form is created upon start
    * of the wizard.
    */
-  IWizardContainerForm createContainerForm() throws ProcessingException;
+  IWizardContainerForm createContainerForm();
 
   IWizardContainerForm getContainerForm();
 

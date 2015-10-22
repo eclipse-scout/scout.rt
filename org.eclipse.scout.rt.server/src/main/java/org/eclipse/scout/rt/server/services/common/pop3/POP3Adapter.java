@@ -61,11 +61,11 @@ public class POP3Adapter {
     super.finalize();
   }
 
-  public String[] getUnseenMessageSubjects() throws ProcessingException {
+  public String[] getUnseenMessageSubjects() {
     return getUnseenMessageSubjects(getDefaultFolderName());
   }
 
-  public String[] getUnseenMessageSubjects(String folderName) throws ProcessingException {
+  public String[] getUnseenMessageSubjects(String folderName) {
     connect();
     ArrayList<Message> messages = new ArrayList<Message>();
     Folder folder = null;
@@ -101,7 +101,7 @@ public class POP3Adapter {
     return subjects;
   }
 
-  public Message[] getUnseenMessages(final Flags.Flag markAfterRead) throws ProcessingException {
+  public Message[] getUnseenMessages(final Flags.Flag markAfterRead) {
     final ArrayList<Message> list = new ArrayList<Message>();
     visitUnseenMessages(getDefaultFolderName(), new IPOP3MessageVisitor() {
       @Override
@@ -114,7 +114,7 @@ public class POP3Adapter {
     return list.toArray(new Message[list.size()]);
   }
 
-  public void visitUnseenMessages(String folderName, IPOP3MessageVisitor visitor) throws ProcessingException {
+  public void visitUnseenMessages(String folderName, IPOP3MessageVisitor visitor) {
     connect();
     Folder folder = null;
     try {
@@ -143,7 +143,7 @@ public class POP3Adapter {
     }
   }
 
-  protected void connect() throws ProcessingException {
+  protected void connect() {
     try {
       final Properties props = new Properties();
       props.setProperty("mail.pop3.host", getHost());
@@ -168,11 +168,11 @@ public class POP3Adapter {
     }
   }
 
-  protected Folder findFolder(String name) throws ProcessingException {
+  protected Folder findFolder(String name) {
     return findFolder(name, false);
   }
 
-  protected Folder findFolder(String name, boolean createNonExisting) throws ProcessingException {
+  protected Folder findFolder(String name, boolean createNonExisting) {
     connect();
     Folder folder = m_cachedFolders.get(name);
     if (folder == null) {
@@ -197,7 +197,7 @@ public class POP3Adapter {
     return folder;
   }
 
-  public void closeConnection() throws ProcessingException {
+  public void closeConnection() {
     if (isConnected()) {
       List<MessagingException> exceptions = new ArrayList<MessagingException>();
       for (Folder folder : m_cachedFolders.values()) {
@@ -230,7 +230,7 @@ public class POP3Adapter {
     }
   }
 
-  public boolean hasAttachments(Message message, boolean includingInlineAttachments) throws ProcessingException {
+  public boolean hasAttachments(Message message, boolean includingInlineAttachments) {
     connect();
     try {
       Object content = message.getContent();

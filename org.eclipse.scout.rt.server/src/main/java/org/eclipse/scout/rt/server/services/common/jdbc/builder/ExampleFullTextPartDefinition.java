@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 /**
@@ -33,7 +32,7 @@ public class ExampleFullTextPartDefinition extends BasicPartDefinition {
   }
 
   @Override
-  protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+  protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) {
     String pattern = (String) bindValues.get(0);
     //generate a search patter from pattern, decorate and replace pattern
     //...

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.extension.dto.fixture;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -35,7 +34,7 @@ public class OrigForm extends AbstractForm {
   public static final String STRING_TEMPLATE_2_2 = "2.2";
   public static final String STRING_TEMPLATE_2_3 = "2.3";
 
-  public OrigForm() throws ProcessingException {
+  public OrigForm() {
     super();
   }
 
@@ -60,7 +59,7 @@ public class OrigForm extends AbstractForm {
     @Order(1000)
     public class FirstStringField extends AbstractStringField {
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         super.execInitField();
         setValue(STRING_FIELD_ORIG_VALUE);
       }
@@ -69,7 +68,7 @@ public class OrigForm extends AbstractForm {
     @Order(2000)
     public class FirstUseOfTemplateBox extends AbstractTemplateBox {
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         super.execInitField();
         getFirstStringInTemplateField().setValue(STRING_TEMPLATE_1_1);
         getSecondStringInTemplateField().setValue(STRING_TEMPLATE_1_2);
@@ -80,7 +79,7 @@ public class OrigForm extends AbstractForm {
     @Order(3000)
     public class SecondUseOfTemplateBox extends AbstractTemplateBox {
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         super.execInitField();
         getFirstStringInTemplateField().setValue(STRING_TEMPLATE_2_1);
         getSecondStringInTemplateField().setValue(STRING_TEMPLATE_2_2);

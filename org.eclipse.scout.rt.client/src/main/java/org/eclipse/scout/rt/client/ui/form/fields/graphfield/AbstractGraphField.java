@@ -40,7 +40,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
    */
   @ConfigOperation
   @Order(230)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
   }
 
   @Override
@@ -49,7 +49,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
   }
 
   @Override
-  public void doAppLinkAction(String ref) throws ProcessingException {
+  public void doAppLinkAction(String ref) {
     interceptAppLinkAction(ref);
   }
 
@@ -66,7 +66,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
     }
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     GraphFieldAppLinkActionChain chain = new GraphFieldAppLinkActionChain(extensions);
     chain.execAppLinkAction(ref);
@@ -79,7 +79,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
     }
 
     @Override
-    public void execAppLinkAction(GraphFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+    public void execAppLinkAction(GraphFieldAppLinkActionChain chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
   }

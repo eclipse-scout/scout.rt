@@ -48,7 +48,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   public static final String SETTINGS_EXT = ".prefs";
 
   @Override
-  public void flush(IPreferences prefs) throws ProcessingException {
+  public void flush(IPreferences prefs) {
     if (prefs == null) {
       return;
     }
@@ -72,7 +72,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   }
 
   @Override
-  protected void load(String userScope, String nodeId, IPreferences prefsToFill) throws ProcessingException {
+  protected void load(String userScope, String nodeId, IPreferences prefsToFill) {
     File prefsLocation = getPrefsLocation(userScope, nodeId);
     if (!prefsLocation.exists()) {
       // fallback: try legacy location
@@ -109,7 +109,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     }
   }
 
-  protected void flushToDisk(Properties props, File prefsLocation) throws ProcessingException {
+  protected void flushToDisk(Properties props, File prefsLocation) {
     File parentDirectory = prefsLocation.getParentFile();
     if (!parentDirectory.exists()) {
       boolean done = parentDirectory.mkdirs();
@@ -129,7 +129,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     }
   }
 
-  protected Properties loadFromDisk(File prefsLocation) throws ProcessingException {
+  protected Properties loadFromDisk(File prefsLocation) {
     LOG.debug("loading preferences from file '" + prefsLocation.getAbsolutePath() + "'.");
     Properties result = new Properties();
     try (InputStream input = new BufferedInputStream(new FileInputStream(prefsLocation))) {

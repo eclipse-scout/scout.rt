@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -50,7 +49,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
   private static final BigDecimal FAR_BELOW_ZERO = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     for (int i = 0; i < 10; i++) {
       ITableRow row = getTable().createRow();
       getTable().getIntegerColumn().setValue(row, i);

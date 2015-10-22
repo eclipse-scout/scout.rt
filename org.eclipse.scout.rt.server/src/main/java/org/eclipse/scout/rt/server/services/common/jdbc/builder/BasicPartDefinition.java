@@ -176,7 +176,7 @@ public class BasicPartDefinition implements DataModelConstants {
    *         the form data
    * @throws ProcessingException
    */
-  public boolean accept(AbstractFormData formData) throws ProcessingException {
+  public boolean accept(AbstractFormData formData) {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
     Map<Integer, Map<String, AbstractPropertyData<?>>> propertiesBreathFirstMap = formData.getAllPropertiesRec();
     if (getValueTypeClassIdentifiers().length > 0) {
@@ -221,7 +221,7 @@ public class BasicPartDefinition implements DataModelConstants {
    *         {@link FormDataStatementBuilder#addBind(String, Object)}
    * @throws ProcessingException
    */
-  public EntityContribution createInstance(FormDataStatementBuilder builder, AbstractFormData formData, Map<String, String> parentAliasMap) throws ProcessingException {
+  public EntityContribution createInstance(FormDataStatementBuilder builder, AbstractFormData formData, Map<String, String> parentAliasMap) {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
     Map<Integer, Map<String, AbstractPropertyData<?>>> propertiesBreathFirstMap = formData.getAllPropertiesRec();
     ClassIdentifier[] valueTypes = getValueTypeClassIdentifiers();
@@ -273,7 +273,7 @@ public class BasicPartDefinition implements DataModelConstants {
    * <p>
    * valueDatas, bindNames, bindValues are all pre-processed.
    */
-  protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+  protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) {
     return builder.createSqlPart(DataModelConstants.AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
   }
 

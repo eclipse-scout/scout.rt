@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.data.model;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
@@ -20,6 +19,6 @@ import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.Da
  */
 public interface IDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends IExtension<OWNER> {
 
-  void execInitEntity(DataModelEntityInitEntityChain chain) throws ProcessingException;
+  void execInitEntity(DataModelEntityInitEntityChain chain);
 
 }

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
@@ -101,7 +100,7 @@ public class FormDataImportWithPropertiesTest {
     private int m_primitiveInteger;
     private String m_text;
 
-    private DynamicFormWithProperties(String title, IGroupBox mainBox) throws ProcessingException {
+    private DynamicFormWithProperties(String title, IGroupBox mainBox) {
       super(title, mainBox);
     }
 

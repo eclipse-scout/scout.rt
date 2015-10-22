@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -102,13 +101,13 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     super.execInitField();
     installWizard(getWizard());
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     super.execDisposeField();
     uninstallWizard();
   }
@@ -120,7 +119,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
    */
   @Order(10.0)
   @ConfigOperation
-  protected void execWizardStepAction(int stepIndex) throws ProcessingException {
+  protected void execWizardStepAction(int stepIndex) {
     IWizardStep<? extends IForm> step = CollectionUtility.getElement(getWizardSteps(), stepIndex);
     if (step == null) {
       throw new IllegalStateException("Invalid stepIndex: " + stepIndex);
@@ -185,7 +184,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     }
   }
 
-  protected void interceptWizardStepAction(int stepIndex) throws ProcessingException {
+  protected void interceptWizardStepAction(int stepIndex) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     WizardProgressFieldWizardStepActionChain chain = new WizardProgressFieldWizardStepActionChain(extensions);
     chain.execWizardStepIndex(stepIndex);
@@ -198,7 +197,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     }
 
     @Override
-    public void execWizardStepAction(WizardProgressFieldWizardStepActionChain wizardProgressFieldWizardStepActionChain, int stepIndex) throws ProcessingException {
+    public void execWizardStepAction(WizardProgressFieldWizardStepActionChain wizardProgressFieldWizardStepActionChain, int stepIndex) {
       getOwner().execWizardStepAction(stepIndex);
     }
   }

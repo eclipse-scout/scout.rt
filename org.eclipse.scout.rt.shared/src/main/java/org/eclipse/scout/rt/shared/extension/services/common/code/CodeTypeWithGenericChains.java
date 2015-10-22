@@ -47,11 +47,11 @@ public final class CodeTypeWithGenericChains {
       super(extensions);
     }
 
-    public List<? extends CODE> execCreateCodes() throws ProcessingException {
+    public List<? extends CODE> execCreateCodes() {
       MethodInvocation<List<? extends CODE>> methodInvocation = new MethodInvocation<List<? extends CODE>>() {
         @SuppressWarnings("unchecked")
         @Override
-        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) throws ProcessingException {
+        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) {
           setReturnValue((List<? extends CODE>) next.execCreateCodes(CodeTypeWithGenericCreateCodesChain.this));
         }
       };
@@ -76,11 +76,11 @@ public final class CodeTypeWithGenericChains {
       super(extensions);
     }
 
-    public CODE execCreateCode(final ICodeRow<CODE_ID> newRow) throws ProcessingException {
+    public CODE execCreateCode(final ICodeRow<CODE_ID> newRow) {
       MethodInvocation<CODE> methodInvocation = new MethodInvocation<CODE>() {
         @SuppressWarnings("unchecked")
         @Override
-        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) throws ProcessingException {
+        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) {
           setReturnValue((CODE) next.execCreateCode(CodeTypeWithGenericCreateCodeChain.this, newRow));
         }
       };
@@ -105,10 +105,10 @@ public final class CodeTypeWithGenericChains {
       super(extensions);
     }
 
-    public List<? extends ICodeRow<CODE_ID>> execLoadCodes(final Class<? extends ICodeRow<CODE_ID>> codeRowType) throws ProcessingException {
+    public List<? extends ICodeRow<CODE_ID>> execLoadCodes(final Class<? extends ICodeRow<CODE_ID>> codeRowType) {
       MethodInvocation<List<? extends ICodeRow<CODE_ID>>> methodInvocation = new MethodInvocation<List<? extends ICodeRow<CODE_ID>>>() {
         @Override
-        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) throws ProcessingException {
+        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) {
           setReturnValue(next.execLoadCodes(CodeTypeWithGenericLoadCodesChain.this, codeRowType));
         }
       };
@@ -133,10 +133,10 @@ public final class CodeTypeWithGenericChains {
       super(extensions);
     }
 
-    public void execOverwriteCode(final ICodeRow<CODE_ID> oldCode, final ICodeRow<CODE_ID> newCode) throws ProcessingException {
+    public void execOverwriteCode(final ICodeRow<CODE_ID> oldCode, final ICodeRow<CODE_ID> newCode) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) throws ProcessingException {
+        protected void callMethod(ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>> next) {
           next.execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain.this, oldCode, newCode);
         }
       };

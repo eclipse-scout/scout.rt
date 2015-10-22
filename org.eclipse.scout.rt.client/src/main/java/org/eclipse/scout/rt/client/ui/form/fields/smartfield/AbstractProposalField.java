@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
@@ -104,7 +103,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected String handleMissingLookupRow(String text) throws VetoException {
+  protected String handleMissingLookupRow(String text) {
     return text;
   }
 
@@ -115,12 +114,12 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() throws ProcessingException {
+  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() {
     return createProposalChooser(true);
   }
 
   @Override
-  protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+  protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
     super.filterKeyLookup(call, result);
     /*
      * ticket 79027

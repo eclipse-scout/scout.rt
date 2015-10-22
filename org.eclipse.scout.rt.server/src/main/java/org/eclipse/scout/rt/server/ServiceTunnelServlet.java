@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
@@ -177,7 +176,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Process request without creating a server session
    */
-  protected void processWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, ProcessingException, Exception {
+  protected void processWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, Exception {
     Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
     Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceRequest.getOperation(), serviceRequest.getParameterTypes());
     Object service = BEANS.get(serviceInterfaceClass);
@@ -285,7 +284,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   // === SESSION LOOKUP ===
 
   @Internal
-  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext serverRunContext) throws ProcessingException, ServletException {
+  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext serverRunContext) throws ServletException {
     final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
@@ -325,7 +324,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    *          <code>ServerRunContext</code> with information about the ongoing service request.
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
-  protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
+  protected IServerSession provideServerSession(final ServerRunContext serverRunContext) {
     String sessionId = (String) serverRunContext.getProperty(SESSION_ID);
     return BEANS.get(ServerSessionProvider.class).<IServerSession> provide(serverRunContext, sessionId);
   }

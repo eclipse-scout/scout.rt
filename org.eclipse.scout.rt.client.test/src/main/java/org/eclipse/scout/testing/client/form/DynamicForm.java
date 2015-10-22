@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -22,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 public class DynamicForm extends AbstractForm {
   private IGroupBox m_mainBox;
 
-  public DynamicForm(String title, IGroupBox mainBox) throws ProcessingException {
+  public DynamicForm(String title, IGroupBox mainBox) {
     super(false);
     m_mainBox = mainBox;
     callInitializer();
@@ -38,7 +37,7 @@ public class DynamicForm extends AbstractForm {
     return (IButton) getFieldById(id);
   }
 
-  public void start(IFormHandler handler) throws ProcessingException {
+  public void start(IFormHandler handler) {
     startInternal(handler);
   }
 

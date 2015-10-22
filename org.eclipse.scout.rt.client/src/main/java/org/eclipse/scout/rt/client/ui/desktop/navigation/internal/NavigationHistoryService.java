@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.navigation.internal;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -66,18 +65,18 @@ public class NavigationHistoryService implements INavigationHistoryService {
   }
 
   @Override
-  public void stepForward() throws ProcessingException {
+  public void stepForward() {
     getUserNavigationHistory().stepForward();
   }
 
   @Override
-  public void stepBackward() throws ProcessingException {
+  public void stepBackward() {
     getUserNavigationHistory().stepBackward();
 
   }
 
   @Override
-  public void stepTo(Bookmark b) throws ProcessingException {
+  public void stepTo(Bookmark b) {
     getUserNavigationHistory().stepTo(b);
   }
 

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.navigation;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.service.IService;
@@ -82,12 +81,12 @@ public interface INavigationHistoryService extends IService {
   /**
    * Steps forward in the history by one step and activates that bookmark
    */
-  void stepForward() throws ProcessingException;
+  void stepForward();
 
   /**
    * Steps backward in the history by one step and activates that bookmark
    */
-  void stepBackward() throws ProcessingException;
+  void stepBackward();
 
   /**
    * Steps to the given bookmark and activates it
@@ -95,7 +94,7 @@ public interface INavigationHistoryService extends IService {
    * @param bm
    *          the bookmark
    */
-  void stepTo(Bookmark bm) throws ProcessingException;
+  void stepTo(Bookmark bm);
 
   /**
    * @return the bookmarks in the history as menus.

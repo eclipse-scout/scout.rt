@@ -132,7 +132,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
     if (m_toolFormHandler != null) {
       m_toolFormHandler.notifyTablePageLoaded(tablePage);
     }
@@ -172,11 +172,11 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void transformDesktop() throws ProcessingException {
+  public void transformDesktop() {
   }
 
   @Override
-  public void transformForm(IForm form) throws ProcessingException {
+  public void transformForm(IForm form) {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
     }
@@ -233,7 +233,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     }
   }
 
-  public void transformPageDetailForm(IPage page) throws ProcessingException {
+  public void transformPageDetailForm(IPage page) {
     if (page.isDetailFormVisible() && page.getDetailForm() != null) {
       transformForm(page.getDetailForm());
     }
@@ -261,7 +261,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     return activePage.isLeaf();
   }
 
-  protected void transformFormFields(IForm form) throws ProcessingException {
+  protected void transformFormFields(IForm form) {
     WeakReference<IForm> formRef = m_modifiedForms.get(form);
     if (formRef != null) {
       return;
@@ -360,7 +360,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     }
   }
 
-  protected void transformMainBox(IGroupBox groupBox) throws ProcessingException {
+  protected void transformMainBox(IGroupBox groupBox) {
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE, groupBox)) {
       makeGroupBoxScrollable(groupBox);
     }

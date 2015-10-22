@@ -15,7 +15,6 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -163,7 +162,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
     try {
       return tx.commitPhase1();
     }
-    catch (ProcessingException | RuntimeException e) {
+    catch (RuntimeException e) {
       LOG.error(String.format("Failed to commit XA transaction [2PC-phase='voting', job=%s, tx=%s]", getCurrentJobName(), tx), e);
       return false;
     }

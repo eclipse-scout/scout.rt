@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IBeanArrayHolder;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
@@ -20,7 +19,7 @@ class BeanArrayHolderOutput implements IBindOutput {
   private IBeanArrayHolder m_holder;
   private AbstractBeanPropertyOutput m_delegate;
 
-  public BeanArrayHolderOutput(IBeanArrayHolder holder, String propertyName, ValueOutputToken source) throws ProcessingException {
+  public BeanArrayHolderOutput(IBeanArrayHolder holder, String propertyName, ValueOutputToken source) {
     m_holder = holder;
     m_delegate = new AbstractBeanPropertyOutput(m_holder.getHolderType(), propertyName, source) {
       @Override
@@ -71,7 +70,7 @@ class BeanArrayHolderOutput implements IBindOutput {
   }
 
   @Override
-  public void finishBatch() throws ProcessingException {
+  public void finishBatch() {
     m_holder.ensureSize(m_delegate.getBatchIndex() + 1);
     m_delegate.finishBatch();
   }
@@ -82,7 +81,7 @@ class BeanArrayHolderOutput implements IBindOutput {
   }
 
   @Override
-  public void consumeValue(Object value) throws ProcessingException {
+  public void consumeValue(Object value) {
     m_delegate.consumeValue(value);
   }
 

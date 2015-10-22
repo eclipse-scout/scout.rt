@@ -53,7 +53,7 @@ public class PageFormInitFieldVisitor implements IFormFieldVisitor {
     return true;
   }
 
-  public void handleResult() throws ProcessingException {
+  public void handleResult() {
     m_formsToIgnore.clear();
     if (m_firstEx != null) {
       throw m_firstEx;

@@ -26,10 +26,10 @@ public final class HtmlFieldChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final String ref) throws ProcessingException {
+    public void execAppLinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IHtmlFieldExtension<? extends AbstractHtmlField> next) throws ProcessingException {
+        protected void callMethod(IHtmlFieldExtension<? extends AbstractHtmlField> next) {
           next.execAppLinkAction(HtmlFieldAppLinkActionChain.this, ref);
         }
       };

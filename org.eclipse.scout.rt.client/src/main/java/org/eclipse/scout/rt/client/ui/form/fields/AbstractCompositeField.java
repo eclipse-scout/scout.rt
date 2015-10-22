@@ -396,7 +396,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  protected boolean execIsSaveNeeded() throws ProcessingException {
+  protected boolean execIsSaveNeeded() {
     for (IFormField f : m_fields) {
       if (f.isSaveNeeded()) {
         return true;
@@ -406,7 +406,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  protected void execMarkSaved() throws ProcessingException {
+  protected void execMarkSaved() {
     super.execMarkSaved();
     for (IFormField f : m_fields) {
       f.markSaved();
@@ -414,7 +414,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     for (IFormField f : m_fields) {
       if (!f.isEmpty()) {
         return false;

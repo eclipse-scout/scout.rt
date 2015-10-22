@@ -167,7 +167,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    */
   @ConfigOperation
   @Order(10)
-  protected void execInitEntity() throws ProcessingException {
+  protected void execInitEntity() {
   }
 
   private List<Class<IDataModelAttribute>> getConfiguredAttributes() {
@@ -250,7 +250,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    */
 
   @Override
-  public final void initEntity() throws ProcessingException {
+  public final void initEntity() {
     if (m_initialized) {
       return;
     }
@@ -503,13 +503,13 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     }
 
     @Override
-    public void execInitEntity(DataModelEntityInitEntityChain chain) throws ProcessingException {
+    public void execInitEntity(DataModelEntityInitEntityChain chain) {
       getOwner().execInitEntity();
     }
 
   }
 
-  protected final void interceptInitEntity() throws ProcessingException {
+  protected final void interceptInitEntity() {
     List<? extends IDataModelEntityExtension<? extends AbstractDataModelEntity>> extensions = getAllExtensions();
     DataModelEntityInitEntityChain chain = new DataModelEntityInitEntityChain(extensions);
     chain.execInitEntity();

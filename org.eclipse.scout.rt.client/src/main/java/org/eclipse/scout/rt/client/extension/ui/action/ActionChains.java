@@ -24,10 +24,10 @@ public final class ActionChains {
       super(extensions);
     }
 
-    public void execSelectionChanged(final boolean selection) throws ProcessingException {
+    public void execSelectionChanged(final boolean selection) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IActionExtension<? extends AbstractAction> next) throws ProcessingException {
+        protected void callMethod(IActionExtension<? extends AbstractAction> next) {
           next.execSelectionChanged(ActionSelectionChangedChain.this, selection);
         }
       };
@@ -45,10 +45,10 @@ public final class ActionChains {
       super(extensions);
     }
 
-    public void execAction() throws ProcessingException {
+    public void execAction() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IActionExtension<? extends AbstractAction> next) throws ProcessingException {
+        protected void callMethod(IActionExtension<? extends AbstractAction> next) {
           next.execAction(ActionActionChain.this);
         }
       };
@@ -66,10 +66,10 @@ public final class ActionChains {
       super(extensions);
     }
 
-    public void execInitAction() throws ProcessingException {
+    public void execInitAction() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IActionExtension<? extends AbstractAction> next) throws ProcessingException {
+        protected void callMethod(IActionExtension<? extends AbstractAction> next) {
           next.execInitAction(ActionInitActionChain.this);
         }
       };

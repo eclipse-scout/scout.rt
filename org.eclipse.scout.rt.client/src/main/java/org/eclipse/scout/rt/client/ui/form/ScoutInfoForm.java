@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.html.IHtmlElement;
 import org.eclipse.scout.commons.html.IHtmlTable;
@@ -43,7 +42,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ScoutInfoForm extends AbstractForm {
 
-  public ScoutInfoForm() throws ProcessingException {
+  public ScoutInfoForm() {
     super();
   }
 
@@ -64,7 +63,7 @@ public class ScoutInfoForm extends AbstractForm {
     return getFieldByClass(CloseButton.class);
   }
 
-  public void startModify() throws ProcessingException {
+  public void startModify() {
     startInternal(new ModifyHandler());
   }
 
@@ -172,7 +171,7 @@ public class ScoutInfoForm extends AbstractForm {
   public class ModifyHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       List<BinaryResource> attachments = new ArrayList<BinaryResource>();
       contributeHtmlAttachments(attachments);
       if (!attachments.isEmpty()) {

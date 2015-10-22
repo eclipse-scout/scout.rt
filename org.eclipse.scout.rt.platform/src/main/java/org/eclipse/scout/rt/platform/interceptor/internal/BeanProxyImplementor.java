@@ -85,7 +85,7 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
       }
 
       @Override
-      public Object proceed() throws ProcessingException {
+      public Object proceed() {
         try {
           return method.invoke(m_impl, args);
         }

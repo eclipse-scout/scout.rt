@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -49,7 +48,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   private final ColumnSet m_columnSet;
   private final Set<IColumn<?>> m_ignoredColumns;
 
-  public TableRowDataMapper(Class<? extends AbstractTableRowData> rowType, ColumnSet columnSet) throws ProcessingException {
+  public TableRowDataMapper(Class<? extends AbstractTableRowData> rowType, ColumnSet columnSet) {
     Assertions.assertNotNull(rowType);
     Assertions.assertNotNull(columnSet);
 
@@ -140,7 +139,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   }
 
   @Override
-  public void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
+  public void importTableRowData(ITableRow row, AbstractTableRowData rowData) {
     for (IColumn column : m_columnSet.getColumns()) {
       if (m_ignoredColumns.contains(column)) {
         continue;
@@ -170,7 +169,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   }
 
   @Override
-  public void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
+  public void exportTableRowData(ITableRow row, AbstractTableRowData rowData) {
     for (IColumn column : m_columnSet.getColumns()) {
       if (m_ignoredColumns.contains(column)) {
         continue;
@@ -210,12 +209,12 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   }
 
   @Override
-  public boolean acceptExport(ITableRow row) throws ProcessingException {
+  public boolean acceptExport(ITableRow row) {
     return true;
   }
 
   @Override
-  public boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException {
+  public boolean acceptImport(AbstractTableRowData rowData) {
     return true;
   }
 }

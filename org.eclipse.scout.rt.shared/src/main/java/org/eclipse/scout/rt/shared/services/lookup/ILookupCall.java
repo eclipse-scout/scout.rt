@@ -88,7 +88,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @return
    * @throws ProcessingException
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByKey() throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByKey();
 
   /**
    * @param caller
@@ -100,7 +100,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @return
    * @throws ProcessingException
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByText() throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByText();
 
   /**
    * @param caller
@@ -112,7 +112,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @return
    * @throws ProcessingException
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByAll() throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByAll();
 
   /**
    * @param caller
@@ -124,7 +124,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @return
    * @throws ProcessingException
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByRec() throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByRec();
 
   /**
    * @param caller

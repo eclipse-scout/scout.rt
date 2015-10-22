@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.integerfield.IIntegerFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -71,7 +70,7 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
    * uses {@link #parseToBigDecimalInternal(String)} to parse text and returns the result as Integer
    */
   @Override
-  protected Integer parseValueInternal(String text) throws ProcessingException {
+  protected Integer parseValueInternal(String text) {
     Integer retVal = null;
     BigDecimal parsedVal = parseToBigDecimalInternal(text);
     if (parsedVal != null) {

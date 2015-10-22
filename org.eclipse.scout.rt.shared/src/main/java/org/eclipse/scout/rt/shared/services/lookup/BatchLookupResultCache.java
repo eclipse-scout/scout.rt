@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -46,7 +45,7 @@ public class BatchLookupResultCache {
   /**
    * @return the same as {@link LookupCall#getDataByKey()} but use the cache to lookup already fetched results
    */
-  public List<ILookupRow<?>> getDataByKey(ILookupCall call) throws ProcessingException {
+  public List<ILookupRow<?>> getDataByKey(ILookupCall call) {
     if (call == null || call.getKey() == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -61,7 +60,7 @@ public class BatchLookupResultCache {
   /**
    * @return the same as {@link LookupCall#getDataByText()} but use the cache to lookup already fetched results
    */
-  public List<ILookupRow<?>> getDataByText(ILookupCall call) throws ProcessingException {
+  public List<ILookupRow<?>> getDataByText(ILookupCall call) {
     List<ILookupRow<?>> result = getCachedResult(call);
     if (result == null) {
       result = call.getDataByText();
@@ -73,7 +72,7 @@ public class BatchLookupResultCache {
   /**
    * @return the same as {@link LookupCall#getDataByAll()} but use the cache to lookup already fetched results
    */
-  public List<ILookupRow<?>> getDataByAll(ILookupCall call) throws ProcessingException {
+  public List<ILookupRow<?>> getDataByAll(ILookupCall call) {
     List<ILookupRow<?>> result = getCachedResult(call);
     if (result == null) {
       result = call.getDataByAll();
@@ -85,7 +84,7 @@ public class BatchLookupResultCache {
   /**
    * @return the same as {@link LookupCall#getDataByRec()} but use the cache to lookup already fetched results
    */
-  public List<ILookupRow<?>> getDataByRec(ILookupCall call) throws ProcessingException {
+  public List<ILookupRow<?>> getDataByRec(ILookupCall call) {
     List<ILookupRow<?>> result = getCachedResult(call);
     if (result == null) {
       result = call.getDataByRec();

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.security.Permission;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -31,7 +30,7 @@ public interface ITreeNode {
   int STATUS_UPDATED = 2;
   int STATUS_DELETED = 3;
 
-  void initTreeNode() throws ProcessingException;
+  void initTreeNode();
 
   boolean isInitializing();
 
@@ -264,7 +263,7 @@ public interface ITreeNode {
   /**
    * Convenience to find a menu, uses {@link ActionFinder}
    */
-  <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
+  <T extends IMenu> T getMenu(Class<T> menuType);
 
   void setMenus(List<? extends IMenu> a);
 
@@ -338,18 +337,18 @@ public interface ITreeNode {
   /**
    * (re)load all children
    */
-  void loadChildren() throws ProcessingException;
+  void loadChildren();
 
   boolean isChildrenLoaded();
 
   void setChildrenLoaded(boolean b);
 
-  void ensureChildrenLoaded() throws ProcessingException;
+  void ensureChildrenLoaded();
 
   /**
    * see {@link ITree#resolveVirtualNode(ITreeNode)}
    */
-  ITreeNode resolveVirtualChildNode(ITreeNode node) throws ProcessingException;
+  ITreeNode resolveVirtualChildNode(ITreeNode node);
 
   /**
    * Convenience for getTree().updateNode(this);

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
@@ -67,7 +66,7 @@ public class StatementProcessorCreateSqlDumpTest {
     runSimpleSelectPlainText(vals, "select '?', :myText from dual");
   }
 
-  private void runSimpleSelectPlainText(List<String> expectedValues, String statement) throws ProcessingException {
+  private void runSimpleSelectPlainText(List<String> expectedValues, String statement) {
     String expected = concatValues(SQL_PLAIN_LINE, expectedValues, SELECT, "," + NL + SELECT_SPACE, NL + FROM_DUAL_LINE);
     runDump(expected, StatementType.PLAIN_TEXT, statement);
   }
@@ -92,7 +91,7 @@ public class StatementProcessorCreateSqlDumpTest {
     runSimpleSelectWithBinds(selectValues, bindsValues, "select :myKey, :myText from dual");
   }
 
-  private void runSimpleSelectWithBinds(List<String> expectedValues, List<String> expectedBinds, String statement) throws ProcessingException {
+  private void runSimpleSelectWithBinds(List<String> expectedValues, List<String> expectedBinds, String statement) {
     String expected = concatValues(SQL_WITH_BINDS, expectedValues, SELECT, "," + NL + SELECT_SPACE, NL + FROM_DUAL_LINE);
     expected = concatValues(expected, expectedBinds, NL + IN, NL + IN, "");
     runDump(expected, StatementType.WITH_BINDS, statement);
@@ -114,7 +113,7 @@ public class StatementProcessorCreateSqlDumpTest {
     return expected;
   }
 
-  private void runDump(String expected, StatementType type, String statement) throws ProcessingException {
+  private void runDump(String expected, StatementType type, String statement) {
     ISqlStyle style = Mockito.mock(ISqlStyle.class);
     Mockito.when(style.buildBindFor(23, null)).thenReturn(new SqlBind(4, 23));
     Mockito.when(style.toPlainText(23)).thenReturn("23");
@@ -138,11 +137,11 @@ public class StatementProcessorCreateSqlDumpTest {
 
   public static class P_StatementProcessor_UnderTest extends StatementProcessor {
 
-    public P_StatementProcessor_UnderTest(ISqlService callerService, String stm, Object[] bindBases) throws ProcessingException {
+    public P_StatementProcessor_UnderTest(ISqlService callerService, String stm, Object[] bindBases) {
       super(callerService, stm, bindBases);
     }
 
-    public P_StatementProcessor_UnderTest(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount) throws ProcessingException {
+    public P_StatementProcessor_UnderTest(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount) {
       super(callerService, stm, bindBases, maxRowCount);
     }
 

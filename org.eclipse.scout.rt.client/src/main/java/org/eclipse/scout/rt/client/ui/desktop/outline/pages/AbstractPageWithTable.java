@@ -183,7 +183,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * {@link PageData} annotation is present on this class):
    *
    * <pre>
-   * protected void execLoadData(SearchFilter filter) throws ProcessingException {
+   * protected void execLoadData(SearchFilter filter) {
    *   //logic to initialize the service, to handle the search filter...
    *   AbstractTablePageData pageData = service.loadPageData(...);
    *   importPageData(pageData);
@@ -193,7 +193,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * An other possibility is to import some data array (Object[][]):
    *
    * <pre>
-   * protected void execLoadData(SearchFilter filter) throws ProcessingException {
+   * protected void execLoadData(SearchFilter filter) {
    *   //logic to initialize the service, to handle the search filter...
    *   Object[][] data = service.loadTableData(...);
    *   importTableData(data);
@@ -210,7 +210,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(85)
-  protected void execLoadData(SearchFilter filter) throws ProcessingException {
+  protected void execLoadData(SearchFilter filter) {
   }
 
   /**
@@ -229,7 +229,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(100)
-  protected void execPopulateTable() throws ProcessingException {
+  protected void execPopulateTable() {
     if (isSearchActive()) {
       SearchFilter filter = getSearchFilter();
       if (filter.isCompleted() || !isSearchRequired()) {
@@ -273,11 +273,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(110)
-  protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateChildPage(ITableRow row) {
     return null;
   }
 
-  protected IPage<?> createChildPageInternal(final ITableRow row) throws ProcessingException {
+  protected IPage<?> createChildPageInternal(final ITableRow row) {
     return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IPage<?>>() {
 
       @Override
@@ -307,7 +307,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(111)
-  protected IPage<?> execCreateVirtualChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateVirtualChildPage(ITableRow row) {
     if (ConfigurationUtility.isMethodOverwrite(AbstractPageWithTable.class, "execCreateChildPage", new Class[]{ITableRow.class}, AbstractPageWithTable.this.getClass())) {
       return new VirtualPage();
     }
@@ -330,7 +330,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @throws ProcessingException
    */
   @Override
-  protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) throws ProcessingException {
+  protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) {
     ITableRow row = getTableRowFor(node);
     if (row == null) {
       return null;
@@ -418,7 +418,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @return {@link ISearchForm} or <code>null</code> if the search form could not be created.
    * @throws ProcessingException
    */
-  protected ISearchForm createSearchForm() throws ProcessingException {
+  protected ISearchForm createSearchForm() {
     final Class<? extends ISearchForm> configuredSearchForm = getConfiguredSearchForm();
     if (configuredSearchForm == null) {
       return null;
@@ -477,7 +477,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     // listen for search action
     m_searchFormListener = new FormListener() {
       @Override
-      public void formChanged(FormEvent e) throws ProcessingException {
+      public void formChanged(FormEvent e) {
         switch (e.getType()) {
           case FormEvent.TYPE_STORE_AFTER: {
             // save navigation history
@@ -532,7 +532,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
-  protected void disposeSearchForm() throws ProcessingException {
+  protected void disposeSearchForm() {
     if (m_searchForm != null) {
       m_searchForm.doClose();
       setSearchForm(null);
@@ -566,7 +566,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(120)
-  protected void execInitSearchForm() throws ProcessingException {
+  protected void execInitSearchForm() {
   }
 
   @Override
@@ -676,7 +676,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param tablePageData
    * @since 3.10.0-M3
    */
-  protected void importPageData(AbstractTablePageData tablePageData) throws ProcessingException {
+  protected void importPageData(AbstractTablePageData tablePageData) {
     getTable().importFromTableBeanData(tablePageData);
     m_limitedResult = tablePageData.isLimitedResult();
   }
@@ -688,7 +688,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param data
    * @since 4.2.0 (Mars-M4)
    */
-  protected void importTableData(Object[][] data) throws ProcessingException {
+  protected void importTableData(Object[][] data) {
     //do NOT reference the result data object and wrap it into a ref, so the processor is allowed to delete the contents to free up memory sooner
     getTable().replaceRowsByMatrix(new AtomicReference<Object>(data));
   }
@@ -696,7 +696,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   /**
    * load table data
    */
-  protected void loadTableDataImpl() throws ProcessingException {
+  protected void loadTableDataImpl() {
     if (getTable() != null) {
       try {
         getTable().setTableChanging(true);
@@ -741,7 +741,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * when the table is loaded and this node is not a leaf node then the table rows are mirrored in child nodes
    */
   @Override
-  public final void loadChildren() throws ProcessingException {
+  public final void loadChildren() {
     ITree tree = getTree();
     try {
       if (tree != null) {
@@ -969,31 +969,31 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   }
 
-  protected final void interceptLoadData(SearchFilter filter) throws ProcessingException {
+  protected final void interceptLoadData(SearchFilter filter) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<T>(extensions);
     chain.execLoadData(filter);
   }
 
-  protected final IPage<?> interceptCreateChildPage(ITableRow row) throws ProcessingException {
+  protected final IPage<?> interceptCreateChildPage(ITableRow row) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<T>(extensions);
     return chain.execCreateChildPage(row);
   }
 
-  protected final void interceptPopulateTable() throws ProcessingException {
+  protected final void interceptPopulateTable() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<T>(extensions);
     chain.execPopulateTable();
   }
 
-  protected final IPage<?> interceptCreateVirtualChildPage(ITableRow row) throws ProcessingException {
+  protected final IPage<?> interceptCreateVirtualChildPage(ITableRow row) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableCreateVirtualChildPageChain<T> chain = new PageWithTableCreateVirtualChildPageChain<T>(extensions);
     return chain.execCreateVirtualChildPage(row);
   }
 
-  protected final void interceptInitSearchForm() throws ProcessingException {
+  protected final void interceptInitSearchForm() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<T>(extensions);
     chain.execInitSearchForm();
@@ -1006,27 +1006,27 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     @Override
-    public void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
+    public void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) {
       getOwner().execLoadData(filter);
     }
 
     @Override
-    public IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) {
       return getOwner().execCreateChildPage(row);
     }
 
     @Override
-    public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) throws ProcessingException {
+    public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) {
       getOwner().execPopulateTable();
     }
 
     @Override
-    public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) {
       return getOwner().execCreateVirtualChildPage(row);
     }
 
     @Override
-    public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) throws ProcessingException {
+    public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) {
       getOwner().execInitSearchForm();
     }
   }

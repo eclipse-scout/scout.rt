@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
@@ -44,7 +43,7 @@ public class RemoteCacheService implements IRemoteCacheService {
   }
 
   @Override
-  public <K, V> void invalidate(String cacheId, ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException {
+  public <K, V> void invalidate(String cacheId, ICacheEntryFilter<K, V> filter, boolean propagate) {
     ICache<K, V> cache = getCache(cacheId);
     if (cache != null) {
       cache.invalidate(filter, propagate);

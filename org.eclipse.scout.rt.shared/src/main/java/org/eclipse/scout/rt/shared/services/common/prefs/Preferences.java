@@ -88,7 +88,7 @@ public class Preferences implements IPreferences {
    * @throws IllegalArgumentException
    *           if the session or nodeId is <code>null</code>.
    */
-  public static IPreferences get(ISession userScope, String nodeId) throws ProcessingException {
+  public static IPreferences get(ISession userScope, String nodeId) {
     IUserPreferencesService service = BEANS.get(IUserPreferencesService.class);
     if (service == null) {
       LOG.warn("No preferences service could be found!");
@@ -99,7 +99,7 @@ public class Preferences implements IPreferences {
   }
 
   @Override
-  public synchronized boolean flush() throws ProcessingException {
+  public synchronized boolean flush() {
     if (!isDirty()) {
       return false;
     }

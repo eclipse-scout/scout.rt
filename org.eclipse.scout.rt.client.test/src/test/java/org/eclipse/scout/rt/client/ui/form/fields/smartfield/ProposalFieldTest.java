@@ -21,7 +21,6 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -62,7 +61,7 @@ public class ProposalFieldTest {
   }
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     m_proposalField.registerProposalChooserInternal();
   }
 
@@ -70,7 +69,7 @@ public class ProposalFieldTest {
    * When no proposal matches the searchText, the ProposalField uses that searchText as value.
    */
   @Test
-  public void testNoMatch() throws ProcessingException, InterruptedException {
+  public void testNoMatch() throws InterruptedException {
     testMatch("c", "c", 0);
   }
 
@@ -79,7 +78,7 @@ public class ProposalFieldTest {
    * proposal match as value, it only sets the searchText as value.
    */
   @Test
-  public void testSingleMatch() throws ProcessingException, InterruptedException {
+  public void testSingleMatch() throws InterruptedException {
     testMatch("a", "a", 1);
   }
 
@@ -88,12 +87,12 @@ public class ProposalFieldTest {
    * (other than the SmartField which throws a VetoException in that case).
    */
   @Test
-  public void testMultiMatch() throws ProcessingException, InterruptedException {
+  public void testMultiMatch() throws InterruptedException {
     testMatch("b", "b", 2);
   }
 
   @Test
-  public void testSelectFromProposalChooser() throws ProcessingException, InterruptedException {
+  public void testSelectFromProposalChooser() throws InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -130,7 +129,7 @@ public class ProposalFieldTest {
   /**
    * This method deals with the async nature of the proposal chooser
    */
-  void testMatch(String searchText, String expectedValue, int expectedNumProposals) throws ProcessingException, InterruptedException {
+  void testMatch(String searchText, String expectedValue, int expectedNumProposals) throws InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -187,22 +186,22 @@ public class ProposalFieldTest {
   public static class P_LookupService implements ILookupService<Long> {
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) {
       return null;
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) {
       return LookupRows.getRowsByText(call.getText());
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) {
       return null;
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
       return null;
     }
 

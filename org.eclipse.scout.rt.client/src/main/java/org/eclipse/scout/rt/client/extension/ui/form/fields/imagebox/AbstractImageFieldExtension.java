@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
@@ -14,12 +13,12 @@ public abstract class AbstractImageFieldExtension<OWNER extends AbstractImageFie
   }
 
   @Override
-  public TransferObject execDragRequest(ImageFieldDragRequestChain chain) throws ProcessingException {
+  public TransferObject execDragRequest(ImageFieldDragRequestChain chain) {
     return chain.execDragRequest();
   }
 
   @Override
-  public void execDropRequest(ImageFieldDropRequestChain chain, TransferObject transferObject) throws ProcessingException {
+  public void execDropRequest(ImageFieldDropRequestChain chain, TransferObject transferObject) {
     chain.execDropRequest(transferObject);
   }
 }

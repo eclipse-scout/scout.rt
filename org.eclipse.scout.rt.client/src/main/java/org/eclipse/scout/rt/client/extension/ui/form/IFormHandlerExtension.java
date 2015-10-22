@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerDiscardChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerFinallyChain;
@@ -26,18 +25,18 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface IFormHandlerExtension<OWNER extends AbstractFormHandler> extends IExtension<OWNER> {
 
-  void execPostLoad(FormHandlerPostLoadChain chain) throws ProcessingException;
+  void execPostLoad(FormHandlerPostLoadChain chain);
 
-  boolean execValidate(FormHandlerValidateChain chain) throws ProcessingException;
+  boolean execValidate(FormHandlerValidateChain chain);
 
-  void execLoad(FormHandlerLoadChain chain) throws ProcessingException;
+  void execLoad(FormHandlerLoadChain chain);
 
-  void execStore(FormHandlerStoreChain chain) throws ProcessingException;
+  void execStore(FormHandlerStoreChain chain);
 
-  void execDiscard(FormHandlerDiscardChain chain) throws ProcessingException;
+  void execDiscard(FormHandlerDiscardChain chain);
 
-  boolean execCheckFields(FormHandlerCheckFieldsChain chain) throws ProcessingException;
+  boolean execCheckFields(FormHandlerCheckFieldsChain chain);
 
-  void execFinally(FormHandlerFinallyChain chain) throws ProcessingException;
+  void execFinally(FormHandlerFinallyChain chain);
 
 }

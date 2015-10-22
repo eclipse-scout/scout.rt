@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -40,7 +39,7 @@ import org.junit.runner.RunWith;
 public class PageWithTable7Test {
 
   @Test
-  public void testExecPageDataLoaded() throws ProcessingException {
+  public void testExecPageDataLoaded() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
@@ -63,7 +62,7 @@ public class PageWithTable7Test {
   public static class PageWithTableOutline extends AbstractOutline {
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -74,18 +73,18 @@ public class PageWithTable7Test {
     private String[] m_data = new String[]{"first", "second", "third", "fourth"};
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{new Object[]{m_data[m_counter]}});
     }
 
     @Override
-    protected void execPageDataLoaded() throws ProcessingException {
+    protected void execPageDataLoaded() {
       super.execPageDataLoaded();
       m_protocol.add("counter: " + m_counter + " value: " + getTable().getRow(0).getCell(0).getValue().toString());
     }
 
     @Override
-    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) {
       return new PageWithNode();
     }
 

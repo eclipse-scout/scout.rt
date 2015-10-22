@@ -48,7 +48,7 @@ public class ImportFormDataWithFiltersTest {
    *           if form instantiation fails
    */
   @Test
-  public void testFormDataImportNoFilters() throws ProcessingException {
+  public void testFormDataImportNoFilters() {
     FilterImportTestForm form = new FilterImportTestForm();
     ImportTestFormData data = new ImportTestFormData();
     data.getTestSubString().setValue("test");
@@ -65,7 +65,7 @@ public class ImportFormDataWithFiltersTest {
    *           if form instantiation fails
    */
   @Test
-  public void testFormDataImportWithFieldFilter() throws ProcessingException {
+  public void testFormDataImportWithFieldFilter() {
     FilterImportTestForm form = new FilterImportTestForm();
     ImportTestFormData data = new ImportTestFormData();
     data.getTestString().setValue("test");
@@ -84,7 +84,7 @@ public class ImportFormDataWithFiltersTest {
    *           if form instantiation fails
    */
   @Test
-  public void testFormDataImportWithFieldFilterAndInitValue() throws ProcessingException {
+  public void testFormDataImportWithFieldFilterAndInitValue() {
     FilterImportTestForm form = new FilterImportTestForm();
     form.getTestStringField().setValue("init");
     ImportTestFormData data = new ImportTestFormData();
@@ -101,7 +101,7 @@ public class ImportFormDataWithFiltersTest {
    *           if form instantiation fails
    */
   @Test
-  public void testFormDataImportWithEmptyFieldFilter() throws ProcessingException {
+  public void testFormDataImportWithEmptyFieldFilter() {
     FilterImportTestForm form = new FilterImportTestForm();
     ImportTestFormData data = new ImportTestFormData();
     data.getTestString().setValue("test");
@@ -112,7 +112,7 @@ public class ImportFormDataWithFiltersTest {
 
   class FilterImportTestForm extends AbstractForm {
 
-    public FilterImportTestForm() throws ProcessingException {
+    public FilterImportTestForm() {
       super();
     }
 

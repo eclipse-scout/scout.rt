@@ -28,10 +28,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execActiveStepChanged() throws ProcessingException {
+    public void execActiveStepChanged() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execActiveStepChanged(WizardActiveStepChangedChain.this);
         }
       };
@@ -49,10 +49,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execSuspend() throws ProcessingException {
+    public void execSuspend() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execSuspend(WizardSuspendChain.this);
         }
       };
@@ -70,10 +70,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execRefreshButtonPolicy() throws ProcessingException {
+    public void execRefreshButtonPolicy() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execRefreshButtonPolicy(WizardRefreshButtonPolicyChain.this);
         }
       };
@@ -91,10 +91,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execCancel() throws ProcessingException {
+    public void execCancel() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execCancel(WizardCancelChain.this);
         }
       };
@@ -112,10 +112,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execStart() throws ProcessingException {
+    public void execStart() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execStart(WizardStartChain.this);
         }
       };
@@ -133,10 +133,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public IWizardContainerForm execCreateContainerForm() throws ProcessingException {
+    public IWizardContainerForm execCreateContainerForm() {
       MethodInvocation<IWizardContainerForm> methodInvocation = new MethodInvocation<IWizardContainerForm>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           setReturnValue(next.execCreateContainerForm(WizardCreateContainerFormChain.this));
         }
       };
@@ -154,10 +154,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execAnyFieldChanged(final IFormField source) throws ProcessingException {
+    public void execAnyFieldChanged(final IFormField source) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execAnyFieldChanged(WizardAnyFieldChangedChain.this, source);
         }
       };
@@ -175,10 +175,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execReset() throws ProcessingException {
+    public void execReset() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execReset(WizardResetChain.this);
         }
       };
@@ -196,10 +196,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final String ref) throws ProcessingException {
+    public void execAppLinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execAppLinkAction(WizardAppLinkActionChain.this, ref);
         }
       };
@@ -217,10 +217,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execWizardStepAction(final IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+    public void execWizardStepAction(final IWizardStep<? extends IForm> wizardStep) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execWizardStepAction(WizardWizardStepActionChain.this, wizardStep);
         }
       };
@@ -237,10 +237,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execPreviousStep() throws ProcessingException {
+    public void execPreviousStep() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execPreviousStep(WizardPreviousStepChain.this);
         }
       };
@@ -258,10 +258,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execNextStep() throws ProcessingException {
+    public void execNextStep() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execNextStep(WizardNextStepChain.this);
         }
       };
@@ -279,10 +279,10 @@ public final class WizardChains {
       super(extensions);
     }
 
-    public void execFinish() throws ProcessingException {
+    public void execFinish() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
           next.execFinish(WizardFinishChain.this);
         }
       };

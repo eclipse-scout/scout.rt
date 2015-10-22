@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
 import org.junit.Test;
 
@@ -54,7 +53,7 @@ public class EntityContributionUtilityTest {
   }
 
   @Test
-  public void testMerge() throws ProcessingException {
+  public void testMerge() {
     EntityContribution e = new EntityContribution();
     e.getFromParts().add("ADDRESS A");
     e.getFromParts().add("INNER JOIN CONTACT C ON C.PERSON_ID=P.PERSON_ID");

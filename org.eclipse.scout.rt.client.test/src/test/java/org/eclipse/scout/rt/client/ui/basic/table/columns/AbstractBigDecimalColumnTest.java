@@ -18,7 +18,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -30,7 +29,7 @@ import org.mockito.Mockito;
 public class AbstractBigDecimalColumnTest extends AbstractBigDecimalColumn {
 
   @Test
-  public void testFormattingInDecorateCellInternal() throws ProcessingException {
+  public void testFormattingInDecorateCellInternal() {
     ITableRow row = Mockito.mock(ITableRow.class);
     Cell cell = new Cell();
     BigDecimal testValue = new BigDecimal("-123456789.12345");

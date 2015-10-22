@@ -79,7 +79,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     return BookmarkForm.class;
   }
 
-  private void createNewBookmark(int kind) throws ProcessingException {
+  private void createNewBookmark(int kind) {
     Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
     if (b != null) {
       IBookmarkService service = BEANS.get(IBookmarkService.class);
@@ -161,12 +161,12 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       setVisiblePermission(new CreateUserBookmarkPermission());
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       createNewBookmark(Bookmark.USER_BOOKMARK);
     }
   }
@@ -179,12 +179,12 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       setVisiblePermission(new CreateGlobalBookmarkPermission());
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       BEANS.get(IBookmarkService.class).loadBookmarks();
       createNewBookmark(Bookmark.GLOBAL_BOOKMARK);
     }
@@ -198,7 +198,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       ManageBookmarksForm form = new ManageBookmarksForm();
       form.startModify();
     }
@@ -219,7 +219,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         IBookmarkService service = BEANS.get(IBookmarkService.class);
         Bookmark b = service.getStartBookmark();
         if (b != null) {
@@ -249,7 +249,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         IBookmarkService service = BEANS.get(IBookmarkService.class);
         service.setStartBookmark();
         service.storeBookmarks();
@@ -264,7 +264,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         IBookmarkService service = BEANS.get(IBookmarkService.class);
         service.deleteStartBookmark();
         service.storeBookmarks();

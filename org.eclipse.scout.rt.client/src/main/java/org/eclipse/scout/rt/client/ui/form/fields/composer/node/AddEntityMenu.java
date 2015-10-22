@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
@@ -38,7 +37,7 @@ public class AddEntityMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execInitAction() throws ProcessingException {
+  protected void execInitAction() {
     setText(ScoutTexts.get("ExtendedSearchAddEntityPrefix") + " " + m_entity.getText());
     setIconId(m_entity.getIconId());
     if (m_propertyChangeListener == null) {
@@ -60,7 +59,7 @@ public class AddEntityMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     m_field.addEntityNode(m_parentNode, m_entity, false, null, null);
   }
 

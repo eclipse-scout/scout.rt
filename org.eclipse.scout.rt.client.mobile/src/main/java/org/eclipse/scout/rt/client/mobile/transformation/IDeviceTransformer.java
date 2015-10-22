@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -28,13 +27,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  */
 public interface IDeviceTransformer {
 
-  void transformDesktop() throws ProcessingException;
+  void transformDesktop();
 
-  void transformForm(IForm form) throws ProcessingException;
+  void transformForm(IForm form);
 
-  void transformOutline(IOutline outline) throws ProcessingException;
+  void transformOutline(IOutline outline);
 
-  void transformPageDetailTable(ITable table) throws ProcessingException;
+  void transformPageDetailTable(ITable table);
 
   void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList);
 
@@ -46,7 +45,7 @@ public interface IDeviceTransformer {
 
   void notifyDesktopClosing();
 
-  void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
+  void notifyTablePageLoaded(IPageWithTable<?> tablePage);
 
   boolean acceptFormAddingToDesktop(IForm form);
 

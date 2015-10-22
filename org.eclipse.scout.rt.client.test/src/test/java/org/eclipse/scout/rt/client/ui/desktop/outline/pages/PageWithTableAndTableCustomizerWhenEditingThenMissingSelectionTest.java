@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -104,7 +103,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
 
   public static class Outline extends AbstractOutline {
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -112,17 +111,17 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
-    protected void execInitPage() throws ProcessingException {
+    protected void execInitPage() {
       getTable().setTableCustomizer(new AbstractTableCustomizer() {
         private byte seq;
 
         @Override
-        public void setSerializedData(byte[] data) throws ProcessingException {
+        public void setSerializedData(byte[] data) {
           //nop
         }
 
         @Override
-        public byte[] getSerializedData() throws ProcessingException {
+        public byte[] getSerializedData() {
           seq++;
           if (tableCustomizerSerialDataIsRandom) {
             return new byte[]{seq, 0};
@@ -134,7 +133,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
     }
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{
           new Object[]{1, "Account 1"},
           new Object[]{2, "Account 2"},
@@ -185,7 +184,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
         }
 
         @Override
-        protected void execAction() throws ProcessingException {
+        protected void execAction() {
           System.out.println("Edit: change data 'Account'");
           dataChanged("Account");
         }

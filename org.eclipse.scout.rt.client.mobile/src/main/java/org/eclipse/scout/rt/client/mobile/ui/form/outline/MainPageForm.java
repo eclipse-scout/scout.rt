@@ -10,17 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public class MainPageForm extends PageForm implements IMainPageForm {
 
-  public MainPageForm(IPage<?> page, PageFormManager manager, PageFormConfig config) throws ProcessingException {
+  public MainPageForm(IPage<?> page, PageFormManager manager, PageFormConfig config) {
     super(page, manager, config);
   }
 
   @Override
-  protected void initConfig() throws ProcessingException {
+  protected void initConfig() {
     super.initConfig();
 
     getPageTableField().setActionBarVisible(false);

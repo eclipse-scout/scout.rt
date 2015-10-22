@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.navigation;
 import java.util.List;
 import java.util.Stack;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -21,9 +20,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  * @since 3.9.0
  */
 public interface IBreadCrumbsNavigation {
-  void goHome() throws ProcessingException;
+  void goHome();
 
-  void stepBack() throws ProcessingException;
+  void stepBack();
 
   boolean isSteppingBackPossible();
 

@@ -200,7 +200,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @ConfigOperation
   @Order(30)
-  protected void execDisplayModeChanged(int displayMode) throws ProcessingException {
+  protected void execDisplayModeChanged(int displayMode) {
     Calendar from = Calendar.getInstance();
     DateUtility.truncCalendar(from);
     Calendar to = Calendar.getInstance();
@@ -239,17 +239,17 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @ConfigOperation
   @Order(40)
-  protected void execViewRangeChanged(Range<Date> viewRange) throws ProcessingException {
+  protected void execViewRangeChanged(Range<Date> viewRange) {
   }
 
   @ConfigOperation
   @Order(50)
-  protected void execResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
+  protected void execResourcesSelected(List<Resource<RI>> resources) {
   }
 
   @ConfigOperation
   @Order(60)
-  protected void execSelectionRangeChanged(Range<Date> selectionRange) throws ProcessingException {
+  protected void execSelectionRangeChanged(Range<Date> selectionRange) {
   }
 
   /**
@@ -258,7 +258,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
    */
   @ConfigOperation
   @Order(70)
-  protected void execActivitySelected(Activity<RI, AI> activity) throws ProcessingException {
+  protected void execActivitySelected(Activity<RI, AI> activity) {
   }
 
   /**
@@ -267,17 +267,17 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
    */
   @ConfigOperation
   @Order(80)
-  protected void execDecorateActivity(Activity<RI, AI> activity) throws ProcessingException {
+  protected void execDecorateActivity(Activity<RI, AI> activity) {
   }
 
   @ConfigOperation
   @Order(90)
-  protected void execInitPlanner() throws ProcessingException {
+  protected void execInitPlanner() {
   }
 
   @ConfigOperation
   @Order(100)
-  protected void execDisposePlanner() throws ProcessingException {
+  protected void execDisposePlanner() {
   }
 
   protected final void interceptInitConfig() {
@@ -421,14 +421,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
    */
 
   @Override
-  public final void initPlanner() throws ProcessingException {
+  public final void initPlanner() {
     initPlannerInternal();
     interceptInitPlanner();
     // init actions
     ActionUtility.initActions(getMenus());
   }
 
-  protected void initPlannerInternal() throws ProcessingException {
+  protected void initPlannerInternal() {
   }
 
   @Override
@@ -552,11 +552,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     addResources(CollectionUtility.arrayList(resource));
   }
 
-  public void updateResource(Resource<RI> resource) throws ProcessingException {
+  public void updateResource(Resource<RI> resource) {
     updateResources(CollectionUtility.arrayList(resource));
   }
 
-  public void updateResources(List<Resource<RI>> resources) throws ProcessingException {
+  public void updateResources(List<Resource<RI>> resources) {
     if (resources == null || resources.size() == 0) {
       return;
     }
@@ -1098,90 +1098,90 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
 
     @Override
-    public void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
+    public void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell) {
       getOwner().execActivitySelected(cell);
     }
 
     @Override
-    public void execDisposePlanner(PlannerDisposePlannerChain<RI, AI> chain) throws ProcessingException {
+    public void execDisposePlanner(PlannerDisposePlannerChain<RI, AI> chain) {
       getOwner().execDisposePlanner();
     }
 
     @Override
-    public void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
+    public void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell) {
       getOwner().execDecorateActivity(cell);
     }
 
     @Override
-    public void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain) throws ProcessingException {
+    public void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain) {
       getOwner().execInitPlanner();
     }
 
     @Override
-    public void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> plannerResourcesSelectedChain, List<Resource<RI>> resources) throws ProcessingException {
+    public void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> plannerResourcesSelectedChain, List<Resource<RI>> resources) {
       getOwner().execResourcesSelected(resources);
     }
 
     @Override
-    public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> plannerSelectionRangeChangedChain, Range<Date> selectionRange) throws ProcessingException {
+    public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> plannerSelectionRangeChangedChain, Range<Date> selectionRange) {
       getOwner().execSelectionRangeChanged(selectionRange);
     }
 
     @Override
-    public void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> plannerViewRangeChangedChain, Range<Date> viewRange) throws ProcessingException {
+    public void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> plannerViewRangeChangedChain, Range<Date> viewRange) {
       getOwner().execViewRangeChanged(viewRange);
     }
 
     @Override
-    public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> plannerDisplayModeChangedChain, int displayMode) throws ProcessingException {
+    public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> plannerDisplayModeChangedChain, int displayMode) {
       getOwner().execDisplayModeChanged(displayMode);
     }
 
   }
 
-  protected final void interceptResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
+  protected final void interceptResourcesSelected(List<Resource<RI>> resources) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerResourcesSelectedChain<RI, AI> chain = new PlannerResourcesSelectedChain<RI, AI>(extensions);
     chain.execResourcesSelected(resources);
   }
 
-  protected final void interceptSelectionRangeChanged(Range<Date> selectionRange) throws ProcessingException {
+  protected final void interceptSelectionRangeChanged(Range<Date> selectionRange) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerSelectionRangeChangedChain<RI, AI> chain = new PlannerSelectionRangeChangedChain<RI, AI>(extensions);
     chain.execSelectionRangeChanged(selectionRange);
   }
 
-  protected final void interceptViewRangeChanged(Range<Date> viewRange) throws ProcessingException {
+  protected final void interceptViewRangeChanged(Range<Date> viewRange) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerViewRangeChangedChain<RI, AI> chain = new PlannerViewRangeChangedChain<RI, AI>(extensions);
     chain.execViewRangeChanged(viewRange);
   }
 
-  protected void interceptDisplayModeChanged(int displayMode) throws ProcessingException {
+  protected void interceptDisplayModeChanged(int displayMode) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerDisplayModeChangedChain<RI, AI> chain = new PlannerDisplayModeChangedChain<RI, AI>(extensions);
     chain.execDisplayModeChanged(displayMode);
   }
 
-  protected final void interceptActivitySelected(Activity<RI, AI> cell) throws ProcessingException {
+  protected final void interceptActivitySelected(Activity<RI, AI> cell) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerActivitySelectedChain<RI, AI> chain = new PlannerActivitySelectedChain<RI, AI>(extensions);
     chain.execActivitySelected(cell);
   }
 
-  protected final void interceptDisposePlanner() throws ProcessingException {
+  protected final void interceptDisposePlanner() {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerDisposePlannerChain<RI, AI> chain = new PlannerDisposePlannerChain<RI, AI>(extensions);
     chain.execDisposePlanner();
   }
 
-  protected final void interceptDecorateActivity(Activity<RI, AI> activity) throws ProcessingException {
+  protected final void interceptDecorateActivity(Activity<RI, AI> activity) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerDecorateActivityChain<RI, AI> chain = new PlannerDecorateActivityChain<RI, AI>(extensions);
     chain.execDecorateActivity(activity);
   }
 
-  protected final void interceptInitPlanner() throws ProcessingException {
+  protected final void interceptInitPlanner() {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerInitPlannerChain<RI, AI> chain = new PlannerInitPlannerChain<RI, AI>(extensions);
     chain.execInitPlanner();

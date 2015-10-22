@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
@@ -14,13 +13,13 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 public interface IPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends IPageExtension<OWNER> {
 
-  void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException;
+  void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter);
 
-  IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
+  IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row);
 
-  void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) throws ProcessingException;
+  void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain);
 
-  IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
+  IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row);
 
-  void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) throws ProcessingException;
+  void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain);
 }

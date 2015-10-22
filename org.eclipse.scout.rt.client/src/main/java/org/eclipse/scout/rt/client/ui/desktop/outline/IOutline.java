@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -106,7 +105,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   /**
    * Reset outline as it would have been started again from scratch
    */
-  void resetOutline() throws ProcessingException;
+  void resetOutline();
 
   boolean isVisible();
 

@@ -46,10 +46,10 @@ public final class CalendarChains {
       super(extensions);
     }
 
-    public void execDisposeCalendar() throws ProcessingException {
+    public void execDisposeCalendar() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICalendarExtension<? extends AbstractCalendar> next) throws ProcessingException {
+        protected void callMethod(ICalendarExtension<? extends AbstractCalendar> next) {
           next.execDisposeCalendar(CalendarDisposeCalendarChain.this);
         }
       };
@@ -67,10 +67,10 @@ public final class CalendarChains {
       super(extensions);
     }
 
-    public void execInitCalendar() throws ProcessingException {
+    public void execInitCalendar() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICalendarExtension<? extends AbstractCalendar> next) throws ProcessingException {
+        protected void callMethod(ICalendarExtension<? extends AbstractCalendar> next) {
           next.execInitCalendar(CalendarInitCalendarChain.this);
         }
       };

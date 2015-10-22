@@ -204,10 +204,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigOperation
   @Order(90)
-  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) {
   }
 
-  protected void createChildPagesInternal(List<IPage<?>> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage<?>> pageList) {
     interceptCreateChildPages(pageList);
   }
 
@@ -236,7 +236,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigOperation
   @Order(120)
-  protected void execInitDefaultDetailForm() throws ProcessingException {
+  protected void execInitDefaultDetailForm() {
   }
 
   @Override
@@ -517,7 +517,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public void unloadNode(ITreeNode node) throws ProcessingException {
+  public void unloadNode(ITreeNode node) {
     try {
       setTreeChanging(true);
       //
@@ -532,7 +532,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public void resetOutline() throws ProcessingException {
+  public void resetOutline() {
     if (getRootNode() == null) {
       return;
     }
@@ -692,11 +692,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * The default uses {@link IForm#start()} and therefore expects a form handler to be previously set. Override to call
    * a custom start method or implement a {@link IForm#start()} on the default detail form.
    */
-  protected void startDefaultDetailForm() throws ProcessingException {
+  protected void startDefaultDetailForm() {
     getDefaultDetailForm().start();
   }
 
-  public void ensureDefaultDetailFormCreated() throws ProcessingException {
+  public void ensureDefaultDetailFormCreated() {
     if (getDefaultDetailForm() != null) {
       return;
     }
@@ -707,21 +707,21 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
-  public void ensureDefaultDetailFormStarted() throws ProcessingException {
+  public void ensureDefaultDetailFormStarted() {
     if (getDefaultDetailForm() == null || getDefaultDetailForm().isFormStarted()) {
       return;
     }
     startDefaultDetailForm();
   }
 
-  protected void disposeDefaultDetailForm() throws ProcessingException {
+  protected void disposeDefaultDetailForm() {
     if (getDefaultDetailForm() != null) {
       getDefaultDetailForm().doClose();
       setDefaultDetailForm(null);
     }
   }
 
-  protected IForm createDefaultDetailForm() throws ProcessingException {
+  protected IForm createDefaultDetailForm() {
     if (getConfiguredDefaultDetailForm() == null) {
       return null;
     }
@@ -846,7 +846,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private class InvisibleRootPage extends AbstractPageWithNodes {
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       AbstractOutline.this.createChildPagesInternal(pageList);
     }
   }
@@ -857,7 +857,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return chain.execCreateRootPage();
   }
 
-  protected final void interceptCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+  protected final void interceptCreateChildPages(List<IPage<?>> pageList) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     OutlineCreateChildPagesChain chain = new OutlineCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
@@ -870,7 +870,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
 
     @Override
-    public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
+    public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage<?>> pageList) {
       getOwner().execCreateChildPages(pageList);
     }
 

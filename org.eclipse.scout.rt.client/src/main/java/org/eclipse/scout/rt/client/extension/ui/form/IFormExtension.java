@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -39,34 +38,34 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  */
 public interface IFormExtension<OWNER_FORM extends AbstractForm> extends IExtension<OWNER_FORM> {
 
-  void execCloseTimer(FormCloseTimerChain chain) throws ProcessingException;
+  void execCloseTimer(FormCloseTimerChain chain);
 
-  void execInactivityTimer(FormInactivityTimerChain chain) throws ProcessingException;
+  void execInactivityTimer(FormInactivityTimerChain chain);
 
-  void execStored(FormStoredChain chain) throws ProcessingException;
+  void execStored(FormStoredChain chain);
 
-  boolean execCheckFields(FormCheckFieldsChain chain) throws ProcessingException;
+  boolean execCheckFields(FormCheckFieldsChain chain);
 
-  void execResetSearchFilter(FormResetSearchFilterChain chain, SearchFilter searchFilter) throws ProcessingException;
+  void execResetSearchFilter(FormResetSearchFilterChain chain, SearchFilter searchFilter);
 
   void execAddSearchTerms(FormAddSearchTermsChain chain, SearchFilter search);
 
-  void execOnVetoException(FormOnVetoExceptionChain chain, VetoException e, int code) throws ProcessingException;
+  void execOnVetoException(FormOnVetoExceptionChain chain, VetoException e, int code);
 
-  void execFormActivated(FormFormActivatedChain chain) throws ProcessingException;
+  void execFormActivated(FormFormActivatedChain chain);
 
-  void execDisposeForm(FormDisposeFormChain chain) throws ProcessingException;
+  void execDisposeForm(FormDisposeFormChain chain);
 
-  void execTimer(FormTimerChain chain, String timerId) throws ProcessingException;
+  void execTimer(FormTimerChain chain, String timerId);
 
-  AbstractFormData execCreateFormData(FormCreateFormDataChain chain) throws ProcessingException;
+  AbstractFormData execCreateFormData(FormCreateFormDataChain chain);
 
-  void execInitForm(FormInitFormChain chain) throws ProcessingException;
+  void execInitForm(FormInitFormChain chain);
 
-  boolean execValidate(FormValidateChain chain) throws ProcessingException;
+  boolean execValidate(FormValidateChain chain);
 
-  void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException;
+  void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes);
 
-  void execDataChanged(FormDataChangedChain chain, Object... dataTypes) throws ProcessingException;
+  void execDataChanged(FormDataChangedChain chain, Object... dataTypes);
 
 }

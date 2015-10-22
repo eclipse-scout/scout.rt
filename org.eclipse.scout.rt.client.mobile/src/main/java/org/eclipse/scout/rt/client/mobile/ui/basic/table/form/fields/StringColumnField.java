@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
@@ -34,7 +33,7 @@ public class StringColumnField extends AbstractStringField implements IColumnWra
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     m_propertyDelegator.dispose();
   }
 

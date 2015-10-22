@@ -21,9 +21,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationService;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -55,7 +55,7 @@ public class OfflineSharedVariableNotificationTest {
   private final String testUserId = "testUser";
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     OfflineState.setOfflineDefault(false);
     OfflineState.CURRENT.remove();
     svc = BEANS.get(ClientNotificationService.class);
@@ -93,7 +93,7 @@ public class OfflineSharedVariableNotificationTest {
    * @throws ProcessingException
    */
   @Test
-  public void testDefaultOffline() throws ProcessingException {
+  public void testDefaultOffline() {
     runWithNotificationContainer(new IRunnable() {
 
       @Override
@@ -121,7 +121,7 @@ public class OfflineSharedVariableNotificationTest {
    * @throws ProcessingException
    */
   @Test
-  public void testDefaultOfflineThreadOffline() throws ProcessingException {
+  public void testDefaultOfflineThreadOffline() {
     runWithNotificationContainer(new IRunnable() {
 
       @Override
@@ -150,7 +150,7 @@ public class OfflineSharedVariableNotificationTest {
   @Test
   @Ignore
   //slow, ignore until timeout is configurable
-  public void testDefaultOfflineThreadOnline() throws ProcessingException {
+  public void testDefaultOfflineThreadOnline() {
     runWithNotificationContainer(new IRunnable() {
 
       @Override
@@ -176,7 +176,7 @@ public class OfflineSharedVariableNotificationTest {
    * A CLIENT NOTIFICATION SHOULD BE SENT IN THIS CASE.
    */
   @Test
-  public void testDefaultOnline() throws ProcessingException {
+  public void testDefaultOnline() {
     runWithNotificationContainer(new IRunnable() {
 
       @Override
@@ -201,7 +201,7 @@ public class OfflineSharedVariableNotificationTest {
    * A client notification should be sent in this case.
    */
   @Test
-  public void testDefaultOnlineThreadOnline() throws ProcessingException {
+  public void testDefaultOnlineThreadOnline() {
     runWithNotificationContainer(new IRunnable() {
 
       @Override
@@ -229,7 +229,7 @@ public class OfflineSharedVariableNotificationTest {
   @Test
   @Ignore
   //slow, ignore until timeout is configurable
-  public void testDefaultOnlineThreadOffline() throws ProcessingException {
+  public void testDefaultOnlineThreadOffline() {
     runWithNotificationContainer(new IRunnable() {
 
       @Override
@@ -246,12 +246,12 @@ public class OfflineSharedVariableNotificationTest {
 
   }
 
-  private void commit() throws ProcessingException {
+  private void commit() {
     ITransaction.CURRENT.get().commitPhase1();
     ITransaction.CURRENT.get().commitPhase2();
   }
 
-  private void runWithNotificationContainer(IRunnable runnable) throws ProcessingException {
+  private void runWithNotificationContainer(IRunnable runnable) {
     ServerRunContexts.copyCurrent()
         .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
         .withNotificationNodeId("test").run(runnable);

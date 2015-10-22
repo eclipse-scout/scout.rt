@@ -29,7 +29,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -166,7 +165,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * are called upon leaving the transaction boundary, e.g. to implement a 2-phase-commit-protocol (2PC) for the
    * webservice operations invoked.
    */
-  public InvocationContext<PORT> newInvocationContext() throws ProcessingException {
+  public InvocationContext<PORT> newInvocationContext() {
     final PORT port = (m_portCache != null ? m_portCache.get() : m_portProvider.provide());
 
     final InvocationContext<PORT> portHandle = new InvocationContext<>(port, getClass().getSimpleName());

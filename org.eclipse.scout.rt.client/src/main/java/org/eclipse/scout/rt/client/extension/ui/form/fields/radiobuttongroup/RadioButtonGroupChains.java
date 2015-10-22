@@ -45,10 +45,10 @@ public final class RadioButtonGroupChains {
       super(extensions);
     }
 
-    public void execFilterLookupResult(final ILookupCall<T> call, final List<ILookupRow<T>> result) throws ProcessingException {
+    public void execFilterLookupResult(final ILookupCall<T> call, final List<ILookupRow<T>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>> next) throws ProcessingException {
+        protected void callMethod(IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>> next) {
           next.execFilterLookupResult(RadioButtonGroupFilterLookupResultChain.this, call, result);
         }
       };

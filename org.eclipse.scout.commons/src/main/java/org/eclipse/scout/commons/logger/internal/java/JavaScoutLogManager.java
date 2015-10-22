@@ -136,7 +136,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
   }
 
   @Override
-  public boolean startRecording() throws ProcessingException {
+  public boolean startRecording() {
     synchronized (m_recordingLock) {
       if (m_logRecorderHandler == null) {
         m_logRecorderHandler = createLogRecordingHandler();
@@ -172,7 +172,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
    * @return
    * @throws ProcessingException
    */
-  protected LogRecorderHandler createLogRecordingHandler() throws ProcessingException {
+  protected LogRecorderHandler createLogRecordingHandler() {
     try {
       File tempLogDir = IOUtility.createTempDirectory("log");
       LogRecorderHandler handler = new LogRecorderHandler(tempLogDir.getAbsolutePath(), 1024 * 1024, 1024, false);

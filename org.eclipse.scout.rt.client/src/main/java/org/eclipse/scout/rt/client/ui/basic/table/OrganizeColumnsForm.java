@@ -74,14 +74,14 @@ public class OrganizeColumnsForm extends AbstractForm {
   protected P_TableState m_oldTableState;
   protected boolean m_loading;
 
-  public OrganizeColumnsForm(ITable table) throws ProcessingException {
+  public OrganizeColumnsForm(ITable table) {
     super(false);
     m_table = table;
     callInitializer();
   }
 
   @Override
-  protected void initConfig() throws ProcessingException {
+  protected void initConfig() {
     super.initConfig();
     getRootGroupBox().setScrollable(true);
   }
@@ -206,7 +206,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execReloadTableData() throws ProcessingException {
+          protected void execReloadTableData() {
             List<ITableRow> rowList = new ArrayList<ITableRow>();
             ClientUIPreferences prefs = ClientUIPreferences.getInstance();
 
@@ -243,7 +243,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           }
 
-          protected void resetAll() throws ProcessingException {
+          protected void resetAll() {
             try {
               m_table.setTableChanging(true);
               //
@@ -263,7 +263,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             getColumnsTableField().reloadTableData();
           }
 
-          protected void resetView() throws ProcessingException {
+          protected void resetView() {
             try {
               m_table.setTableChanging(true);
               //
@@ -281,7 +281,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             getColumnsTableField().reloadTableData();
           }
 
-          private void ensureNewConfigRowExists() throws ProcessingException {
+          private void ensureNewConfigRowExists() {
             for (ITableRow row : getTable().getRows()) {
               if (getTable().getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
                 return;
@@ -320,7 +320,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
 
             @Override
-            protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+            protected void execRowsSelected(List<? extends ITableRow> rows) {
               getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected());
               getMenuByClass(RenameMenu.class).setVisible(isOnlyCustomConfigsSelected());
 
@@ -341,7 +341,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
+              protected IFormField execPrepareEdit(ITableRow row) {
                 IStringField field = (IStringField) super.execPrepareEdit(row);
                 if (getConfigTypeColumn().getValue(row) == ConfigType.NEW) {
                   field.setValue(null);
@@ -350,7 +350,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
+              protected void execCompleteEdit(ITableRow row, IFormField editingField) {
                 String oldValue = getConfigNameColumn().getValue(row);
                 super.execCompleteEdit(row, editingField);
                 String newValue = ((IStringField) editingField).getValue();
@@ -411,7 +411,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execAction() throws ProcessingException {
+              protected void execAction() {
                 ensureNewConfigRowExists();
               }
 
@@ -436,7 +436,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execAction() throws ProcessingException {
+              protected void execAction() {
                 if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
                   resetAll();
                 }
@@ -487,7 +487,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                 }
 
                 @Override
-                protected void execAction() throws ProcessingException {
+                protected void execAction() {
                   if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
                     resetAll();
                   }
@@ -508,7 +508,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                 }
 
                 @Override
-                protected void execAction() throws ProcessingException {
+                protected void execAction() {
                   if (getConfigTypeColumn().getSelectedValue() == ConfigType.DEFAULT) {
                     resetView();
                   }
@@ -529,7 +529,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                 }
 
                 @Override
-                protected void execAction() throws ProcessingException {
+                protected void execAction() {
                   String configName = getConfigNameColumn().getSelectedValue();
                   m_table.getColumnSet().applySortingAndGrouping(configName);
                   getColumnsTableField().reloadTableData();
@@ -557,7 +557,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execAction() throws ProcessingException {
+              protected void execAction() {
                 getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
                 // FIXME ASA open and focus cell for edit, once it is supported.
               }
@@ -601,7 +601,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execAction() throws ProcessingException {
+              protected void execAction() {
                 List<ITableRow> rows = getSelectedRows();
                 deleteRows(rows);
                 for (ITableRow row : rows) {
@@ -659,7 +659,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execReloadTableData() throws ProcessingException {
+          protected void execReloadTableData() {
             List<ITableRow> rowList = new ArrayList<ITableRow>();
             for (IColumn<?> col : m_table.getColumnSet().getAllColumnsInUserOrder()) {
               if (col.isDisplayable()) {
@@ -723,12 +723,12 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
 
             @Override
-            protected TransferObject execDrag(List<ITableRow> rows) throws ProcessingException {
+            protected TransferObject execDrag(List<ITableRow> rows) {
               return new JavaTransferObject(rows);
             }
 
             @Override
-            protected void execDrop(ITableRow row, TransferObject transfer) throws ProcessingException {
+            protected void execDrop(ITableRow row, TransferObject transfer) {
               if (row != null && transfer != null && transfer instanceof JavaTransferObject) {
                 List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
                 if (CollectionUtility.hasElements(draggedRows)) {
@@ -795,7 +795,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
 
             @Override
-            protected void execRowsChecked(Collection<? extends ITableRow> rows) throws ProcessingException {
+            protected void execRowsChecked(Collection<? extends ITableRow> rows) {
               if (isFormLoading()) {
                 return;
               }
@@ -805,11 +805,11 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
 
             @Override
-            protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+            protected void execRowsSelected(List<? extends ITableRow> rows) {
               validateButtons();
             }
 
-            protected void sortSelectedColumn(boolean ascending) throws ProcessingException {
+            protected void sortSelectedColumn(boolean ascending) {
               ITableRow row = getColumnsTableField().getTable().getSelectedRow();
               try {
                 getColumnsTableField().getTable().setTableChanging(true);
@@ -914,7 +914,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execAction() throws ProcessingException {
+              protected void execAction() {
                 sortSelectedColumn(true);
               }
             }
@@ -938,7 +938,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
-              protected void execAction() throws ProcessingException {
+              protected void execAction() {
                 sortSelectedColumn(false);
               }
             }
@@ -978,7 +978,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             getColumnsTableField().getTable().checkAllRows();
 
             updateColumnVisibilityAndOrder();
@@ -999,7 +999,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             getColumnsTableField().getTable().uncheckAllRows();
 
             updateColumnVisibilityAndOrder();
@@ -1026,7 +1026,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             moveUp(getColumnsTableField().getTable().getSelectedRow());
           }
 
@@ -1071,13 +1071,13 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             setVisiblePermission(new CreateCustomColumnPermission());
             setVisible(m_table.getTableCustomizer() != null);
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             if (m_table != null) {
               if (m_table.getTableCustomizer() != null) {
                 ArrayList<String> existingColumns = new ArrayList<String>();
@@ -1139,12 +1139,12 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             setVisiblePermission(new UpdateCustomColumnPermission());
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             if (m_table != null) {
               if (m_table.getTableCustomizer() != null) {
                 if (getColumnsTableField().getTable().getSelectedRow() != null) {
@@ -1174,12 +1174,12 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             setVisiblePermission(new DeleteCustomColumnPermission());
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             if (m_table != null) {
               if (m_table.getTableCustomizer() != null) {
                 if (getColumnsTableField().getTable().getSelectedRow() != null) {
@@ -1210,13 +1210,13 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             // This button is only visible in development mode
             setVisibleGranted(Platform.get().inDevelopmentMode());
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             try {
               StringBuilder sb = new StringBuilder();
 
@@ -1261,7 +1261,7 @@ public class OrganizeColumnsForm extends AbstractForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         // revert to original state
         P_TableState tableState = m_oldTableState;
         restoreTableState(tableState);
@@ -1277,7 +1277,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
   }
 
-  private void setColumnVisible(ITableRow row, Boolean visible) throws ProcessingException {
+  private void setColumnVisible(ITableRow row, Boolean visible) {
     getColumnsTableField().getTable().checkRow(row, visible);
 
     updateColumnVisibilityAndOrder();
@@ -1320,7 +1320,7 @@ public class OrganizeColumnsForm extends AbstractForm {
   }
 
   @Override
-  public void validateForm() throws ProcessingException {
+  public void validateForm() {
     boolean oneColumnIsVisble = getColumnsTableField().getTable().getCheckedRows().size() > 0;
 
     if (!oneColumnIsVisble) {
@@ -1371,7 +1371,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   }
 
-  public void reload() throws ProcessingException {
+  public void reload() {
     m_loading = true;
     try {
       // Back-up the current columns so we may restore them if
@@ -1390,7 +1390,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     return super.isFormLoading() || m_loading;
   }
 
-  protected P_TableState createTableStateSnpashot() throws ProcessingException {
+  protected P_TableState createTableStateSnpashot() {
     P_TableState tableState = new P_TableState();
     if (m_table.getTableCustomizer() != null) {
 
@@ -1404,7 +1404,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     return tableState;
   }
 
-  protected void restoreTableState(P_TableState tableState) throws ProcessingException {
+  protected void restoreTableState(P_TableState tableState) {
     try {
       m_table.setTableChanging(true);
       if (m_table.getTableCustomizer() != null) {
@@ -1424,7 +1424,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  protected void storeCurrentStateAsConfig(String configName) throws ProcessingException {
+  protected void storeCurrentStateAsConfig(String configName) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     if (prefs != null) {
       prefs.addTableColumnsConfig(m_table, configName);
@@ -1442,12 +1442,12 @@ public class OrganizeColumnsForm extends AbstractForm {
     }
   }
 
-  protected void applyAll(String configName) throws ProcessingException {
+  protected void applyAll(String configName) {
     applyViewForConfig(configName);
     m_table.getColumnSet().applySortingAndGrouping(configName);
   }
 
-  protected void applyViewForConfig(String configName) throws ProcessingException {
+  protected void applyViewForConfig(String configName) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     if (m_table.getTableCustomizer() != null) {
       byte[] tableCustomizerData = prefs.getTableCustomizerData(m_table, m_table.getTableCustomizer().getClass(), configName);

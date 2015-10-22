@@ -61,7 +61,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
-  protected Boolean parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected Boolean parseValueInternal(ITableRow row, Object rawValue) {
     Boolean validValue = null;
     if (rawValue == null) {
       validValue = null;
@@ -79,7 +79,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
-  protected Boolean validateValueInternal(ITableRow row, Boolean rawValue) throws ProcessingException {
+  protected Boolean validateValueInternal(ITableRow row, Boolean rawValue) {
     return BooleanUtility.nvl(super.validateValueInternal(row, rawValue));
   }
 

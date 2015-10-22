@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 /**
@@ -26,7 +25,7 @@ public interface ITableRowDataMapper {
    * @param row
    * @param rowData
    */
-  void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
+  void importTableRowData(ITableRow row, AbstractTableRowData rowData);
 
   /**
    * Writes the data from the given {@link ITableRow} to the given {@link AbstractTableRowData}.
@@ -34,19 +33,19 @@ public interface ITableRowDataMapper {
    * @param row
    * @param rowData
    */
-  void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
+  void exportTableRowData(ITableRow row, AbstractTableRowData rowData);
 
   /**
    * Override to exclude certain rows from being exported.
    * <p>
    * As default every row is accepted.
    */
-  boolean acceptExport(ITableRow row) throws ProcessingException;
+  boolean acceptExport(ITableRow row);
 
   /**
    * Override to exclude certain rows from being imported.
    * <p>
    * As default every row is accepted.
    */
-  boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException;
+  boolean acceptImport(AbstractTableRowData rowData);
 }

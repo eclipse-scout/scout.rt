@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.cache;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheWrapper;
 import org.eclipse.scout.rt.shared.cache.ICache;
@@ -29,7 +28,7 @@ public class ClientNotificationClientCacheWrapper<K, V> extends AbstractCacheWra
   }
 
   @Override
-  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException {
+  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
     if (propagate) {
       // invalidate the remote server cache. This will in turn invalidate the local client cache
       BEANS.get(IRemoteCacheService.class).invalidate(getCacheId(), filter, true);

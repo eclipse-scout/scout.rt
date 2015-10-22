@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * Outline with search capabilities.
  */
@@ -26,7 +24,7 @@ public interface ISearchOutline extends IOutline {
    */
   String PROP_REQUEST_FOCUS_QUERY_FIELD = "requestFocusQueryField";
 
-  void search() throws ProcessingException;
+  void search();
 
   String getSearchQuery();
 

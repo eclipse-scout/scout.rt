@@ -60,7 +60,7 @@ public class PrintApplicationAction extends AbstractAction {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (getDesktop() == null) {
       throw new VetoException("desktop is null");
     }
@@ -118,7 +118,7 @@ public class PrintApplicationAction extends AbstractAction {
             final IGroupBox selectedTabFinal = selectedTab;
             m_taskList.add(new ITask() {
               @Override
-              public void run() throws ProcessingException {
+              public void run() {
                 tabBox.setSelectedTab(selectedTabFinal);
                 executeNextTask();
               }
@@ -171,7 +171,7 @@ public class PrintApplicationAction extends AbstractAction {
     }
   }
 
-  private void executeNextTask() throws ProcessingException {
+  private void executeNextTask() {
     if (m_taskList.isEmpty()) {
       return;
     }
@@ -179,7 +179,7 @@ public class PrintApplicationAction extends AbstractAction {
     task.run();
   }
 
-  private File createFile(File dir, String filename, String fileExtension) throws ProcessingException {
+  private File createFile(File dir, String filename, String fileExtension) {
     File file = new File(dir, new StringBuilder().append(filename).append('.').append(fileExtension).toString());
     try {
       if (!file.createNewFile()) {
@@ -213,7 +213,7 @@ public class PrintApplicationAction extends AbstractAction {
     }
 
     @Override
-    public void run() throws ProcessingException {
+    public void run() {
       StringBuilder filename = new StringBuilder();
       filename.append(getForm().getFormId());
       if (getGroupBox() != null) {
@@ -238,7 +238,7 @@ public class PrintApplicationAction extends AbstractAction {
 
   private class P_EndTask implements ITask {
     @Override
-    public void run() throws ProcessingException {
+    public void run() {
       firePrintEvent(new PrintEvent(PrintApplicationAction.this, PrintEvent.TYPE_PRINT_DONE));
     }
   } // end
@@ -266,7 +266,7 @@ public class PrintApplicationAction extends AbstractAction {
     }
 
     @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
+    public void formChanged(FormEvent e) {
       if (e.getType() == FormEvent.TYPE_PRINTED) {
         getForm().removeFormListener(P_FormListener.this);
         executeNextTask();
@@ -279,7 +279,7 @@ public class PrintApplicationAction extends AbstractAction {
   } // end class P_FormListener
 
   private interface ITask {
-    void run() throws ProcessingException;
+    void run();
   }
 
   public interface IFormFilter {

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.AbstractTemplate2GroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.AbstractTemplate3GroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm;
@@ -34,7 +33,7 @@ import org.junit.runner.RunWith;
 public class TabFormTestTest {
 
   @Test
-  public void testSimpleExport() throws ProcessingException {
+  public void testSimpleExport() {
     TestForm f = new TestForm();
     TabForm tabForm = null;
     try {
@@ -63,7 +62,7 @@ public class TabFormTestTest {
   }
 
   @Test
-  public void testTemplateExport() throws ProcessingException {
+  public void testTemplateExport() {
     TestForm f = new TestForm();
     TabForm tabForm = null;
     try {
@@ -97,7 +96,7 @@ public class TabFormTestTest {
   }
 
   @Test
-  public void testTemplateExExport() throws ProcessingException {
+  public void testTemplateExExport() {
     TestForm f = new TestForm();
     TabForm tabForm = null;
     try {

@@ -115,7 +115,7 @@ public final class ActionUtility {
     return CollectionUtility.emptyArrayList();
   }
 
-  public static void initActions(List<? extends IAction> actions) throws ProcessingException {
+  public static void initActions(List<? extends IAction> actions) {
     InitActionVisitor v = new InitActionVisitor();
     for (IAction a : actions) {
       a.acceptVisitor(v);
@@ -144,7 +144,7 @@ public final class ActionUtility {
       return CONTINUE;
     }
 
-    public void handleResult() throws ProcessingException {
+    public void handleResult() {
       if (m_firstEx != null) {
         throw m_firstEx;
       }

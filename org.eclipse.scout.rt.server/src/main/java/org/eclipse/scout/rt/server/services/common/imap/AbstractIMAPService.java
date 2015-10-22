@@ -100,11 +100,11 @@ public abstract class AbstractIMAPService implements IIMAPService {
     return null;
   }
 
-  public void openConnection() throws ProcessingException {
+  public void openConnection() {
     openConnection(false);
   }
 
-  public void openConnection(boolean useSSL) throws ProcessingException {
+  public void openConnection(boolean useSSL) {
     try {
       Properties props = new Properties();
       props.put("mail.transport.protocol", "imap");
@@ -149,7 +149,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
     }
   }
 
-  public void closeConnection() throws ProcessingException {
+  public void closeConnection() {
     try {
       m_folder.close(true);
       m_folder = null;
@@ -179,26 +179,26 @@ public abstract class AbstractIMAPService implements IIMAPService {
   }
 
   @Override
-  public Message[] getUnreadMessages() throws ProcessingException {
+  public Message[] getUnreadMessages() {
     ReadMailTask task = new ReadMailTask();
     doTask(task);
     return task.getUnreadMessages();
   }
 
   @Override
-  public void deleteAllMessages() throws ProcessingException {
+  public void deleteAllMessages() {
     DeleteMailTask task = new DeleteMailTask(true);
     doTask(task);
   }
 
   @Override
-  public void deleteMessages(Message... toDelete) throws ProcessingException {
+  public void deleteMessages(Message... toDelete) {
     DeleteMailTask task = new DeleteMailTask(false);
     task.setMessagesToDelete(toDelete);
     doTask(task);
   }
 
-  private void doTask(AbstractMailTask task) throws ProcessingException {
+  private void doTask(AbstractMailTask task) {
     if (m_opened == false) {
       throw new ProcessingException("No connection opened");
     }
@@ -208,7 +208,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
   }
 
   private abstract class AbstractMailTask {
-    public void doTask(Folder folder) throws ProcessingException {
+    public void doTask(Folder folder) {
     }
   }
 
@@ -217,7 +217,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
     private ArrayList<Message> messages = new ArrayList<Message>();
 
     @Override
-    public void doTask(Folder folder) throws ProcessingException {
+    public void doTask(Folder folder) {
       try {
         Message item;
         Message[] m = folder.getMessages();
@@ -250,7 +250,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
     }
 
     @Override
-    public void doTask(Folder folder) throws ProcessingException {
+    public void doTask(Folder folder) {
       try {
         Message[] m = folder.getMessages();
         if (deleteAll == true) {

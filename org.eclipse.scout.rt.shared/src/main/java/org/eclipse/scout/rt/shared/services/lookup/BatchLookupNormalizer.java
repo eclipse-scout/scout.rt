@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Normalize batch lookup calls. see {@link #normalize(LookupCall[])}
@@ -46,7 +45,7 @@ public class BatchLookupNormalizer {
    *
    * @return the reduced array only containing distinct calls with respect to {@link LookupCall#equals(Object)}
    */
-  public List<ILookupCall<?>> normalizeCalls(List<ILookupCall<?>> calls) throws ProcessingException {
+  public List<ILookupCall<?>> normalizeCalls(List<ILookupCall<?>> calls) {
     m_originalLength = 0;
     m_forwardMapping = null;
     m_normalizedCalls = null;
@@ -88,7 +87,7 @@ public class BatchLookupNormalizer {
   /**
    * @return the results for the original array containing direct references to the shared results.
    */
-  public List<List<ILookupRow<?>>> denormalizeResults(List<List<ILookupRow<?>>> normalizedResults) throws ProcessingException {
+  public List<List<ILookupRow<?>>> denormalizeResults(List<List<ILookupRow<?>>> normalizedResults) {
     if (m_originalLength == 0 || normalizedResults == null) {
       return CollectionUtility.emptyArrayList();
     }

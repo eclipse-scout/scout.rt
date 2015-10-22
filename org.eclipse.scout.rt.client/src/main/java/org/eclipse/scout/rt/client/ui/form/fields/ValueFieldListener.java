@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.EventListener;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  *
  */
 public interface ValueFieldListener extends EventListener {
-  void valueFieldChanged(ValueFieldEvent event) throws ProcessingException;
+  void valueFieldChanged(ValueFieldEvent event);
 }

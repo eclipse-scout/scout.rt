@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.AbstractStringFieldExtension;
@@ -39,7 +38,7 @@ public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
 
   public static class NameField extends AbstractStringField {
     @Override
-    protected String execValidateValue(String rawValue) throws ProcessingException {
+    protected String execValidateValue(String rawValue) {
       nameFieldExecValidateCounter.incrementAndGet();
       return super.execValidateValue(rawValue);
     }
@@ -55,7 +54,7 @@ public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
-    public String execValidateValue(ValueFieldExecValidateChain<String> chain, String rawValue) throws ProcessingException {
+    public String execValidateValue(ValueFieldExecValidateChain<String> chain, String rawValue) {
       nameFieldExtExecValidateCounter.incrementAndGet();
       String chainVal01 = chain.execValidateValue(rawValue);
       String chainVal02 = chain.execValidateValue(rawValue);

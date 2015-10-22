@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.DocumentFieldChains.DocumentFieldComReadyStatusChangedChain;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
@@ -13,7 +12,7 @@ public abstract class AbstractDocumentFieldExtension<OWNER extends AbstractDocum
   }
 
   @Override
-  public void execComReadyStatusChanged(DocumentFieldComReadyStatusChangedChain chain, boolean ready) throws ProcessingException {
+  public void execComReadyStatusChanged(DocumentFieldComReadyStatusChangedChain chain, boolean ready) {
     chain.execComReadyStatusChanged(ready);
   }
 }

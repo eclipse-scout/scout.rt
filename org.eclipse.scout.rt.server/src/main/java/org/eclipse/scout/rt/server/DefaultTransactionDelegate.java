@@ -179,7 +179,7 @@ public class DefaultTransactionDelegate {
   /**
    * Check, if the service can be accessed
    */
-  protected void checkServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object[] args) throws ProcessingException {
+  protected void checkServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object[] args) {
     Object service = BEANS.opt(serviceInterfaceClass);
     checkServiceAvailable(serviceInterfaceClass, service);
     checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, args);

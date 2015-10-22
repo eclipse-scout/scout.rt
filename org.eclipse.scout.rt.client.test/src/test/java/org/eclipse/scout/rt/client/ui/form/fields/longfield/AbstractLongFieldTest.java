@@ -48,12 +48,12 @@ public class AbstractLongFieldTest extends AbstractLongField {
   }
 
   @Test
-  public void testParseValueInternalNull() throws ProcessingException {
+  public void testParseValueInternalNull() {
     assertEquals("expected null return for null input", null, parseValueInternal(null));
   }
 
   @Test
-  public void testParseValueInternalInRange() throws ProcessingException {
+  public void testParseValueInternalInRange() {
     assertEquals("parsing failed", Long.valueOf(42), parseValueInternal("42"));
     assertEquals("parsing failed", Long.valueOf(-42), parseValueInternal("-42"));
     assertEquals("parsing failed", Long.valueOf(0), parseValueInternal("0"));
@@ -78,7 +78,7 @@ public class AbstractLongFieldTest extends AbstractLongField {
     assertEquals("expected minValue=Long.MIN_VALUE after calling setter with null-param", Long.valueOf(Long.MIN_VALUE), getMinValue());
   }
 
-  public void testParseValueInternalAroundLongMinMaxValue() throws ProcessingException {
+  public void testParseValueInternalAroundLongMinMaxValue() {
     assertEquals("parsing failed", Long.valueOf(Integer.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MAX_VALUE).toPlainString()));
     assertEquals("parsing failed", Long.valueOf(Integer.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MIN_VALUE).toPlainString()));
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this,
@@ -88,7 +88,7 @@ public class AbstractLongFieldTest extends AbstractLongField {
   }
 
   @Test
-  public void testParseValueInternalNotANumber() throws ProcessingException {
+  public void testParseValueInternalNotANumber() {
     boolean exceptionOccured = false;
     try {
       parseValueInternal("onethousend");
@@ -100,7 +100,7 @@ public class AbstractLongFieldTest extends AbstractLongField {
   }
 
   @Test
-  public void testParseValueInternalDecimal() throws ProcessingException {
+  public void testParseValueInternalDecimal() {
     // expecting RoundingMode.UNNECESSARY as default
     boolean exceptionOccured = false;
     try {

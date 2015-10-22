@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application. See Bug
@@ -26,7 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public class BatchLookupService implements IBatchLookupService {
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
     List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
@@ -37,7 +36,7 @@ public class BatchLookupService implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
     List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
@@ -48,7 +47,7 @@ public class BatchLookupService implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
     List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
@@ -59,7 +58,7 @@ public class BatchLookupService implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
     List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();

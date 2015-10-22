@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.client.job.ClientJobs;
@@ -80,7 +79,7 @@ public class NotificationDispatcherTest {
   }
 
   @Test
-  public void testStringNotification() throws ProcessingException {
+  public void testStringNotification() {
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend JUnit model thread", true);
     final String stringNotification = "A simple string notification";
 
@@ -103,7 +102,7 @@ public class NotificationDispatcherTest {
   }
 
   @Test
-  public void testSuperClassNotification() throws ProcessingException {
+  public void testSuperClassNotification() {
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend JUnit model thread1", true);
 
     ClientJobs.schedule(new IRunnable() {

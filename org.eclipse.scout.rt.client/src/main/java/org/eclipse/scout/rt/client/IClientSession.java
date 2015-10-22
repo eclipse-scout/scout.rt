@@ -16,7 +16,6 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
@@ -121,7 +120,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
   /**
    * set the desktop model assiciated with this client session
    */
-  void setDesktop(IDesktop a) throws ProcessingException;
+  void setDesktop(IDesktop a);
 
   /**
    * see {@link IMemoryPolicy}
@@ -138,7 +137,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   Subject getOfflineSubject();
 
-  void goOffline() throws ProcessingException;
+  void goOffline();
 
   /**
    * @param newMap

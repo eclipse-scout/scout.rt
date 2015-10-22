@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -29,7 +28,7 @@ import org.mockito.Mockito;
 public class AbstractStringColumnTest {
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractStringColumn column = new AbstractStringColumn() {
     };
     column.setCssClass("myCSSClass");
@@ -44,7 +43,7 @@ public class AbstractStringColumnTest {
   }
 
   @Test
-  public void testCustomValidation() throws ProcessingException {
+  public void testCustomValidation() {
     TestTable table = new TestTable();
     TestStringColumn col = table.getTestStringColumn();
     ITableRow row = table.addRowByArray(new Object[]{"valid"});
@@ -55,7 +54,7 @@ public class AbstractStringColumnTest {
   }
 
   @Test
-  public void testMaxLengthValidation() throws ProcessingException {
+  public void testMaxLengthValidation() {
     TestTable table = new TestTable();
     TestStringColumn col = table.getTestStringColumn();
     col.setMaxLength(1);
@@ -78,7 +77,7 @@ public class AbstractStringColumnTest {
       }
 
       @Override
-      protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
+      protected String execValidateValue(ITableRow row, String rawValue) {
         if ("invalid".equals(rawValue)) {
           throw new VetoException("invalid");
         }

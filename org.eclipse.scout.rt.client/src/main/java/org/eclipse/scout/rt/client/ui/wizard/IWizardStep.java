@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -116,21 +115,21 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
    *          {@link IForm#startWizardStep(IWizardStep2, Class)} on the form and places the form inside the wizard
    *          {@link IWizard#setWizardForm(org.eclipse.scout.rt.client.ui.form.IForm)}
    */
-  void activate(int stepKind) throws ProcessingException;
+  void activate(int stepKind);
 
   /**
    * @param stepKind
    *          any of the STEP_* constants deactivate this step
    */
-  void deactivate(int stepKind) throws ProcessingException;
+  void deactivate(int stepKind);
 
   /**
    * dispose this step The default implementation closes the form at {@link #getForm()}
    */
-  void dispose() throws ProcessingException;
+  void dispose();
 
   /**
    * Performs the "wizard step action"
    */
-  void doAction() throws ProcessingException;
+  void doAction();
 }

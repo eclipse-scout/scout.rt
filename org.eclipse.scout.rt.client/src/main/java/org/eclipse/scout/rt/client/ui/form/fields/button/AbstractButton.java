@@ -185,7 +185,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigOperation
   @Order(190)
-  protected void execClickAction() throws ProcessingException {
+  protected void execClickAction() {
   }
 
   /**
@@ -197,7 +197,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigOperation
   @Order(210)
-  protected void execSelectionChanged(boolean selection) throws ProcessingException {
+  protected void execSelectionChanged(boolean selection) {
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -246,7 +246,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     super.initFieldInternal();
     // init actions
     ActionUtility.initActions(getMenus());
@@ -331,7 +331,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public void doClick() throws ProcessingException {
+  public void doClick() {
     if (isEnabled() && isVisible() && isEnabledProcessingButton()) {
       try {
         setEnabledProcessingButton(false);
@@ -471,13 +471,13 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
   }
 
-  protected final void interceptSelectionChanged(boolean selection) throws ProcessingException {
+  protected final void interceptSelectionChanged(boolean selection) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ButtonSelectionChangedChain chain = new ButtonSelectionChangedChain(extensions);
     chain.execSelectionChanged(selection);
   }
 
-  protected final void interceptClickAction() throws ProcessingException {
+  protected final void interceptClickAction() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ButtonClickActionChain chain = new ButtonClickActionChain(extensions);
     chain.execClickAction();
@@ -490,12 +490,12 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
 
     @Override
-    public void execSelectionChanged(ButtonSelectionChangedChain chain, boolean selection) throws ProcessingException {
+    public void execSelectionChanged(ButtonSelectionChangedChain chain, boolean selection) {
       getOwner().execSelectionChanged(selection);
     }
 
     @Override
-    public void execClickAction(ButtonClickActionChain chain) throws ProcessingException {
+    public void execClickAction(ButtonClickActionChain chain) {
       getOwner().execClickAction();
     }
   }

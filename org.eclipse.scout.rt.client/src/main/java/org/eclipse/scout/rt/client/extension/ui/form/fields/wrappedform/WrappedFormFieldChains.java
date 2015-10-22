@@ -27,10 +27,10 @@ public final class WrappedFormFieldChains {
       super(extensions);
     }
 
-    public void execInnerFormChanged(final FORM oldInnerForm, final FORM newInnerForm) throws ProcessingException {
+    public void execInnerFormChanged(final FORM oldInnerForm, final FORM newInnerForm) {
       MethodInvocation<Void> methodInvocation = new MethodInvocation<Void>() {
         @Override
-        protected void callMethod(IWrappedFormFieldExtension<FORM, ? extends AbstractWrappedFormField<FORM>> next) throws ProcessingException {
+        protected void callMethod(IWrappedFormFieldExtension<FORM, ? extends AbstractWrappedFormField<FORM>> next) {
           next.execInnerFormChanged(WrappedFormFieldInnerFormChangedChain.this, oldInnerForm, newInnerForm);
         }
       };

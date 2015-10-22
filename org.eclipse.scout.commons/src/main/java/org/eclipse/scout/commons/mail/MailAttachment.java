@@ -57,7 +57,7 @@ public class MailAttachment {
     return m_dataSource;
   }
 
-  public byte[] getContent() throws ProcessingException {
+  public byte[] getContent() {
     if (m_content == null) {
       try {
         m_content = IOUtility.getContent(m_dataSource.getInputStream());

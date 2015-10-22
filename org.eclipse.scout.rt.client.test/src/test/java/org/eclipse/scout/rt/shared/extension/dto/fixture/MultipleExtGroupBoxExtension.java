@@ -18,7 +18,6 @@ import java.util.Date;
 import org.eclipse.scout.commons.annotations.Data;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -41,7 +40,7 @@ public class MultipleExtGroupBoxExtension extends AbstractGroupBoxExtension<Main
   @Order(2000)
   public class SecondBigDecimalField extends AbstractBigDecimalField {
     @Override
-    protected void execInitField() throws ProcessingException {
+    protected void execInitField() {
       super.execInitField();
       setValue(BIGDECIMAL_FIELD_ORIG_VAL);
     }
@@ -50,7 +49,7 @@ public class MultipleExtGroupBoxExtension extends AbstractGroupBoxExtension<Main
   @Order(3000)
   public class ThirdDateField extends AbstractDateField {
     @Override
-    protected void execInitField() throws ProcessingException {
+    protected void execInitField() {
       super.execInitField();
       setValue(DATE_FIELD_ORIG_VAL);
     }

@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IScheduler {
 
   boolean isActive();
@@ -86,7 +84,7 @@ public interface IScheduler {
    * Override this filter to control the running of scheduler jobs This method is synchronous and must wait until the
    * call to {@link ISchedulerJob#run(TickSignal)} has returned The default implementation just calls job.run(signal);
    */
-  void handleJobExecution(ISchedulerJob job, TickSignal signal) throws ProcessingException;
+  void handleJobExecution(ISchedulerJob job, TickSignal signal);
 
   /**
    * start scheduler if already running, this method does nothing

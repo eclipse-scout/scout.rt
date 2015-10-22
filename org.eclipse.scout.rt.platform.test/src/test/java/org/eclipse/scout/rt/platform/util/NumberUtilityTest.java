@@ -18,7 +18,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.Test;
 

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  *
@@ -36,12 +35,12 @@ public abstract class AbstractMenuSeparator extends AbstractMenu {
   }
 
   @Override
-  protected final void execAction() throws ProcessingException {
+  protected final void execAction() {
     // void
   }
 
   @Override
-  protected final void execSelectionChanged(boolean selection) throws ProcessingException {
+  protected final void execSelectionChanged(boolean selection) {
     // void
   }
 

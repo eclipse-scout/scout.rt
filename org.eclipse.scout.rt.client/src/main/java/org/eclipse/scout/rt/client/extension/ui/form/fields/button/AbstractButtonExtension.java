@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.button;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonClickActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonSelectionChangedChain;
@@ -13,12 +12,12 @@ public abstract class AbstractButtonExtension<OWNER extends AbstractButton> exte
   }
 
   @Override
-  public void execSelectionChanged(ButtonSelectionChangedChain chain, boolean selection) throws ProcessingException {
+  public void execSelectionChanged(ButtonSelectionChangedChain chain, boolean selection) {
     chain.execSelectionChanged(selection);
   }
 
   @Override
-  public void execClickAction(ButtonClickActionChain chain) throws ProcessingException {
+  public void execClickAction(ButtonClickActionChain chain) {
     chain.execClickAction();
   }
 }

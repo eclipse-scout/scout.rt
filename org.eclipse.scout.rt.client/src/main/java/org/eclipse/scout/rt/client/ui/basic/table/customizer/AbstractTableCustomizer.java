@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 /**
@@ -20,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 public abstract class AbstractTableCustomizer implements ITableCustomizer {
 
   @Override
-  public void addColumn() throws ProcessingException {
+  public void addColumn() {
   }
 
   @Override
@@ -28,24 +27,24 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
   }
 
   @Override
-  public void modifyColumn(ICustomColumn<?> col) throws ProcessingException {
+  public void modifyColumn(ICustomColumn<?> col) {
   }
 
   @Override
-  public void removeAllColumns() throws ProcessingException {
+  public void removeAllColumns() {
   }
 
   @Override
-  public void removeColumn(ICustomColumn<?> col) throws ProcessingException {
+  public void removeColumn(ICustomColumn<?> col) {
   }
 
   @Override
-  public byte[] getSerializedData() throws ProcessingException {
+  public byte[] getSerializedData() {
     return null;
   }
 
   @Override
-  public void setSerializedData(byte[] data) throws ProcessingException {
+  public void setSerializedData(byte[] data) {
 
   }
 }

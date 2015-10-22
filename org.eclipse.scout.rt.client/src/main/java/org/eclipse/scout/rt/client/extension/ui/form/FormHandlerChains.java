@@ -24,10 +24,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public void execPostLoad() throws ProcessingException {
+    public void execPostLoad() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           next.execPostLoad(FormHandlerPostLoadChain.this);
         }
       };
@@ -45,10 +45,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public boolean execValidate() throws ProcessingException {
+    public boolean execValidate() {
       MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           setReturnValue(next.execValidate(FormHandlerValidateChain.this));
         }
       };
@@ -66,10 +66,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public void execLoad() throws ProcessingException {
+    public void execLoad() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           next.execLoad(FormHandlerLoadChain.this);
         }
       };
@@ -87,10 +87,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public void execStore() throws ProcessingException {
+    public void execStore() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           next.execStore(FormHandlerStoreChain.this);
         }
       };
@@ -108,10 +108,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public void execDiscard() throws ProcessingException {
+    public void execDiscard() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           next.execDiscard(FormHandlerDiscardChain.this);
         }
       };
@@ -129,10 +129,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public boolean execCheckFields() throws ProcessingException {
+    public boolean execCheckFields() {
       MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           setReturnValue(next.execCheckFields(FormHandlerCheckFieldsChain.this));
         }
       };
@@ -150,10 +150,10 @@ public final class FormHandlerChains {
       super(extensions);
     }
 
-    public void execFinally() throws ProcessingException {
+    public void execFinally() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) throws ProcessingException {
+        protected void callMethod(IFormHandlerExtension<? extends AbstractFormHandler> next) {
           next.execFinally(FormHandlerFinallyChain.this);
         }
       };

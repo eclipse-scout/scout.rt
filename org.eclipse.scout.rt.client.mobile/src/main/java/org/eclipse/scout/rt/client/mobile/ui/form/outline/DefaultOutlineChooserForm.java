@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationUtility;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
@@ -33,7 +32,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 
 public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOutlineChooserForm {
 
-  public DefaultOutlineChooserForm() throws ProcessingException {
+  public DefaultOutlineChooserForm() {
     super();
   }
 
@@ -57,7 +56,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
     return TEXTS.get("MobileOutlineChooserTitle");
   }
 
-  public void startView() throws ProcessingException {
+  public void startView() {
     startInternal(new ViewHandler());
   }
 
@@ -88,7 +87,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
     }
 
     @Override
-    protected void execInitField() throws ProcessingException {
+    protected void execInitField() {
       //Table already is scrollable, it's not necessary to make the form scrollable too
       DeviceTransformationConfig config = DeviceTransformationUtility.getDeviceTransformationConfig();
       if (config != null) {
@@ -141,7 +140,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
         }
 
         @Override
-        protected void execDecorateRow(ITableRow row) throws ProcessingException {
+        protected void execDecorateRow(ITableRow row) {
           final String outlineIcon = getOutlineColumn().getValue(row).getDefaultIconId();
           if (outlineIcon != null) {
             row.setIconId(outlineIcon);
@@ -163,7 +162,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
         }
 
         @Override
-        protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+        protected void execRowsSelected(List<? extends ITableRow> rows) {
           if (CollectionUtility.hasElements(rows)) {
             IOutline outline = getOutlineColumn().getValue(CollectionUtility.firstElement(rows));
             MobileDesktopUtility.activateOutline(outline);
@@ -181,7 +180,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
   public class ViewHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       final OutlinesTableField.Table table = getOutlinesTableField().getTable();
 
       for (IOutline outline : getDesktop().getAvailableOutlines()) {
@@ -194,7 +193,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
     }
 
     @Override
-    protected void execFinally() throws ProcessingException {
+    protected void execFinally() {
       final OutlinesTableField.Table table = getOutlinesTableField().getTable();
       table.discardAllRows();
     }

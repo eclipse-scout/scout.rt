@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public class DefaultProposalChooserProvider<LOOKUP_KEY> implements IProposalChooserProvider<LOOKUP_KEY> {
 
   @Override
-  public IProposalChooser<?, LOOKUP_KEY> createProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
+  public IProposalChooser<?, LOOKUP_KEY> createProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
     if (contentAssistField.isBrowseHierarchy()) {
       return new TreeProposalChooser<LOOKUP_KEY>(contentAssistField, allowCustomText);
     }

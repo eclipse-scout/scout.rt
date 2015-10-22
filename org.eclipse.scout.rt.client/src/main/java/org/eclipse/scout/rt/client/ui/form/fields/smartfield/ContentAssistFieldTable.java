@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.annotations.ColumnData;
 import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -86,7 +85,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
   }
 
   @Override
-  public void setLookupRows(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) throws ProcessingException {
+  public void setLookupRows(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) {
     List<ITableRow> rows = new ArrayList<ITableRow>();
     for (ILookupRow<LOOKUP_KEY> lookupRow : lookupRows) {
       ITableRow row = createRow();
@@ -125,7 +124,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
   }
 
   @Override
-  public boolean select(ILookupRow<LOOKUP_KEY> lookupRow) throws ProcessingException {
+  public boolean select(ILookupRow<LOOKUP_KEY> lookupRow) {
     LOOKUP_KEY key = null;
     if (lookupRow != null) {
       key = lookupRow.getKey();
@@ -134,7 +133,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
   }
 
   @Override
-  public boolean select(LOOKUP_KEY key) throws ProcessingException {
+  public boolean select(LOOKUP_KEY key) {
     for (ITableRow row : getRows()) {
       if (CompareUtility.equals(key, getKeyColumn().getValue(row).getKey())) {
         selectRow(row);

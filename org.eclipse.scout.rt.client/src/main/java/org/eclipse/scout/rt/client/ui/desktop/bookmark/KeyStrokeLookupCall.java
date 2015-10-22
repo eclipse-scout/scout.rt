@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -40,7 +39,7 @@ public class KeyStrokeLookupCall extends LocalLookupCall<String> {
   }
 
   @Override
-  protected List<ILookupRow<String>> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<String>> execCreateLookupRows() {
     final HashMap<String, Integer> keyStrokesUpper = new HashMap<String, Integer>();
     //build possible keyStrokes
     for (int i = 1; i <= 12; i++) {

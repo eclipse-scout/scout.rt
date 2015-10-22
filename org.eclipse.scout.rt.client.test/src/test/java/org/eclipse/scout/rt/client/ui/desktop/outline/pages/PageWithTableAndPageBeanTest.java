@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -92,7 +91,7 @@ public class PageWithTableAndPageBeanTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -105,7 +104,7 @@ public class PageWithTableAndPageBeanTest {
     }
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       PageWithTableData pageData = new PageWithTableData();
       PageWithTableRowData row = pageData.addRow();
       row.setFirst(FIRST_COL_CONTENT);
@@ -114,7 +113,7 @@ public class PageWithTableAndPageBeanTest {
     }
 
     @Override
-    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) {
       return new PageWithNode();
     }
 

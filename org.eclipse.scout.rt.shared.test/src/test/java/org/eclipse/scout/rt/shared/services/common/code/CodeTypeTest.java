@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -100,7 +99,7 @@ public class CodeTypeTest {
     }
 
     @Override
-    protected List<ICodeRow<String>> execLoadCodes(Class<? extends ICodeRow<String>> codeRowType) throws ProcessingException {
+    protected List<ICodeRow<String>> execLoadCodes(Class<? extends ICodeRow<String>> codeRowType) {
       List<ICodeRow<String>> codeRows = new ArrayList<ICodeRow<String>>();
       codeRows.add(new CodeRow<String>(
           Test1Code.ID,

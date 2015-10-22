@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -39,11 +38,11 @@ public class ClipboardForm extends AbstractForm {
 
   private MimeType[] m_mimeTypes;
 
-  public ClipboardForm() throws ProcessingException {
+  public ClipboardForm() {
     this(true);
   }
 
-  protected ClipboardForm(boolean callInitializer) throws ProcessingException {
+  protected ClipboardForm(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -72,12 +71,12 @@ public class ClipboardForm extends AbstractForm {
     return TEXTS.get("Clipboard");
   }
 
-  public void startCopy() throws ProcessingException {
+  public void startCopy() {
     setHandler(new CopyHandler());
     start();
   }
 
-  public void startPaste() throws ProcessingException {
+  public void startPaste() {
     setHandler(new PasteHandler());
     start();
   }
@@ -124,7 +123,7 @@ public class ClipboardForm extends AbstractForm {
       }
 
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         super.execInitField();
       }
 
@@ -171,7 +170,7 @@ public class ClipboardForm extends AbstractForm {
         }
 
         @Override
-        protected void execChangedValue() throws ProcessingException {
+        protected void execChangedValue() {
           checkOkButtonEnabled();
         }
       }
@@ -199,7 +198,7 @@ public class ClipboardForm extends AbstractForm {
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         doClose();
       }
     }
@@ -209,7 +208,7 @@ public class ClipboardForm extends AbstractForm {
   public class CopyHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       // use setVisibleGranted here because we don't want to send the cancel-button (incl. ESC keyStroke) to the UI
       super.execLoad();
       getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
@@ -222,7 +221,7 @@ public class ClipboardForm extends AbstractForm {
   public class PasteHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       super.execLoad();
       getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
       checkOkButtonEnabled();

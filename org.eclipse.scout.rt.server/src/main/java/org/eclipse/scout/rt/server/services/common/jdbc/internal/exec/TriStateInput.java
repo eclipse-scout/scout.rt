@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
@@ -20,7 +19,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 class TriStateInput implements IBindInput {
   private IBindInput m_delegate;
 
-  public TriStateInput(ISqlStyle sqlStyle, TriState ts, ValueInputToken target) throws ProcessingException {
+  public TriStateInput(ISqlStyle sqlStyle, TriState ts, ValueInputToken target) {
     if (ts == null || ts.isUndefined()) {
       m_delegate = new ArrayInput(sqlStyle, new int[]{0, 1}, target);
     }
@@ -65,7 +64,7 @@ class TriStateInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     return m_delegate.produceSqlBindAndSetReplaceToken(sqlStyle);
   }
 

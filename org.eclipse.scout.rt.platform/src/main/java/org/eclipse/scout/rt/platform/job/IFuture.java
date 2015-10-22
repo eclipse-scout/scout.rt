@@ -87,7 +87,7 @@ public interface IFuture<RESULT> extends ICancellable {
    *           if this thread was interrupted while waiting for the job to complete; see
    *           {@link ProcessingException#isInterruption()}
    */
-  void awaitDone() throws ProcessingException;
+  void awaitDone();
 
   /**
    * Waits if necessary for the job to complete, or until cancelled, or the timeout elapses. This method does not throw
@@ -102,7 +102,7 @@ public interface IFuture<RESULT> extends ICancellable {
    *           if this thread was interrupted while waiting for the job to complete; see
    *           {@link ProcessingException#isInterruption()}
    */
-  boolean awaitDone(long timeout, TimeUnit unit) throws ProcessingException;
+  boolean awaitDone(long timeout, TimeUnit unit);
 
   /**
    * Waits if necessary for the computation to complete, and then retrieves its result, or throws a
@@ -117,7 +117,7 @@ public interface IFuture<RESULT> extends ICancellable {
    *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
    *           </ul>
    */
-  RESULT awaitDoneAndGet() throws ProcessingException;
+  RESULT awaitDoneAndGet();
 
   /**
    * Waits if necessary for the computation to complete, and then retrieves its result, or throws an exception according
@@ -152,7 +152,7 @@ public interface IFuture<RESULT> extends ICancellable {
    *           </li>
    *           </ul>
    */
-  RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;
+  RESULT awaitDoneAndGet(long timeout, TimeUnit unit);
 
   /**
    * Waits if necessary for the computation to complete, and then retrieves its result, or throws an exception according

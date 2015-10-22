@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.NestedMenusTest.P_Desktop.HelpMenu.AboutMenu;
@@ -44,7 +43,7 @@ public class NestedMenusTest {
     }
 
     @Override
-    protected void execOpened() throws ProcessingException {
+    protected void execOpened() {
     }
 
     @Order(10.0)
@@ -64,7 +63,7 @@ public class NestedMenusTest {
         }
 
         @Override
-        protected void execAction() throws ProcessingException {
+        protected void execAction() {
           ClientSessionProvider.currentSession(TestEnvironmentClientSession.class).stop();
         }
       }
@@ -78,7 +77,7 @@ public class NestedMenusTest {
         }
 
         @Override
-        protected void execAction() throws ProcessingException {
+        protected void execAction() {
         }
       }
     }
@@ -109,7 +108,7 @@ public class NestedMenusTest {
         }
 
         @Override
-        protected void execAction() throws ProcessingException {
+        protected void execAction() {
           ScoutInfoForm form = new ScoutInfoForm();
           form.startModify();
         }

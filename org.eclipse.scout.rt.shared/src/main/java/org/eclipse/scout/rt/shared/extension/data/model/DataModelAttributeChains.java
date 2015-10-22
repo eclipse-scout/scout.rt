@@ -25,10 +25,10 @@ public final class DataModelAttributeChains {
       super(extensions);
     }
 
-    public void execInitAttribute() throws ProcessingException {
+    public void execInitAttribute() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDataModelAttributeExtension<? extends AbstractDataModelAttribute> next) throws ProcessingException {
+        protected void callMethod(IDataModelAttributeExtension<? extends AbstractDataModelAttribute> next) {
           next.execInitAttribute(DataModelAttributeInitAttributeChain.this);
         }
       };
@@ -46,10 +46,10 @@ public final class DataModelAttributeChains {
       super(extensions);
     }
 
-    public void execPrepareLookup(final ILookupCall<?> call) throws ProcessingException {
+    public void execPrepareLookup(final ILookupCall<?> call) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDataModelAttributeExtension<? extends AbstractDataModelAttribute> next) throws ProcessingException {
+        protected void callMethod(IDataModelAttributeExtension<? extends AbstractDataModelAttribute> next) {
           next.execPrepareLookup(DataModelAttributePrepareLookupChain.this, call);
         }
       };

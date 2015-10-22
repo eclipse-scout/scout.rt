@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -72,7 +71,7 @@ public class JobCancelTest {
   }
 
   @Test
-  public void testCancelSoft() throws ProcessingException, InterruptedException {
+  public void testCancelSoft() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
@@ -117,7 +116,7 @@ public class JobCancelTest {
   }
 
   @Test
-  public void testCancelForce() throws ProcessingException, InterruptedException {
+  public void testCancelForce() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
@@ -220,7 +219,7 @@ public class JobCancelTest {
   }
 
   @Test
-  public void testShutdownJobManagerAndSchedule() throws InterruptedException, ProcessingException {
+  public void testShutdownJobManagerAndSchedule() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
@@ -568,7 +567,7 @@ public class JobCancelTest {
    * Tests that a job is not run if the RunMonitor is already cancelled.
    */
   @Test
-  public void testCancelRunContextPriorSchedulingJob() throws ProcessingException {
+  public void testCancelRunContextPriorSchedulingJob() {
     RunContext runContext = RunContexts.copyCurrent();
 
     // 1. Cancel the RunMonitor

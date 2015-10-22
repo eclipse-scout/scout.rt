@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -149,7 +148,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
   public static class PageWithTableOutline extends AbstractOutline {
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -157,12 +156,12 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{new Object[]{"a", "b"}});
     }
 
     @Override
-    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) {
       return new SubPageWithTable();
     }
 
@@ -210,7 +209,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
   public static class SubPageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{new Object[]{"sub_a", "sub_b"}});
     }
 

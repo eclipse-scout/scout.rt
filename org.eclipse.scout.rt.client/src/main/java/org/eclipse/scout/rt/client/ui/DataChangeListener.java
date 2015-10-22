@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui;
 
 import java.util.EventListener;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 /**
@@ -22,6 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  */
 public interface DataChangeListener extends EventListener {
 
-  void dataChanged(Object... dataTypes) throws ProcessingException;
+  void dataChanged(Object... dataTypes);
 
 }

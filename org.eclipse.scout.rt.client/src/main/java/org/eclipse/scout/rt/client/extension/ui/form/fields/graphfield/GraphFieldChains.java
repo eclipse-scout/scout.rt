@@ -26,10 +26,10 @@ public final class GraphFieldChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final String ref) throws ProcessingException {
+    public void execAppLinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IGraphFieldExtension<? extends AbstractGraphField> next) throws ProcessingException {
+        protected void callMethod(IGraphFieldExtension<? extends AbstractGraphField> next) {
           next.execAppLinkAction(GraphFieldAppLinkActionChain.this, ref);
         }
       };

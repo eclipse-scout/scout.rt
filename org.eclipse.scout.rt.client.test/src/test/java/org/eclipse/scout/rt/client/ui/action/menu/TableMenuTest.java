@@ -20,7 +20,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
@@ -69,7 +68,7 @@ public class TableMenuTest {
    * Tests the visibility for a single selection menu
    */
   @Test
-  public void testSingleSelection() throws ProcessingException {
+  public void testSingleSelection() {
     Table t = new Table();
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
@@ -94,7 +93,7 @@ public class TableMenuTest {
    * Tests the visibility for a multi selection menu
    */
   @Test
-  public void setMultiSeleciton() throws ProcessingException {
+  public void setMultiSeleciton() {
     Table t = new Table();
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
@@ -111,7 +110,7 @@ public class TableMenuTest {
    * Tests the visibility for a empty space menu
    */
   @Test
-  public void testEmptySeleciton() throws ProcessingException {
+  public void testEmptySeleciton() {
     Table t = new Table();
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
@@ -128,7 +127,7 @@ public class TableMenuTest {
    * are selected.
    */
   @Test
-  public void testOwnerValueOnMultiSelection() throws ProcessingException {
+  public void testOwnerValueOnMultiSelection() {
     final ContextMenuTable table = createContextMenuTable();
     addTestMenus(table);
 
@@ -146,7 +145,7 @@ public class TableMenuTest {
    * row is selected.
    */
   @Test
-  public void testOwnerValueOnSingleSelection() throws ProcessingException {
+  public void testOwnerValueOnSingleSelection() {
     final ContextMenuTable table = createContextMenuTable();
     addTestMenus(table);
     table.selectFirstRow();
@@ -162,7 +161,7 @@ public class TableMenuTest {
    * selected.
    */
   @Test
-  public void testOwnerValueOnEmptySpace() throws ProcessingException {
+  public void testOwnerValueOnEmptySpace() {
     final ContextMenuTable table = createContextMenuTable();
     table.selectAllRows();
     addTestMenus(table);
@@ -184,7 +183,7 @@ public class TableMenuTest {
     table.addMenu(m_combindedSingle);
   }
 
-  private ContextMenuTable createContextMenuTable() throws ProcessingException {
+  private ContextMenuTable createContextMenuTable() {
     final ContextMenuTable table = new ContextMenuTable();
     table.addRowsByMatrix(TEST_ROWS);
     return table;
@@ -240,7 +239,7 @@ public class TableMenuTest {
       }
 
       @Override
-      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+      protected void execOwnerValueChanged(Object newOwnerValue) {
         setVisible(CompareUtility.equals(getPrenameColumn().getSelectedValue(), "Hugo"));
       }
     }

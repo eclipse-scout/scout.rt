@@ -92,7 +92,7 @@ public class InvocationContextTest {
   }
 
   @Test
-  public void testWithSuccess() throws ProcessingException {
+  public void testWithSuccess() {
     final Holder<ITransaction> currentTransaction = new Holder<>();
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
@@ -133,7 +133,7 @@ public class InvocationContextTest {
   }
 
   @Test
-  public void testWithException() throws ProcessingException {
+  public void testWithException() {
     final Holder<ITransaction> currentTransaction = new Holder<>();
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
@@ -192,7 +192,7 @@ public class InvocationContextTest {
   }
 
   @Test
-  public void testInvokeNotWebMethod() throws ProcessingException {
+  public void testInvokeNotWebMethod() {
     final BooleanHolder intercepted = new BooleanHolder(false);
 
     InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
@@ -212,7 +212,7 @@ public class InvocationContextTest {
   }
 
   @Test
-  public void testCancel() throws ProcessingException {
+  public void testCancel() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     final InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");

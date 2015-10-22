@@ -132,7 +132,7 @@ public class MutexSemaphores {
    *           is thrown if the current thread is interrupted while waiting for the mutex to become available, or upon
    *           shutdown of the job manager.
    */
-  public void acquire(final IMutexTask<?> task) throws ProcessingException {
+  public void acquire(final IMutexTask<?> task) {
     Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
     final Object mutexObject = task.getMutexObject();
     final Object acquisitionLock = new Object();

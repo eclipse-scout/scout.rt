@@ -52,7 +52,7 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
    */
 
   @Override
-  protected Long parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected Long parseValueInternal(ITableRow row, Object rawValue) {
     Long validValue = null;
     if (rawValue == null) {
       validValue = null;

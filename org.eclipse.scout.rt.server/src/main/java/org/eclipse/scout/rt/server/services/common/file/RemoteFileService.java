@@ -54,25 +54,25 @@ public class RemoteFileService implements IRemoteFileService {
   }
 
   @Override
-  public RemoteFile getRemoteFileHeader(RemoteFile spec) throws ProcessingException {
+  public RemoteFile getRemoteFileHeader(RemoteFile spec) {
     return getRemoteFileInternal(spec, false, 0, -1);
   }
 
   @Override
-  public RemoteFile getRemoteFile(RemoteFile spec) throws ProcessingException {
+  public RemoteFile getRemoteFile(RemoteFile spec) {
     return getRemoteFileInternal(spec, null, 0, -1);
   }
 
-  public RemoteFile getRemoteFile(RemoteFile spec, long maxBlockSize) throws ProcessingException {
+  public RemoteFile getRemoteFile(RemoteFile spec, long maxBlockSize) {
     return getRemoteFileInternal(spec, null, 0, maxBlockSize);
   }
 
   @Override
-  public RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) throws ProcessingException {
+  public RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) {
     return getRemoteFileInternal(spec, null, blockNumber * RemoteFile.DEFAULT_MAX_BLOCK_SIZE, RemoteFile.DEFAULT_MAX_BLOCK_SIZE);
   }
 
-  private RemoteFile getRemoteFileInternal(RemoteFile spec, Boolean includeContent, long startPosition, long maxBlockSize) throws ProcessingException {
+  private RemoteFile getRemoteFileInternal(RemoteFile spec, Boolean includeContent, long startPosition, long maxBlockSize) {
     File file = getFileInternal(spec);
     RemoteFile result = new RemoteFile(spec.getDirectory(), file.getName(), spec.getLocale(), -1, spec.getCharsetName());
     result.setContentType(spec.getContentType());
@@ -117,7 +117,7 @@ public class RemoteFileService implements IRemoteFileService {
     return result;
   }
 
-  private String[][] getFiles(String folderBase, FilenameFilter filter) throws ProcessingException {
+  private String[][] getFiles(String folderBase, FilenameFilter filter) {
     File root = new File(getRootPath());
     File path = null;
     if (folderBase == null || folderBase.length() == 0) {
@@ -177,15 +177,15 @@ public class RemoteFileService implements IRemoteFileService {
   }
 
   @Override
-  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException {
+  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) {
     return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, Encoding.UTF_8);
   }
 
-  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName) throws ProcessingException {
+  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName) {
     return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, charsetName, RemoteFile.DEFAULT_MAX_BLOCK_SIZE);
   }
 
-  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName, long maxBlockSize) throws ProcessingException {
+  public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName, long maxBlockSize) {
     HashMap<String, RemoteFile> fileList = new HashMap<String, RemoteFile>();
     if (existingFileInfoOnClient != null) {
       for (RemoteFile rf : existingFileInfoOnClient) {
@@ -209,7 +209,7 @@ public class RemoteFileService implements IRemoteFileService {
 
   @Override
   @RemoteServiceAccessDenied
-  public void putRemoteFile(RemoteFile spec) throws ProcessingException {
+  public void putRemoteFile(RemoteFile spec) {
     File file = getFileInternal(spec);
     try {
       file.getParentFile().mkdirs();
@@ -223,7 +223,7 @@ public class RemoteFileService implements IRemoteFileService {
 
   private static final Pattern LOCALE_SECURITY_PATTERN = Pattern.compile("[a-z]+([_][a-z0-9]+)?([_][a-z0-9_]+)?", Pattern.CASE_INSENSITIVE);
 
-  private File getFileInternal(RemoteFile spec) throws ProcessingException {
+  private File getFileInternal(RemoteFile spec) {
     File root = new File(getRootPath());
     File folder = null;
     if (spec.getDirectory() == null || spec.getDirectory().length() == 0) {
@@ -293,7 +293,7 @@ public class RemoteFileService implements IRemoteFileService {
   }
 
   @Override
-  public void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException {
+  public void streamRemoteFile(RemoteFile spec, OutputStream out) {
     File file = getFileInternal(spec);
     if (!file.exists()) {
       throw new ProcessingException("remote file does not exist: " + spec.getPath());

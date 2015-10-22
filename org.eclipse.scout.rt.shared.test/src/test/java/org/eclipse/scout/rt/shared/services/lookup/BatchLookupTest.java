@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -258,7 +257,7 @@ public class BatchLookupTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<ILookupRow<Object>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Object>> execCreateLookupRows() {
       m_localInvocations++;
       return createCallResult(this);
     }
@@ -283,7 +282,7 @@ public class BatchLookupTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<ILookupRow<Object>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Object>> execCreateLookupRows() {
       m_localInvocations++;
       return createCallResult(this);
     }
@@ -310,7 +309,7 @@ public class BatchLookupTest {
     private Long m_latinId;
 
     @Override
-    protected List<ILookupRow<Object>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Object>> execCreateLookupRows() {
       m_localInvocations++;
       return createCallResult(this);
     }
@@ -332,7 +331,7 @@ public class BatchLookupTest {
     private Long m_latinId;
 
     @Override
-    protected List<ILookupRow<Object>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Object>> execCreateLookupRows() {
       m_localInvocations++;
       return createCallResult(this);
     }

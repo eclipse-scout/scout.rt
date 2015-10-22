@@ -26,10 +26,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execPageDataLoaded() throws ProcessingException {
+    public void execPageDataLoaded() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execPageDataLoaded(PagePageDataLoadedChain.this);
         }
       };
@@ -47,10 +47,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execPageActivated() throws ProcessingException {
+    public void execPageActivated() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execPageActivated(PagePageActivatedChain.this);
         }
       };
@@ -68,10 +68,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execDataChanged(final Object... dataTypes) throws ProcessingException {
+    public void execDataChanged(final Object... dataTypes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execDataChanged(PageDataChangedChain.this, dataTypes);
         }
       };
@@ -89,10 +89,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execInitPage() throws ProcessingException {
+    public void execInitPage() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execInitPage(PageInitPageChain.this);
         }
       };
@@ -110,10 +110,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execInitDetailForm() throws ProcessingException {
+    public void execInitDetailForm() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execInitDetailForm(PageInitDetailFormChain.this);
         }
       };
@@ -131,10 +131,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execPageDeactivated() throws ProcessingException {
+    public void execPageDeactivated() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execPageDeactivated(PagePageDeactivatedChain.this);
         }
       };
@@ -152,10 +152,10 @@ public final class PageChains {
       super(extensions);
     }
 
-    public void execDisposePage() throws ProcessingException {
+    public void execDisposePage() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageExtension<? extends AbstractPage> next) throws ProcessingException {
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           next.execDisposePage(PageDisposePageChain.this);
         }
       };

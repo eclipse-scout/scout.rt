@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisplayModeChangedChain;
@@ -35,42 +34,42 @@ public abstract class AbstractPlannerExtension<RI, AI, OWNER extends AbstractPla
   }
 
   @Override
-  public void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
+  public void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell) {
     chain.execActivitySelected(cell);
   }
 
   @Override
-  public void execDisposePlanner(PlannerDisposePlannerChain<RI, AI> chain) throws ProcessingException {
+  public void execDisposePlanner(PlannerDisposePlannerChain<RI, AI> chain) {
     chain.execDisposePlanner();
   }
 
   @Override
-  public void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
+  public void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell) {
     chain.execDecorateActivity(cell);
   }
 
   @Override
-  public void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain) throws ProcessingException {
+  public void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain) {
     chain.execInitPlanner();
   }
 
   @Override
-  public void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> chain, List<Resource<RI>> resources) throws ProcessingException {
+  public void execResourcesSelected(PlannerResourcesSelectedChain<RI, AI> chain, List<Resource<RI>> resources) {
     chain.execResourcesSelected(resources);
   }
 
   @Override
-  public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> chain, Range<Date> selectionRange) throws ProcessingException {
+  public void execSelectionRangeChanged(PlannerSelectionRangeChangedChain<RI, AI> chain, Range<Date> selectionRange) {
     chain.execSelectionRangeChanged(selectionRange);
   }
 
   @Override
-  public void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> chain, Range<Date> viewRange) throws ProcessingException {
+  public void execViewRangeChanged(PlannerViewRangeChangedChain<RI, AI> chain, Range<Date> viewRange) {
     chain.execViewRangeChanged(viewRange);
   }
 
   @Override
-  public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> chain, int displayMode) throws ProcessingException {
+  public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> chain, int displayMode) {
     chain.execDisplayModeChanged(displayMode);
   }
 

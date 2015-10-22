@@ -46,10 +46,10 @@ public final class SequenceBoxChains {
       super(extensions);
     }
 
-    public <T extends Comparable<T>> void execCheckFromTo(final IValueField<T>[] valueFields, final int changedIndex) throws ProcessingException {
+    public <T extends Comparable<T>> void execCheckFromTo(final IValueField<T>[] valueFields, final int changedIndex) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ISequenceBoxExtension<? extends AbstractSequenceBox> next) throws ProcessingException {
+        protected void callMethod(ISequenceBoxExtension<? extends AbstractSequenceBox> next) {
           next.execCheckFromTo(SequenceBoxCheckFromToChain.this, valueFields, changedIndex);
         }
       };

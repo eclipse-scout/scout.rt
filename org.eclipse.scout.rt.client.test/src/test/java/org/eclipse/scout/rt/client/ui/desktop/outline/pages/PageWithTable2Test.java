@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -77,7 +76,7 @@ public class PageWithTable2Test {
 
     private final SimpleTablePageData m_pageData;
 
-    public SimpleTablePage(boolean limited, Object[][] data) throws ProcessingException {
+    public SimpleTablePage(boolean limited, Object[][] data) {
       super(false);
       m_pageData = new SimpleTablePageData();
       for (Object[] objects : data) {
@@ -91,7 +90,7 @@ public class PageWithTable2Test {
     }
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importPageData(m_pageData);
     }
 

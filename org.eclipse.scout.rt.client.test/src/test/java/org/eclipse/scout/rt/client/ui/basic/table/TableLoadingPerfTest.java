@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class TableLoadingPerfTest {
    * infrastructure.
    */
   @Test
-  public void testLoadingMatrix() throws ProcessingException {
+  public void testLoadingMatrix() {
     Object[][] testRows = createRows(5000);
     TestTable testTable = new TestTable();
     Long[] durations = new Long[TEST_RUN_COUNT];

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActiveStepChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
@@ -38,67 +37,67 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   }
 
   @Override
-  public void execActiveStepChanged(WizardActiveStepChangedChain chain) throws ProcessingException {
+  public void execActiveStepChanged(WizardActiveStepChangedChain chain) {
     chain.execActiveStepChanged();
   }
 
   @Override
-  public void execSuspend(WizardSuspendChain chain) throws ProcessingException {
+  public void execSuspend(WizardSuspendChain chain) {
     chain.execSuspend();
   }
 
   @Override
-  public void execRefreshButtonPolicy(WizardRefreshButtonPolicyChain chain) throws ProcessingException {
+  public void execRefreshButtonPolicy(WizardRefreshButtonPolicyChain chain) {
     chain.execRefreshButtonPolicy();
   }
 
   @Override
-  public void execCancel(WizardCancelChain chain) throws ProcessingException {
+  public void execCancel(WizardCancelChain chain) {
     chain.execCancel();
   }
 
   @Override
-  public void execStart(WizardStartChain chain) throws ProcessingException {
+  public void execStart(WizardStartChain chain) {
     chain.execStart();
   }
 
   @Override
-  public IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain) throws ProcessingException {
+  public IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain) {
     return chain.execCreateContainerForm();
   }
 
   @Override
-  public void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source) throws ProcessingException {
+  public void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source) {
     chain.execAnyFieldChanged(source);
   }
 
   @Override
-  public void execReset(WizardResetChain chain) throws ProcessingException {
+  public void execReset(WizardResetChain chain) {
     chain.execReset();
   }
 
   @Override
-  public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException {
+  public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) {
     chain.execAppLinkAction(ref);
   }
 
   @Override
-  public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+  public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) {
     chain.execWizardStepAction(wizardStep);
   }
 
   @Override
-  public void execPreviousStep(WizardPreviousStepChain chain) throws ProcessingException {
+  public void execPreviousStep(WizardPreviousStepChain chain) {
     chain.execPreviousStep();
   }
 
   @Override
-  public void execNextStep(WizardNextStepChain chain) throws ProcessingException {
+  public void execNextStep(WizardNextStepChain chain) {
     chain.execNextStep();
   }
 
   @Override
-  public void execFinish(WizardFinishChain chain) throws ProcessingException {
+  public void execFinish(WizardFinishChain chain) {
     chain.execFinish();
   }
 

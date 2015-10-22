@@ -43,7 +43,7 @@ public final class UriUtility {
    * @return map with parsed query parameters. Never <code>null</code>.
    * @throws ProcessingException
    */
-  public static Map<String, String> getQueryParameters(URL url) throws ProcessingException {
+  public static Map<String, String> getQueryParameters(URL url) {
     return getQueryParameters(url, null);
   }
 
@@ -56,7 +56,7 @@ public final class UriUtility {
    * @return map with parsed query parameters. Never <code>null</code>.
    * @throws ProcessingException
    */
-  public static Map<String, String> getQueryParameters(URL url, String encoding) throws ProcessingException {
+  public static Map<String, String> getQueryParameters(URL url, String encoding) {
     if (url == null) {
       return new HashMap<String, String>(0);
     }
@@ -70,7 +70,7 @@ public final class UriUtility {
    * @return map with parsed query parameters. Never <code>null</code>.
    * @throws ProcessingException
    */
-  public static Map<String, String> getQueryParameters(URI uri) throws ProcessingException {
+  public static Map<String, String> getQueryParameters(URI uri) {
     return getQueryParameters(uri, null);
   }
 
@@ -83,7 +83,7 @@ public final class UriUtility {
    * @return map with parsed query parameters. Never <code>null</code>.
    * @throws ProcessingException
    */
-  public static Map<String, String> getQueryParameters(URI uri, String encoding) throws ProcessingException {
+  public static Map<String, String> getQueryParameters(URI uri, String encoding) {
     if (uri == null || uri.getQuery() == null) {
       return new HashMap<String, String>(0);
     }
@@ -136,7 +136,7 @@ public final class UriUtility {
    * @return <code>null</code> if the given url is <code>null</code>.
    * @throws ProcessingException
    */
-  public static URI urlToUri(URL url) throws ProcessingException {
+  public static URI urlToUri(URL url) {
     if (url == null) {
       return null;
     }
@@ -155,7 +155,7 @@ public final class UriUtility {
    * @return <code>null</code> if the given uri is <code>null</code>.
    * @throws ProcessingException
    */
-  public static URL uriToUrl(URI uri) throws ProcessingException {
+  public static URL uriToUrl(URI uri) {
     if (uri == null) {
       return null;
     }
@@ -174,7 +174,7 @@ public final class UriUtility {
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URI} instance.
    * @throws ProcessingException
    */
-  public static URI toUri(String uri) throws ProcessingException {
+  public static URI toUri(String uri) {
     if (!StringUtility.hasText(uri)) {
       return null;
     }
@@ -193,7 +193,7 @@ public final class UriUtility {
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URL} instance.
    * @throws ProcessingException
    */
-  public static URL toUrl(String url) throws ProcessingException {
+  public static URL toUrl(String url) {
     if (!StringUtility.hasText(url)) {
       return null;
     }

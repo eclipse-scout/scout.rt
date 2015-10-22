@@ -188,7 +188,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
    *          first rows first value is 1
    */
   @SuppressWarnings("boxing")
-  protected boolean execCheckLevel(int requiredLevel) throws ProcessingException {
+  protected boolean execCheckLevel(int requiredLevel) {
     Object[][] data = execCheckLevelData(requiredLevel);
     return data != null && data.length > 0 && TypeCastUtility.castValue(data[0][0], Boolean.class);
   }
@@ -199,7 +199,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
    * @param requiredLevel
    * @return data with data[0][0]=1 as true
    */
-  protected Object[][] execCheckLevelData(int requiredLevel) throws ProcessingException {
+  protected Object[][] execCheckLevelData(int requiredLevel) {
     return null;
   }
 

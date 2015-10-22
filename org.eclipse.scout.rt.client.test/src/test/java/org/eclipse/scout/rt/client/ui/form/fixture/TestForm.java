@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fixture;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -34,7 +33,7 @@ import org.eclipse.scout.rt.shared.data.form.fixture.TestFormData;
 @FormData(value = TestFormData.class, sdkCommand = SdkCommand.USE)
 public class TestForm extends AbstractForm {
 
-  public TestForm() throws ProcessingException {
+  public TestForm() {
     super();
   }
 
@@ -42,7 +41,7 @@ public class TestForm extends AbstractForm {
     return getFieldByClass(CancelButton.class);
   }
 
-  public void startNew() throws ProcessingException {
+  public void startNew() {
     startInternal(new NewHandler());
   }
 

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertSame;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -106,7 +105,7 @@ public class AbstractPageWithNodesTest {
 
   public static class PageWithTableOutline extends AbstractOutline {
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new ParentItemNodePage());
     }
   }
@@ -119,7 +118,7 @@ public class AbstractPageWithNodesTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new ItemNodePage());
     }
   }

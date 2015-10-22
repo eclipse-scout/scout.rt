@@ -15,7 +15,6 @@ import static org.junit.Assert.assertSame;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
@@ -39,7 +38,7 @@ import org.junit.Test;
 public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testSetup() throws ProcessingException {
+  public void testSetup() {
     TestDataModel dataModel = new TestDataModel();
     assertDataModelElements(dataModel.getEntities(), Top1Entity.class, Top2Entity.class, Top3Entity.class);
     assertDataModelElements(dataModel.getAttributes(), Top1Attribute.class, Top2Attribute.class, Top3Attribute.class);
@@ -50,7 +49,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveTopLevelEntity() throws ProcessingException {
+  public void testMoveTopLevelEntity() {
     BEANS.get(IExtensionRegistry.class).registerMove(Top1Entity.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
@@ -62,7 +61,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveTopLevelAttribute() throws ProcessingException {
+  public void testMoveTopLevelAttribute() {
     BEANS.get(IExtensionRegistry.class).registerMove(Top1Attribute.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
@@ -75,7 +74,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveSubLevelEntity() throws ProcessingException {
+  public void testMoveSubLevelEntity() {
     BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Entity.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
@@ -87,7 +86,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveSubLevelAttribute() throws ProcessingException {
+  public void testMoveSubLevelAttribute() {
     BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Attribute.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
@@ -100,22 +99,22 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testMoveSubLevelEntityToRoot() throws ProcessingException {
+  public void testMoveSubLevelEntityToRoot() {
     BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Entity.class, 40d);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testMoveSubLevelAttributeToRoot() throws ProcessingException {
+  public void testMoveSubLevelAttributeToRoot() {
     BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Attribute.class, 40d);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testMoveEntityToAnotherEntity() throws ProcessingException {
+  public void testMoveEntityToAnotherEntity() {
     BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Entity.class, 40d, Top2Entity.class);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testMoveAttributeToAnotherEntity() throws ProcessingException {
+  public void testMoveAttributeToAnotherEntity() {
     BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Attribute.class, 40d, Top2Entity.class);
   }
 

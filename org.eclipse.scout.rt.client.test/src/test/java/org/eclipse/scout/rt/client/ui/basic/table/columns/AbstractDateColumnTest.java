@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -40,7 +39,7 @@ public class AbstractDateColumnTest {
   private static final String TEST_FORMAT1 = "YYYY-MM-dd";
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractDateColumn column = new AbstractDateColumn() {
     };
     column.setMandatory(true);
@@ -52,7 +51,7 @@ public class AbstractDateColumnTest {
   }
 
   @Test
-  public void testCompleteEdit_ParsingError() throws ProcessingException {
+  public void testCompleteEdit_ParsingError() {
     TestTable table = new TestTable();
     Date date = new Date();
     table.addRowsByArray(new Date[]{date});
@@ -66,7 +65,7 @@ public class AbstractDateColumnTest {
     assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
   }
 
-  private void setParseErrorInUI(ITableRow row, AbstractDateColumn column) throws ProcessingException {
+  private void setParseErrorInUI(ITableRow row, AbstractDateColumn column) {
     AbstractDateField field = (AbstractDateField) column.prepareEdit(row);
     field.getUIFacade().setParseErrorFromUI("invalid", "invalid", null);
     column.completeEdit(row, field);
@@ -87,7 +86,7 @@ public class AbstractDateColumnTest {
    * Tests that the cell text changes to the correct format, if the format is set on a column
    */
   @Test
-  public void testChangeFormat() throws ProcessingException {
+  public void testChangeFormat() {
     Date testDate = new Date();
     String testFormat = "YYYY--MM--dd";
     SimpleDateFormat df = new SimpleDateFormat(testFormat, NlsLocale.get());
@@ -105,7 +104,7 @@ public class AbstractDateColumnTest {
    * Tests that the cell text changes to the correct format, if hasTime is changed
    */
   @Test
-  public void testHasTimeChange() throws ProcessingException {
+  public void testHasTimeChange() {
     Date testDate = new Date();
     TestTable table = new TestTable();
     TestDateColumn col = table.getTestDateColumn();
@@ -121,7 +120,7 @@ public class AbstractDateColumnTest {
    * Tests that the cell text changes to the correct format, if hasTime is changed for an editable table
    */
   @Test
-  public void testHasTime_EditableChange() throws ProcessingException {
+  public void testHasTime_EditableChange() {
     Date testDate = new Date();
     TestTable table = new TestTable();
     TestDateColumn col = table.getTestDateColumn();
@@ -135,7 +134,7 @@ public class AbstractDateColumnTest {
   }
 
   @Test
-  public void testHasDate() throws ProcessingException {
+  public void testHasDate() {
     Date testDate = new Date();
     TestTable table = new TestTable();
     TestDateColumn col = table.getTestDateColumn();

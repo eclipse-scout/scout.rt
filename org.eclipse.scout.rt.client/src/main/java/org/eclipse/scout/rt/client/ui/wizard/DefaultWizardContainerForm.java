@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -39,11 +38,11 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  */
 public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
-  public DefaultWizardContainerForm(IWizard wizard) throws ProcessingException {
+  public DefaultWizardContainerForm(IWizard wizard) {
     this(wizard, true);
   }
 
-  public DefaultWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
+  public DefaultWizardContainerForm(IWizard wizard, boolean callInitializer) {
     super(wizard, false);
     if (callInitializer) {
       callInitializer();
@@ -102,12 +101,12 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
   }
 
   @Override
-  protected void setInnerWizardForm(IForm form) throws ProcessingException {
+  protected void setInnerWizardForm(IForm form) {
     getWrappedWizardForm().setInnerForm(form, false);
   }
 
   @Override
-  public void startWizard() throws ProcessingException {
+  public void startWizard() {
     startInternal(new WizardHandler());
   }
 
@@ -165,7 +164,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doPreviousStep();
       }
     }
@@ -179,7 +178,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doNextStep();
       }
 
@@ -198,7 +197,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doFinish();
       }
 
@@ -222,7 +221,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doCancel();
       }
     }
@@ -241,7 +240,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doSuspend();
       }
     }
@@ -260,7 +259,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doReset();
       }
     }
@@ -273,7 +272,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         handleEnterKey();
       }
     }
@@ -286,7 +285,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         handleEscapeKey(false);
       }
     }
@@ -295,7 +294,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
   public class WizardHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       setInnerWizardForm(getWizard() == null ? null : getWizard().getWizardForm());
     }
   }

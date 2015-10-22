@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -39,7 +38,7 @@ public class PageWithNodesTest {
    * Tests that {@link AbstractPage#execPageDataLoaded()} is called correctly on a {@link AbstractPageWithNodes}
    */
   @Test
-  public void testExecPageDataLoaded() throws ProcessingException {
+  public void testExecPageDataLoaded() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
@@ -56,7 +55,7 @@ public class PageWithNodesTest {
   public static class PageWithTableOutline extends AbstractOutline {
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithNodes());
     }
   }
@@ -66,13 +65,13 @@ public class PageWithNodesTest {
     public int m_execPageDataLoadedCalled = 0;
 
     @Override
-    protected void execPageDataLoaded() throws ProcessingException {
+    protected void execPageDataLoaded() {
       super.execPageDataLoaded();
       m_execPageDataLoadedCalled++;
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithNode());
       pageList.add(new PageWithNode());
       pageList.add(new PageWithNode());

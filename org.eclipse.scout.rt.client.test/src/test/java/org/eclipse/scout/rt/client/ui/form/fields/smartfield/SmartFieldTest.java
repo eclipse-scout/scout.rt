@@ -22,7 +22,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -81,7 +80,7 @@ public class SmartFieldTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -90,7 +89,7 @@ public class SmartFieldTest {
       return "SmartField Form";
     }
 
-    public void startForm() throws ProcessingException {
+    public void startForm() {
       startInternal(new FormHandler());
     }
 

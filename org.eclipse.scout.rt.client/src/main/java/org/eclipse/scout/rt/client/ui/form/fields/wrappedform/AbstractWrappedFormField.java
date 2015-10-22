@@ -81,7 +81,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  protected boolean execIsSaveNeeded() throws ProcessingException {
+  protected boolean execIsSaveNeeded() {
     return getInnerForm() != null && getInnerForm().isSaveNeeded();
   }
 
@@ -137,12 +137,12 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public void setInnerForm(FORM form) throws ProcessingException {
+  public void setInnerForm(FORM form) {
     setInnerForm(form, true);
   }
 
   @Override
-  public void setInnerForm(FORM form, boolean manageFormLifeCycle) throws ProcessingException {
+  public void setInnerForm(FORM form, boolean manageFormLifeCycle) {
     if (m_innerForm == form) {
       return;
     }
@@ -191,7 +191,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     m_innerForm.addFormListener(m_innerFormListener);
   }
 
-  protected void uninstallInnerForm() throws ProcessingException {
+  protected void uninstallInnerForm() {
     if (m_innerForm == null) {
       return;
     }
@@ -219,7 +219,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public void loadFromXml(Element x) throws ProcessingException {
+  public void loadFromXml(Element x) {
     super.loadFromXml(x);
     if (getInnerForm() != null) {
       getInnerForm().loadFromXml(x);
@@ -227,7 +227,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public void storeToXml(Element x) throws ProcessingException {
+  public void storeToXml(Element x) {
     super.storeToXml(x);
     if (getInnerForm() != null) {
       getInnerForm().storeToXml(x);
@@ -287,14 +287,14 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
 
   private class P_InnerFormListener implements FormListener {
     @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
+    public void formChanged(FormEvent e) {
       if (e.getType() == FormEvent.TYPE_CLOSED && m_manageInnerFormLifeCycle) {
         setInnerForm(null, true);
       }
     }
   }// end private class
 
-  protected final void interceptInnerFormChanged(FORM oldInnerForm, FORM newInnerForm) throws ProcessingException {
+  protected final void interceptInnerFormChanged(FORM oldInnerForm, FORM newInnerForm) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     WrappedFormFieldInnerFormChangedChain<FORM> chain = new WrappedFormFieldInnerFormChangedChain<>(extensions);
     chain.execInnerFormChanged(oldInnerForm, newInnerForm);
@@ -307,7 +307,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     }
 
     @Override
-    public void execInnerFormChanged(WrappedFormFieldInnerFormChangedChain<FORM> chain, FORM oldInnerForm, FORM newInnerForm) throws ProcessingException {
+    public void execInnerFormChanged(WrappedFormFieldInnerFormChangedChain<FORM> chain, FORM oldInnerForm, FORM newInnerForm) {
       getOwner().execInnerFormChanged(oldInnerForm, newInnerForm);
     }
   }

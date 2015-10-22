@@ -49,7 +49,7 @@ public interface IBlockingCondition {
    *           <li>if being a mutually exclusive job and the mutex could not be acquired anew upon unblocking</li>
    *           </ul>
    */
-  void waitFor() throws ProcessingException;
+  void waitFor();
 
   /**
    * Blocks the calling thread until the <i>blocking-state</i> of this blocking condition is changed to
@@ -72,7 +72,7 @@ public interface IBlockingCondition {
    *           <li>if being a mutually exclusive job and the mutex could not be acquired anew upon unblocking</li>
    *           </ul>
    */
-  boolean waitFor(long timeout, TimeUnit unit) throws ProcessingException;
+  boolean waitFor(long timeout, TimeUnit unit);
 
   /**
    * @return the name of this blocking condition.

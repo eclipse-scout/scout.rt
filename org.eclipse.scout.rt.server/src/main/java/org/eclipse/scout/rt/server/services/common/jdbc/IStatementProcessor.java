@@ -12,25 +12,23 @@ package org.eclipse.scout.rt.server.services.common.jdbc;
 
 import java.sql.Connection;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IStatementProcessor {
 
-  Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException;
+  Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor);
 
-  void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException;
+  void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor);
 
-  void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler) throws ProcessingException;
+  void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler);
 
-  int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException;
+  int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor);
 
-  boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException;
+  boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor);
 
-  String createPlainText() throws ProcessingException;
+  String createPlainText();
 
   /**
    * Simulate the execution of the statement and dump output to System.out
    */
-  void simulate() throws ProcessingException;
+  void simulate();
 
 }

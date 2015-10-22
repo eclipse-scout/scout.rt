@@ -27,7 +27,7 @@ class BeanPropertyInput implements IBindInput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
-  public BeanPropertyInput(String propertyName, Object[] beans, ValueInputToken target) throws ProcessingException {
+  public BeanPropertyInput(String propertyName, Object[] beans, ValueInputToken target) {
     if (beans == null) {
       beans = new Object[0];
     }
@@ -125,7 +125,7 @@ class BeanPropertyInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     if (isBatch()) {
       Object value = null;
       Class<?> valueType = m_propertyDesc != null ? m_propertyDesc.getPropertyType() : null;
@@ -178,7 +178,7 @@ class BeanPropertyInput implements IBindInput {
     return m_rawValues;
   }
 
-  private SqlBind applyMultivalued(ISqlStyle sqlStyle) throws ProcessingException {
+  private SqlBind applyMultivalued(ISqlStyle sqlStyle) {
     Object[] values = getRawValues();
     if (m_target.getParsedAttribute() != null) {
       boolean plain = m_target.isPlainSql() || m_target.isPlainValue();

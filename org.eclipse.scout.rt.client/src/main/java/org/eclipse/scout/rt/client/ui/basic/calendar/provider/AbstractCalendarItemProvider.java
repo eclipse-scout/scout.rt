@@ -136,7 +136,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(30)
-  protected void execLoadItems(final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
+  protected void execLoadItems(final Date minDate, final Date maxDate, final Set<ICalendarItem> result) {
   }
 
   /**
@@ -147,7 +147,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(40)
-  protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
+  protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) {
     ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
@@ -158,7 +158,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
 
   @ConfigOperation
   @Order(10)
-  protected void execDecorateCell(Cell cell, ICalendarItem item) throws ProcessingException {
+  protected void execDecorateCell(Cell cell, ICalendarItem item) {
   }
 
   /**
@@ -166,12 +166,12 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(20)
-  protected void execItemMoved(ICalendarItem item, Date newDate) throws ProcessingException {
+  protected void execItemMoved(ICalendarItem item, Date newDate) {
   }
 
   @ConfigOperation
   @Order(50)
-  protected void execItemAction(ICalendarItem item) throws ProcessingException {
+  protected void execItemAction(ICalendarItem item) {
   }
 
   protected final void interceptInitConfig() {
@@ -332,7 +332,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public void onItemAction(ICalendarItem item) throws ProcessingException {
+  public void onItemAction(ICalendarItem item) {
     try {
       interceptItemAction(item);
     }
@@ -345,7 +345,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public void onItemMoved(ICalendarItem item, Date newDate) throws ProcessingException {
+  public void onItemMoved(ICalendarItem item, Date newDate) {
     try {
       interceptItemMoved(item, newDate);
     }
@@ -449,46 +449,46 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
 
     @Override
-    public void execLoadItems(CalendarItemProviderLoadItemsChain chain, Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
+    public void execLoadItems(CalendarItemProviderLoadItemsChain chain, Date minDate, Date maxDate, Set<ICalendarItem> result) {
       getOwner().execLoadItems(minDate, maxDate, result);
     }
 
     @Override
-    public void execItemAction(CalendarItemProviderItemActionChain chain, ICalendarItem item) throws ProcessingException {
+    public void execItemAction(CalendarItemProviderItemActionChain chain, ICalendarItem item) {
       getOwner().execItemAction(item);
     }
 
     @Override
-    public void execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain chain, IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
+    public void execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain chain, IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result) {
       getOwner().execLoadItemsInBackground(session, minDate, maxDate, result);
     }
 
     @Override
-    public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) throws ProcessingException {
+    public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) {
       getOwner().execItemMoved(item, newDate);
     }
 
   }
 
-  protected final void interceptLoadItems(Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
+  protected final void interceptLoadItems(Date minDate, Date maxDate, Set<ICalendarItem> result) {
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderLoadItemsChain chain = new CalendarItemProviderLoadItemsChain(extensions);
     chain.execLoadItems(minDate, maxDate, result);
   }
 
-  protected final void interceptItemAction(ICalendarItem item) throws ProcessingException {
+  protected final void interceptItemAction(ICalendarItem item) {
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderItemActionChain chain = new CalendarItemProviderItemActionChain(extensions);
     chain.execItemAction(item);
   }
 
-  protected final void interceptLoadItemsInBackground(IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
+  protected final void interceptLoadItemsInBackground(IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result) {
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderLoadItemsInBackgroundChain chain = new CalendarItemProviderLoadItemsInBackgroundChain(extensions);
     chain.execLoadItemsInBackground(session, minDate, maxDate, result);
   }
 
-  protected final void interceptItemMoved(ICalendarItem item, Date newDate) throws ProcessingException {
+  protected final void interceptItemMoved(ICalendarItem item, Date newDate) {
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderItemMovedChain chain = new CalendarItemProviderItemMovedChain(extensions);
     chain.execItemMoved(item, newDate);

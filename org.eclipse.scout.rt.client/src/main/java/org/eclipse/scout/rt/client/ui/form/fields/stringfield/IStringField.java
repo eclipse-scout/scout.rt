@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
@@ -87,5 +86,5 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
 
   void setSpellCheckEnabled(boolean spellCheckEnabled);
 
-  void doAction() throws ProcessingException;
+  void doAction();
 }

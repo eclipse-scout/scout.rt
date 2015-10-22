@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 
@@ -19,7 +18,7 @@ public interface IWizardContainerForm extends IForm {
   /**
    * Normally starts the {@link IFormHandler} with the name WizardHandler.
    */
-  void startWizard() throws ProcessingException;
+  void startWizard();
 
   IWizardAction getWizardCancelButton();
 

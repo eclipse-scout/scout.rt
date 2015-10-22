@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.server;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * A test server session with shared context variables. <br>
  * Has to be located in package <code>org.eclipse.scout.rt.server</code>, because ServerSessionRegistryService requires
@@ -15,7 +13,7 @@ public class TestServerSession extends AbstractServerSession {
   }
 
   @Override
-  protected void execLoadSession() throws ProcessingException {
+  protected void execLoadSession() {
     setSharedContextVariable("test", String.class, "testval");
   }
 }

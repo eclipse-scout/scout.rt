@@ -29,7 +29,7 @@ public final class FormUtility {
    * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
    * constructor after the form initConfig. This method is normally called before {@link #initFormFields(IForm)}.
    */
-  public static void postInitConfig(IForm form) throws ProcessingException {
+  public static void postInitConfig(IForm form) {
     PostInitConfigFieldVisitor v = new PostInitConfigFieldVisitor();
     form.visitFields(v);
     v.handleResult();
@@ -40,7 +40,7 @@ public final class FormUtility {
    * constructor after the form initConfig and postInitConfig. This method is normally called before
    * {@link #initFormFields(IForm)}.
    */
-  public static void rebuildFieldGrid(IForm form, boolean initMainBoxGridData) throws ProcessingException {
+  public static void rebuildFieldGrid(IForm form, boolean initMainBoxGridData) {
     RebuildFieldGridVisitor v = new RebuildFieldGridVisitor();
     form.visitFields(v);
     v.handleResult();
@@ -50,7 +50,7 @@ public final class FormUtility {
     }
   }
 
-  private static void initRootBoxGridData(IForm form, ICompositeField rootBox) throws ProcessingException {
+  private static void initRootBoxGridData(IForm form, ICompositeField rootBox) {
     // layout data for root group box
     GridData rootData = new GridData(rootBox.getGridDataHints());
     if (rootData.w == IFormField.FULL_WIDTH) {
@@ -71,7 +71,7 @@ public final class FormUtility {
   /**
    * Initialize the complete field tree of the form
    */
-  public static void initFormFields(IForm form) throws ProcessingException {
+  public static void initFormFields(IForm form) {
     InitFieldVisitor v = new InitFieldVisitor();
     form.visitFields(v);
     v.handleResult();
@@ -119,7 +119,7 @@ public final class FormUtility {
       return true;
     }
 
-    public void handleResult() throws ProcessingException {
+    public void handleResult() {
       if (m_firstEx != null) {
         throw m_firstEx;
       }
@@ -144,7 +144,7 @@ public final class FormUtility {
       return true;
     }
 
-    public void handleResult() throws ProcessingException {
+    public void handleResult() {
       if (m_firstEx != null) {
         throw m_firstEx;
       }
@@ -172,7 +172,7 @@ public final class FormUtility {
       return true;
     }
 
-    public void handleResult() throws ProcessingException {
+    public void handleResult() {
       if (m_firstEx != null) {
         throw m_firstEx;
       }

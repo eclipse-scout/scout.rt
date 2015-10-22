@@ -40,67 +40,67 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public ContributionCommand initDelegate() throws ProcessingException {
+  public ContributionCommand initDelegate() {
     return execInit();
   }
 
   @Override
-  public ContributionCommand desktopOpenedDelegate() throws ProcessingException {
+  public ContributionCommand desktopOpenedDelegate() {
     return execOpened();
   }
 
   @Override
-  public ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException {
+  public ContributionCommand desktopBeforeClosingDelegate() {
     return execBeforeClosing();
   }
 
   @Override
-  public ContributionCommand desktopClosingDelegate() throws ProcessingException {
+  public ContributionCommand desktopClosingDelegate() {
     return execClosing();
   }
 
   @Override
-  public ContributionCommand guiAttachedDelegate() throws ProcessingException {
+  public ContributionCommand guiAttachedDelegate() {
     return execGuiAttached();
   }
 
   @Override
-  public ContributionCommand guiDetachedDelegate() throws ProcessingException {
+  public ContributionCommand guiDetachedDelegate() {
     return execGuiDetached();
   }
 
   @Override
-  public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) {
     return execOutlineChanged(oldOutline, newOutline);
   }
 
   @Override
-  public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) throws ProcessingException {
+  public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) {
     return execFormAboutToShow(formHolder);
   }
 
   @Override
-  public ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
+  public ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) {
     return execPageSearchFormChanged(oldForm, newForm);
   }
 
   @Override
-  public ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
+  public ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) {
     return execPageDetailFormChanged(oldForm, newForm);
   }
 
   @Override
-  public ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) throws ProcessingException {
+  public ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) {
     return execPageDetailTableChanged(oldTable, newTable);
   }
 
   @Override
-  public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) throws ProcessingException {
+  public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) {
     return execTablePageLoaded(tablePage);
   }
 
   @Override
-  public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) throws ProcessingException {
+  public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) {
     return execAddTrayMenus(menus);
   }
 
@@ -154,7 +154,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(10)
-  protected ContributionCommand execInit() throws ProcessingException {
+  protected ContributionCommand execInit() {
     return ContributionCommand.Continue;
   }
 
@@ -173,7 +173,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(12)
-  protected ContributionCommand execOpened() throws ProcessingException {
+  protected ContributionCommand execOpened() {
     return ContributionCommand.Continue;
   }
 
@@ -188,7 +188,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(14)
-  protected ContributionCommand execBeforeClosing() throws ProcessingException {
+  protected ContributionCommand execBeforeClosing() {
     return ContributionCommand.Continue;
   }
 
@@ -203,7 +203,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(15)
-  protected ContributionCommand execClosing() throws ProcessingException {
+  protected ContributionCommand execClosing() {
     return ContributionCommand.Continue;
   }
 
@@ -218,7 +218,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(20)
-  protected ContributionCommand execGuiAttached() throws ProcessingException {
+  protected ContributionCommand execGuiAttached() {
     return ContributionCommand.Continue;
   }
 
@@ -233,7 +233,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(25)
-  protected ContributionCommand execGuiDetached() throws ProcessingException {
+  protected ContributionCommand execGuiDetached() {
     return ContributionCommand.Continue;
   }
 
@@ -252,7 +252,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(30)
-  protected ContributionCommand execOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  protected ContributionCommand execOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     return ContributionCommand.Continue;
   }
 
@@ -288,7 +288,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @Order(40)
   @ConfigOperation
-  protected ContributionCommand execPageSearchFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+  protected ContributionCommand execPageSearchFormChanged(IForm oldForm, IForm newForm) {
     return ContributionCommand.Continue;
   }
 
@@ -307,7 +307,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @Order(50)
   @ConfigOperation
-  protected ContributionCommand execPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+  protected ContributionCommand execPageDetailFormChanged(IForm oldForm, IForm newForm) {
     return ContributionCommand.Continue;
   }
 
@@ -326,7 +326,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @Order(60)
   @ConfigOperation
-  protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
+  protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) {
     return ContributionCommand.Continue;
   }
 
@@ -343,7 +343,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @Order(62)
   @ConfigOperation
-  protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) {
     return ContributionCommand.Continue;
   }
 
@@ -364,7 +364,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @Order(70)
   @ConfigOperation
-  protected ContributionCommand execAddTrayMenus(List<IMenu> menus) throws ProcessingException {
+  protected ContributionCommand execAddTrayMenus(List<IMenu> menus) {
     return ContributionCommand.Continue;
   }
 

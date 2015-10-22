@@ -13,40 +13,38 @@ package org.eclipse.scout.rt.server.services.common.imap;
 import javax.mail.Message;
 import javax.mail.Store;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IImapAdapter {
 
-  Message[] getUnseenMessages() throws ProcessingException;
+  Message[] getUnseenMessages();
 
-  Message[] getUnseenMessages(String folderName) throws ProcessingException;
+  Message[] getUnseenMessages(String folderName);
 
-  Message[] getAllMessages() throws ProcessingException;
+  Message[] getAllMessages();
 
-  Message[] getAllMessages(String folderName) throws ProcessingException;
+  Message[] getAllMessages(String folderName);
 
-  void moveToTrash(Message[] messages) throws ProcessingException;
+  void moveToTrash(Message[] messages);
 
-  void moveMessages(String destFolderName, Message[] messages) throws ProcessingException;
+  void moveMessages(String destFolderName, Message[] messages);
 
-  void copyMessages(String destFolderName, Message[] messages) throws ProcessingException;
+  void copyMessages(String destFolderName, Message[] messages);
 
   /**
    * messages are flagged as DELETED and their folder is closed in order to delete them on the server
    */
-  void deleteMessagesPermanently(Message[] messages) throws ProcessingException;
+  void deleteMessagesPermanently(Message[] messages);
 
-  void createFolder(String folderName) throws ProcessingException;
+  void createFolder(String folderName);
 
-  void removeFolder(String folderName) throws ProcessingException;
+  void removeFolder(String folderName);
 
-  void connect() throws ProcessingException;
+  void connect();
 
-  void closeConnection() throws ProcessingException;
+  void closeConnection();
 
   boolean isConnected();
 
-  Store getStore() throws ProcessingException;
+  Store getStore();
 
   String getDefaultFolderName();
 

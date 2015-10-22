@@ -38,6 +38,6 @@ public interface IUserPreferencesService extends IService {
    * @throws IllegalArgumentException
    *           if the session or nodeId is <code>null</code>.
    */
-  IPreferences getPreferences(ISession userScope, String nodeId) throws ProcessingException;
+  IPreferences getPreferences(ISession userScope, String nodeId);
 
 }

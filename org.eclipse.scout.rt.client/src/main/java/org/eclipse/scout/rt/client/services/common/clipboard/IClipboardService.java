@@ -33,7 +33,7 @@ public interface IClipboardService extends IService {
    * @param transferObject
    * @throws ProcessingException
    */
-  void setContents(TransferObject transferObject) throws ProcessingException;
+  void setContents(TransferObject transferObject);
 
   /**
    * Reads the requested contents of the clipboard and returns them as {@link Collection} of {@link BinaryResource}.
@@ -43,7 +43,7 @@ public interface IClipboardService extends IService {
    * @param allowedMimeTypes
    * @throws ProcessingException
    */
-  Collection<BinaryResource> getClipboardContents(MimeType... allowedMimeTypes) throws ProcessingException;
+  Collection<BinaryResource> getClipboardContents(MimeType... allowedMimeTypes);
 
   /**
    * Convenience method for putting the given string into the system clipboard.See {@link #setContents(TransferObject)}
@@ -52,6 +52,6 @@ public interface IClipboardService extends IService {
    * @param textContents
    * @throws ProcessingException
    */
-  void setTextContents(String textContents) throws ProcessingException;
+  void setTextContents(String textContents);
 
 }

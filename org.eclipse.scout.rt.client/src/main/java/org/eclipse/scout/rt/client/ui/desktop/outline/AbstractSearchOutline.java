@@ -31,11 +31,11 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
   }
 
   @Override
-  public void search() throws ProcessingException {
+  public void search() {
     execSearch(getSearchQuery());
   }
 
-  protected void execSearch(String query) throws ProcessingException {
+  protected void execSearch(String query) {
   }
 
   @Override

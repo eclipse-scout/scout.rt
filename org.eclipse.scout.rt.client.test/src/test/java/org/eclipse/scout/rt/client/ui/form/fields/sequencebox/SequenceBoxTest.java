@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -126,7 +125,7 @@ public class SequenceBoxTest {
    * configured to 'null'. See bugzilla 432481
    */
   @Test
-  public void testSearchFilterText() throws ProcessingException {
+  public void testSearchFilterText() {
     Calendar cal = Calendar.getInstance();
     cal.set(2014, Calendar.JANUARY, 1, 8, 0);
 
@@ -211,7 +210,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testThreeFieldsValid() throws ProcessingException {
+  public void testThreeFieldsValid() {
     ThreeElementSequence sb = new ThreeElementSequence();
     sb.clearErrorStatus();
     sb.getFirstField().setValue(1);
@@ -237,7 +236,7 @@ public class SequenceBoxTest {
    */
   public static class SequenceTestForm extends AbstractForm {
 
-    public SequenceTestForm() throws ProcessingException {
+    public SequenceTestForm() {
       super();
     }
 
@@ -268,7 +267,7 @@ public class SequenceBoxTest {
           /**
            * force field check
            */
-          protected void execCheckFromTo(int changedIndex) throws ProcessingException {
+          protected void execCheckFromTo(int changedIndex) {
             super.execCheckFromTo(new AbstractDateField[]{getStartField(), getEndField()}, changedIndex);
           }
 
@@ -328,7 +327,7 @@ public class SequenceBoxTest {
     /**
      * force field check
      */
-    public void execCheckFromTo(int changedIndex) throws ProcessingException {
+    public void execCheckFromTo(int changedIndex) {
       super.execCheckFromTo(new AbstractIntegerField[]{getFirstField(), getSecondField(), getThirdField()}, changedIndex);
     }
 
@@ -380,7 +379,7 @@ public class SequenceBoxTest {
     /**
      * force field check
      */
-    public void execCheckFromTo(int changedIndex) throws ProcessingException {
+    public void execCheckFromTo(int changedIndex) {
       super.execCheckFromTo(new AbstractIntegerField[]{getFirstField(), getSecondField(), getThirdField()}, changedIndex);
     }
 

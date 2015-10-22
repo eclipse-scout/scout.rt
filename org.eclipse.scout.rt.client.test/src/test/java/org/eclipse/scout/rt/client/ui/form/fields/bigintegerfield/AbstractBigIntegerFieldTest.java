@@ -20,7 +20,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -43,12 +42,12 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
   }
 
   @Test
-  public void testParseValueInternalNull() throws ProcessingException {
+  public void testParseValueInternalNull() {
     assertEquals("expected null return for null input", null, parseValueInternal(null));
   }
 
   @Test
-  public void testParseValue() throws ProcessingException {
+  public void testParseValue() {
     // maxValue and minValue must not have an influence for parsing
     setMaxValue(BigInteger.valueOf(99));
     setMinValue(BigInteger.valueOf(-99));
@@ -61,7 +60,7 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
   }
 
   @Test
-  public void testParseValueInternalAroundPossibleMinMaxValue() throws ProcessingException {
+  public void testParseValueInternalAroundPossibleMinMaxValue() {
 
     assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(new BigDecimal(getMaxPossibleValue()).toPlainString()));
     assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(new BigDecimal(getMinPossibleValue()).toPlainString()));
@@ -72,12 +71,12 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
   }
 
   @Test
-  public void testParseValueInternalNotANumber() throws ProcessingException {
+  public void testParseValueInternalNotANumber() {
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string not representing a number.", this, "onethousend");
   }
 
   @Test
-  public void testParseValueInternalDecimal() throws ProcessingException {
+  public void testParseValueInternalDecimal() {
     // expecting RoundingMode.UNNECESSARY as default
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a decimal value.", this, formatWithFractionDigits(12.1, 1));
     Assert.assertEquals("parsing failed", BigInteger.valueOf(12), parseValueInternal(formatWithFractionDigits(12.0, 1)));

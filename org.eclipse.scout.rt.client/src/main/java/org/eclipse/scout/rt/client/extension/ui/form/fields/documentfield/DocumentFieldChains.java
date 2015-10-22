@@ -26,10 +26,10 @@ public final class DocumentFieldChains {
       super(extensions);
     }
 
-    public void execComReadyStatusChanged(final boolean ready) throws ProcessingException {
+    public void execComReadyStatusChanged(final boolean ready) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDocumentFieldExtension<? extends AbstractDocumentField> next) throws ProcessingException {
+        protected void callMethod(IDocumentFieldExtension<? extends AbstractDocumentField> next) {
           next.execComReadyStatusChanged(DocumentFieldComReadyStatusChangedChain.this, ready);
         }
       };

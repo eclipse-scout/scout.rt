@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -56,7 +55,7 @@ public class SmartFieldMultilineTest {
    * Tests whether new lines get replaced, if multilineText is set to false
    */
   @Test
-  public void testSingleLine() throws ProcessingException {
+  public void testSingleLine() {
     m_smartField.setValue(1L);
     assertEquals("Line1 Line2", m_smartField.getDisplayText());
   }
@@ -65,7 +64,7 @@ public class SmartFieldMultilineTest {
    * Tests whether new lines don't get replaced, if multilineText is set to true
    */
   @Test
-  public void testMultiLine() throws ProcessingException {
+  public void testMultiLine() {
     m_smartField.setMultilineText(true);
     m_smartField.setValue(1L);
     assertEquals("Line1\nLine2", m_smartField.getDisplayText());
@@ -77,7 +76,7 @@ public class SmartFieldMultilineTest {
    * from the proposal chooser.
    */
   @Test
-  public void testMultiLine_DisplayTextMatchesCurrentLookupRow() throws ProcessingException {
+  public void testMultiLine_DisplayTextMatchesCurrentLookupRow() {
     m_smartField.setMultilineText(true);
     m_smartField.setValue(1L);
     assertEquals("Line1\nLine2", m_smartField.getDisplayText());
@@ -111,22 +110,22 @@ public class SmartFieldMultilineTest {
   public static class P_LookupService implements ILookupService<Long> {
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) {
       return LookupRows.multiLineRow();
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) {
       return LookupRows.multiLineRow();
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) {
       return null;
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
       return null;
     }
 

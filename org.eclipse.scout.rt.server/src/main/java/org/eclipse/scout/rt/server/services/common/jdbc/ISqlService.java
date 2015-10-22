@@ -17,7 +17,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -173,7 +172,7 @@ public interface ISqlService extends IService {
    * @return a two dimensional array, the first index referencing the rows, the second referencing the column. Cannot be
    *         <code>null</code>
    */
-  Object[][] select(String s, Object... bindBases) throws ProcessingException;
+  Object[][] select(String s, Object... bindBases);
 
   /**
    * Select a normal matrix of data and limit amount of returned rows.
@@ -186,7 +185,7 @@ public interface ISqlService extends IService {
    * @return a two dimensional array, the first index referencing the rows, the second referencing the column. Cannot be
    *         <code>null</code>
    */
-  Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException;
+  Object[][] selectLimited(String s, int maxRowCount, Object... bindBases);
 
   /**
    * The <code>INTO</code> binds are filled by the corresponding result column.
@@ -196,7 +195,7 @@ public interface ISqlService extends IService {
    *
    * @see #select(String, Object...)
    */
-  void selectInto(String s, Object... bindBases) throws ProcessingException;
+  void selectInto(String s, Object... bindBases);
 
   /**
    * The <code>INTO</code> binds are filled by the corresponding result column.
@@ -206,7 +205,7 @@ public interface ISqlService extends IService {
    *
    * @see #selectLimited(String, int, Object...)
    */
-  void selectIntoLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException;
+  void selectIntoLimited(String s, int maxRowCount, Object... bindBases);
 
   /**
    * The callback can handle each row individually and therefore stream data
@@ -218,7 +217,7 @@ public interface ISqlService extends IService {
    *          callback to handle individual rows
    * @see #select(String, Object...)
    */
-  void selectStreaming(String s, ISelectStreamHandler handler, Object... bindBases) throws ProcessingException;
+  void selectStreaming(String s, ISelectStreamHandler handler, Object... bindBases);
 
   /**
    * The callback can handle each row individually and therefore stream data
@@ -230,7 +229,7 @@ public interface ISqlService extends IService {
    *          callback to handle individual rows
    * @see #selectLimited(String, int, Object...)
    */
-  void selectStreamingLimited(String s, ISelectStreamHandler handler, int maxRowCount, Object... bindBases) throws ProcessingException;
+  void selectStreamingLimited(String s, ISelectStreamHandler handler, int maxRowCount, Object... bindBases);
 
   /**
    * insert rows
@@ -240,7 +239,7 @@ public interface ISqlService extends IService {
    *
    * @return number of inserted rows
    */
-  int insert(String s, Object... bindBases) throws ProcessingException;
+  int insert(String s, Object... bindBases);
 
   /**
    * update rows
@@ -250,7 +249,7 @@ public interface ISqlService extends IService {
    *
    * @return number of updated rows
    */
-  int update(String s, Object... bindBases) throws ProcessingException;
+  int update(String s, Object... bindBases);
 
   /**
    * delete rows
@@ -260,7 +259,7 @@ public interface ISqlService extends IService {
    *
    * @return number of deleted rows
    */
-  int delete(String s, Object... bindBases) throws ProcessingException;
+  int delete(String s, Object... bindBases);
 
   /**
    * call a stored procedure
@@ -270,7 +269,7 @@ public interface ISqlService extends IService {
    *
    * @return result code
    */
-  boolean callStoredProcedure(String s, Object... bindBases) throws ProcessingException;
+  boolean callStoredProcedure(String s, Object... bindBases);
 
   /**
    * <p>
@@ -281,7 +280,7 @@ public interface ISqlService extends IService {
    * When the service completes work without an exception, a xa commit is done on ALL used service request resources.
    * </p>
    */
-  void commit() throws ProcessingException;
+  void commit();
 
   /**
    * <p>
@@ -291,25 +290,25 @@ public interface ISqlService extends IService {
    *
    * @see #commit()
    */
-  void rollback() throws ProcessingException;
+  void rollback();
 
   /**
    * @returns the next value from a given sequence
    */
-  Long getSequenceNextval(String sequenceName) throws ProcessingException;
+  Long getSequenceNextval(String sequenceName);
 
   /**
    * Creates plaintext SQL from the given SQL part by plaining all binds
    *
    * @see ISqlStyle.createPlainText()
    */
-  String createPlainText(String s, Object... bindBases) throws ProcessingException;
+  String createPlainText(String s, Object... bindBases);
 
   String getTransactionMemberId();
 
   /**
    * @return current connection from {@link ITransactionMember} that is registered inside the {@link ITransaction}.
    */
-  Connection getConnection() throws ProcessingException;
+  Connection getConnection();
 
 }

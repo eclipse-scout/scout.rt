@@ -27,10 +27,10 @@ public final class OutlineChains {
       super(extensions);
     }
 
-    public void execCreateChildPages(final List<IPage<?>> pageList) throws ProcessingException {
+    public void execCreateChildPages(final List<IPage<?>> pageList) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) throws ProcessingException {
+        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) {
           next.execCreateChildPages(OutlineCreateChildPagesChain.this, pageList);
         }
       };
@@ -51,7 +51,7 @@ public final class OutlineChains {
     public IPage<?> execCreateRootPage() {
       MethodInvocation<IPage<?>> methodInvocation = new MethodInvocation<IPage<?>>() {
         @Override
-        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) throws ProcessingException {
+        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) {
           setReturnValue(next.execCreateRootPage(OutlineCreateRootPageChain.this));
         }
       };

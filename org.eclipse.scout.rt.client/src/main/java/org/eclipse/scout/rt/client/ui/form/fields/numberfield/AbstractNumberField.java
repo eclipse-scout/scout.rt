@@ -286,7 +286,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   protected abstract NUMBER getMaxPossibleValue();
 
   @Override
-  protected NUMBER validateValueInternal(NUMBER rawValue) throws ProcessingException {
+  protected NUMBER validateValueInternal(NUMBER rawValue) {
     NUMBER validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     if (rawValue == null) {
@@ -319,7 +319,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   }
 
   @Override
-  protected abstract NUMBER parseValueInternal(String text) throws ProcessingException;
+  protected abstract NUMBER parseValueInternal(String text);
 
   /**
    * Parses text input into a BigDecimal.
@@ -336,7 +336,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * @return
    * @throws ProcessingException
    */
-  protected BigDecimal parseToBigDecimalInternal(String text) throws ProcessingException {
+  protected BigDecimal parseToBigDecimalInternal(String text) {
     BigDecimal retVal = null;
     if (text == null) {
       text = "";
@@ -369,7 +369,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return retVal;
   }
 
-  private void throwNumberTooLarge() throws VetoException {
+  private void throwNumberTooLarge() {
     if (getMinValue() == null || CompareUtility.equals(getMinValue(), getMinPossibleValue())) {
       throw new VetoException(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())));
     }
@@ -378,7 +378,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     }
   }
 
-  private void throwNumberTooSmall() throws VetoException {
+  private void throwNumberTooSmall() {
     if (getMaxValue() == null || CompareUtility.equals(getMaxValue(), getMaxPossibleValue())) {
       throw new VetoException(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())));
     }
@@ -489,7 +489,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * @throws throws
    *           a {@link ProcessingException} if the number's digits before the decimal point would be cut off
    */
-  public static String createNumberWithinFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) throws ProcessingException {
+  public static String createNumberWithinFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
     // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
     // When changing this implementation also consider updating the js version!
     if (insertText == null || insertText.length() < 1) {

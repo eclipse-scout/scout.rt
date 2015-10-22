@@ -16,7 +16,6 @@ import static org.mockito.Mockito.mock;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
@@ -31,7 +30,7 @@ import org.junit.runner.RunWith;
 public class AbstractLongColumnTest extends AbstractLongColumn {
 
   @Test
-  public void testFormattingInDecorateCellInternal() throws ProcessingException {
+  public void testFormattingInDecorateCellInternal() {
     ITableRow row = mock(ITableRow.class);
     Cell cell = new Cell();
     Long testValue = Long.valueOf(-123456789);
@@ -48,7 +47,7 @@ public class AbstractLongColumnTest extends AbstractLongColumn {
   }
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractLongColumn column = new AbstractLongColumn() {
     };
     column.setMandatory(true);

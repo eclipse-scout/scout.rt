@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabForm;
@@ -75,7 +74,7 @@ public class ToolFormHandler {
    * This is a delegate and needs to be explicitly called.<br>
    * It's purpose is to close tool forms after a search or after a bookmark activation.
    */
-  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
     if (isCloseToolFormsAfterTablePageLoaded()) {
       MobileDesktopUtility.closeAllToolForms();
     }

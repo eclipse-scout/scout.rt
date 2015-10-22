@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -18,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 public interface IBreadCrumb {
 
-  void activate() throws ProcessingException;
+  void activate();
 
   IForm getForm();
 

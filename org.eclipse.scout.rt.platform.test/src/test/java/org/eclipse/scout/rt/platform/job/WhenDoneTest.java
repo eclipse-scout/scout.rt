@@ -91,7 +91,7 @@ public class WhenDoneTest {
   }
 
   @Test
-  public void testSuccessWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
+  public void testSuccessWithJobAlreadyCompleted() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
 
@@ -171,7 +171,7 @@ public class WhenDoneTest {
   }
 
   @Test
-  public void testErrorWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
+  public void testErrorWithJobAlreadyCompleted() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final Exception error = new ProcessingException();
@@ -301,7 +301,7 @@ public class WhenDoneTest {
   }
 
   @Test
-  public void testCancelWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
+  public void testCancelWithJobAlreadyCompleted() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
 

@@ -35,7 +35,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * initialize, load html template and inline images
    */
   @Override
-  public void initialize(AbstractWizardStatusField htmlField) throws ProcessingException {
+  public void initialize(AbstractWizardStatusField htmlField) {
     m_htmlTemplate = initHtmlTemplate();
 
     // collect attachments for HTML field
@@ -46,7 +46,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
   }
 
   @Override
-  public String initHtmlTemplate() throws ProcessingException {
+  public String initHtmlTemplate() {
     try {
       return new String(IOUtility.getContent(org.eclipse.scout.rt.client.ResourceBase.class.getResource("html/defaultWizardStatus.html").openStream()), "iso-8859-1");
     }
@@ -60,7 +60,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
   }
 
   @Override
-  public String createHtml(IWizard w) throws ProcessingException {
+  public String createHtml(IWizard w) {
     String html = m_htmlTemplate;
     String topPart = "";
     String bottomPart = "";

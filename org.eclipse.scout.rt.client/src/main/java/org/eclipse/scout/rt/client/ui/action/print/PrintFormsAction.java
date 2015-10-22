@@ -99,7 +99,7 @@ public class PrintFormsAction extends AbstractAction {
 
   @SuppressWarnings("unchecked")
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (getFormTypes() == null) {
       throw new VetoException("formTypes array is null");
     }
@@ -153,7 +153,7 @@ public class PrintFormsAction extends AbstractAction {
   private class P_FormListener implements FormListener {
 
     @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
+    public void formChanged(FormEvent e) {
       if (e.getType() == FormEvent.TYPE_ACTIVATED) {
         schedulePrintJob(e.getForm());
       }

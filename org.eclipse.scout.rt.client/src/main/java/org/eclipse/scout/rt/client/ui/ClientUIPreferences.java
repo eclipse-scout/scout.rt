@@ -266,7 +266,7 @@ public class ClientUIPreferences {
     }
   }
 
-  public void setTableCustomizerData(ITable table, ITableCustomizer customizer, String configName) throws ProcessingException {
+  public void setTableCustomizerData(ITable table, ITableCustomizer customizer, String configName) {
     if (m_prefs == null) {
       return;
     }

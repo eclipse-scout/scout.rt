@@ -267,7 +267,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(40)
-  protected void execInitPage() throws ProcessingException {
+  protected void execInitPage() {
   }
 
   /**
@@ -279,7 +279,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(50)
-  protected void execDisposePage() throws ProcessingException {
+  protected void execDisposePage() {
   }
 
   /**
@@ -299,7 +299,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(55)
-  protected void execDataChanged(Object... dataTypes) throws ProcessingException {
+  protected void execDataChanged(Object... dataTypes) {
     if (getTree() == null) {
       return;
     }
@@ -358,7 +358,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(60)
-  protected void execPageDataLoaded() throws ProcessingException {
+  protected void execPageDataLoaded() {
   }
 
   /**
@@ -370,7 +370,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(70)
-  protected void execPageActivated() throws ProcessingException {
+  protected void execPageActivated() {
   }
 
   /**
@@ -382,7 +382,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(80)
-  protected void execPageDeactivated() throws ProcessingException {
+  protected void execPageDeactivated() {
   }
 
   /**
@@ -397,7 +397,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @ConfigOperation
   @Order(120)
-  protected void execInitDetailForm() throws ProcessingException {
+  protected void execInitDetailForm() {
   }
 
   protected abstract T initTable();
@@ -414,7 +414,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Runtime
    */
   @Override
-  public void initPage() throws ProcessingException {
+  public void initPage() {
     setInitializing(true);
     try {
       Cell cell = getCellForUpdate();
@@ -573,7 +573,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  protected void enhanceTableWithPageMenus() throws ProcessingException {
+  protected void enhanceTableWithPageMenus() {
     if (m_pageMenusAdded) {
       return;
     }
@@ -603,7 +603,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  protected IForm createDetailForm() throws ProcessingException {
+  protected IForm createDetailForm() {
     if (getConfiguredDetailForm() == null) {
       return null;
     }
@@ -628,11 +628,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * The default uses {@link IForm#start()} and therefore expects a form handler to be previously set. Override to call
    * a custom start method or implement a {@link IForm#start()} on the detail form.
    */
-  protected void startDetailForm() throws ProcessingException {
+  protected void startDetailForm() {
     getDetailForm().start();
   }
 
-  protected void ensureDetailFormCreated() throws ProcessingException {
+  protected void ensureDetailFormCreated() {
     if (getDetailForm() != null) {
       return;
     }
@@ -643,7 +643,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  protected void ensureDetailFormStarted() throws ProcessingException {
+  protected void ensureDetailFormStarted() {
     if (getDetailForm() == null || getDetailForm().isFormStarted()) {
       return;
     }
@@ -656,7 +656,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  protected void disposeDetailForm() throws ProcessingException {
+  protected void disposeDetailForm() {
     if (getDetailForm() != null) {
       getDetailForm().doClose();
       setDetailForm(null);
@@ -685,7 +685,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  protected void decorateDetailForm() throws ProcessingException {
+  protected void decorateDetailForm() {
     IForm form = getDetailForm();
     if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
       form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
@@ -711,7 +711,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       m_internalDataChangeListener = new WeakDataChangeListener() {
 
         @Override
-        public void dataChanged(Object... innerDataTypes) throws ProcessingException {
+        public void dataChanged(Object... innerDataTypes) {
           AbstractPage.this.dataChanged(innerDataTypes);
         }
       };
@@ -751,7 +751,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public final void reloadPage() throws ProcessingException {
+  public final void reloadPage() {
     ITree tree = getTree();
     if (tree != null) {
       try {
@@ -768,7 +768,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public void loadChildren() throws ProcessingException {
+  public void loadChildren() {
     super.loadChildren();
     interceptPageDataLoaded();
   }
@@ -837,43 +837,43 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return null;
   }
 
-  protected final void interceptPageDataLoaded() throws ProcessingException {
+  protected final void interceptPageDataLoaded() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageDataLoadedChain chain = new PagePageDataLoadedChain(extensions);
     chain.execPageDataLoaded();
   }
 
-  protected final void interceptPageActivated() throws ProcessingException {
+  protected final void interceptPageActivated() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageActivatedChain chain = new PagePageActivatedChain(extensions);
     chain.execPageActivated();
   }
 
-  protected final void interceptDataChanged(Object... dataTypes) throws ProcessingException {
+  protected final void interceptDataChanged(Object... dataTypes) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageDataChangedChain chain = new PageDataChangedChain(extensions);
     chain.execDataChanged(dataTypes);
   }
 
-  protected final void interceptInitPage() throws ProcessingException {
+  protected final void interceptInitPage() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageInitPageChain chain = new PageInitPageChain(extensions);
     chain.execInitPage();
   }
 
-  protected final void interceptPageDeactivated() throws ProcessingException {
+  protected final void interceptPageDeactivated() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageDeactivatedChain chain = new PagePageDeactivatedChain(extensions);
     chain.execPageDeactivated();
   }
 
-  protected final void interceptDisposePage() throws ProcessingException {
+  protected final void interceptDisposePage() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageDisposePageChain chain = new PageDisposePageChain(extensions);
     chain.execDisposePage();
   }
 
-  protected final void interceptInitDetailForm() throws ProcessingException {
+  protected final void interceptInitDetailForm() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageInitDetailFormChain chain = new PageInitDetailFormChain(extensions);
     chain.execInitDetailForm();
@@ -886,37 +886,37 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
 
     @Override
-    public void execPageDataLoaded(PagePageDataLoadedChain chain) throws ProcessingException {
+    public void execPageDataLoaded(PagePageDataLoadedChain chain) {
       getOwner().execPageDataLoaded();
     }
 
     @Override
-    public void execPageActivated(PagePageActivatedChain chain) throws ProcessingException {
+    public void execPageActivated(PagePageActivatedChain chain) {
       getOwner().execPageActivated();
     }
 
     @Override
-    public void execDataChanged(PageDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+    public void execDataChanged(PageDataChangedChain chain, Object... dataTypes) {
       getOwner().execDataChanged(dataTypes);
     }
 
     @Override
-    public void execInitPage(PageInitPageChain chain) throws ProcessingException {
+    public void execInitPage(PageInitPageChain chain) {
       getOwner().execInitPage();
     }
 
     @Override
-    public void execPageDeactivated(PagePageDeactivatedChain chain) throws ProcessingException {
+    public void execPageDeactivated(PagePageDeactivatedChain chain) {
       getOwner().execPageDeactivated();
     }
 
     @Override
-    public void execDisposePage(PageDisposePageChain chain) throws ProcessingException {
+    public void execDisposePage(PageDisposePageChain chain) {
       getOwner().execDisposePage();
     }
 
     @Override
-    public void execInitDetailForm(PageInitDetailFormChain chain) throws ProcessingException {
+    public void execInitDetailForm(PageInitDetailFormChain chain) {
       getOwner().execInitDetailForm();
     }
   }

@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.mobile.navigation;
 
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -27,7 +26,7 @@ public abstract class AbstractMobileHomeAction extends AbstractMenu {
   }
 
   @Override
-  protected void execInitAction() throws ProcessingException {
+  protected void execInitAction() {
     if (m_breadCrumbsListener == null) {
       m_breadCrumbsListener = new P_BreadCrumbsListener();
       BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().addBreadCrumbsListener(m_breadCrumbsListener);
@@ -35,7 +34,7 @@ public abstract class AbstractMobileHomeAction extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().goHome();
   }
 

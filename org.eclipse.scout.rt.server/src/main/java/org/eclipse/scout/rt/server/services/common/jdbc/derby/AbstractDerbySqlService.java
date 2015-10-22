@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.derby;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
  */
 public abstract class AbstractDerbySqlService extends AbstractSqlService {
 
-  protected String getConfiguredSequenceColumnName() throws ProcessingException {
+  protected String getConfiguredSequenceColumnName() {
     return "LAST_VAL";
   }
 
@@ -33,7 +32,7 @@ public abstract class AbstractDerbySqlService extends AbstractSqlService {
   }
 
   @Override
-  public Long getSequenceNextval(String sequenceName) throws ProcessingException {
+  public Long getSequenceNextval(String sequenceName) {
     //increase
     String update = "UPDATE " + sequenceName + " SET " + getConfiguredSequenceColumnName() + " = " + getConfiguredSequenceColumnName() + " + 1";
     createStatementProcessor(update, null, 0).processModification(getTransaction(), getStatementCache(), null);

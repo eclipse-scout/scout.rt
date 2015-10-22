@@ -60,12 +60,12 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   }
 
   @Test
-  public void testParseValueInternalNull() throws ProcessingException {
+  public void testParseValueInternalNull() {
     assertEquals("expected null return for null input", null, parseValueInternal(null));
   }
 
   @Test
-  public void testParseValue() throws ProcessingException {
+  public void testParseValue() {
     // maxValue and minValue must not have an influence for parsing
     setMaxValue(99);
     setMinValue(-99);
@@ -78,7 +78,7 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   }
 
   @Test
-  public void testParseValueInternalAroundIntegerMinMaxValue() throws ProcessingException {
+  public void testParseValueInternalAroundIntegerMinMaxValue() {
     assertEquals("parsing failed", Integer.valueOf(Integer.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Integer.MAX_VALUE).toPlainString()));
     assertEquals("parsing failed", Integer.valueOf(Integer.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Integer.MIN_VALUE).toPlainString()));
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this,
@@ -88,7 +88,7 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   }
 
   @Test
-  public void testParseValueInternalNotANumber() throws ProcessingException {
+  public void testParseValueInternalNotANumber() {
     boolean exceptionOccured = false;
     try {
       parseValueInternal("onethousend");
@@ -100,7 +100,7 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   }
 
   @Test
-  public void testParseValueInternalDecimal() throws ProcessingException {
+  public void testParseValueInternalDecimal() {
     // expecting RoundingMode.UNNECESSARY as default
     NlsLocale.set(Locale.TRADITIONAL_CHINESE);
     boolean exceptionOccured = false;

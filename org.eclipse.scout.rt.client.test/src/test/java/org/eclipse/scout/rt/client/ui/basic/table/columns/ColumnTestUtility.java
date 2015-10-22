@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
@@ -23,7 +22,7 @@ public final class ColumnTestUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> void editCellValue(ITableRow row, IColumn<T> column, String value) throws ProcessingException {
+  public static <T> void editCellValue(ITableRow row, IColumn<T> column, String value) {
     IValueField<T> field = (IValueField<T>) column.prepareEdit(row);
     field.parseAndSetValue(value);
     column.completeEdit(row, field);

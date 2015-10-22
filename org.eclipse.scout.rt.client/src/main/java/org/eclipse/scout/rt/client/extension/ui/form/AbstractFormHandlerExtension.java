@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerDiscardChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerFinallyChain;
@@ -34,37 +33,37 @@ public abstract class AbstractFormHandlerExtension<OWNER extends AbstractFormHan
   }
 
   @Override
-  public void execPostLoad(FormHandlerPostLoadChain chain) throws ProcessingException {
+  public void execPostLoad(FormHandlerPostLoadChain chain) {
     chain.execPostLoad();
   }
 
   @Override
-  public boolean execValidate(FormHandlerValidateChain chain) throws ProcessingException {
+  public boolean execValidate(FormHandlerValidateChain chain) {
     return chain.execValidate();
   }
 
   @Override
-  public void execLoad(FormHandlerLoadChain chain) throws ProcessingException {
+  public void execLoad(FormHandlerLoadChain chain) {
     chain.execLoad();
   }
 
   @Override
-  public void execStore(FormHandlerStoreChain chain) throws ProcessingException {
+  public void execStore(FormHandlerStoreChain chain) {
     chain.execStore();
   }
 
   @Override
-  public void execDiscard(FormHandlerDiscardChain chain) throws ProcessingException {
+  public void execDiscard(FormHandlerDiscardChain chain) {
     chain.execDiscard();
   }
 
   @Override
-  public boolean execCheckFields(FormHandlerCheckFieldsChain chain) throws ProcessingException {
+  public boolean execCheckFields(FormHandlerCheckFieldsChain chain) {
     return chain.execCheckFields();
   }
 
   @Override
-  public void execFinally(FormHandlerFinallyChain chain) throws ProcessingException {
+  public void execFinally(FormHandlerFinallyChain chain) {
     chain.execFinally();
   }
 

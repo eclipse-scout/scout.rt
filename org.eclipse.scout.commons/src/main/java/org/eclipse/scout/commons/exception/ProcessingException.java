@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
  *
  * @see org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService
  */
-public class ProcessingException extends Exception implements Serializable {
+public class ProcessingException extends RuntimeException implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private ProcessingStatus m_status;

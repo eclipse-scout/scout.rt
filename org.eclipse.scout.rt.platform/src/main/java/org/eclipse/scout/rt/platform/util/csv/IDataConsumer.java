@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.platform.util.csv;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IDataConsumer {
-  void processRow(int lineNr, List<Object> row) throws ProcessingException;
+  void processRow(int lineNr, List<Object> row);
 }

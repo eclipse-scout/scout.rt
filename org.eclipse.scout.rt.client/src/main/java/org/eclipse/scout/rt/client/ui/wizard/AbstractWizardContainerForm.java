@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardContainerFormExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -31,11 +30,11 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   private IWizard m_wizard;
   private P_WizardPropertyListener m_propertyChangeListener;
 
-  public AbstractWizardContainerForm(IWizard wizard) throws ProcessingException {
+  public AbstractWizardContainerForm(IWizard wizard) {
     this(wizard, true);
   }
 
-  public AbstractWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
+  public AbstractWizardContainerForm(IWizard wizard, boolean callInitializer) {
     super(false);
     m_wizard = wizard;
     if (callInitializer) {
@@ -54,7 +53,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   @Override
-  protected void execInitForm() throws ProcessingException {
+  protected void execInitForm() {
     // attach to wizard
     if (m_wizard != null) {
       if (m_propertyChangeListener == null) {
@@ -66,7 +65,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   @Override
-  protected void execDisposeForm() throws ProcessingException {
+  protected void execDisposeForm() {
     // detach from wizard
     if (m_wizard != null) {
       if (m_propertyChangeListener != null) {
@@ -78,11 +77,11 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   @Override
-  protected void execOnCloseRequest(boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
+  protected void execOnCloseRequest(boolean kill, Set<Integer> enabledButtonSystemTypes) {
     handleEscapeKey(kill);
   }
 
-  protected void handleEscapeKey(boolean kill) throws ProcessingException {
+  protected void handleEscapeKey(boolean kill) {
     if (kill) {
       if (getWizardSuspendButton() != null && getWizardSuspendButton().isVisible() && getWizardSuspendButton().isEnabled()) {
         getWizard().doSuspend();
@@ -107,7 +106,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
     }
   }
 
-  protected void handleEnterKey() throws ProcessingException {
+  protected void handleEnterKey() {
     if (getWizardNextStepButton() != null && getWizardNextStepButton().isVisible() && getWizardNextStepButton().isEnabled()) {
       getWizard().doNextStep();
     }
@@ -125,7 +124,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
 
   protected abstract IForm getInnerWizardForm();
 
-  protected abstract void setInnerWizardForm(IForm form) throws ProcessingException;
+  protected abstract void setInnerWizardForm(IForm form);
 
   /**
    * may be overridden to handle property changes.

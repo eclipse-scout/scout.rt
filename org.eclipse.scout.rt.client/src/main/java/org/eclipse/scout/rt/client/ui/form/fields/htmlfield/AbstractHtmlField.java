@@ -99,7 +99,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @ConfigOperation
   @Order(230)
   @Deprecated
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected void execHyperlinkAction(URL url, String path, boolean local) {
     LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
   }
 
@@ -110,7 +110,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   @ConfigOperation
   @Order(230)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
     //FIXME CGU remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
@@ -156,11 +156,11 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
-  public void doAppLinkAction(String ref) throws ProcessingException {
+  public void doAppLinkAction(String ref) {
     interceptAppLinkAction(ref);
   }
 
-  public void setValueFromURL(URL url, String encoding) throws ProcessingException {
+  public void setValueFromURL(URL url, String encoding) {
     if (url != null) {
       try {
         setValue(IOUtility.getContent(new InputStreamReader(url.openStream(), encoding)));
@@ -192,7 +192,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
-  protected String validateValueInternal(String rawValue) throws ProcessingException {
+  protected String validateValueInternal(String rawValue) {
     String validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     validValue = rawValue;
@@ -214,7 +214,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   // convert string to a real string
   @Override
-  protected String parseValueInternal(String text) throws ProcessingException {
+  protected String parseValueInternal(String text) {
     if (text != null && text.length() == 0) {
       text = null;
     }
@@ -324,7 +324,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     HtmlFieldAppLinkActionChain chain = new HtmlFieldAppLinkActionChain(extensions);
     chain.execAppLinkAction(ref);
@@ -337,7 +337,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
 
     @Override
-    public void execAppLinkAction(HtmlFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+    public void execAppLinkAction(HtmlFieldAppLinkActionChain chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
   }

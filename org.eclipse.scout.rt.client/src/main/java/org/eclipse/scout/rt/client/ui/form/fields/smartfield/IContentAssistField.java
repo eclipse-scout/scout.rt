@@ -158,13 +158,13 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   void setLookupCall(ILookupCall<LOOKUP_KEY> call);
 
-  void prepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException;
+  void prepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key);
 
-  void prepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException;
+  void prepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text);
 
-  void prepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint, TriState activeState) throws ProcessingException;
+  void prepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint, TriState activeState);
 
-  void prepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException;
+  void prepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey, TriState activeState);
 
   /**
    * If the browse lookup call yields exactly one value, assign it to the smartfield, otherwise do nothing.
@@ -175,7 +175,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    *          provider. Whenever possible, background=true should be used to allow for batch calls to the backend.
    * @since 22.05.2009
    */
-  void setUniquelyDefinedValue(boolean background) throws ProcessingException;
+  void setUniquelyDefinedValue(boolean background);
 
   /**
    * updates the lookup rows with the same search text as last time.
@@ -202,9 +202,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   void acceptProposal(ILookupRow<LOOKUP_KEY> row);
 
-  List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key);
 
-  List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount);
 
   /**
    * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
@@ -216,9 +216,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   IFuture<?> callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
-  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount);
 
-  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState);
 
   /**
    * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
@@ -240,9 +240,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
-  List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey);
 
-  List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState);
 
   IContentAssistFieldUIFacade getUIFacade();
 
@@ -267,7 +267,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass();
 
-  void acceptProposal() throws ProcessingException;
+  void acceptProposal();
 
   void setWildcard(String wildcard);
 

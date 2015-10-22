@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -39,7 +38,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
   }
 
   @Override
-  public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext, String sessionId) throws ProcessingException {
+  public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext, String sessionId) {
     final Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
@@ -65,7 +64,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
   }
 
   @Internal
-  protected <SESSION extends IServerSession> SESSION getFromCache(final Collection<Principal> principals, final Class<? extends IServerSession> serverSessionClass) throws ProcessingException {
+  protected <SESSION extends IServerSession> SESSION getFromCache(final Collection<Principal> principals, final Class<? extends IServerSession> serverSessionClass) {
     for (final Principal principal : principals) {
       final IServerSession serverSession = m_cache.get(newCacheKey(serverSessionClass, principal));
       if (serverSession != null) {
@@ -76,7 +75,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
   }
 
   @Internal
-  protected <SESSION extends IServerSession> SESSION putToCache(final Collection<Principal> principals, final SESSION serverSession) throws ProcessingException {
+  protected <SESSION extends IServerSession> SESSION putToCache(final Collection<Principal> principals, final SESSION serverSession) {
     for (final Principal principal : principals) {
       m_cache.put(newCacheKey(serverSession.getClass(), principal), serverSession);
     }

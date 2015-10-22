@@ -149,7 +149,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     doTestMoveFieldOrderOnly();
   }
 
-  private void doTestMoveFieldOrderOnly() throws ProcessingException {
+  private void doTestMoveFieldOrderOnly() {
     OrigForm form = new OrigForm();
 
     assertEquals(2, form.getTopBox().getFieldCount());
@@ -484,7 +484,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     assertSame(stringField, form.getBottomBox().getFieldById(stringField.getFieldId(), StringField.class));
   }
 
-  private MoveFieldsTestForm setupTestMoveFormFieldGetByOnAnyLevel() throws ProcessingException {
+  private MoveFieldsTestForm setupTestMoveFormFieldGetByOnAnyLevel() {
     BEANS.get(IExtensionRegistry.class).registerMove(MoveFieldsTestForm.MainBox.TopBox.SubBox.StringField.class, null, MoveFieldsTestForm.MainBox.BottomBox.class);
 
     MoveFieldsTestForm form = new MoveFieldsTestForm();

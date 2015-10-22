@@ -15,7 +15,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBox.GroupBoxInTemplateField;
 
@@ -29,7 +28,7 @@ public class TreeBoxToTemplateField extends AbstractTreeBox<Integer> {
   public static final Set<Integer> LIST_BOX_DEFAULT_VAL = CollectionUtility.hashSet(1, 2, 3);
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     super.execInitField();
     setValue(LIST_BOX_DEFAULT_VAL);
   }

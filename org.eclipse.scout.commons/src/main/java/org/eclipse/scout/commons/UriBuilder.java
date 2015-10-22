@@ -41,27 +41,27 @@ public class UriBuilder {
   public UriBuilder() {
   }
 
-  public UriBuilder(String uri) throws ProcessingException {
+  public UriBuilder(String uri) {
     this(uri, null);
   }
 
-  public UriBuilder(String uri, String encoding) throws ProcessingException {
+  public UriBuilder(String uri, String encoding) {
     this(UriUtility.toUri(uri), encoding);
   }
 
-  public UriBuilder(URL url) throws ProcessingException {
+  public UriBuilder(URL url) {
     this(UriUtility.urlToUri(url), null);
   }
 
-  public UriBuilder(URI uri) throws ProcessingException {
+  public UriBuilder(URI uri) {
     this(uri, null);
   }
 
-  public UriBuilder(URL url, String encoding) throws ProcessingException {
+  public UriBuilder(URL url, String encoding) {
     this(UriUtility.urlToUri(url), encoding);
   }
 
-  public UriBuilder(URI uri, String encoding) throws ProcessingException {
+  public UriBuilder(URI uri, String encoding) {
     if (uri == null) {
       return;
     }
@@ -130,19 +130,19 @@ public class UriBuilder {
     return this;
   }
 
-  public URL createURL() throws ProcessingException {
+  public URL createURL() {
     return createURL(null);
   }
 
-  public URI createURI() throws ProcessingException {
+  public URI createURI() {
     return createURI(null);
   }
 
-  public URL createURL(String encoding) throws ProcessingException {
+  public URL createURL(String encoding) {
     return UriUtility.uriToUrl(createURI(encoding));
   }
 
-  public URI createURI(String encoding) throws ProcessingException {
+  public URI createURI(String encoding) {
     try {
       if (m_parameters == null || m_parameters.isEmpty()) {
         return new URI(m_scheme, null, m_host, m_port, m_path, null, m_fragment);

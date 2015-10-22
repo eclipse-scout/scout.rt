@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -33,7 +32,7 @@ public class FileChooserFieldTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -42,7 +41,7 @@ public class FileChooserFieldTest {
       return "Test Form";
     }
 
-    public void startForm() throws ProcessingException {
+    public void startForm() {
       startInternal(new FormHandler());
     }
 

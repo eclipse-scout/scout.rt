@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.junit.Test;
 
@@ -31,7 +30,7 @@ public class TableValidationTest {
   //only validation with internal table row
   //why?
   @Test
-  public void testValidateWithInternalTableRow() throws ProcessingException {
+  public void testValidateWithInternalTableRow() {
     TestTable table = new TestTable();
     ITableRow row = table.createRow();
     table.getC1Column().setValue(row, "key");

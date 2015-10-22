@@ -29,7 +29,7 @@ class TableBeanHolderInput implements IBindInput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
-  public TableBeanHolderInput(ITableBeanHolder table, ITableBeanRowHolder[] filteredRows, String columnName, ValueInputToken target) throws ProcessingException {
+  public TableBeanHolderInput(ITableBeanHolder table, ITableBeanRowHolder[] filteredRows, String columnName, ValueInputToken target) {
     m_table = table;
     if (filteredRows == null) {
       m_filteredRows = m_table.getRows();
@@ -90,7 +90,7 @@ class TableBeanHolderInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     Object value = null;
     if (m_batchIndex < m_filteredRows.length) {
       try {

@@ -31,9 +31,9 @@ public interface IPublishSubscribeMessageService extends IService {
    * @throws ProcessingException
    *           if because of some reason the service could not be fully initialized
    */
-  void subscribe() throws ProcessingException;
+  void subscribe();
 
-  void unsubsribe() throws ProcessingException;
+  void unsubsribe();
 
   /**
    * This method is not called within a scout server transaction

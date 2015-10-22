@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -48,7 +47,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  protected void loadSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
+  protected void loadSearchFormState(IForm f, String pageFormIdentifier) {
     //check if there is stored search form data
     SearchFormState state = m_searchFormCache.get(pageFormIdentifier);
     if (state != null) {
@@ -62,7 +61,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  protected void storeSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
+  protected void storeSearchFormState(IForm f, String pageFormIdentifier) {
     //cache search form data
     if (f.isEmpty()) {
       m_searchFormCache.remove(pageFormIdentifier);
@@ -75,7 +74,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  protected void storeUserFilterState(ITable table, String pageTableIdentifier) throws ProcessingException {
+  protected void storeUserFilterState(ITable table, String pageTableIdentifier) {
     TableUserFilterManager filterManager = table.getUserFilterManager();
     if (filterManager == null || filterManager.isEmpty()) {
       m_tableUserFilterState.remove(pageTableIdentifier);
@@ -85,7 +84,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  protected void loadUserFilterState(ITable table, String pageTableIdentifier) throws ProcessingException {
+  protected void loadUserFilterState(ITable table, String pageTableIdentifier) {
     TableUserFilterManager filterManager = table.getUserFilterManager();
     if (filterManager == null) {
       return;

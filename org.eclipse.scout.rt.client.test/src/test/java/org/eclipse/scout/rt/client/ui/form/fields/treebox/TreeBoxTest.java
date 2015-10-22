@@ -185,7 +185,7 @@ public class TreeBoxTest {
    * Test {@link #execIsEmpty} empty field
    */
   @Test
-  public void testEmpty() throws ProcessingException {
+  public void testEmpty() {
     SimpleTreeBox treeBox = createSimpleTreeBox();
     assertTrue(treeBox.isEmpty());
     assertTrue(treeBox.getValue().isEmpty());
@@ -197,7 +197,7 @@ public class TreeBoxTest {
    * Test {@link #execIsEmpty} non empty
    */
   @Test
-  public void testNonEmpty() throws ProcessingException {
+  public void testNonEmpty() {
     SimpleTreeBox treeBox = createSimpleTreeBox();
     treeBox.setValue(testValue);
     assertFalse(treeBox.isEmpty());
@@ -212,7 +212,7 @@ public class TreeBoxTest {
    * @throws ProcessingException
    */
   @Test
-  public void testContentValid() throws ProcessingException {
+  public void testContentValid() {
     SimpleTreeBox treeBox = createSimpleTreeBox();
     treeBox.setValue(testValue);
     treeBox.setMandatory(true);
@@ -226,7 +226,7 @@ public class TreeBoxTest {
    * @throws ProcessingException
    */
   @Test
-  public void testContentInvalid() throws ProcessingException {
+  public void testContentInvalid() {
     SimpleTreeBox treeBox = createSimpleTreeBox();
     treeBox.setMandatory(true);
     assertTrue(treeBox.isMandatory());
@@ -239,13 +239,13 @@ public class TreeBoxTest {
    * @throws ProcessingException
    */
   @Test
-  public void testContentInvalidError() throws ProcessingException {
+  public void testContentInvalidError() {
     SimpleTreeBox treeBox = createSimpleTreeBox();
     treeBox.addErrorStatus("Error");
     assertFalse(treeBox.isContentValid());
   }
 
-  private SimpleTreeBox createSimpleTreeBox() throws ProcessingException {
+  private SimpleTreeBox createSimpleTreeBox() {
     SimpleTreeBox treeBox = new SimpleTreeBox();
     treeBox.initField();
     return treeBox;
@@ -278,7 +278,7 @@ public class TreeBoxTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Long>> execCreateLookupRows() {
       List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
       list.add(new LookupRow<Long>(1L, "A"));
       list.add(new LookupRow<Long>(2L, "B"));

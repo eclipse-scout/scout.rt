@@ -30,10 +30,10 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public void execLoadData(final SearchFilter filter) throws ProcessingException {
+    public void execLoadData(final SearchFilter filter) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
           next.execLoadData(PageWithTableLoadDataChain.this, filter);
         }
       };
@@ -51,10 +51,10 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public IPage<?> execCreateChildPage(final ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateChildPage(final ITableRow row) {
       MethodInvocation<IPage> methodInvocation = new MethodInvocation<IPage>() {
         @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
           setReturnValue(next.execCreateChildPage(PageWithTableCreateChildPageChain.this, row));
         }
       };
@@ -72,10 +72,10 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public void execPopulateTable() throws ProcessingException {
+    public void execPopulateTable() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
           next.execPopulateTable(PageWithTablePopulateTableChain.this);
         }
       };
@@ -93,10 +93,10 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public IPage<?> execCreateVirtualChildPage(final ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateVirtualChildPage(final ITableRow row) {
       MethodInvocation<IPage> methodInvocation = new MethodInvocation<IPage>() {
         @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
           setReturnValue(next.execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain.this, row));
         }
       };
@@ -114,10 +114,10 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public void execInitSearchForm() throws ProcessingException {
+    public void execInitSearchForm() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
+        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
           next.execInitSearchForm(PageWithTableInitSearchFormChain.this);
         }
       };

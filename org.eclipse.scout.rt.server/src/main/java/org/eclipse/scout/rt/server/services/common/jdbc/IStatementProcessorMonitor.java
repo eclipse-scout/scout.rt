@@ -15,8 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IStatementProcessorMonitor {
 
   /**
@@ -28,5 +26,5 @@ public interface IStatementProcessorMonitor {
    *          {@link IStatementProcessor#processSelect(Connection, IStatementCache, IStatementProcessorMonitor)}
    *          {@link IStatementProcessor#processSelectInto(Connection, IStatementCache, IStatementProcessorMonitor)}
    */
-  void postFetchData(Connection con, PreparedStatement stm, ResultSet rs, List<Object[]> rows) throws ProcessingException;
+  void postFetchData(Connection con, PreparedStatement stm, ResultSet rs, List<Object[]> rows);
 }

@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -283,7 +282,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   @Override
-  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
+  protected IFormField prepareEditInternal(ITableRow row) {
     INumberField<NUMBER> f = (INumberField<NUMBER>) getDefaultEditor();
     mapEditorFieldProperties(f);
     return f;

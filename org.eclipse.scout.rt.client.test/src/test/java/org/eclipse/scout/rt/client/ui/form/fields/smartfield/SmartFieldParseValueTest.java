@@ -21,7 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -36,7 +35,6 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -63,7 +61,7 @@ public class SmartFieldParseValueTest {
   }
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     m_smartField = new SmartField();
     m_smartField.registerProposalChooserInternal();
   }
@@ -72,7 +70,7 @@ public class SmartFieldParseValueTest {
    * Tests the case where only a single proposal matches the seachText and the proposal is accepted.
    */
   @Test
-  public void testSingleMatch() throws ProcessingException, InterruptedException {
+  public void testSingleMatch() throws InterruptedException {
     testMatch("a", 1L, "aName", 1, false, false);
   }
 
@@ -80,7 +78,7 @@ public class SmartFieldParseValueTest {
    * Expect the proposal chooser to be open when multiple matches have been found.
    */
   @Test
-  public void testMultiMatch() throws ProcessingException, InterruptedException {
+  public void testMultiMatch() throws InterruptedException {
     testMatch("b", 0L, null, 2, true, true);
   }
 
@@ -88,7 +86,7 @@ public class SmartFieldParseValueTest {
    * Expect the proposal chooser to be open when no match has been found.
    */
   @Test
-  public void testNoMatch() throws ProcessingException, InterruptedException {
+  public void testNoMatch() throws InterruptedException {
     testMatch("c", 0L, null, 0, true, true);
   }
 
@@ -132,7 +130,7 @@ public class SmartFieldParseValueTest {
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, Long expectedValue, String expectedDisplayText, int expectedNumProposals,
-      boolean expectedProposalChooserOpen, boolean expectValidationError) throws ProcessingException, InterruptedException {
+      boolean expectedProposalChooserOpen, boolean expectValidationError) throws InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_smartField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -215,22 +213,22 @@ public class SmartFieldParseValueTest {
   public static class P_LookupService implements ILookupService<Long> {
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) {
       return LookupRows.getRowsByKey(call.getKey());
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) {
       return LookupRows.getRowsByText(call.getText());
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) {
       return null;
     }
 
     @Override
-    public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) throws ProcessingException {
+    public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
       return null;
     }
 

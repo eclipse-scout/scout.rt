@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
@@ -36,42 +35,42 @@ public abstract class AbstractColumnExtension<VALUE, OWNER extends AbstractColum
   }
 
   @Override
-  public void execCompleteEdit(ColumnCompleteEditChain<VALUE> chain, ITableRow row, IFormField editingField) throws ProcessingException {
+  public void execCompleteEdit(ColumnCompleteEditChain<VALUE> chain, ITableRow row, IFormField editingField) {
     chain.execCompleteEdit(row, editingField);
   }
 
   @Override
-  public void execInitColumn(ColumnInitColumnChain<VALUE> chain) throws ProcessingException {
+  public void execInitColumn(ColumnInitColumnChain<VALUE> chain) {
     chain.execInitColumn();
   }
 
   @Override
-  public VALUE execParseValue(ColumnParseValueChain<VALUE> chain, ITableRow row, Object rawValue) throws ProcessingException {
+  public VALUE execParseValue(ColumnParseValueChain<VALUE> chain, ITableRow row, Object rawValue) {
     return chain.execParseValue(row, rawValue);
   }
 
   @Override
-  public VALUE execValidateValue(ColumnValidateValueChain<VALUE> chain, ITableRow row, VALUE rawValue) throws ProcessingException {
+  public VALUE execValidateValue(ColumnValidateValueChain<VALUE> chain, ITableRow row, VALUE rawValue) {
     return chain.execValidateValue(row, rawValue);
   }
 
   @Override
-  public IFormField execPrepareEdit(ColumnPrepareEditChain<VALUE> chain, ITableRow row) throws ProcessingException {
+  public IFormField execPrepareEdit(ColumnPrepareEditChain<VALUE> chain, ITableRow row) {
     return chain.execPrepareEdit(row);
   }
 
   @Override
-  public void execDecorateHeaderCell(ColumnDecorateHeaderCellChain<VALUE> chain, HeaderCell cell) throws ProcessingException {
+  public void execDecorateHeaderCell(ColumnDecorateHeaderCellChain<VALUE> chain, HeaderCell cell) {
     chain.execDecorateHeaderCell(cell);
   }
 
   @Override
-  public void execDecorateCell(ColumnDecorateCellChain<VALUE> chain, Cell cell, ITableRow row) throws ProcessingException {
+  public void execDecorateCell(ColumnDecorateCellChain<VALUE> chain, Cell cell, ITableRow row) {
     chain.execDecorateCell(cell, row);
   }
 
   @Override
-  public void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain) throws ProcessingException {
+  public void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain) {
     chain.execDisposeColumn();
   }
 

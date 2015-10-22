@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.control;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
@@ -22,7 +21,7 @@ public abstract class AbstractTableControlExtension<OWNER extends AbstractTableC
   }
 
   @Override
-  public void execInitForm(TableControlInitFormChain chain) throws ProcessingException {
+  public void execInitForm(TableControlInitFormChain chain) {
     chain.execInitForm();
   }
 

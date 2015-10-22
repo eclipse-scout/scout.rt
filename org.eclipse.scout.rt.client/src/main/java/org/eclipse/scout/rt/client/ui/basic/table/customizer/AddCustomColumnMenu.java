@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -41,7 +40,7 @@ public class AddCustomColumnMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execInitAction() throws ProcessingException {
+  protected void execInitAction() {
     setVisiblePermission(new CreateCustomColumnPermission());
     m_table.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -62,7 +61,7 @@ public class AddCustomColumnMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (m_table != null) {
       if (m_table.getTableCustomizer() != null) {
         m_table.getTableCustomizer().addColumn();

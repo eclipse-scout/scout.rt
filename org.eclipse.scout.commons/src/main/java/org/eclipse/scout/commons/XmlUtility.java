@@ -156,7 +156,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an exception wellforming the document.
    */
-  public static void wellformDocument(Document document, OutputStream out) throws ProcessingException {
+  public static void wellformDocument(Document document, OutputStream out) {
     wellformDocument(document, new StreamResult(out));
     try {
       out.flush();
@@ -176,7 +176,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an exception wellforming the document or saving the result in the file.
    */
-  public static void wellformDocument(Document document, File f) throws ProcessingException {
+  public static void wellformDocument(Document document, File f) {
     File dir = f.getParentFile();
     if (!dir.exists()) {
       boolean success = dir.mkdirs();
@@ -202,7 +202,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an exception wellforming the document or saving the result in the {@link Writer}.
    */
-  public static void wellformDocument(Document document, Writer writer) throws ProcessingException {
+  public static void wellformDocument(Document document, Writer writer) {
     wellformDocument(document, new StreamResult(writer));
     try {
       writer.flush();
@@ -212,7 +212,7 @@ public final class XmlUtility {
     }
   }
 
-  private static void wellformDocument(Document document, Result result) throws ProcessingException {
+  private static void wellformDocument(Document document, Result result) {
     try {
       // format transformer
       TransformerFactory tf = TransformerFactory.newInstance();
@@ -237,7 +237,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an exception wellforming the document.
    */
-  public static String wellformDocument(Document document) throws ProcessingException {
+  public static String wellformDocument(Document document) {
     StringWriter writer = new StringWriter();
     wellformDocument(document, new StreamResult(writer));
     return writer.getBuffer().toString();
@@ -252,7 +252,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an exception wellforming the input xml.
    */
-  public static String wellformXml(String rawXml) throws ProcessingException {
+  public static String wellformXml(String rawXml) {
     return wellformDocument(getXmlDocument(rawXml));
   }
 
@@ -285,7 +285,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an error reading from the {@link InputStream} or parsing the content.
    */
-  public static Document getXmlDocument(InputStream is) throws ProcessingException {
+  public static Document getXmlDocument(InputStream is) {
     try {
       return getDocumentBuilder().parse(is);
     }
@@ -303,7 +303,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an error reading from the {@link File} or parsing the content.
    */
-  public static Document getXmlDocument(File f) throws ProcessingException {
+  public static Document getXmlDocument(File f) {
     try {
       return getDocumentBuilder().parse(f);
     }
@@ -321,7 +321,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an error reading from the {@link URL} or parsing the content.
    */
-  public static Document getXmlDocument(URL url) throws ProcessingException {
+  public static Document getXmlDocument(URL url) {
     try (InputStream is = url.openStream()) {
       return XmlUtility.getXmlDocument(is);
     }
@@ -339,7 +339,7 @@ public final class XmlUtility {
    * @throws ProcessingException
    *           if there is an error parsing the content of the {@link String} into a {@link Document}.
    */
-  public static Document getXmlDocument(String rawXml) throws ProcessingException {
+  public static Document getXmlDocument(String rawXml) {
     try {
       return getDocumentBuilder().parse(new InputSource(new StringReader(rawXml)));
     }

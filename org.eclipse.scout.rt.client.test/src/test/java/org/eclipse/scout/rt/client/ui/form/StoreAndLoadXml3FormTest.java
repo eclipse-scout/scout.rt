@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox.InnerTestGroupBox;
@@ -84,7 +83,7 @@ public class StoreAndLoadXml3FormTest {
   }
 
   @Test
-  public void testStoreLoad() throws ProcessingException {
+  public void testStoreLoad() {
     //store some values
     TestForm f = new TestForm();
     f.getText1Field().setValue("t1");
@@ -115,7 +114,7 @@ public class StoreAndLoadXml3FormTest {
   }
 
   @Test
-  public void testLegacyLoad() throws ProcessingException {
+  public void testLegacyLoad() {
     TestForm f = new TestForm();
     f.getText1Field().setValue("t1");
     f.getText3Field().setValue("t3");
@@ -151,7 +150,7 @@ public class StoreAndLoadXml3FormTest {
     assertEquals("g3g2", text2FieldVal);
   }
 
-  private void checkFieldXml(IFormField field, String expectedFieldId, EnclosingField... expectedEnclosingFieldPath) throws ProcessingException {
+  private void checkFieldXml(IFormField field, String expectedFieldId, EnclosingField... expectedEnclosingFieldPath) {
     Document document = XmlUtility.createNewXmlDocument("field");
     Element xml = document.getDocumentElement();
     field.storeToXml(xml);

@@ -39,7 +39,7 @@ import org.junit.runner.RunWith;
 public class AbstractRowDataColumnTest {
 
   @Test
-  public void testTablesObservedBeforeInsertionEvent() throws ProcessingException {
+  public void testTablesObservedBeforeInsertionEvent() {
     TestTable table = new TestTable();
     table.initTable();
     ITableRow row = table.createRow();
@@ -53,7 +53,7 @@ public class AbstractRowDataColumnTest {
   }
 
   @Test
-  public void testSuccessfulImport() throws ProcessingException {
+  public void testSuccessfulImport() {
     TestTable table = new TestTable();
     table.initTable();
 
@@ -87,7 +87,7 @@ public class AbstractRowDataColumnTest {
     public class RowDataColumn extends AbstractTestRowDataColumn<String> {
 
       @Override
-      protected void updateTableColumns(ITableRow r, String newValue) throws ProcessingException {
+      protected void updateTableColumns(ITableRow r, String newValue) {
         getStringTestColumn().setValue(r, newValue);
       }
     }
@@ -167,7 +167,7 @@ abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
   private TableListener m_updateTableRowListener;
 
   @Override
-  public void initColumn() throws ProcessingException {
+  public void initColumn() {
     super.initColumn();
     if (getTable() != null) {
       if (m_updateTableRowListener != null) {
@@ -179,7 +179,7 @@ abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
   }
 
   @Override
-  public void disposeColumn() throws ProcessingException {
+  public void disposeColumn() {
     super.disposeColumn();
     if (getTable() != null) {
       if (m_updateTableRowListener != null) {
@@ -192,7 +192,7 @@ abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
   /**
    * Updates all other columns based on this column's value.
    */
-  protected abstract void updateTableColumns(ITableRow r, T newValue) throws ProcessingException;
+  protected abstract void updateTableColumns(ITableRow r, T newValue);
 
   protected class P_UpdateTableRowListener extends TableAdapter {
 

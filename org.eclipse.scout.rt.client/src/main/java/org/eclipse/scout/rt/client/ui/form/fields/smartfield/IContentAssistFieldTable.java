@@ -12,13 +12,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public interface IContentAssistFieldTable<LOOKUP_KEY> extends ITable {
 
-  void setLookupRows(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) throws ProcessingException;
+  void setLookupRows(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows);
 
   List<ILookupRow<LOOKUP_KEY>> getLookupRows();
 
@@ -26,8 +25,8 @@ public interface IContentAssistFieldTable<LOOKUP_KEY> extends ITable {
 
   ILookupRow<LOOKUP_KEY> getCheckedLookupRow();
 
-  boolean select(ILookupRow<LOOKUP_KEY> lookupRow) throws ProcessingException;
+  boolean select(ILookupRow<LOOKUP_KEY> lookupRow);
 
-  boolean select(LOOKUP_KEY key) throws ProcessingException;
+  boolean select(LOOKUP_KEY key);
 
 }

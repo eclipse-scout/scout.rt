@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDeactivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDisposeChain;
@@ -34,32 +33,32 @@ public abstract class AbstractWizardStepExtension<FORM extends IForm, OWNER exte
   }
 
   @Override
-  public void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind) throws ProcessingException {
+  public void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind) {
     chain.execDeactivate(stepKind);
   }
 
   @Override
-  public void execDispose(WizardStepDisposeChain<? extends IForm> chain) throws ProcessingException {
+  public void execDispose(WizardStepDisposeChain<? extends IForm> chain) {
     chain.execDispose();
   }
 
   @Override
-  public void execFormClosed(WizardStepFormClosedChain<? extends IForm> chain, boolean activation) throws ProcessingException {
+  public void execFormClosed(WizardStepFormClosedChain<? extends IForm> chain, boolean activation) {
     chain.execFormClosed(activation);
   }
 
   @Override
-  public void execActivate(WizardStepActivateChain<? extends IForm> chain, int stepKind) throws ProcessingException {
+  public void execActivate(WizardStepActivateChain<? extends IForm> chain, int stepKind) {
     chain.execActivate(stepKind);
   }
 
   @Override
-  public void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation) throws ProcessingException {
+  public void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation) {
     chain.execFormDiscarded(activation);
   }
 
   @Override
-  public void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation) throws ProcessingException {
+  public void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation) {
     chain.execFormStored(activation);
   }
 

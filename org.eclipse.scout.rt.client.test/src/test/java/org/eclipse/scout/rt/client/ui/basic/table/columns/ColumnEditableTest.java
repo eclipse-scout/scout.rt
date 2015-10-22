@@ -67,7 +67,7 @@ public class ColumnEditableTest {
    * @throws ProcessingException
    */
   @Test
-  public void testFieldInEditableColumn() throws ProcessingException {
+  public void testFieldInEditableColumn() {
     EditableTestTable testTable = new EditableTestTable();
     testTable.setEnabled(true);
     testTable.addRowByArray(getTestRow());
@@ -84,7 +84,7 @@ public class ColumnEditableTest {
    * Tests if cell can set to be dynamically not editable with execIsEditable
    */
   @Test
-  public void testDynamicEditableColumn() throws ProcessingException {
+  public void testDynamicEditableColumn() {
     DynamicEditableTestTable testTable = new DynamicEditableTestTable();
     testTable.setEnabled(true);
     testTable.addRowByArray(getTestRow());
@@ -153,7 +153,7 @@ public class ColumnEditableTest {
       }
 
       @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+      protected void execDecorateCell(Cell cell, ITableRow row) {
         super.execDecorateCell(cell, row);
         cell.setEditable(row.getRowIndex() == 0);
       }

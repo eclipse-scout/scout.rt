@@ -296,7 +296,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   @ConfigOperation
   @Order(15)
-  protected void execAfterConnectionCreated(Connection conn) throws ProcessingException {
+  protected void execAfterConnectionCreated(Connection conn) {
   }
 
   /**
@@ -304,7 +304,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
    */
   @ConfigOperation
   @Order(20)
-  protected void execBeginTransaction() throws ProcessingException {
+  protected void execBeginTransaction() {
   }
 
   @ConfigOperation
@@ -342,7 +342,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
    */
   @ConfigOperation
   @Order(40)
-  protected Object execCustomBindFunction(String functionName, String[] args, Object[] bindBases) throws ProcessingException {
+  protected Object execCustomBindFunction(String functionName, String[] args, Object[] bindBases) {
     if ("level".equals(functionName)) {
       if (args.length != 1) {
         throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
@@ -401,7 +401,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     }
   }
 
-  private Object tryGetPermissionLevel(Class permissionClass, String levelField, IAccessControlService accessControlService) throws ProcessingException {
+  private Object tryGetPermissionLevel(Class permissionClass, String levelField, IAccessControlService accessControlService) {
     if (permissionClass == null) {
       return null;
     }
@@ -426,13 +426,13 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
    */
   @ConfigOperation
   @Order(50)
-  protected void execEndTransaction(boolean willBeCommitted) throws ProcessingException {
+  protected void execEndTransaction(boolean willBeCommitted) {
   }
 
   /*
    * Runtime
    */
-  public void callbackAfterConnectionCreated(Connection conn) throws ProcessingException {
+  public void callbackAfterConnectionCreated(Connection conn) {
     execAfterConnectionCreated(conn);
   }
 
@@ -440,7 +440,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     execTestConnection(conn);
   }
 
-  public Object callbackCustomBindFunction(String functionName, String[] args, Object[] bindBases) throws ProcessingException {
+  public Object callbackCustomBindFunction(String functionName, String[] args, Object[] bindBases) {
     return execCustomBindFunction(functionName, args, bindBases);
   }
 
@@ -593,11 +593,11 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   }
 
   @Override
-  public Connection getConnection() throws ProcessingException {
+  public Connection getConnection() {
     return getTransaction();
   }
 
-  protected Connection getTransaction() throws ProcessingException {
+  protected Connection getTransaction() {
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
 
     SqlTransactionMember member = (SqlTransactionMember) tx.getMember(getTransactionMemberId());
@@ -622,7 +622,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   /**
    * @return the statement cache used for this {@link ITransaction} transaction
    */
-  protected final IStatementCache getStatementCache() throws ProcessingException {
+  protected final IStatementCache getStatementCache() {
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
     IStatementCache res = (IStatementCache) tx.getMember(PreparedStatementCache.TRANSACTION_MEMBER_ID);
     if (res == null) {
@@ -637,57 +637,57 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
    */
 
   @Override
-  public Object[][] select(String s, Object... bindBases) throws ProcessingException {
+  public Object[][] select(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).processSelect(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {
+  public Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) {
     return createStatementProcessor(s, bindBases, maxRowCount).processSelect(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public void selectInto(String s, Object... bindBases) throws ProcessingException {
+  public void selectInto(String s, Object... bindBases) {
     createStatementProcessor(s, bindBases, 0).processSelectInto(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public void selectIntoLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {
+  public void selectIntoLimited(String s, int maxRowCount, Object... bindBases) {
     createStatementProcessor(s, bindBases, maxRowCount).processSelectInto(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public void selectStreaming(String s, ISelectStreamHandler handler, Object... bindBases) throws ProcessingException {
+  public void selectStreaming(String s, ISelectStreamHandler handler, Object... bindBases) {
     createStatementProcessor(s, bindBases, 0).processSelectStreaming(getTransaction(), getStatementCache(), handler);
   }
 
   @Override
-  public void selectStreamingLimited(String s, ISelectStreamHandler handler, int maxRowCount, Object... bindBases) throws ProcessingException {
+  public void selectStreamingLimited(String s, ISelectStreamHandler handler, int maxRowCount, Object... bindBases) {
     createStatementProcessor(s, bindBases, maxRowCount).processSelectStreaming(getTransaction(), getStatementCache(), handler);
   }
 
   @Override
-  public int insert(String s, Object... bindBases) throws ProcessingException {
+  public int insert(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public int update(String s, Object... bindBases) throws ProcessingException {
+  public int update(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public int delete(String s, Object... bindBases) throws ProcessingException {
+  public int delete(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public boolean callStoredProcedure(String s, Object... bindBases) throws ProcessingException {
+  public boolean callStoredProcedure(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).processStoredProcedure(getTransaction(), getStatementCache(), null);
   }
 
   @Override
-  public void commit() throws ProcessingException {
+  public void commit() {
     try {
       getTransaction().commit();
       ISqlStyle style = getSqlStyle();
@@ -701,11 +701,11 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   }
 
   @Override
-  public String createPlainText(String s, Object... bindBases) throws ProcessingException {
+  public String createPlainText(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).createPlainText();
   }
 
-  protected IStatementProcessor createStatementProcessor(String s, Object[] bindBases, int maxRowCount) throws ProcessingException {
+  protected IStatementProcessor createStatementProcessor(String s, Object[] bindBases, int maxRowCount) {
     return new StatementProcessor(this, s, bindBases, maxRowCount, m_maxFetchMemorySize);
   }
 
@@ -715,7 +715,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
    * @see commit
    */
   @Override
-  public void rollback() throws ProcessingException {
+  public void rollback() {
     try {
       getTransaction().rollback();
       ISqlStyle style = getSqlStyle();
@@ -729,7 +729,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   }
 
   @Override
-  public Long getSequenceNextval(String sequenceName) throws ProcessingException {
+  public Long getSequenceNextval(String sequenceName) {
     String s = "SELECT " + sequenceName + ".NEXTVAL FROM DUAL ";
     Object[][] ret = createStatementProcessor(s, null, 0).processSelect(getTransaction(), getStatementCache(), null);
     if (ret.length == 1) {

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.services.common.file;
 import java.io.FilenameFilter;
 import java.io.OutputStream;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -35,28 +34,28 @@ public interface IRemoteFileService extends IService {
    *         Example with absolute jndi path: path="/WEB-INF/resources/templates/word", name="template.dot" <br>
    *         Example with absolute filesystem path: path="C:/TEMP/resources/templates/word", name="template.dot" <br>
    */
-  RemoteFile getRemoteFile(RemoteFile spec) throws ProcessingException;
+  RemoteFile getRemoteFile(RemoteFile spec);
 
   /**
    * @return RemoteFile of specified file block. Use this method to get a large file from server to client. <br>
    *         The flag hasMoreParts indicates if there are more parts to follow.
    */
-  RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) throws ProcessingException;
+  RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber);
 
   /**
    * Same as {@link #getRemoteFile(RemoteFile)} with the difference that no content is read and returned.
    */
-  RemoteFile getRemoteFileHeader(RemoteFile spec) throws ProcessingException;
+  RemoteFile getRemoteFileHeader(RemoteFile spec);
 
   @RemoteServiceAccessDenied
-  void putRemoteFile(RemoteFile spec) throws ProcessingException;
+  void putRemoteFile(RemoteFile spec);
 
   /**
    * @return all files specified in foldePath and filter including existingFileInfoOnClient <br>
    *         Note: existing files that have not changed, are returned without content <br>
    *         spec normally doesn't contain any content
    */
-  RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException;
+  RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient);
 
   /**
    * The file is not returned but immediately streamed from the original location to the destination. <br>
@@ -66,6 +65,6 @@ public interface IRemoteFileService extends IService {
    *
    * @see #getRemoteFile(RemoteFile)
    */
-  void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException;
+  void streamRemoteFile(RemoteFile spec, OutputStream out);
 
 }

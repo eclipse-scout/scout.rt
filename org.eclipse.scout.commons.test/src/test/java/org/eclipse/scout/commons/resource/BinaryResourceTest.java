@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.resource;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 public class BinaryResourceTest {
 
   // Default constructors should never fail
   @Test
-  public void testConstructor() throws ProcessingException {
+  public void testConstructor() {
     String filename = "file.dat";
     MimeType mimeType = MimeType.TEXT_PLAIN;
     String contentType = "application/binary";
@@ -59,7 +58,7 @@ public class BinaryResourceTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testFileConstructor() throws ProcessingException {
+  public void testFileConstructor() {
     new BinaryResource(null);
   }
 }

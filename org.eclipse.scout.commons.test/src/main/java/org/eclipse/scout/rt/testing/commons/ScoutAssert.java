@@ -126,7 +126,7 @@ public final class ScoutAssert {
    *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
    * @throws ProcessingException
    */
-  public static void assertTextFileEquals(File expectedFile, File actualFile, String charsetName) throws ProcessingException {
+  public static void assertTextFileEquals(File expectedFile, File actualFile, String charsetName) {
     if (!expectedFile.exists()) {
       fail("File does not exists:" + expectedFile.getPath());
     }

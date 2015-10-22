@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
@@ -44,67 +43,67 @@ public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> 
   }
 
   @Override
-  public void execInit(DesktopInitChain chain) throws ProcessingException {
+  public void execInit(DesktopInitChain chain) {
     chain.execInit();
   }
 
   @Override
-  public void execOpened(DesktopOpenedChain chain) throws ProcessingException {
+  public void execOpened(DesktopOpenedChain chain) {
     chain.execOpened();
   }
 
   @Override
-  public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) throws ProcessingException {
+  public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) {
     chain.execAddTrayMenus(menus);
   }
 
   @Override
-  public void execBeforeClosing(DesktopBeforeClosingChain chain) throws ProcessingException {
+  public void execBeforeClosing(DesktopBeforeClosingChain chain) {
     chain.execBeforeClosing();
   }
 
   @Override
-  public void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException {
+  public void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) {
     chain.execPageDetailFormChanged(oldForm, newForm);
   }
 
   @Override
-  public void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage) throws ProcessingException {
+  public void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage) {
     chain.execTablePageLoaded(tablePage);
   }
 
   @Override
-  public void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  public void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) {
     chain.execOutlineChanged(oldOutline, newOutline);
   }
 
   @Override
-  public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) throws ProcessingException {
+  public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) {
     return chain.execFormAboutToShow(form);
   }
 
   @Override
-  public void execClosing(DesktopClosingChain chain) throws ProcessingException {
+  public void execClosing(DesktopClosingChain chain) {
     chain.execClosing();
   }
 
   @Override
-  public void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException {
+  public void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm) {
     chain.execPageSearchFormChanged(oldForm, newForm);
   }
 
   @Override
-  public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) throws ProcessingException {
+  public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) {
     chain.execPageDetailTableChanged(oldTable, newTable);
   }
 
   @Override
-  public void execGuiAttached(DesktopGuiAttachedChain chain) throws ProcessingException {
+  public void execGuiAttached(DesktopGuiAttachedChain chain) {
     chain.execGuiAttached();
   }
 
   @Override
-  public void execGuiDetached(DesktopGuiDetachedChain chain) throws ProcessingException {
+  public void execGuiDetached(DesktopGuiDetachedChain chain) {
     chain.execGuiDetached();
   }
 }

@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -46,21 +45,21 @@ public class TabletDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void transformDesktop() throws ProcessingException {
+  public void transformDesktop() {
     m_desktop.setCacheSplitterPosition(false);
   }
 
   @Override
-  public void transformForm(IForm form) throws ProcessingException {
+  public void transformForm(IForm form) {
   }
 
   @Override
-  public void transformOutline(IOutline outline) throws ProcessingException {
+  public void transformOutline(IOutline outline) {
     outline.setBreadcrumbEnabled(true);
   }
 
   @Override
-  public void transformPageDetailTable(ITable table) throws ProcessingException {
+  public void transformPageDetailTable(ITable table) {
   }
 
   @Override
@@ -84,7 +83,7 @@ public class TabletDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
   }
 
   @Override

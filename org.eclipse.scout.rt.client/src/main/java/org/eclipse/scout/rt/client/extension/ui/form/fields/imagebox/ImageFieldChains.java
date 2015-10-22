@@ -27,10 +27,10 @@ public final class ImageFieldChains {
       super(extensions);
     }
 
-    public TransferObject execDragRequest() throws ProcessingException {
+    public TransferObject execDragRequest() {
       MethodInvocation<TransferObject> methodInvocation = new MethodInvocation<TransferObject>() {
         @Override
-        protected void callMethod(IImageFieldExtension<? extends AbstractImageField> next) throws ProcessingException {
+        protected void callMethod(IImageFieldExtension<? extends AbstractImageField> next) {
           setReturnValue(next.execDragRequest(ImageFieldDragRequestChain.this));
         }
       };
@@ -48,10 +48,10 @@ public final class ImageFieldChains {
       super(extensions);
     }
 
-    public void execDropRequest(final TransferObject transferObject) throws ProcessingException {
+    public void execDropRequest(final TransferObject transferObject) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IImageFieldExtension<? extends AbstractImageField> next) throws ProcessingException {
+        protected void callMethod(IImageFieldExtension<? extends AbstractImageField> next) {
           next.execDropRequest(ImageFieldDropRequestChain.this, transferObject);
         }
       };

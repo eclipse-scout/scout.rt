@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -67,7 +66,7 @@ public class PageWithTable1Test {
    * Tests that {@link AbstractPage#execPageDataLoaded()} is called correctly on a {@link AbstractTablePage}
    */
   @Test
-  public void testExecPageDataLoaded() throws ProcessingException {
+  public void testExecPageDataLoaded() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
@@ -84,7 +83,7 @@ public class PageWithTable1Test {
   public static class PageWithTableOutline extends AbstractOutline {
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -94,18 +93,18 @@ public class PageWithTable1Test {
     public int m_execPageDataLoadedCalled = 0;
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{new Object[]{"a", "b"}});
     }
 
     @Override
-    protected void execPageDataLoaded() throws ProcessingException {
+    protected void execPageDataLoaded() {
       super.execPageDataLoaded();
       m_execPageDataLoadedCalled++;
     }
 
     @Override
-    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) {
       return new PageWithNode();
     }
 

@@ -309,7 +309,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     super.initFieldInternal();
     // init actions
     ActionUtility.initActions(getMenus());

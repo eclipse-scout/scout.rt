@@ -49,7 +49,7 @@ public interface ICodeService extends IService {
    * @throws ProcessingException
    * @return Non null unmodifiable list with reloaded code types.
    */
-  <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type) throws ProcessingException;
+  <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type);
 
   /**
    * reload code types
@@ -57,7 +57,7 @@ public interface ICodeService extends IService {
    * @throws ProcessingException
    * @return Non null unmodifiable list with reloaded code types.
    */
-  List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException;
+  List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types);
 
   /**
    * @return all code type classes with classPrefix

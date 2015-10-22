@@ -27,7 +27,7 @@ public final class FormToolButtonChains {
       super(extensions);
     }
 
-    public void execInitForm(final FORM form) throws ProcessingException {
+    public void execInitForm(final FORM form) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<FORM>> next) throws Exception {

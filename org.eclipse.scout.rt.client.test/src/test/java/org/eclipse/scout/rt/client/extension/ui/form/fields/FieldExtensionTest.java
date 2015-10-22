@@ -57,12 +57,12 @@ public class FieldExtensionTest extends AbstractLocalExtensionTestCase {
     /**
      * @throws ProcessingException
      */
-    public MyForm() throws ProcessingException {
+    public MyForm() {
       super();
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new StartHandler());
     }
 

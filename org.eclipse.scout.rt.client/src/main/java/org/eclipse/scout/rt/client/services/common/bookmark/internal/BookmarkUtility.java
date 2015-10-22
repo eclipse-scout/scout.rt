@@ -274,7 +274,7 @@ public final class BookmarkUtility {
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
-  public static void activateBookmark(IDesktop desktop, Bookmark bm) throws ProcessingException {
+  public static void activateBookmark(IDesktop desktop, Bookmark bm) {
     activateBookmark(desktop, bm, true);
   }
 
@@ -288,7 +288,7 @@ public final class BookmarkUtility {
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
-  public static void activateBookmark(IDesktop desktop, Bookmark bm, boolean activateOutline) throws ProcessingException {
+  public static void activateBookmark(IDesktop desktop, Bookmark bm, boolean activateOutline) {
     if (bm.getOutlineClassName() == null) {
       return;
     }
@@ -421,7 +421,7 @@ public final class BookmarkUtility {
    *          A {@link List} of {@link TableColumnState} objects to restore. Such can be retrieved by the
    *          {@link #backupTableColumns(ITable)} method.
    */
-  public static void restoreTableColumns(ITable table, List<TableColumnState> oldColumns) throws ProcessingException {
+  public static void restoreTableColumns(ITable table, List<TableColumnState> oldColumns) {
     if (oldColumns != null && oldColumns.size() > 0 && table != null) {
       ColumnSet columnSet = table.getColumnSet();
       // visible columns and width
@@ -530,7 +530,7 @@ public final class BookmarkUtility {
     return new DefaultBookmarkAdapter(page);
   }
 
-  public static Bookmark createBookmark(IDesktop desktop) throws ProcessingException {
+  public static Bookmark createBookmark(IDesktop desktop) {
     IOutline outline = desktop.getOutline();
     if (outline == null) {
       return null;
@@ -540,7 +540,7 @@ public final class BookmarkUtility {
     return createBookmark(activePage);
   }
 
-  public static Bookmark createBookmark(IPage<?> page) throws ProcessingException {
+  public static Bookmark createBookmark(IPage<?> page) {
     if (page == null || page.getOutline() == null) {
       return null;
     }
@@ -643,7 +643,7 @@ public final class BookmarkUtility {
     return b;
   }
 
-  private static IPage<?> bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState, boolean resetViewAndWarnOnFail) throws ProcessingException {
+  private static IPage<?> bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState, boolean resetViewAndWarnOnFail) {
     ITable table = tablePage.getTable();
     if (tablePageState.getTableCustomizerData() != null && tablePage.getTable().getTableCustomizer() != null) {
       byte[] newData = tablePageState.getTableCustomizerData();
@@ -787,7 +787,7 @@ public final class BookmarkUtility {
     return childPage;
   }
 
-  private static IPage<?> bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState, boolean resetViewAndWarnOnFail) throws ProcessingException {
+  private static IPage<?> bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState, boolean resetViewAndWarnOnFail) {
     IPage<?> childPage = null;
     if (childState != null) {
       nodePage.ensureChildrenLoaded();
@@ -812,7 +812,7 @@ public final class BookmarkUtility {
     return childPage;
   }
 
-  private static TablePageState bmStoreTablePage(IPageWithTable page, IPage<?> childPage) throws ProcessingException {
+  private static TablePageState bmStoreTablePage(IPageWithTable page, IPage<?> childPage) {
     ITable table = page.getTable();
     TablePageState state = new TablePageState();
     state.setPageClassName(page.getClass().getName());
@@ -852,7 +852,7 @@ public final class BookmarkUtility {
     return state;
   }
 
-  private static NodePageState bmStoreNodePage(IPageWithNodes page) throws ProcessingException {
+  private static NodePageState bmStoreNodePage(IPageWithNodes page) {
     NodePageState state = new NodePageState();
     state.setPageClassName(page.getClass().getName());
     IBookmarkAdapter bookmarkAdapter = getBookmarkAdapter(page);

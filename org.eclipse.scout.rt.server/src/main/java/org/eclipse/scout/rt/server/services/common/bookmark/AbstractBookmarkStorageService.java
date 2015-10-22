@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.bookmark;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.security.ReadGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
@@ -28,7 +27,7 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
   }
 
   @Override
-  public BookmarkData getBookmarkData() throws ProcessingException {
+  public BookmarkData getBookmarkData() {
     Object userId = getCurrentUserId();
     BookmarkData newData = readBookmarks(userId);
     if (processSpoolToInbox(newData.getUserBookmarks())) {
@@ -38,7 +37,7 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
   }
 
   @Override
-  public BookmarkData storeBookmarkData(BookmarkData newData) throws ProcessingException {
+  public BookmarkData storeBookmarkData(BookmarkData newData) {
     Object userId = getCurrentUserId();
     BookmarkFolder existingUserFolder = readUserFolder(userId);
     if (existingUserFolder != null) {
@@ -74,7 +73,7 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
   }
 
   @Override
-  public void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException {
+  public void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) {
     //default is empty
   }
 
@@ -86,7 +85,7 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
   /**
    * add bookmarks to the publish folder of a user
    */
-  protected void publishBookmarkDataToUser(BookmarkFolder publishFolder, Object userId) throws ProcessingException {
+  protected void publishBookmarkDataToUser(BookmarkFolder publishFolder, Object userId) {
     if (userId != null) {
       BookmarkFolder userFolder = readUserFolder(userId);
       if (userFolder == null) {
@@ -103,7 +102,7 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
     }
   }
 
-  protected BookmarkData readBookmarks(Object userId) throws ProcessingException {
+  protected BookmarkData readBookmarks(Object userId) {
     BookmarkData model = new BookmarkData();
     //user
     BookmarkFolder folder = readUserFolder(userId);
@@ -120,7 +119,7 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
     return model;
   }
 
-  protected void writeBookmarks(BookmarkData model, Object userId) throws ProcessingException {
+  protected void writeBookmarks(BookmarkData model, Object userId) {
     //user
     if (ACCESS.check(new UpdateUserBookmarkPermission())) {
       writeUserFolder(model.getUserBookmarks(), userId);
@@ -134,20 +133,20 @@ public abstract class AbstractBookmarkStorageService implements IBookmarkStorage
   /**
    * read resource containing user folder
    */
-  protected abstract BookmarkFolder readUserFolder(Object userId) throws ProcessingException;
+  protected abstract BookmarkFolder readUserFolder(Object userId);
 
   /**
    * read resource containing global folder
    */
-  protected abstract BookmarkFolder readGlobalFolder() throws ProcessingException;
+  protected abstract BookmarkFolder readGlobalFolder();
 
   /**
    * write resource containing user folder
    */
-  protected abstract void writeUserFolder(BookmarkFolder folder, Object userId) throws ProcessingException;
+  protected abstract void writeUserFolder(BookmarkFolder folder, Object userId);
 
   /**
    * read resource containing global folder
    */
-  protected abstract void writeGlobalFolder(BookmarkFolder folder) throws ProcessingException;
+  protected abstract void writeGlobalFolder(BookmarkFolder folder);
 }

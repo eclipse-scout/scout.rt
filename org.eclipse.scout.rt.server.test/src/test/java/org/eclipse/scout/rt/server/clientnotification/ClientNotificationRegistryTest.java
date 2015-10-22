@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -260,7 +259,7 @@ public class ClientNotificationRegistryTest {
     });
   }
 
-  private void commit() throws ProcessingException {
+  private void commit() {
     ITransaction.CURRENT.get().commitPhase1();
     ITransaction.CURRENT.get().commitPhase2();
   }

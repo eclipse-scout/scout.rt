@@ -57,23 +57,23 @@ public class AbstractDesktopTest {
   private CheckSaveTestForm m_testForm;
 
   @Before
-  public void setup() throws ProcessingException {
+  public void setup() {
     m_testForm = new CheckSaveTestForm();
   }
 
   @After
-  public void tearDown() throws ProcessingException {
+  public void tearDown() {
     m_testForm.doClose();
   }
 
   @Test
-  public void testNoSaveNeeded() throws ProcessingException {
+  public void testNoSaveNeeded() {
     m_testForm.startNew();
     assertFalse(m_testForm.isSaveNeeded());
   }
 
   @Test
-  public void testSaveNeeded() throws ProcessingException {
+  public void testSaveNeeded() {
     System.out.println("test");
     m_testForm.startNew();
     m_testForm.getMessageField().setValue("test");
@@ -84,7 +84,7 @@ public class AbstractDesktopTest {
    * {@link AbstractDesktop#doBeforeClosingInternal()}
    */
   @Test
-  public void testClosingDoBeforeClosingInternal() throws ProcessingException {
+  public void testClosingDoBeforeClosingInternal() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     boolean closing = desktop.doBeforeClosingInternal();
@@ -92,7 +92,7 @@ public class AbstractDesktopTest {
   }
 
   @Test
-  public void testUnsavedForms() throws ProcessingException {
+  public void testUnsavedForms() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     m_testForm.startNew();
@@ -101,14 +101,14 @@ public class AbstractDesktopTest {
   }
 
   @Test
-  public void testDataChangedSimple() throws ProcessingException {
+  public void testDataChangedSimple() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
     desktop.addDataChangeListener(new DataChangeListener() {
 
       @Override
-      public void dataChanged(Object... dataTypes) throws ProcessingException {
+      public void dataChanged(Object... dataTypes) {
         resultHolder.setValue(dataTypes);
       }
     }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
@@ -119,14 +119,14 @@ public class AbstractDesktopTest {
   }
 
   @Test
-  public void testDataChangedChanging() throws ProcessingException {
+  public void testDataChangedChanging() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
     desktop.addDataChangeListener(new DataChangeListener() {
 
       @Override
-      public void dataChanged(Object... dataTypes) throws ProcessingException {
+      public void dataChanged(Object... dataTypes) {
         resultHolder.setValue(dataTypes);
       }
     }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
@@ -144,7 +144,7 @@ public class AbstractDesktopTest {
 
   @Test
   @Ignore
-  public void testGetDialogs() throws ProcessingException {
+  public void testGetDialogs() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     //                       form
@@ -224,7 +224,7 @@ public class AbstractDesktopTest {
     assertEquals(CollectionUtility.arrayList(form_1, form_2_1_1, form_2_1_2_1, form_2_1_2, form_2_1, form_2_2, form_2_3_1, form_2_3, form_2, form_3_1, form_3), desktop.getDialogs(form, true));
   }
 
-  protected void verifyDataChanged(Holder<Object[]> resultHolder) throws ProcessingException {
+  protected void verifyDataChanged(Holder<Object[]> resultHolder) {
     Object[] result = resultHolder.getValue();
     assertTrue(result.length == 2);
     assertTrue(result[0] == TEST_DATA_TYPE_1 && result[1] == TEST_DATA_TYPE_2
@@ -237,7 +237,7 @@ public class AbstractDesktopTest {
     /**
      * @throws ProcessingException
      */
-    public CheckSaveTestForm() throws ProcessingException {
+    public CheckSaveTestForm() {
       super();
     }
 
@@ -246,7 +246,7 @@ public class AbstractDesktopTest {
       return TEXTS.get("AskIfSaveNeededForm");
     }
 
-    public void startNew() throws ProcessingException {
+    public void startNew() {
       startInternal(new NewHandler());
     }
 
@@ -283,7 +283,7 @@ public class AbstractDesktopTest {
 
     private String m_identifier;
 
-    public P_Form(String identifier) throws ProcessingException {
+    public P_Form(String identifier) {
       m_identifier = identifier;
     }
 

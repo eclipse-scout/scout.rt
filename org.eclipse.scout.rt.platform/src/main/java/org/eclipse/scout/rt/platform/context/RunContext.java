@@ -70,7 +70,7 @@ public class RunContext {
    * @throws ProcessingException
    *           exception thrown during the runnable's execution.
    */
-  public void run(final IRunnable runnable) throws ProcessingException {
+  public void run(final IRunnable runnable) {
     call(Callables.callable(runnable));
   }
 
@@ -99,7 +99,7 @@ public class RunContext {
    * @throws ProcessingException
    *           exception thrown during the callable's execution.
    */
-  public <RESULT> RESULT call(final Callable<RESULT> callable) throws ProcessingException {
+  public <RESULT> RESULT call(final Callable<RESULT> callable) {
     return call(callable, BEANS.get(ProcessingExceptionTranslator.class));
   }
 

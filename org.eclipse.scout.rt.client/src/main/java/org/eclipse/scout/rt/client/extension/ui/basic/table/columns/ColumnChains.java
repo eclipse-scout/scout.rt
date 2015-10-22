@@ -28,10 +28,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public void execCompleteEdit(final ITableRow row, final IFormField editingField) throws ProcessingException {
+    public void execCompleteEdit(final ITableRow row, final IFormField editingField) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           next.execCompleteEdit(ColumnCompleteEditChain.this, row, editingField);
         }
       };
@@ -49,10 +49,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public void execInitColumn() throws ProcessingException {
+    public void execInitColumn() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           next.execInitColumn(ColumnInitColumnChain.this);
         }
       };
@@ -70,10 +70,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public VALUE execParseValue(final ITableRow row, final Object rawValue) throws ProcessingException {
+    public VALUE execParseValue(final ITableRow row, final Object rawValue) {
       MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           setReturnValue(next.execParseValue(ColumnParseValueChain.this, row, rawValue));
         }
       };
@@ -91,10 +91,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public VALUE execValidateValue(final ITableRow row, final VALUE rawValue) throws ProcessingException {
+    public VALUE execValidateValue(final ITableRow row, final VALUE rawValue) {
       MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           setReturnValue(next.execValidateValue(ColumnValidateValueChain.this, row, rawValue));
         }
       };
@@ -112,10 +112,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public IFormField execPrepareEdit(final ITableRow row) throws ProcessingException {
+    public IFormField execPrepareEdit(final ITableRow row) {
       MethodInvocation<IFormField> methodInvocation = new MethodInvocation<IFormField>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           setReturnValue(next.execPrepareEdit(ColumnPrepareEditChain.this, row));
         }
       };
@@ -133,10 +133,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public void execDecorateHeaderCell(final HeaderCell cell) throws ProcessingException {
+    public void execDecorateHeaderCell(final HeaderCell cell) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           next.execDecorateHeaderCell(ColumnDecorateHeaderCellChain.this, cell);
         }
       };
@@ -154,10 +154,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public void execDecorateCell(final Cell cell, final ITableRow row) throws ProcessingException {
+    public void execDecorateCell(final Cell cell, final ITableRow row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           next.execDecorateCell(ColumnDecorateCellChain.this, cell, row);
         }
       };
@@ -175,10 +175,10 @@ public final class ColumnChains {
       super(extensions);
     }
 
-    public void execDisposeColumn() throws ProcessingException {
+    public void execDisposeColumn() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) {
           next.execDisposeColumn(ColumnDisposeColumnChain.this);
         }
       };

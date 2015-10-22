@@ -112,12 +112,12 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     return future != null && !future.isDone();
   }
 
-  protected synchronized void startMessageConsumer() throws ProcessingException {
+  protected synchronized void startMessageConsumer() {
     stopMessageConsumer();
     m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput(null).withName("JmsMessageConsumer"));
   }
 
-  protected synchronized void stopMessageConsumer() throws ProcessingException {
+  protected synchronized void stopMessageConsumer() {
     if (m_messageConsumerFuture != null) {
       m_messageConsumerFuture.cancel(true);
 
@@ -131,7 +131,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     }
   }
 
-  protected MessageConsumerRunnable createMessageConsumerRunnable() throws ProcessingException {
+  protected MessageConsumerRunnable createMessageConsumerRunnable() {
     return new MessageConsumerRunnable(getConnection(), getDestination(), createMessageSerializer(), m_receiveTimeout);
   }
 
@@ -144,7 +144,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
    * @param session
    *          The JMS-session; in case of a transacted JMS-session, one can commit an reject on it.
    */
-  protected void execOnMessage(T message, Session session) throws ProcessingException {
+  protected void execOnMessage(T message, Session session) {
   }
 
   /**
@@ -159,7 +159,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     private final Session m_session;
     private final MessageConsumer m_consumer;
 
-    public MessageConsumerRunnable(final Connection connection, final Destination destination, final IJmsMessageSerializer<T> messageSerializer, final long receiveTimeout) throws ProcessingException {
+    public MessageConsumerRunnable(final Connection connection, final Destination destination, final IJmsMessageSerializer<T> messageSerializer, final long receiveTimeout) {
       m_connection = Assertions.assertNotNull(connection, "JMS-connection must not be null");
       m_messageSerializer = Assertions.assertNotNull(messageSerializer, "Message serializer must not be null");
       m_receiveTimeout = receiveTimeout;

@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -164,7 +163,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
   }
 
   @Override
-  protected BinaryResource parseValueInternal(String text) throws ProcessingException {
+  protected BinaryResource parseValueInternal(String text) {
     // Don't allow to edit the value - except to completely delete it!
     if (StringUtility.hasText(text)) {
       return getValue();

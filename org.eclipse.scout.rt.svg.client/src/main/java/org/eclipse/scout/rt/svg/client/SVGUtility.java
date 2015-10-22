@@ -83,7 +83,7 @@ public final class SVGUtility {
    *          input stream the SVG document is read from.
    * @return Returns the SVG document.
    */
-  public static SVGDocument readSVGDocument(InputStream in) throws ProcessingException {
+  public static SVGDocument readSVGDocument(InputStream in) {
     String cn;
     try {
       cn = Class.forName("org.apache.xerces.parsers.SAXParser").getName();
@@ -130,7 +130,7 @@ public final class SVGUtility {
    * @return Returns a bridge context that holds references to the SVG document as well as to the GVT tree wrapping
    *         objects.
    */
-  public static BridgeContext readSVGDocumentForGraphicalModification(InputStream in) throws ProcessingException {
+  public static BridgeContext readSVGDocumentForGraphicalModification(InputStream in) {
     SVGDocument doc = readSVGDocument(in);
     //add a gvt tree for text and alignment calculations
     BridgeContext bc = new BridgeContext(new UserAgentAdapter());
@@ -141,7 +141,7 @@ public final class SVGUtility {
     return bc;
   }
 
-  public static void writeSVGDocument(SVGDocument doc, OutputStream out, String encoding) throws ProcessingException {
+  public static void writeSVGDocument(SVGDocument doc, OutputStream out, String encoding) {
     try {
       DOMSource domSource = new DOMSource(doc);
       StreamResult streamResult = new StreamResult(out);

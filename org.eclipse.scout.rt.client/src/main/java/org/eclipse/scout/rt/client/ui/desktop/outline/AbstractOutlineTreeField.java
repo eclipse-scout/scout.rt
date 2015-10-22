@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTreeFieldExtension;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -40,7 +39,7 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField impleme
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     m_desktopListener = new DesktopListener() {
       @Override
       public void desktopChanged(DesktopEvent e) {
@@ -67,7 +66,7 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField impleme
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     ClientSessionProvider.currentSession().getDesktop().removeDesktopListener(m_desktopListener);
     m_desktopListener = null;
   }

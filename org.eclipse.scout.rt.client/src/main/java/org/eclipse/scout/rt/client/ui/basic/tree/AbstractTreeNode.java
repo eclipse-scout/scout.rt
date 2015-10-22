@@ -185,7 +185,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @ConfigOperation
   @Order(30)
-  protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) throws ProcessingException {
+  protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) {
     return node;
   }
 
@@ -428,7 +428,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public ITreeNode resolveVirtualChildNode(ITreeNode node) throws ProcessingException {
+  public ITreeNode resolveVirtualChildNode(ITreeNode node) {
     if (m_tree != null) {
       if (node instanceof IVirtualTreeNode) {
         if (node.getTree() == m_tree && node.getParentNode() == this) {
@@ -749,7 +749,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
+  public <T extends IMenu> T getMenu(Class<T> menuType) {
     // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
     return new ActionFinder().findAction(getMenus(), menuType);
   }
@@ -1047,7 +1047,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public final void ensureChildrenLoaded() throws ProcessingException {
+  public final void ensureChildrenLoaded() {
     if (!isChildrenLoaded()) {
       // avoid loop
       try {
@@ -1082,7 +1082,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public void loadChildren() throws ProcessingException {
+  public void loadChildren() {
   }
 
   @Override
@@ -1106,7 +1106,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public Object validateValue(ICell cell, Object value) throws ProcessingException {
+  public Object validateValue(ICell cell, Object value) {
     return value;
   }
 
@@ -1131,7 +1131,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     }
 
     @Override
-    public ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node) throws ProcessingException {
+    public ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node) {
       return getOwner().execResolveVirtualChildNode(node);
     }
 
@@ -1149,7 +1149,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     chain.execInitTreeNode();
   }
 
-  protected final ITreeNode interceptResolveVirtualChildNode(IVirtualTreeNode node) throws ProcessingException {
+  protected final ITreeNode interceptResolveVirtualChildNode(IVirtualTreeNode node) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     TreeNodeResolveVirtualChildNodeChain chain = new TreeNodeResolveVirtualChildNodeChain(extensions);
     return chain.execResolveVirtualChildNode(node);

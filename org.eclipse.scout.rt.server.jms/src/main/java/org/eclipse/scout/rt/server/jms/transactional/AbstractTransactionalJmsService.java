@@ -35,7 +35,7 @@ public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsServ
   public abstract String getTransactionId();
 
   @Override
-  protected synchronized void setupConnection() throws ProcessingException {
+  protected synchronized void setupConnection() {
     super.setupConnection();
     // directly start connection
     try {
@@ -46,7 +46,7 @@ public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsServ
     }
   }
 
-  protected Session createSession(Connection connection) throws ProcessingException {
+  protected Session createSession(Connection connection) {
     try {
       return connection.createSession(true, Session.CLIENT_ACKNOWLEDGE);
     }
@@ -55,7 +55,7 @@ public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsServ
     }
   }
 
-  protected JmsTransactionMember<T> getTransaction() throws ProcessingException {
+  protected JmsTransactionMember<T> getTransaction() {
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
     @SuppressWarnings("unchecked")
     JmsTransactionMember<T> m = (JmsTransactionMember<T>) tx.getMember(getTransactionId());
@@ -67,22 +67,22 @@ public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsServ
     return m;
   }
 
-  protected void send(T message) throws ProcessingException {
+  protected void send(T message) {
     JmsTransactionMember<T> transactionMember = getTransaction();
     transactionMember.send(message);
   }
 
-  protected T receive(long timeoutMillis) throws ProcessingException {
+  protected T receive(long timeoutMillis) {
     JmsTransactionMember<T> transactionMember = getTransaction();
     return transactionMember.receive(timeoutMillis);
   }
 
-  protected T receive() throws ProcessingException {
+  protected T receive() {
     JmsTransactionMember<T> transactionMember = getTransaction();
     return transactionMember.receive(-1);
   }
 
-  protected T receiveNoWait() throws ProcessingException {
+  protected T receiveNoWait() {
     JmsTransactionMember<T> transactionMember = getTransaction();
     return transactionMember.receive(0);
   }

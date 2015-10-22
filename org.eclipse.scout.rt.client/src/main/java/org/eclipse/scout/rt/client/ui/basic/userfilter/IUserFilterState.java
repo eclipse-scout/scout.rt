@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * @since 5.1
  */
@@ -27,7 +25,7 @@ public interface IUserFilterState extends Serializable {
    */
   Object createKey();
 
-  void notifyDeserialized(Object obj) throws ProcessingException;
+  void notifyDeserialized(Object obj);
 
   String getDisplayText();
 }

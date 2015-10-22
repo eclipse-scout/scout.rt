@@ -28,7 +28,7 @@ class TableHolderOutput implements IBindOutput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
-  public TableHolderOutput(ITableHolder holder, String columnName, ValueOutputToken source) throws ProcessingException {
+  public TableHolderOutput(ITableHolder holder, String columnName, ValueOutputToken source) {
     m_holder = holder;
     try {
       m_getterMethod = m_holder.getClass().getMethod("get" + Character.toUpperCase(columnName.charAt(0)) + columnName.substring(1), new Class[]{int.class});
@@ -93,7 +93,7 @@ class TableHolderOutput implements IBindOutput {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void consumeValue(Object value) throws ProcessingException {
+  public void consumeValue(Object value) {
     m_holder.ensureSize(m_batchIndex + 1);
     try {
       Object castValue = TypeCastUtility.castValue(value, m_beanType);

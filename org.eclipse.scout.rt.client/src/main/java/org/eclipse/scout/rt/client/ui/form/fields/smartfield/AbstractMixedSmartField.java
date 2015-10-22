@@ -126,7 +126,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   }
 
   @Override
-  protected VALUE handleMissingLookupRow(String text) throws VetoException {
+  protected VALUE handleMissingLookupRow(String text) {
     doSearch(text, false, true);
     IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
     ILookupRow<LOOKUP_KEY> singleMatchLookupRow = null;
@@ -283,7 +283,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   }
 
   @Override
-  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() throws ProcessingException {
+  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() {
     return createProposalChooser(false);
   }
 

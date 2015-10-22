@@ -174,7 +174,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
-  void initTable() throws ProcessingException;
+  void initTable();
 
   void disposeTable();
 
@@ -336,12 +336,12 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * extract transfer data to be sent to the backend
    */
-  void extractTableData(AbstractTableFieldData target) throws ProcessingException;
+  void extractTableData(AbstractTableFieldData target);
 
   /**
    * apply transfer data to this table
    */
-  void updateTable(AbstractTableFieldData source) throws ProcessingException;
+  void updateTable(AbstractTableFieldData source);
 
   /**
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
@@ -361,7 +361,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    *
    * @return true if menu was executed
    */
-  boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException;
+  boolean runMenu(Class<? extends IMenu> menuType);
 
   /**
    * @see #setScrollToSelection(boolean)
@@ -581,11 +581,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   boolean isTableInitialized();
 
-  void setRowState(ITableRow row, int rowState) throws ProcessingException;
+  void setRowState(ITableRow row, int rowState);
 
-  void setRowState(Collection<? extends ITableRow> rows, int rowState) throws ProcessingException;
+  void setRowState(Collection<? extends ITableRow> rows, int rowState);
 
-  void setAllRowState(int rowState) throws ProcessingException;
+  void setAllRowState(int rowState);
 
   void updateRow(ITableRow modifiedRow);
 
@@ -603,16 +603,16 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * existingRow the check getRowKeys(newRow)==getRowKeys(existingRow) is true then the newRow is added to the table as
    * a really new row 3. all existing rows that do not match any newRow are deleted
    */
-  void replaceRows(List<? extends ITableRow> newRows) throws ProcessingException;
+  void replaceRows(List<? extends ITableRow> newRows);
 
-  void replaceRowsByArray(Object dataArray) throws ProcessingException;
+  void replaceRowsByArray(Object dataArray);
 
   /**
    * Performance note:<br>
    * Since the matrix may contain large amount of data, the Object[][] can be passed as new AtomicReference
    * <Object>(Object[][]) so that the further processing can set the content of the holder to null while processing.
    */
-  void replaceRowsByMatrix(Object dataMatrix) throws ProcessingException;
+  void replaceRowsByMatrix(Object dataMatrix);
 
   int getSelectedRowCount();
 
@@ -681,9 +681,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param value
    *          true if the row should be checked, false if not
    */
-  void checkRows(Collection<? extends ITableRow> rows, boolean value) throws ProcessingException;
+  void checkRows(Collection<? extends ITableRow> rows, boolean value);
 
-  void checkAllRows() throws ProcessingException;
+  void checkAllRows();
 
   void uncheckRow(ITableRow row);
 
@@ -691,7 +691,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void uncheckAllEnabledRows();
 
-  void uncheckAllRows() throws ProcessingException;
+  void uncheckAllRows();
 
   /**
    * column that represented the last ui (mouse click) context {@link ITableUIFacade#setContextColumnFromUI(IColumn)}
@@ -708,7 +708,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Creates and inserts a new {@link ITableRow} (with status {@link ITableRow#STATUS_INSERTED})
    */
-  ITableRow addRow() throws ProcessingException;
+  ITableRow addRow();
 
   /**
    * Adds a new {@link ITableRow}
@@ -718,28 +718,28 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    *          {@link ITableRow#STATUS_NON_CHANGED}
    * @throws ProcessingException
    */
-  ITableRow addRow(boolean markAsInserted) throws ProcessingException;
+  ITableRow addRow(boolean markAsInserted);
 
   /**
    * calls {@link #addRow(ITableRow, false)}
    */
-  ITableRow addRow(ITableRow newRow) throws ProcessingException;
+  ITableRow addRow(ITableRow newRow);
 
   /**
    * the newRow is added to the table. After the add succeeds the argument row newRow has a valid reference to its
    * coresponding ITableRow and the new ITableRow is returned
    */
-  ITableRow addRow(ITableRow newRow, boolean markAsInserted) throws ProcessingException;
+  ITableRow addRow(ITableRow newRow, boolean markAsInserted);
 
   /**
    * calls {@link #addRows(List<? extends ITableRow>, false)}
    */
-  List<ITableRow> addRows(List<? extends ITableRow> newRows) throws ProcessingException;
+  List<ITableRow> addRows(List<? extends ITableRow> newRows);
 
   /**
    * calls {@link #addRows(List<? extends ITableRow>, markAsInserted, null)}
    */
-  List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted) throws ProcessingException;
+  List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted);
 
   /**
    * all newRows are added to the table. After the add succeeds the argument rows newRows have valid references to their
@@ -748,32 +748,32 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    *
    * @return added rows in order as they were passed to the method
    */
-  List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException;
+  List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes);
 
   /**
    * Convenience to add one row by its data
    */
-  ITableRow addRowByArray(Object dataArray) throws ProcessingException;
+  ITableRow addRowByArray(Object dataArray);
 
   /**
    * Convenience to add one row by its data
    */
-  List<ITableRow> addRowsByArray(Object dataArray, int rowStatus) throws ProcessingException;
+  List<ITableRow> addRowsByArray(Object dataArray, int rowStatus);
 
   /**
    * Convenience to add multiple rows by their data arrays
    */
-  List<ITableRow> addRowsByMatrix(Object dataMatrix) throws ProcessingException;
+  List<ITableRow> addRowsByMatrix(Object dataMatrix);
 
   /**
    * Convenience to add multiple rows by their data arrays
    */
-  List<ITableRow> addRowsByMatrix(Object dataMatrix, int rowStatus) throws ProcessingException;
+  List<ITableRow> addRowsByMatrix(Object dataMatrix, int rowStatus);
 
   /**
    * Convenience to add multiple rows by their single value (key value)
    */
-  List<ITableRow> addRowsByArray(Object dataArray) throws ProcessingException;
+  List<ITableRow> addRowsByArray(Object dataArray);
 
   void moveRow(int sourceIndex, int targetIndex);
 
@@ -928,7 +928,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @throws ProcessingException
    * @since 3.10.0-M3
    */
-  void exportToTableBeanData(AbstractTableFieldBeanData target) throws ProcessingException;
+  void exportToTableBeanData(AbstractTableFieldBeanData target);
 
   /**
    * Imports the contents of the given {@link AbstractTableFieldBeanData}. The mapping from {@link AbstractTableRowData}
@@ -938,7 +938,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @throws ProcessingException
    * @since 3.10.0-M3
    */
-  void importFromTableBeanData(AbstractTableFieldBeanData source) throws ProcessingException;
+  void importFromTableBeanData(AbstractTableFieldBeanData source);
 
   /**
    * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
@@ -949,7 +949,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @throws ProcessingException
    * @since 3.10.0-M5
    */
-  ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException;
+  ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType);
 
   /**
    * @param menus
@@ -970,7 +970,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the created table row
    * @throws ProcessingException
    */
-  ITableRow createRow() throws ProcessingException;
+  ITableRow createRow();
 
   /**
    * Creates table rows for the given matrix of row values. The created rows are not added to the table yet. One row is
@@ -987,7 +987,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the list of the created table rows
    * @throws ProcessingException
    */
-  List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException;
+  List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference);
 
   /**
    * Creates table rows from the given matrix of row values. The created rows are not added to the table yet. One row is
@@ -1006,7 +1006,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the list of the created table rows
    * @throws ProcessingException
    */
-  List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException;
+  List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus);
 
   /**
    * Creates table rows from the codes. The created rows are not added to the table yet.
@@ -1015,7 +1015,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the list of the created table rows
    * @throws ProcessingException
    */
-  List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) throws ProcessingException;
+  List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes);
 
   /**
    * Creates a new table row from the <code>rowValues</code> argument. The created row is not added to the table yet.
@@ -1025,7 +1025,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the created table row
    * @throws ProcessingException
    */
-  ITableRow createRow(Object rowValues) throws ProcessingException;
+  ITableRow createRow(Object rowValues);
 
   /**
    * Creates new table rows from the given (one dimensional) array. The created rows are not added to the table yet.
@@ -1035,7 +1035,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the list of the created table rows
    * @throws ProcessingException
    */
-  List<ITableRow> createRowsByArray(Object dataArray) throws ProcessingException;
+  List<ITableRow> createRowsByArray(Object dataArray);
 
   /**
    * Creates new table rows from the given (one dimensional) array. The created rows are not added to the table yet. The
@@ -1048,7 +1048,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the list of the created table rows
    * @throws ProcessingException
    */
-  List<ITableRow> createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException;
+  List<ITableRow> createRowsByArray(Object dataArray, int rowStatus);
 
   /**
    * @since 5.1.0

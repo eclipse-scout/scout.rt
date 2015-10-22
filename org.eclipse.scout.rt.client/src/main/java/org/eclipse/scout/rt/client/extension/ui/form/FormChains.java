@@ -28,10 +28,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execCloseTimer() throws ProcessingException {
+    public void execCloseTimer() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execCloseTimer(FormCloseTimerChain.this);
         }
       };
@@ -49,10 +49,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execInactivityTimer() throws ProcessingException {
+    public void execInactivityTimer() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execInactivityTimer(FormInactivityTimerChain.this);
         }
       };
@@ -70,10 +70,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execStored() throws ProcessingException {
+    public void execStored() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execStored(FormStoredChain.this);
         }
       };
@@ -91,10 +91,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public boolean execCheckFields() throws ProcessingException {
+    public boolean execCheckFields() {
       MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           setReturnValue(next.execCheckFields(FormCheckFieldsChain.this));
         }
       };
@@ -112,10 +112,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execResetSearchFilter(final SearchFilter searchFilter) throws ProcessingException {
+    public void execResetSearchFilter(final SearchFilter searchFilter) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execResetSearchFilter(FormResetSearchFilterChain.this, searchFilter);
         }
       };
@@ -150,10 +150,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execOnVetoException(final VetoException e, final int code) throws ProcessingException {
+    public void execOnVetoException(final VetoException e, final int code) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execOnVetoException(FormOnVetoExceptionChain.this, e, code);
         }
       };
@@ -171,10 +171,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execFormActivated() throws ProcessingException {
+    public void execFormActivated() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execFormActivated(FormFormActivatedChain.this);
         }
       };
@@ -192,10 +192,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execDisposeForm() throws ProcessingException {
+    public void execDisposeForm() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execDisposeForm(FormDisposeFormChain.this);
         }
       };
@@ -213,10 +213,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execTimer(final String timerId) throws ProcessingException {
+    public void execTimer(final String timerId) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execTimer(FormTimerChain.this, timerId);
         }
       };
@@ -234,10 +234,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public AbstractFormData execCreateFormData() throws ProcessingException {
+    public AbstractFormData execCreateFormData() {
       MethodInvocation<AbstractFormData> methodInvocation = new MethodInvocation<AbstractFormData>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           setReturnValue(next.execCreateFormData(FormCreateFormDataChain.this));
         }
       };
@@ -255,10 +255,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execInitForm() throws ProcessingException {
+    public void execInitForm() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execInitForm(FormInitFormChain.this);
         }
       };
@@ -276,10 +276,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public boolean execValidate() throws ProcessingException {
+    public boolean execValidate() {
       MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           setReturnValue(next.execValidate(FormValidateChain.this));
         }
       };
@@ -297,10 +297,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execOnCloseRequest(final boolean kill, final Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
+    public void execOnCloseRequest(final boolean kill, final Set<Integer> enabledButtonSystemTypes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execOnCloseRequest(FormOnCloseRequestChain.this, kill, enabledButtonSystemTypes);
         }
       };
@@ -318,10 +318,10 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execDataChanged(final Object... dataTypes) throws ProcessingException {
+    public void execDataChanged(final Object... dataTypes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
           next.execDataChanged(FormDataChangedChain.this, dataTypes);
         }
       };

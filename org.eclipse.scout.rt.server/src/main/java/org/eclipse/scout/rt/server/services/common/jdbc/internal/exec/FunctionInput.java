@@ -82,7 +82,7 @@ class FunctionInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     if (isBatch() || !m_valueSet) {
       if (m_callerService instanceof AbstractSqlService) {
         m_value = ((AbstractSqlService) m_callerService).callbackCustomBindFunction(m_target.getName(), m_target.getArgs(), m_bindBases);

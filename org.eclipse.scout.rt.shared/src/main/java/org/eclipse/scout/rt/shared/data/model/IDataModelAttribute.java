@@ -16,21 +16,20 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 public interface IDataModelAttribute extends IPropertyObserver, DataModelConstants, IOrdered {
 
-  void initAttribute() throws ProcessingException;
+  void initAttribute();
 
   /**
    * For {@link #TYPE_CODE_LIST}, {@link #TYPE_CODE_TREE}, {@link #TYPE_NUMBER_LIST}, {@link #TYPE_NUMBER_TREE} and
    * {@link #TYPE_SMART} only. Delegate of the callback {@link AbstractListBox#execPrepareLookup(LookupCall)} and
    * {@link AbstractTreeBox#execPrepareLookup(LookupCall, org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode)}
    */
-  void prepareLookup(ILookupCall<?> call) throws ProcessingException;
+  void prepareLookup(ILookupCall<?> call);
 
   String getText();
 

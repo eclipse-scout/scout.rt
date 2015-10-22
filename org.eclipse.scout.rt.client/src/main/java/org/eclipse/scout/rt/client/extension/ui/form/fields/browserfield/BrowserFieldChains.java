@@ -26,10 +26,10 @@ public final class BrowserFieldChains {
       super(extensions);
     }
 
-    public void execPostMessage(final String data, final String origin) throws ProcessingException {
+    public void execPostMessage(final String data, final String origin) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) throws ProcessingException {
+        protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) {
           next.execPostMessage(BrowserFieldLocationChangedChain.this, data, origin);
         }
       };

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.DefaultTableRowFormProvider;
@@ -244,7 +243,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
   }
 
-  protected void startTableRowForm(ITableRow row) throws ProcessingException {
+  protected void startTableRowForm(ITableRow row) {
     ITableRowForm form = getTableRowFormProvider().createTableRowForm(row);
     form.setDisplayHint(getTableRowFormDisplayHint());
     form.setDisplayViewId(getTableRowFormDisplayViewId());

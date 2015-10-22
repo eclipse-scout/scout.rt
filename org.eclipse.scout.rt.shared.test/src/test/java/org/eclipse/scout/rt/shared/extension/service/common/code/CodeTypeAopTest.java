@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -54,7 +53,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     private static final long serialVersionUID = 1L;
     public static final Long ID = 20000L;
 
-    public CountryCodeType() throws ProcessingException {
+    public CountryCodeType() {
       super();
     }
 
@@ -171,7 +170,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
-    public List<? extends ICode<Long>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) throws ProcessingException {
+    public List<? extends ICode<Long>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) {
       execCreateCodesCounter.incrementAndGet();
       AbstractCode<Long> burmaCode = new AbstractCode<Long>() {
         private static final long serialVersionUID = 1L;
@@ -190,19 +189,19 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
-    public ICode<Long> execCreateCode(CodeTypeWithGenericCreateCodeChain chain, ICodeRow<Long> newRow) throws ProcessingException {
+    public ICode<Long> execCreateCode(CodeTypeWithGenericCreateCodeChain chain, ICodeRow<Long> newRow) {
       execCreateCodeCounter.incrementAndGet();
       return super.execCreateCode(chain, newRow);
     }
 
     @Override
-    public List<? extends ICodeRow<Long>> execLoadCodes(CodeTypeWithGenericLoadCodesChain chain, Class<? extends ICodeRow<Long>> codeRowType) throws ProcessingException {
+    public List<? extends ICodeRow<Long>> execLoadCodes(CodeTypeWithGenericLoadCodesChain chain, Class<? extends ICodeRow<Long>> codeRowType) {
       execLoadCodesCounter.incrementAndGet();
       return super.execLoadCodes(chain, codeRowType);
     }
 
     @Override
-    public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<Long> oldCode, ICodeRow<Long> newCode) throws ProcessingException {
+    public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<Long> oldCode, ICodeRow<Long> newCode) {
       execOverwriteCodeCounter.incrementAndGet();
       super.execOverwriteCode(chain, oldCode, newCode);
     }

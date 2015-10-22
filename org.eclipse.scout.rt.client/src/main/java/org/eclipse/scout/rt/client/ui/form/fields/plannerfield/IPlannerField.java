@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -35,7 +34,7 @@ public interface IPlannerField<P extends IPlanner<?, ?>> extends IFormField {
   /**
    * (re)load table data
    */
-  void loadResources() throws ProcessingException;
+  void loadResources();
 
   IPlannerFieldUIFacade getUIFacade();
 

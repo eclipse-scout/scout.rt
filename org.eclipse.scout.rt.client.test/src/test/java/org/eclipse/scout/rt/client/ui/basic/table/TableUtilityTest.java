@@ -19,7 +19,6 @@ import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
@@ -223,7 +222,7 @@ public class TableUtilityTest {
     assertEquals("World", row2[11]);
   }
 
-  private static P_Table createTable(int status) throws ProcessingException {
+  private static P_Table createTable(int status) {
     P_Table table = new P_Table();
 
     Date date = new Date(DATE_IN_MILLIS);

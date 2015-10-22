@@ -87,7 +87,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    *           if initialization fails
    */
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     final IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o.getClass() == getConfiguredOutline()) {
@@ -146,7 +146,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    *          the state of the toggle button
    */
   @Override
-  protected final void execSelectionChanged(boolean selection) throws ProcessingException {
+  protected final void execSelectionChanged(boolean selection) {
     if (selection) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {

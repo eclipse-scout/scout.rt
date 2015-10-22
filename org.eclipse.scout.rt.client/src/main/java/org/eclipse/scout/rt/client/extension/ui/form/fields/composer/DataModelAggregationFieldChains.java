@@ -27,10 +27,10 @@ public final class DataModelAggregationFieldChains {
       super(extensions);
     }
 
-    public void execAttributeChanged(final IDataModelAttribute attribute) throws ProcessingException {
+    public void execAttributeChanged(final IDataModelAttribute attribute) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField> next) throws ProcessingException {
+        protected void callMethod(IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField> next) {
           next.execAttributeChanged(DataModelAggregationFieldAttributeChangedChain.this, attribute);
         }
       };

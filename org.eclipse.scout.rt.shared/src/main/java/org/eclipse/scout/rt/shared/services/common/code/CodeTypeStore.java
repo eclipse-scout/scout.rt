@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.cache.ICache;
 
 /**
@@ -49,19 +48,19 @@ public class CodeTypeStore {
     }
   }
 
-  public void unloadCodeTypeCache(Class<? extends ICodeType<?, ?>> type) throws ProcessingException {
+  public void unloadCodeTypeCache(Class<? extends ICodeType<?, ?>> type) {
     List<Class<? extends ICodeType<?, ?>>> codeTypeList = new ArrayList<Class<? extends ICodeType<?, ?>>>();
     codeTypeList.add(type);
     unloadCodeTypeCache(codeTypeList);
   }
 
-  public void unloadCodeTypeCacheNoFire(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+  public void unloadCodeTypeCacheNoFire(List<Class<? extends ICodeType<?, ?>>> types) {
     for (CodeTypeCache cache : m_store.values()) {
       cache.unloadCodeTypes(types);
     }
   }
 
-  public void unloadCodeTypeCache(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+  public void unloadCodeTypeCache(List<Class<? extends ICodeType<?, ?>>> types) {
     for (CodeTypeCache cache : m_store.values()) {
       cache.unloadCodeTypes(types);
     }

@@ -64,7 +64,7 @@ public final class BeanUtility {
   /**
    * @return all properties of from up to (and excluding) to stopClazz, filtering with filter
    */
-  public static Map<String, Object> getProperties(Object from, Class<?> stopClazz, IPropertyFilter filter) throws ProcessingException {
+  public static Map<String, Object> getProperties(Object from, Class<?> stopClazz, IPropertyFilter filter) {
     HashMap<String, Object> map = new HashMap<String, Object>();
     try {
       FastPropertyDescriptor[] props = getFastPropertyDescriptors(from.getClass(), stopClazz, filter);
@@ -88,7 +88,7 @@ public final class BeanUtility {
    *          true just logs warnings on exceptions, false throws exceptions set all properties on to, filtering with
    *          filter
    */
-  public static void setProperties(Object to, Map<String, Object> map, boolean lenient, IPropertyFilter filter) throws ProcessingException {
+  public static void setProperties(Object to, Map<String, Object> map, boolean lenient, IPropertyFilter filter) {
     FastBeanInfo toInfo = getFastBeanInfo(to.getClass(), null);
     for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
       Map.Entry<String, Object> entry = it.next();
@@ -182,7 +182,7 @@ public final class BeanUtility {
    * @throws ProcessingException
    * @since 3.8.1
    */
-  public static <T> T createInstance(Class<T> c, Object... parameters) throws ProcessingException {
+  public static <T> T createInstance(Class<T> c, Object... parameters) {
     if (parameters == null || parameters.length == 0) {
       return createInstance(c, null, null);
     }
@@ -210,7 +210,7 @@ public final class BeanUtility {
    * @throws ProcessingException
    * @since 3.8.1
    */
-  public static <T> T createInstance(Class<T> c, Class<?>[] parameterTypes, Object[] parameters) throws ProcessingException {
+  public static <T> T createInstance(Class<T> c, Class<?>[] parameterTypes, Object[] parameters) {
     Constructor<T> ctor = findConstructor(c, parameterTypes);
     if (ctor != null) {
       try {
@@ -241,7 +241,7 @@ public final class BeanUtility {
    *           constructor specification.
    * @since 3.8.1
    */
-  public static <T> Constructor<T> findConstructor(Class<T> c, Class<?>... parameterTypes) throws ProcessingException {
+  public static <T> Constructor<T> findConstructor(Class<T> c, Class<?>... parameterTypes) {
     if (c == null) {
       return null;
     }

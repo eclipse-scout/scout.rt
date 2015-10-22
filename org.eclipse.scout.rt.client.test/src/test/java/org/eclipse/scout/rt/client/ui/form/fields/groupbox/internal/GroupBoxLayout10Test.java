@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -199,7 +198,7 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       }
 
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         setSelected(getFieldByClass(Field03.class).isVisible());
       }
 
@@ -209,7 +208,7 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       }
 
       @Override
-      protected void execSelectionChanged(boolean selection) throws ProcessingException {
+      protected void execSelectionChanged(boolean selection) {
         getFieldByClass(Field03.class).setVisible(selection);
       }
     }

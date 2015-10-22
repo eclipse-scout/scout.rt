@@ -38,6 +38,6 @@ public interface IMenu extends IActionNode<IMenu> {
    * @param newValue
    * @throws ProcessingException
    */
-  void handleOwnerValueChanged(Object newValue) throws ProcessingException;
+  void handleOwnerValueChanged(Object newValue);
 
 }

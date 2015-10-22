@@ -24,5 +24,5 @@ public interface IBeanInterceptor<T> {
    * @return the result of the call
    * @throws ProcessingException
    */
-  Object invoke(IBeanInvocationContext<T> context) throws ProcessingException;
+  Object invoke(IBeanInvocationContext<T> context);
 }

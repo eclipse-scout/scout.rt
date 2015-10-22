@@ -104,22 +104,22 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
    */
   @ConfigOperation
   @Order(200)
-  protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  protected void execLoadChildNodes(ITreeNode parentNode) {
   }
 
   @ConfigOperation
   @Order(210)
-  protected void execSaveDeletedNode(ITreeNode row) throws ProcessingException {
+  protected void execSaveDeletedNode(ITreeNode row) {
   }
 
   @ConfigOperation
   @Order(220)
-  protected void execSaveInsertedNode(ITreeNode row) throws ProcessingException {
+  protected void execSaveInsertedNode(ITreeNode row) {
   }
 
   @ConfigOperation
   @Order(230)
-  protected void execSaveUpdatedNode(ITreeNode row) throws ProcessingException {
+  protected void execSaveUpdatedNode(ITreeNode row) {
   }
 
   private Class<? extends ITree> getConfiguredTree() {
@@ -178,7 +178,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     if (m_tree != null && !m_treeExternallyManaged) {
       m_tree.initTree();
     }
@@ -197,7 +197,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+  public void exportFormFieldData(AbstractFormFieldData target) {
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) target;
     if (m_tree != null) {
       m_tree.exportTreeData(treeFieldData);
@@ -205,7 +205,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) throws ProcessingException {
+  public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) source;
     if (treeFieldData.isValueSet()) {
       if (m_tree != null) {
@@ -291,14 +291,14 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  public void loadRootNode() throws ProcessingException {
+  public void loadRootNode() {
     if (m_tree != null && !m_treeExternallyManaged) {
       loadChildNodes(m_tree.getRootNode());
     }
   }
 
   @Override
-  public void loadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  public void loadChildNodes(ITreeNode parentNode) {
     if (m_tree != null && !m_treeExternallyManaged) {
       try {
         m_tree.setTreeChanging(true);
@@ -311,13 +311,13 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
   }
 
-  public ITreeNode createTreeNode() throws ProcessingException {
+  public ITreeNode createTreeNode() {
     ITreeNode node = new P_InternalTreeNode();
     return node;
   }
 
   @Override
-  protected boolean execIsSaveNeeded() throws ProcessingException {
+  protected boolean execIsSaveNeeded() {
     boolean b = false;
     if (m_tree != null) {
       if (b == false && m_tree.getDeletedNodeCount() > 0) {
@@ -334,7 +334,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  protected void execMarkSaved() throws ProcessingException {
+  protected void execMarkSaved() {
     if (m_tree != null && !m_treeExternallyManaged) {
       try {
         m_tree.setTreeChanging(true);
@@ -359,7 +359,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     if (m_tree != null) {
       if (m_tree.isRootNodeVisible()) {
         if (m_tree.getRootNode() != null) {
@@ -376,7 +376,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  public void doSave() throws ProcessingException {
+  public void doSave() {
     if (m_tree != null && !m_treeExternallyManaged) {
       try {
         m_tree.setTreeChanging(true);
@@ -415,7 +415,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   private class P_InternalTreeNode extends AbstractTreeNode {
 
     @Override
-    public void loadChildren() throws ProcessingException {
+    public void loadChildren() {
       AbstractTreeField.this.loadChildNodes(this);
     }
   }
@@ -448,22 +448,22 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
 
     @Override
-    public void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row) throws ProcessingException {
+    public void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row) {
       getOwner().execSaveDeletedNode(row);
     }
 
     @Override
-    public void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row) throws ProcessingException {
+    public void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row) {
       getOwner().execSaveUpdatedNode(row);
     }
 
     @Override
-    public void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode) throws ProcessingException {
+    public void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode) {
       getOwner().execLoadChildNodes(parentNode);
     }
 
     @Override
-    public void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row) throws ProcessingException {
+    public void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row) {
       getOwner().execSaveInsertedNode(row);
     }
   }
@@ -479,25 +479,25 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     chain.execSave(insertedNodes, updatedNodes, deletedNodes);
   }
 
-  protected final void interceptSaveDeletedNode(ITreeNode row) throws ProcessingException {
+  protected final void interceptSaveDeletedNode(ITreeNode row) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveDeletedNodeChain chain = new TreeFieldSaveDeletedNodeChain(extensions);
     chain.execSaveDeletedNode(row);
   }
 
-  protected final void interceptSaveUpdatedNode(ITreeNode row) throws ProcessingException {
+  protected final void interceptSaveUpdatedNode(ITreeNode row) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveUpdatedNodeChain chain = new TreeFieldSaveUpdatedNodeChain(extensions);
     chain.execSaveUpdatedNode(row);
   }
 
-  protected final void interceptLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  protected final void interceptLoadChildNodes(ITreeNode parentNode) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldLoadChildNodesChain chain = new TreeFieldLoadChildNodesChain(extensions);
     chain.execLoadChildNodes(parentNode);
   }
 
-  protected final void interceptSaveInsertedNode(ITreeNode row) throws ProcessingException {
+  protected final void interceptSaveInsertedNode(ITreeNode row) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveInsertedNodeChain chain = new TreeFieldSaveInsertedNodeChain(extensions);
     chain.execSaveInsertedNode(row);

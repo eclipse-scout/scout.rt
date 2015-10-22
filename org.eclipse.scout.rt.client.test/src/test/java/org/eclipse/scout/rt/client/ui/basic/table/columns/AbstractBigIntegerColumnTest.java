@@ -16,7 +16,6 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
@@ -49,7 +48,7 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
   }
 
   @Test
-  public void testEditorFieldMinAndMaxValue() throws ProcessingException {
+  public void testEditorFieldMinAndMaxValue() {
     ITableRow row = Mockito.mock(ITableRow.class);
     AbstractBigIntegerField field = (AbstractBigIntegerField) prepareEditInternal(row);
 
@@ -58,7 +57,7 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
   }
 
   @Test
-  public void testFormattingInDecorateCellInternal() throws ProcessingException {
+  public void testFormattingInDecorateCellInternal() {
     ITableRow row = Mockito.mock(ITableRow.class);
     Cell cell = new Cell();
     BigInteger testValue = BigInteger.valueOf(-123456789);

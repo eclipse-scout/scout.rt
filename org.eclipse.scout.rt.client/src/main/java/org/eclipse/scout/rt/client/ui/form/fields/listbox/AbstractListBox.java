@@ -178,7 +178,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    * <p>
    */
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     return getValue().isEmpty();
   }
 
@@ -187,7 +187,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    */
   @ConfigOperation
   @Order(250)
-  protected void execPrepareLookup(ILookupCall<KEY> call) throws ProcessingException {
+  protected void execPrepareLookup(ILookupCall<KEY> call) {
   }
 
   /**
@@ -199,12 +199,12 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    */
   @ConfigOperation
   @Order(260)
-  protected void execFilterLookupResult(ILookupCall<KEY> call, List<ILookupRow<KEY>> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<KEY> call, List<ILookupRow<KEY>> result) {
   }
 
   @ConfigOperation
   @Order(230)
-  protected List<? extends ILookupRow<KEY>> execLoadTableData() throws ProcessingException {
+  protected List<? extends ILookupRow<KEY>> execLoadTableData() {
     List<? extends ILookupRow<KEY>> data;
     // (1) get data by service
     if (getLookupCall() != null) {
@@ -239,7 +239,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    */
   @ConfigOperation
   @Order(240)
-  protected void execPopulateTable() throws ProcessingException {
+  protected void execPopulateTable() {
     List<? extends ILookupRow<KEY>> data = null;
     //sle Ticket 92'893: Listbox Master required. only run loadTable when master value is set
     if (!isMasterRequired() || getMasterValue() != null) {
@@ -271,7 +271,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
-  protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+  protected void execChangedMasterValue(Object newMasterValue) {
     setValue(null);
     loadListBoxData();
   }
@@ -416,7 +416,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     getTable().initTable();
     if (getConfiguredAutoLoad()) {
       try {
@@ -524,7 +524,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
-  public void loadListBoxData() throws ProcessingException {
+  public void loadListBoxData() {
     if (getTable() != null) {
       try {
         m_valueTableSyncActive = true;
@@ -544,12 +544,12 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    * do not use this internal method directly
    */
   @Override
-  public final void prepareLookupCall(ILookupCall<KEY> call) throws ProcessingException {
+  public final void prepareLookupCall(ILookupCall<KEY> call) {
     prepareLookupCallInternal(call);
     interceptPrepareLookup(call);
   }
 
-  private List<ILookupRow<KEY>> filterLookupResult(ILookupCall<KEY> call, List<? extends ILookupRow<KEY>> data) throws ProcessingException {
+  private List<ILookupRow<KEY>> filterLookupResult(ILookupCall<KEY> call, List<? extends ILookupRow<KEY>> data) {
     // create a copy for the custom filter method
     List<ILookupRow<KEY>> result = CollectionUtility.arrayList(data);
     interceptFilterLookupResult(call, result);
@@ -628,7 +628,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
-  protected final Set<KEY> validateValueInternal(Set<KEY> rawValue0) throws ProcessingException {
+  protected final Set<KEY> validateValueInternal(Set<KEY> rawValue0) {
     Set<KEY> rawValue = CollectionUtility.hashSet(rawValue0);
     return doValidateValueInternal(rawValue);
   }
@@ -636,7 +636,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   /**
    * override this method to perform detailed validation in subclasses
    */
-  protected Set<KEY> doValidateValueInternal(Set<KEY> rawValue) throws ProcessingException {
+  protected Set<KEY> doValidateValueInternal(Set<KEY> rawValue) {
     if (CollectionUtility.isEmpty(rawValue)) {
       // fast return empty set
       return rawValue;
@@ -787,7 +787,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
-  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+  public void exportFormFieldData(AbstractFormFieldData target) {
     @SuppressWarnings("unchecked")
     AbstractValueFieldData<Set<KEY>> v = (AbstractValueFieldData<Set<KEY>>) target;
     Set<KEY> value = getValue();
@@ -1035,7 +1035,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
 
     @Override
-    public ITableRow createTableRow(ILookupRow<KEY> dataRow) throws ProcessingException {
+    public ITableRow createTableRow(ILookupRow<KEY> dataRow) {
       TableRow tableRow = (TableRow) super.createTableRow(dataRow);
       // fill values to tableRow
       getKeyColumnInternal().setValue(tableRow, dataRow.getKey());
@@ -1057,25 +1057,25 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
   }
 
-  protected final void interceptPopulateTable() throws ProcessingException {
+  protected final void interceptPopulateTable() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxPopulateTableChain<KEY> chain = new ListBoxPopulateTableChain<KEY>(extensions);
     chain.execPopulateTable();
   }
 
-  protected final List<? extends ILookupRow<KEY>> interceptLoadTableData() throws ProcessingException {
+  protected final List<? extends ILookupRow<KEY>> interceptLoadTableData() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxLoadTableDataChain<KEY> chain = new ListBoxLoadTableDataChain<KEY>(extensions);
     return chain.execLoadTableData();
   }
 
-  protected final void interceptFilterLookupResult(ILookupCall<KEY> call, List<ILookupRow<KEY>> result) throws ProcessingException {
+  protected final void interceptFilterLookupResult(ILookupCall<KEY> call, List<ILookupRow<KEY>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxFilterLookupResultChain<KEY> chain = new ListBoxFilterLookupResultChain<KEY>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
-  protected final void interceptPrepareLookup(ILookupCall<KEY> call) throws ProcessingException {
+  protected final void interceptPrepareLookup(ILookupCall<KEY> call) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxPrepareLookupChain<KEY> chain = new ListBoxPrepareLookupChain<KEY>(extensions);
     chain.execPrepareLookup(call);
@@ -1088,22 +1088,22 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
 
     @Override
-    public void execPopulateTable(ListBoxPopulateTableChain<KEY> chain) throws ProcessingException {
+    public void execPopulateTable(ListBoxPopulateTableChain<KEY> chain) {
       getOwner().execPopulateTable();
     }
 
     @Override
-    public List<? extends ILookupRow<KEY>> execLoadTableData(ListBoxLoadTableDataChain<KEY> chain) throws ProcessingException {
+    public List<? extends ILookupRow<KEY>> execLoadTableData(ListBoxLoadTableDataChain<KEY> chain) {
       return getOwner().execLoadTableData();
     }
 
     @Override
-    public void execFilterLookupResult(ListBoxFilterLookupResultChain<KEY> chain, ILookupCall<KEY> call, List<ILookupRow<KEY>> result) throws ProcessingException {
+    public void execFilterLookupResult(ListBoxFilterLookupResultChain<KEY> chain, ILookupCall<KEY> call, List<ILookupRow<KEY>> result) {
       getOwner().execFilterLookupResult(call, result);
     }
 
     @Override
-    public void execPrepareLookup(ListBoxPrepareLookupChain<KEY> chain, ILookupCall<KEY> call) throws ProcessingException {
+    public void execPrepareLookup(ListBoxPrepareLookupChain<KEY> chain, ILookupCall<KEY> call) {
       getOwner().execPrepareLookup(call);
     }
   }

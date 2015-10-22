@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.fixture.OwnerValueCapturingMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
@@ -54,7 +53,7 @@ public class TreeMenuTest {
    * is selected.
    */
   @Test
-  public void testOwnerValueOnSingleSelection() throws ProcessingException {
+  public void testOwnerValueOnSingleSelection() {
     final ContextMenuTree tree = createContextMenuTree();
     addTestMenus(tree);
     tree.selectFirstNode();
@@ -71,7 +70,7 @@ public class TreeMenuTest {
    * are selected.
    */
   @Test
-  public void testOwnerValueOnMultiSelection() throws ProcessingException {
+  public void testOwnerValueOnMultiSelection() {
     final ContextMenuTree tree = createContextMenuTree();
     addTestMenus(tree);
     tree.setMultiSelect(true);
@@ -89,7 +88,7 @@ public class TreeMenuTest {
    * selected.
    */
   @Test
-  public void testEmptySpaceSelection() throws ProcessingException {
+  public void testEmptySpaceSelection() {
     final ContextMenuTree tree = createContextMenuTree();
     tree.selectNode(tree.getRootNode());
     addTestMenus(tree);
@@ -122,7 +121,7 @@ public class TreeMenuTest {
     tree.setContextMenuInternal(new TreeContextMenu(tree, menus));
   }
 
-  private ContextMenuTree createContextMenuTree() throws ProcessingException {
+  private ContextMenuTree createContextMenuTree() {
     final ContextMenuTree tree = new ContextMenuTree();
     tree.addChildNode(tree.getRootNode(), new AbstractTreeNode() {
     });

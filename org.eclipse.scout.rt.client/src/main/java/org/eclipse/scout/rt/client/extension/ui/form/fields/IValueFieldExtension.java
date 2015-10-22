@@ -29,14 +29,14 @@ public interface IValueFieldExtension<VALUE, OWNER extends AbstractValueField<VA
    * @return
    * @throws ProcessingException
    */
-  VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) throws ProcessingException;
+  VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue);
 
   String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value);
 
-  VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) throws ProcessingException;
+  VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue);
 
-  void execChangedValue(ValueFieldChangedValueChain<VALUE> chain) throws ProcessingException;
+  void execChangedValue(ValueFieldChangedValueChain<VALUE> chain);
 
-  VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text) throws ProcessingException;
+  VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text);
 
 }

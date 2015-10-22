@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.control;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 
 public interface ITableControlExtension<OWNER extends AbstractTableControl> extends IActionExtension<OWNER> {
 
-  void execInitForm(TableControlInitFormChain chain) throws ProcessingException;
+  void execInitForm(TableControlInitFormChain chain);
 
 }

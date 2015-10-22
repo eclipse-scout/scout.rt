@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -68,7 +67,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new CockpitMainTablePage());
       pageList.add(new CockpitSecondTablePage());
     }
@@ -81,7 +80,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new AdminMainTablePage());
     }
   }
@@ -94,7 +93,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{
           new Object[]{1L, "5 Tickets"},
           new Object[]{2L, "12 Appointments"},
@@ -133,7 +132,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{
           new Object[]{1L, "Rated tickets"},
           new Object[]{2L, "Rated appointments"},
@@ -171,7 +170,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{
           new Object[]{1L, "User Account"},
           new Object[]{2L, "Guest Account"},

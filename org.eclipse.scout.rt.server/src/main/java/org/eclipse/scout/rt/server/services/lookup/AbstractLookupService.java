@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.MatrixUtility;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
@@ -39,7 +38,7 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILoo
   /**
    * @see #createLookupRowArray(Object[][], int, ILookupCall, Class)
    */
-  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, ILookupCall<KEY_TYPE> call, Class<?> keyClass) throws ProcessingException {
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, ILookupCall<KEY_TYPE> call, Class<?> keyClass) {
     return createLookupRowArray(data, data != null && data.length > 0 ? data[0].length : 0, call, keyClass);
   }
 
@@ -67,7 +66,7 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILoo
    *          Class describing the type of the key column in the data. Usually corresponds to the LOOKUP_ROW_KEY_TYPE
    *          type parameter of the lookup service.
    */
-  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call, Class<?> keyClass) throws ProcessingException {
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call, Class<?> keyClass) {
     List<ILookupRow<KEY_TYPE>> list = new ArrayList<ILookupRow<KEY_TYPE>>(data.length);
     Boolean active = call.getActive().getBooleanValue();
     for (int i = 0; i < data.length; i++) {

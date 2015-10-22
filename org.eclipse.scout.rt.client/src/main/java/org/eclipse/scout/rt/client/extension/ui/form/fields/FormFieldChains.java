@@ -36,10 +36,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public void execDataChanged(final Object... dataTypes) throws ProcessingException {
+    public void execDataChanged(final Object... dataTypes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           next.execDataChanged(FormFieldDataChangedChain.this, dataTypes);
         }
       };
@@ -74,10 +74,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public void execChangedMasterValue(final Object newMasterValue) throws ProcessingException {
+    public void execChangedMasterValue(final Object newMasterValue) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           next.execChangedMasterValue(FormFieldChangedMasterValueChain.this, newMasterValue);
         }
       };
@@ -95,10 +95,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public void execDisposeField() throws ProcessingException {
+    public void execDisposeField() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           next.execDisposeField(FormFieldDisposeFieldChain.this);
         }
       };
@@ -116,10 +116,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public void execInitField() throws ProcessingException {
+    public void execInitField() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           next.execInitField(FormFieldInitFieldChain.this);
         }
       };
@@ -155,10 +155,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public void execMarkSaved() throws ProcessingException {
+    public void execMarkSaved() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           next.execMarkSaved(FormFieldMarkSavedChain.this);
         }
       };
@@ -176,10 +176,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public boolean execIsEmpty() throws ProcessingException {
+    public boolean execIsEmpty() {
       MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           setReturnValue(next.execIsEmpty(FormFieldIsEmptyChain.this));
         }
       };
@@ -197,10 +197,10 @@ public class FormFieldChains {
       super(extensions);
     }
 
-    public boolean execIsSaveNeeded() throws ProcessingException {
+    public boolean execIsSaveNeeded() {
       MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
         @Override
-        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) throws ProcessingException {
+        protected void callMethod(IFormFieldExtension<? extends AbstractFormField> next) {
           setReturnValue(next.execIsSaveNeeded(FormFieldIsSaveNeededChain.this));
         }
       };

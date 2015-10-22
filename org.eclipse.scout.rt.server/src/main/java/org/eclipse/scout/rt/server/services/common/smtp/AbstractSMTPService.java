@@ -187,12 +187,12 @@ public abstract class AbstractSMTPService implements ISMTPService {
   }
 
   @Override
-  public void sendMessage(MimeMessage message) throws ProcessingException {
+  public void sendMessage(MimeMessage message) {
     sendMessage(message, null);
   }
 
   @Override
-  public void sendMessage(MimeMessage message, Session session) throws ProcessingException {
+  public void sendMessage(MimeMessage message, Session session) {
     Transport transport = null;
     try {
       if (session == null) {

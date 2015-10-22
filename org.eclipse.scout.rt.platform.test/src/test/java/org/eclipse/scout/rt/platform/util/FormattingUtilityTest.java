@@ -19,8 +19,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.util.DateUtility;
-import org.eclipse.scout.rt.platform.util.FormattingUtility;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

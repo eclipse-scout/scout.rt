@@ -49,7 +49,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   }
 
   @Override
-  protected String parseValueInternal(String text) throws ProcessingException {
+  protected String parseValueInternal(String text) {
     // hex
     if (StringUtility.isNullOrEmpty(text)) {
       return null;

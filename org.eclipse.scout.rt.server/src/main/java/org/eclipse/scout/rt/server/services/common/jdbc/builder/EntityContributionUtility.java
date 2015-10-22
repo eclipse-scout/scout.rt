@@ -124,7 +124,7 @@ public final class EntityContributionUtility {
    *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
    *          its onw plus all of these child tags (proxy)
    */
-  public static EntityContribution mergeContributions(EntityStrategy entityStrategy, final String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) throws ProcessingException {
+  public static EntityContribution mergeContributions(EntityStrategy entityStrategy, final String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) {
     String entityPart = entityPartWithTags;
     EntityContribution parentContrib = new EntityContribution();
     //PROCESS collectiong tags: selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
@@ -361,7 +361,7 @@ public final class EntityContributionUtility {
    *           with {@link IStatus#getCode()} = X
    * @since 3.8
    */
-  public static void checkGroupByPart(String groupByPart) throws ProcessingException {
+  public static void checkGroupByPart(String groupByPart) {
     if (groupByPart == null) {
       return;
     }

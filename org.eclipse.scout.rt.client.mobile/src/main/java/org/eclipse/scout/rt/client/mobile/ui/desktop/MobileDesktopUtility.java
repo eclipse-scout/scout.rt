@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -91,13 +90,13 @@ public class MobileDesktopUtility {
     }
   }
 
-  public static void closeOpenForms() throws ProcessingException {
+  public static void closeOpenForms() {
     for (IForm view : getDesktop().getViews()) {
       closeForm(view);
     }
   }
 
-  public static void closeForm(IForm form) throws ProcessingException {
+  public static void closeForm(IForm form) {
     if (form == null) {
       return;
     }

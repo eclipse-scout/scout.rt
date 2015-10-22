@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table.control;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
@@ -36,7 +35,7 @@ public final class TableControlChains {
       super(extensions);
     }
 
-    public void execInitForm() throws ProcessingException {
+    public void execInitForm() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
 
         @Override

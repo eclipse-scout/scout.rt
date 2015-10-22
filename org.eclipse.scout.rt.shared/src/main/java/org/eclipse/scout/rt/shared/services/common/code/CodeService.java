@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -208,7 +207,7 @@ public class CodeService implements ICodeService {
   }
 
   @Override
-  public <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type) throws ProcessingException {
+  public <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type) {
     if (type == null) {
       return null;
     }
@@ -217,7 +216,7 @@ public class CodeService implements ICodeService {
   }
 
   @Override
-  public List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+  public List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
     CodeTypeCacheEntryFilter filter = new CodeTypeCacheEntryFilter(types);
     if (filter.getCodeTypeClasses().isEmpty()) {
       return Collections.emptyList();

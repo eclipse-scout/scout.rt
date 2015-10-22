@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
@@ -79,7 +78,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   }
 
   @Override
-  public void stepBack() throws ProcessingException {
+  public void stepBack() {
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
       return;
@@ -111,7 +110,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   }
 
   @Override
-  public void goHome() throws ProcessingException {
+  public void goHome() {
     if (getBreadCrumbs().size() == 0) {
       return;
     }
@@ -119,7 +118,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     activate(getBreadCrumbs().get(0));
   }
 
-  public void activate(IBreadCrumb breadCrumb) throws ProcessingException {
+  public void activate(IBreadCrumb breadCrumb) {
     if (!getBreadCrumbs().contains(breadCrumb)) {
       return;
     }
@@ -373,7 +372,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   private class P_FormListener implements FormListener {
 
     @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
+    public void formChanged(FormEvent e) {
       if (FormEvent.TYPE_CLOSED == e.getType()) {
         IForm form = e.getForm();
         removeExistingBreadCrumb(form);

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -28,7 +27,7 @@ import org.mockito.Mockito;
 public class AbstractBooleanColumnTest {
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractBooleanColumn column = new AbstractBooleanColumn() {
     };
     column.setMandatory(true);
@@ -38,7 +37,7 @@ public class AbstractBooleanColumnTest {
   }
 
   @Test
-  public void testNoNullValues() throws ProcessingException {
+  public void testNoNullValues() {
     TestTable table = new TestTable();
     table.addRowByArray(new Object[]{null});
     Boolean value = table.getTestBooleanColumn().getValue(0);

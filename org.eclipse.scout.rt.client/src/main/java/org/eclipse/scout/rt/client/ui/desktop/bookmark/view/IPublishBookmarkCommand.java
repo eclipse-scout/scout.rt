@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark.view;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.AbstractBookmarkTreeField;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
@@ -27,6 +26,6 @@ public interface IPublishBookmarkCommand {
    * and calls
    * {@link IBookmarkStorageService#publishBookmarkData(org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder, java.util.Map)}
    */
-  void publishBookmark(BookmarkFolder publishFolder) throws ProcessingException;
+  void publishBookmark(BookmarkFolder publishFolder);
 
 }

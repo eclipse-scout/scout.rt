@@ -38,23 +38,23 @@ public class TableUserFilterManager {
     m_table = table;
   }
 
-  public void addFilter(IUserFilterState filter) throws ProcessingException {
+  public void addFilter(IUserFilterState filter) {
     m_filterMap.put(filter.createKey(), filter);
     fireFilterAdded(filter);
     LOG.info("Filter added " + filter);
   }
 
-  public void removeFilter(IUserFilterState filter) throws ProcessingException {
+  public void removeFilter(IUserFilterState filter) {
     removeFilterByKey(filter.createKey());
   }
 
-  public void removeFilterByKey(Object key) throws ProcessingException {
+  public void removeFilterByKey(Object key) {
     IUserFilterState filter = m_filterMap.remove(key);
     fireFilterRemoved(filter);
     LOG.info("Filter removed " + filter);
   }
 
-  public void reset() throws ProcessingException {
+  public void reset() {
     for (IUserFilterState filter : new ArrayList<>(m_filterMap.values())) {
       removeFilter(filter);
     }
@@ -80,13 +80,13 @@ public class TableUserFilterManager {
     return list;
   }
 
-  private void fireFilterAdded(IUserFilterState filter) throws ProcessingException {
+  private void fireFilterAdded(IUserFilterState filter) {
     TableEvent event = new TableEvent(m_table, TableEvent.TYPE_USER_FILTER_ADDED);
     event.setUserFilter(filter);
     m_table.fireTableEventInternal(event);
   }
 
-  private void fireFilterRemoved(IUserFilterState filter) throws ProcessingException {
+  private void fireFilterRemoved(IUserFilterState filter) {
     TableEvent event = new TableEvent(m_table, TableEvent.TYPE_USER_FILTER_REMOVED);
     event.setUserFilter(filter);
     m_table.fireTableEventInternal(event);
@@ -95,7 +95,7 @@ public class TableUserFilterManager {
   /**
    * Get the serialized data of the UserFilterManager for further processing (e.g. storing a bookmark)
    */
-  public byte[] getSerializedData() throws ProcessingException {
+  public byte[] getSerializedData() {
     byte[] data = null;
     try {
       // Create array list because m_filterMap.values() is not serializable
@@ -111,7 +111,7 @@ public class TableUserFilterManager {
   /**
    * Import the serialized data, e.g. after restoring from a bookmark
    */
-  public void setSerializedData(byte[] data) throws ProcessingException {
+  public void setSerializedData(byte[] data) {
     try {
       Collection<IUserFilterState> filterStates = SerializationUtility.createObjectSerializer().deserialize(data, null);
       for (IUserFilterState filterState : filterStates) {

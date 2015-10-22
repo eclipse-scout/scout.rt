@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 /**
@@ -30,31 +29,31 @@ public interface ITableCustomizer {
   /**
    * Add a new custom column to the table by for example showing a form with potential candidates
    */
-  void addColumn() throws ProcessingException;
+  void addColumn();
 
   /**
    * Modify an existing custom column
    */
-  void modifyColumn(ICustomColumn<?> col) throws ProcessingException;
+  void modifyColumn(ICustomColumn<?> col);
 
   /**
    * Remove an existing custom column
    */
-  void removeColumn(ICustomColumn<?> col) throws ProcessingException;
+  void removeColumn(ICustomColumn<?> col);
 
   /**
    * Remove all existing custom columns
    */
-  void removeAllColumns() throws ProcessingException;
+  void removeAllColumns();
 
   /**
    * Get the serialized data of the TableCustomizer for further processing (e.g. storing a bookmark)
    */
-  byte[] getSerializedData() throws ProcessingException;
+  byte[] getSerializedData();
 
   /**
    * Import the serialized data, e.g. after restoring from a bookmark
    */
-  void setSerializedData(byte[] data) throws ProcessingException;
+  void setSerializedData(byte[] data);
 
 }

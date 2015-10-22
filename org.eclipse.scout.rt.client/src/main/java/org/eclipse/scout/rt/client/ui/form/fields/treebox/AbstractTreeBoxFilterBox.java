@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
@@ -65,7 +64,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     if (m_treeBoxPropertyListener == null) {
       m_treeBoxPropertyListener = new PropertyChangeListener() {
         @Override
@@ -120,7 +119,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     if (m_treeBoxPropertyListener != null) {
       getTreeBox().removePropertyChangeListener(m_treeBoxPropertyListener);
       m_treeBoxPropertyListener = null;
@@ -156,17 +155,17 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Override
-    protected boolean execIsEmpty() throws ProcessingException {
+    protected boolean execIsEmpty() {
       return true;
     }
 
     @Override
-    protected boolean execIsSaveNeeded() throws ProcessingException {
+    protected boolean execIsSaveNeeded() {
       return false;
     }
 
     @Override
-    protected void execChangedValue() throws ProcessingException {
+    protected void execChangedValue() {
       try {
         if (m_treeBoxSyncLock.acquire()) {
           Boolean b = getCheckedStateRadioButtonGroup().getValue();
@@ -257,17 +256,17 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Override
-    protected boolean execIsEmpty() throws ProcessingException {
+    protected boolean execIsEmpty() {
       return true;
     }
 
     @Override
-    protected boolean execIsSaveNeeded() throws ProcessingException {
+    protected boolean execIsSaveNeeded() {
       return false;
     }
 
     @Override
-    protected void execChangedValue() throws ProcessingException {
+    protected void execChangedValue() {
       try {
         if (m_treeBoxSyncLock.acquire()) {
           getTreeBox().setFilterActiveNodesValue(getActiveStateRadioButtonGroup().getValue());

@@ -83,7 +83,7 @@ class MapOutput implements IBindOutput {
   }
 
   @Override
-  public void consumeValue(Object value) throws ProcessingException {
+  public void consumeValue(Object value) {
     if (m_batchIndex == 0) {
       m_accumulator = value;
     }

@@ -27,7 +27,6 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
@@ -470,7 +469,7 @@ public class DataModelAttributeTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Long>> execCreateLookupRows() {
       List<ILookupRow<Long>> result = new ArrayList<ILookupRow<Long>>();
       result.add(new LookupRow<Long>(1L, "a"));
       result.add(new LookupRow<Long>(2L, "b"));
@@ -489,7 +488,7 @@ public class DataModelAttributeTest {
     }
 
     @Override
-    protected AbstractCode<Long> execCreateCode(ICodeRow<Long> newRow) throws ProcessingException {
+    protected AbstractCode<Long> execCreateCode(ICodeRow<Long> newRow) {
       return new MutableCode<Long>(newRow);
     }
 

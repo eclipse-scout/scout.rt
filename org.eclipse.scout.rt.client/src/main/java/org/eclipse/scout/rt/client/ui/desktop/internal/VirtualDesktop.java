@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -235,12 +234,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void activateBookmark(Bookmark bm) throws ProcessingException {
+  public void activateBookmark(Bookmark bm) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void activateBookmark(Bookmark bm, boolean activateOutline) throws ProcessingException {
+  public void activateBookmark(Bookmark bm, boolean activateOutline) {
     throw createUnsupportedOperationException();
   }
 
@@ -341,17 +340,17 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void closeInternal() throws ProcessingException {
+  public void closeInternal() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public Bookmark createBookmark() throws ProcessingException {
+  public Bookmark createBookmark() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public Bookmark createBookmark(IPage<?> page) throws ProcessingException {
+  public Bookmark createBookmark(IPage<?> page) {
     throw createUnsupportedOperationException();
   }
 
@@ -600,7 +599,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void initDesktop() throws ProcessingException {
+  public void initDesktop() {
     throw createUnsupportedOperationException();
   }
 
@@ -636,7 +635,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException {
+  public void afterTablePageLoaded(IPageWithTable<?> page) {
     throw createUnsupportedOperationException();
   }
 

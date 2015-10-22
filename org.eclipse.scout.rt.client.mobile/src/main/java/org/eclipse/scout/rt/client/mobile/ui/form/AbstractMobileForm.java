@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -19,16 +18,16 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 public abstract class AbstractMobileForm extends AbstractForm implements IMobileForm {
 
-  public AbstractMobileForm() throws ProcessingException {
+  public AbstractMobileForm() {
     this(true);
   }
 
-  public AbstractMobileForm(boolean callInitializer) throws ProcessingException {
+  public AbstractMobileForm(boolean callInitializer) {
     super(callInitializer);
   }
 
   @Override
-  protected void initConfig() throws ProcessingException {
+  protected void initConfig() {
     super.initConfig();
 
     setHeaderVisible(getConfiguredHeaderVisible());

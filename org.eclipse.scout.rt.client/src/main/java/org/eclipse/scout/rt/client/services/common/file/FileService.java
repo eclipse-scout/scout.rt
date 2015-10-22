@@ -32,22 +32,22 @@ public class FileService implements IFileService {
   private String m_rootPath = null;
 
   @Override
-  public File getLocalFile(String dir, String simpleName) throws ProcessingException {
+  public File getLocalFile(String dir, String simpleName) {
     return getFileLocation(dir, simpleName, true);
   }
 
   @Override
-  public File getRemoteFile(String dir, String simpleName) throws ProcessingException {
+  public File getRemoteFile(String dir, String simpleName) {
     return getRemoteFile(dir, simpleName, null);
   }
 
   @Override
-  public File getRemoteFile(String dir, String simpleName, Locale locale) throws ProcessingException {
+  public File getRemoteFile(String dir, String simpleName, Locale locale) {
     return getRemoteFile(dir, simpleName, locale, true);
   }
 
   @Override
-  public File getRemoteFile(String dir, String simpleName, Locale locale, boolean checkCache) throws ProcessingException {
+  public File getRemoteFile(String dir, String simpleName, Locale locale, boolean checkCache) {
     RemoteFile spec = null;
     File f = null;
     if (locale != null && simpleName != null && simpleName.lastIndexOf('.') != -1) {
@@ -104,7 +104,7 @@ public class FileService implements IFileService {
     return f;
   }
 
-  private String[][] getFiles(String folderBase, FilenameFilter filter, boolean useServerFolderStructureOnClient) throws ProcessingException {
+  private String[][] getFiles(String folderBase, FilenameFilter filter, boolean useServerFolderStructureOnClient) {
     File path = getFileLocation(useServerFolderStructureOnClient ? folderBase : "", null, false);
     ArrayList<String> dirList = new ArrayList<String>();
     ArrayList<String> fileList = new ArrayList<String>();
@@ -137,18 +137,18 @@ public class FileService implements IFileService {
   }
 
   @Override
-  public void syncRemoteFilesToPath(String clientFolderPath, String serverFolderPath, FilenameFilter filter) throws ProcessingException {
+  public void syncRemoteFilesToPath(String clientFolderPath, String serverFolderPath, FilenameFilter filter) {
     setDirectPath(clientFolderPath);
     syncRemoteFilesInternal(serverFolderPath, filter, false);
     setDirectPath(null);
   }
 
   @Override
-  public void syncRemoteFiles(String serverFolderPath, FilenameFilter filter) throws ProcessingException {
+  public void syncRemoteFiles(String serverFolderPath, FilenameFilter filter) {
     syncRemoteFilesInternal(serverFolderPath, filter, true);
   }
 
-  private void syncRemoteFilesInternal(String serverFolderPath, FilenameFilter filter, boolean useServerFolderStructureOnClient) throws ProcessingException {
+  private void syncRemoteFilesInternal(String serverFolderPath, FilenameFilter filter, boolean useServerFolderStructureOnClient) {
     IRemoteFileService svc = BEANS.get(IRemoteFileService.class);
     String[][] realFiles = getFiles(serverFolderPath, filter, useServerFolderStructureOnClient);
     RemoteFile[] existingFileInfoOnClient = new RemoteFile[realFiles.length];
@@ -228,7 +228,7 @@ public class FileService implements IFileService {
    * @since 21.10.2009
    */
   @Override
-  public File getLocalFileLocation(String dir, String name) throws ProcessingException {
+  public File getLocalFileLocation(String dir, String name) {
     return getFileLocation(dir, name, true);
   }
 
@@ -236,11 +236,11 @@ public class FileService implements IFileService {
    * @since 21.10.2009
    */
   @Override
-  public File getRemoteFileLocation(String dir, String name) throws ProcessingException {
+  public File getRemoteFileLocation(String dir, String name) {
     return getFileLocation(dir, name, false);
   }
 
-  private File getFileLocation(String dir, String name, boolean local) throws ProcessingException {
+  private File getFileLocation(String dir, String name, boolean local) {
     String path = m_rootPath;
     if (path == null) {
       path = System.getProperty("java.io.tmpdir");

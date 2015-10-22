@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.transaction;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.ICancellable;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
@@ -51,7 +51,7 @@ public interface ITransaction extends ICancellable {
    * @throws ProcessingException
    *           with an {@link InterruptedException} when the transaction is canceled
    */
-  void registerMember(ITransactionMember member) throws ProcessingException;
+  void registerMember(ITransactionMember member);
 
   ITransactionMember getMember(String memberId);
 
@@ -77,7 +77,7 @@ public interface ITransaction extends ICancellable {
    *         <p>
    *         Subsequently there will be a call to {@link #commitPhase2()} or {@link #rollback()}
    */
-  boolean commitPhase1() throws ProcessingException;
+  boolean commitPhase1();
 
   /**
    * commit phase 2 of the transaction members (commit phase 1 confirmation)

@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.RadioButtonGroupChains.RadioButtonGroupFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.RadioButtonGroupChains.RadioButtonGroupPrepareLookupChain;
@@ -14,5 +13,5 @@ public interface IRadioButtonGroupExtension<T, OWNER extends AbstractRadioButton
 
   void execPrepareLookup(RadioButtonGroupPrepareLookupChain<T> chain, ILookupCall<T> call);
 
-  void execFilterLookupResult(RadioButtonGroupFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException;
+  void execFilterLookupResult(RadioButtonGroupFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result);
 }

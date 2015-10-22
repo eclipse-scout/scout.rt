@@ -45,10 +45,10 @@ public final class TreeFieldChains {
       super(extensions);
     }
 
-    public void execSaveDeletedNode(final ITreeNode row) throws ProcessingException {
+    public void execSaveDeletedNode(final ITreeNode row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) throws ProcessingException {
+        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) {
           next.execSaveDeletedNode(TreeFieldSaveDeletedNodeChain.this, row);
         }
       };
@@ -66,10 +66,10 @@ public final class TreeFieldChains {
       super(extensions);
     }
 
-    public void execSaveUpdatedNode(final ITreeNode row) throws ProcessingException {
+    public void execSaveUpdatedNode(final ITreeNode row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) throws ProcessingException {
+        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) {
           next.execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain.this, row);
         }
       };
@@ -87,10 +87,10 @@ public final class TreeFieldChains {
       super(extensions);
     }
 
-    public void execLoadChildNodes(final ITreeNode parentNode) throws ProcessingException {
+    public void execLoadChildNodes(final ITreeNode parentNode) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) throws ProcessingException {
+        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) {
           next.execLoadChildNodes(TreeFieldLoadChildNodesChain.this, parentNode);
         }
       };
@@ -108,10 +108,10 @@ public final class TreeFieldChains {
       super(extensions);
     }
 
-    public void execSaveInsertedNode(final ITreeNode row) throws ProcessingException {
+    public void execSaveInsertedNode(final ITreeNode row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) throws ProcessingException {
+        protected void callMethod(ITreeFieldExtension<? extends AbstractTreeField> next) {
           next.execSaveInsertedNode(TreeFieldSaveInsertedNodeChain.this, row);
         }
       };

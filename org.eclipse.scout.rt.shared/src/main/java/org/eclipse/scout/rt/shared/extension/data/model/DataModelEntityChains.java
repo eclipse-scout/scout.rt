@@ -24,10 +24,10 @@ public final class DataModelEntityChains {
       super(extensions);
     }
 
-    public void execInitEntity() throws ProcessingException {
+    public void execInitEntity() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDataModelEntityExtension<? extends AbstractDataModelEntity> next) throws ProcessingException {
+        protected void callMethod(IDataModelEntityExtension<? extends AbstractDataModelEntity> next) {
           next.execInitEntity(DataModelEntityInitEntityChain.this);
         }
       };

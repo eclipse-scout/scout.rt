@@ -75,13 +75,13 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     setObserver(observer);
   }
 
-  public Cell(ICellObserver observer, ICell c) throws ProcessingException {
+  public Cell(ICellObserver observer, ICell c) {
     super();
     updateFrom(c);
     setObserver(observer);
   }
 
-  public void updateFrom(ICell c) throws ProcessingException {
+  public void updateFrom(ICell c) {
     if (c != null) {
       setCssClass(c.getCssClass());
       setFont(c.getFont());
@@ -108,7 +108,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   /**
    * @return true if the value has in fact changed
    */
-  public boolean setValue(Object value) throws ProcessingException {
+  public boolean setValue(Object value) {
     if (getObserver() != null) {
       try {
         value = getObserver().validateValue(this, value);

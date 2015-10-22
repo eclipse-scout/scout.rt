@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * LookupCall for cases where no backend service exists.<br>
@@ -46,7 +45,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
 
   @ConfigOperation
   @Order(30)
-  protected List<? extends ILookupRow<T>> execCreateLookupRows() throws ProcessingException {
+  protected List<? extends ILookupRow<T>> execCreateLookupRows() {
     return null;
   }
 
@@ -81,7 +80,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    * Complete override using local data
    */
   @Override
-  public List<? extends ILookupRow<T>> getDataByKey() throws ProcessingException {
+  public List<? extends ILookupRow<T>> getDataByKey() {
     if (getKey() == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -103,7 +102,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    * Complete override using local data
    */
   @Override
-  public List<? extends ILookupRow<T>> getDataByText() throws ProcessingException {
+  public List<? extends ILookupRow<T>> getDataByText() {
     List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     Pattern p = createSearchPattern(getText());
     for (ILookupRow<T> row : execCreateLookupRows()) {
@@ -118,7 +117,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    * Complete override using local data
    */
   @Override
-  public List<? extends ILookupRow<T>> getDataByAll() throws ProcessingException {
+  public List<? extends ILookupRow<T>> getDataByAll() {
     List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     Pattern p = createSearchPattern(getAll());
     for (ILookupRow<T> row : execCreateLookupRows()) {
@@ -133,7 +132,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    * Complete override using local data
    */
   @Override
-  public List<? extends ILookupRow<T>> getDataByRec() throws ProcessingException {
+  public List<? extends ILookupRow<T>> getDataByRec() {
     List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     Object parentKey = getRec();
     if (parentKey == null) {

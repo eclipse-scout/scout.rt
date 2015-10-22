@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.junit.Test;
@@ -26,7 +25,7 @@ public abstract class AbstractTransactionalMapTest {
     return new BasicTransaction();
   }
 
-  protected void commitTransaction(ITransaction tr) throws ProcessingException {
+  protected void commitTransaction(ITransaction tr) {
     assertTrue(tr.commitPhase1());
     tr.commitPhase2();
     tr.release();
@@ -64,7 +63,7 @@ public abstract class AbstractTransactionalMapTest {
   }
 
   @Test
-  public void testPut() throws ProcessingException {
+  public void testPut() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
@@ -104,7 +103,7 @@ public abstract class AbstractTransactionalMapTest {
   }
 
   @Test
-  public void testPutAll() throws ProcessingException {
+  public void testPutAll() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
     Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, false, new HashMap<Integer, String>());
@@ -140,7 +139,7 @@ public abstract class AbstractTransactionalMapTest {
   }
 
   @Test
-  public void testRemove() throws ProcessingException {
+  public void testRemove() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
@@ -182,7 +181,7 @@ public abstract class AbstractTransactionalMapTest {
   }
 
   @Test
-  public void testConcurrentModifications() throws ProcessingException {
+  public void testConcurrentModifications() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
@@ -229,7 +228,7 @@ public abstract class AbstractTransactionalMapTest {
   }
 
   @Test
-  public void testFastForward() throws ProcessingException {
+  public void testFastForward() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 

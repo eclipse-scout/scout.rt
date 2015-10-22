@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineTableFieldChains.OutlineTableFieldTableTitleChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -63,7 +62,7 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     m_tablePropertyListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
@@ -75,7 +74,7 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     super.execDisposeField();
     ClientSessionProvider.currentSession().getDesktop().removeDesktopListener(m_desktopListener);
     m_desktopListener = null;

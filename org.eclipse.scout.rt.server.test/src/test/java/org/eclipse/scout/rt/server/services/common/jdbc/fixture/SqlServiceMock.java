@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.jdbc.fixture;
 import java.sql.Connection;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.sql.SqlFormatter;
@@ -53,7 +52,7 @@ public class SqlServiceMock extends AbstractSqlService {
     return m_resultData;
   }
 
-  private void createPlainTextLog(String s, Object... bindBases) throws ProcessingException {
+  private void createPlainTextLog(String s, Object... bindBases) {
     if (logger.isInfoEnabled()) {
       String plainTextSql = SQL.createPlainText(s, bindBases);
       if (StringUtility.hasText(plainTextSql)) {
@@ -78,24 +77,24 @@ public class SqlServiceMock extends AbstractSqlService {
   }
 
   @Override
-  public Object[][] select(String s, Object... bindBases) throws ProcessingException {
+  public Object[][] select(String s, Object... bindBases) {
     return createStatementProcessor(s, bindBases, 0).processSelect(getTransaction(), new PreparedStatementCache(1), null);
   }
 
   @Override
-  public void selectInto(String s, Object... bindBases) throws ProcessingException {
+  public void selectInto(String s, Object... bindBases) {
     createPlainTextLog(s, bindBases);
     createStatementProcessor(s, bindBases, 0).processSelectInto(getTransaction(), new PreparedStatementCache(1), null);
   }
 
   @Override
-  public int update(String s, Object... bindBases) throws ProcessingException {
+  public int update(String s, Object... bindBases) {
     createPlainTextLog(s, bindBases);
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), new PreparedStatementCache(1), null);
   }
 
   @Override
-  protected Connection getTransaction() throws ProcessingException {
+  protected Connection getTransaction() {
     return new ConnectionMock(m_protocol, getResultData()).getConnection();
   }
 }

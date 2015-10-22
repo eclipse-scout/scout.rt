@@ -79,7 +79,7 @@ public class CsvSqlAdapter {
    * @throws ProcessingException
    */
   public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
-      List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) throws ProcessingException {
+      List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
       encoding = Encoding.UTF_8;
     }
@@ -135,7 +135,7 @@ public class CsvSqlAdapter {
    * @throws ProcessingException
    */
   public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumNames,
-      List<String> csvColumnTypes, boolean writeColumnTypes) throws ProcessingException {
+      List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
       encoding = Encoding.UTF_8;
     }
@@ -169,7 +169,7 @@ public class CsvSqlAdapter {
    * @param params
    * @throws ProcessingException
    */
-  public void exportData(CsvSqlSettings params) throws ProcessingException {
+  public void exportData(CsvSqlSettings params) {
     final CsvHelper h = new CsvHelper(params.getContentLocale(), params.getColSeparator(), params.getTextDelimiter(), "\n");
     if (params.getCsvColumnTypes() != null) {
       h.setColumnTypes(params.getCsvColumnTypes());
@@ -219,7 +219,7 @@ public class CsvSqlAdapter {
         h.exportHeaderRows(w, params.getWriteColumnNames(), params.getWriteColumnTypes());
         ISelectStreamHandler handler = new ISelectStreamHandler() {
           @Override
-          public void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) throws ProcessingException {
+          public void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) {
             Object[] row = new Object[values.size()];
             for (int i = 0; i < row.length; i++) {
               row[i] = values.get(i).getValue();
@@ -228,7 +228,7 @@ public class CsvSqlAdapter {
           }
 
           @Override
-          public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) throws ProcessingException {
+          public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) {
           }
         };
         m_sqlService.selectStreaming(sqlText, handler, base);
@@ -247,7 +247,7 @@ public class CsvSqlAdapter {
   }
 
   public void importDataIntoTable(File f, String encoding, Locale contentLocale, int headerRowCount, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
-      List<String> csvColumnNames, List<String> csvColumnTypes, boolean allowVariableColumnCount) throws ProcessingException {
+      List<String> csvColumnNames, List<String> csvColumnTypes, boolean allowVariableColumnCount) {
     if (encoding == null) {
       encoding = Encoding.UTF_8;
     }
@@ -277,7 +277,7 @@ public class CsvSqlAdapter {
     }
   }
 
-  public void importData(CsvSqlSettings params) throws ProcessingException {
+  public void importData(CsvSqlSettings params) {
     CsvHelper h = new CsvHelper(params.getContentLocale(), params.getColSeparator(), params.getTextDelimiter(), "\n");
     if (params.getCsvColumnTypes() != null) {
       h.setColumnTypes(params.getCsvColumnTypes());
@@ -346,7 +346,7 @@ public class CsvSqlAdapter {
     }
 
     @Override
-    public void processRow(int lineNr, List<Object> row) throws ProcessingException {
+    public void processRow(int lineNr, List<Object> row) {
       try {
         ArrayList<Object> bindBase = new ArrayList<Object>();
         int i = 0;

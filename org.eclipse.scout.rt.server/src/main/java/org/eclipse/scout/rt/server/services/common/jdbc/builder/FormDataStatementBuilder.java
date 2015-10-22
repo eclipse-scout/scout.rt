@@ -482,7 +482,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   @SuppressWarnings("cast")
-  public String build(AbstractFormData formData) throws ProcessingException {
+  public String build(AbstractFormData formData) {
     m_where = new StringBuffer();
     // get all formData fields and properties defined directly and indirectly by extending template fields, respectively
     //build constraints for fields
@@ -528,7 +528,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @throws ProcessingException
    * @since 3.8.1
    */
-  public String createSelectStatement(String stm, EntityContribution... contributions) throws ProcessingException {
+  public String createSelectStatement(String stm, EntityContribution... contributions) {
     EntityContribution mergedContribution = new EntityContribution();
     if (contributions != null) {
       for (EntityContribution c : contributions) {
@@ -741,7 +741,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @return the complete string of all attribute contributions
    * @throws ProcessingException
    */
-  public EntityContribution buildTreeNodes(List<TreeNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) throws ProcessingException {
+  public EntityContribution buildTreeNodes(List<TreeNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) {
     EntityContribution contrib = new EntityContribution();
     int i = 0;
     while (i < nodes.size()) {
@@ -795,7 +795,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * do not use or override this method, it is protected for unit test purposes
    */
-  protected EntityContribution buildComposerOrNodes(List<ComposerEitherOrNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) throws ProcessingException {
+  protected EntityContribution buildComposerOrNodes(List<ComposerEitherOrNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) {
     EntityContribution contrib = new EntityContribution();
     // check if only one condition
     StringBuilder buf = new StringBuilder();
@@ -836,7 +836,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return contrib;
   }
 
-  public EntityContribution buildComposerEntityNodeContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
+  public EntityContribution buildComposerEntityNodeContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy) {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
@@ -897,7 +897,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * do not use or override this method, it is protected for unit test purposes
    */
-  protected String buildComposerEntityEitherOrSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+  protected String buildComposerEntityEitherOrSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) {
     if (entityStrategy != EntityStrategy.BuildConstraints) {
       return null;
     }
@@ -968,7 +968,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * do not use or override this method, it is protected for unit test purposes
    */
-  protected String buildComposerEntityZeroTraversingSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+  protected String buildComposerEntityZeroTraversingSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) {
     if (entityStrategy != EntityStrategy.BuildConstraints) {
       return null;
     }
@@ -1003,7 +1003,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * do not use or override this method, it is protected for unit test purposes
    */
-  protected EntityContribution buildComposerEntityUnitContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy, String baseStm, List<TreeNodeData> childParts, boolean consumeChildContributions) throws ProcessingException {
+  protected EntityContribution buildComposerEntityUnitContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy, String baseStm, List<TreeNodeData> childParts, boolean consumeChildContributions) {
     EntityContribution childContributions = new EntityContribution();
     switch (entityStrategy) {
       case BuildConstraints: {
@@ -1057,7 +1057,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * do not use or override this method, it is protected for unit test purposes
    */
-  protected String buildComposerEntityUnit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+  protected String buildComposerEntityUnit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) {
     EntityContribution contrib = buildComposerEntityUnitContribution(null, entityStrategy, baseStm, childParts, true);
     List<String> list = contrib.getWhereParts();
     if (list.isEmpty()) {
@@ -1077,7 +1077,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return s;
   }
 
-  public EntityContribution buildComposerAttributeNode(final ComposerAttributeNodeData node, AttributeStrategy attributeStrategy) throws ProcessingException {
+  public EntityContribution buildComposerAttributeNode(final ComposerAttributeNodeData node, AttributeStrategy attributeStrategy) {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
@@ -1166,7 +1166,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
    *          its onw plus all of these child tags (proxy)
    */
-  public EntityContribution createEntityPart(EntityStrategy entityStrategy, String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) throws ProcessingException {
+  public EntityContribution createEntityPart(EntityStrategy entityStrategy, String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) {
     if (consumeChildContributions) {
       entityPartWithTags = autoCompleteEntityPartTags(entityPartWithTags);
     }
@@ -1180,7 +1180,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * 
    * @return the statement combined with the contributions
    */
-  public String createEntityPart(String stm, boolean negative, EntityContribution childContributions) throws ProcessingException {
+  public String createEntityPart(String stm, boolean negative, EntityContribution childContributions) {
     EntityContribution contrib = createEntityPart(EntityStrategy.BuildConstraints, stm, childContributions, true);
     List<String> list = contrib.getWhereParts();
     if (list.isEmpty()) {
@@ -1224,7 +1224,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *           with {@link IStatus#getCode()} = X
    * @since 3.8
    */
-  protected void checkGroupByPart(String groupByPart) throws ProcessingException {
+  protected void checkGroupByPart(String groupByPart) {
     EntityContributionUtility.checkGroupByPart(groupByPart);
   }
 
@@ -1237,7 +1237,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *          may contain attribute, fromPart and wherePart tags
    */
   public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind,
-      Map<String, String> parentAliasMap) throws ProcessingException {
+      Map<String, String> parentAliasMap) {
     if (stm == null) {
       return new EntityContribution();
     }
@@ -1432,8 +1432,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
-  public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap)
-      throws ProcessingException {
+  public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap) {
     EntityContribution contrib = createAttributePart(attributeStrategy, aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap);
     if (contrib.isEmpty()) {
       return null;
@@ -1446,7 +1445,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * Convenience for {@link #createSqlPart(AGGREGATION_NONE, String, OPERATOR_NONE, List, List, boolean, Map)}
    */
-  public String createSqlPart(String sql, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+  public String createSqlPart(String sql, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) {
     return createSqlPart(AGGREGATION_NONE, sql, OPERATOR_NONE, bindNames, bindValues, plainBind, parentAliasMap);
   }
 
@@ -1458,7 +1457,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * To use no aggregation use {@link DataModelConstants#AGGREGATION_NONE}
    */
-  public String createSqlPart(final Integer aggregationType, String sql, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+  public String createSqlPart(final Integer aggregationType, String sql, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) {
     if (sql == null) {
       sql = "";
     }

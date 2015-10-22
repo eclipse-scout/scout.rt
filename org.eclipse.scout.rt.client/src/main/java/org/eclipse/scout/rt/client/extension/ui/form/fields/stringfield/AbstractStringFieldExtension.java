@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractBasicFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDropRequestChain;
@@ -36,7 +35,7 @@ public abstract class AbstractStringFieldExtension<OWNER extends AbstractStringF
   }
 
   @Override
-  public void execAction(StringFieldLinkActionChain chain) throws ProcessingException {
+  public void execAction(StringFieldLinkActionChain chain) {
     chain.execAction();
   }
 

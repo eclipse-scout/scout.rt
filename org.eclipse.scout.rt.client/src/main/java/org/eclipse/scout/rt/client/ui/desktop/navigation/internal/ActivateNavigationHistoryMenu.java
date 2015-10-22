@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.navigation.internal;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -38,7 +37,7 @@ public class ActivateNavigationHistoryMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (m_bookmark != null) {
       BEANS.get(INavigationHistoryService.class).stepTo(m_bookmark);
     }

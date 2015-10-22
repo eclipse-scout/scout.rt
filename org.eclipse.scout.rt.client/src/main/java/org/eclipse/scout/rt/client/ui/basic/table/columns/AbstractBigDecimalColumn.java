@@ -46,7 +46,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
   }
 
   @Override
-  protected BigDecimal parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected BigDecimal parseValueInternal(ITableRow row, Object rawValue) {
     BigDecimal validValue = null;
     if (rawValue == null) {
       validValue = null;

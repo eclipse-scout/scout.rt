@@ -44,7 +44,7 @@ public class IOUtilityTest {
   private static final String EXTENSION = ".tmp";
 
   @Test
-  public void testGetContentInEncoding() throws ProcessingException {
+  public void testGetContentInEncoding() {
     File utf8File = null;
     File ansiFile = null;
     try {
@@ -72,7 +72,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testCreateNewTempFile() throws ProcessingException, Throwable {
+  public void testCreateNewTempFile() throws Throwable {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile(FILENAME + EXTENSION, CONTENT);
@@ -96,7 +96,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testCreateNewTempFileNoContent() throws ProcessingException, Throwable {
+  public void testCreateNewTempFileNoContent() throws Throwable {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile(FILENAME + EXTENSION, null);
@@ -119,7 +119,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testCreateNewTempFileEmptyFilename() throws ProcessingException, Throwable {
+  public void testCreateNewTempFileEmptyFilename() throws Throwable {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile("", CONTENT);
@@ -132,7 +132,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testCreateNewTempFileNullParameter() throws ProcessingException, Throwable {
+  public void testCreateNewTempFileNullParameter() throws Throwable {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile(null, CONTENT);
@@ -198,7 +198,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadLines() throws ProcessingException, FileNotFoundException {
+  public void testReadLines() throws FileNotFoundException {
     File tempFile = null;
     try {
       tempFile = createTextTempFile();
@@ -213,7 +213,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadLinesUTF8() throws ProcessingException, FileNotFoundException {
+  public void testReadLinesUTF8() throws FileNotFoundException {
     File tempFile = null;
     try {
       tempFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/commons/ioUtilityTestUtf8.txt", getClass());
@@ -227,7 +227,7 @@ public class IOUtilityTest {
     }
   }
 
-  private File createTextTempFile() throws ProcessingException, FileNotFoundException {
+  private File createTextTempFile() throws FileNotFoundException {
     File tempFile;
     tempFile = IOUtility.createTempFile(FILENAME, EXTENSION, null);
     PrintWriter printWriter = new PrintWriter(tempFile);
@@ -239,7 +239,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadLinesEmptyFile() throws ProcessingException, FileNotFoundException {
+  public void testReadLinesEmptyFile() throws FileNotFoundException {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile(FILENAME, EXTENSION, null);
@@ -264,7 +264,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testAppendFile() throws FileNotFoundException, ProcessingException {
+  public void testAppendFile() throws FileNotFoundException {
     File tempFile = null;
     File tempFile2 = null;
     PrintWriter pw = null;
@@ -289,7 +289,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testAppendEmptyFile() throws FileNotFoundException, ProcessingException {
+  public void testAppendEmptyFile() throws FileNotFoundException {
     File tempFile = null;
     File tempFile2 = null;
     PrintWriter pw = null;
@@ -313,7 +313,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testAppendNonExistingFile() throws FileNotFoundException, ProcessingException {
+  public void testAppendNonExistingFile() throws FileNotFoundException {
     File tempFile = null;
     File tempFile2 = new File("doesNotExist");
     PrintWriter pw = null;
@@ -339,7 +339,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testAppendSameFile() throws FileNotFoundException, ProcessingException {
+  public void testAppendSameFile() throws FileNotFoundException {
     File tempFile = null;
     PrintWriter pw = null;
     try {

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.navigation;
 import java.util.List;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -32,7 +31,7 @@ public class BreadCrumb implements IBreadCrumb {
   }
 
   @Override
-  public void activate() throws ProcessingException {
+  public void activate() {
     autoCloseNavigationForms();
 
     //Add form to desktop if it is open but has been removed
@@ -49,7 +48,7 @@ public class BreadCrumb implements IBreadCrumb {
     }
   }
 
-  private void autoCloseNavigationForms() throws ProcessingException {
+  private void autoCloseNavigationForms() {
     List<IForm> currentNavigationForms = getBreadCrumbsNavigation().getCurrentNavigationForms();
     for (IForm form : currentNavigationForms) {
       if (form != getForm() && !getBreadCrumbsNavigation().containsFormInHistory(form)) {

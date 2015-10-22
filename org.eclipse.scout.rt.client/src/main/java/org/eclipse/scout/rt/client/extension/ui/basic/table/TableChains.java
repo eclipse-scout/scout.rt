@@ -31,10 +31,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final String ref) throws ProcessingException {
+    public void execAppLinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execAppLinkAction(TableAppLinkActionChain.this, ref);
         }
       };
@@ -52,10 +52,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execRowAction(final ITableRow row) throws ProcessingException {
+    public void execRowAction(final ITableRow row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execRowAction(TableRowActionChain.this, row);
         }
       };
@@ -73,10 +73,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execContentChanged() throws ProcessingException {
+    public void execContentChanged() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execContentChanged(TableContentChangedChain.this);
         }
       };
@@ -94,10 +94,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public ITableRowDataMapper execCreateTableRowDataMapper(final Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+    public ITableRowDataMapper execCreateTableRowDataMapper(final Class<? extends AbstractTableRowData> rowType) {
       MethodInvocation<ITableRowDataMapper> methodInvocation = new MethodInvocation<ITableRowDataMapper>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           setReturnValue(next.execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain.this, rowType));
         }
       };
@@ -115,10 +115,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execInitTable() throws ProcessingException {
+    public void execInitTable() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execInitTable(TableInitTableChain.this);
         }
       };
@@ -136,10 +136,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execResetColumns(final boolean visibility, final boolean order, final boolean sorting, final boolean widths) throws ProcessingException {
+    public void execResetColumns(final boolean visibility, final boolean order, final boolean sorting, final boolean widths) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execResetColumns(TableResetColumnsChain.this, visibility, order, sorting, widths);
         }
       };
@@ -157,10 +157,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execDecorateCell(final Cell view, final ITableRow row, final IColumn<?> col) throws ProcessingException {
+    public void execDecorateCell(final Cell view, final ITableRow row, final IColumn<?> col) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execDecorateCell(TableDecorateCellChain.this, view, row, col);
         }
       };
@@ -178,10 +178,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execDrop(final ITableRow row, final TransferObject t) throws ProcessingException {
+    public void execDrop(final ITableRow row, final TransferObject t) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execDrop(TableDropChain.this, row, t);
         }
       };
@@ -199,10 +199,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execDisposeTable() throws ProcessingException {
+    public void execDisposeTable() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execDisposeTable(TableDisposeTableChain.this);
         }
       };
@@ -220,10 +220,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execRowClick(final ITableRow row, final MouseButton mouseButton) throws ProcessingException {
+    public void execRowClick(final ITableRow row, final MouseButton mouseButton) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execRowClick(TableRowClickChain.this, row, mouseButton);
         }
       };
@@ -241,10 +241,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execRowsChecked(final List<? extends ITableRow> rows) throws ProcessingException {
+    public void execRowsChecked(final List<? extends ITableRow> rows) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execRowsChecked(TableRowsCheckedChain.this, rows);
         }
       };
@@ -262,10 +262,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execDecorateRow(final ITableRow row) throws ProcessingException {
+    public void execDecorateRow(final ITableRow row) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execDecorateRow(TableDecorateRowChain.this, row);
         }
       };
@@ -283,10 +283,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public TransferObject execCopy(final List<? extends ITableRow> rows) throws ProcessingException {
+    public TransferObject execCopy(final List<? extends ITableRow> rows) {
       MethodInvocation<TransferObject> methodInvocation = new MethodInvocation<TransferObject>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           setReturnValue(next.execCopy(TableCopyChain.this, rows));
         }
       };
@@ -304,10 +304,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execRowsSelected(final List<? extends ITableRow> rows) throws ProcessingException {
+    public void execRowsSelected(final List<? extends ITableRow> rows) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           next.execRowsSelected(TableRowsSelectedChain.this, rows);
         }
       };
@@ -325,10 +325,10 @@ public final class TableChains {
       super(extensions);
     }
 
-    public TransferObject execDrag(final List<ITableRow> rows) throws ProcessingException {
+    public TransferObject execDrag(final List<ITableRow> rows) {
       MethodInvocation<TransferObject> methodInvocation = new MethodInvocation<TransferObject>() {
         @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
           setReturnValue(next.execDrag(TableDragChain.this, rows));
         }
       };

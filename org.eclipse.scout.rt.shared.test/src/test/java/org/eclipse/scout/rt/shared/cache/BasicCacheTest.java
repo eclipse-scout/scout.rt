@@ -50,7 +50,7 @@ public class BasicCacheTest {
   }
 
   @Test
-  public void testCacheBasic() throws ProcessingException {
+  public void testCacheBasic() {
     ICache<Integer, String> cache = createCache();
 
     // test get
@@ -86,7 +86,7 @@ public class BasicCacheTest {
   }
 
   @Test
-  public void testCacheNullValues() throws ProcessingException {
+  public void testCacheNullValues() {
     ICache<Integer, String> cache = createCache();
 
     assertEquals("2.1", cache.get(2));

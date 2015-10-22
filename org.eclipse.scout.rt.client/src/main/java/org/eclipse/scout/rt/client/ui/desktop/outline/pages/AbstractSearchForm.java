@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.ISearchFormExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
@@ -22,12 +21,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  */
 public abstract class AbstractSearchForm extends AbstractForm implements ISearchForm {
 
-  public AbstractSearchForm() throws ProcessingException {
+  public AbstractSearchForm() {
     super();
   }
 
   @Override
-  public void initForm() throws ProcessingException {
+  public void initForm() {
     // form
     initFormInternal();
     // fields

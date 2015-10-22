@@ -97,7 +97,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Override
-  protected BigDecimal parseValueInternal(String text) throws ProcessingException {
+  protected BigDecimal parseValueInternal(String text) {
     return parseToBigDecimalInternal(text);
   }
 
@@ -124,7 +124,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
-  public void testParseValueSuffix() throws ProcessingException {
+  public void testParseValueSuffix() {
     for (Locale locale : DecimalFormat.getAvailableLocales()) {
       DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
       df.applyPattern(getFormat().toPattern());
@@ -352,7 +352,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
-  public void testCreateNumberWithinFormatLimits() throws ProcessingException {
+  public void testCreateNumberWithinFormatLimits() {
     for (Locale locale : Locale.getAvailableLocales()) {
       DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
       char decimalSeparator = format.getDecimalFormatSymbols().getDecimalSeparator();
@@ -392,7 +392,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
-  public void testValidateValueInternalMaxMin() throws ProcessingException {
+  public void testValidateValueInternalMaxMin() {
     // expect default for maxValue=getMaxPossibleValue() and minValue=getMinPossibleValue()
     assertEquals("expected to pass validation", getMaxPossibleValue(), validateValueInternal(getMaxPossibleValue()));
     assertEquals("expected to pass validation", getMinPossibleValue(), validateValueInternal(getMinPossibleValue()));

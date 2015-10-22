@@ -20,10 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutTestParameter;
-import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
-import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedFrameworkMethod;
-import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtension;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.Description;

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.pwd;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -31,7 +30,7 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
 
   @Override
   @SuppressWarnings("null")
-  public void check(String userId, String newPassword, String userName, int historyIndex) throws ProcessingException {
+  public void check(String userId, String newPassword, String userName, int historyIndex) {
     if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH) {
       throwFailure("PasswordMin8Chars");
     }
@@ -52,7 +51,7 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
     }
   }
 
-  protected void throwFailure(String msgId) throws ProcessingException {
+  protected void throwFailure(String msgId) {
     throw new VetoException(ScoutTexts.get(msgId));
   }
 }

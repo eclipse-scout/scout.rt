@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
@@ -31,20 +30,20 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface IColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends IExtension<OWNER> {
 
-  void execCompleteEdit(ColumnCompleteEditChain<VALUE> chain, ITableRow row, IFormField editingField) throws ProcessingException;
+  void execCompleteEdit(ColumnCompleteEditChain<VALUE> chain, ITableRow row, IFormField editingField);
 
-  void execInitColumn(ColumnInitColumnChain<VALUE> chain) throws ProcessingException;
+  void execInitColumn(ColumnInitColumnChain<VALUE> chain);
 
-  VALUE execParseValue(ColumnParseValueChain<VALUE> chain, ITableRow row, Object rawValue) throws ProcessingException;
+  VALUE execParseValue(ColumnParseValueChain<VALUE> chain, ITableRow row, Object rawValue);
 
-  VALUE execValidateValue(ColumnValidateValueChain<VALUE> chain, ITableRow row, VALUE rawValue) throws ProcessingException;
+  VALUE execValidateValue(ColumnValidateValueChain<VALUE> chain, ITableRow row, VALUE rawValue);
 
-  IFormField execPrepareEdit(ColumnPrepareEditChain<VALUE> chain, ITableRow row) throws ProcessingException;
+  IFormField execPrepareEdit(ColumnPrepareEditChain<VALUE> chain, ITableRow row);
 
-  void execDecorateHeaderCell(ColumnDecorateHeaderCellChain<VALUE> chain, HeaderCell cell) throws ProcessingException;
+  void execDecorateHeaderCell(ColumnDecorateHeaderCellChain<VALUE> chain, HeaderCell cell);
 
-  void execDecorateCell(ColumnDecorateCellChain<VALUE> chain, Cell cell, ITableRow row) throws ProcessingException;
+  void execDecorateCell(ColumnDecorateCellChain<VALUE> chain, Cell cell, ITableRow row);
 
-  void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain) throws ProcessingException;
+  void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain);
 
 }

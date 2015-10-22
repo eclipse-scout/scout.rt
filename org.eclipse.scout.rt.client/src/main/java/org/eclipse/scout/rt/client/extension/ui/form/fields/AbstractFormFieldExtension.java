@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldChangedMasterValueChain;
@@ -35,7 +34,7 @@ public abstract class AbstractFormFieldExtension<OWNER_FIELD extends AbstractFor
   }
 
   @Override
-  public void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+  public void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes) {
     chain.execDataChanged(dataTypes);
   }
 
@@ -45,17 +44,17 @@ public abstract class AbstractFormFieldExtension<OWNER_FIELD extends AbstractFor
   }
 
   @Override
-  public void execChangedMasterValue(FormFieldChangedMasterValueChain chain, Object newMasterValue) throws ProcessingException {
+  public void execChangedMasterValue(FormFieldChangedMasterValueChain chain, Object newMasterValue) {
     chain.execChangedMasterValue(newMasterValue);
   }
 
   @Override
-  public void execDisposeField(FormFieldDisposeFieldChain chain) throws ProcessingException {
+  public void execDisposeField(FormFieldDisposeFieldChain chain) {
     chain.execDisposeField();
   }
 
   @Override
-  public void execInitField(FormFieldInitFieldChain chain) throws ProcessingException {
+  public void execInitField(FormFieldInitFieldChain chain) {
     chain.execInitField();
   }
 
@@ -65,17 +64,17 @@ public abstract class AbstractFormFieldExtension<OWNER_FIELD extends AbstractFor
   }
 
   @Override
-  public void execMarkSaved(FormFieldMarkSavedChain chain) throws ProcessingException {
+  public void execMarkSaved(FormFieldMarkSavedChain chain) {
     chain.execMarkSaved();
   }
 
   @Override
-  public boolean execIsEmpty(FormFieldIsEmptyChain chain) throws ProcessingException {
+  public boolean execIsEmpty(FormFieldIsEmptyChain chain) {
     return chain.execIsEmpty();
   }
 
   @Override
-  public boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain) throws ProcessingException {
+  public boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain) {
     return chain.execIsSaveNeeded();
   }
 }

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.common.pwd;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
@@ -45,12 +44,12 @@ public interface IPasswordManagementService extends IService {
   /**
    * change the password of a user
    */
-  void changePassword(String userId, String oldPassword, String newPassword) throws ProcessingException;
+  void changePassword(String userId, String oldPassword, String newPassword);
 
   /**
    * reset the password of a user <br>
    * In the implementation make sure to use sufficient permission rights to enable this method.
    */
-  void resetPassword(String userId, String newPassword) throws ProcessingException;
+  void resetPassword(String userId, String newPassword);
 
 }

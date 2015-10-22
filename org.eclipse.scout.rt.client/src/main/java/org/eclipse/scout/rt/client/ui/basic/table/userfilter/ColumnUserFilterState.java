@@ -61,7 +61,7 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   }
 
   @Override
-  public void notifyDeserialized(Object obj) throws ProcessingException {
+  public void notifyDeserialized(Object obj) {
     ITable table = (ITable) obj;
     IColumn<?> col = BookmarkUtility.resolveColumn(table.getColumns(), m_columnId);
     if (col == null) {

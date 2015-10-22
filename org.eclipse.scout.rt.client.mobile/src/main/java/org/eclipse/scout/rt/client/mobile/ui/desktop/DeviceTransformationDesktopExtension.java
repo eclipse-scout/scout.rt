@@ -68,7 +68,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execInit() throws ProcessingException {
+  protected ContributionCommand execInit() {
     if (!isActive()) {
       return super.execInit();
     }
@@ -78,7 +78,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execClosing() throws ProcessingException {
+  protected ContributionCommand execClosing() {
     if (!isActive()) {
       return super.execClosing();
     }
@@ -108,7 +108,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  protected ContributionCommand execOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     if (!isActive()) {
       return super.execOutlineChanged(oldOutline, newOutline);
     }
@@ -119,7 +119,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
+  protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) {
     if (!isActive()) {
       return super.execPageDetailTableChanged(oldTable, newTable);
     }
@@ -156,7 +156,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) {
     if (!isActive()) {
       return super.execTablePageLoaded(tablePage);
     }

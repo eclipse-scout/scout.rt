@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -93,13 +92,13 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
    *
    * @see execFilterTreeNode
    */
-  void loadRootNode() throws ProcessingException;
+  void loadRootNode();
 
-  void loadChildNodes(ITreeNode parentNode) throws ProcessingException;
+  void loadChildNodes(ITreeNode parentNode);
 
-  List<ITreeNode> callChildLookup(ITreeNode parentNode) throws ProcessingException;
+  List<ITreeNode> callChildLookup(ITreeNode parentNode);
 
-  List<ITreeNode> callCompleteTreeLookup() throws ProcessingException;
+  List<ITreeNode> callCompleteTreeLookup();
 
   ILookupCall<T> getLookupCall();
 

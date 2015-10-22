@@ -56,7 +56,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 public class BookmarkViewForm extends AbstractForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkViewForm.class);
 
-  public BookmarkViewForm() throws ProcessingException {
+  public BookmarkViewForm() {
     super();
   }
 
@@ -71,7 +71,7 @@ public class BookmarkViewForm extends AbstractForm {
     return ScoutTexts.get("Bookmarks");
   }
 
-  public void startView() throws ProcessingException {
+  public void startView() {
     startInternal(new ViewHandler());
   }
 
@@ -211,12 +211,12 @@ public class BookmarkViewForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             setVisiblePermission(new CreateUserBookmarkPermission());
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             //createNewBookmark
             int kind = Bookmark.USER_BOOKMARK;
             Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
@@ -270,12 +270,12 @@ public class BookmarkViewForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             setVisiblePermission(new CreateUserBookmarkPermission());
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             IBookmarkService service = BEANS.get(IBookmarkService.class);
             service.setStartBookmark();
             service.storeBookmarks();
@@ -295,12 +295,12 @@ public class BookmarkViewForm extends AbstractForm {
           }
 
           @Override
-          protected void execInitField() throws ProcessingException {
+          protected void execInitField() {
             setVisiblePermission(new CreateUserBookmarkPermission());
           }
 
           @Override
-          protected void execClickAction() throws ProcessingException {
+          protected void execClickAction() {
             IBookmarkService service = BEANS.get(IBookmarkService.class);
             service.deleteStartBookmark();
             service.storeBookmarks();
@@ -344,7 +344,7 @@ public class BookmarkViewForm extends AbstractForm {
     };
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       //add listeners
       BookmarkClientNotificationHandler bookmarkClientNotificationHandler = BEANS.get(BookmarkClientNotificationHandler.class);
       bookmarkClientNotificationHandler.addListener(m_cncListener);
@@ -357,7 +357,7 @@ public class BookmarkViewForm extends AbstractForm {
     }
 
     @Override
-    protected void execFinally() throws ProcessingException {
+    protected void execFinally() {
       IBookmarkService bmService = BEANS.get(IBookmarkService.class);
       if (bmService != null) {
         bmService.removeBookmarkServiceListener(m_bmListener);

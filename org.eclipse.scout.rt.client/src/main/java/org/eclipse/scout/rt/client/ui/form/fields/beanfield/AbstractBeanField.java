@@ -49,10 +49,10 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
    */
   @ConfigOperation
   @Order(10)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     BeanFieldAppLinkActionChain chain = new BeanFieldAppLinkActionChain<VALUE>(extensions);
     chain.execAppLinkAction(ref);
@@ -65,7 +65,7 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
     }
 
     @Override
-    public void execAppLinkAction(BeanFieldAppLinkActionChain<VALUE> chain, String ref) throws ProcessingException {
+    public void execAppLinkAction(BeanFieldAppLinkActionChain<VALUE> chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
   }
@@ -76,7 +76,7 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
   }
 
   @Override
-  public void doAppLinkAction(String ref) throws ProcessingException {
+  public void doAppLinkAction(String ref) {
     interceptAppLinkAction(ref);
   }
 

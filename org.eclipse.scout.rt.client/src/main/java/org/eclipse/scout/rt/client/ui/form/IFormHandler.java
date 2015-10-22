@@ -44,7 +44,7 @@ public interface IFormHandler {
    * After this method call, the form is in the state "Saved / Unchanged" All field value changes done here appear as
    * unchanged in the form.
    */
-  void onLoad() throws ProcessingException;
+  void onLoad();
 
   /**
    * Load additional form state<br>
@@ -52,7 +52,7 @@ public interface IFormHandler {
    * any changes to fields might result in the form ot fields being changed and therefore in the state
    * "Save needed / Changed"
    */
-  void onPostLoad() throws ProcessingException;
+  void onPostLoad();
 
   /**
    * This method is called in order to check field validity.<br>
@@ -64,7 +64,7 @@ public interface IFormHandler {
    * @throws ProcessingException
    *           to cancel the current process with error handling and user notification such as a dialog
    */
-  boolean onCheckFields() throws ProcessingException;
+  boolean onCheckFields();
 
   /**
    * This method is called in order to update derived states like button enablings.<br>
@@ -74,26 +74,26 @@ public interface IFormHandler {
    * @throws ProcessingException
    *           to cancel the current process with error handling and user notification such as a dialog
    */
-  boolean onValidate() throws ProcessingException;
+  boolean onValidate();
 
   /**
    * Store form state<br>
    * after this method call, the form is in the state "Saved / Unchanged" When the form is closed using Ok, Save,
    * Search, Next, etc.. this method is called to apply the changes to the persistency layer
    */
-  void onStore() throws ProcessingException;
+  void onStore();
 
   /**
    * When the form is closed using cancel or close this method is called to manage the case that no changes should be
    * performed (revert case)
    */
-  void onDiscard() throws ProcessingException;
+  void onDiscard();
 
   /**
    * Finalize form state<br>
    * called whenever the handler is finished and the form is closed When the form is closed in any way this method is
    * called to dispose of resources or deallocate services
    */
-  void onFinally() throws ProcessingException;
+  void onFinally();
 
 }

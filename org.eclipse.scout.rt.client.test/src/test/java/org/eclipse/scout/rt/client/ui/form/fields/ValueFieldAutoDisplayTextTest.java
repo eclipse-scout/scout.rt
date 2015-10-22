@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -51,7 +50,7 @@ public class ValueFieldAutoDisplayTextTest extends AbstractValueField<Integer> {
   }
 
   @Override
-  protected Integer execValidateValue(Integer rawValue) throws ProcessingException {
+  protected Integer execValidateValue(Integer rawValue) {
     if (rawValue.equals(Integer.valueOf(13))) {
       throw new VetoException("Superstitious test class does not accept number 13.");
     }

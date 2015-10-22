@@ -42,10 +42,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execInit() throws ProcessingException {
+    public void execInit() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop> next) {
           next.execInit(org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain.this);
         }
       };
@@ -63,10 +63,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execOpened() throws ProcessingException {
+    public void execOpened() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execOpened(DesktopOpenedChain.this);
         }
       };
@@ -84,10 +84,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execAddTrayMenus(final List<IMenu> menus) throws ProcessingException {
+    public void execAddTrayMenus(final List<IMenu> menus) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execAddTrayMenus(DesktopAddTrayMenusChain.this, menus);
         }
       };
@@ -105,10 +105,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execBeforeClosing() throws ProcessingException {
+    public void execBeforeClosing() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execBeforeClosing(DesktopBeforeClosingChain.this);
         }
       };
@@ -126,10 +126,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execPageDetailFormChanged(final IForm oldForm, final IForm newForm) throws ProcessingException {
+    public void execPageDetailFormChanged(final IForm oldForm, final IForm newForm) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execPageDetailFormChanged(DesktopPageDetailFormChangedChain.this, oldForm, newForm);
         }
       };
@@ -147,10 +147,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execTablePageLoaded(final IPageWithTable<?> tablePage) throws ProcessingException {
+    public void execTablePageLoaded(final IPageWithTable<?> tablePage) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execTablePageLoaded(DesktopTablePageLoadedChain.this, tablePage);
         }
       };
@@ -168,10 +168,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execOutlineChanged(final IOutline oldOutline, final IOutline newOutline) throws ProcessingException {
+    public void execOutlineChanged(final IOutline oldOutline, final IOutline newOutline) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execOutlineChanged(DesktopOutlineChangedChain.this, oldOutline, newOutline);
         }
       };
@@ -189,10 +189,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public IForm execFormAboutToShow(final IForm form) throws ProcessingException {
+    public IForm execFormAboutToShow(final IForm form) {
       MethodInvocation<IForm> methodInvocation = new MethodInvocation<IForm>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           setReturnValue(next.execFormAboutToShow(DesktopFormAboutToShowChain.this, form));
         }
       };
@@ -212,10 +212,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execClosing() throws ProcessingException {
+    public void execClosing() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execClosing(DesktopClosingChain.this);
         }
       };
@@ -233,10 +233,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execPageSearchFormChanged(final IForm oldForm, final IForm newForm) throws ProcessingException {
+    public void execPageSearchFormChanged(final IForm oldForm, final IForm newForm) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execPageSearchFormChanged(DesktopPageSearchFormChangedChain.this, oldForm, newForm);
         }
       };
@@ -254,10 +254,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execPageDetailTableChanged(final ITable oldTable, final ITable newTable) throws ProcessingException {
+    public void execPageDetailTableChanged(final ITable oldTable, final ITable newTable) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execPageDetailTableChanged(DesktopPageDetailTableChangedChain.this, oldTable, newTable);
         }
       };
@@ -275,10 +275,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execGuiAttached() throws ProcessingException {
+    public void execGuiAttached() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execGuiAttached(DesktopGuiAttachedChain.this);
         }
       };
@@ -296,10 +296,10 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execGuiDetached() throws ProcessingException {
+    public void execGuiDetached() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execGuiDetached(DesktopGuiDetachedChain.this);
         }
       };

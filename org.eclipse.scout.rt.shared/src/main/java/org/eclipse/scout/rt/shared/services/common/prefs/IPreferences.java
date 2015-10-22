@@ -369,7 +369,7 @@ public interface IPreferences extends Serializable {
    * @throws ProcessingException
    *           On an error while persisting this node.
    */
-  boolean flush() throws ProcessingException;
+  boolean flush();
 
   /**
    * Adds the given {@link IPreferenceChangeListener} to the list of listeners to be notified about preference changes.

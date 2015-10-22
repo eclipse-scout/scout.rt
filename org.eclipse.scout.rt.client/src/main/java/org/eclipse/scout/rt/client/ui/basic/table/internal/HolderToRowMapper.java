@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -26,7 +25,7 @@ public class HolderToRowMapper<T> {
     m_holder = holder;
   }
 
-  public void importRowValue() throws ProcessingException {
+  public void importRowValue() {
     m_col.setValue(m_row, m_holder.getValue());
   }
 }

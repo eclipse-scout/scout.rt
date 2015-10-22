@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.scout.commons.StoppableThread;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
@@ -33,11 +32,11 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
 
   private boolean m_active = true;
 
-  public AbstractScheduler() throws ProcessingException {
+  public AbstractScheduler() {
     this(new Ticker(Calendar.MINUTE));
   }
 
-  public AbstractScheduler(Ticker ticker) throws ProcessingException {
+  public AbstractScheduler(Ticker ticker) {
     m_availableJobs = new HashSet<ISchedulerJob>();
     m_runningJobs = new HashSet<ISchedulerJob>();
     m_queueLock = new Object();

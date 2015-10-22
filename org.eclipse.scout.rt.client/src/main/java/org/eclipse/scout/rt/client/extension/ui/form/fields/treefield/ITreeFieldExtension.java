@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.treefield;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldLoadChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveChain;
@@ -16,11 +15,11 @@ public interface ITreeFieldExtension<OWNER extends AbstractTreeField> extends IF
 
   void execSave(TreeFieldSaveChain chain, Collection<? extends ITreeNode> insertedNodes, Collection<? extends ITreeNode> updatedNodes, Collection<? extends ITreeNode> deletedNodes);
 
-  void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row) throws ProcessingException;
+  void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row);
 
-  void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row) throws ProcessingException;
+  void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row);
 
-  void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode) throws ProcessingException;
+  void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode);
 
-  void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row) throws ProcessingException;
+  void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row);
 }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
@@ -21,8 +20,8 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface IClientSessionExtension<OWNER extends AbstractClientSession> extends IExtension<OWNER> {
 
-  void execStoreSession(ClientSessionStoreSessionChain chain) throws ProcessingException;
+  void execStoreSession(ClientSessionStoreSessionChain chain);
 
-  void execLoadSession(ClientSessionLoadSessionChain chain) throws ProcessingException;
+  void execLoadSession(ClientSessionLoadSessionChain chain);
 
 }

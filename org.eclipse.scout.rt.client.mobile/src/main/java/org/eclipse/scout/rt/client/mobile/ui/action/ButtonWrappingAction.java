@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.mobile.ui.action;
 
 import java.beans.PropertyChangeEvent;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileAction;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -32,12 +31,12 @@ public class ButtonWrappingAction extends AbstractMobileAction {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     getWrappedButton().doClick();
   }
 
   @Override
-  protected void execSelectionChanged(boolean selection) throws ProcessingException {
+  protected void execSelectionChanged(boolean selection) {
     getWrappedButton().setSelected(selection);
   }
 

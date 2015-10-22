@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +27,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class AbstractHtmlFieldTest {
   @Test
-  public void testExecHyperlinkAction() throws MalformedURLException, ProcessingException {
+  public void testExecHyperlinkAction() throws MalformedURLException {
     P_HtmlField htmlField = new P_HtmlField();
     String ref = "data";
     htmlField.getUIFacade().fireAppLinkActionFromUI(ref);
@@ -42,7 +41,7 @@ public class AbstractHtmlFieldTest {
     public String m_ref;
 
     @Override
-    protected void execAppLinkAction(String ref) throws ProcessingException {
+    protected void execAppLinkAction(String ref) {
       super.execAppLinkAction(ref);
       m_execAppLinkActionCalled = true;
       m_ref = ref;

@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.BeanClassFilter;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
@@ -53,7 +52,7 @@ public class CodeTypeClassInventoryTest {
   }
 
   @Test
-  public void testCodeTypeClass_IgnoredName() throws ProcessingException {
+  public void testCodeTypeClass_IgnoredName() {
     CodeTypeClassInventory testService = new CodeTypeClassInventory(new IgnoreTestCodeType1Filter());
     Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = testService.getClasses();
     assertFalse(allCodeTypes.contains(TestCodeType1.class));

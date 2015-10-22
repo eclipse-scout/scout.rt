@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
@@ -41,7 +40,7 @@ public class AbstractUserFilterState implements IUserFilterState {
   }
 
   @Override
-  public void notifyDeserialized(Object obj) throws ProcessingException {
+  public void notifyDeserialized(Object obj) {
   }
 
 }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.cache;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheWrapper;
@@ -33,7 +32,7 @@ public final class ClientNotificationServerCacheWrapper<K, V> extends AbstractCa
   }
 
   @Override
-  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException {
+  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
     super.invalidate(filter, propagate);
     // always send invalidate operations from a server to clients and do not check on the propagate property
     InvalidateCacheNotification notification = new InvalidateCacheNotification(getCacheId(), filter);

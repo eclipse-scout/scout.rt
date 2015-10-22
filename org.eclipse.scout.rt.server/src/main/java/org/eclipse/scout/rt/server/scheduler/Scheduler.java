@@ -11,20 +11,19 @@
 package org.eclipse.scout.rt.server.scheduler;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 public class Scheduler extends AbstractScheduler implements IScheduler {
 
   private ServerRunContext m_serverRunContext;
 
-  public Scheduler(Ticker ticker, ServerRunContext serverRunContext) throws ProcessingException {
+  public Scheduler(Ticker ticker, ServerRunContext serverRunContext) {
     super(ticker);
     m_serverRunContext = serverRunContext;
   }
 
   @Override
-  public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
+  public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) {
     m_serverRunContext.run(new IRunnable() {
 
       @Override

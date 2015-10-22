@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.services.common.pwd;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -101,7 +100,7 @@ public class PasswordPolicyVerifier {
     }
   }
 
-  protected void callPasswordForm(String userId) throws ProcessingException {
+  protected void callPasswordForm(String userId) {
     DefaultPasswordForm form = new DefaultPasswordForm();
     form.setUserId(userId);
     form.startChange();

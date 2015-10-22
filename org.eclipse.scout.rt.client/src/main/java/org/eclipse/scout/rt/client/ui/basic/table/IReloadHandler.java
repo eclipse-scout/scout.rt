@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * Interface for classes supporting a reload function.
  *
@@ -19,6 +17,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  */
 public interface IReloadHandler {
 
-  void reload() throws ProcessingException;
+  void reload();
 
 }

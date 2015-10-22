@@ -366,12 +366,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @ConfigOperation
   @Order(10)
-  protected void execInitTree() throws ProcessingException {
+  protected void execInitTree() {
   }
 
   @ConfigOperation
   @Order(15)
-  protected void execDisposeTree() throws ProcessingException {
+  protected void execDisposeTree() {
   }
 
   /**
@@ -385,7 +385,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(18)
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected void execHyperlinkAction(URL url, String path, boolean local) {
   }
 
   /**
@@ -395,7 +395,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(18)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
     //FIXME CGU remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
@@ -419,7 +419,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(20)
-  protected TransferObject execDrag(ITreeNode node) throws ProcessingException {
+  protected TransferObject execDrag(ITreeNode node) {
     return null;
   }
 
@@ -431,7 +431,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(30)
-  protected TransferObject execDrag(Collection<ITreeNode> nodes) throws ProcessingException {
+  protected TransferObject execDrag(Collection<ITreeNode> nodes) {
     return null;
   }
 
@@ -440,7 +440,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(40)
-  protected void execDrop(ITreeNode node, TransferObject t) throws ProcessingException {
+  protected void execDrop(ITreeNode node, TransferObject t) {
   }
 
   /**
@@ -450,7 +450,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(45)
-  protected void execDropTargetChanged(ITreeNode node) throws ProcessingException {
+  protected void execDropTargetChanged(ITreeNode node) {
   }
 
   /**
@@ -460,7 +460,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(50)
-  protected void execDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
+  protected void execDecorateCell(ITreeNode node, Cell cell) {
     if (cell.getIconId() == null && getDefaultIconId() != null) {
       cell.setIconId(getDefaultIconId());
     }
@@ -469,19 +469,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @ConfigOperation
   @Order(60)
-  protected void execNodesSelected(TreeEvent e) throws ProcessingException {
+  protected void execNodesSelected(TreeEvent e) {
   }
 
   @ConfigOperation
   @Order(70)
-  protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+  protected void execNodeClick(ITreeNode node, MouseButton mouseButton) {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
     fireTreeEventInternal(e);
   }
 
   @ConfigOperation
   @Order(80)
-  protected void execNodeAction(ITreeNode node) throws ProcessingException {
+  protected void execNodeAction(ITreeNode node) {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_ACTION, node);
     fireTreeEventInternal(e);
   }
@@ -497,11 +497,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigOperation
   @Order(90)
-  protected void execNodesChecked(List<ITreeNode> nodes) throws ProcessingException {
+  protected void execNodesChecked(List<ITreeNode> nodes) {
   }
 
   @ConfigOperation
-  protected void execAutoCheckChildNodes(List<ITreeNode> nodes) throws ProcessingException {
+  protected void execAutoCheckChildNodes(List<ITreeNode> nodes) {
     for (ITreeNode node : nodes) {
       for (ITreeNode childNode : node.getFilteredChildNodes()) {
         if (childNode.isEnabled() && childNode.isVisible()) {
@@ -634,7 +634,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (ConfigurationUtility.isMethodOverwrite(AbstractTree.class, "execNodeAction", new Class[]{ITreeNode.class}, this.getClass())) {
       ksList.add(new KeyStroke("ENTER") {
         @Override
-        protected void execAction() throws ProcessingException {
+        protected void execAction() {
           fireNodeAction(getSelectedNode());
         }
       });
@@ -677,13 +677,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Runtime
    */
   @Override
-  public final void initTree() throws ProcessingException {
+  public final void initTree() {
     initTreeInternal();
     ActionUtility.initActions(getMenus());
     interceptInitTree();
   }
 
-  protected void initTreeInternal() throws ProcessingException {
+  protected void initTreeInternal() {
   }
 
   @Override
@@ -747,7 +747,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override
-  public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
+  public <T extends IMenu> T getMenu(Class<T> menuType) {
     // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
     return new ActionFinder().findAction(getMenus(), menuType);
   }
@@ -1693,7 +1693,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes) throws ProcessingException {
+  public Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes) {
     if (!CollectionUtility.hasElements(nodes)) {
       return CollectionUtility.hashSet();
     }
@@ -1714,7 +1714,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public ITreeNode resolveVirtualNode(ITreeNode node) throws ProcessingException {
+  public ITreeNode resolveVirtualNode(ITreeNode node) {
     if (node instanceof IVirtualTreeNode) {
       IVirtualTreeNode vnode = (IVirtualTreeNode) node;
       if (vnode.getResolvedNode() != null && vnode.getResolvedNode().getTree() == this) {
@@ -2418,13 +2418,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  protected void interceptNodesChecked(List<ITreeNode> nodes) throws ProcessingException {
+  protected void interceptNodesChecked(List<ITreeNode> nodes) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeNodesCheckedChain chain = new TreeNodesCheckedChain(extensions);
     chain.execNodesChecked(nodes);
   }
 
-  protected void interceptAutoCheckChildNodes(List<? extends ITreeNode> nodes) throws ProcessingException {
+  protected void interceptAutoCheckChildNodes(List<? extends ITreeNode> nodes) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
     chain.execAutoCheckChildNodes(nodes);
@@ -2652,7 +2652,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void unloadNode(ITreeNode node) throws ProcessingException {
+  public void unloadNode(ITreeNode node) {
     try {
       setTreeChanging(true);
       //
@@ -2666,7 +2666,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void doAppLinkAction(String ref) throws ProcessingException {
+  public void doAppLinkAction(String ref) {
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;
@@ -2679,11 +2679,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void exportTreeData(final AbstractTreeFieldData target) throws ProcessingException {
+  public void exportTreeData(final AbstractTreeFieldData target) {
     exportTreeNodeDataRec(getRootNode().getChildNodes(), target, null);
   }
 
-  private void exportTreeNodeDataRec(List<ITreeNode> nodes, AbstractTreeFieldData treeData, TreeNodeData parentNodeData) throws ProcessingException {
+  private void exportTreeNodeDataRec(List<ITreeNode> nodes, AbstractTreeFieldData treeData, TreeNodeData parentNodeData) {
     ArrayList<TreeNodeData> nodeDataList = new ArrayList<TreeNodeData>(nodes.size());
     for (ITreeNode node : nodes) {
       TreeNodeData nodeData = exportTreeNodeData(node, treeData);
@@ -2703,13 +2703,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * @return a node data for this tree node or null to skip this node
    */
-  protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) throws ProcessingException {
+  protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) {
     TreeNodeData nodeData = new TreeNodeData();
     return nodeData;
   }
 
   @Override
-  public void importTreeData(AbstractTreeFieldData source) throws ProcessingException {
+  public void importTreeData(AbstractTreeFieldData source) {
     if (source.isValueSet()) {
       try {
         setTreeChanging(true);
@@ -2723,7 +2723,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private void importTreeNodeDataRec(ITreeNode parentNode, AbstractTreeFieldData treeData, List<TreeNodeData> nodeDataList) throws ProcessingException {
+  private void importTreeNodeDataRec(ITreeNode parentNode, AbstractTreeFieldData treeData, List<TreeNodeData> nodeDataList) {
     if (nodeDataList != null) {
       for (TreeNodeData nodeData : nodeDataList) {
         ITreeNode node = importTreeNodeData(parentNode, treeData, nodeData);
@@ -2738,7 +2738,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * @return the new tree node for this node data or null to skip this node It is the responsibility of this method to
    *         add the new nopde to the tree.
    */
-  protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) throws ProcessingException {
+  protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) {
     return null;
   }
 
@@ -3074,132 +3074,132 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t) throws ProcessingException {
+    public void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t) {
       getOwner().execDrop(node, t);
     }
 
     @Override
-    public void execInitTree(TreeInitTreeChain chain) throws ProcessingException {
+    public void execInitTree(TreeInitTreeChain chain) {
       getOwner().execInitTree();
     }
 
     @Override
-    public void execDropTargetChanged(TreeDropTargetChangedChain chain, ITreeNode node) throws ProcessingException {
+    public void execDropTargetChanged(TreeDropTargetChangedChain chain, ITreeNode node) {
       getOwner().execDropTargetChanged(node);
     }
 
     @Override
-    public TransferObject execDrag(TreeDragNodesChain chain, Collection<ITreeNode> nodes) throws ProcessingException {
+    public TransferObject execDrag(TreeDragNodesChain chain, Collection<ITreeNode> nodes) {
       return getOwner().execDrag(nodes);
     }
 
     @Override
-    public void execNodeAction(TreeNodeActionChain chain, ITreeNode node) throws ProcessingException {
+    public void execNodeAction(TreeNodeActionChain chain, ITreeNode node) {
       getOwner().execNodeAction(node);
     }
 
     @Override
-    public void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+    public void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) {
       getOwner().execNodeClick(node, mouseButton);
     }
 
     @Override
-    public void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) throws ProcessingException {
+    public void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
 
     @Override
-    public void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e) throws ProcessingException {
+    public void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e) {
       getOwner().execNodesSelected(e);
     }
 
     @Override
-    public void execDisposeTree(TreeDisposeTreeChain chain) throws ProcessingException {
+    public void execDisposeTree(TreeDisposeTreeChain chain) {
       getOwner().execDisposeTree();
     }
 
     @Override
-    public void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell) throws ProcessingException {
+    public void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell) {
       getOwner().execDecorateCell(node, cell);
     }
 
     @Override
-    public TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) throws ProcessingException {
+    public TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) {
       return getOwner().execDrag(node);
     }
 
     @Override
-    public void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) throws ProcessingException {
+    public void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) {
       getOwner().execNodesChecked(CollectionUtility.arrayList(nodes));
     }
 
     @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes) throws ProcessingException {
+    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes) {
       getOwner().execAutoCheckChildNodes(CollectionUtility.arrayList(nodes));
     }
   }
 
-  protected final void interceptDrop(ITreeNode node, TransferObject t) throws ProcessingException {
+  protected final void interceptDrop(ITreeNode node, TransferObject t) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeDropChain chain = new TreeDropChain(extensions);
     chain.execDrop(node, t);
   }
 
-  protected final void interceptInitTree() throws ProcessingException {
+  protected final void interceptInitTree() {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeInitTreeChain chain = new TreeInitTreeChain(extensions);
     chain.execInitTree();
   }
 
-  protected final void interceptDropTargetChanged(ITreeNode node) throws ProcessingException {
+  protected final void interceptDropTargetChanged(ITreeNode node) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeDropTargetChangedChain chain = new TreeDropTargetChangedChain(extensions);
     chain.execDropTargetChanged(node);
   }
 
-  protected final TransferObject interceptDrag(Collection<ITreeNode> nodes) throws ProcessingException {
+  protected final TransferObject interceptDrag(Collection<ITreeNode> nodes) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeDragNodesChain chain = new TreeDragNodesChain(extensions);
     return chain.execDrag(nodes);
   }
 
-  protected final void interceptNodeAction(ITreeNode node) throws ProcessingException {
+  protected final void interceptNodeAction(ITreeNode node) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeNodeActionChain chain = new TreeNodeActionChain(extensions);
     chain.execNodeAction(node);
   }
 
-  protected final void interceptNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+  protected final void interceptNodeClick(ITreeNode node, MouseButton mouseButton) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeNodeClickChain chain = new TreeNodeClickChain(extensions);
     chain.execNodeClick(node, mouseButton);
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeHyperlinkActionChain chain = new TreeHyperlinkActionChain(extensions);
     chain.execHyperlinkAction(ref);
   }
 
-  protected final void interceptNodesSelected(TreeEvent e) throws ProcessingException {
+  protected final void interceptNodesSelected(TreeEvent e) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeNodesSelectedChain chain = new TreeNodesSelectedChain(extensions);
     chain.execNodesSelected(e);
   }
 
-  protected final void interceptDisposeTree() throws ProcessingException {
+  protected final void interceptDisposeTree() {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeDisposeTreeChain chain = new TreeDisposeTreeChain(extensions);
     chain.execDisposeTree();
   }
 
-  protected final void interceptDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
+  protected final void interceptDecorateCell(ITreeNode node, Cell cell) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeDecorateCellChain chain = new TreeDecorateCellChain(extensions);
     chain.execDecorateCell(node, cell);
   }
 
-  protected final TransferObject interceptDrag(ITreeNode node) throws ProcessingException {
+  protected final TransferObject interceptDrag(ITreeNode node) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeDragNodeChain chain = new TreeDragNodeChain(extensions);
     return chain.execDrag(node);

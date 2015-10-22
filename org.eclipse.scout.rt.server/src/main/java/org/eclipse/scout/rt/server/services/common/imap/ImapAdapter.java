@@ -71,12 +71,12 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public Message[] getUnseenMessages() throws ProcessingException {
+  public Message[] getUnseenMessages() {
     return getUnseenMessages(getDefaultFolderName());
   }
 
   @Override
-  public Message[] getUnseenMessages(String folderName) throws ProcessingException {
+  public Message[] getUnseenMessages(String folderName) {
     connect();
     ArrayList<Message> messages = new ArrayList<Message>();
     Folder folder = null;
@@ -101,12 +101,12 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public Message[] getAllMessages() throws ProcessingException {
+  public Message[] getAllMessages() {
     return getAllMessages(getDefaultFolderName());
   }
 
   @Override
-  public Message[] getAllMessages(String folderName) throws ProcessingException {
+  public Message[] getAllMessages(String folderName) {
     connect();
     Message[] messages = new Message[0];
     Folder folder = null;
@@ -123,21 +123,21 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public void moveToTrash(Message[] messages) throws ProcessingException {
+  public void moveToTrash(Message[] messages) {
     moveMessages(TRASH_FOLDER_NAME, messages);
   }
 
   @Override
-  public void moveMessages(String destFolderName, Message[] messages) throws ProcessingException {
+  public void moveMessages(String destFolderName, Message[] messages) {
     copyMessages(destFolderName, messages, true);
   }
 
   @Override
-  public void copyMessages(String destFolderName, Message[] messages) throws ProcessingException {
+  public void copyMessages(String destFolderName, Message[] messages) {
     copyMessages(destFolderName, messages, false);
   }
 
-  protected void copyMessages(String destFolderName, Message[] messages, boolean deleteSourceMessages) throws ProcessingException {
+  protected void copyMessages(String destFolderName, Message[] messages, boolean deleteSourceMessages) {
     connect();
 
     Folder destFolder = null;
@@ -187,7 +187,7 @@ public class ImapAdapter implements IImapAdapter {
    * messages are flagged as DELETED and their folder is closed in order to delete them on the server
    */
   @Override
-  public void deleteMessagesPermanently(Message[] messages) throws ProcessingException {
+  public void deleteMessagesPermanently(Message[] messages) {
     connect();
     Set<Folder> folders = new HashSet<Folder>();
     try {
@@ -207,12 +207,12 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public void createFolder(String folderName) throws ProcessingException {
+  public void createFolder(String folderName) {
     findFolder(folderName, true);
   }
 
   @Override
-  public void removeFolder(String folderName) throws ProcessingException {
+  public void removeFolder(String folderName) {
     connect();
     try {
       Folder folder = findFolder(folderName);
@@ -229,7 +229,7 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public void connect() throws ProcessingException {
+  public void connect() {
     if (!isConnected()) {
       m_cachedFolders.clear();
       Properties props = new Properties();
@@ -283,11 +283,11 @@ public class ImapAdapter implements IImapAdapter {
   protected void interceptProperties(Properties props) {
   }
 
-  protected Folder findFolder(String name) throws ProcessingException {
+  protected Folder findFolder(String name) {
     return findFolder(name, false);
   }
 
-  protected Folder findFolder(String name, boolean createNonExisting) throws ProcessingException {
+  protected Folder findFolder(String name, boolean createNonExisting) {
     connect();
     Folder folder = m_cachedFolders.get(name);
     if (folder == null) {
@@ -320,7 +320,7 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public void closeConnection() throws ProcessingException {
+  public void closeConnection() {
     if (isConnected()) {
       List<MessagingException> exceptions = new ArrayList<MessagingException>();
       for (Folder folder : m_cachedFolders.values()) {
@@ -364,7 +364,7 @@ public class ImapAdapter implements IImapAdapter {
   }
 
   @Override
-  public Store getStore() throws ProcessingException {
+  public Store getStore() {
     connect();
     return m_store;
   }

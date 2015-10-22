@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 import java.util.Date;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -23,7 +22,7 @@ public interface IHolidayCalendarService extends ICalendarService {
   /**
    * default value: calendar/holidays.xml
    */
-  Set<? extends ICalendarItem> getItems(RemoteFile f, Date minDate, Date maxDate) throws ProcessingException;
+  Set<? extends ICalendarItem> getItems(RemoteFile f, Date minDate, Date maxDate);
 
   /*
    * Not needed void storeItems(ICalendarItem[] items, boolean delta) throws

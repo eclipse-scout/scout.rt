@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -261,7 +260,7 @@ public class CheckRowsInTableTest {
     assertEquals("Lorem", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
   }
 
-  private P_Table createTable(boolean isMulticheck) throws ProcessingException {
+  private P_Table createTable(boolean isMulticheck) {
     P_Table table = new P_Table();
     table.initTable();
     table.setMultiCheck(isMulticheck);

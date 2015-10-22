@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -95,7 +94,7 @@ public class EitherOrNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       getComposerField().addAdditionalOrNode(EitherOrNode.this, false);
     }
   }
@@ -108,7 +107,7 @@ public class EitherOrNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       ITreeNode node = getComposerField().addEitherNode(EitherOrNode.this, false);
       getComposerField().addAdditionalOrNode(node, false);
     }
@@ -127,7 +126,7 @@ public class EitherOrNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       setNegative(!isNegative());
       if (!isStatusInserted()) {
         setStatusInternal(ITreeNode.STATUS_UPDATED);
@@ -150,7 +149,7 @@ public class EitherOrNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       ITreeNode next = getSiblingAfter();
       if (isBeginOfEitherOr()) {
         if (next instanceof EitherOrNode && !((EitherOrNode) next).isBeginOfEitherOr()) {

@@ -97,12 +97,12 @@ public class BlockingCondition implements IBlockingCondition {
   }
 
   @Override
-  public void waitFor() throws ProcessingException {
+  public void waitFor() {
     waitFor(-1L, TimeUnit.MILLISECONDS);
   }
 
   @Override
-  public boolean waitFor(final long timeout, final TimeUnit unit) throws ProcessingException {
+  public boolean waitFor(final long timeout, final TimeUnit unit) {
     final JobFutureTask<?> currentTask = (JobFutureTask<?>) IFuture.CURRENT.get();
     if (currentTask != null) {
       return blockManagedThread(currentTask, timeout, unit);
@@ -120,7 +120,7 @@ public class BlockingCondition implements IBlockingCondition {
    * @throws ProcessingException
    *           if the waiting thread was interrupted.
    */
-  protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit) throws ProcessingException {
+  protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit) {
     m_lock.lock();
     try {
       if (!m_blocking) {
@@ -185,7 +185,7 @@ public class BlockingCondition implements IBlockingCondition {
    * @throws ProcessingException
    *           if the waiting thread was interrupted.
    */
-  protected boolean blockArbitraryThread(final long timeout, final TimeUnit unit) throws ProcessingException {
+  protected boolean blockArbitraryThread(final long timeout, final TimeUnit unit) {
     m_lock.lock();
     try {
       if (!m_blocking) {

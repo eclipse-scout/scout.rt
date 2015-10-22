@@ -28,10 +28,10 @@ public final class CalendarItemProviderChains {
       super(extensions);
     }
 
-    public void execLoadItems(final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
+    public void execLoadItems(final Date minDate, final Date maxDate, final Set<ICalendarItem> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) throws ProcessingException {
+        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
           next.execLoadItems(CalendarItemProviderLoadItemsChain.this, minDate, maxDate, result);
         }
       };
@@ -49,10 +49,10 @@ public final class CalendarItemProviderChains {
       super(extensions);
     }
 
-    public void execItemAction(final ICalendarItem item) throws ProcessingException {
+    public void execItemAction(final ICalendarItem item) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) throws ProcessingException {
+        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
           next.execItemAction(CalendarItemProviderItemActionChain.this, item);
         }
       };
@@ -70,10 +70,10 @@ public final class CalendarItemProviderChains {
       super(extensions);
     }
 
-    public void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
+    public void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) throws ProcessingException {
+        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
           next.execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain.this, session, minDate, maxDate, result);
         }
       };
@@ -91,10 +91,10 @@ public final class CalendarItemProviderChains {
       super(extensions);
     }
 
-    public void execItemMoved(final ICalendarItem item, final Date newDate) throws ProcessingException {
+    public void execItemMoved(final ICalendarItem item, final Date newDate) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) throws ProcessingException {
+        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
           next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, newDate);
         }
       };

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
@@ -30,7 +29,7 @@ import org.mockito.Mockito;
 public class AbstractProposalColumnTest {
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractProposalColumn<Long> column = new AbstractProposalColumn<Long>() {
     };
     column.setCodeTypeClass(TestCodeType.class);
@@ -48,7 +47,7 @@ public class AbstractProposalColumnTest {
    */
   @SuppressWarnings("unchecked")
   @Test
-  public void testPrepareLookupCallback() throws ProcessingException {
+  public void testPrepareLookupCallback() {
     TestProposalColumn column = new TestProposalColumn();
     ITableRow row = Mockito.mock(ITableRow.class);
     IProposalField<Long> field = (IProposalField<Long>) column.prepareEditInternal(row);

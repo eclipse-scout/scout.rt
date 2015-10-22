@@ -131,7 +131,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigOperation
   @Order(270)
-  protected void execFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) {
   }
 
   @Override
@@ -247,7 +247,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * text, foreground color etc.) are applied to the returned instance afterwards. This method must <b>not</b> return
    * <code>null</code>!
    */
-  protected IRadioButton<T> createEmptyRadioButtonForLookupRow() throws ProcessingException {
+  protected IRadioButton<T> createEmptyRadioButtonForLookupRow() {
     return new RadioButton();
   }
 
@@ -306,7 +306,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * Runtime
    */
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     // special case: a button represents null
     IRadioButton b = getButtonFor(null);
     if (b != null) {
@@ -322,7 +322,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * @return
    * @throws ProcessingException
    */
-  protected List<ILookupRow<T>> getLookupRows() throws ProcessingException {
+  protected List<ILookupRow<T>> getLookupRows() {
     List<ILookupRow<T>> data;
     ILookupCall<T> call = getLookupCall();
     // Get the data
@@ -354,7 +354,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  protected void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  protected void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) {
     interceptFilterLookupResult(call, result);
 
     // filter invalid rows
@@ -417,7 +417,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  protected T validateValueInternal(T rawValue) throws ProcessingException {
+  protected T validateValueInternal(T rawValue) {
     T validValue;
     if (rawValue == null) {
       validValue = null;
@@ -648,7 +648,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     chain.execPrepareLookup(call);
   }
 
-  protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     RadioButtonGroupFilterLookupResultChain<T> chain = new RadioButtonGroupFilterLookupResultChain<T>(extensions);
     chain.execFilterLookupResult(call, result);
@@ -666,7 +666,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
 
     @Override
-    public void execFilterLookupResult(RadioButtonGroupFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+    public void execFilterLookupResult(RadioButtonGroupFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) {
       getOwner().execFilterLookupResult(call, result);
     }
   }

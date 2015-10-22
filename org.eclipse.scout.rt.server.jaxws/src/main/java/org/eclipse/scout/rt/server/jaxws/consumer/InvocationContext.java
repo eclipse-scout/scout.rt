@@ -73,7 +73,7 @@ public class InvocationContext<PORT> {
   protected final PORT m_portProxy;
 
   @SuppressWarnings("unchecked")
-  public InvocationContext(final PORT port, final String name) throws ProcessingException {
+  public InvocationContext(final PORT port, final String name) {
     m_name = name;
     m_implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
     m_port = port;

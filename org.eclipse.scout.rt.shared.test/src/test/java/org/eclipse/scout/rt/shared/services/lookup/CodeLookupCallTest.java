@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
@@ -82,7 +81,7 @@ public class CodeLookupCallTest {
     runGetDataByTextFiltered("");
   }
 
-  private void runGetDataByTextFiltered(String text) throws ProcessingException {
+  private void runGetDataByTextFiltered(String text) {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setText(text);
@@ -103,7 +102,7 @@ public class CodeLookupCallTest {
     runGetDataByKey(0, Integer.valueOf(0));
   }
 
-  private void runGetDataByKey(int expectedLength, Integer key) throws ProcessingException {
+  private void runGetDataByKey(int expectedLength, Integer key) {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setKey(key);
@@ -126,7 +125,7 @@ public class CodeLookupCallTest {
 
   }
 
-  private void runGetDataByRec(int expectedLength, Integer parent) throws ProcessingException {
+  private void runGetDataByRec(int expectedLength, Integer parent) {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setRec(parent);
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByRec();
@@ -229,7 +228,7 @@ public class CodeLookupCallTest {
     }
 
     @Override
-    protected List<ICodeRow<Integer>> execLoadCodes(Class<? extends ICodeRow<Integer>> codeRowType) throws ProcessingException {
+    protected List<ICodeRow<Integer>> execLoadCodes(Class<? extends ICodeRow<Integer>> codeRowType) {
       List<ICodeRow<Integer>> result = new ArrayList<ICodeRow<Integer>>();
       result.add(createTestCodeRow(ROW10_KEY, null, ROW10_TEXT));
       result.add(createTestCodeRow(ROW11_KEY, ROW10_KEY, ROW11_TEXT));

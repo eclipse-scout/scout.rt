@@ -26,10 +26,10 @@ public final class MenuChains {
       super(extensions);
     }
 
-    public void execOwnerValueChanged(final Object newOwnerValue) throws ProcessingException {
+    public void execOwnerValueChanged(final Object newOwnerValue) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IMenuExtension<? extends AbstractMenu> next) throws ProcessingException {
+        protected void callMethod(IMenuExtension<? extends AbstractMenu> next) {
           next.execOwnerValueChanged(MenuOwnerValueChangedChain.this, newOwnerValue);
         }
       };

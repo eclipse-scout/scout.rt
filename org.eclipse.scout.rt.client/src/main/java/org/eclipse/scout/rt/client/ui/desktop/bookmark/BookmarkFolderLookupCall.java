@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
@@ -38,7 +37,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
   }
 
   @Override
-  protected List<ILookupRow<BookmarkFolder>> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<BookmarkFolder>> execCreateLookupRows() {
     final ArrayList<ILookupRow<BookmarkFolder>> rows = new ArrayList<ILookupRow<BookmarkFolder>>();
     if (m_rootFolder != null) {
       m_rootFolder.visit(new IBookmarkVisitor() {

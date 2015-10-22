@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.imap;
 
 import javax.mail.Message;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -20,10 +19,10 @@ import org.eclipse.scout.rt.platform.service.IService;
  */
 public interface IIMAPService extends IService {
 
-  Message[] getUnreadMessages() throws ProcessingException;
+  Message[] getUnreadMessages();
 
-  void deleteMessages(Message... toDelete) throws ProcessingException;
+  void deleteMessages(Message... toDelete);
 
-  void deleteAllMessages() throws ProcessingException;
+  void deleteAllMessages();
 
 }

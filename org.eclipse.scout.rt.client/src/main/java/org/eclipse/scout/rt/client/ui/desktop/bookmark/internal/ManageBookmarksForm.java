@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.internal;
 import java.security.Permission;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
@@ -39,7 +38,7 @@ import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 
 public class ManageBookmarksForm extends AbstractForm implements BookmarkServiceListener {
 
-  public ManageBookmarksForm() throws ProcessingException {
+  public ManageBookmarksForm() {
     super();
   }
 
@@ -54,7 +53,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     getUserBookmarkTreeField().setBookmarkRootFolder(e.getBookmarkService().getBookmarkData().getUserBookmarks());
   }
 
-  public void startModify() throws ProcessingException {
+  public void startModify() {
     startInternal(new ModifyHandler());
   }
 
@@ -97,7 +96,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       }
 
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         setVisiblePermission(new UpdateGlobalBookmarkPermission());
       }
 
@@ -133,7 +132,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       }
 
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         setVisiblePermission(new ReadUserBookmarkPermission());
       }
 
@@ -175,7 +174,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
   public class ModifyHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       IBookmarkService service = BEANS.get(IBookmarkService.class);
       //get notified about changes
       service.addBookmarkServiceListener(ManageBookmarksForm.this);
@@ -187,23 +186,23 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     }
 
     @Override
-    protected void execPostLoad() throws ProcessingException {
+    protected void execPostLoad() {
       touch();
     }
 
     @Override
-    protected void execStore() throws ProcessingException {
+    protected void execStore() {
       BEANS.get(IBookmarkService.class).storeBookmarks();
     }
 
     @Override
-    protected void execDiscard() throws ProcessingException {
+    protected void execDiscard() {
       //revert all changes
       BEANS.get(IBookmarkService.class).loadBookmarks();
     }
 
     @Override
-    protected void execFinally() throws ProcessingException {
+    protected void execFinally() {
       IBookmarkService service = BEANS.get(IBookmarkService.class);
       service.removeBookmarkServiceListener(ManageBookmarksForm.this);
     }

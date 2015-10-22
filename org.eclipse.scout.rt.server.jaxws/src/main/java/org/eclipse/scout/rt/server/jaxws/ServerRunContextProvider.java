@@ -14,7 +14,6 @@ import java.security.AccessController;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -37,7 +36,7 @@ public class ServerRunContextProvider {
   /**
    * Provides a {@link RunContext} for the given {@link Subject}.
    */
-  public ServerRunContext provide(final Subject subject) throws ProcessingException {
+  public ServerRunContext provide(final Subject subject) {
     final ServerRunContext currentRunContext = ServerRunContexts.copyCurrent().withSubject(subject);
 
     if (currentRunContext.getSession() == null || !subject.equals(Subject.getSubject(AccessController.getContext()))) {

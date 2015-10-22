@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
@@ -38,7 +37,7 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+  protected void execOwnerValueChanged(Object newOwnerValue) {
     EntityNode entityNode = null;
     ITreeNode treeNode = m_parentNode;
     while (treeNode != null) {
@@ -59,7 +58,7 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     ComposerAttributeForm form = new ComposerAttributeForm();
     EntityNode eNode = null;
     ITreeNode n = m_parentNode;

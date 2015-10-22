@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MoveFormFieldStackOverflowForm.MainBox.BottomBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MoveFormFieldStackOverflowForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MoveFormFieldStackOverflowForm.MainBox.TopBox.ListBox;
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 
 public class MoveFormFieldStackOverflowForm extends AbstractForm {
 
-  public MoveFormFieldStackOverflowForm() throws ProcessingException {
+  public MoveFormFieldStackOverflowForm() {
   }
 
   public MainBox getMainBox() {

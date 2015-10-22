@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
@@ -43,7 +42,7 @@ public class TestingLookupService implements ILookupService<Long> {
   }
 
   @Override
-  public List<ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
+  public List<ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) {
     List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Object key = call.getKey();
     if (key != null) {
@@ -57,7 +56,7 @@ public class TestingLookupService implements ILookupService<Long> {
   }
 
   @Override
-  public List<ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) throws ProcessingException {
+  public List<ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
     List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Object parentKey = call.getRec();
     if (parentKey == null) {
@@ -78,7 +77,7 @@ public class TestingLookupService implements ILookupService<Long> {
   }
 
   @Override
-  public List<ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
+  public List<ILookupRow<Long>> getDataByText(ILookupCall<Long> call) {
     List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Pattern p = createLowerCaseSearchPattern(call.getText());
     for (ILookupRow<Long> row : getRows()) {
@@ -90,7 +89,7 @@ public class TestingLookupService implements ILookupService<Long> {
   }
 
   @Override
-  public List<ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) throws ProcessingException {
+  public List<ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) {
     List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Pattern p = createLowerCaseSearchPattern(call.getAll());
     for (ILookupRow<Long> row : getRows()) {

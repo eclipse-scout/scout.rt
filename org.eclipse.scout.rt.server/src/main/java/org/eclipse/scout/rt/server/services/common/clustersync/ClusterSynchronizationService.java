@@ -31,7 +31,6 @@ import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -232,14 +231,14 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   @Override
-  public void publishTransactional(Serializable notification) throws ProcessingException {
+  public void publishTransactional(Serializable notification) {
     if (isEnabled()) {
       getTransaction().addMessage(new ClusterNotificationMessage(notification, getNotificationProperties()));
     }
   }
 
   @Override
-  public void publish(Serializable notification) throws ProcessingException {
+  public void publish(Serializable notification) {
     publishAll(CollectionUtility.arrayList(notification));
   }
 
@@ -272,7 +271,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   @Override
-  public void onMessage(final IClusterNotificationMessage message) throws ProcessingException {
+  public void onMessage(final IClusterNotificationMessage message) {
     if (isEnabled()) {
       //Do not progress notifications sent by node itself
       String originNode = message.getProperties().getOriginNode();
@@ -305,7 +304,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   /**
    * @return transaction member for publishing messages within a transaction
    */
-  protected ClusterSynchTransactionMember getTransaction() throws ProcessingException {
+  protected ClusterSynchTransactionMember getTransaction() {
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
     ClusterSynchTransactionMember m = (ClusterSynchTransactionMember) tx.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
@@ -322,7 +321,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private class ClusterSynchTransactionMember extends AbstractTransactionMember {
     private List<IClusterNotificationMessage> m_messageQueue;
 
-    public ClusterSynchTransactionMember(String transactionId) throws ProcessingException {
+    public ClusterSynchTransactionMember(String transactionId) {
       super(transactionId);
       m_messageQueue = new LinkedList<IClusterNotificationMessage>();
     }

@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
@@ -64,7 +63,7 @@ public class ClusterSynchronizationServiceTest {
    * Tests that the statusInfo is updated up on receipt of a message.
    */
   @Test
-  public void testReveiveInfoUpdated() throws ProcessingException {
+  public void testReveiveInfoUpdated() {
     m_svc.onMessage(m_message);
     IClusterNodeStatusInfo nodeInfo = m_svc.getStatusInfo();
     assertEquals(1, nodeInfo.getReceivedMessageCount());
@@ -76,7 +75,7 @@ public class ClusterSynchronizationServiceTest {
    * Tests that the message is sent when publishing it.
    */
   @Test
-  public void testSendNoTransaction() throws ProcessingException {
+  public void testSendNoTransaction() {
     m_svc.publish("Testnotification");
     assertSingleMessageSent();
   }

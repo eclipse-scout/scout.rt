@@ -25,7 +25,7 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
   private final IWizard m_parentWizard;
   private final IWizard m_childWizard;
 
-  public WrappedWizardWizardStep(IWizard parentWizard, IWizard childWizard) throws ProcessingException {
+  public WrappedWizardWizardStep(IWizard parentWizard, IWizard childWizard) {
     super();
     this.m_parentWizard = parentWizard;
     this.m_childWizard = childWizard;
@@ -33,7 +33,7 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
   }
 
   @Override
-  protected void execActivate(int stepKind) throws ProcessingException {
+  protected void execActivate(int stepKind) {
     m_childWizard.addWizardListener(new WizardListener() {
       @Override
       public void wizardChanged(WizardEvent e) {

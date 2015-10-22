@@ -69,7 +69,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * {@link AbstractTable#addRowByArray(Object)}
    */
   @Test
-  public void testValidColumn() throws ProcessingException {
+  public void testValidColumn() {
     TestTable table = new TestTable();
     table.addRowsByArray(new String[]{VALID});
     ICell c0 = table.getCell(0, 0);
@@ -84,7 +84,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * {@link AbstractTable#addRowByArray(Object)}
    */
   @Test
-  public void testInvalidColumn() throws ProcessingException {
+  public void testInvalidColumn() {
     TestTable table = new TestTable();
     table.addRowsByArray(new String[]{INVALID, "a"});
     ICell c0 = table.getCell(0, 0);
@@ -105,7 +105,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * Test that setting a valid value in an initially invalid table resets the error.
    */
   @Test
-  public void testResetValidationError() throws ProcessingException {
+  public void testResetValidationError() {
     TestTable table = new TestTable();
     table.addRowsByArray(new String[]{INVALID});
     table.getValidateTestColumn().setValue(0, VALID);
@@ -120,7 +120,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * Test that setting a valid value using the cell editor in an initially invalid table resets the error.
    */
   @Test
-  public void testResetValidationError_UsingField() throws ProcessingException {
+  public void testResetValidationError_UsingField() {
     TestTable table = new TestTable();
     table.addRowsByArray(new String[]{"aaa"});
     ITableRow testRow = table.getRow(0);
@@ -138,7 +138,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * A displayable invalid column should become visible after validation
    */
   @Test
-  public void testInvalidColumnVisible() throws ProcessingException {
+  public void testInvalidColumnVisible() {
     TestTable testTable = new TestTable();
     testTable.getValidateTestColumn().setVisible(false);
     testTable.addRowsByArray(new String[]{INVALID});
@@ -152,7 +152,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * Invalid column values should have an error status
    */
   @Test
-  public void testValidateVetoColumn() throws ProcessingException {
+  public void testValidateVetoColumn() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{INVALID, "a"});
     ICell c0 = table.getCell(0, 0);
@@ -166,7 +166,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * Tests mandatory validation after setting property.
    */
   @Test
-  public void testValidate_MandatoryChange() throws ProcessingException {
+  public void testValidate_MandatoryChange() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"", ""});
     table.addRowsByArray(new String[]{"", ""});
@@ -211,7 +211,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testCompleteEdit_ParsingError() throws ProcessingException {
+  public void testCompleteEdit_ParsingError() {
     ParsingTestTable table = new ParsingTestTable();
     table.addRowsByArray(new Integer[]{0});
     IIntegerField field = new AbstractIntegerField() {
@@ -234,7 +234,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testInitialDecoration() throws ProcessingException {
+  public void testInitialDecoration() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"decorate"});
     ICell c0 = table.getCell(0, 0);
@@ -243,7 +243,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testDecoration_SetValue() throws ProcessingException {
+  public void testDecoration_SetValue() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"b"});
     table.getValidateTestColumn().setValue(0, "decorate");
@@ -268,7 +268,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testUpdateDisplayText() throws ProcessingException {
+  public void testUpdateDisplayText() {
     final TestDecorationTable table = new TestDecorationTable();
     ITableRow row = table.addRow();
     table.getC1Column().setValue(row, "newValue");
@@ -289,7 +289,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       }
 
       @Override
-      protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
+      protected String execValidateValue(ITableRow row, String rawValue) {
         Cell cell = row.getCellForUpdate(this);
         if (INVALID.equals(rawValue)) {
           cell.addErrorStatus(INVALID_MESSAGE);
@@ -318,7 +318,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       }
 
       @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+      protected void execDecorateCell(Cell cell, ITableRow row) {
         m_decorateCount++;
         if ("decorate".equals(cell.getValue())) {
           cell.setCssClass("decorated");
@@ -331,7 +331,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       }
 
       @Override
-      protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
+      protected String execValidateValue(ITableRow row, String rawValue) {
         if (INVALID.equals(rawValue)) {
           throw new VetoException(INVALID_MESSAGE);
         }
@@ -358,7 +358,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     public class C2Column extends AbstractStringColumn {
 
       @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+      protected void execDecorateCell(Cell cell, ITableRow row) {
         if (getC1Column().getValue(row) == null) {
           throw new ProcessingException("decoration on empty column");
         }

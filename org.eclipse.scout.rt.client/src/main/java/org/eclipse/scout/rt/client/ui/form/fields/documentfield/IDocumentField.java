@@ -44,7 +44,7 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    * @param format
    *          doc, dot, odt, html, pdf, ... or null to use the default format.
    */
-  RemoteFile saveAs(String name, String format) throws ProcessingException;
+  RemoteFile saveAs(String name, String format);
 
   /**
    * @see IDocumentField#saveAs(String, String).
@@ -52,9 +52,9 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    * @return
    * @throws ProcessingException
    */
-  RemoteFile saveAs(String name) throws ProcessingException;
+  RemoteFile saveAs(String name);
 
-  RemoteFile save() throws ProcessingException;
+  RemoteFile save();
 
   void autoResizeDocument();
 

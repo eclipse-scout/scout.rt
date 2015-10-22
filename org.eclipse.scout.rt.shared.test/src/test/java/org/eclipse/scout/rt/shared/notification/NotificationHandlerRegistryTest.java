@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.notification;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -60,7 +59,7 @@ public class NotificationHandlerRegistryTest {
    * Tests that a notification of type {@link String} is only handled by handlers for Strings.
    **/
   @Test
-  public void testStringNotification() throws ProcessingException {
+  public void testStringNotification() {
     NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
     reg.notifyHandlers("A simple string notification");
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
@@ -71,7 +70,7 @@ public class NotificationHandlerRegistryTest {
    * Tests that a notification of type {@link INotificationGroup} is only handled by handlers for INotificationGroups.
    **/
   @Test
-  public void testNotificationGroup() throws ProcessingException {
+  public void testNotificationGroup() {
     NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
     reg.notifyHandlers(new Notification01());
     reg.notifyHandlers(new Notification01());

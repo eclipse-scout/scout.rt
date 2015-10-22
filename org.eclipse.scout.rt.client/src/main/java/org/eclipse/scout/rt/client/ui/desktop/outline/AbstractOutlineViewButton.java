@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineViewButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -98,7 +97,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
    * Activates the associated outline if it is not the desktop's active outline.
    */
   @Override
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (isSelected() && m_desktop.getOutline() != m_outline) {
       m_desktop.activateOutline(m_outline);
     }

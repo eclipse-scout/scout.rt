@@ -177,7 +177,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     super.initFieldInternal();
     // init actions
     ActionUtility.initActions(getMenus());
@@ -194,7 +194,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+  public void exportFormFieldData(AbstractFormFieldData target) {
     AbstractValueFieldData<VALUE> v = (AbstractValueFieldData<VALUE>) target;
     v.setValue(this.getValue());
   }
@@ -237,7 +237,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * XML i/o
    */
   @Override
-  public void storeToXml(Element x) throws ProcessingException {
+  public void storeToXml(Element x) {
     super.storeToXml(x);
     VALUE value = getValue();
     try {
@@ -251,7 +251,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  public void loadFromXml(Element x) throws ProcessingException {
+  public void loadFromXml(Element x) {
     super.loadFromXml(x);
     try {
       VALUE value = TypeCastUtility.castValue(XmlUtility.getObjectAttribute(x, "value"), getHolderType());
@@ -303,19 +303,19 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  protected boolean execIsSaveNeeded() throws ProcessingException {
+  protected boolean execIsSaveNeeded() {
     return !CompareUtility.equals(getValue(), getInitValue());
   }
 
   @Override
-  protected void execMarkSaved() throws ProcessingException {
+  protected void execMarkSaved() {
     super.execMarkSaved();
     VALUE value = getValue();
     setInitValue(value);
   }
 
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     return getValue() == null;
   }
 
@@ -465,7 +465,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
   }
 
-  private VALUE validateValue(VALUE rawValue) throws ProcessingException {
+  private VALUE validateValue(VALUE rawValue) {
     try {
       setValueValidating(true);
 
@@ -482,7 +482,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   /**
    * override this method to perform detailed validation in subclasses
    */
-  protected VALUE validateValueInternal(VALUE rawValue) throws ProcessingException {
+  protected VALUE validateValueInternal(VALUE rawValue) {
     return rawValue;
   }
 
@@ -496,7 +496,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
   @ConfigOperation
   @Order(190)
-  protected VALUE execValidateValue(VALUE rawValue) throws ProcessingException {
+  protected VALUE execValidateValue(VALUE rawValue) {
     return rawValue;
   }
 
@@ -511,7 +511,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
   @ConfigOperation
   @Order(220)
-  protected void execChangedValue() throws ProcessingException {
+  protected void execChangedValue() {
   }
 
   /**
@@ -563,7 +563,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   /**
    * override this method to perform detailed parsing in subclasses
    */
-  protected VALUE parseValueInternal(String text) throws ProcessingException {
+  protected VALUE parseValueInternal(String text) {
     throw new ProcessingException("Not implemented");
   }
 
@@ -574,7 +574,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
   @ConfigOperation
   @Order(200)
-  protected VALUE execParseValue(String text) throws ProcessingException {
+  protected VALUE execParseValue(String text) {
     return parseValueInternal(text);
   }
 
@@ -638,7 +638,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * Full override: set my value to null
    */
   @Override
-  protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+  protected void execChangedMasterValue(Object newMasterValue) {
     setValue(null);
   }
 
@@ -668,7 +668,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
 
     @Override
-    public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) throws ProcessingException {
+    public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) {
       return getOwner().execValidateValue(rawValue);
     }
 
@@ -678,22 +678,22 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
 
     @Override
-    public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) throws ProcessingException {
+    public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) {
       return getOwner().execValidateValue(rawValue);
     }
 
     @Override
-    public void execChangedValue(ValueFieldChangedValueChain<VALUE> chain) throws ProcessingException {
+    public void execChangedValue(ValueFieldChangedValueChain<VALUE> chain) {
       getOwner().execChangedValue();
     }
 
     @Override
-    public VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text) throws ProcessingException {
+    public VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text) {
       return getOwner().execParseValue(text);
     }
   }
 
-  protected final VALUE interceptValidateValue(VALUE rawValue) throws ProcessingException {
+  protected final VALUE interceptValidateValue(VALUE rawValue) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ValueFieldExecValidateChain<VALUE> chain = new ValueFieldExecValidateChain<VALUE>(extensions);
     return chain.execValidateValue(rawValue);
@@ -705,13 +705,13 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     return chain.execFormatValue(validValue);
   }
 
-  protected final void interceptChangedValue() throws ProcessingException {
+  protected final void interceptChangedValue() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ValueFieldChangedValueChain<VALUE> chain = new ValueFieldChangedValueChain<VALUE>(extensions);
     chain.execChangedValue();
   }
 
-  protected final VALUE interceptParseValue(String text) throws ProcessingException {
+  protected final VALUE interceptParseValue(String text) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ValueFieldParseValueChain<VALUE> chain = new ValueFieldParseValueChain<VALUE>(extensions);
     return chain.execParseValue(text);

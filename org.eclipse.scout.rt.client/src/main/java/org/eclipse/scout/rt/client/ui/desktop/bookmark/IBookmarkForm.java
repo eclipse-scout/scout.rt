@@ -45,26 +45,26 @@ public interface IBookmarkForm extends IForm {
    * @return the folder where the bookmark is located
    * @throws ProcessingException
    */
-  BookmarkFolder getFolder() throws ProcessingException;
+  BookmarkFolder getFolder();
 
   /**
    * @param folder
    *          the folder where the bookmark is located
    * @throws ProcessingException
    */
-  void setFolder(BookmarkFolder folder) throws ProcessingException;
+  void setFolder(BookmarkFolder folder);
 
   /**
    * Opens the form for modification of an existing bookmark
    * 
    * @throws ProcessingException
    */
-  void startModify() throws ProcessingException;
+  void startModify();
 
   /**
    * Opens the form for creation of a new bookmark
    * 
    * @throws ProcessingException
    */
-  void startNew() throws ProcessingException;
+  void startNew();
 }

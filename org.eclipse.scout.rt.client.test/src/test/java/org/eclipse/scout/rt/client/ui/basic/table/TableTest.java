@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -37,31 +36,31 @@ import org.junit.runner.RunWith;
 public class TableTest {
 
   @Test
-  public void testAddRows_StatusNonChanged() throws ProcessingException {
+  public void testAddRows_StatusNonChanged() {
     P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
     assertValidTestTable(table, ITableRow.STATUS_NON_CHANGED);
   }
 
   @Test
-  public void testAddRows_StatusInserted() throws ProcessingException {
+  public void testAddRows_StatusInserted() {
     P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
     assertValidTestTable(table, ITableRow.STATUS_INSERTED);
   }
 
   @Test
-  public void testAddRows_StatusUpdated() throws ProcessingException {
+  public void testAddRows_StatusUpdated() {
     P_Table table = createTestTable(ITableRow.STATUS_UPDATED);
     assertValidTestTable(table, ITableRow.STATUS_UPDATED);
   }
 
   @Test
-  public void testAddRows_StatusDeleted() throws ProcessingException {
+  public void testAddRows_StatusDeleted() {
     P_Table table = createTestTable(ITableRow.STATUS_DELETED);
     assertValidTestTable(table, ITableRow.STATUS_DELETED);
   }
 
   @Test
-  public void testAddRow() throws ProcessingException {
+  public void testAddRow() {
     P_Table table = new P_Table();
     final ITableRow row = table.addRow();
     assertEquals(ITableRow.STATUS_INSERTED, row.getStatus());
@@ -71,7 +70,7 @@ public class TableTest {
    * Test that new inserted rows are automatically discarded.
    */
   @Test
-  public void testDeleteAllNew() throws ProcessingException {
+  public void testDeleteAllNew() {
     //Bug 361985
     P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
 
@@ -88,7 +87,7 @@ public class TableTest {
    * AutoDiscardOnDelete = false) discard these rows.
    */
   @Test
-  public void testDeleteAllAndDiscardFirst() throws ProcessingException {
+  public void testDeleteAllAndDiscardFirst() {
     //Bug 361985
     P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
     final CapturingTableAdapter ta = new CapturingTableAdapter();
@@ -360,7 +359,7 @@ public class TableTest {
   }
 
   @Test
-  public void testReplaceRows() throws ProcessingException {
+  public void testReplaceRows() {
     P_Table table = new P_Table();
     table.initTable();
   }
@@ -381,14 +380,14 @@ public class TableTest {
   /**
    * Creates a table with 2 rows. with given status.
    */
-  private P_Table createTestTable(int status) throws ProcessingException {
+  private P_Table createTestTable(int status) {
     P_Table table = new P_Table();
     table.initTable();
     table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}}, status);
     return table;
   }
 
-  private void fillTable(P_Table table) throws ProcessingException {
+  private void fillTable(P_Table table) {
     addTableRow(table, 10, "Lorem", 1);
     addTableRow(table, 1, "A Total", 2);
     addTableRow(table, 30, "Ipsum", 1);
@@ -398,7 +397,7 @@ public class TableTest {
     assertRowCount(5, 0, table);
   }
 
-  private void addTableRow(P_Table table, Integer first, String second, Integer third) throws ProcessingException {
+  private void addTableRow(P_Table table, Integer first, String second, Integer third) {
     ITableRow r = table.addRow();
     table.getFirstColumn().setValue(r, first);
     table.getSecondColumn().setValue(r, second);

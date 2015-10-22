@@ -32,7 +32,7 @@ public class BeanAnnotations {
   /**
    * Initialize fields annotated with {@link BeanMock}
    */
-  public void init(Object testObj) throws ProcessingException {
+  public void init(Object testObj) {
     List<IBean<?>> regs = new ArrayList<IBean<?>>();
     Field[] fields = testObj.getClass().getDeclaredFields();
     for (Field f : fields) {
@@ -43,7 +43,7 @@ public class BeanAnnotations {
     m_regs = Collections.unmodifiableList(regs);
   }
 
-  private IBean<?> registerMock(Object testObj, Field f) throws ProcessingException {
+  private IBean<?> registerMock(Object testObj, Field f) {
     Class<?> mockType = f.getType();
     BeanMetaData beanData = BEANS.get(IBeanAnnotationMetaDataProducer.class).produce(mockType);
     IBean<?> reg = Platform.get().getBeanManager().registerBean(beanData);
@@ -56,7 +56,7 @@ public class BeanAnnotations {
     return f.getAnnotation(BeanMock.class) != null;
   }
 
-  private void trySetMock(Field field, Object mock, Object testObj) throws ProcessingException {
+  private void trySetMock(Field field, Object mock, Object testObj) {
     try {
       field.setAccessible(true);
       field.set(testObj, mock);

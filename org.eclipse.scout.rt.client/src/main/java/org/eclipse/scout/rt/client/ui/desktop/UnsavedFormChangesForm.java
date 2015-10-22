@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 public class UnsavedFormChangesForm extends AbstractForm {
   private final List<IForm> m_forms;
 
-  public UnsavedFormChangesForm(List<IForm> forms) throws ProcessingException {
+  public UnsavedFormChangesForm(List<IForm> forms) {
     m_forms = forms;
   }
 
@@ -63,7 +63,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
     return getDesktop();
   }
 
-  public void startNew() throws ProcessingException {
+  public void startNew() {
     startInternal(new NewHandler());
   }
 
@@ -116,7 +116,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       public class OpenFormsField extends AbstractListBox<IForm> {
 
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           checkAllKeys();
         }
 
@@ -139,7 +139,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
         }
 
         @Override
-        protected void execPrepareLookup(ILookupCall<IForm> call) throws ProcessingException {
+        protected void execPrepareLookup(ILookupCall<IForm> call) {
           UnsavedFormsLookupCall unsavedFormsLookupCall = (UnsavedFormsLookupCall) call;
           unsavedFormsLookupCall.setUnsavedForms(getUnsavedForms());
         }
@@ -170,7 +170,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
             }
 
             @Override
-            protected void execAction() throws ProcessingException {
+            protected void execAction() {
               checkAllKeys();
             }
           }
@@ -189,7 +189,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
             }
 
             @Override
-            protected void execAction() throws ProcessingException {
+            protected void execAction() {
               uncheckAllKeys();
             }
           }
@@ -218,12 +218,12 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
   public class NewHandler extends AbstractFormHandler {
     @Override
-    protected void execPostLoad() throws ProcessingException {
+    protected void execPostLoad() {
       touch();
     }
 
     @Override
-    protected boolean execValidate() throws ProcessingException {
+    protected boolean execValidate() {
       List<IForm> invalidForms = getOpenFormsField().getInvalidForms();
       if (invalidForms.size() > 0) {
         StringBuilder msg = new StringBuilder(TEXTS.get("FormsCannotBeSaved"));
@@ -238,7 +238,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
     }
 
     @Override
-    protected void execStore() throws ProcessingException {
+    protected void execStore() {
       for (IForm f : getOpenFormsField().getValue()) {
         f.doOk();
       }
@@ -259,7 +259,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
     }
 
     @Override
-    protected List<? extends ILookupRow<IForm>> execCreateLookupRows() throws ProcessingException {
+    protected List<? extends ILookupRow<IForm>> execCreateLookupRows() {
       List<ILookupRow<IForm>> formRows = new ArrayList<ILookupRow<IForm>>();
       for (IForm f : m_unsavedForms) {
         String text = getFormDisplayName(f);

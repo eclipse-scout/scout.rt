@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
@@ -40,34 +39,34 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 
 public interface ITableExtension<TABLE extends AbstractTable> extends IExtension<TABLE> {
 
-  void execAppLinkAction(TableAppLinkActionChain chain, String ref) throws ProcessingException;
+  void execAppLinkAction(TableAppLinkActionChain chain, String ref);
 
-  void execRowAction(TableRowActionChain chain, ITableRow row) throws ProcessingException;
+  void execRowAction(TableRowActionChain chain, ITableRow row);
 
-  void execContentChanged(TableContentChangedChain chain) throws ProcessingException;
+  void execContentChanged(TableContentChangedChain chain);
 
-  ITableRowDataMapper execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain chain, Class<? extends AbstractTableRowData> rowType) throws ProcessingException;
+  ITableRowDataMapper execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain chain, Class<? extends AbstractTableRowData> rowType);
 
-  void execInitTable(TableInitTableChain chain) throws ProcessingException;
+  void execInitTable(TableInitTableChain chain);
 
-  void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths) throws ProcessingException;
+  void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths);
 
-  void execDecorateCell(TableDecorateCellChain chain, Cell view, ITableRow row, IColumn<?> col) throws ProcessingException;
+  void execDecorateCell(TableDecorateCellChain chain, Cell view, ITableRow row, IColumn<?> col);
 
-  void execDrop(TableDropChain chain, ITableRow row, TransferObject t) throws ProcessingException;
+  void execDrop(TableDropChain chain, ITableRow row, TransferObject t);
 
-  void execDisposeTable(TableDisposeTableChain chain) throws ProcessingException;
+  void execDisposeTable(TableDisposeTableChain chain);
 
-  void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) throws ProcessingException;
+  void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton);
 
-  void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> rows) throws ProcessingException;
+  void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> rows);
 
-  void execDecorateRow(TableDecorateRowChain chain, ITableRow row) throws ProcessingException;
+  void execDecorateRow(TableDecorateRowChain chain, ITableRow row);
 
-  TransferObject execCopy(TableCopyChain chain, List<? extends ITableRow> rows) throws ProcessingException;
+  TransferObject execCopy(TableCopyChain chain, List<? extends ITableRow> rows);
 
-  void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows) throws ProcessingException;
+  void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows);
 
-  TransferObject execDrag(TableDragChain chain, List<ITableRow> rows) throws ProcessingException;
+  TransferObject execDrag(TableDragChain chain, List<ITableRow> rows);
 
 }

@@ -66,26 +66,26 @@ public final class ValidationUtility {
   /**
    * check if value is an array
    */
-  public static void checkArray(Object array) throws ProcessingException {
+  public static void checkArray(Object array) {
     if (array == null || !array.getClass().isArray()) {
       throw new ProcessingException("value  is no array");
     }
   }
 
-  public static void checkMandatoryValue(Object value) throws ProcessingException {
+  public static void checkMandatoryValue(Object value) {
     if (value == null) {
       throw new ProcessingException("value  is required");
     }
   }
 
-  public static void checkMandatoryArray(Object array) throws ProcessingException {
+  public static void checkMandatoryArray(Object array) {
     checkArray(array);
     if (Array.getLength(array) == 0) {
       throw new ProcessingException("value  is required");
     }
   }
 
-  public static void checkMinLength(Object value, Object minLength) throws ProcessingException {
+  public static void checkMinLength(Object value, Object minLength) {
     if (value == null || minLength == null) {
       return;
     }
@@ -117,7 +117,7 @@ public final class ValidationUtility {
     }
   }
 
-  public static void checkMaxLength(Object value, Object maxLength) throws ProcessingException {
+  public static void checkMaxLength(Object value, Object maxLength) {
     if (value == null || maxLength == null) {
       return;
     }
@@ -150,7 +150,7 @@ public final class ValidationUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkMinValue(Object value, Object minValue) throws ProcessingException {
+  public static void checkMinValue(Object value, Object minValue) {
     if (value == null || minValue == null) {
       return;
     }
@@ -161,7 +161,7 @@ public final class ValidationUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkMaxValue(Object value, Object maxValue) throws ProcessingException {
+  public static void checkMaxValue(Object value, Object maxValue) {
     if (value == null || maxValue == null) {
       return;
     }
@@ -172,7 +172,7 @@ public final class ValidationUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkCodeTypeValue(Object codeKey, ICodeType codeType) throws ProcessingException {
+  public static void checkCodeTypeValue(Object codeKey, ICodeType codeType) {
     if (codeKey == null || codeType == null) {
       return;
     }
@@ -182,7 +182,7 @@ public final class ValidationUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkCodeTypeSet(Object codeKeySet, ICodeType codeType) throws ProcessingException {
+  public static void checkCodeTypeSet(Object codeKeySet, ICodeType codeType) {
     if (codeKeySet == null || codeType == null) {
       return;
     }
@@ -201,7 +201,7 @@ public final class ValidationUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkLookupCallValue(Object lookupKey, ILookupCall call) throws ProcessingException {
+  public static void checkLookupCallValue(Object lookupKey, ILookupCall call) {
     if (lookupKey == null || call == null) {
       return;
     }
@@ -212,7 +212,7 @@ public final class ValidationUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkLookupCallSet(Object lookupKeySet, ILookupCall call) throws ProcessingException {
+  public static void checkLookupCallSet(Object lookupKeySet, ILookupCall call) {
     if (lookupKeySet == null || call == null) {
       return;
     }
@@ -238,7 +238,7 @@ public final class ValidationUtility {
    * @param value
    * @param regex
    */
-  public static void checkRegexMatchValue(Object value, Pattern regex) throws ProcessingException {
+  public static void checkRegexMatchValue(Object value, Pattern regex) {
     if (value == null || regex == null) {
       return;
     }
@@ -254,7 +254,7 @@ public final class ValidationUtility {
   /**
    * see {@link #checkRegexMatchValue(Object, Pattern)}
    */
-  public static void checkRegexMatchArray(Object arrayOfStrings, Pattern regex) throws ProcessingException {
+  public static void checkRegexMatchArray(Object arrayOfStrings, Pattern regex) {
     if (arrayOfStrings == null || regex == null) {
       return;
     }

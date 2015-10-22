@@ -29,6 +29,6 @@ public interface IUserPreferencesStorageService extends IUserPreferencesService 
    * @throws ProcessingException
    *           On an error while storing the given preferences.
    */
-  void flush(IPreferences prefs) throws ProcessingException;
+  void flush(IPreferences prefs);
 
 }

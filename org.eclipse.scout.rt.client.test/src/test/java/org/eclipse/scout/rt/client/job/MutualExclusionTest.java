@@ -114,7 +114,7 @@ public class MutualExclusionTest {
    * Tests serial execution of model jobs.
    */
   @Test
-  public void testModelJobs() throws ProcessingException, InterruptedException {
+  public void testModelJobs() throws InterruptedException {
     final Set<Integer> protocol = Collections.synchronizedSet(new HashSet<Integer>()); // synchronized because modified/read by different threads.
     final List<String> modelThreadProtocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
@@ -185,7 +185,7 @@ public class MutualExclusionTest {
    * Tests serial execution of nested model jobs.
    */
   @Test
-  public void testNestedModelJobs() throws ProcessingException, InterruptedException {
+  public void testNestedModelJobs() throws InterruptedException {
     final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
     ModelJobs.schedule(new IRunnable() {
@@ -254,7 +254,7 @@ public class MutualExclusionTest {
    * Tests that a model-job cannot wait for a scheduled job.
    */
   @Test
-  public void testMutexDeadlock() throws ProcessingException, InterruptedException {
+  public void testMutexDeadlock() throws InterruptedException {
     final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
     ModelJobs.schedule(new IRunnable() {
@@ -291,7 +291,7 @@ public class MutualExclusionTest {
    * Tests a BlockingCondition that blocks a single model-thread.
    */
   @Test
-  public void testBlockingConditionSingle() throws ProcessingException, InterruptedException {
+  public void testBlockingConditionSingle() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
@@ -385,7 +385,7 @@ public class MutualExclusionTest {
    * Tests a BlockingCondition that blocks multiple model-threads.
    */
   @Test
-  public void testBlockingConditionMultipleFlat() throws ProcessingException, InterruptedException {
+  public void testBlockingConditionMultipleFlat() throws InterruptedException {
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
@@ -397,7 +397,7 @@ public class MutualExclusionTest {
    * Tests a BlockingCondition that blocks multiple model-threads that were scheduled as nested jobs.
    */
   @Test
-  public void testBlockingConditionMultipleNested() throws ProcessingException, InterruptedException {
+  public void testBlockingConditionMultipleNested() throws InterruptedException {
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
@@ -411,7 +411,7 @@ public class MutualExclusionTest {
    * interrupted, job3 must not be scheduled because the mutex-owner is still job2.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException, ProcessingException {
+  public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
@@ -478,7 +478,7 @@ public class MutualExclusionTest {
    * complete, so that the 're-acquire-mutex'-task for job1 can finally schedule job3.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws ProcessingException, InterruptedException {
+  public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
@@ -607,7 +607,7 @@ public class MutualExclusionTest {
    * job2 gets scheduled, it is rejected by the executor. This test verifies, that job3 still gets scheduled.
    */
   @Test
-  public void testRejection() throws ProcessingException {
+  public void testRejection() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final ExecutorService executorMock = mock(ExecutorService.class);
@@ -730,7 +730,7 @@ public class MutualExclusionTest {
    * acquired and therefore job1 can run. After job1 complete, job3 and job4 gets scheduled.
    */
   @Test
-  public void testBlockedJobRejection() throws InterruptedException, ProcessingException {
+  public void testBlockedJobRejection() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final ScheduledExecutorService executorMock = mock(ScheduledExecutorService.class);
@@ -920,7 +920,7 @@ public class MutualExclusionTest {
     assertTrue(future4.isDone());
   }
 
-  public void runTestBlockingConditionMultipleFlat(final IBlockingCondition BC) throws ProcessingException, InterruptedException {
+  public void runTestBlockingConditionMultipleFlat(final IBlockingCondition BC) throws InterruptedException {
     BC.setBlocking(true);
 
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
@@ -1034,7 +1034,7 @@ public class MutualExclusionTest {
     assertEquals(expected, protocol);
   }
 
-  private void runTestBlockingCondition(final IBlockingCondition BC) throws ProcessingException {
+  private void runTestBlockingCondition(final IBlockingCondition BC) {
     BC.setBlocking(true);
 
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
@@ -1133,7 +1133,7 @@ public class MutualExclusionTest {
    * Tests that an invalidated Blocking condition does not block.
    */
   @Test
-  public void testBlockingConditionNotBlocking() throws ProcessingException {
+  public void testBlockingConditionNotBlocking() {
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", false);
     ModelJobs.schedule(new IRunnable() {
 

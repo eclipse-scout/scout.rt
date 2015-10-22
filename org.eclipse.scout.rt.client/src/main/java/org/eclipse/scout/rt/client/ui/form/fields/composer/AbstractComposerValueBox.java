@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -99,7 +98,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
    */
   @ConfigOperation
   @Order(50)
-  protected void execChangedValue() throws ProcessingException {
+  protected void execChangedValue() {
   }
 
   @Override
@@ -254,7 +253,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
 
     @Override
-    protected void execPrepareLookup(ILookupCall<Object> call) throws ProcessingException {
+    protected void execPrepareLookup(ILookupCall<Object> call) {
       if (m_attribute != null) {
         // if isFilterActiveRows() is true, do not use a filter to load rows
         // the list box is only populated one time and filtering for active/inactive is done afterwards
@@ -343,7 +342,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
 
     @Override
-    protected void execPrepareLookup(ILookupCall<Object> call, ITreeNode parent) throws ProcessingException {
+    protected void execPrepareLookup(ILookupCall<Object> call, ITreeNode parent) {
       if (m_attribute != null) {
         // if isFilterActiveNodes() is true, do not use a filter to load nodes
         // the tree box is only populated one time and filtering for active/inactive is done afterwards
@@ -827,7 +826,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   public class SmartField extends AbstractSmartField<Object> implements IComposerValueField {
 
     @Override
-    protected void execPrepareLookup(ILookupCall<Object> call) throws ProcessingException {
+    protected void execPrepareLookup(ILookupCall<Object> call) {
       if (m_attribute != null) {
         call.setActive(isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
         m_attribute.prepareLookup(call);
@@ -1305,7 +1304,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
   }
 
-  protected final void interceptChangedValue() throws ProcessingException {
+  protected final void interceptChangedValue() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerValueBoxChangedValueChain chain = new ComposerValueBoxChangedValueChain(extensions);
     chain.execChangedValue();
@@ -1318,7 +1317,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
 
     @Override
-    public void execChangedValue(ComposerValueBoxChangedValueChain chain) throws ProcessingException {
+    public void execChangedValue(ComposerValueBoxChangedValueChain chain) {
       getOwner().execChangedValue();
     }
   }

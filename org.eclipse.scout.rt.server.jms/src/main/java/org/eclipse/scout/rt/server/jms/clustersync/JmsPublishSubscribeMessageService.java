@@ -99,7 +99,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   }
 
   @Override
-  public void subscribe() throws ProcessingException {
+  public void subscribe() {
     if (!isEnabled()) {
       throw new ProcessingException("Cluster synchronization is not enabled: missing connectionFactory or topic configuration properties.");
     }
@@ -109,7 +109,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   }
 
   @Override
-  public void unsubsribe() throws ProcessingException {
+  public void unsubsribe() {
     if (!isEnabled()) {
       LOG.info("Cluster synchronization is not enabled");
       return;
@@ -129,7 +129,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   }
 
   @Override
-  protected void execOnMessage(IClusterNotificationMessage message, Session session) throws ProcessingException {
+  protected void execOnMessage(IClusterNotificationMessage message, Session session) {
     IPublishSubscribeMessageListener listener = getListener();
     if (listener != null) {
       listener.onMessage(message);

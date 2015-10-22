@@ -139,7 +139,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    *         default just returns the incoming stm (either {@link #getSelectClause()} or {@link #getWhereClause()})
    * @throws ProcessingException
    */
-  public String createInstance(FormDataStatementBuilder builder, ComposerEntityNodeData entityNodeData, EntityStrategy strategy, String stm, Map<String, String> parentAliasMap) throws ProcessingException {
+  public String createInstance(FormDataStatementBuilder builder, ComposerEntityNodeData entityNodeData, EntityStrategy strategy, String stm, Map<String, String> parentAliasMap) {
     return stm;
   }
 }

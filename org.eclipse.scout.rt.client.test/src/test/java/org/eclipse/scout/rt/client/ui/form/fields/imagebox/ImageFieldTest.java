@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -32,7 +31,7 @@ public class ImageFieldTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -41,7 +40,7 @@ public class ImageFieldTest {
       return "Test Form";
     }
 
-    public void startForm() throws ProcessingException {
+    public void startForm() {
       startInternal(new FormHandler());
     }
 

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
@@ -31,7 +30,7 @@ public class AutoOutline extends AbstractOutline {
   }
 
   @Override
-  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) {
     pageList.add(m_page);
   }
 

@@ -14,7 +14,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
@@ -40,30 +39,30 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<OWNER> {
 
-  void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t) throws ProcessingException;
+  void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t);
 
-  void execInitTree(TreeInitTreeChain chain) throws ProcessingException;
+  void execInitTree(TreeInitTreeChain chain);
 
-  void execDropTargetChanged(TreeDropTargetChangedChain chain, ITreeNode node) throws ProcessingException;
+  void execDropTargetChanged(TreeDropTargetChangedChain chain, ITreeNode node);
 
-  TransferObject execDrag(TreeDragNodesChain chain, Collection<ITreeNode> nodes) throws ProcessingException;
+  TransferObject execDrag(TreeDragNodesChain chain, Collection<ITreeNode> nodes);
 
-  void execNodeAction(TreeNodeActionChain chain, ITreeNode node) throws ProcessingException;
+  void execNodeAction(TreeNodeActionChain chain, ITreeNode node);
 
-  void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) throws ProcessingException;
+  void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton);
 
-  void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) throws ProcessingException;
+  void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes);
 
-  void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) throws ProcessingException;
+  void execAppLinkAction(TreeHyperlinkActionChain chain, String ref);
 
-  void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e) throws ProcessingException;
+  void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e);
 
-  void execDisposeTree(TreeDisposeTreeChain chain) throws ProcessingException;
+  void execDisposeTree(TreeDisposeTreeChain chain);
 
-  void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell) throws ProcessingException;
+  void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell);
 
-  TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) throws ProcessingException;
+  TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node);
 
-  void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes) throws ProcessingException;
+  void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes);
 
 }

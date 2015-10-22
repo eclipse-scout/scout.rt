@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.interceptor;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBean;
 
 /**
@@ -44,5 +43,5 @@ public interface IBeanInvocationContext<T> {
    *
    * @return the result of the call
    */
-  Object proceed() throws ProcessingException;
+  Object proceed();
 }

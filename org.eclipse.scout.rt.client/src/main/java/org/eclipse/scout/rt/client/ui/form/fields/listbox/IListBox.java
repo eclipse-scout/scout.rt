@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -88,7 +87,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
 
   void setFilterActiveRowsValue(TriState t);
 
-  void prepareLookupCall(ILookupCall<KEY> call) throws ProcessingException;
+  void prepareLookupCall(ILookupCall<KEY> call);
 
   /**
    * Populate table with data from data service<br>
@@ -96,7 +95,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
    * 
    * @see execFilterTableRow
    */
-  void loadListBoxData() throws ProcessingException;
+  void loadListBoxData();
 
   ILookupCall<KEY> getLookupCall();
 

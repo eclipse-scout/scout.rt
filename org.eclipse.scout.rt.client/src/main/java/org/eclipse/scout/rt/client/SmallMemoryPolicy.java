@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -42,12 +41,12 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  public void pageSearchFormStarted(IPageWithTable<?> p) throws ProcessingException {
+  public void pageSearchFormStarted(IPageWithTable<?> p) {
     //nop
   }
 
   @Override
-  public void pageCreated(IPage<?> p) throws ProcessingException {
+  public void pageCreated(IPage<?> p) {
     //nop
   }
 

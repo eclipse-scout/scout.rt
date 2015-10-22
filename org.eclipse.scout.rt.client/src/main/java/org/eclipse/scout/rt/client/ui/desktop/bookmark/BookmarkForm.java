@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.DescriptionField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.FolderField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.KeyStrokeField;
@@ -36,7 +35,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   private BookmarkFolder m_bookmarkRootFolder;
   private Bookmark m_bookmark;
 
-  public BookmarkForm() throws ProcessingException {
+  public BookmarkForm() {
     super();
   }
 
@@ -79,12 +78,12 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   }
 
   @Override
-  public void startModify() throws ProcessingException {
+  public void startModify() {
     startInternal(new ModifyHandler());
   }
 
   @Override
-  public void startNew() throws ProcessingException {
+  public void startNew() {
     startInternal(new NewHandler());
   }
 
@@ -171,7 +170,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
         }
 
         @Override
-        protected void execPrepareLookup(ILookupCall<String> call) throws ProcessingException {
+        protected void execPrepareLookup(ILookupCall<String> call) {
           ((KeyStrokeLookupCall) call).setCurrentKeyStroke(getValue());
         }
       }
@@ -249,18 +248,18 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   @Order(20f)
   public class NewHandler extends AbstractFormHandler {
     @Override
-    protected void execPostLoad() throws ProcessingException {
+    protected void execPostLoad() {
       touch();
     }
   }
 
   @Override
-  public BookmarkFolder getFolder() throws ProcessingException {
+  public BookmarkFolder getFolder() {
     return getFolderField().getValue();
   }
 
   @Override
-  public void setFolder(BookmarkFolder folder) throws ProcessingException {
+  public void setFolder(BookmarkFolder folder) {
     getFolderField().setValue(folder);
   }
 }

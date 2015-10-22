@@ -224,7 +224,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
 
   @SuppressWarnings("unchecked")
   @Override
-  protected VALUE parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected VALUE parseValueInternal(ITableRow row, Object rawValue) {
     VALUE validValue = null;
     if (rawValue == null) {
       validValue = null;

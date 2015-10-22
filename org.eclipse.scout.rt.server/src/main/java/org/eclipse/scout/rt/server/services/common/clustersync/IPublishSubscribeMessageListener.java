@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface IPublishSubscribeMessageListener {
 
   /**
@@ -20,5 +18,5 @@ public interface IPublishSubscribeMessageListener {
    * @param message
    *          message received.
    */
-  void onMessage(IClusterNotificationMessage message) throws ProcessingException;
+  void onMessage(IClusterNotificationMessage message);
 }

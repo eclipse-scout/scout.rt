@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -41,27 +40,27 @@ public abstract class AbstractFormExtension<FORM extends AbstractForm> extends A
   }
 
   @Override
-  public void execCloseTimer(FormCloseTimerChain chain) throws ProcessingException {
+  public void execCloseTimer(FormCloseTimerChain chain) {
     chain.execCloseTimer();
   }
 
   @Override
-  public void execInactivityTimer(FormInactivityTimerChain chain) throws ProcessingException {
+  public void execInactivityTimer(FormInactivityTimerChain chain) {
     chain.execInactivityTimer();
   }
 
   @Override
-  public void execStored(FormStoredChain chain) throws ProcessingException {
+  public void execStored(FormStoredChain chain) {
     chain.execStored();
   }
 
   @Override
-  public boolean execCheckFields(FormCheckFieldsChain chain) throws ProcessingException {
+  public boolean execCheckFields(FormCheckFieldsChain chain) {
     return chain.execCheckFields();
   }
 
   @Override
-  public void execResetSearchFilter(FormResetSearchFilterChain chain, SearchFilter searchFilter) throws ProcessingException {
+  public void execResetSearchFilter(FormResetSearchFilterChain chain, SearchFilter searchFilter) {
     chain.execResetSearchFilter(searchFilter);
   }
 
@@ -71,47 +70,47 @@ public abstract class AbstractFormExtension<FORM extends AbstractForm> extends A
   }
 
   @Override
-  public void execOnVetoException(FormOnVetoExceptionChain chain, VetoException e, int code) throws ProcessingException {
+  public void execOnVetoException(FormOnVetoExceptionChain chain, VetoException e, int code) {
     chain.execOnVetoException(e, code);
   }
 
   @Override
-  public void execFormActivated(FormFormActivatedChain chain) throws ProcessingException {
+  public void execFormActivated(FormFormActivatedChain chain) {
     chain.execFormActivated();
   }
 
   @Override
-  public void execDisposeForm(FormDisposeFormChain chain) throws ProcessingException {
+  public void execDisposeForm(FormDisposeFormChain chain) {
     chain.execDisposeForm();
   }
 
   @Override
-  public void execTimer(FormTimerChain chain, String timerId) throws ProcessingException {
+  public void execTimer(FormTimerChain chain, String timerId) {
     chain.execTimer(timerId);
   }
 
   @Override
-  public AbstractFormData execCreateFormData(FormCreateFormDataChain chain) throws ProcessingException {
+  public AbstractFormData execCreateFormData(FormCreateFormDataChain chain) {
     return chain.execCreateFormData();
   }
 
   @Override
-  public void execInitForm(FormInitFormChain chain) throws ProcessingException {
+  public void execInitForm(FormInitFormChain chain) {
     chain.execInitForm();
   }
 
   @Override
-  public boolean execValidate(FormValidateChain chain) throws ProcessingException {
+  public boolean execValidate(FormValidateChain chain) {
     return chain.execValidate();
   }
 
   @Override
-  public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
+  public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes) {
     chain.execOnCloseRequest(kill, enabledButtonSystemTypes);
   }
 
   @Override
-  public void execDataChanged(FormDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+  public void execDataChanged(FormDataChangedChain chain, Object... dataTypes) {
     chain.execDataChanged(dataTypes);
   }
 

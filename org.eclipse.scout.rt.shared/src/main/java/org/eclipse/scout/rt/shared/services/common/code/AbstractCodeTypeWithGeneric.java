@@ -142,7 +142,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(1)
-  protected List<? extends CODE> execCreateCodes() throws ProcessingException {
+  protected List<? extends CODE> execCreateCodes() {
     List<Class<ICode>> configuredCodes = getConfiguredCodes();
     List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
     OrderedCollection<CODE> codes = new OrderedCollection<CODE>();
@@ -172,7 +172,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(2)
-  protected CODE execCreateCode(ICodeRow<CODE_ID> newRow) throws ProcessingException {
+  protected CODE execCreateCode(ICodeRow<CODE_ID> newRow) {
     Class<CODE> codeClazz = TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractCodeTypeWithGeneric.class, 2);
     if (!Modifier.isAbstract(codeClazz.getModifiers()) && !Modifier.isInterface(codeClazz.getModifiers())) {
       Class<? extends ICodeRow<CODE_ID>> codeRowClazz = getConfiguredCodeRowType();
@@ -209,7 +209,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    */
   @ConfigOperation
   @Order(10)
-  protected List<? extends ICodeRow<CODE_ID>> execLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) throws ProcessingException {
+  protected List<? extends ICodeRow<CODE_ID>> execLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) {
     return null;
   }
 
@@ -235,7 +235,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    */
   @ConfigOperation
   @Order(20)
-  protected void execOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
+  protected void execOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) {
     if (newCode.getBackgroundColor() == null) {
       newCode.withBackgroundColor(oldCode.getBackgroundColor());
     }
@@ -300,7 +300,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * @return
    * @throws ProcessingException
    */
-  protected final List<? extends CODE> interceptCreateCodes() throws ProcessingException {
+  protected final List<? extends CODE> interceptCreateCodes() {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
     CodeTypeWithGenericCreateCodesChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericCreateCodesChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
     return chain.execCreateCodes();
@@ -312,7 +312,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * @return
    * @throws ProcessingException
    */
-  protected final CODE interceptCreateCode(ICodeRow<CODE_ID> newRow) throws ProcessingException {
+  protected final CODE interceptCreateCode(ICodeRow<CODE_ID> newRow) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
     CodeTypeWithGenericCreateCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericCreateCodeChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
     return chain.execCreateCode(newRow);
@@ -325,13 +325,13 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * @return
    * @throws ProcessingException
    */
-  protected List<? extends ICodeRow<CODE_ID>> interceptLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) throws ProcessingException {
+  protected List<? extends ICodeRow<CODE_ID>> interceptLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
     CodeTypeWithGenericLoadCodesChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericLoadCodesChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
     return chain.execLoadCodes(codeRowType);
   }
 
-  protected void interceptOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
+  protected void interceptOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
     CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
     chain.execOverwriteCode(oldCode, newCode);
@@ -465,7 +465,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     return list;
   }
 
-  protected void loadCodes() throws ProcessingException {
+  protected void loadCodes() {
     m_rootCodeMap = new HashMap<CODE_ID, CODE>();
     m_rootCodeList = new ArrayList<CODE>();
     //
@@ -670,22 +670,22 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     }
 
     @Override
-    public List<? extends CODE> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) throws ProcessingException {
+    public List<? extends CODE> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) {
       return getOwner().execCreateCodes();
     }
 
     @Override
-    public ICode<CODE_ID> execCreateCode(CodeTypeWithGenericCreateCodeChain chain, ICodeRow<CODE_ID> newRow) throws ProcessingException {
+    public ICode<CODE_ID> execCreateCode(CodeTypeWithGenericCreateCodeChain chain, ICodeRow<CODE_ID> newRow) {
       return getOwner().execCreateCode(newRow);
     }
 
     @Override
-    public List<? extends ICodeRow<CODE_ID>> execLoadCodes(CodeTypeWithGenericLoadCodesChain chain, Class<? extends ICodeRow<CODE_ID>> codeRowType) throws ProcessingException {
+    public List<? extends ICodeRow<CODE_ID>> execLoadCodes(CodeTypeWithGenericLoadCodesChain chain, Class<? extends ICodeRow<CODE_ID>> codeRowType) {
       return getOwner().execLoadCodes(codeRowType);
     }
 
     @Override
-    public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
+    public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) {
       getOwner().execOverwriteCode(oldCode, newCode);
     }
 

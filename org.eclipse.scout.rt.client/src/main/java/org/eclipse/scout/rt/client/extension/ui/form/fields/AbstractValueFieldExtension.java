@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
@@ -33,7 +32,7 @@ public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractV
   }
 
   @Override
-  public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) throws ProcessingException {
+  public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) {
     VALUE retChain = chain.execValidateValue(rawValue);
     return retChain;
   }
@@ -44,17 +43,17 @@ public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractV
   }
 
   @Override
-  public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) throws ProcessingException {
+  public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) {
     return chain.execValidateValue(rawValue);
   }
 
   @Override
-  public void execChangedValue(ValueFieldChangedValueChain<VALUE> chain) throws ProcessingException {
+  public void execChangedValue(ValueFieldChangedValueChain<VALUE> chain) {
     chain.execChangedValue();
   }
 
   @Override
-  public VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text) throws ProcessingException {
+  public VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text) {
     return chain.execParseValue(text);
   }
 }

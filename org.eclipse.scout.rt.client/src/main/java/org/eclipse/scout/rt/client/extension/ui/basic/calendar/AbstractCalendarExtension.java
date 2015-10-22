@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarDisposeCalendarChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarFilterCalendarItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
@@ -42,12 +41,12 @@ public abstract class AbstractCalendarExtension<OWNER extends AbstractCalendar> 
   }
 
   @Override
-  public void execDisposeCalendar(CalendarDisposeCalendarChain chain) throws ProcessingException {
+  public void execDisposeCalendar(CalendarDisposeCalendarChain chain) {
     chain.execDisposeCalendar();
   }
 
   @Override
-  public void execInitCalendar(CalendarInitCalendarChain chain) throws ProcessingException {
+  public void execInitCalendar(CalendarInitCalendarChain chain) {
     chain.execInitCalendar();
   }
 

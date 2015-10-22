@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.treebox;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterNewNodeChain;
@@ -21,22 +20,22 @@ public abstract class AbstractTreeBoxExtension<T, OWNER extends AbstractTreeBox<
   }
 
   @Override
-  public void execFilterNewNode(TreeBoxFilterNewNodeChain<T> chain, ITreeNode newNode, int treeLevel) throws ProcessingException {
+  public void execFilterNewNode(TreeBoxFilterNewNodeChain<T> chain, ITreeNode newNode, int treeLevel) {
     chain.execFilterNewNode(newNode, treeLevel);
   }
 
   @Override
-  public void execLoadChildNodes(TreeBoxLoadChildNodesChain<T> chain, ITreeNode parentNode) throws ProcessingException {
+  public void execLoadChildNodes(TreeBoxLoadChildNodesChain<T> chain, ITreeNode parentNode) {
     chain.execLoadChildNodes(parentNode);
   }
 
   @Override
-  public void execPrepareLookup(TreeBoxPrepareLookupChain<T> chain, ILookupCall<T> call, ITreeNode parent) throws ProcessingException {
+  public void execPrepareLookup(TreeBoxPrepareLookupChain<T> chain, ILookupCall<T> call, ITreeNode parent) {
     chain.execPrepareLookup(call, parent);
   }
 
   @Override
-  public void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  public void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) {
     chain.execFilterLookupResult(call, result);
   }
 }

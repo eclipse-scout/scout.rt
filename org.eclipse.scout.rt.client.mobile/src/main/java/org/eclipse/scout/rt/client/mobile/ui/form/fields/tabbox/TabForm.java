@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.groupbox.GroupBoxPropertyDelegator;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -25,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 public class TabForm extends AbstractForm {
   private IGroupBox m_tabGroupBox;
 
-  public TabForm(IGroupBox tabGroupBox) throws ProcessingException {
+  public TabForm(IGroupBox tabGroupBox) {
     super(false);
     m_tabGroupBox = tabGroupBox;
     callInitializer();
@@ -87,7 +86,7 @@ public class TabForm extends AbstractForm {
   }
 
   @Override
-  public void start() throws ProcessingException {
+  public void start() {
     startInternal(new FormHandler());
   }
 
@@ -95,7 +94,7 @@ public class TabForm extends AbstractForm {
   public class FormHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
 
     }
 

@@ -15,12 +15,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 public interface ISelectStreamHandler {
 
-  void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) throws ProcessingException;
+  void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values);
 
-  void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) throws ProcessingException;
+  void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount);
 
 }

@@ -375,7 +375,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Runtime
    */
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     getTree().initTree();
     super.initFieldInternal();
   }
@@ -392,7 +392,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+  public void exportFormFieldData(AbstractFormFieldData target) {
     if (m_tree != null) {
       AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) target;
       m_tree.exportTreeData(treeFieldData);
@@ -400,7 +400,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) throws ProcessingException {
+  public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) source;
     if (treeFieldData.isValueSet()) {
       if (m_tree != null) {
@@ -431,7 +431,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void loadFromXml(Element x) throws ProcessingException {
+  public void loadFromXml(Element x) {
     super.loadFromXml(x);
     ITree tree = getTree();
     try {
@@ -555,7 +555,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void storeToXml(Element x) throws ProcessingException {
+  public void storeToXml(Element x) {
     super.storeToXml(x);
     storeXMLRec(x, getTree().getRootNode());
   }
@@ -697,7 +697,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  protected boolean execIsSaveNeeded() throws ProcessingException {
+  protected boolean execIsSaveNeeded() {
     boolean b = false;
     if (b == false && m_tree.getDeletedNodeCount() > 0) {
       b = true;
@@ -712,7 +712,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  protected void execMarkSaved() throws ProcessingException {
+  protected void execMarkSaved() {
     try {
       m_tree.setTreeChanging(true);
       //
@@ -737,7 +737,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     if (m_tree.getRootNode() != null && m_tree.getRootNode().getChildNodeCount() > 0) {
       return false;
     }
@@ -767,7 +767,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    protected void execDisposeTree() throws ProcessingException {
+    protected void execDisposeTree() {
       super.execDisposeTree();
 
       // dispose nodes (not necessary to remove them, dispose is sufficient)
@@ -783,7 +783,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) throws ProcessingException {
+    protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) {
       if (node instanceof EntityNode) {
         EntityNode enode = (EntityNode) node;
         String externalId = DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(enode));
@@ -829,7 +829,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) throws ProcessingException {
+    protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) {
       if (nodeData instanceof ComposerEntityNodeData) {
         ComposerEntityNodeData enodeData = (ComposerEntityNodeData) nodeData;
         String externalId = enodeData.getEntityExternalId();
@@ -877,7 +877,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    protected void execDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
+    protected void execDecorateCell(ITreeNode node, Cell cell) {
       node.decorateCell();
     }
   }

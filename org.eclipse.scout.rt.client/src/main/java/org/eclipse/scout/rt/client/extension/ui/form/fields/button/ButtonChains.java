@@ -26,10 +26,10 @@ public final class ButtonChains {
       super(extensions);
     }
 
-    public void execSelectionChanged(final boolean selection) throws ProcessingException {
+    public void execSelectionChanged(final boolean selection) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IButtonExtension<? extends AbstractButton> next) throws ProcessingException {
+        protected void callMethod(IButtonExtension<? extends AbstractButton> next) {
           next.execSelectionChanged(ButtonSelectionChangedChain.this, selection);
         }
       };
@@ -47,10 +47,10 @@ public final class ButtonChains {
       super(extensions);
     }
 
-    public void execClickAction() throws ProcessingException {
+    public void execClickAction() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IButtonExtension<? extends AbstractButton> next) throws ProcessingException {
+        protected void callMethod(IButtonExtension<? extends AbstractButton> next) {
           next.execClickAction(ButtonClickActionChain.this);
         }
       };

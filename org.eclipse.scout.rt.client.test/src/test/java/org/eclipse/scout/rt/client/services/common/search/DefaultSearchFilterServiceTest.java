@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.search.DefaultSearchFilterServiceTest.MyComposerField.CarEntity;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -71,7 +70,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testListBox() throws ProcessingException {
+  public void testListBox() {
     AbstractListBox<Long> listBox = new MyListBox();
     listBox.initField();
     runBasicAsserts(listBox);
@@ -81,7 +80,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testTreeBox() throws ProcessingException {
+  public void testTreeBox() {
     AbstractTreeBox<Long> treeBox = new MyTreeBox();
     treeBox.initField();
     runBasicAsserts(treeBox);
@@ -91,7 +90,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testLabelField() throws ProcessingException {
+  public void testLabelField() {
     AbstractLabelField labelField = new MyLabelField();
     labelField.initField();
     runBasicAsserts(labelField);
@@ -101,7 +100,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testStringField() throws ProcessingException {
+  public void testStringField() {
     AbstractStringField stringField = new MyStringField();
     stringField.initField();
     runBasicAsserts(stringField);
@@ -111,7 +110,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testHtmlField() throws ProcessingException {
+  public void testHtmlField() {
     AbstractHtmlField htmlField = new MyHTMLField();
     htmlField.initField();
     runBasicAsserts(htmlField);
@@ -121,7 +120,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testBooleanField() throws ProcessingException {
+  public void testBooleanField() {
     AbstractBooleanField booleanField = new MyBooleanField();
     booleanField.initField();
     runBasicAsserts(booleanField);
@@ -143,7 +142,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testRadioButtonGroup() throws ProcessingException {
+  public void testRadioButtonGroup() {
     MyRadioButtonGroup radioButtonGroup = new MyRadioButtonGroup();
     radioButtonGroup.initField();
     runBasicAsserts(radioButtonGroup);
@@ -153,7 +152,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testValueField() throws ProcessingException {
+  public void testValueField() {
     MyValueField field = new MyValueField();
     field.initField();
     runBasicAsserts(field);
@@ -163,7 +162,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testSequenceBox() throws ProcessingException {
+  public void testSequenceBox() {
     MySequenceBox seqBox = new MySequenceBox();
     seqBox.initField();
 
@@ -185,7 +184,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
-  public void testComposerField() throws ProcessingException {
+  public void testComposerField() {
     MyComposerField composer = new MyComposerField();
     composer.initField();
     runBasicAsserts(composer);
@@ -221,7 +220,7 @@ public class DefaultSearchFilterServiceTest {
   public class MyListBox extends AbstractListBox<Long> {
     @SuppressWarnings("unchecked")
     @Override
-    protected List<? extends ILookupRow<Long>> execLoadTableData() throws ProcessingException {
+    protected List<? extends ILookupRow<Long>> execLoadTableData() {
       List<ILookupRow<Long>> data = new LinkedList<ILookupRow<Long>>();
       data.add(new LookupRow(1L, "Element 1"));
       data.add(new LookupRow(2L, "Element 2"));
@@ -235,7 +234,7 @@ public class DefaultSearchFilterServiceTest {
   public class MyTreeBox extends AbstractTreeBox<Long> {
     @SuppressWarnings("unchecked")
     @Override
-    protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+    protected void execLoadChildNodes(ITreeNode parentNode) {
       List<ILookupRow<Long>> data = new LinkedList<ILookupRow<Long>>();
       data.add(new LookupRow(1L, "Element 1"));
       data.add(new LookupRow(2L, "Element 1a").withParentKey(1L));

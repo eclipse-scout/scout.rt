@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDeactivateChain;
@@ -27,18 +26,18 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
  */
 public interface IWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends IExtension<OWNER> {
 
-  void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind) throws ProcessingException;
+  void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind);
 
-  void execDispose(WizardStepDisposeChain<? extends IForm> chain) throws ProcessingException;
+  void execDispose(WizardStepDisposeChain<? extends IForm> chain);
 
-  void execFormClosed(WizardStepFormClosedChain<? extends IForm> chain, boolean activation) throws ProcessingException;
+  void execFormClosed(WizardStepFormClosedChain<? extends IForm> chain, boolean activation);
 
-  void execActivate(WizardStepActivateChain<? extends IForm> chain, int stepKind) throws ProcessingException;
+  void execActivate(WizardStepActivateChain<? extends IForm> chain, int stepKind);
 
-  void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation) throws ProcessingException;
+  void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation);
 
-  void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation) throws ProcessingException;
+  void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation);
 
-  void execAction(WizardStepActionChain<? extends IForm> chain) throws ProcessingException;
+  void execAction(WizardStepActionChain<? extends IForm> chain);
 
 }

@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -157,7 +156,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID>> getDataByKey() throws ProcessingException {
+  public List<ILookupRow<CODE_ID>> getDataByKey() {
     ArrayList<ICode<CODE_ID>> list = new ArrayList<ICode<CODE_ID>>(1);
     ICode<CODE_ID> c = resolveCodeByKey();
     if (c != null) {
@@ -170,7 +169,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID>> getDataByText() throws ProcessingException {
+  public List<ILookupRow<CODE_ID>> getDataByText() {
     final Pattern pat = createSearchPattern(getText());
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
@@ -202,7 +201,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID>> getDataByAll() throws ProcessingException {
+  public List<ILookupRow<CODE_ID>> getDataByAll() {
     final Pattern pat = createSearchPattern(getAll());
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
@@ -234,7 +233,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID>> getDataByRec() throws ProcessingException {
+  public List<ILookupRow<CODE_ID>> getDataByRec() {
     Object recValue = getRec();
     if ((recValue instanceof Number) && ((Number) recValue).longValue() == 0) {
       recValue = null;
@@ -276,7 +275,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * @return the result of this lookup call into a single code or null.
    * @since 3.8.1
    */
-  protected ICode<CODE_ID> resolveCodeByKey() throws ProcessingException {
+  protected ICode<CODE_ID> resolveCodeByKey() {
     CODE_ID key = getKey();
     ICodeType<?, CODE_ID> t = BEANS.opt(m_codeTypeClass);
     if (t == null) {
@@ -292,7 +291,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * @return the result of this lookup call into multiple codes matching the filter.
    * @since 3.8.1
    */
-  protected void resolveCodes(ICodeVisitor<ICode<CODE_ID>> v) throws ProcessingException {
+  protected void resolveCodes(ICodeVisitor<ICode<CODE_ID>> v) {
     ICodeType<?, CODE_ID> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);

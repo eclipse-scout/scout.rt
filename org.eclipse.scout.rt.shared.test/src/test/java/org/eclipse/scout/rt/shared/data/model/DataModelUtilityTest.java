@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModelExtension;
 import org.eclipse.scout.rt.shared.test.ResourceBase;
@@ -113,7 +112,7 @@ public class DataModelUtilityTest {
     assertEquals(3545, externaIdSet.size());
   }
 
-  private String readTextFile(InputStream in) throws UnsupportedEncodingException, ProcessingException {
+  private String readTextFile(InputStream in) throws UnsupportedEncodingException {
     return IOUtility.getContentUtf8(in).replaceAll("[\\n\\r]+", "\n").trim();
   }
 

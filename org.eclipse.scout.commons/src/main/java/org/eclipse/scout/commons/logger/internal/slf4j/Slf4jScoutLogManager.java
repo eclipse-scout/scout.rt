@@ -12,7 +12,6 @@ package org.eclipse.scout.commons.logger.internal.slf4j;
 
 import java.io.File;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 
@@ -46,7 +45,7 @@ public class Slf4jScoutLogManager implements IScoutLogManager {
   }
 
   @Override
-  public boolean startRecording() throws ProcessingException, UnsupportedOperationException {
+  public boolean startRecording() throws UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 

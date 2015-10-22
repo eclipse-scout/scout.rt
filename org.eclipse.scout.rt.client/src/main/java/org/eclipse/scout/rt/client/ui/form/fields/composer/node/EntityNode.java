@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -120,14 +119,14 @@ public class EntityNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execInitAction() throws ProcessingException {
+    protected void execInitAction() {
       List<IDataModelAttribute> atts = m_entity.getAttributes();
       List<IDataModelEntity> ents = m_entity.getEntities();
       setVisible(CollectionUtility.hasElements(atts) || CollectionUtility.hasElements(ents));
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       ITreeNode node = getComposerField().addEitherNode(EntityNode.this, false);
       getComposerField().addAdditionalOrNode(node, false);
     }
@@ -142,7 +141,7 @@ public class EntityNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       setNegative(!isNegative());
       if (!isStatusInserted()) {
         setStatusInternal(ITreeNode.STATUS_UPDATED);
@@ -165,7 +164,7 @@ public class EntityNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execAction() throws ProcessingException {
+    protected void execAction() {
       getTree().selectPreviousParentNode();
       getTree().removeNode(EntityNode.this);
     }

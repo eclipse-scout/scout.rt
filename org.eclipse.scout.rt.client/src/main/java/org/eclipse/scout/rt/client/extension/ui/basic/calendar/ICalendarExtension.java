@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarDisposeCalendarChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarFilterCalendarItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
@@ -30,8 +29,8 @@ public interface ICalendarExtension<OWNER extends AbstractCalendar> extends IExt
 
   void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider);
 
-  void execDisposeCalendar(CalendarDisposeCalendarChain chain) throws ProcessingException;
+  void execDisposeCalendar(CalendarDisposeCalendarChain chain);
 
-  void execInitCalendar(CalendarInitCalendarChain chain) throws ProcessingException;
+  void execInitCalendar(CalendarInitCalendarChain chain);
 
 }

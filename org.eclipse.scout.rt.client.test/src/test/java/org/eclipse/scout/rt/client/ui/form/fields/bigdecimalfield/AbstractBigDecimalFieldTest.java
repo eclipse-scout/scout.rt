@@ -44,12 +44,12 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalNull() throws ProcessingException {
+  public void testParseValueInternalNull() {
     assertEquals("expected null return for null input", null, parseValueInternal(null));
   }
 
   @Test
-  public void testParseValue() throws ProcessingException {
+  public void testParseValue() {
     setFractionDigits(5);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(42), parseValueInternal("42"));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-42), parseValueInternal("-42"));
@@ -62,7 +62,7 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalAroundPossibleMinMaxValue() throws ProcessingException {
+  public void testParseValueInternalAroundPossibleMinMaxValue() {
 
     assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(getMaxPossibleValue().toPlainString()));
     assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(getMinPossibleValue().toPlainString()));
@@ -71,7 +71,7 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalMultiplier() throws ProcessingException {
+  public void testParseValueInternalMultiplier() {
 
     setFractionDigits(0);
     setMultiplier(10);
@@ -100,7 +100,7 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalNotANumber() throws ProcessingException {
+  public void testParseValueInternalNotANumber() {
     boolean exceptionOccured = false;
     try {
       parseValueInternal("onethousend");

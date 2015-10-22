@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
@@ -55,7 +54,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     if (m_listBoxPropertyListener == null) {
       m_listBoxPropertyListener = new PropertyChangeListener() {
         @Override
@@ -110,7 +109,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   }
 
   @Override
-  protected void execDisposeField() throws ProcessingException {
+  protected void execDisposeField() {
     if (m_listBoxPropertyListener != null) {
       getListBox().removePropertyChangeListener(m_listBoxPropertyListener);
       m_listBoxPropertyListener = null;
@@ -126,12 +125,12 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Override
-    protected boolean execIsEmpty() throws ProcessingException {
+    protected boolean execIsEmpty() {
       return true;
     }
 
     @Override
-    protected boolean execIsSaveNeeded() throws ProcessingException {
+    protected boolean execIsSaveNeeded() {
       return false;
     }
 
@@ -141,7 +140,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Override
-    protected void execChangedValue() throws ProcessingException {
+    protected void execChangedValue() {
       try {
         if (m_listBoxSyncLock.acquire()) {
           Boolean b = getCheckedStateRadioButtonGroup().getValue();
@@ -212,12 +211,12 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Override
-    protected boolean execIsEmpty() throws ProcessingException {
+    protected boolean execIsEmpty() {
       return true;
     }
 
     @Override
-    protected boolean execIsSaveNeeded() throws ProcessingException {
+    protected boolean execIsSaveNeeded() {
       return false;
     }
 
@@ -227,7 +226,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Override
-    protected void execChangedValue() throws ProcessingException {
+    protected void execChangedValue() {
       try {
         if (m_listBoxSyncLock.acquire()) {
           getListBox().setFilterActiveRowsValue(getActiveStateRadioButtonGroup().getValue());

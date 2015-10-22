@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -23,12 +22,12 @@ public interface IClusterSynchronizationService extends IService {
   /**
    * Publish a message with the given notification for the other server nodes.
    */
-  void publish(Serializable notification) throws ProcessingException;
+  void publish(Serializable notification);
 
   /**
    * Publish a message with the given notification for the other server nodes, if the transaction is commited.
    */
-  void publishTransactional(Serializable notification) throws ProcessingException;
+  void publishTransactional(Serializable notification);
 
   /**
    * @return the node of the currently connected cluster

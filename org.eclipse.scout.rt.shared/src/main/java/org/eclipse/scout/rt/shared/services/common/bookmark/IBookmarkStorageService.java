@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
@@ -29,13 +28,13 @@ public interface IBookmarkStorageService extends IService {
    *
    * @return the new complete set of bookmarks with (eventually) updated ids
    */
-  BookmarkData storeBookmarkData(BookmarkData data) throws ProcessingException;
+  BookmarkData storeBookmarkData(BookmarkData data);
 
   /**
    * @return all bookmarks of the current user (subject) AND global bookmarks <br>
    *         check the property {@link Bookmark#getKind()} for switching
    */
-  BookmarkData getBookmarkData() throws ProcessingException;
+  BookmarkData getBookmarkData();
 
   /**
    * copy the bookmarks contained in the folder to the {@value #INBOX_FOLDER_NAME} folder of the users
@@ -50,6 +49,6 @@ public interface IBookmarkStorageService extends IService {
    *          to the implementation to define and handle the target group parameter
    */
   @InputValidation(IValidationStrategy.NO_CHECK.class)
-  void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException;
+  void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup);
 
 }

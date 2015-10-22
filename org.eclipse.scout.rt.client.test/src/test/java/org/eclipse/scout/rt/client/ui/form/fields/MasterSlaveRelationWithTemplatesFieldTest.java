@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.MasterSlaveRelationWithTemplatesFieldTest.MyForm.MainBox;
@@ -78,7 +77,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
 
   public static final class MyForm extends AbstractForm {
 
-    private MyForm() throws ProcessingException {
+    private MyForm() {
       super();
     }
 
@@ -117,7 +116,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new FormHandler());
     }
   }
@@ -174,7 +173,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
       }
 
       @Override
-      protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+      protected void execChangedMasterValue(Object newMasterValue) {
         super.execChangedMasterValue(newMasterValue);
         m_masterChanged = true;
       }
@@ -183,7 +182,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
 
   public static final class NonExistingMasterFieldTestForm extends AbstractForm {
 
-    private NonExistingMasterFieldTestForm() throws ProcessingException {
+    private NonExistingMasterFieldTestForm() {
       super();
     }
 
@@ -210,7 +209,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new FormHandler());
     }
   }

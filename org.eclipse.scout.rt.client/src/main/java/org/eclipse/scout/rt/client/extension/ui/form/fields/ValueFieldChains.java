@@ -43,10 +43,10 @@ public final class ValueFieldChains {
       super(extensions);
     }
 
-    public VALUE execValidateValue(final VALUE rawValue) throws ProcessingException {
+    public VALUE execValidateValue(final VALUE rawValue) {
       MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
         @Override
-        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) {
           setReturnValue(next.execValidateValue(ValueFieldExecValidateChain.this, rawValue));
         }
       };
@@ -82,10 +82,10 @@ public final class ValueFieldChains {
       super(extensions);
     }
 
-    public VALUE execValidateValue(final VALUE rawValue) throws ProcessingException {
+    public VALUE execValidateValue(final VALUE rawValue) {
       MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
         @Override
-        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) {
           setReturnValue(next.execValidateValue(ValueFieldValidateValueChain.this, rawValue));
         }
       };
@@ -103,10 +103,10 @@ public final class ValueFieldChains {
       super(extensions);
     }
 
-    public void execChangedValue() throws ProcessingException {
+    public void execChangedValue() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) {
           next.execChangedValue(ValueFieldChangedValueChain.this);
         }
       };
@@ -124,10 +124,10 @@ public final class ValueFieldChains {
       super(extensions);
     }
 
-    public VALUE execParseValue(final String text) throws ProcessingException {
+    public VALUE execParseValue(final String text) {
       MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
         @Override
-        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) throws ProcessingException {
+        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) {
           setReturnValue(next.execParseValue(ValueFieldParseValueChain.this, text));
         }
       };

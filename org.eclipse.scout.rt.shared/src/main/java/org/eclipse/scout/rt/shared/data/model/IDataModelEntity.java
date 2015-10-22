@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 public interface IDataModelEntity extends IPropertyObserver, IOrdered {
 
@@ -38,7 +37,7 @@ public interface IDataModelEntity extends IPropertyObserver, IOrdered {
   /**
    * Initialize this entity.
    */
-  void initEntity() throws ProcessingException;
+  void initEntity();
 
   String getIconId();
 

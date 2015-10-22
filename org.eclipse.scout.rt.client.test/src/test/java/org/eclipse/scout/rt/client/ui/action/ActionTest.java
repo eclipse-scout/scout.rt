@@ -22,7 +22,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield;
@@ -53,7 +52,7 @@ public class ActionTest {
   private static final String TEST_ACTION_CLASS_ID = "TEST_CLASS_ID";
 
   @Test
-  public void testOutlineButton() throws ProcessingException {
+  public void testOutlineButton() {
     IDesktop desktopMock = Mockito.mock(IDesktop.class);
     IOutline outlineMock = Mockito.mock(IOutline.class);
 
@@ -62,12 +61,12 @@ public class ActionTest {
     final IntegerHolder execToggleHolder = new IntegerHolder(0);
     AbstractOutlineViewButton b = new AbstractOutlineViewButton(desktopMock, outlineMock.getClass()) {
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         execActionHolder.setValue(execActionHolder.getValue() + 1);
       }
 
       @Override
-      protected void execSelectionChanged(boolean selection) throws ProcessingException {
+      protected void execSelectionChanged(boolean selection) {
         execToggleHolder.setValue(execToggleHolder.getValue() + 1);
       }
     };
@@ -101,7 +100,7 @@ public class ActionTest {
   }
 
   @Test
-  public void testActionClassIds() throws ProcessingException {
+  public void testActionClassIds() {
     assertEquals(TEST_ACTION_CLASS_ID, new AnnotatedAction().classId());
   }
 
@@ -120,7 +119,7 @@ public class ActionTest {
    * Test for {@link AbstractMenu#classId()} when using smartfields and templates
    */
   @Test
-  public void testActionClassIdsForTemplates() throws ProcessingException {
+  public void testActionClassIdsForTemplates() {
     TestFormWithTemplateSmartfield smartfield = new TestFormWithTemplateSmartfield();
     List<IMenu> menus1 = smartfield.getFieldByClass(SmartField1.class).getMenus();
     List<IMenu> menus2 = smartfield.getFieldByClass(SmartField2.class).getMenus();

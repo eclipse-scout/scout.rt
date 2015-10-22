@@ -57,7 +57,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   private Map<ITableRow, AutoLeafPageWithNodes> m_autoLeafPageMap;
   private boolean m_rowSelectionRequired;
 
-  public PageForm(IPage<?> page, PageFormManager manager, PageFormConfig pageFormConfig) throws ProcessingException {
+  public PageForm(IPage<?> page, PageFormManager manager, PageFormConfig pageFormConfig) {
     super(false);
     m_pageFormManager = manager;
     m_pageFormConfig = pageFormConfig;
@@ -74,7 +74,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
-  public void initForm() throws ProcessingException {
+  public void initForm() {
     // form
     initFormInternal();
 
@@ -124,7 +124,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     return m_page;
   }
 
-  private void setPageInternal(IPage<?> page) throws ProcessingException {
+  private void setPageInternal(IPage<?> page) {
     m_page = page;
     m_page = (IPage) m_page.getTree().resolveVirtualNode(m_page);
 
@@ -143,7 +143,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
    * If there is a detail form the table field is visible depending on its content. If there is no detail form the table
    * field always is visible.
    */
-  protected void updateTableFieldVisibility() throws ProcessingException {
+  protected void updateTableFieldVisibility() {
     ITable table = getPageTableField().getTable();
     boolean hasDetailForm = getPageDetailFormField().getInnerForm() != null;
 
@@ -172,7 +172,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   /**
    * Creates a {@link TableRowForm} out of the selected table row if the parent page is a {@link IPageWithTable}.
    */
-  private TableRowForm createAutoDetailForm() throws ProcessingException {
+  private TableRowForm createAutoDetailForm() {
     ITable table = null;
     IPage<?> parentPage = m_page.getParentPage();
     if (parentPage instanceof IPageWithTable) {
@@ -205,7 +205,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     return new PageFormFooterActionFetcher(this);
   }
 
-  private void initMainButtons() throws ProcessingException {
+  private void initMainButtons() {
     List<IButton> buttonList = new LinkedList<IButton>();
 
     //Add buttons of the detail form to the main box
@@ -216,7 +216,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     m_mainboxButtons = buttonList;
   }
 
-  private void initFields() throws ProcessingException {
+  private void initFields() {
     if (m_pageFormConfig.isDetailFormVisible()) {
       getPageDetailFormField().setInnerForm(m_page.getDetailForm());
     }
@@ -254,7 +254,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
-  protected void execDisposeForm() throws ProcessingException {
+  protected void execDisposeForm() {
     removeTableListener();
     for (AutoLeafPageWithNodes autoLeafPage : m_autoLeafPageMap.values()) {
       disposeAutoLeafPage(autoLeafPage);
@@ -298,7 +298,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     return PageFormManager.isDrillDownPage(getPage().getPageFor(tableRow));
   }
 
-  public void formAddedNotify() throws ProcessingException {
+  public void formAddedNotify() {
     LOG.debug(this + " added");
 
     //Clear selection if form gets visible again. It must not happen earlier, since the actions typically depend on the selected row.
@@ -319,7 +319,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
-  public void pageSelectedNotify() throws ProcessingException {
+  public void pageSelectedNotify() {
     if (m_rowSelectionRequired) {
       selectFirstChildPageTableRowIfNecessary(getPageTableField().getTable());
       m_rowSelectionRequired = false;
@@ -339,7 +339,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
   }
 
-  public void formRemovedNotify() throws ProcessingException {
+  public void formRemovedNotify() {
     removeTableSelectionListener();
   }
 
@@ -389,7 +389,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     m_pageTableSelectionListener = null;
   }
 
-  private void processSelectedTableRow() throws ProcessingException {
+  private void processSelectedTableRow() {
     if (!m_pageFormConfig.isKeepSelection() && !m_pageFormConfig.isAutoSelectFirstChildPage()) {
       return;
     }
@@ -501,12 +501,12 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
-  public Object computeExclusiveKey() throws ProcessingException {
+  public Object computeExclusiveKey() {
     return m_page;
   }
 
   @Override
-  public void start() throws ProcessingException {
+  public void start() {
     startInternalExclusive(new FormHandler());
   }
 
@@ -520,7 +520,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
   }
 
-  private void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
+  private void handleTableRowSelected(ITable table, ITableRow tableRow) {
     LOG.debug("Table row selected: " + tableRow);
 
     // If children are not loaded rowPage cannot be estimated.
@@ -563,7 +563,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     m_pageFormManager.pageSelectedNotify(this, rowPage);
   }
 
-  private void handleTableRowsDeleted(ITable table, Collection<ITableRow> tableRows) throws ProcessingException {
+  private void handleTableRowsDeleted(ITable table, Collection<ITableRow> tableRows) {
     if (tableRows == null) {
       return;
     }
@@ -588,11 +588,11 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     outline.disposeTree();
   }
 
-  private void handleTableRowsInserted(ITable table, List<ITableRow> tableRows) throws ProcessingException {
+  private void handleTableRowsInserted(ITable table, List<ITableRow> tableRows) {
     setTableRowDrillDownStyle(table, tableRows);
   }
 
-  protected void selectFirstChildPageTableRowIfNecessary(final ITable pageDetailTable) throws ProcessingException {
+  protected void selectFirstChildPageTableRowIfNecessary(final ITable pageDetailTable) {
     if (!m_pageFormConfig.isAutoSelectFirstChildPage() || pageDetailTable == null || pageDetailTable.getRowCount() == 0) {
       return;
     }
@@ -685,12 +685,12 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       }
     }
 
-    private void handleTableRowDeleted(TableEvent event) throws ProcessingException {
+    private void handleTableRowDeleted(TableEvent event) {
       PageForm.this.handleTableRowsDeleted(event.getTable(), event.getRows());
       updateTableFieldVisibility();
     }
 
-    private void handleTableRowsInserted(TableEvent event) throws ProcessingException {
+    private void handleTableRowsInserted(TableEvent event) {
       PageForm.this.handleTableRowsInserted(event.getTable(), event.getRows());
       updateTableFieldVisibility();
     }
@@ -713,7 +713,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       }
     }
 
-    private void handleTableRowSelected(TableEvent event) throws ProcessingException {
+    private void handleTableRowSelected(TableEvent event) {
       if (event.isConsumed()) {
         return;
       }

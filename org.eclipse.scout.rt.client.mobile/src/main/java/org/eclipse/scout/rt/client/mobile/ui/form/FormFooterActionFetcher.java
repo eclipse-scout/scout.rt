@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -29,7 +28,7 @@ public class FormFooterActionFetcher extends AbstractFormActionFetcher {
   }
 
   @Override
-  public List<IMenu> fetch() throws ProcessingException {
+  public List<IMenu> fetch() {
     List<IMenu> formActions = new LinkedList<IMenu>();
     if (getForm().getRootGroupBox().getCustomProcessButtonCount() > 0) {
       List<IMobileAction> leftActions = createLeftFooterActions();
@@ -41,7 +40,7 @@ public class FormFooterActionFetcher extends AbstractFormActionFetcher {
     return formActions;
   }
 
-  protected List<IMobileAction> createLeftFooterActions() throws ProcessingException {
+  protected List<IMobileAction> createLeftFooterActions() {
     return convertCustomProcessButtons();
   }
 

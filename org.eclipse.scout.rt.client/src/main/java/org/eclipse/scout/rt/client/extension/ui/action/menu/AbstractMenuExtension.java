@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.action.menu;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.AbstractActionNodeExtension;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -13,7 +12,7 @@ public abstract class AbstractMenuExtension<OWNER extends AbstractMenu> extends 
   }
 
   @Override
-  public void execOwnerValueChanged(MenuOwnerValueChangedChain chain, Object newOwnerValue) throws ProcessingException {
+  public void execOwnerValueChanged(MenuOwnerValueChangedChain chain, Object newOwnerValue) {
     chain.execOwnerValueChanged(newOwnerValue);
   }
 }

@@ -84,7 +84,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
     return m_messageProducer;
   }
 
-  public void send(T message) throws ProcessingException {
+  public void send(T message) {
     try {
       getMessageProducer().send(getMessageSerializer().createMessage(message, getSession()));
     }
@@ -96,7 +96,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
     }
   }
 
-  public T receive(long timeoutMillis) throws ProcessingException {
+  public T receive(long timeoutMillis) {
     try {
       Message jmsMessage;
       if (timeoutMillis > 0) {

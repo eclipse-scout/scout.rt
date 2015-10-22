@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -64,7 +63,7 @@ public interface IFileChooser {
    *
    * @return {@link #getFiles()}
    */
-  List<BinaryResource> startChooser() throws ProcessingException;
+  List<BinaryResource> startChooser();
 
   /**
    * Sets the result and releases the blocking condition held by {@link #startChooser()}.

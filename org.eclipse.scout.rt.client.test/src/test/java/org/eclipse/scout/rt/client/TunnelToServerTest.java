@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -83,7 +82,7 @@ public class TunnelToServerTest {
     protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<? extends T> queryType) {
       return new IBeanInterceptor<T>() {
         @Override
-        public Object invoke(IBeanInvocationContext<T> context) throws ProcessingException {
+        public Object invoke(IBeanInvocationContext<T> context) {
           Method method = context.getTargetMethod();
           return "return " + bean.getBeanClazz().getSimpleName() + "#" + method.getName();
         }

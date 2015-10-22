@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -32,7 +31,7 @@ import org.junit.runner.RunWith;
 public class JobsTest {
 
   @Test
-  public void testScheduleWithoutInput() throws ProcessingException {
+  public void testScheduleWithoutInput() {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
     // Test schedule
@@ -85,7 +84,7 @@ public class JobsTest {
   }
 
   @Test
-  public void testScheduleWithoutRunContext() throws ProcessingException {
+  public void testScheduleWithoutRunContext() {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
     // Test schedule

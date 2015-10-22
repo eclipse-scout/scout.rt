@@ -27,10 +27,10 @@ public final class MailFieldChains {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final String ref) throws ProcessingException {
+    public void execHyperlinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IMailFieldExtension<? extends AbstractMailField> next) throws ProcessingException {
+        protected void callMethod(IMailFieldExtension<? extends AbstractMailField> next) {
           next.execHyperlinkAction(MailFieldHyperlinkActionChain.this, ref);
         }
       };
@@ -48,10 +48,10 @@ public final class MailFieldChains {
       super(extensions);
     }
 
-    public void execAttachementAction(final File file) throws ProcessingException {
+    public void execAttachementAction(final File file) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IMailFieldExtension<? extends AbstractMailField> next) throws ProcessingException {
+        protected void callMethod(IMailFieldExtension<? extends AbstractMailField> next) {
           next.execAttachementAction(MailFieldAttachementActionChain.this, file);
         }
       };

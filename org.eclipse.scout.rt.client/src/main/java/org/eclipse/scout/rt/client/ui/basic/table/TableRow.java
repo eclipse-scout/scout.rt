@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -47,7 +46,7 @@ public class TableRow implements ITableRow {
     addDesktopProfiler();
   }
 
-  public TableRow(ColumnSet columnSet, ITableRow row) throws ProcessingException {
+  public TableRow(ColumnSet columnSet, ITableRow row) {
     m_columnSet = columnSet;
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
@@ -55,7 +54,7 @@ public class TableRow implements ITableRow {
     addDesktopProfiler();
   }
 
-  public TableRow(ColumnSet columnSet, List<? extends Object> values) throws ProcessingException {
+  public TableRow(ColumnSet columnSet, List<? extends Object> values) {
     this(columnSet);
     if (CollectionUtility.hasElements(values)) {
       for (int i = 0; i < values.size(); i++) {
@@ -194,12 +193,12 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public void setCell(IColumn column, ICell cell) throws ProcessingException {
+  public void setCell(IColumn column, ICell cell) {
     setCell(column.getColumnIndex(), cell);
   }
 
   @Override
-  public void setCell(int columnIndex, ICell cell) throws ProcessingException {
+  public void setCell(int columnIndex, ICell cell) {
     if (cell != null) {
       getCellForUpdate(columnIndex);
       m_cells.set(columnIndex, new Cell(null, cell));
@@ -260,7 +259,7 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public boolean/* changed */ setCellValue(int columnIndex, Object value) throws ProcessingException {
+  public boolean/* changed */ setCellValue(int columnIndex, Object value) {
     try {
       setRowChanging(true);
       //
@@ -287,7 +286,7 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public boolean setCellValues(List<? extends Object> values) throws ProcessingException {
+  public boolean setCellValues(List<? extends Object> values) {
     try {
       setRowChanging(true);
       //
@@ -309,11 +308,11 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public void touch() throws ProcessingException {
+  public void touch() {
   }
 
   @Override
-  public void delete() throws ProcessingException {
+  public void delete() {
   }
 
   @Override

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -38,7 +37,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   }
 
   @Override
-  protected void execInitPage() throws ProcessingException {
+  protected void execInitPage() {
     Cell cell = getCellForUpdate();
     if (cell.getText() == null) {
       cell.setText(findAppropriateTitle());

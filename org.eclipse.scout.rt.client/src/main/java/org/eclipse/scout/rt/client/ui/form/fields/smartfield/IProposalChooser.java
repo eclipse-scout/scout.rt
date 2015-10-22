@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
@@ -53,7 +52,7 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
    */
   void dispose();
 
-  void forceProposalSelection() throws ProcessingException;
+  void forceProposalSelection();
 
   void dataFetchedDelegate(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount);
 

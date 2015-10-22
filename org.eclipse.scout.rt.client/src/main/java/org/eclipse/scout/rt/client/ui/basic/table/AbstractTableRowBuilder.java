@@ -16,14 +16,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractTableRowBuilder<T> {
 
-  public ITableRow createTableRow(ILookupRow<T> dataRow) throws ProcessingException {
+  public ITableRow createTableRow(ILookupRow<T> dataRow) {
     ITableRow tableRow = createEmptyTableRow();
     tableRow.setEnabled(dataRow.isEnabled());
     Cell cell = tableRow.getCellForUpdate(1);
@@ -46,11 +45,11 @@ public abstract class AbstractTableRowBuilder<T> {
     return tableRow;
   }
 
-  public ITableRow createRow() throws ProcessingException {
+  public ITableRow createRow() {
     return createEmptyTableRow();
   }
 
-  public ITableRow createRow(Object rowValues) throws ProcessingException {
+  public ITableRow createRow(Object rowValues) {
     if (!rowValues.getClass().isArray()) {
       throw new IllegalArgumentException("argument must be an array value []");
     }
@@ -61,11 +60,11 @@ public abstract class AbstractTableRowBuilder<T> {
     return row;
   }
 
-  public List<ITableRow> createRowsByArray(Object dataArray) throws ProcessingException {
+  public List<ITableRow> createRowsByArray(Object dataArray) {
     return createRowsByArray(dataArray, ITableRow.STATUS_INSERTED);
   }
 
-  public List<ITableRow> createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException {
+  public List<ITableRow> createRowsByArray(Object dataArray, int rowStatus) {
     if (dataArray == null) {
       dataArray = new Object[0];
     }
@@ -90,7 +89,7 @@ public abstract class AbstractTableRowBuilder<T> {
    * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
    * the holder to null while processing.
    */
-  public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
+  public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) {
     return createRowsByMatrix(dataMatrixOrReference, ITableRow.STATUS_INSERTED);
   }
 
@@ -100,7 +99,7 @@ public abstract class AbstractTableRowBuilder<T> {
    * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
    * the holder to null while processing.
    */
-  public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException {
+  public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) {
     Object dataMatrix;
     boolean isRef;
     if (dataMatrixOrReference instanceof AtomicReference<?>) {
@@ -147,7 +146,7 @@ public abstract class AbstractTableRowBuilder<T> {
     return rows;
   }
 
-  public List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) throws ProcessingException {
+  public List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) {
     List<ITableRow> result = new ArrayList<ITableRow>(codes.size());
     for (ICode<?> code : codes) {
       ITableRow row = createRow(new Object[]{code.getId(), code.getText()});

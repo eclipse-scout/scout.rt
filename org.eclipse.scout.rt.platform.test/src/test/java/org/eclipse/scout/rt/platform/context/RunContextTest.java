@@ -28,7 +28,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -129,7 +128,7 @@ public class RunContextTest {
    * Expected: a new RunMonitor is CREATED and set as CURRENT for the time of execution.
    */
   @Test
-  public void testCopyCurrent_RunMonitor1() throws ProcessingException {
+  public void testCopyCurrent_RunMonitor1() {
     RunMonitor.CURRENT.remove();
 
     RunContext runContext = RunContexts.copyCurrent();
@@ -156,7 +155,7 @@ public class RunContextTest {
    * Expected: explicit RunMonitor is set as CURRENT for the time of execution.
    */
   @Test
-  public void testCopyCurrent_RunMonitor2() throws ProcessingException {
+  public void testCopyCurrent_RunMonitor2() {
     RunMonitor.CURRENT.remove();
 
     final RunMonitor explicitRunMonitor = new RunMonitor();
@@ -188,7 +187,7 @@ public class RunContextTest {
    * Expected: a new RunMonitor is CREATED, registered as child and set as CURRENT for the time of execution.
    */
   @Test
-  public void testCopyCurrent_RunMonitor3() throws ProcessingException {
+  public void testCopyCurrent_RunMonitor3() {
     final RunMonitor currentRunMonitor = new RunMonitor();
     RunMonitor.CURRENT.set(currentRunMonitor);
 
@@ -221,7 +220,7 @@ public class RunContextTest {
    * Expected: explicit RunMonitor is used as CURRENT for the time of execution, but NOT registered as child.
    */
   @Test
-  public void testCopyCurrent_RunMonitor4() throws ProcessingException {
+  public void testCopyCurrent_RunMonitor4() {
     final RunMonitor currentRunMonitor = new RunMonitor();
     final RunMonitor explicitRunMonitor = new RunMonitor();
 

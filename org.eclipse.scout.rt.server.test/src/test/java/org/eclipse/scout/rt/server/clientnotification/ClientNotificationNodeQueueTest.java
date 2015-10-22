@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -53,7 +52,7 @@ public class ClientNotificationNodeQueueTest {
   }
 
   @Test
-  public void testBlockingWait() throws ProcessingException {
+  public void testBlockingWait() {
     IFuture<List<ClientNotificationMessage>> res = Jobs.schedule(new Callable<List<ClientNotificationMessage>>() {
 
       @Override

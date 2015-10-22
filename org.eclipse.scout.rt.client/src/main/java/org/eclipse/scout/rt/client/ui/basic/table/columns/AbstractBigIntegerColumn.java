@@ -51,7 +51,7 @@ public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigI
    */
 
   @Override
-  protected BigInteger parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected BigInteger parseValueInternal(ITableRow row, Object rawValue) {
     BigInteger validValue = null;
     if (rawValue == null) {
       validValue = null;

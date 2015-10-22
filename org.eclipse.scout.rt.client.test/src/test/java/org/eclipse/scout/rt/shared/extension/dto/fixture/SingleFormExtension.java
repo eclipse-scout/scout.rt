@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import org.eclipse.scout.commons.annotations.Data;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
@@ -36,7 +35,7 @@ public class SingleFormExtension extends AbstractFormExtension<OrigForm> {
   @Extends(MainBox.class)
   public class SecondBigDecimalField extends AbstractBigDecimalField {
     @Override
-    protected void execInitField() throws ProcessingException {
+    protected void execInitField() {
       super.execInitField();
       setValue(BIG_DECIMAL_FIELD_ORIG_VALUE);
     }

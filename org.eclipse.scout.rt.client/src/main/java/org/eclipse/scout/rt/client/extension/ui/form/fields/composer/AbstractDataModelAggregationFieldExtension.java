@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.DataModelAggregationFieldChains.DataModelAggregationFieldAttributeChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.AbstractSmartFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractDataModelAggregationField;
@@ -13,7 +12,7 @@ public abstract class AbstractDataModelAggregationFieldExtension<OWNER extends A
   }
 
   @Override
-  public void execAttributeChanged(DataModelAggregationFieldAttributeChangedChain chain, IDataModelAttribute attribute) throws ProcessingException {
+  public void execAttributeChanged(DataModelAggregationFieldAttributeChangedChain chain, IDataModelAttribute attribute) {
     chain.execAttributeChanged(attribute);
   }
 }

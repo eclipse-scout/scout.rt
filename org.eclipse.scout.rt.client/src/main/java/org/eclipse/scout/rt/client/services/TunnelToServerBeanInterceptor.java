@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.services;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -36,7 +35,7 @@ public class TunnelToServerBeanInterceptor<T> implements IBeanInterceptor<T> {
   }
 
   @Override
-  public Object invoke(IBeanInvocationContext<T> context) throws ProcessingException {
+  public Object invoke(IBeanInvocationContext<T> context) {
     Method method = context.getTargetMethod();
     Object[] args = context.getTargetArgs();
     if (LOG.isDebugEnabled()) {

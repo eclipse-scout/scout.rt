@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.ClearTableSelectionFormCloseListener;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -31,7 +30,7 @@ public class TableRowFormTest {
   private ITableRowForm m_tableRowForm;
 
   @Before
-  public void setUp() throws ProcessingException {
+  public void setUp() {
     m_table = new Table();
     ITableRow row = m_table.createRow();
     m_table.getString1EditableColumn().setValue(row, "value 1");
@@ -44,7 +43,7 @@ public class TableRowFormTest {
   }
 
   @After
-  public void tearDown() throws ProcessingException {
+  public void tearDown() {
     m_tableRowForm.doClose();
   }
 
@@ -132,7 +131,7 @@ public class TableRowFormTest {
     }
 
     @Override
-    protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+    protected void execRowsSelected(List<? extends ITableRow> rows) {
       if (CollectionUtility.hasElements(rows)) {
         startTableRowForm(CollectionUtility.firstElement(rows));
       }
@@ -142,8 +141,7 @@ public class TableRowFormTest {
     protected ITableRowFormProvider createTableRowFormProvider() {
       return new DefaultTableRowFormProvider() {
         @Override
-        public ITableRowForm createTableRowForm(ITableRow row)
-            throws ProcessingException {
+        public ITableRowForm createTableRowForm(ITableRow row) {
           ITableRowForm form = super.createTableRowForm(row);
           form.setShowOnStart(false); // Disable to avoid
           // ClientJob usage
@@ -160,8 +158,7 @@ public class TableRowFormTest {
       public String m_headerText;
 
       @Override
-      protected void execDecorateHeaderCell(HeaderCell cell)
-          throws ProcessingException {
+      protected void execDecorateHeaderCell(HeaderCell cell) {
         if (m_headerText != null) {
           cell.setText(m_headerText);
         }

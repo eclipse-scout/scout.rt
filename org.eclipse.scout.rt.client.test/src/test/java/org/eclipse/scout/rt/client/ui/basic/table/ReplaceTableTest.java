@@ -5,7 +5,6 @@ import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -275,7 +274,7 @@ public class ReplaceTableTest {
 
   public static class BaseForm extends AbstractForm {
 
-    public BaseForm() throws ProcessingException {
+    public BaseForm() {
     }
 
     public MainBox getMainBox() {
@@ -308,11 +307,11 @@ public class ReplaceTableTest {
               return getColumnSet().getColumnByClass(SecondColumn.class);
             }
 
-            public FirstMenu getFirstMenu() throws ProcessingException {
+            public FirstMenu getFirstMenu() {
               return getMenuByClass(FirstMenu.class);
             }
 
-            public SecondMenu getSecondMenu() throws ProcessingException {
+            public SecondMenu getSecondMenu() {
               return getMenuByClass(SecondMenu.class);
             }
 
@@ -339,7 +338,7 @@ public class ReplaceTableTest {
 
   public static class ExtendedForm extends BaseForm {
 
-    public ExtendedForm() throws ProcessingException {
+    public ExtendedForm() {
     }
 
     public TableExField getTableExField() {
@@ -367,11 +366,11 @@ public class ReplaceTableTest {
           return getColumnSet().getColumnByClass(ThirdColumn.class);
         }
 
-        public FirstExMenu getFirstExMenu() throws ProcessingException {
+        public FirstExMenu getFirstExMenu() {
           return getMenuByClass(FirstExMenu.class);
         }
 
-        public ThirdMenu getThirdMenu() throws ProcessingException {
+        public ThirdMenu getThirdMenu() {
           return getMenuByClass(ThirdMenu.class);
         }
 
@@ -431,12 +430,12 @@ public class ReplaceTableTest {
       }
 
       @SuppressWarnings("unchecked")
-      public FirstMenu getFirstMenu() throws ProcessingException {
+      public FirstMenu getFirstMenu() {
         return getMenuByClass(FirstMenu.class);
       }
 
       @SuppressWarnings("unchecked")
-      public SecondMenu getSecondMenu() throws ProcessingException {
+      public SecondMenu getSecondMenu() {
         return getMenuByClass(SecondMenu.class);
       }
 
@@ -473,7 +472,7 @@ public class ReplaceTableTest {
 
   public static class BaseFormUsingTemplates extends AbstractForm {
 
-    public BaseFormUsingTemplates() throws ProcessingException {
+    public BaseFormUsingTemplates() {
     }
 
     public MainBox getMainBox() {
@@ -519,7 +518,7 @@ public class ReplaceTableTest {
 
   public static class ExtendedFormUsingTemplates extends BaseFormUsingTemplates {
 
-    public ExtendedFormUsingTemplates() throws ProcessingException {
+    public ExtendedFormUsingTemplates() {
     }
 
     public TableFieldEx1 getTableFieldEx1() {
@@ -544,11 +543,11 @@ public class ReplaceTableTest {
       @Replace
       public class TableEx1 extends MainBox.TabBox.FirstGroupBox.TableField1.Table1 {
 
-        public SecondMenuEx1 getSecondMenuEx1() throws ProcessingException {
+        public SecondMenuEx1 getSecondMenuEx1() {
           return getMenuByClass(SecondMenuEx1.class);
         }
 
-        public ThirdMenu1 getThirdMenu1() throws ProcessingException {
+        public ThirdMenu1 getThirdMenu1() {
           return getMenuByClass(ThirdMenu1.class);
         }
 
@@ -582,11 +581,11 @@ public class ReplaceTableTest {
       @Replace
       public class InnerTableEx1 extends MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable {
 
-        public SecondMenuEx2 getSecondMenuEx2() throws ProcessingException {
+        public SecondMenuEx2 getSecondMenuEx2() {
           return getMenuByClass(SecondMenuEx2.class);
         }
 
-        public ThirdMenu2 getThirdMenu2() throws ProcessingException {
+        public ThirdMenu2 getThirdMenu2() {
           return getMenuByClass(ThirdMenu2.class);
         }
 

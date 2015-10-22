@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionTest.FormFieldInjectionTestForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionTest.FormFieldInjectionTestForm.MainBox.TopBox.StringField;
@@ -90,14 +89,14 @@ public class FormFieldInjectionTest {
 
     private IFormFieldInjection m_injection;
 
-    public FormFieldInjectionTestForm(IFormFieldInjection injection) throws ProcessingException {
+    public FormFieldInjectionTestForm(IFormFieldInjection injection) {
       super(false);
       m_injection = injection;
       callInitializer();
     }
 
     @Override
-    protected void initConfig() throws ProcessingException {
+    protected void initConfig() {
       try {
         FormFieldInjectionThreadLocal.push(m_injection);
         super.initConfig();

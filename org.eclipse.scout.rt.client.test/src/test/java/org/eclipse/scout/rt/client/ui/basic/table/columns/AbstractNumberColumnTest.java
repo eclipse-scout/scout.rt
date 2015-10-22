@@ -22,7 +22,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
@@ -55,7 +54,7 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
   }
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     setGroupingUsed(false);
     String bColor = "469406";
     setBackgroundColor(bColor);
@@ -112,7 +111,7 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
   }
 
   @Test
-  public void testUpdateFormat() throws ProcessingException {
+  public void testUpdateFormat() {
     TestTable table = new TestTable();
     table.addRow(table.createRow());
     table.getTestNumberColumn().setValue(0, BigDecimal.TEN);

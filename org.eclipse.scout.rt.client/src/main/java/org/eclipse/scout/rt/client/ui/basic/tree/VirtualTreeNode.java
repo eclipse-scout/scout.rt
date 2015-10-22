@@ -14,7 +14,6 @@ import java.security.Permission;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -155,7 +154,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public ITreeNode resolveVirtualChildNode(ITreeNode node) throws ProcessingException {
+  public ITreeNode resolveVirtualChildNode(ITreeNode node) {
     return node;
   }
 
@@ -336,7 +335,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
+  public <T extends IMenu> T getMenu(Class<T> menuType) {
     return null;
   }
 
@@ -466,7 +465,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public final void ensureChildrenLoaded() throws ProcessingException {
+  public final void ensureChildrenLoaded() {
   }
 
   @Override
@@ -483,7 +482,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public void loadChildren() throws ProcessingException {
+  public void loadChildren() {
   }
 
   @Override
@@ -501,7 +500,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public Object validateValue(ICell cell, Object value) throws ProcessingException {
+  public Object validateValue(ICell cell, Object value) {
     return value;
   }
 

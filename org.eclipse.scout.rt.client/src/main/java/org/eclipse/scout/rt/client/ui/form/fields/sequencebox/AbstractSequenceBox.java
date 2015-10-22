@@ -109,7 +109,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    */
   @ConfigOperation
   @Order(200)
-  protected <T extends Comparable<T>> void execCheckFromTo(IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+  protected <T extends Comparable<T>> void execCheckFromTo(IValueField<T>[] valueFields, int changedIndex) {
     ArrayList<IValueField<T>> nonEmptyFields = new ArrayList<IValueField<T>>();
     int nonEmptyIndex = -1;
     for (int i = 0; i < valueFields.length; i++) {
@@ -130,7 +130,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
-  private <T extends Comparable<T>> void checkNonEmptyFromTo(ArrayList<IValueField<T>> nonEmptyFields, int nonEmptyIndex) throws ProcessingException {
+  private <T extends Comparable<T>> void checkNonEmptyFromTo(ArrayList<IValueField<T>> nonEmptyFields, int nonEmptyIndex) {
     // check changed field against its non-empty neighbours
     IValueField<T> v = nonEmptyFields.get(nonEmptyIndex);
 
@@ -455,7 +455,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return chain.execIsLabelSuffixCandidate(formField);
   }
 
-  protected final <T extends Comparable<T>> void interceptCheckFromTo(IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+  protected final <T extends Comparable<T>> void interceptCheckFromTo(IValueField<T>[] valueFields, int changedIndex) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SequenceBoxCheckFromToChain chain = new SequenceBoxCheckFromToChain(extensions);
     chain.execCheckFromTo(valueFields, changedIndex);
@@ -479,7 +479,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
 
     @Override
-    public <T extends Comparable<T>> void execCheckFromTo(SequenceBoxCheckFromToChain chain, IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+    public <T extends Comparable<T>> void execCheckFromTo(SequenceBoxCheckFromToChain chain, IValueField<T>[] valueFields, int changedIndex) {
       getOwner().execCheckFromTo(valueFields, changedIndex);
     }
 

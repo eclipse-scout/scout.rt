@@ -68,11 +68,11 @@ public class HolidayCalendarItemParser {
   private SimpleDateFormat m_dateFormat = new SimpleDateFormat("dd.MM.yyyy");
   private final Element m_xml;
 
-  public HolidayCalendarItemParser(URL xmlResource) throws ProcessingException {
+  public HolidayCalendarItemParser(URL xmlResource) {
     m_xml = XmlUtility.getXmlDocument(xmlResource).getDocumentElement();
   }
 
-  public HolidayCalendarItemParser(InputStream xmlResource, String displayFileName) throws ProcessingException {
+  public HolidayCalendarItemParser(InputStream xmlResource, String displayFileName) {
     try {
       m_xml = XmlUtility.getXmlDocument(xmlResource).getDocumentElement();
     }
@@ -81,7 +81,7 @@ public class HolidayCalendarItemParser {
     }
   }
 
-  public Set<? extends ICalendarItem> getItems(Locale loc, Date minDate, Date maxDate) throws ProcessingException {
+  public Set<? extends ICalendarItem> getItems(Locale loc, Date minDate, Date maxDate) {
     Set<HolidayItem> itemList = new HashSet<HolidayItem>();
     int startYear, endYear;
     Calendar cal = Calendar.getInstance();

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -34,7 +33,7 @@ public class AbstractSmartColumnTest {
   private P_Table table = new P_Table();
 
   @Test
-  public void testResetInvalidValue() throws ProcessingException {
+  public void testResetInvalidValue() {
     table.addRowsByArray(new Long[]{3L});
     ITableRow testRow = table.getRow(0);
 
@@ -47,13 +46,13 @@ public class AbstractSmartColumnTest {
     assertTrue(testRow.getCell(0).isContentValid());
   }
 
-  private void parseAndSetInEditField(ITableRow testRow, String text) throws ProcessingException {
+  private void parseAndSetInEditField(ITableRow testRow, String text) {
     IValueField<?> field = prepareTestEdit();
     field.parseAndSetValue(text);
     table.getEditableSmartColumn().completeEdit(testRow, field);
   }
 
-  private IValueField prepareTestEdit() throws ProcessingException {
+  private IValueField prepareTestEdit() {
     return (IValueField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
   }
 

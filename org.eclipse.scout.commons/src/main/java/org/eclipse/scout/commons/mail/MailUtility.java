@@ -77,7 +77,7 @@ public class MailUtility {
    * @return
    * @throws ProcessingException
    */
-  public static List<Part> getBodyParts(Part message) throws ProcessingException {
+  public static List<Part> getBodyParts(Part message) {
     List<Part> bodyCollector = new ArrayList<Part>();
     collectMailParts(message, bodyCollector, null, null);
     return bodyCollector;
@@ -91,7 +91,7 @@ public class MailUtility {
    * @return
    * @throws ProcessingException
    */
-  public static List<Part> getAttachmentParts(Part message) throws ProcessingException {
+  public static List<Part> getAttachmentParts(Part message) {
     List<Part> attachmentCollector = new ArrayList<Part>();
     collectMailParts(message, null, attachmentCollector, null);
     return attachmentCollector;
@@ -112,7 +112,7 @@ public class MailUtility {
    *          Inline attachment collector (optional)
    * @throws ProcessingException
    */
-  public static void collectMailParts(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) throws ProcessingException {
+  public static void collectMailParts(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) {
     if (part == null) {
       return;
     }
@@ -171,7 +171,7 @@ public class MailUtility {
    *         plainText Part is not given
    * @throws ProcessingException
    */
-  public static String getPlainText(Part part) throws ProcessingException {
+  public static String getPlainText(Part part) {
     String text = null;
     try {
       List<Part> bodyParts = getBodyParts(part);
@@ -200,7 +200,7 @@ public class MailUtility {
     return text;
   }
 
-  public static Part getHtmlPart(List<Part> bodyParts) throws ProcessingException {
+  public static Part getHtmlPart(List<Part> bodyParts) {
     for (Part p : bodyParts) {
       try {
         if (p != null && p.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
@@ -214,7 +214,7 @@ public class MailUtility {
     return null;
   }
 
-  public static Part getPlainTextPart(List<Part> bodyParts) throws ProcessingException {
+  public static Part getPlainTextPart(List<Part> bodyParts) {
     for (Part p : bodyParts) {
       try {
         if (p != null && p.isMimeType(CONTENT_TYPE_TEXT_PLAIN)) {
@@ -228,7 +228,7 @@ public class MailUtility {
     return null;
   }
 
-  public static DataSource createDataSource(File file) throws ProcessingException {
+  public static DataSource createDataSource(File file) {
     try {
       int indexDot = file.getName().lastIndexOf('.');
       if (indexDot > 0) {
@@ -254,7 +254,7 @@ public class MailUtility {
    * @return
    * @throws ProcessingException
    */
-  public static DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) throws ProcessingException {
+  public static DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) {
     try {
       String mimeType = getContentTypeForExtension(fileExtension);
       if (mimeType == null) {
@@ -277,7 +277,7 @@ public class MailUtility {
    * @return Mime message
    * @throws ProcessingException
    */
-  public static MimeMessage createMimeMessage(MailMessage mailMessage) throws ProcessingException {
+  public static MimeMessage createMimeMessage(MailMessage mailMessage) {
     if (mailMessage == null) {
       throw new IllegalArgumentException("Mail message is missing");
     }
@@ -369,11 +369,11 @@ public class MailUtility {
     return part;
   }
 
-  public static MimeMessage createMessageFromBytes(byte[] bytes) throws ProcessingException {
+  public static MimeMessage createMessageFromBytes(byte[] bytes) {
     return createMessageFromBytes(bytes, null);
   }
 
-  public static MimeMessage createMessageFromBytes(byte[] bytes, Session session) throws ProcessingException {
+  public static MimeMessage createMessageFromBytes(byte[] bytes, Session session) {
     try {
       ByteArrayInputStream st = new ByteArrayInputStream(bytes);
       return new MimeMessage(session, st);
@@ -395,7 +395,7 @@ public class MailUtility {
    * @throws ProcessingException
    * @since 4.1
    */
-  public static void addAttachmentsToMimeMessage(MimeMessage msg, List<File> attachments) throws ProcessingException {
+  public static void addAttachmentsToMimeMessage(MimeMessage msg, List<File> attachments) {
     if (CollectionUtility.isEmpty(attachments)) {
       return;
     }
@@ -432,7 +432,7 @@ public class MailUtility {
    * @throws ProcessingException
    * @since 6.0
    */
-  public static void addResourcesAsAttachments(MimeMessage msg, List<BinaryResource> attachments) throws ProcessingException {
+  public static void addResourcesAsAttachments(MimeMessage msg, List<BinaryResource> attachments) {
     if (CollectionUtility.isEmpty(attachments)) {
       return;
     }
@@ -467,7 +467,7 @@ public class MailUtility {
    * @throws MessagingException
    * @throws ProcessingException
    */
-  private static Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException, ProcessingException {
+  private static Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException {
     Object messageContent = msg.getContent();
 
     Multipart multiPart = null;

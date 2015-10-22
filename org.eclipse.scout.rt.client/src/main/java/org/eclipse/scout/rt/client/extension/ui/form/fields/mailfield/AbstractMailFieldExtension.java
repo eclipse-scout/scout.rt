@@ -4,7 +4,6 @@ import java.io.File;
 
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldAttachementActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldHyperlinkActionChain;
@@ -17,12 +16,12 @@ public abstract class AbstractMailFieldExtension<OWNER extends AbstractMailField
   }
 
   @Override
-  public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, String ref) throws ProcessingException {
+  public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, String ref) {
     chain.execHyperlinkAction(ref);
   }
 
   @Override
-  public void execAttachementAction(MailFieldAttachementActionChain chain, File file) throws ProcessingException {
+  public void execAttachementAction(MailFieldAttachementActionChain chain, File file) {
     chain.execAttachementAction(file);
   }
 }

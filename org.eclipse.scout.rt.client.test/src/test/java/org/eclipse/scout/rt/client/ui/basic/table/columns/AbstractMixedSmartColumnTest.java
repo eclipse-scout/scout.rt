@@ -17,7 +17,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -44,7 +43,7 @@ import org.mockito.Mockito;
 public class AbstractMixedSmartColumnTest {
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractMixedSmartColumn<Long, Long> column = new AbstractMixedSmartColumn<Long, Long>() {
     };
     column.setCodeTypeClass(TestCodeType.class);
@@ -61,7 +60,7 @@ public class AbstractMixedSmartColumnTest {
    * Tests successful editing of a table cell
    */
   @Test
-  public void testEditingValidValue() throws ProcessingException {
+  public void testEditingValidValue() {
     P_Table table = new P_Table();
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
@@ -77,7 +76,7 @@ public class AbstractMixedSmartColumnTest {
    * An unparsable error should lead to an error on the column
    */
   @Test
-  public void testSetUnparsableValue() throws ProcessingException {
+  public void testSetUnparsableValue() {
     P_Table table = new P_Table();
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
@@ -93,7 +92,7 @@ public class AbstractMixedSmartColumnTest {
    * An unparsable error should be reset, if a valid value is entered
    */
   @Test
-  public void testResetParsingError() throws ProcessingException {
+  public void testResetParsingError() {
     P_Table table = new P_Table();
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
@@ -113,7 +112,7 @@ public class AbstractMixedSmartColumnTest {
    */
   @SuppressWarnings("unchecked")
   @Test
-  public void testPrepareLookupCallback() throws ProcessingException {
+  public void testPrepareLookupCallback() {
     TestMixedSmartColumn column = new TestMixedSmartColumn();
     ITableRow row = Mockito.mock(ITableRow.class);
     IMixedSmartField<String, Long> field = (IMixedSmartField<String, Long>) column.prepareEditInternal(row);
@@ -129,7 +128,7 @@ public class AbstractMixedSmartColumnTest {
    */
   @SuppressWarnings("unchecked")
   @Test
-  public void tesConvertValueToKeyCallback() throws ProcessingException {
+  public void tesConvertValueToKeyCallback() {
     TestMixedSmartColumn column = new TestMixedSmartColumn();
     ITableRow row = Mockito.mock(ITableRow.class);
     AbstractMixedSmartField<String, Long> field = (AbstractMixedSmartField<String, Long>) column.prepareEditInternal(row);

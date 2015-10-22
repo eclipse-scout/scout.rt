@@ -119,7 +119,7 @@ public class UserNavigationHistory {
     return null;
   }
 
-  protected void activateBookmark(Bookmark b) throws ProcessingException {
+  protected void activateBookmark(Bookmark b) {
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     desktop.activateBookmark(b);
     //scroll to tree selection
@@ -326,7 +326,7 @@ public class UserNavigationHistory {
    * bookmark stays the same.
    * </p>
    */
-  public void stepForward() throws ProcessingException {
+  public void stepForward() {
     int nextPos = m_index + 1;
     if (nextPos >= 0 && nextPos < m_bookmarks.size()) {
       saveCurrentStep();
@@ -352,7 +352,7 @@ public class UserNavigationHistory {
    * bookmark stays the same.
    * </p>
    */
-  public void stepBackward() throws ProcessingException {
+  public void stepBackward() {
     int nextPos = m_index - 1;
     if (nextPos >= 0 && nextPos < m_bookmarks.size()) {
       saveCurrentStep();
@@ -371,7 +371,7 @@ public class UserNavigationHistory {
     }
   }
 
-  public void stepTo(Bookmark b) throws ProcessingException {
+  public void stepTo(Bookmark b) {
     for (int i = 0; i < m_bookmarks.size(); i++) {
       if (m_bookmarks.get(i) == b) {
         saveCurrentStep();

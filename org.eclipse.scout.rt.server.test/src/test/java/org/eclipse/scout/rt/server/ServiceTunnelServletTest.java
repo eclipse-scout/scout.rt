@@ -37,7 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -114,7 +113,7 @@ public class ServiceTunnelServletTest {
   }
 
   @Test
-  public void testNewSessionCreatedOnLookupHttpSession() throws ProcessingException, ServletException {
+  public void testNewSessionCreatedOnLookupHttpSession() throws ServletException {
     ServletRunContexts.empty()
         .withServletRequest(m_requestMock)
         .withServletResponse(m_responseMock)
@@ -129,7 +128,7 @@ public class ServiceTunnelServletTest {
   }
 
   @Test
-  public void testNoNewServerSessionOnLookup() throws ProcessingException, ServletException {
+  public void testNoNewServerSessionOnLookup() throws ServletException {
     final TestServerSession testSession = new TestServerSession();
     ICacheEntry cacheMock = mock(ICacheEntry.class);
     when(cacheMock.getValue()).thenReturn(testSession);
@@ -153,7 +152,7 @@ public class ServiceTunnelServletTest {
    * @link ServerSessionProvider#provide(ServerJobInput)} is called only once.
    */
   @Test
-  public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ProcessingException, ServletException, InterruptedException {
+  public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException, InterruptedException {
     final Map<String, ICacheEntry<?>> cache = new HashMap<String, ICacheEntry<?>>();
 
     final TestServerSession testServerSession = new TestServerSession();
@@ -222,7 +221,7 @@ public class ServiceTunnelServletTest {
     };
   }
 
-  private List<IFuture<?>> scheduleAndJoinJobs(List<? extends Callable<?>> jobs) throws ProcessingException {
+  private List<IFuture<?>> scheduleAndJoinJobs(List<? extends Callable<?>> jobs) {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (Callable<?> job : jobs) {

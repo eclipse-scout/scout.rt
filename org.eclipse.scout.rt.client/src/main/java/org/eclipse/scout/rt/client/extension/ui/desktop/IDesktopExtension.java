@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
@@ -42,30 +41,30 @@ public interface IDesktopExtension<DESKTOP extends AbstractDesktop> extends IExt
   /**
    * @param chain
    */
-  void execInit(DesktopInitChain chain) throws ProcessingException;
+  void execInit(DesktopInitChain chain);
 
-  void execOpened(DesktopOpenedChain chain) throws ProcessingException;
+  void execOpened(DesktopOpenedChain chain);
 
-  void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) throws ProcessingException;
+  void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus);
 
-  void execBeforeClosing(DesktopBeforeClosingChain chain) throws ProcessingException;
+  void execBeforeClosing(DesktopBeforeClosingChain chain);
 
-  void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException;
+  void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm);
 
-  void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage) throws ProcessingException;
+  void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage);
 
-  void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) throws ProcessingException;
+  void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline);
 
-  IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) throws ProcessingException;
+  IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form);
 
-  void execClosing(DesktopClosingChain chain) throws ProcessingException;
+  void execClosing(DesktopClosingChain chain);
 
-  void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException;
+  void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm);
 
-  void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) throws ProcessingException;
+  void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable);
 
-  void execGuiAttached(DesktopGuiAttachedChain chain) throws ProcessingException;
+  void execGuiAttached(DesktopGuiAttachedChain chain);
 
-  void execGuiDetached(DesktopGuiDetachedChain chain) throws ProcessingException;
+  void execGuiDetached(DesktopGuiDetachedChain chain);
 
 }

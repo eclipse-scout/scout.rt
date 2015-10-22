@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
@@ -109,7 +108,7 @@ public interface ICalendar extends IPropertyObserver, IContextMenuOwner {
    */
   String PROP_CONTEXT_MENU = "contextMenus";
 
-  void initCalendar() throws ProcessingException;
+  void initCalendar();
 
   void disposeCalendar();
 

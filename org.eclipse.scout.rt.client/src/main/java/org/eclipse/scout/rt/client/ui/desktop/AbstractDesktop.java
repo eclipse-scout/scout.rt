@@ -314,7 +314,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(10)
-  protected void execInit() throws ProcessingException {
+  protected void execInit() {
   }
 
   /**
@@ -326,7 +326,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(20)
-  protected void execOpened() throws ProcessingException {
+  protected void execOpened() {
   }
 
   /**
@@ -340,7 +340,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(30)
-  protected void execBeforeClosing() throws ProcessingException {
+  protected void execBeforeClosing() {
   }
 
   /**
@@ -352,7 +352,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(40)
-  protected void execClosing() throws ProcessingException {
+  protected void execClosing() {
   }
 
   /**
@@ -364,7 +364,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(50)
-  protected void execGuiAttached() throws ProcessingException {
+  protected void execGuiAttached() {
   }
 
   /**
@@ -376,7 +376,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(60)
-  protected void execGuiDetached() throws ProcessingException {
+  protected void execGuiDetached() {
   }
 
   /**
@@ -392,7 +392,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(70)
-  protected void execOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  protected void execOutlineChanged(IOutline oldOutline, IOutline newOutline) {
   }
 
   /**
@@ -407,7 +407,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigOperation
   @Order(80)
-  protected IForm execFormAboutToShow(IForm form) throws ProcessingException {
+  protected IForm execFormAboutToShow(IForm form) {
     return form;
   }
 
@@ -425,7 +425,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @Order(90)
   @ConfigOperation
-  protected void execPageSearchFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+  protected void execPageSearchFormChanged(IForm oldForm, IForm newForm) {
   }
 
   /**
@@ -442,7 +442,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @Order(100)
   @ConfigOperation
-  protected void execPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+  protected void execPageDetailFormChanged(IForm oldForm, IForm newForm) {
   }
 
   /**
@@ -460,7 +460,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @Order(110)
   @ConfigOperation
-  protected void execPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
+  protected void execPageDetailTableChanged(ITable oldTable, ITable newTable) {
   }
 
   /**
@@ -475,7 +475,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @Order(120)
   @ConfigOperation
-  protected void execTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  protected void execTablePageLoaded(IPageWithTable<?> tablePage) {
     ISearchForm searchForm = tablePage.getSearchFormInternal();
     if (searchForm != null) {
       searchForm.setMinimized(tablePage.getTable().getRowCount() > 0);
@@ -497,7 +497,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @Order(130)
   @ConfigOperation
-  protected void execAddTrayMenus(List<IMenu> menus) throws ProcessingException {
+  protected void execAddTrayMenus(List<IMenu> menus) {
   }
 
   public List<IDesktopExtension> getDesktopExtensions() {
@@ -622,7 +622,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  protected final void interceptInit() throws ProcessingException {
+  protected final void interceptInit() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop>> extensions = getAllExtensions();
     DesktopInitChain chain = new DesktopInitChain(extensions);
     chain.execInit();
@@ -656,7 +656,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void initDesktop() throws ProcessingException {
+  public void initDesktop() {
     if (!m_desktopInited) {
       m_desktopInited = true;
       // extensions
@@ -1733,7 +1733,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void firePrint(PrintDevice device, Map<String, Object> parameters) throws ProcessingException {
+  private void firePrint(PrintDevice device, Map<String, Object> parameters) {
     fireDesktopEvent(new DesktopEvent(this, DesktopEvent.TYPE_PRINT, device, parameters));
   }
 
@@ -1874,22 +1874,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void activateBookmark(Bookmark bm) throws ProcessingException {
+  public void activateBookmark(Bookmark bm) {
     activateBookmark(bm, true);
   }
 
   @Override
-  public void activateBookmark(Bookmark bm, boolean activateOutline) throws ProcessingException {
+  public void activateBookmark(Bookmark bm, boolean activateOutline) {
     BookmarkUtility.activateBookmark(this, bm, activateOutline);
   }
 
   @Override
-  public Bookmark createBookmark() throws ProcessingException {
+  public Bookmark createBookmark() {
     return BookmarkUtility.createBookmark(this);
   }
 
   @Override
-  public Bookmark createBookmark(IPage<?> page) throws ProcessingException {
+  public Bookmark createBookmark(IPage<?> page) {
     return BookmarkUtility.createBookmark(page);
   }
 
@@ -1915,7 +1915,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void afterTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  public void afterTablePageLoaded(IPageWithTable<?> tablePage) {
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
@@ -1931,7 +1931,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void closeInternal() throws ProcessingException {
+  public void closeInternal() {
     setOpenedInternal(false);
     detachGui();
 
@@ -2027,7 +2027,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
+  public boolean runMenu(Class<? extends IMenu> menuType) {
     for (IMenu m : getMenus()) {
       if (runMenuRec(m, menuType)) {
         return true;
@@ -2036,7 +2036,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return false;
   }
 
-  private boolean runMenuRec(IMenu m, Class<? extends IMenu> menuType) throws ProcessingException {
+  private boolean runMenuRec(IMenu m, Class<? extends IMenu> menuType) {
     if (m.getClass() == menuType) {
       if (m.isVisible() && m.isEnabled()) {
         m.doAction();
@@ -2121,79 +2121,79 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public ContributionCommand initDelegate() throws ProcessingException {
+    public ContributionCommand initDelegate() {
       interceptInit();
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand desktopOpenedDelegate() throws ProcessingException {
+    public ContributionCommand desktopOpenedDelegate() {
       interceptOpened();
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException {
+    public ContributionCommand desktopBeforeClosingDelegate() {
       interceptBeforeClosing();
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand desktopClosingDelegate() throws ProcessingException {
+    public ContributionCommand desktopClosingDelegate() {
       interceptClosing();
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand guiAttachedDelegate() throws ProcessingException {
+    public ContributionCommand guiAttachedDelegate() {
       interceptGuiAttached();
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand guiDetachedDelegate() throws ProcessingException {
+    public ContributionCommand guiDetachedDelegate() {
       interceptGuiDetached();
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+    public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) {
       interceptOutlineChanged(oldOutline, newOutline);
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) throws ProcessingException {
+    public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) {
       formHolder.setValue(interceptFormAboutToShow(formHolder.getValue()));
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
+    public ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) {
       interceptPageSearchFormChanged(oldForm, newForm);
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
+    public ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) {
       interceptPageDetailFormChanged(oldForm, newForm);
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) throws ProcessingException {
+    public ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) {
       interceptPageDetailTableChanged(oldTable, newTable);
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) throws ProcessingException {
+    public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) {
       interceptTablePageLoaded(tablePage);
       return ContributionCommand.Continue;
     }
 
     @Override
-    public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) throws ProcessingException {
+    public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) {
       interceptAddTrayMenus(menus);
       return ContributionCommand.Continue;
     }
@@ -2391,139 +2391,139 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void execInit(DesktopInitChain chain) throws ProcessingException {
+    public void execInit(DesktopInitChain chain) {
       getOwner().execInit();
     }
 
     @Override
-    public void execOpened(DesktopOpenedChain chain) throws ProcessingException {
+    public void execOpened(DesktopOpenedChain chain) {
       getOwner().execOpened();
     }
 
     @Override
-    public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) throws ProcessingException {
+    public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) {
       getOwner().execAddTrayMenus(menus);
     }
 
     @Override
-    public void execBeforeClosing(DesktopBeforeClosingChain chain) throws ProcessingException {
+    public void execBeforeClosing(DesktopBeforeClosingChain chain) {
       getOwner().execBeforeClosing();
     }
 
     @Override
-    public void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException {
+    public void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) {
       getOwner().execPageDetailFormChanged(oldForm, newForm);
     }
 
     @Override
-    public void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage) throws ProcessingException {
+    public void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage) {
       getOwner().execTablePageLoaded(tablePage);
     }
 
     @Override
-    public void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+    public void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) {
       getOwner().execOutlineChanged(oldOutline, newOutline);
     }
 
     @Override
-    public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) throws ProcessingException {
+    public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) {
       return getOwner().execFormAboutToShow(form);
     }
 
     @Override
-    public void execClosing(DesktopClosingChain chain) throws ProcessingException {
+    public void execClosing(DesktopClosingChain chain) {
       getOwner().execClosing();
     }
 
     @Override
-    public void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException {
+    public void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm) {
       getOwner().execPageSearchFormChanged(oldForm, newForm);
     }
 
     @Override
-    public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) throws ProcessingException {
+    public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) {
       getOwner().execPageDetailTableChanged(oldTable, newTable);
     }
 
     @Override
-    public void execGuiAttached(DesktopGuiAttachedChain chain) throws ProcessingException {
+    public void execGuiAttached(DesktopGuiAttachedChain chain) {
       getOwner().execGuiAttached();
     }
 
     @Override
-    public void execGuiDetached(DesktopGuiDetachedChain chain) throws ProcessingException {
+    public void execGuiDetached(DesktopGuiDetachedChain chain) {
       getOwner().execGuiDetached();
     }
 
   }
 
-  protected final void interceptOpened() throws ProcessingException {
+  protected final void interceptOpened() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopOpenedChain chain = new DesktopOpenedChain(extensions);
     chain.execOpened();
   }
 
-  protected final void interceptAddTrayMenus(List<IMenu> menus) throws ProcessingException {
+  protected final void interceptAddTrayMenus(List<IMenu> menus) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopAddTrayMenusChain chain = new DesktopAddTrayMenusChain(extensions);
     chain.execAddTrayMenus(menus);
   }
 
-  protected final void interceptBeforeClosing() throws ProcessingException {
+  protected final void interceptBeforeClosing() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopBeforeClosingChain chain = new DesktopBeforeClosingChain(extensions);
     chain.execBeforeClosing();
   }
 
-  protected final void interceptPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+  protected final void interceptPageDetailFormChanged(IForm oldForm, IForm newForm) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopPageDetailFormChangedChain chain = new DesktopPageDetailFormChangedChain(extensions);
     chain.execPageDetailFormChanged(oldForm, newForm);
   }
 
-  protected final void interceptTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  protected final void interceptTablePageLoaded(IPageWithTable<?> tablePage) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopTablePageLoadedChain chain = new DesktopTablePageLoadedChain(extensions);
     chain.execTablePageLoaded(tablePage);
   }
 
-  protected final void interceptOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  protected final void interceptOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopOutlineChangedChain chain = new DesktopOutlineChangedChain(extensions);
     chain.execOutlineChanged(oldOutline, newOutline);
   }
 
-  protected final IForm interceptFormAboutToShow(IForm form) throws ProcessingException {
+  protected final IForm interceptFormAboutToShow(IForm form) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopFormAboutToShowChain chain = new DesktopFormAboutToShowChain(extensions);
     return chain.execFormAboutToShow(form);
   }
 
-  protected final void interceptClosing() throws ProcessingException {
+  protected final void interceptClosing() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopClosingChain chain = new DesktopClosingChain(extensions);
     chain.execClosing();
   }
 
-  protected final void interceptPageSearchFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+  protected final void interceptPageSearchFormChanged(IForm oldForm, IForm newForm) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopPageSearchFormChangedChain chain = new DesktopPageSearchFormChangedChain(extensions);
     chain.execPageSearchFormChanged(oldForm, newForm);
   }
 
-  protected final void interceptPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
+  protected final void interceptPageDetailTableChanged(ITable oldTable, ITable newTable) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopPageDetailTableChangedChain chain = new DesktopPageDetailTableChangedChain(extensions);
     chain.execPageDetailTableChanged(oldTable, newTable);
   }
 
-  protected final void interceptGuiAttached() throws ProcessingException {
+  protected final void interceptGuiAttached() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopGuiAttachedChain chain = new DesktopGuiAttachedChain(extensions);
     chain.execGuiAttached();
   }
 
-  protected final void interceptGuiDetached() throws ProcessingException {
+  protected final void interceptGuiDetached() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopGuiDetachedChain chain = new DesktopGuiDetachedChain(extensions);
     chain.execGuiDetached();

@@ -112,7 +112,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    */
   @ConfigOperation
   @Order(230)
-  protected void execPostMessage(String data, String orgin) throws ProcessingException {
+  protected void execPostMessage(String data, String orgin) {
   }
 
   @Override
@@ -322,7 +322,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
   }
 
-  protected final void interceptPostMessage(String data, String origin) throws ProcessingException {
+  protected final void interceptPostMessage(String data, String origin) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     BrowserFieldLocationChangedChain chain = new BrowserFieldLocationChangedChain(extensions);
     chain.execPostMessage(data, origin);
@@ -335,7 +335,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
 
     @Override
-    public void execPostMessage(BrowserFieldLocationChangedChain chain, String data, String origin) throws ProcessingException {
+    public void execPostMessage(BrowserFieldLocationChangedChain chain, String data, String origin) {
       getOwner().execPostMessage(data, origin);
     }
   }

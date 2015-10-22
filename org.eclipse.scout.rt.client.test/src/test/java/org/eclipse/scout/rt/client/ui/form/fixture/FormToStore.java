@@ -14,7 +14,6 @@ package org.eclipse.scout.rt.client.ui.form.fixture;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -48,19 +47,19 @@ public class FormToStore extends AbstractForm {
   /**
    * @throws org.eclipse.scout.commons.exception.ProcessingException
    */
-  public FormToStore() throws ProcessingException {
+  public FormToStore() {
     super();
   }
 
   /**
    * @throws org.eclipse.scout.commons.exception.ProcessingException
    */
-  public void startModify() throws ProcessingException {
+  public void startModify() {
     startInternal(new ModifyHandler());
   }
 
   @Override
-  protected void execStored() throws ProcessingException {
+  protected void execStored() {
     doIt(m_execStoredImplementation);
   }
 
@@ -83,12 +82,12 @@ public class FormToStore extends AbstractForm {
   public class ModifyHandler extends AbstractFormHandler {
 
     @Override
-    protected void execStore() throws ProcessingException {
+    protected void execStore() {
       doIt(m_execStoreHandlerImplementation);
     }
   }
 
-  private void doIt(MethodImplementation implementation) throws ProcessingException {
+  private void doIt(MethodImplementation implementation) {
     switch (implementation) {
       case MARK_NOT_STORED:
         setFormStored(false);
@@ -144,15 +143,15 @@ public class FormToStore extends AbstractForm {
     CONSUMED_VETO_EXCEPTION
   }
 
-  public void clickSave() throws ProcessingException {
+  public void clickSave() {
     getFieldByClass(SaveButton.class).doClick();
   }
 
-  public void clickOk() throws ProcessingException {
+  public void clickOk() {
     getFieldByClass(OkButton.class).doClick();
   }
 
-  public void clickCancel() throws ProcessingException {
+  public void clickCancel() {
     getFieldByClass(CancelButton.class).doClick();
   }
 

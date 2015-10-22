@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldInitFieldChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.AbstractStringFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -22,7 +21,7 @@ public class TemplateStringFieldExtension extends AbstractStringFieldExtension<A
   }
 
   @Override
-  public void execInitField(FormFieldInitFieldChain chain) throws ProcessingException {
+  public void execInitField(FormFieldInitFieldChain chain) {
     chain.execInitField();
     getOwner().setValue("A");
   }

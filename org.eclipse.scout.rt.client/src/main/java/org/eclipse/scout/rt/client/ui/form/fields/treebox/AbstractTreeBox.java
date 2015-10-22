@@ -117,7 +117,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    */
   @ConfigOperation
   @Order(240)
-  protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  protected void execLoadChildNodes(ITreeNode parentNode) {
     List<ITreeNode> children;
     if (isLoadIncremental()) {
       children = callChildLookup(parentNode);
@@ -230,7 +230,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    * <p>
    */
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     return getValue().isEmpty();
   }
 
@@ -239,7 +239,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    */
   @ConfigOperation
   @Order(230)
-  protected void execPrepareLookup(ILookupCall<T> call, ITreeNode parent) throws ProcessingException {
+  protected void execPrepareLookup(ILookupCall<T> call, ITreeNode parent) {
   }
 
   /**
@@ -251,7 +251,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    */
   @ConfigOperation
   @Order(240)
-  protected void execFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) {
   }
 
   /**
@@ -265,7 +265,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    */
   @ConfigOperation
   @Order(250)
-  protected void execFilterNewNode(ITreeNode newNode, int treeLevel) throws ProcessingException {
+  protected void execFilterNewNode(ITreeNode newNode, int treeLevel) {
   }
 
   private Class<? extends ITree> getConfiguredTree() {
@@ -285,7 +285,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+  protected void execChangedMasterValue(Object newMasterValue) {
     setValue(null);
     loadRootNode();
   }
@@ -429,7 +429,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     getTree().initTree();
     if (getConfiguredAutoLoad()) {
       try {
@@ -464,12 +464,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  public void loadRootNode() throws ProcessingException {
+  public void loadRootNode() {
     loadChildNodes(m_tree.getRootNode());
   }
 
   @Override
-  public final void loadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  public final void loadChildNodes(ITreeNode parentNode) {
     if (m_tree != null) {
       try {
         m_valueTreeSyncActive = true;
@@ -509,7 +509,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return new P_TreeNodeBuilder();
   }
 
-  private void prepareLookupCall(ILookupCall<T> call, ITreeNode parent) throws ProcessingException {
+  private void prepareLookupCall(ILookupCall<T> call, ITreeNode parent) {
     prepareLookupCallInternal(call, parent);
     interceptPrepareLookup(call, parent);
   }
@@ -558,7 +558,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  public List<ITreeNode> callChildLookup(ITreeNode parentNode) throws ProcessingException {
+  public List<ITreeNode> callChildLookup(ITreeNode parentNode) {
     List<? extends ILookupRow<T>> data = null;
     ILookupCall<T> call = getLookupCall();
     if (call != null) {
@@ -576,7 +576,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  public List<ITreeNode> callCompleteTreeLookup() throws ProcessingException {
+  public List<ITreeNode> callCompleteTreeLookup() {
     List<? extends ILookupRow<T>> data = null;
     ILookupCall<T> call = getLookupCall();
     if (call != null) {
@@ -596,7 +596,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-  private List<? extends ILookupRow<T>> filterLookupResult(ILookupCall<T> call, List<? extends ILookupRow<T>> data) throws ProcessingException {
+  private List<? extends ILookupRow<T>> filterLookupResult(ILookupCall<T> call, List<? extends ILookupRow<T>> data) {
     List<ILookupRow<T>> result = CollectionUtility.arrayList(data);
     interceptFilterLookupResult(call, result);
     Iterator<ILookupRow<T>> resultIt = result.iterator();
@@ -613,7 +613,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return result;
   }
 
-  private void filterNewNodesRec(List<ITreeNode> nodes, int level) throws ProcessingException {
+  private void filterNewNodesRec(List<ITreeNode> nodes, int level) {
     if (nodes != null) {
       for (ITreeNode node : nodes) {
         if (node != null) {
@@ -648,7 +648,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  protected final Set<T> validateValueInternal(Set<T> rawValue0) throws ProcessingException {
+  protected final Set<T> validateValueInternal(Set<T> rawValue0) {
     // ensure a copy of the input values
     Set<T> rawValue = CollectionUtility.hashSet(rawValue0);
     return doValidateValueInternal(rawValue);
@@ -657,7 +657,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   /**
    * override this method to perform detailed validation in subclasses
    */
-  protected Set<T> doValidateValueInternal(Set<T> rawValue) throws ProcessingException {
+  protected Set<T> doValidateValueInternal(Set<T> rawValue) {
     if (CollectionUtility.isEmpty(rawValue)) {
       // fast return
       return rawValue;
@@ -780,7 +780,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+  public void exportFormFieldData(AbstractFormFieldData target) {
     @SuppressWarnings("unchecked")
     AbstractValueFieldData<Set<T>> v = (AbstractValueFieldData<Set<T>>) target;
     Set<T> value = getValue();
@@ -1078,7 +1078,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
 
     @Override
-    public void loadChildren() throws ProcessingException {
+    public void loadChildren() {
       if (isLoadIncremental()) {
         AbstractTreeBox.this.loadChildNodes(this);
       }
@@ -1091,12 +1091,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<T> {
 
     @Override
-    protected ITreeNode createEmptyTreeNode() throws ProcessingException {
+    protected ITreeNode createEmptyTreeNode() {
       return new P_InternalTreeNode();
     }
 
     @Override
-    public ITreeNode createTreeNode(ILookupRow<T> lookupRow, int nodeStatus, boolean markChildrenLoaded) throws ProcessingException {
+    public ITreeNode createTreeNode(ILookupRow<T> lookupRow, int nodeStatus, boolean markChildrenLoaded) {
       @SuppressWarnings("unchecked")
       P_InternalTreeNode treeNode = (P_InternalTreeNode) super.createTreeNode(lookupRow, nodeStatus, markChildrenLoaded);
       treeNode.setActive(lookupRow.isActive());
@@ -1124,25 +1124,25 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-  protected final void interceptFilterNewNode(ITreeNode newNode, int treeLevel) throws ProcessingException {
+  protected final void interceptFilterNewNode(ITreeNode newNode, int treeLevel) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxFilterNewNodeChain<T> chain = new TreeBoxFilterNewNodeChain<T>(extensions);
     chain.execFilterNewNode(newNode, treeLevel);
   }
 
-  protected final void interceptLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+  protected final void interceptLoadChildNodes(ITreeNode parentNode) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxLoadChildNodesChain<T> chain = new TreeBoxLoadChildNodesChain<T>(extensions);
     chain.execLoadChildNodes(parentNode);
   }
 
-  protected final void interceptPrepareLookup(ILookupCall<T> call, ITreeNode parent) throws ProcessingException {
+  protected final void interceptPrepareLookup(ILookupCall<T> call, ITreeNode parent) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxPrepareLookupChain<T> chain = new TreeBoxPrepareLookupChain<T>(extensions);
     chain.execPrepareLookup(call, parent);
   }
 
-  protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxFilterLookupResultChain<T> chain = new TreeBoxFilterLookupResultChain<T>(extensions);
     chain.execFilterLookupResult(call, result);
@@ -1155,22 +1155,22 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
 
     @Override
-    public void execFilterNewNode(TreeBoxFilterNewNodeChain<T> chain, ITreeNode newNode, int treeLevel) throws ProcessingException {
+    public void execFilterNewNode(TreeBoxFilterNewNodeChain<T> chain, ITreeNode newNode, int treeLevel) {
       getOwner().execFilterNewNode(newNode, treeLevel);
     }
 
     @Override
-    public void execLoadChildNodes(TreeBoxLoadChildNodesChain<T> chain, ITreeNode parentNode) throws ProcessingException {
+    public void execLoadChildNodes(TreeBoxLoadChildNodesChain<T> chain, ITreeNode parentNode) {
       getOwner().execLoadChildNodes(parentNode);
     }
 
     @Override
-    public void execPrepareLookup(TreeBoxPrepareLookupChain<T> chain, ILookupCall<T> call, ITreeNode parent) throws ProcessingException {
+    public void execPrepareLookup(TreeBoxPrepareLookupChain<T> chain, ILookupCall<T> call, ITreeNode parent) {
       getOwner().execPrepareLookup(call, parent);
     }
 
     @Override
-    public void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+    public void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) {
       getOwner().execFilterLookupResult(call, result);
     }
   }

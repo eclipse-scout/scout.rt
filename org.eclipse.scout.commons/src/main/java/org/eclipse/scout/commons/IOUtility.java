@@ -55,7 +55,7 @@ public final class IOUtility {
   /**
    * retrieve content as raw bytes
    */
-  public static byte[] getContent(InputStream stream) throws ProcessingException {
+  public static byte[] getContent(InputStream stream) {
     return getContent(stream, true);
   }
 
@@ -71,7 +71,7 @@ public final class IOUtility {
    * @return A {@link String} containing the content of the given {@link InputStream}.
    * @throws ProcessingException
    */
-  public static String getContent(InputStream stream, String charsetName) throws ProcessingException {
+  public static String getContent(InputStream stream, String charsetName) {
     try {
       return new String(IOUtility.getContent(stream), charsetName);
     }
@@ -89,7 +89,7 @@ public final class IOUtility {
    * @return The content of the given {@link InputStream}.
    * @throws ProcessingException
    */
-  public static String getContentUtf8(InputStream stream) throws ProcessingException {
+  public static String getContentUtf8(InputStream stream) {
     return getContent(stream, Encoding.UTF_8);
   }
 
@@ -146,7 +146,7 @@ public final class IOUtility {
     }
   }
 
-  public static byte[] getContent(InputStream stream, boolean autoClose) throws ProcessingException {
+  public static byte[] getContent(InputStream stream, boolean autoClose) {
     BufferedInputStream in = null;
     try {
       in = new BufferedInputStream(stream);
@@ -175,7 +175,7 @@ public final class IOUtility {
     }
   }
 
-  public static byte[] getContent(File file) throws ProcessingException {
+  public static byte[] getContent(File file) {
     try {
       return getContent(new FileInputStream(file), true);
     }
@@ -184,7 +184,7 @@ public final class IOUtility {
     }
   }
 
-  public static byte[] getContent(String filename) throws ProcessingException {
+  public static byte[] getContent(String filename) {
     return getContent(toFile(filename));
   }
 
@@ -192,7 +192,7 @@ public final class IOUtility {
    * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8" If no encoding is provided, the
    * system default encoding is used
    */
-  public static String getContentInEncoding(String filepath, String encoding) throws ProcessingException {
+  public static String getContentInEncoding(String filepath, String encoding) {
     try {
       FileInputStream in = null;
       String content = null;
@@ -220,11 +220,11 @@ public final class IOUtility {
   /**
    * write content as raw bytes
    */
-  public static void writeContent(OutputStream stream, byte[] data) throws ProcessingException {
+  public static void writeContent(OutputStream stream, byte[] data) {
     writeContent(stream, data, true);
   }
 
-  public static void writeContent(OutputStream stream, byte[] data, boolean autoClose) throws ProcessingException {
+  public static void writeContent(OutputStream stream, byte[] data, boolean autoClose) {
     BufferedOutputStream out = null;
     try {
       out = new BufferedOutputStream(stream);
@@ -245,7 +245,7 @@ public final class IOUtility {
     }
   }
 
-  public static void writeContent(String filename, Object o) throws ProcessingException {
+  public static void writeContent(String filename, Object o) {
     File f = toFile(filename);
     try {
       if (o instanceof byte[]) {
@@ -266,11 +266,11 @@ public final class IOUtility {
     }
   }
 
-  public static void writeContent(Writer stream, String text) throws ProcessingException {
+  public static void writeContent(Writer stream, String text) {
     writeContent(stream, text, true);
   }
 
-  public static void writeContent(Writer stream, String text, boolean autoClose) throws ProcessingException {
+  public static void writeContent(Writer stream, String text, boolean autoClose) {
     try {
       stream.write(text);
     }
@@ -293,11 +293,11 @@ public final class IOUtility {
   /**
    * retrieve content as string (correct character conversion)
    */
-  public static String getContent(Reader stream) throws ProcessingException {
+  public static String getContent(Reader stream) {
     return getContent(stream, true);
   }
 
-  public static String getContent(Reader stream, boolean autoClose) throws ProcessingException {
+  public static String getContent(Reader stream, boolean autoClose) {
     BufferedReader in = null;
     try {
       in = new BufferedReader(stream);
@@ -352,7 +352,7 @@ public final class IOUtility {
   /**
    * creates a temporary directory with a random name and the given suffix
    */
-  public static File createTempDirectory(String dirSuffix) throws ProcessingException {
+  public static File createTempDirectory(String dirSuffix) {
     try {
       if (dirSuffix != null) {
         dirSuffix = dirSuffix.replaceAll("[:*?\\\"<>|]*", "");
@@ -379,7 +379,7 @@ public final class IOUtility {
    * @return A new temporary file with specified content
    * @throws ProcessingException
    */
-  public static File createTempFile(String fileName, byte[] content) throws ProcessingException {
+  public static File createTempFile(String fileName, byte[] content) {
     try {
       if (fileName != null) {
         fileName = fileName.replaceAll("[\\\\/:*?\\\"<>|]*", "");
@@ -423,7 +423,7 @@ public final class IOUtility {
    * @return A new temporary file with the specified content
    * @throws ProcessingException
    */
-  public static File createTempFile(String prefix, String suffix, byte[] content) throws ProcessingException {
+  public static File createTempFile(String prefix, String suffix, byte[] content) {
     File f = null;
     try {
       f = File.createTempFile(prefix, suffix);
@@ -491,7 +491,7 @@ public final class IOUtility {
     return false;
   }
 
-  public static String exec(String cmd, String[] envp, File dir) throws ProcessingException {
+  public static String exec(String cmd, String[] envp, File dir) {
     StringWriter sw = new StringWriter();
     try {
       Process p = Runtime.getRuntime().exec(cmd, envp, dir);
@@ -615,7 +615,7 @@ public final class IOUtility {
     }
   }
 
-  public static String getTempFileName(String fileExtension) throws ProcessingException {
+  public static String getTempFileName(String fileExtension) {
     try {
       File f = File.createTempFile("tmp", fileExtension);
       f.delete();
@@ -726,7 +726,7 @@ public final class IOUtility {
    * @throws ProcessingException
    *           if an {@link IOException} occurs (e.g. if file does not exists)
    */
-  public static void appendFile(PrintWriter writer, File file) throws ProcessingException {
+  public static void appendFile(PrintWriter writer, File file) {
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new FileReader(file));
@@ -759,7 +759,7 @@ public final class IOUtility {
    * @throws ProcessingException
    *           if an {@link IOException} occurs (e.g. if file does not exists)
    */
-  public static List<String> readLines(File file, String charsetName) throws ProcessingException {
+  public static List<String> readLines(File file, String charsetName) {
     ArrayList<String> lines;
     lines = new ArrayList<String>();
     BufferedReader bufferedReader = null;

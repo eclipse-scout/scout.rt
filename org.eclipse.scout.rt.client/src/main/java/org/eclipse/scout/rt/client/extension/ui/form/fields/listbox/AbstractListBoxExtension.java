@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.listbox;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.ListBoxChains.ListBoxFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.ListBoxChains.ListBoxLoadTableDataChain;
@@ -20,22 +19,22 @@ public abstract class AbstractListBoxExtension<KEY, OWNER extends AbstractListBo
   }
 
   @Override
-  public void execPopulateTable(ListBoxPopulateTableChain<KEY> chain) throws ProcessingException {
+  public void execPopulateTable(ListBoxPopulateTableChain<KEY> chain) {
     chain.execPopulateTable();
   }
 
   @Override
-  public List<? extends ILookupRow<KEY>> execLoadTableData(ListBoxLoadTableDataChain<KEY> chain) throws ProcessingException {
+  public List<? extends ILookupRow<KEY>> execLoadTableData(ListBoxLoadTableDataChain<KEY> chain) {
     return chain.execLoadTableData();
   }
 
   @Override
-  public void execFilterLookupResult(ListBoxFilterLookupResultChain<KEY> chain, ILookupCall<KEY> call, List<ILookupRow<KEY>> result) throws ProcessingException {
+  public void execFilterLookupResult(ListBoxFilterLookupResultChain<KEY> chain, ILookupCall<KEY> call, List<ILookupRow<KEY>> result) {
     chain.execFilterLookupResult(call, result);
   }
 
   @Override
-  public void execPrepareLookup(ListBoxPrepareLookupChain<KEY> chain, ILookupCall<KEY> call) throws ProcessingException {
+  public void execPrepareLookup(ListBoxPrepareLookupChain<KEY> chain, ILookupCall<KEY> call) {
     chain.execPrepareLookup(call);
   }
 }

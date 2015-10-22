@@ -153,7 +153,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    * @throws ProcessingException
    */
   public EntityContribution createInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, AttributeStrategy strategy, String stm, List<String> bindNames, List<Object> bindValues,
-      Map<String, String> parentAliasMap) throws ProcessingException {
+      Map<String, String> parentAliasMap) {
     return builder.createAttributePart(strategy, attributeNodeData.getAggregationType(), stm, attributeNodeData.getOperator(), bindNames, bindValues, this.isPlainBind(), parentAliasMap);
   }
 

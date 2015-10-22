@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -123,7 +122,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID_TYPE>> getDataByKey() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByKey() {
     CODE_ID_TYPE key = getKey();
     List<ICode<CODE_ID_TYPE>> list = new ArrayList<ICode<CODE_ID_TYPE>>(1);
     ICodeType<?, CODE_ID_TYPE> t = BEANS.opt(m_codeTypeClass);
@@ -140,7 +139,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID_TYPE>> getDataByText() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByText() {
     final Pattern pat = getSearchPattern(getText());
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
       @Override
@@ -169,7 +168,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID_TYPE>> getDataByAll() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByAll() {
     final Pattern pat = getSearchPattern(getAll());
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
       @Override
@@ -198,7 +197,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
    * Complete override using code data
    */
   @Override
-  public List<ILookupRow<CODE_ID_TYPE>> getDataByRec() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByRec() {
     Object recValue = getRec();
     if ((recValue instanceof Number) && ((Number) recValue).longValue() == 0) {
       recValue = null;

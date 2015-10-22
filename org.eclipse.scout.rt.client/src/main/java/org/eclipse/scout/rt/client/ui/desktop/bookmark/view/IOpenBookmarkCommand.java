@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark.view;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.AbstractBookmarkTreeField;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
@@ -24,6 +23,6 @@ public interface IOpenBookmarkCommand {
    * Opens the bookmark, it's up to the implementation to track additional features
    * <p>
    */
-  void openBookmark(Bookmark bookmark) throws ProcessingException;
+  void openBookmark(Bookmark bookmark);
 
 }

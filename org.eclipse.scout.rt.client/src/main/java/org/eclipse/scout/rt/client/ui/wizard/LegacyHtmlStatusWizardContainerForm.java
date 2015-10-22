@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -47,11 +46,11 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 @Deprecated
 public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainerForm {
 
-  public LegacyHtmlStatusWizardContainerForm(IWizard wizard) throws ProcessingException {
+  public LegacyHtmlStatusWizardContainerForm(IWizard wizard) {
     this(wizard, true);
   }
 
-  public LegacyHtmlStatusWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
+  public LegacyHtmlStatusWizardContainerForm(IWizard wizard, boolean callInitializer) {
     super(wizard, false);
     if (callInitializer) {
       callInitializer();
@@ -118,12 +117,12 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
   }
 
   @Override
-  protected void setInnerWizardForm(IForm form) throws ProcessingException {
+  protected void setInnerWizardForm(IForm form) {
     getWrappedWizardForm().setInnerForm(form, false);
   }
 
   @Override
-  public void startWizard() throws ProcessingException {
+  public void startWizard() {
     startInternal(new WizardHandler());
   }
 
@@ -214,7 +213,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
           }
 
           @Override
-          protected void execAppLinkAction(String ref) throws ProcessingException {
+          protected void execAppLinkAction(String ref) {
             if (LegacyHtmlStatusWizardContainerForm.this.getWizard() != null) {
               LegacyHtmlStatusWizardContainerForm.this.getWizard().doAppLinkAction(ref);
             }
@@ -240,7 +239,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doPreviousStep();
       }
     }
@@ -259,7 +258,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doNextStep();
       }
     }
@@ -278,7 +277,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doFinish();
       }
     }
@@ -302,7 +301,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doCancel();
       }
     }
@@ -326,7 +325,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doSuspend();
       }
     }
@@ -350,7 +349,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
+      protected void execClickAction() {
         getWizard().doReset();
       }
     }
@@ -363,7 +362,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         handleEnterKey();
       }
     }
@@ -376,7 +375,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
+      protected void execAction() {
         handleEscapeKey(false);
       }
     }
@@ -385,7 +384,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
   public class WizardHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       setInnerWizardForm(getWizard() == null ? null : getWizard().getWizardForm());
     }
   }

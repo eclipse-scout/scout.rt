@@ -83,9 +83,9 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
-  void initColumn() throws ProcessingException;
+  void initColumn();
 
-  void disposeColumn() throws ProcessingException;
+  void disposeColumn();
 
   void setVisiblePermission(Permission p);
 
@@ -122,7 +122,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * @param value
    * @throws ProcessingException
    */
-  void setValue(ITableRow r, VALUE value) throws ProcessingException;
+  void setValue(ITableRow r, VALUE value);
 
   /**
    * <p>
@@ -136,12 +136,12 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * @param value
    * @throws ProcessingException
    */
-  void setValue(int rowIndex, VALUE value) throws ProcessingException;
+  void setValue(int rowIndex, VALUE value);
 
   /**
    * fill all values in this column with the new value
    */
-  void fill(VALUE rawValue) throws ProcessingException;
+  void fill(VALUE rawValue);
 
   List<VALUE> getValues();
 
@@ -369,7 +369,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * <p>
    * The default implementation writes the given value directly into the corresponding cell.
    */
-  void importValue(ITableRow row, Object value) throws ProcessingException;
+  void importValue(ITableRow row, Object value);
 
   /**
    * Parse row and set value to ensure correct type and valid value
@@ -382,12 +382,12 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * @throws ProcessingException
    *           parse AND validate value
    */
-  VALUE/* validValue */ parseValue(ITableRow row, Object rawValue) throws ProcessingException;
+  VALUE/* validValue */ parseValue(ITableRow row, Object rawValue);
 
   /**
    * validate cell value on a row
    */
-  VALUE/* validValue */ validateValue(ITableRow row, VALUE rawValue) throws ProcessingException;
+  VALUE/* validValue */ validateValue(ITableRow row, VALUE rawValue);
 
   /**
    * Prepare editing of a cell in the table.
@@ -400,12 +400,12 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    *          on which editing occurs
    * @return a field for editing, use super.{@link #prepareEdit(ITableRow)} for the default implementation.
    */
-  IFormField prepareEdit(ITableRow row) throws ProcessingException;
+  IFormField prepareEdit(ITableRow row);
 
   /**
    * Complete editing of a cell
    */
-  void completeEdit(ITableRow row, IFormField editingField) throws ProcessingException;
+  void completeEdit(ITableRow row, IFormField editingField);
 
   void decorateCell(ITableRow row);
 

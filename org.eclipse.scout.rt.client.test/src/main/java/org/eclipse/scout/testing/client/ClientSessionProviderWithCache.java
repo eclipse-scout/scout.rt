@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -47,7 +46,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   }
 
   @Override
-  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext, final String sessionId) throws ProcessingException {
+  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext, final String sessionId) {
     final Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
@@ -104,7 +103,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   }
 
   @Internal
-  protected <SESSION extends IClientSession> SESSION getFromCache(final Collection<Principal> principals, final Class<? extends IClientSession> clientSessionClass) throws ProcessingException {
+  protected <SESSION extends IClientSession> SESSION getFromCache(final Collection<Principal> principals, final Class<? extends IClientSession> clientSessionClass) {
     for (final Principal principal : principals) {
       final IClientSession clientSession = m_cache.get(newCacheKey(clientSessionClass, principal));
       if (clientSession != null) {
@@ -115,7 +114,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   }
 
   @Internal
-  protected <SESSION extends IClientSession> SESSION putToCache(final Collection<Principal> principals, final SESSION clientSession) throws ProcessingException {
+  protected <SESSION extends IClientSession> SESSION putToCache(final Collection<Principal> principals, final SESSION clientSession) {
     for (final Principal principal : principals) {
       m_cache.put(newCacheKey(clientSession.getClass(), principal), clientSession);
     }

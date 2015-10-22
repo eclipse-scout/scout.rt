@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -112,7 +111,7 @@ public class FileChooser implements IFileChooser {
   }
 
   @Override
-  public List<BinaryResource> startChooser() throws ProcessingException {
+  public List<BinaryResource> startChooser() {
     m_files = null;
     m_blockingCondition.setBlocking(true);
 
@@ -128,7 +127,7 @@ public class FileChooser implements IFileChooser {
     return getFiles();
   }
 
-  private void waitFor() throws ProcessingException {
+  private void waitFor() {
     m_blockingCondition.waitFor();
   }
 

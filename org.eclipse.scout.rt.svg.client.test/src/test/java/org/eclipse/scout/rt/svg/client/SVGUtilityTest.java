@@ -19,7 +19,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -34,7 +33,7 @@ import org.xml.sax.SAXException;
 
 public class SVGUtilityTest {
 
-  private SVGDocument getTestDocument() throws ProcessingException, IOException {
+  private SVGDocument getTestDocument() throws IOException {
     try (InputStream is = getClass().getClassLoader().getResourceAsStream("test.svg");) {
       return SVGUtility.readSVGDocument(is);
     }
@@ -53,7 +52,7 @@ public class SVGUtilityTest {
     Assert.assertEquals(parent.getHref().getBaseVal(), url);
   }
 
-  private Document asXML(SVGDocument d) throws SAXException, IOException, ProcessingException, ParserConfigurationException {
+  private Document asXML(SVGDocument d) throws SAXException, IOException, ParserConfigurationException {
     try (OutputStream os = new ByteArrayOutputStream();) {
       SVGUtility.writeSVGDocument(d, os, "utf8");
       return XmlUtility.getXmlDocument(os.toString());
@@ -74,7 +73,7 @@ public class SVGUtilityTest {
   }
 
   @Test
-  public void testAddAppLink() throws ProcessingException, IOException {
+  public void testAddAppLink() throws IOException {
     String ref = "test";
     String otherRef = "another test";
     SVGDocument doc = getTestDocument();
@@ -128,7 +127,7 @@ public class SVGUtilityTest {
   }
 
   @Test
-  public void testAddHyperlink() throws ProcessingException, IOException {
+  public void testAddHyperlink() throws IOException {
     String url = "http://www.test.example.org";
     SVGDocument doc = getTestDocument();
     Element e = doc.getElementById("outerRect");

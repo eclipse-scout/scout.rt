@@ -143,7 +143,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     }
   }
 
-  protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) throws ProcessingException {
+  protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) {
     if (!DefaultAuthToken.isActive()) {
       return null;
     }
@@ -178,7 +178,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   @Override
-  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
+  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) {
     if (m_contentHandler == null) {
       m_contentHandler = BEANS.get(IServiceTunnelContentHandler.class);
       m_contentHandler.initialize();

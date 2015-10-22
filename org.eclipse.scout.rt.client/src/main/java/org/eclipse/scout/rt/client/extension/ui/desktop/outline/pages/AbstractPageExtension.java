@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
@@ -18,37 +17,37 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
   }
 
   @Override
-  public void execPageDataLoaded(PagePageDataLoadedChain chain) throws ProcessingException {
+  public void execPageDataLoaded(PagePageDataLoadedChain chain) {
     chain.execPageDataLoaded();
   }
 
   @Override
-  public void execPageActivated(PagePageActivatedChain chain) throws ProcessingException {
+  public void execPageActivated(PagePageActivatedChain chain) {
     chain.execPageActivated();
   }
 
   @Override
-  public void execDataChanged(PageDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+  public void execDataChanged(PageDataChangedChain chain, Object... dataTypes) {
     chain.execDataChanged(dataTypes);
   }
 
   @Override
-  public void execInitPage(PageInitPageChain chain) throws ProcessingException {
+  public void execInitPage(PageInitPageChain chain) {
     chain.execInitPage();
   }
 
   @Override
-  public void execPageDeactivated(PagePageDeactivatedChain chain) throws ProcessingException {
+  public void execPageDeactivated(PagePageDeactivatedChain chain) {
     chain.execPageDeactivated();
   }
 
   @Override
-  public void execDisposePage(PageDisposePageChain chain) throws ProcessingException {
+  public void execDisposePage(PageDisposePageChain chain) {
     chain.execDisposePage();
   }
 
   @Override
-  public void execInitDetailForm(PageInitDetailFormChain chain) throws ProcessingException {
+  public void execInitDetailForm(PageInitDetailFormChain chain) {
     chain.execInitDetailForm();
   }
 

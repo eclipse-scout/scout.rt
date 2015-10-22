@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ISession;
@@ -156,12 +155,12 @@ public class PreferencesTest {
     private boolean m_flushed = false;
 
     @Override
-    public IPreferences getPreferences(ISession userScope, String nodeId) throws ProcessingException {
+    public IPreferences getPreferences(ISession userScope, String nodeId) {
       return null;
     }
 
     @Override
-    public void flush(IPreferences prefs) throws ProcessingException {
+    public void flush(IPreferences prefs) {
       m_flushed = true;
     }
 

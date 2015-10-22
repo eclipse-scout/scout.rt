@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -98,7 +97,7 @@ public class PageWithTableGroupingWithSortingTest {
 
   public static class PageWithTableOutline extends AbstractOutline {
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -106,7 +105,7 @@ public class PageWithTableGroupingWithSortingTest {
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{
           new Object[]{0, 0, 0, 0},
           new Object[]{1, 1, 0, 6},

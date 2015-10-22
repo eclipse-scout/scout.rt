@@ -21,7 +21,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
@@ -53,7 +52,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     m_table = table;
   }
 
-  public InternalTableRow(ITable table, ITableRow row) throws ProcessingException {
+  public InternalTableRow(ITable table, ITableRow row) {
     super(table.getColumnSet(), row);
     setEnabled(row.isEnabled());
     m_rowIndex = row.getRowIndex();
@@ -171,12 +170,12 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public void setCell(IColumn column, ICell cell) throws ProcessingException {
+  public void setCell(IColumn column, ICell cell) {
     setCell(column.getColumnIndex(), cell);
   }
 
   @Override
-  public void setCell(int columnIndex, ICell cell) throws ProcessingException {
+  public void setCell(int columnIndex, ICell cell) {
     if (cell != null) {
       try {
         setRowChanging(true);
@@ -256,12 +255,12 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public boolean/* changed */ setCellValue(int columnIndex, Object value) throws ProcessingException {
+  public boolean/* changed */ setCellValue(int columnIndex, Object value) {
     return getCellForUpdate(columnIndex).setValue(value);
   }
 
   @Override
-  public boolean setCellValues(List<? extends Object> values) throws ProcessingException {
+  public boolean setCellValues(List<? extends Object> values) {
     boolean changed = false;
     for (int i = 0; i < values.size(); i++) {
       boolean b = setCellValue(i, values.get(i));
@@ -283,7 +282,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public void touch() throws ProcessingException {
+  public void touch() {
     try {
       setRowChanging(true);
       //
@@ -295,7 +294,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public void delete() throws ProcessingException {
+  public void delete() {
     if (getTable() != null) {
       getTable().deleteRow(this);
     }
@@ -413,7 +412,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
  * Implementation of ICellObserver
  */
   @Override
-  public Object validateValue(ICell cell, Object value) throws ProcessingException {
+  public Object validateValue(ICell cell, Object value) {
     Object oldValue = cell.getValue();
     if (CompareUtility.equals(oldValue, value)) {
       // no change in value

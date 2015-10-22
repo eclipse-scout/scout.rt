@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.ui.action.menu.fixture;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
@@ -20,7 +19,7 @@ public class OwnerValueCapturingMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execOwnerValueChanged(Object ownerValue) throws ProcessingException {
+  protected void execOwnerValueChanged(Object ownerValue) {
     m_count++;
     m_lastOwnerValue = ownerValue;
   }

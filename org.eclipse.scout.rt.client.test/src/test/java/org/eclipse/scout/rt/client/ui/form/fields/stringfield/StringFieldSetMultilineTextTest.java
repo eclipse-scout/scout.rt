@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -50,7 +49,7 @@ public class StringFieldSetMultilineTextTest {
 
   public static final class MyForm extends AbstractForm {
 
-    private MyForm() throws ProcessingException {
+    private MyForm() {
       super();
     }
 
@@ -95,7 +94,7 @@ public class StringFieldSetMultilineTextTest {
       return getFieldByClass(CloseButton.class);
     }
 
-    public void startForm() throws ProcessingException {
+    public void startForm() {
       startInternal(new FormHandler());
     }
   }

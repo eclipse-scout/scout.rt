@@ -30,10 +30,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execDrop(final ITreeNode node, final TransferObject t) throws ProcessingException {
+    public void execDrop(final ITreeNode node, final TransferObject t) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execDrop(TreeDropChain.this, node, t);
         }
       };
@@ -51,10 +51,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execInitTree() throws ProcessingException {
+    public void execInitTree() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execInitTree(TreeInitTreeChain.this);
         }
       };
@@ -72,10 +72,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execDropTargetChanged(final ITreeNode node) throws ProcessingException {
+    public void execDropTargetChanged(final ITreeNode node) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execDropTargetChanged(TreeDropTargetChangedChain.this, node);
         }
       };
@@ -93,10 +93,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public TransferObject execDrag(final Collection<ITreeNode> nodes) throws ProcessingException {
+    public TransferObject execDrag(final Collection<ITreeNode> nodes) {
       MethodInvocation<TransferObject> methodInvocation = new MethodInvocation<TransferObject>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           setReturnValue(next.execDrag(TreeDragNodesChain.this, nodes));
         }
       };
@@ -114,10 +114,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execNodeAction(final ITreeNode node) throws ProcessingException {
+    public void execNodeAction(final ITreeNode node) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execNodeAction(TreeNodeActionChain.this, node);
         }
       };
@@ -135,10 +135,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execNodeClick(final ITreeNode node, final MouseButton mouseButton) throws ProcessingException {
+    public void execNodeClick(final ITreeNode node, final MouseButton mouseButton) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execNodeClick(TreeNodeClickChain.this, node, mouseButton);
         }
       };
@@ -156,10 +156,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execNodesChecked(final List<ITreeNode> nodes) throws ProcessingException {
+    public void execNodesChecked(final List<ITreeNode> nodes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execNodesChecked(TreeNodesCheckedChain.this, nodes);
         }
       };
@@ -177,10 +177,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execAutoCheckChildNodes(final List<? extends ITreeNode> nodes) throws ProcessingException {
+    public void execAutoCheckChildNodes(final List<? extends ITreeNode> nodes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execAutoCheckChildNodes(TreeAutoCheckChildNodesChain.this, nodes);
         }
       };
@@ -198,10 +198,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final String ref) throws ProcessingException {
+    public void execHyperlinkAction(final String ref) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execAppLinkAction(TreeHyperlinkActionChain.this, ref);
         }
       };
@@ -219,10 +219,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execNodesSelected(final TreeEvent e) throws ProcessingException {
+    public void execNodesSelected(final TreeEvent e) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execNodesSelected(TreeNodesSelectedChain.this, e);
         }
       };
@@ -240,10 +240,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execDisposeTree() throws ProcessingException {
+    public void execDisposeTree() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execDisposeTree(TreeDisposeTreeChain.this);
         }
       };
@@ -261,10 +261,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execDecorateCell(final ITreeNode node, final Cell cell) throws ProcessingException {
+    public void execDecorateCell(final ITreeNode node, final Cell cell) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           next.execDecorateCell(TreeDecorateCellChain.this, node, cell);
         }
       };
@@ -282,10 +282,10 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public TransferObject execDrag(final ITreeNode node) throws ProcessingException {
+    public TransferObject execDrag(final ITreeNode node) {
       MethodInvocation<TransferObject> methodInvocation = new MethodInvocation<TransferObject>() {
         @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
           setReturnValue(next.execDrag(TreeDragNodeChain.this, node));
         }
       };

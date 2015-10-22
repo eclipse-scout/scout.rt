@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -46,7 +45,7 @@ public class ScheduleAtFixedRateTest {
   }
 
   @Test
-  public void testFiveRunsAndCancel() throws ProcessingException {
+  public void testFiveRunsAndCancel() {
     final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
 
     final AtomicInteger counter = new AtomicInteger();
@@ -87,7 +86,7 @@ public class ScheduleAtFixedRateTest {
   }
 
   @Test
-  public void testFiveRunsAndException() throws ProcessingException {
+  public void testFiveRunsAndException() {
     final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
 
     final AtomicInteger counter = new AtomicInteger();
@@ -128,7 +127,7 @@ public class ScheduleAtFixedRateTest {
   }
 
   @Test
-  public void testFiveShortRunsAndException() throws ProcessingException {
+  public void testFiveShortRunsAndException() {
     final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
 
     final AtomicInteger counter = new AtomicInteger();
@@ -171,7 +170,7 @@ public class ScheduleAtFixedRateTest {
   }
 
   @Test
-  public void testFiveLongRunsAndException() throws ProcessingException {
+  public void testFiveLongRunsAndException() {
     final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
 
     final AtomicInteger counter = new AtomicInteger();

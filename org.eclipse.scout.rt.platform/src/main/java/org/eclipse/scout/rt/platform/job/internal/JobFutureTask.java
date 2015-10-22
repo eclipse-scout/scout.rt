@@ -246,7 +246,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public void awaitDone() throws ProcessingException {
+  public void awaitDone() {
     try {
       awaitDoneAndGet();
     }
@@ -261,7 +261,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public boolean awaitDone(final long timeout, final TimeUnit unit) throws ProcessingException {
+  public boolean awaitDone(final long timeout, final TimeUnit unit) {
     try {
       awaitDoneAndGet(timeout, unit);
     }
@@ -280,7 +280,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public RESULT awaitDoneAndGet() throws ProcessingException {
+  public RESULT awaitDoneAndGet() {
     return awaitDoneAndGet(BEANS.get(ProcessingExceptionTranslator.class));
   }
 
@@ -303,7 +303,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws ProcessingException {
+  public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) {
     return awaitDoneAndGet(timeout, unit, BEANS.get(ProcessingExceptionTranslator.class));
   }
 

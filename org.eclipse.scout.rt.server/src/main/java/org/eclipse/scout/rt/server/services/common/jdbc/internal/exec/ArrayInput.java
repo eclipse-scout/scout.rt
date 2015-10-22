@@ -26,7 +26,7 @@ class ArrayInput implements IBindInput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
-  public ArrayInput(ISqlStyle sqlStyle, Object array, ValueInputToken target) throws ProcessingException {
+  public ArrayInput(ISqlStyle sqlStyle, Object array, ValueInputToken target) {
     if (array != null && !array.getClass().isArray()) {
       throw new ProcessingException("array parameter must be an array type: " + array.getClass());
     }
@@ -106,7 +106,7 @@ class ArrayInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     if (isBatch()) {
       Object value = null;
       if (m_batchIndex < m_arrayLen) {
@@ -131,7 +131,7 @@ class ArrayInput implements IBindInput {
     }
   }
 
-  private SqlBind applyMultiValued(ISqlStyle sqlStyle) throws ProcessingException {
+  private SqlBind applyMultiValued(ISqlStyle sqlStyle) {
     if (m_target.getParsedAttribute() != null) {
       boolean plain = m_target.isPlainSql() || m_target.isPlainValue();
       String att = m_target.getParsedAttribute();

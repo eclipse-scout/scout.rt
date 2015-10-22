@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
  * Used by {@link AbstractWizardStatusField} and {@link DefaultWizardContainerForm} to customize html presentation of
  * wizard status content
@@ -21,7 +19,7 @@ public interface IWizardStatusHtmlProvider {
   /**
    * initialize, load html template and inline images
    */
-  void initialize(AbstractWizardStatusField htmlField) throws ProcessingException;
+  void initialize(AbstractWizardStatusField htmlField);
 
   /**
    * Initialize the HTML template. <br>
@@ -37,8 +35,8 @@ public interface IWizardStatusHtmlProvider {
    * 
    * @return template HTML file
    */
-  String initHtmlTemplate() throws ProcessingException;
+  String initHtmlTemplate();
 
-  String createHtml(IWizard w) throws ProcessingException;
+  String createHtml(IWizard w);
 
 }

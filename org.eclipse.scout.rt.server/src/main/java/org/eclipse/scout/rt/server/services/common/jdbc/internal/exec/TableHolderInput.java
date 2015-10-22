@@ -27,7 +27,7 @@ class TableHolderInput implements IBindInput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
-  public TableHolderInput(ITableHolder table, int[] filteredRowIndices, String columnName, ValueInputToken target) throws ProcessingException {
+  public TableHolderInput(ITableHolder table, int[] filteredRowIndices, String columnName, ValueInputToken target) {
     m_table = table;
     if (filteredRowIndices == null) {
       filteredRowIndices = new int[table.getRowCount()];
@@ -89,7 +89,7 @@ class TableHolderInput implements IBindInput {
   }
 
   @Override
-  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
+  public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) {
     Object value = null;
     if (m_batchIndex < m_filteredRowIndices.length) {
       try {

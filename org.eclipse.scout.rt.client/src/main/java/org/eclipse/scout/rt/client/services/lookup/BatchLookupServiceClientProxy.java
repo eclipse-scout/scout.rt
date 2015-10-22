@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
@@ -33,7 +32,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) {
     List<ILookupCall<?>> allCalls = batch.getCallBatch();
     List<ILookupCall<?>> cleanCalls = new ArrayList<ILookupCall<?>>(allCalls.size());
     //set calls with key==null to null
@@ -75,7 +74,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
@@ -94,7 +93,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
@@ -113,7 +112,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   }
 
   @Override
-  public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();

@@ -26,10 +26,10 @@ public final class DateFieldChains {
       super(extensions);
     }
 
-    public void execShiftTime(final int level, final int value) throws ProcessingException {
+    public void execShiftTime(final int level, final int value) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDateFieldExtension<? extends AbstractDateField> next) throws ProcessingException {
+        protected void callMethod(IDateFieldExtension<? extends AbstractDateField> next) {
           next.execShiftTime(DateFieldShiftTimeChain.this, level, value);
         }
       };
@@ -47,10 +47,10 @@ public final class DateFieldChains {
       super(extensions);
     }
 
-    public void execShiftDate(final int level, final int value) throws ProcessingException {
+    public void execShiftDate(final int level, final int value) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IDateFieldExtension<? extends AbstractDateField> next) throws ProcessingException {
+        protected void callMethod(IDateFieldExtension<? extends AbstractDateField> next) {
           next.execShiftDate(DateFieldShiftDateChain.this, level, value);
         }
       };

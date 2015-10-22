@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 
@@ -71,7 +70,7 @@ public interface ISession {
    * @param sessionId
    *          unique id
    */
-  void start(String sessionId) throws ProcessingException;
+  void start(String sessionId);
 
   /**
    * Invoke this method to stop the session. This is the last call on the session.

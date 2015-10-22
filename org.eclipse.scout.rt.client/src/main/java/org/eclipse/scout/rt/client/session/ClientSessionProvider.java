@@ -36,7 +36,7 @@ public class ClientSessionProvider {
   /**
    * @see ClientSessionProvider#provide(ClientRunContext, String)
    */
-  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) throws ProcessingException {
+  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) {
     return provide(runContext, UUID.randomUUID().toString());
   }
 
@@ -51,7 +51,7 @@ public class ClientSessionProvider {
    * @throws ProcessingException
    *           is thrown if the {@link IClientSession} could not be created or initialized.
    */
-  public <SESSION extends IClientSession> SESSION provide(final ClientRunContext runContext, final String sessionId) throws ProcessingException {
+  public <SESSION extends IClientSession> SESSION provide(final ClientRunContext runContext, final String sessionId) {
     return runContext.call(new Callable<SESSION>() {
 
       @Override
@@ -116,7 +116,7 @@ public class ClientSessionProvider {
 
   @Internal
   @SuppressWarnings("unchecked")
-  protected static <SESSION extends IClientSession> SESSION cast(final IClientSession clientSession) throws ProcessingException {
+  protected static <SESSION extends IClientSession> SESSION cast(final IClientSession clientSession) {
     try {
       return (SESSION) clientSession;
     }

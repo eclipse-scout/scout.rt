@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.BottomBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.BottomBox.StreetField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox;
@@ -29,7 +28,7 @@ public class OrigForm extends AbstractForm {
   public static final String EXEC_VALIDATE_VALUE_OPERATION_NAME = "execValidateValue";
   private final List<String> m_operations;
 
-  public OrigForm() throws ProcessingException {
+  public OrigForm() {
     super(false);
     m_operations = new ArrayList<String>();
     callInitializer();
@@ -80,7 +79,7 @@ public class OrigForm extends AbstractForm {
       public class SalutationField extends AbstractStringField {
 
         @Override
-        protected String execValidateValue(String rawValue) throws ProcessingException {
+        protected String execValidateValue(String rawValue) {
           logOperation(SalutationField.class, EXEC_VALIDATE_VALUE_OPERATION_NAME);
           return super.execValidateValue(rawValue);
         }

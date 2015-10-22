@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Wrapper for binary content (<code>byte[]</code>) with some meta data.
@@ -123,7 +122,7 @@ public final class BinaryResource implements Serializable {
    * Reads the contents of the given file into a new {@link BinaryResource}. This constructor is intended to read from
    * temporary files only. If the file is not accessible, the constructor will fail.
    */
-  public BinaryResource(File file) throws ProcessingException {
+  public BinaryResource(File file) {
     this(file.getName(), FileUtility.getContentType(file), null, IOUtility.getContent(file), file.lastModified());
   }
 

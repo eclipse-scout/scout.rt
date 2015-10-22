@@ -69,7 +69,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
    */
   @ConfigOperation
   @Order(10)
-  protected void execClicked(SvgFieldEvent e) throws ProcessingException {
+  protected void execClicked(SvgFieldEvent e) {
   }
 
   /**
@@ -80,7 +80,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   @ConfigOperation
   @Order(20)
   @Deprecated
-  protected void execHyperlink(SvgFieldEvent e) throws ProcessingException {
+  protected void execHyperlink(SvgFieldEvent e) {
   }
 
   /**
@@ -90,7 +90,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
    */
   @ConfigOperation
   @Order(230)
-  protected void execAppLinkAction(String ref) throws ProcessingException {
+  protected void execAppLinkAction(String ref) {
     // FIXME CGU: remove this code when execpHyperlink() has been removed
     execHyperlink(new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, ref));
   }
@@ -225,13 +225,13 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     }
   }
 
-  protected final void interceptClicked(SvgFieldEvent e) throws ProcessingException {
+  protected final void interceptClicked(SvgFieldEvent e) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SvgFieldClickedChain chain = new SvgFieldClickedChain(extensions);
     chain.execClicked(e);
   }
 
-  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SvgFieldAppLinkActionChain chain = new SvgFieldAppLinkActionChain(extensions);
     chain.execAppLinkAction(ref);
@@ -244,12 +244,12 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     }
 
     @Override
-    public void execClicked(SvgFieldClickedChain chain, SvgFieldEvent e) throws ProcessingException {
+    public void execClicked(SvgFieldClickedChain chain, SvgFieldEvent e) {
       getOwner().execClicked(e);
     }
 
     @Override
-    public void execAppLinkAction(SvgFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+    public void execAppLinkAction(SvgFieldAppLinkActionChain chain, String ref) {
       getOwner().execAppLinkAction(ref);
     }
   }

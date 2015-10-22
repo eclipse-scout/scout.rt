@@ -25,7 +25,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
 
   private final boolean m_allowCustomText;
 
-  protected AbstractProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
+  protected AbstractProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
     m_contentAssistField = contentAssistField;
     m_allowCustomText = allowCustomText;
     propertySupport.setProperty(PROP_ACTIVE_STATE_FILTER_ENABLED, m_contentAssistField.isActiveFilterEnabled());
@@ -39,7 +39,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
    * Creates a new instance of the proposal model if the smart-field has an inner class for tree or table, or returns an
    * instance of the default class for the proposal model.
    */
-  protected T createConfiguredOrDefaultModel(Class<?> modelInterface) throws ProcessingException {
+  protected T createConfiguredOrDefaultModel(Class<?> modelInterface) {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(m_contentAssistField.getClass());
     // We cannot use 'Class<T> modelInterface' since we cannot pass a parameterized class like ArrayList<String> to it
     @SuppressWarnings("unchecked")
@@ -59,19 +59,19 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
    * Used to create the 'model' of the proposal chooser. In this method you shouldn't call methods that access the
    * m_model variable since it isn't set until this method has completed. Use the {@link #init()} method instead.
    */
-  abstract protected T createModel() throws ProcessingException;
+  abstract protected T createModel();
 
   /**
    * Called when smart-field doesn't provide a inner class for a proposal model (tree or table). Returns the default
    * proposal model.
    */
-  abstract protected T createDefaultModel() throws ProcessingException;
+  abstract protected T createDefaultModel();
 
   /**
    * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set. The
    * default implementation does nothing.
    */
-  protected void init() throws ProcessingException {
+  protected void init() {
   }
 
   @Override

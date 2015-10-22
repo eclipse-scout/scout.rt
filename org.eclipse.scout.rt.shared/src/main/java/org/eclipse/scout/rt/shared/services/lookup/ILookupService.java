@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
 public interface ILookupService<KEY_TYPE> extends IService {
@@ -20,20 +19,20 @@ public interface ILookupService<KEY_TYPE> extends IService {
   /**
    * Lookup by performing a "key" filter and activating the <key> tags
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByKey(ILookupCall<KEY_TYPE> call) throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByKey(ILookupCall<KEY_TYPE> call);
 
   /**
    * Lookup by performing a "text" filter and activating the <text> tags
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByText(ILookupCall<KEY_TYPE> call) throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByText(ILookupCall<KEY_TYPE> call);
 
   /**
    * Lookup by performing a "all" filter and activating the <all> tags
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByAll(ILookupCall<KEY_TYPE> call) throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByAll(ILookupCall<KEY_TYPE> call);
 
   /**
    * Lookup by performing a "recursion" filter and activating the <rec> tags
    */
-  List<? extends ILookupRow<KEY_TYPE>> getDataByRec(ILookupCall<KEY_TYPE> call) throws ProcessingException;
+  List<? extends ILookupRow<KEY_TYPE>> getDataByRec(ILookupCall<KEY_TYPE> call);
 }

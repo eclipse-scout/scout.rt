@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -92,7 +91,7 @@ public class PageWithTable6Test {
 
   public static class Outline extends AbstractOutline {
     @Override
-    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
       pageList.add(new PageWithTable());
     }
   }
@@ -100,14 +99,14 @@ public class PageWithTable6Test {
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
-    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    protected void execLoadData(SearchFilter filter) {
       importTableData(new Object[][]{
           new Object[]{1, "Enabled Account"},
           new Object[]{2, "Disabled Account"},});
     }
 
     @Override
-    protected void execPopulateTable() throws ProcessingException {
+    protected void execPopulateTable() {
       super.execPopulateTable();
       getTable().findRowByKey(CollectionUtility.arrayList((Object) Integer.valueOf(2))).setEnabled(false);
     }

@@ -29,10 +29,10 @@ public final class PlannerFieldChains {
       super(extensions);
     }
 
-    public List<Resource<RI>> execLoadResourceTableData() throws ProcessingException {
+    public List<Resource<RI>> execLoadResourceTableData() {
       MethodInvocation<List<Resource<RI>>> methodInvocation = new MethodInvocation<List<Resource<RI>>>() {
         @Override
-        protected void callMethod(IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>> next) {
           setReturnValue(next.execLoadResources(PlannerFieldLoadResourcesChain.this));
         }
       };
@@ -50,10 +50,10 @@ public final class PlannerFieldChains {
       super(extensions);
     }
 
-    public void execPopulateResources() throws ProcessingException {
+    public void execPopulateResources() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>> next) {
           next.execPopulateResources(PlannerFieldPopulateResourcesChain.this);
         }
       };

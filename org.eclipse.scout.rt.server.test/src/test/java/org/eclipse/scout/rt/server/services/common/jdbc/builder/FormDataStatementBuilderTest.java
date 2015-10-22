@@ -67,7 +67,7 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test
-  public void testFieldData() throws ProcessingException {
+  public void testFieldData() {
     m_builder.setBasicDefinition(FormData.Text.class, "TEXT", DataModelConstants.OPERATOR_EQ);
     assertEquals("  AND TEXT=:__a1", m_builder.build(m_formData));
     assertNotNull(m_builder.getBindMap());
@@ -76,7 +76,7 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test
-  public void testPropertyData() throws ProcessingException {
+  public void testPropertyData() {
     m_builder.setBasicDefinition(FormData.Prop.class, "PROP", DataModelConstants.OPERATOR_EQ);
     assertEquals("  AND PROP=:__a1", m_builder.build(m_formData));
     assertNotNull(m_builder.getBindMap());
@@ -85,13 +85,13 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testTemplate1FieldData_valueDefinition() throws ProcessingException {
+  public void testTemplate1FieldData_valueDefinition() {
     m_builder.setBasicDefinition(FormData.Template1GroupBox.TemplateText.class, "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     m_builder.build(m_formData);
   }
 
   @Test
-  public void testTemplate1FieldData_temlateValueDefinition() throws ProcessingException {
+  public void testTemplate1FieldData_temlateValueDefinition() {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class), "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     assertEquals("  AND TEMPLATE1_TEXT=:__a1", m_builder.build(m_formData));
     assertNotNull(m_builder.getBindMap());
@@ -100,13 +100,13 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testTemplate1PropertyData_valueDefinition() throws ProcessingException {
+  public void testTemplate1PropertyData_valueDefinition() {
     m_builder.setBasicDefinition(FormData.Template1GroupBox.TemplateProp.class, "TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
     m_builder.build(m_formData);
   }
 
   @Test
-  public void testTemplate1PropertyData_temlateValueDefinition() throws ProcessingException {
+  public void testTemplate1PropertyData_temlateValueDefinition() {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateProp.class), "TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
     assertEquals("  AND TEMPLATE1_PROP=:__a1", m_builder.build(m_formData));
     assertNotNull(m_builder.getBindMap());
@@ -115,13 +115,13 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testMasterTemplate1FieldData_valueDefinition() throws ProcessingException {
+  public void testMasterTemplate1FieldData_valueDefinition() {
     m_builder.setBasicDefinition(FormData.Template1GroupBox.MasterTemplateGroupBox.MasterTemplateText.class, "MASTER_TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     m_builder.build(m_formData);
   }
 
   @Test
-  public void testMasterTemplate1FieldData_temlateValueDefinition() throws ProcessingException {
+  public void testMasterTemplate1FieldData_temlateValueDefinition() {
     m_builder.setBasicDefinition(
         new ClassIdentifier(FormData.Template1GroupBox.class, AbstractTemplateFieldData.MasterTemplateGroupBox.class, AbstractMasterTemplateFieldData.MasterTemplateText.class), "MASTER_TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     assertEquals("  AND MASTER_TEMPLATE1_TEXT=:__a1", m_builder.build(m_formData));
@@ -131,13 +131,13 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testMasterTemplate1PropertyData_valueDefinition() throws ProcessingException {
+  public void testMasterTemplate1PropertyData_valueDefinition() {
     m_builder.setBasicDefinition(FormData.Template1GroupBox.MasterTemplateGroupBox.MasterTemplateProp.class, "MASTER_TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
     m_builder.build(m_formData);
   }
 
   @Test
-  public void testMasterTemplate1PropertyData_temlateValueDefinition() throws ProcessingException {
+  public void testMasterTemplate1PropertyData_temlateValueDefinition() {
     m_builder.setBasicDefinition(
         new ClassIdentifier(
             FormData.Template1GroupBox.class,
@@ -151,14 +151,14 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testTemplate1andTemplate2FieldData_valueDefinition() throws ProcessingException {
+  public void testTemplate1andTemplate2FieldData_valueDefinition() {
     m_builder.setBasicDefinition(FormData.Template1GroupBox.TemplateText.class, "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     m_builder.setBasicDefinition(FormData.Template2GroupBox.TemplateText.class, "TEMPLATE2_TEXT", DataModelConstants.OPERATOR_LE);
     m_builder.build(m_formData);
   }
 
   @Test
-  public void testTemplate1andTemplate2FieldData_temlateValueDefinition() throws ProcessingException {
+  public void testTemplate1andTemplate2FieldData_temlateValueDefinition() {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class), "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template2GroupBox.class, FormData.Template2GroupBox.TemplateText.class), "TEMPLATE2_TEXT", DataModelConstants.OPERATOR_LE);
     assertEquals("  AND TEMPLATE1_TEXT=:__a1  AND TEMPLATE2_TEXT<=:__a2", m_builder.build(m_formData));
@@ -169,12 +169,12 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidTemplateDefinition() throws ProcessingException {
+  public void testInvalidTemplateDefinition() {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, String.class, FormData.Template1GroupBox.TemplateText.class), "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidTemplateDefinition_FormData() throws ProcessingException {
+  public void testInvalidTemplateDefinition_FormData() {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.class, FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class), "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
   }
 

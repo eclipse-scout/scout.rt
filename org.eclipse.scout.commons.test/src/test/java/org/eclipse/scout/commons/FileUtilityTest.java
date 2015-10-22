@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.eclipse.scout.commons.utility.TestUtility;
-
 import org.junit.Test;
 
 /**

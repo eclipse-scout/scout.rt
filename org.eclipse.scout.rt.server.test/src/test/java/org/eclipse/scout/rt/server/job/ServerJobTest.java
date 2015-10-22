@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -48,7 +47,7 @@ public class ServerJobTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testNoSession() throws ProcessingException {
+  public void testNoSession() {
     ISession.CURRENT.remove();
     ServerJobs.schedule(new IRunnable() {
 
@@ -59,7 +58,7 @@ public class ServerJobTest {
   }
 
   @Test
-  public void testThreadName() throws ProcessingException, InterruptedException {
+  public void testThreadName() throws InterruptedException {
     ISession.CURRENT.set(m_serverSession1);
     Thread.currentThread().setName("main");
 

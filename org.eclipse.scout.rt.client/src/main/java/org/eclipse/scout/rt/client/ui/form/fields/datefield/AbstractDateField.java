@@ -155,7 +155,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    * see {@link #adjustDate(int, int, int)}
    */
   @ConfigOperation
-  protected void execShiftDate(int level, int value) throws ProcessingException {
+  protected void execShiftDate(int level, int value) {
     switch (level) {
       case 0: {
         adjustDate(value, 0, 0);
@@ -177,7 +177,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    */
   @Override
   @Deprecated
-  protected Date execParseValue(String text) throws ProcessingException {
+  protected Date execParseValue(String text) {
     return super.execParseValue(text);
   }
 
@@ -201,7 +201,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    * see {@link #adjustDate(int, int, int)}
    */
   @ConfigOperation
-  protected void execShiftTime(int level, int value) throws ProcessingException {
+  protected void execShiftTime(int level, int value) {
     switch (level) {
       case 0: {
         adjustTime(value, 0, 0);
@@ -533,13 +533,13 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
   }
 
-  protected final void interceptShiftTime(int level, int value) throws ProcessingException {
+  protected final void interceptShiftTime(int level, int value) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DateFieldShiftTimeChain chain = new DateFieldShiftTimeChain(extensions);
     chain.execShiftTime(level, value);
   }
 
-  protected final void interceptShiftDate(int level, int value) throws ProcessingException {
+  protected final void interceptShiftDate(int level, int value) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DateFieldShiftDateChain chain = new DateFieldShiftDateChain(extensions);
     chain.execShiftDate(level, value);
@@ -552,12 +552,12 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
 
     @Override
-    public void execShiftTime(DateFieldShiftTimeChain chain, int level, int value) throws ProcessingException {
+    public void execShiftTime(DateFieldShiftTimeChain chain, int level, int value) {
       getOwner().execShiftTime(level, value);
     }
 
     @Override
-    public void execShiftDate(DateFieldShiftDateChain chain, int level, int value) throws ProcessingException {
+    public void execShiftDate(DateFieldShiftDateChain chain, int level, int value) {
       getOwner().execShiftDate(level, value);
     }
   }

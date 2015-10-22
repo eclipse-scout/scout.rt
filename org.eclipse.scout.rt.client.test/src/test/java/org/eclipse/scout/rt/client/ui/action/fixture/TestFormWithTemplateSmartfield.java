@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.action.fixture;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 
@@ -23,7 +22,7 @@ public class TestFormWithTemplateSmartfield extends AbstractForm {
   public static final String TEST_SMARTFIELD_ID_1 = "SMARTFIELD_ID1";
   public static final String TEST_SMARTFIELD_ID_2 = "SMARTFIELD_ID2";
 
-  public TestFormWithTemplateSmartfield() throws ProcessingException {
+  public TestFormWithTemplateSmartfield() {
     super();
   }
 

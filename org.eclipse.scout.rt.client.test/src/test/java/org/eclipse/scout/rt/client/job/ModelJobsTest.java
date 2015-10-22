@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -76,7 +75,7 @@ public class ModelJobsTest {
   }
 
   @Test
-  public void testIsModelThread() throws ProcessingException {
+  public void testIsModelThread() {
     final IClientSession clientSession1 = mock(IClientSession.class);
     final IClientSession clientSession2 = mock(IClientSession.class);
 
@@ -108,7 +107,7 @@ public class ModelJobsTest {
   }
 
   @Test
-  public void testScheduleWithoutInput() throws ProcessingException {
+  public void testScheduleWithoutInput() {
     ISession.CURRENT.set(m_clientSession);
 
     // Test schedule
@@ -137,7 +136,7 @@ public class ModelJobsTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
+  public void testScheduleWithoutInputWithoutSession() {
     ISession.CURRENT.set(null);
     ModelJobs.schedule(mock(IRunnable.class));
   }

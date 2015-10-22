@@ -13,14 +13,13 @@ package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.BottomDetailBox.BottomDetailBoxField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
 public class ExtendedForm extends OrigForm {
 
-  public ExtendedForm() throws ProcessingException {
+  public ExtendedForm() {
   }
 
   public SalutationFieldEx getSalutationFieldEx() {
@@ -47,7 +46,7 @@ public class ExtendedForm extends OrigForm {
     }
 
     @Override
-    protected String execValidateValue(String rawValue) throws ProcessingException {
+    protected String execValidateValue(String rawValue) {
       String validatedValue = super.execValidateValue(rawValue);
       logOperation(SalutationFieldEx.class, EXEC_VALIDATE_VALUE_OPERATION_NAME);
       return validatedValue;
@@ -59,7 +58,7 @@ public class ExtendedForm extends OrigForm {
   public class CountryField extends AbstractStringField {
 
     @Override
-    protected String execValidateValue(String rawValue) throws ProcessingException {
+    protected String execValidateValue(String rawValue) {
       String validatedValue = super.execValidateValue(rawValue);
       logOperation(CountryField.class, EXEC_VALIDATE_VALUE_OPERATION_NAME);
       return validatedValue;
@@ -73,7 +72,7 @@ public class ExtendedForm extends OrigForm {
     public class BottomDetailBoxField extends AbstractStringField {
 
       @Override
-      protected String execValidateValue(String rawValue) throws ProcessingException {
+      protected String execValidateValue(String rawValue) {
         String validatedValue = super.execValidateValue(rawValue);
         logOperation(BottomDetailBoxField.class, EXEC_VALIDATE_VALUE_OPERATION_NAME);
         return validatedValue;

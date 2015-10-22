@@ -16,7 +16,6 @@ import static org.mockito.Mockito.mock;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
@@ -29,7 +28,7 @@ import org.mockito.Mockito;
 public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
 
   @Test
-  public void testFormattingInDecorateCellInternal() throws ProcessingException {
+  public void testFormattingInDecorateCellInternal() {
     ITableRow row = Mockito.mock(ITableRow.class);
     Cell cell = new Cell();
     Integer testValue = Integer.valueOf(-123456789);
@@ -46,7 +45,7 @@ public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
   }
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     AbstractIntegerColumn column = new AbstractIntegerColumn() {
     };
     column.setMandatory(true);

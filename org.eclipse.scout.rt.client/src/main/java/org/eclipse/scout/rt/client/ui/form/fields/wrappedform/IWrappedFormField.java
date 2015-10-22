@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
@@ -40,7 +39,7 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
    * <p>
    * This method is equal to {@link #setInnerForm(IForm, boolean)} with automatic form life cycle management.
    */
-  void setInnerForm(T newInnerForm) throws ProcessingException;
+  void setInnerForm(T newInnerForm);
 
   /**
    * Installs the given {@link IForm} as wrapped Form. Thereby, the Form must not be started yet. A previously installed
@@ -53,7 +52,7 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
    *          {@link NullFormHandler} if not set, and is closed once this {@link IFormField} is disposed, or another
    *          inner form is set. If <code>false</code>, the caller is responsible for starting and closing the Form.
    */
-  void setInnerForm(T form, boolean manageFormLifeCycle) throws ProcessingException;
+  void setInnerForm(T form, boolean manageFormLifeCycle);
 
   boolean visitFields(IFormFieldVisitor visitor, int startLevel);
 }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -56,10 +55,10 @@ public interface ITableField<T extends ITable> extends IFormField {
    */
   void setTableStatusVisible(boolean tableStatusVisible);
 
-  void doSave() throws ProcessingException;
+  void doSave();
 
   /**
    * Reload data due to - master value change - sort by data source
    */
-  void reloadTableData() throws ProcessingException;
+  void reloadTableData();
 }

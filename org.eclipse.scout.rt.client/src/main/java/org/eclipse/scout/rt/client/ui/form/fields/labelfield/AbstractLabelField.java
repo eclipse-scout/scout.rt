@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.labelfield;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.labelfield.ILabelFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
@@ -67,7 +66,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   }
 
   @Override
-  protected String validateValueInternal(String rawValue) throws ProcessingException {
+  protected String validateValueInternal(String rawValue) {
     String validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     validValue = rawValue;
@@ -109,7 +108,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
 
   // convert string to a real string
   @Override
-  protected String parseValueInternal(String text) throws ProcessingException {
+  protected String parseValueInternal(String text) {
     if (text != null && text.length() == 0) {
       text = null;
     }

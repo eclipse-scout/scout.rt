@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.services.common.code.fixture;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -26,7 +25,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
   private static final long serialVersionUID = 1L;
   public static final Long ID = 10000L;
 
-  public CompanyTypeCodeType() throws ProcessingException {
+  public CompanyTypeCodeType() {
     super();
   }
 

@@ -551,7 +551,7 @@ public final class FileUtility {
    * @return The content type or null if it could not be determined.
    * @throws ProcessingException
    */
-  public static String getContentType(File f) throws ProcessingException {
+  public static String getContentType(File f) {
     if (f == null || !f.exists()) {
       return null;
     }
@@ -604,7 +604,7 @@ public final class FileUtility {
     }
   }
 
-  public static byte[] removeByteOrderMark(File f) throws ProcessingException {
+  public static byte[] removeByteOrderMark(File f) {
     return IOUtility.removeByteOrderMark(IOUtility.getContent(f.getAbsolutePath()));
   }
 

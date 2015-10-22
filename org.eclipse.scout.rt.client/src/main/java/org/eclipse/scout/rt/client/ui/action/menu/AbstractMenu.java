@@ -78,7 +78,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   @Override
-  public final void handleOwnerValueChanged(Object newValue) throws ProcessingException {
+  public final void handleOwnerValueChanged(Object newValue) {
     m_ownerValue = newValue;
     interceptOwnerValueChanged(newValue);
   }
@@ -109,7 +109,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    */
   @ConfigOperation
   @Order(50.0)
-  protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+  protected void execOwnerValueChanged(Object newOwnerValue) {
 
   }
 
@@ -238,7 +238,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     propertySupport.setProperty(PROP_MENU_TYPES, CollectionUtility.<IMenuType> hashSet(menuTypes));
   }
 
-  protected final void interceptOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+  protected final void interceptOwnerValueChanged(Object newOwnerValue) {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     MenuOwnerValueChangedChain chain = new MenuOwnerValueChangedChain(extensions);
     chain.execOwnerValueChanged(newOwnerValue);
@@ -251,7 +251,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     }
 
     @Override
-    public void execOwnerValueChanged(MenuOwnerValueChangedChain chain, Object newOwnerValue) throws ProcessingException {
+    public void execOwnerValueChanged(MenuOwnerValueChangedChain chain, Object newOwnerValue) {
       getOwner().execOwnerValueChanged(newOwnerValue);
     }
   }

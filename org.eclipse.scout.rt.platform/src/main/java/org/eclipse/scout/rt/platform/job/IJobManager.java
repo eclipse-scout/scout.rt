@@ -150,7 +150,7 @@ public interface IJobManager {
    *           if this thread was interrupted while waiting for the job to complete; see
    *           {@link ProcessingException#isInterruption()}
    */
-  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws ProcessingException;
+  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.

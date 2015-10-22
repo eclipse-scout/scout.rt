@@ -129,7 +129,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testMultipleValidFields() throws ProcessingException {
+  public void testMultipleValidFields() {
     final ValidateTestForm f = new ValidateTestForm();
     f.setValidABCombination();
     assertTrue(f.getBField().isContentValid());
@@ -137,7 +137,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testMultipleInvalidFields() throws ProcessingException {
+  public void testMultipleInvalidFields() {
     final ValidateTestForm f = new ValidateTestForm();
     f.setInvalidABCombination();
     assertInvalid(f.getBField(), ValidateTestForm.AB_ERROR);
@@ -145,7 +145,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testValidationError() throws ProcessingException {
+  public void testValidationError() {
     final ValidateTestForm f = new ValidateTestForm();
     f.getBField().setValue(20);
     assertInvalid(f.getBField(), ValidateTestForm.B_MAX_ERROR);
@@ -153,7 +153,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testValidationErrorManyTimes() throws ProcessingException {
+  public void testValidationErrorManyTimes() {
     final ValidateTestForm f = new ValidateTestForm();
     f.setInvalidABCombination();
     f.setValidABCombination();
@@ -164,7 +164,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testResetValidationError() throws ProcessingException {
+  public void testResetValidationError() {
     final ValidateTestForm f = new ValidateTestForm();
     f.getBField().setValue(20);
     f.setInvalidABCombination();
@@ -175,7 +175,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testMultipleWithValidate() throws ProcessingException {
+  public void testMultipleWithValidate() {
     final ValidateTestForm f = new ValidateTestForm();
     f.setInvalidABCombination(); // A=1,B=0: Message: A > B
     assertInvalid(f.getBField(), ValidateTestForm.AB_ERROR);
@@ -209,14 +209,14 @@ public class ValueFieldTest {
 
   static class MandatoryErrorField extends AbstractValueField<String> {
     @Override
-    protected boolean execIsEmpty() throws ProcessingException {
+    protected boolean execIsEmpty() {
       return EMPTY_VALUE.equals(getValue());
     }
   }
 
   static class ParseErrorField extends AbstractValueField<String> {
     @Override
-    protected String execParseValue(String text) throws ProcessingException {
+    protected String execParseValue(String text) {
       if (UNPARSABLE_VALUE.equals(text)) {
         throw new ProcessingException(PARSE_ERROR_MESSAGE);
       }
@@ -224,7 +224,7 @@ public class ValueFieldTest {
     }
 
     @Override
-    protected String execValidateValue(String text) throws ProcessingException {
+    protected String execValidateValue(String text) {
       if (INVALID_VALUE.equals(text)) {
         throw new ProcessingException(INVALID_VALUE);
       }
@@ -243,7 +243,7 @@ public class ValueFieldTest {
     public static final String AB_ERROR = "Error B";
     public static final String B_MAX_ERROR = ">10";
 
-    public ValidateTestForm() throws ProcessingException {
+    public ValidateTestForm() {
       super();
     }
 
@@ -262,7 +262,7 @@ public class ValueFieldTest {
       public class AField extends AbstractValueField<Integer> {
 
         @Override
-        protected void execChangedValue() throws ProcessingException {
+        protected void execChangedValue() {
           if (!isABValid()) {
             addErrorStatus("Error A");
           }
@@ -276,7 +276,7 @@ public class ValueFieldTest {
       public class BField extends AbstractValueField<Integer> {
 
         @Override
-        protected Integer execValidateValue(Integer rawValue) throws ProcessingException {
+        protected Integer execValidateValue(Integer rawValue) {
           if (rawValue != null && rawValue > 10) {
             throw new VetoException(B_MAX_ERROR);
           }
@@ -284,7 +284,7 @@ public class ValueFieldTest {
         }
 
         @Override
-        protected void execChangedValue() throws ProcessingException {
+        protected void execChangedValue() {
           if (!isABValid()) {
             addErrorStatus(AB_ERROR);
           }
@@ -321,7 +321,7 @@ public class ValueFieldTest {
   @Order(10.0)
   public class IncValidationField extends AbstractValueField<Integer> {
     @Override
-    protected Integer execValidateValue(Integer rawValue) throws ProcessingException {
+    protected Integer execValidateValue(Integer rawValue) {
       return rawValue + 1;
     }
   }

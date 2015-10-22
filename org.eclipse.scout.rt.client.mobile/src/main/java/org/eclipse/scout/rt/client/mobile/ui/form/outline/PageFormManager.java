@@ -136,7 +136,7 @@ public class PageFormManager {
     }
   }
 
-  private void hidePage(IPage<?> page) throws ProcessingException {
+  private void hidePage(IPage<?> page) {
     if (page == null) {
       return;
     }
@@ -148,7 +148,7 @@ public class PageFormManager {
     }
   }
 
-  private IPageForm showPage(IPage<?> page) throws ProcessingException {
+  private IPageForm showPage(IPage<?> page) {
     IPageForm pageForm = getPageForm(page, true);
     if (pageForm != null) {
       return pageForm;
@@ -198,7 +198,7 @@ public class PageFormManager {
     return getMiddlePageSlotViewId();
   }
 
-  private IPageForm showPage(IPage<?> page, String viewId) throws ProcessingException {
+  private IPageForm showPage(IPage<?> page, String viewId) {
     updateLeftPageIfNecessary(page, viewId);
 
     IPageForm pageForm = m_pageFormMap.get(viewId, page);
@@ -240,7 +240,7 @@ public class PageFormManager {
    * Node page switch: The node page on the right side moves to the left side when selecting a node page, happens on
    * nested PageWithNodes
    */
-  private void updateLeftPageIfNecessary(IPage<?> page, String viewId) throws ProcessingException {
+  private void updateLeftPageIfNecessary(IPage<?> page, String viewId) {
     if (getMiddlePageSlotViewId() == null) {
       return;
     }
@@ -255,12 +255,12 @@ public class PageFormManager {
     }
   }
 
-  protected IMainPageForm createMainPageForm(IPage<?> page) throws ProcessingException {
+  protected IMainPageForm createMainPageForm(IPage<?> page) {
     PageFormConfig config = createMainPageFormConfig(page);
     return new MainPageForm(page, this, config);
   }
 
-  protected IPageForm createPageForm(IPage<?> page) throws ProcessingException {
+  protected IPageForm createPageForm(IPage<?> page) {
     PageFormConfig config = createPageFormConfig(page);
     return new PageForm(page, this, config);
   }
@@ -289,7 +289,7 @@ public class PageFormManager {
     return m_desktop;
   }
 
-  public void pageSelectedNotify(PageForm pageForm, IPage<?> selectedPage) throws ProcessingException {
+  public void pageSelectedNotify(PageForm pageForm, IPage<?> selectedPage) {
     if (selectedPage == null) {
       return;
     }
@@ -317,7 +317,7 @@ public class PageFormManager {
    * Mainly a copy from AbstractTree.getUIFacade.setNodeSelectedAndExpandedFromUI() without setTreeChanging(true/false)
    * and additional outline change. TreeChanging must not be set otherwise collecting node menus does not work anymore.
    */
-  private void selectAndExpandPage(IPage<?> page) throws ProcessingException {
+  private void selectAndExpandPage(IPage<?> page) {
     try {
       setPageSelectionRunning(true);
 
@@ -346,7 +346,7 @@ public class PageFormManager {
     }
   }
 
-  private void handleTreeNodeSelected(final ITreeNode deselctedNode, final ITreeNode selectedNode) throws ProcessingException {
+  private void handleTreeNodeSelected(final ITreeNode deselctedNode, final ITreeNode selectedNode) {
     LOG.debug("Tree node selected: " + selectedNode);
     if (selectedNode == null) {
       hidePageForms();
@@ -357,7 +357,7 @@ public class PageFormManager {
     pageForm.pageSelectedNotify();
   }
 
-  private void handleTreeNodesDeleted(Collection<ITreeNode> deletedNodes) throws ProcessingException {
+  private void handleTreeNodesDeleted(Collection<ITreeNode> deletedNodes) {
     if (deletedNodes == null) {
       return;
     }
@@ -375,11 +375,11 @@ public class PageFormManager {
     }
   }
 
-  public void pageRemovedNotify(PageForm pageForm, IPage<?> page) throws ProcessingException {
+  public void pageRemovedNotify(PageForm pageForm, IPage<?> page) {
     handlePageRemoved(page);
   }
 
-  private void handlePageRemoved(IPage<?> page) throws ProcessingException {
+  private void handlePageRemoved(IPage<?> page) {
     if (page == null) {
       return;
     }
@@ -431,7 +431,7 @@ public class PageFormManager {
     }
   }
 
-  private void handlePageFormAdded(PageForm pageForm) throws ProcessingException {
+  private void handlePageFormAdded(PageForm pageForm) {
     if (pageForm == null) {
       return;
     }
@@ -444,7 +444,7 @@ public class PageFormManager {
     pageForm.formAddedNotify();
   }
 
-  private void handlePageFormRemoved(PageForm pageForm) throws ProcessingException {
+  private void handlePageFormRemoved(PageForm pageForm) {
     if (pageForm == null) {
       return;
     }
@@ -500,14 +500,14 @@ public class PageFormManager {
       }
     }
 
-    private void handleFormAdded(DesktopEvent event) throws ProcessingException {
+    private void handleFormAdded(DesktopEvent event) {
       IForm form = event.getForm();
       if (form instanceof PageForm) {
         handlePageFormAdded((PageForm) form);
       }
     }
 
-    private void handleFormRemoved(DesktopEvent event) throws ProcessingException {
+    private void handleFormRemoved(DesktopEvent event) {
       IForm form = event.getForm();
       if (form instanceof PageForm) {
         handlePageFormRemoved((PageForm) form);

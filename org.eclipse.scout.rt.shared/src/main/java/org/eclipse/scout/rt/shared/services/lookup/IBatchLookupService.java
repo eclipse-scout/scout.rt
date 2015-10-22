@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
 public interface IBatchLookupService extends IService {
@@ -21,23 +20,23 @@ public interface IBatchLookupService extends IService {
    * Lookup by performing a "key" filter and activating the {@code<key>} tags<br>
    * Batch processing
    */
-  List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall call) throws ProcessingException;
+  List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall call);
 
   /**
    * Lookup by performing a "text" filter and activating the {@code<text>} tags<br>
    * Batch processing
    */
-  List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall call) throws ProcessingException;
+  List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall call);
 
   /**
    * Lookup by performing a "all" filter and activating the {@code<all>} tags<br>
    * Batch processing
    */
-  List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall call) throws ProcessingException;
+  List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall call);
 
   /**
    * Lookup by performing a "recursion" filter and activating the {@code<rec>} tags<br>
    * Batch processing
    */
-  List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall call) throws ProcessingException;
+  List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall call);
 }

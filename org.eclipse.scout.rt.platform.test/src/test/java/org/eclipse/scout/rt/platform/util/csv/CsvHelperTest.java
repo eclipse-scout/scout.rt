@@ -123,7 +123,7 @@ public class CsvHelperTest {
   }
 
   @Test
-  public void testExportData() throws ProcessingException, IOException {
+  public void testExportData() throws IOException {
     Object[][] data = new Object[][]{
         {"a", "a", "a", "a", "a"},
         {"b", "b", "b", "b", "b"},
@@ -170,7 +170,7 @@ public class CsvHelperTest {
   }
 
   @Test
-  public void testExportDataWithTextEncode() throws ProcessingException {
+  public void testExportDataWithTextEncode() {
     StringWriter writer;
 
     // no special characters -> not encoded

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -20,7 +19,7 @@ public interface IPageForm extends IForm {
 
   PageFormConfig getPageFormConfig();
 
-  void pageSelectedNotify() throws ProcessingException;
+  void pageSelectedNotify();
 
   /**
    * returns true if either the detail form or the table of the page has changed, which makes a recreation of the form

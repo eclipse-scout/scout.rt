@@ -177,7 +177,7 @@ public class CsvHelper {
     m_colCount = Math.max(m_colCount, m_colTypes.size());
   }
 
-  public Object[][] importData(Reader reader, int headerRowCount, List<String> columnTypes, int rowCount) throws ProcessingException {
+  public Object[][] importData(Reader reader, int headerRowCount, List<String> columnTypes, int rowCount) {
     try {
       if (columnTypes != null) {
         setColumnTypes(columnTypes);
@@ -192,11 +192,11 @@ public class CsvHelper {
     }
   }
 
-  public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount) throws ProcessingException {
+  public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount) {
     importData(dataConsumer, reader, readNameHeader, readTypeHeader, headerRowCount, -1);
   }
 
-  public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount) throws ProcessingException {
+  public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount) {
     importData(dataConsumer, reader, readNameHeader, readTypeHeader, headerRowCount, rowCount, false);
   }
 
@@ -216,7 +216,7 @@ public class CsvHelper {
    *          true if not all lines have the same number of columns
    * @throws ProcessingException
    */
-  public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount, boolean allowVariableColumnCount) throws ProcessingException {
+  public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount, boolean allowVariableColumnCount) {
     String cell = null;
     int colIndex = 0;
     int lineNr = -1;
@@ -274,7 +274,7 @@ public class CsvHelper {
     }
   }
 
-  public void exportData(Object[][] data, File f, String encoding, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) throws ProcessingException {
+  public void exportData(Object[][] data, File f, String encoding, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) {
     try {
       if (encoding == null) {
         encoding = Encoding.UTF_8;
@@ -300,7 +300,7 @@ public class CsvHelper {
     }
   }
 
-  public void exportData(Object[][] data, Writer writer, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) throws ProcessingException {
+  public void exportData(Object[][] data, Writer writer, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) {
     try {
       if (columnNames != null) {
         setColumnNames(columnNames);
@@ -331,7 +331,7 @@ public class CsvHelper {
    * @throws ProcessingException
    *           Writes the header rows to the writer.
    */
-  public void exportHeaderRows(Writer writer, boolean writeNames, boolean writeTypes) throws ProcessingException {
+  public void exportHeaderRows(Writer writer, boolean writeNames, boolean writeTypes) {
     String line = null;
     int colIndex = 0;
     Object val = null;
@@ -358,7 +358,7 @@ public class CsvHelper {
    * @throws ProcessingException
    *           Writes data rows to the writer and does close it.
    */
-  public void exportDataRow(Object[] row, Writer writer) throws ProcessingException {
+  public void exportDataRow(Object[] row, Writer writer) {
     exportDataRow(row, writer, true);
   }
 
@@ -369,7 +369,7 @@ public class CsvHelper {
    * @throws ProcessingException
    *           Writes data rows to the writer.
    */
-  public void exportDataRow(Object[] row, Writer writer, boolean closeWriter) throws ProcessingException {
+  public void exportDataRow(Object[] row, Writer writer, boolean closeWriter) {
     String line = null;
     Object val = null;
     String cell = null;
@@ -491,7 +491,7 @@ public class CsvHelper {
     return buf.toString();
   }
 
-  private Object importCell(String text, Format f) throws ProcessingException {
+  private Object importCell(String text, Format f) {
     if (text != null && f != null) {
       try {
         return f.parseObject(text.trim());
@@ -566,7 +566,7 @@ public class CsvHelper {
    * @throws ProcessingException
    *           Read only
    */
-  public List<String> getColumnNames(File f) throws ProcessingException {
+  public List<String> getColumnNames(File f) {
     Reader r = null;
     try {
       r = new FileReader(f);
@@ -592,7 +592,7 @@ public class CsvHelper {
    * @return the current row in the reader as cell tokens based on this helpers context
    * @throws ProcessingException
    */
-  public List<String> getCurrentRow(Reader reader) throws ProcessingException {
+  public List<String> getCurrentRow(Reader reader) {
     BufferedReader bufferedReader = null;
     try {
       bufferedReader = new BufferedReader(reader);

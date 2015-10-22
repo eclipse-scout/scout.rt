@@ -26,10 +26,10 @@ public final class ComposerValueBoxChains {
       super(extensions);
     }
 
-    public void execChangedValue() throws ProcessingException {
+    public void execChangedValue() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IComposerValueBoxExtension<? extends AbstractComposerValueBox> next) throws ProcessingException {
+        protected void callMethod(IComposerValueBoxExtension<? extends AbstractComposerValueBox> next) {
           next.execChangedValue(ComposerValueBoxChangedValueChain.this);
         }
       };

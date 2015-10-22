@@ -89,7 +89,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * This is the init of the runtime model after the environment (form, fields, ..) are built and configured
    */
   @Override
-  public final void initAction() throws ProcessingException {
+  public final void initAction() {
     interceptInitAction();
   }
 
@@ -226,7 +226,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(10)
-  protected void execInitAction() throws ProcessingException {
+  protected void execInitAction() {
   }
 
   /**
@@ -234,7 +234,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(30)
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
   }
 
   /**
@@ -246,7 +246,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(32)
-  protected void execSelectionChanged(boolean selection) throws ProcessingException {
+  protected void execSelectionChanged(boolean selection) {
   }
 
   protected final void interceptInitConfig() {
@@ -353,7 +353,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void doAction() throws ProcessingException {
+  public void doAction() {
     if (isEnabled() && isVisible()) {
       try {
         setEnabledProcessingAction(false);
@@ -371,7 +371,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    *
    * @throws ProcessingException
    */
-  protected void doActionInternal() throws ProcessingException {
+  protected void doActionInternal() {
     interceptAction();
   }
 
@@ -731,35 +731,35 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     }
 
     @Override
-    public void execSelectionChanged(ActionSelectionChangedChain chain, boolean selection) throws ProcessingException {
+    public void execSelectionChanged(ActionSelectionChangedChain chain, boolean selection) {
       getOwner().execSelectionChanged(selection);
     }
 
     @Override
-    public void execAction(ActionActionChain chain) throws ProcessingException {
+    public void execAction(ActionActionChain chain) {
       getOwner().execAction();
     }
 
     @Override
-    public void execInitAction(ActionInitActionChain chain) throws ProcessingException {
+    public void execInitAction(ActionInitActionChain chain) {
       getOwner().execInitAction();
     }
 
   }
 
-  protected final void interceptSelectionChanged(boolean selection) throws ProcessingException {
+  protected final void interceptSelectionChanged(boolean selection) {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     ActionSelectionChangedChain chain = new ActionSelectionChangedChain(extensions);
     chain.execSelectionChanged(selection);
   }
 
-  protected final void interceptAction() throws ProcessingException {
+  protected final void interceptAction() {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     ActionActionChain chain = new ActionActionChain(extensions);
     chain.execAction();
   }
 
-  protected final void interceptInitAction() throws ProcessingException {
+  protected final void interceptInitAction() {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     ActionInitActionChain chain = new ActionInitActionChain(extensions);
     chain.execInitAction();

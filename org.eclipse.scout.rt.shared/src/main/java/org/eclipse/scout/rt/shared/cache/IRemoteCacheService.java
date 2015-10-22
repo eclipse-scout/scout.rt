@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.cache;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -55,6 +54,6 @@ public interface IRemoteCacheService {
    * @param propagate
    *          true if the invalidation should be propagated to other cluster nodes
    */
-  <K, V> void invalidate(String cacheId, ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException;
+  <K, V> void invalidate(String cacheId, ICacheEntryFilter<K, V> filter, boolean propagate);
 
 }

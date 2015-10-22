@@ -19,8 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
-import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.internal.UserNavigationHistory;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
@@ -79,7 +77,7 @@ public class UserNavigationHistoryTest {
    * Adding the a new bookmark removes forward bookmarks.
    */
   @Test
-  public void testAddingBookmarkIntermediate() throws ProcessingException {
+  public void testAddingBookmarkIntermediate() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -102,7 +100,7 @@ public class UserNavigationHistoryTest {
    * Adding the same bookmark as the next one in the history does not remove the forward bookmarks.
    */
   @Test
-  public void testAddingDuplicateBookmarkIntermediate() throws ProcessingException {
+  public void testAddingDuplicateBookmarkIntermediate() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -125,7 +123,7 @@ public class UserNavigationHistoryTest {
    * Tests the stepping one step backwards in the history.
    */
   @Test
-  public void testSteppingBackward() throws ProcessingException {
+  public void testSteppingBackward() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -153,7 +151,7 @@ public class UserNavigationHistoryTest {
    * Tests, if adding still works, when an exception is thrown in stepping backwards.
    */
   @Test
-  public void testAddingAfterSteppingBackwardsFails() throws ProcessingException {
+  public void testAddingAfterSteppingBackwardsFails() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -177,7 +175,7 @@ public class UserNavigationHistoryTest {
    * Tests the stepping one step backwards in the history.
    */
   @Test
-  public void testSteppingForward() throws ProcessingException {
+  public void testSteppingForward() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -204,7 +202,7 @@ public class UserNavigationHistoryTest {
    * Tests stepping to an existing bookmark.
    */
   @Test
-  public void testSteppingToExistingBookmark() throws ProcessingException {
+  public void testSteppingToExistingBookmark() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -222,7 +220,7 @@ public class UserNavigationHistoryTest {
    * Tests, if the active bookmarks stays unchanged when stepping to an non-existing bookmark.
    */
   @Test
-  public void testSteppingToNonExistingBookmark() throws ProcessingException {
+  public void testSteppingToNonExistingBookmark() {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
 
     Bookmark bookmark0 = getTestBookmark(0L);
@@ -242,7 +240,7 @@ public class UserNavigationHistoryTest {
   private UserNavigationHistory getNavigationHistoryWitoutActivation() {
     UserNavigationHistory history = new UserNavigationHistory() {
       @Override
-      protected void activateBookmark(Bookmark b) throws ProcessingException {
+      protected void activateBookmark(Bookmark b) {
         // nop
       }
     };
@@ -253,7 +251,7 @@ public class UserNavigationHistoryTest {
    * Tests the stepping one step forward in the history. No exception should be thrown
    */
   @Test
-  public void testSteppingForwardOnEmptyHistory() throws ProcessingException {
+  public void testSteppingForwardOnEmptyHistory() {
     UserNavigationHistory history = new UserNavigationHistory();
     history.stepForward();
     assertEquals(0, history.getSize());
@@ -263,7 +261,7 @@ public class UserNavigationHistoryTest {
    * Tests the stepping one step backwards in the history, if no element is available. No exception should be thrown
    */
   @Test
-  public void testSteppingBackwardOnEmptyHistory() throws ProcessingException {
+  public void testSteppingBackwardOnEmptyHistory() {
     UserNavigationHistory history = new UserNavigationHistory();
     history.stepBackward();
     assertEquals(0, history.getSize());

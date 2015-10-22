@@ -24,10 +24,10 @@ public final class ClientSessionChains {
       super(extensions);
     }
 
-    public void execStoreSession() throws ProcessingException {
+    public void execStoreSession() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IClientSessionExtension<? extends AbstractClientSession> next) throws ProcessingException {
+        protected void callMethod(IClientSessionExtension<? extends AbstractClientSession> next) {
           next.execStoreSession(ClientSessionStoreSessionChain.this);
         }
       };
@@ -45,10 +45,10 @@ public final class ClientSessionChains {
       super(extensions);
     }
 
-    public void execLoadSession() throws ProcessingException {
+    public void execLoadSession() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IClientSessionExtension<? extends AbstractClientSession> next) throws ProcessingException {
+        protected void callMethod(IClientSessionExtension<? extends AbstractClientSession> next) {
           next.execLoadSession(ClientSessionLoadSessionChain.this);
         }
       };

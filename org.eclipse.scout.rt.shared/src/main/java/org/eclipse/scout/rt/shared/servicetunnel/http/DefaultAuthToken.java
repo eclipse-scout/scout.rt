@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.HexUtility;
 import org.eclipse.scout.commons.HexUtility.HexOutputStream;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -159,12 +158,12 @@ public class DefaultAuthToken {
     }
   }
 
-  protected byte[] sign() throws ProcessingException {
+  protected byte[] sign() {
     byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
     return SecurityUtility.createSignature(privateKey, createUnsignedData());
   }
 
-  protected boolean verify() throws ProcessingException {
+  protected boolean verify() {
     byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
     return SecurityUtility.verifySignature(publicKey, createUnsignedData(), getSignature());
   }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldChangedMasterValueChain;
@@ -29,21 +28,21 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  */
 public interface IFormFieldExtension<OWNER extends AbstractFormField> extends IExtension<OWNER> {
 
-  void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes) throws ProcessingException;
+  void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes);
 
   void execAddSearchTerms(FormFieldAddSearchTermsChain chain, SearchFilter search);
 
-  void execChangedMasterValue(FormFieldChangedMasterValueChain chain, Object newMasterValue) throws ProcessingException;
+  void execChangedMasterValue(FormFieldChangedMasterValueChain chain, Object newMasterValue);
 
-  void execDisposeField(FormFieldDisposeFieldChain chain) throws ProcessingException;
+  void execDisposeField(FormFieldDisposeFieldChain chain);
 
-  void execInitField(FormFieldInitFieldChain chain) throws ProcessingException;
+  void execInitField(FormFieldInitFieldChain chain);
 
   boolean execCalculateVisible(FormFieldCalculateVisibleChain chain);
 
-  void execMarkSaved(FormFieldMarkSavedChain chain) throws ProcessingException;
+  void execMarkSaved(FormFieldMarkSavedChain chain);
 
-  boolean execIsEmpty(FormFieldIsEmptyChain chain) throws ProcessingException;
+  boolean execIsEmpty(FormFieldIsEmptyChain chain);
 
-  boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain) throws ProcessingException;
+  boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain);
 }

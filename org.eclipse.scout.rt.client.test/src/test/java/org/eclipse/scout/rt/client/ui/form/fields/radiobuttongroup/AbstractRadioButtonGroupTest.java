@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
@@ -265,7 +264,7 @@ public class AbstractRadioButtonGroupTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow<Long>> execCreateLookupRows() {
       ArrayList<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
       rows.add(new LookupRow<Long>(1L, "Business Systems Integration AG"));
       rows.add(new LookupRow<Long>(2L, "Eclipse"));

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -68,7 +67,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    */
   String PROP_CONTEXT_MENU = "contextMenu";
 
-  void initTree() throws ProcessingException;
+  void initTree();
 
   void disposeTree();
 
@@ -89,7 +88,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    *             exception if the given menu type is ambiguous. It will be removed in the O-Release (7.0).
    */
   @Deprecated
-  <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
+  <T extends IMenu> T getMenu(Class<T> menuType);
 
   /**
    * @see #setScrollToSelection()
@@ -167,12 +166,12 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    * <p>
    * see {@link IVirtualTreeNode} and {@link VirtualPage}
    */
-  ITreeNode resolveVirtualNode(ITreeNode node) throws ProcessingException;
+  ITreeNode resolveVirtualNode(ITreeNode node);
 
   /**
    * see {@link #resolveVirtualNode(ITreeNode)}
    */
-  Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes) throws ProcessingException;
+  Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes);
 
   Object getProperty(String name);
 
@@ -471,21 +470,21 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   /**
    * unload all children and mark node as not loaded
    */
-  void unloadNode(ITreeNode node) throws ProcessingException;
+  void unloadNode(ITreeNode node);
 
   /**
    * extract transfer data to be sent to the backend
    * <p>
    * The single root node is not exported, the export starts with the first level after the root node
    */
-  void exportTreeData(AbstractTreeFieldData target) throws ProcessingException;
+  void exportTreeData(AbstractTreeFieldData target);
 
   /**
    * apply transfer data to this tree
    * <p>
    * All nodes are imported starting under the (existing) root node
    */
-  void importTreeData(AbstractTreeFieldData source) throws ProcessingException;
+  void importTreeData(AbstractTreeFieldData source);
 
   /*
    * UI Processes

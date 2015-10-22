@@ -220,7 +220,7 @@ public class AliasMapper {
    * <b>Note that on attributes @parent.Person@ and @Person@ is the same and is both supported since an attribute is
    * attached to an entity. Therefore both declarations are equally "correct" and mean the same entitie's alias.
    */
-  public String replaceMarkersByAliases(String statementPart, Map<String, String> aliasMap, Map<String, String> parentAliasMap) throws ProcessingException {
+  public String replaceMarkersByAliases(String statementPart, Map<String, String> aliasMap, Map<String, String> parentAliasMap) {
     String s = statementPart;
     Matcher m = ENTITY_NAME.matcher(s);
     while (m.find()) {

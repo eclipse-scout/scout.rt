@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.useradmin;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -31,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementServic
 public class DefaultPasswordForm extends AbstractForm {
   private String m_userId;
 
-  public DefaultPasswordForm() throws ProcessingException {
+  public DefaultPasswordForm() {
     super();
   }
 
@@ -72,11 +71,11 @@ public class DefaultPasswordForm extends AbstractForm {
     return getFieldByClass(CancelButton.class);
   }
 
-  public void startChange() throws ProcessingException {
+  public void startChange() {
     startInternal(new ChangeHandler());
   }
 
-  public void startReset() throws ProcessingException {
+  public void startReset() {
     startInternal(new ResetHandler());
   }
 
@@ -162,13 +161,13 @@ public class DefaultPasswordForm extends AbstractForm {
   public class ResetHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       getOldPasswordField().setMandatory(false);
       getOldPasswordField().setVisible(false);
     }
 
     @Override
-    protected void execStore() throws ProcessingException {
+    protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
         throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
       }
@@ -181,11 +180,11 @@ public class DefaultPasswordForm extends AbstractForm {
   public class ChangeHandler extends AbstractFormHandler {
 
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
     }
 
     @Override
-    protected void execStore() throws ProcessingException {
+    protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
         throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
       }

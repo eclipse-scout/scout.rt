@@ -28,10 +28,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execFilterBrowseLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    public void execFilterBrowseLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execFilterBrowseLookupResult(ContentAssistFieldFilterBrowseLookupResultChain.this, call, result);
         }
       };
@@ -49,10 +49,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public ILookupRow<LOOKUP_KEY> execBrowseNew(final String searchText) throws ProcessingException {
+    public ILookupRow<LOOKUP_KEY> execBrowseNew(final String searchText) {
       MethodInvocation<ILookupRow<LOOKUP_KEY>> methodInvocation = new MethodInvocation<ILookupRow<LOOKUP_KEY>>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           setReturnValue(next.execBrowseNew(ContentAssistFieldBrowseNewChain.this, searchText));
         }
       };
@@ -70,10 +70,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execFilterKeyLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    public void execFilterKeyLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execFilterKeyLookupResult(ContentAssistFieldFilterKeyLookupResultChain.this, call, result);
         }
       };
@@ -91,10 +91,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execPrepareLookup(final ILookupCall<LOOKUP_KEY> call) throws ProcessingException {
+    public void execPrepareLookup(final ILookupCall<LOOKUP_KEY> call) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execPrepareLookup(ContentAssistFieldPrepareLookupChain.this, call);
         }
       };
@@ -112,10 +112,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execPrepareTextLookup(final ILookupCall<LOOKUP_KEY> call, final String text) throws ProcessingException {
+    public void execPrepareTextLookup(final ILookupCall<LOOKUP_KEY> call, final String text) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execPrepareTextLookup(ContentAssistFieldPrepareTextLookupChain.this, call, text);
         }
       };
@@ -133,10 +133,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execPrepareBrowseLookup(final ILookupCall<LOOKUP_KEY> call, final String browseHint) throws ProcessingException {
+    public void execPrepareBrowseLookup(final ILookupCall<LOOKUP_KEY> call, final String browseHint) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execPrepareBrowseLookup(ContentAssistFieldPrepareBrowseLookupChain.this, call, browseHint);
         }
       };
@@ -154,10 +154,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execFilterTextLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    public void execFilterTextLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execFilterTextLookupResult(ContentAssistFieldFilterTextLookupResultChain.this, call, result);
         }
       };
@@ -175,10 +175,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execPrepareRecLookup(final ILookupCall<LOOKUP_KEY> call, final LOOKUP_KEY parentKey) throws ProcessingException {
+    public void execPrepareRecLookup(final ILookupCall<LOOKUP_KEY> call, final LOOKUP_KEY parentKey) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execPrepareRecLookup(ContentAssistFieldPrepareRecLookupChain.this, call, parentKey);
         }
       };
@@ -196,10 +196,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execFilterLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    public void execFilterLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execFilterLookupResult(ContentAssistFieldFilterLookupResultChain.this, call, result);
         }
       };
@@ -217,10 +217,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execFilterRecLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    public void execFilterRecLookupResult(final ILookupCall<LOOKUP_KEY> call, final List<ILookupRow<LOOKUP_KEY>> result) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execFilterRecLookupResult(ContentAssistFieldFilterRecLookupResultChain.this, call, result);
         }
       };
@@ -238,10 +238,10 @@ public final class ContentAssistFieldChains {
       super(extensions);
     }
 
-    public void execPrepareKeyLookup(final ILookupCall<LOOKUP_KEY> call, final LOOKUP_KEY key) throws ProcessingException {
+    public void execPrepareKeyLookup(final ILookupCall<LOOKUP_KEY> call, final LOOKUP_KEY key) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) throws ProcessingException {
+        protected void callMethod(IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> next) {
           next.execPrepareKeyLookup(ContentAssistFieldPrepareKeyLookupChain.this, call, key);
         }
       };

@@ -44,10 +44,10 @@ public final class StringFieldChains {
       super(extensions);
     }
 
-    public void execAction() throws ProcessingException {
+    public void execAction() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IStringFieldExtension<? extends AbstractStringField> next) throws ProcessingException {
+        protected void callMethod(IStringFieldExtension<? extends AbstractStringField> next) {
           next.execAction(StringFieldLinkActionChain.this);
         }
       };

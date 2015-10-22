@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -27,13 +26,13 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
   public AbstractTreeNodeBuilder() {
   }
 
-  protected abstract ITreeNode createEmptyTreeNode() throws ProcessingException;
+  protected abstract ITreeNode createEmptyTreeNode();
 
-  public ITreeNode createTreeNode(LOOKUP_ROW_TYPE primaryKey, String text, int nodeStatus, boolean markChildrenLoaded) throws ProcessingException {
+  public ITreeNode createTreeNode(LOOKUP_ROW_TYPE primaryKey, String text, int nodeStatus, boolean markChildrenLoaded) {
     return createTreeNode(new LookupRow<LOOKUP_ROW_TYPE>(primaryKey, text), nodeStatus, markChildrenLoaded);
   }
 
-  public List<ITreeNode> createTreeNodes(List<? extends ILookupRow<LOOKUP_ROW_TYPE>> lookupRows, int nodeStatus, boolean markChildrenLoaded) throws ProcessingException {
+  public List<ITreeNode> createTreeNodes(List<? extends ILookupRow<LOOKUP_ROW_TYPE>> lookupRows, int nodeStatus, boolean markChildrenLoaded) {
     ArrayList<ITreeNode> rootNodes = new ArrayList<ITreeNode>();
     HashMap<Object, ITreeNode> nodeMap = new HashMap<Object, ITreeNode>();
     HashMap<Object, ArrayList<ITreeNode>> parentChildMap = new HashMap<Object, ArrayList<ITreeNode>>();
@@ -69,7 +68,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
     return rootNodes;
   }
 
-  public ITreeNode createTreeNode(ILookupRow<LOOKUP_ROW_TYPE> lookupRow, int nodeStatus, boolean markChildrenLoaded) throws ProcessingException {
+  public ITreeNode createTreeNode(ILookupRow<LOOKUP_ROW_TYPE> lookupRow, int nodeStatus, boolean markChildrenLoaded) {
     ITreeNode treeNode = createEmptyTreeNode();
     // fill values to treeNode
     treeNode.setPrimaryKey(lookupRow.getKey());

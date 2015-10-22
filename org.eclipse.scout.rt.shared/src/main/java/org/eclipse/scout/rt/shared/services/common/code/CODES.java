@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 
 /**
@@ -65,12 +64,12 @@ public final class CODES {
     return BEANS.get(ICodeService.class).getCode(type);
   }
 
-  public static <T extends ICodeType> T reloadCodeType(Class<T> type) throws ProcessingException {
+  public static <T extends ICodeType> T reloadCodeType(Class<T> type) {
     return BEANS.get(ICodeService.class).reloadCodeType(type);
   }
 
   @SuppressWarnings("unchecked")
-  public static List<ICodeType<?, ?>> reloadCodeTypes(Class<?>... types) throws ProcessingException {
+  public static List<ICodeType<?, ?>> reloadCodeTypes(Class<?>... types) {
     if (types == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -83,7 +82,7 @@ public final class CODES {
     return BEANS.get(ICodeService.class).reloadCodeTypes(typeList);
   }
 
-  public static List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+  public static List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
     return BEANS.get(ICodeService.class).reloadCodeTypes(types);
   }
 

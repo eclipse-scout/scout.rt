@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardStepExtension;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
@@ -172,7 +171,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(10)
   @ConfigOperation
-  protected void execActivate(int stepKind) throws ProcessingException {
+  protected void execActivate(int stepKind) {
   }
 
   /**
@@ -181,7 +180,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(20)
   @ConfigOperation
-  protected void execDeactivate(int stepKind) throws ProcessingException {
+  protected void execDeactivate(int stepKind) {
   }
 
   /**
@@ -189,7 +188,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(30)
   @ConfigOperation
-  protected void execDispose() throws ProcessingException {
+  protected void execDispose() {
     FORM f = getForm();
     if (f != null) {
       f.doClose();
@@ -206,7 +205,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(40)
   @ConfigOperation
-  protected void execFormStored(boolean activation) throws ProcessingException {
+  protected void execFormStored(boolean activation) {
   }
 
   /**
@@ -219,7 +218,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(50)
   @ConfigOperation
-  protected void execFormDiscarded(boolean activation) throws ProcessingException {
+  protected void execFormDiscarded(boolean activation) {
   }
 
   /**
@@ -232,7 +231,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(60)
   @ConfigOperation
-  protected void execFormClosed(boolean activation) throws ProcessingException {
+  protected void execFormClosed(boolean activation) {
     if (!activation) {
       if (getForm().isFormStored()) {
         getWizard().doNextStep();
@@ -247,7 +246,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    */
   @Order(70)
   @ConfigOperation
-  protected void execAction() throws ProcessingException {
+  protected void execAction() {
     if (getWizard() != null) {
       getWizard().doWizardStepAction(this);
     }
@@ -334,7 +333,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
       if (m_formListener == null) {
         m_formListener = new FormListener() {
           @Override
-          public void formChanged(FormEvent e) throws ProcessingException {
+          public void formChanged(FormEvent e) {
             try {
               switch (e.getType()) {
                 case FormEvent.TYPE_STORE_AFTER: {
@@ -496,7 +495,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public void activate(int stepKind) throws ProcessingException {
+  public void activate(int stepKind) {
     try {
       m_activationCounter++;
       interceptActivate(stepKind);
@@ -507,7 +506,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public void deactivate(int stepKind) throws ProcessingException {
+  public void deactivate(int stepKind) {
     try {
       m_activationCounter++;
       interceptDeactivate(stepKind);
@@ -518,7 +517,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public void dispose() throws ProcessingException {
+  public void dispose() {
     try {
       m_activationCounter++;
       interceptDispose();
@@ -537,7 +536,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public void doAction() throws ProcessingException {
+  public void doAction() {
     if (isActionEnabled() && !isPerformingWizardStepAction()) {
       try {
         setPerformingWizardStepAction(true);
@@ -573,78 +572,78 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     }
 
     @Override
-    public void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind) throws ProcessingException {
+    public void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind) {
       getOwner().execDeactivate(stepKind);
     }
 
     @Override
-    public void execDispose(WizardStepDisposeChain<? extends IForm> chain) throws ProcessingException {
+    public void execDispose(WizardStepDisposeChain<? extends IForm> chain) {
       getOwner().execDispose();
     }
 
     @Override
-    public void execFormClosed(WizardStepFormClosedChain<? extends IForm> chain, boolean activation) throws ProcessingException {
+    public void execFormClosed(WizardStepFormClosedChain<? extends IForm> chain, boolean activation) {
       getOwner().execFormClosed(activation);
     }
 
     @Override
-    public void execActivate(WizardStepActivateChain<? extends IForm> chain, int stepKind) throws ProcessingException {
+    public void execActivate(WizardStepActivateChain<? extends IForm> chain, int stepKind) {
       getOwner().execActivate(stepKind);
     }
 
     @Override
-    public void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation) throws ProcessingException {
+    public void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation) {
       getOwner().execFormDiscarded(activation);
     }
 
     @Override
-    public void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation) throws ProcessingException {
+    public void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation) {
       getOwner().execFormStored(activation);
     }
 
     @Override
-    public void execAction(WizardStepActionChain<? extends IForm> chain) throws ProcessingException {
+    public void execAction(WizardStepActionChain<? extends IForm> chain) {
       getOwner().execAction();
     }
   }
 
-  protected final void interceptDeactivate(int stepKind) throws ProcessingException {
+  protected final void interceptDeactivate(int stepKind) {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepDeactivateChain<FORM> chain = new WizardStepDeactivateChain<FORM>(extensions);
     chain.execDeactivate(stepKind);
   }
 
-  protected final void interceptDispose() throws ProcessingException {
+  protected final void interceptDispose() {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepDisposeChain<FORM> chain = new WizardStepDisposeChain<FORM>(extensions);
     chain.execDispose();
   }
 
-  protected final void interceptFormClosed(boolean activation) throws ProcessingException {
+  protected final void interceptFormClosed(boolean activation) {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormClosedChain<FORM> chain = new WizardStepFormClosedChain<FORM>(extensions);
     chain.execFormClosed(activation);
   }
 
-  protected final void interceptActivate(int stepKind) throws ProcessingException {
+  protected final void interceptActivate(int stepKind) {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepActivateChain<FORM> chain = new WizardStepActivateChain<FORM>(extensions);
     chain.execActivate(stepKind);
   }
 
-  protected final void interceptFormDiscarded(boolean activation) throws ProcessingException {
+  protected final void interceptFormDiscarded(boolean activation) {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormDiscardedChain<FORM> chain = new WizardStepFormDiscardedChain<FORM>(extensions);
     chain.execFormDiscarded(activation);
   }
 
-  protected final void interceptFormStored(boolean activation) throws ProcessingException {
+  protected final void interceptFormStored(boolean activation) {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormStoredChain<FORM> chain = new WizardStepFormStoredChain<FORM>(extensions);
     chain.execFormStored(activation);
   }
 
-  protected final void interceptAction() throws ProcessingException {
+  protected final void interceptAction() {
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepActionChain<FORM> chain = new WizardStepActionChain<FORM>(extensions);
     chain.execAction();

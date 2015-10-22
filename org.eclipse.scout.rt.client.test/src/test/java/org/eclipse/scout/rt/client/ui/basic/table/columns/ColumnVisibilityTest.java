@@ -14,7 +14,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -168,7 +167,7 @@ public class ColumnVisibilityTest {
     }
 
     @Override
-    protected void execInitTable() throws ProcessingException {
+    protected void execInitTable() {
       getTest1Column().setDisplayable(false);
       getTest1Column().setDisplayable(true);
 

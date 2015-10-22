@@ -116,7 +116,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
    */
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     getCalendar().initCalendar();
     super.initFieldInternal();
   }
@@ -137,7 +137,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
    * Full override: reload calendar components
    */
   @Override
-  protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+  protected void execChangedMasterValue(Object newMasterValue) {
     setValue(null);
     getCalendar().reloadCalendarItems();
   }

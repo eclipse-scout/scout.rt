@@ -87,10 +87,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    */
   @ConfigOperation
   @Order(90)
-  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) {
   }
 
-  protected void createChildPagesInternal(final List<IPage<?>> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(final List<IPage<?>> pageList) {
     ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).run(new IRunnable() {
 
       @Override
@@ -154,7 +154,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * @throws ProcessingException
    */
   @Override
-  protected void execPageActivated() throws ProcessingException {
+  protected void execPageActivated() {
     super.execPageActivated();
     // set title of table
     if (getTable() != null && getTree() != null) {
@@ -166,7 +166,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * load tree children and fill table
    */
   @Override
-  public void loadChildren() throws ProcessingException {
+  public void loadChildren() {
     List<IPage<?>> pageList = new ArrayList<IPage<?>>();
     createChildPagesInternal(pageList);
     // load tree
@@ -244,7 +244,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   @Override
-  public void rebuildTableInternal() throws ProcessingException {
+  public void rebuildTableInternal() {
     List<ITreeNode> childNodes = getChildNodes();
     try {
       getTable().setTableChanging(true);
@@ -292,12 +292,12 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   @Override
-  protected void decorateDetailForm() throws ProcessingException {
+  protected void decorateDetailForm() {
     super.decorateDetailForm();
     enhanceDetailFormWithPageMenus();
   }
 
-  protected void enhanceDetailFormWithPageMenus() throws ProcessingException {
+  protected void enhanceDetailFormWithPageMenus() {
     IForm form = getDetailForm();
     IFormFieldContextMenu mainBoxContextMenu = form.getRootGroupBox().getContextMenu();
     List<IMenu> menus = mainBoxContextMenu.getChildActions();
@@ -403,7 +403,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
   }
 
-  protected final void interceptCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+  protected final void interceptCreateChildPages(List<IPage<?>> pageList) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithNodesCreateChildPagesChain chain = new PageWithNodesCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
@@ -416,7 +416,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
 
     @Override
-    public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
+    public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage<?>> pageList) {
       getOwner().execCreateChildPages(pageList);
     }
   }

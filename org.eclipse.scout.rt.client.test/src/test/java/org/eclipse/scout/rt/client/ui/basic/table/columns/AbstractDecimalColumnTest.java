@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
@@ -109,7 +108,7 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
   }
 
   @Test
-  public void testPrepareEditInternal() throws ProcessingException {
+  public void testPrepareEditInternal() {
     setGroupingUsed(false);
     setMinFractionDigits(5);
     setMaxFractionDigits(6);

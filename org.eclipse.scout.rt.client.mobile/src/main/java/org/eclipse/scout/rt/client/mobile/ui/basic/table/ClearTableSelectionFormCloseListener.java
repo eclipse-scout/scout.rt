@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -26,7 +25,7 @@ public class ClearTableSelectionFormCloseListener implements FormListener {
   }
 
   @Override
-  public void formChanged(FormEvent e) throws ProcessingException {
+  public void formChanged(FormEvent e) {
     if (FormEvent.TYPE_CLOSED == e.getType()) {
       handleFormClosed();
     }

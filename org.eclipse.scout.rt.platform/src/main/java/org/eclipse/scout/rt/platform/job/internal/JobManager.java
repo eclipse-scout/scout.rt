@@ -140,7 +140,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws ProcessingException {
+  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
     try {
       return m_futures.awaitDone(filter, timeout, unit);
     }

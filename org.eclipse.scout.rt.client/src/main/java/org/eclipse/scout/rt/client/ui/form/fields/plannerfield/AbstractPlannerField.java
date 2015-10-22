@@ -65,7 +65,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   @Override
-  protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+  protected void execChangedMasterValue(Object newMasterValue) {
     loadResources();
   }
 
@@ -85,7 +85,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
    */
   @ConfigOperation
   @Order(10)
-  protected List<Resource<RI>> execLoadResources() throws ProcessingException {
+  protected List<Resource<RI>> execLoadResources() {
     return null;
   }
 
@@ -106,7 +106,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
    */
   @ConfigOperation
   @Order(20)
-  protected void execPopulateResources() throws ProcessingException {
+  protected void execPopulateResources() {
     List<Resource<RI>> resources = interceptLoadResources();
     getPlanner().replaceResources(resources);
   }
@@ -141,7 +141,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   @Override
-  protected void initFieldInternal() throws ProcessingException {
+  protected void initFieldInternal() {
     getPlanner().initPlanner();
     super.initFieldInternal();
   }
@@ -168,7 +168,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   @Override
-  public void loadResources() throws ProcessingException {
+  public void loadResources() {
     interceptPopulateResources();
   }
 
@@ -195,13 +195,13 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     }
   }
 
-  protected final List<Resource<RI>> interceptLoadResources() throws ProcessingException {
+  protected final List<Resource<RI>> interceptLoadResources() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     PlannerFieldLoadResourcesChain<P, RI, AI> chain = new PlannerFieldLoadResourcesChain<P, RI, AI>(extensions);
     return chain.execLoadResourceTableData();
   }
 
-  protected final void interceptPopulateResources() throws ProcessingException {
+  protected final void interceptPopulateResources() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     PlannerFieldPopulateResourcesChain<P, RI, AI> chain = new PlannerFieldPopulateResourcesChain<P, RI, AI>(extensions);
     chain.execPopulateResources();
@@ -214,12 +214,12 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     }
 
     @Override
-    public List<Resource<RI>> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
+    public List<Resource<RI>> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) {
       return getOwner().execLoadResources();
     }
 
     @Override
-    public void execPopulateResources(PlannerFieldPopulateResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
+    public void execPopulateResources(PlannerFieldPopulateResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) {
       getOwner().execPopulateResources();
     }
   }

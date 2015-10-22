@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
@@ -80,7 +79,7 @@ public class OutlineMenuWrapper implements IMenu {
   }
 
   @Override
-  public void handleOwnerValueChanged(Object newValue) throws ProcessingException {
+  public void handleOwnerValueChanged(Object newValue) {
     // void
   }
 
@@ -135,12 +134,12 @@ public class OutlineMenuWrapper implements IMenu {
   }
 
   @Override
-  public void initAction() throws ProcessingException {
+  public void initAction() {
     m_wrappedMenu.initAction();
   }
 
   @Override
-  public void doAction() throws ProcessingException {
+  public void doAction() {
     m_wrappedMenu.doAction();
   }
 

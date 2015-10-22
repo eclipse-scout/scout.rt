@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -43,7 +42,7 @@ public class ButtonTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -52,7 +51,7 @@ public class ButtonTest {
       return "Test Form";
     }
 
-    public void startForm() throws ProcessingException {
+    public void startForm() {
       startInternal(new FormHandler());
     }
 
@@ -70,7 +69,7 @@ public class ButtonTest {
       public class PushButton1 extends AbstractButton {
 
         @Override
-        protected void execClickAction() throws ProcessingException {
+        protected void execClickAction() {
         }
 
         @Order(10)
@@ -86,7 +85,7 @@ public class ButtonTest {
           }
 
           @Override
-          protected void execAction() throws ProcessingException {
+          protected void execAction() {
             MessageBoxes.createOk().withHeader("click").withBody("it").show();
           }
         }
@@ -104,7 +103,7 @@ public class ButtonTest {
           }
 
           @Override
-          protected void execAction() throws ProcessingException {
+          protected void execAction() {
             MessageBoxes.createOk().withHeader("click").withBody("it").show();
           }
         }

@@ -43,7 +43,7 @@ public interface ISMTPService extends IService {
    * @throws ProcessingException
    * @see {@link MailUtility} to create a message
    */
-  void sendMessage(MimeMessage message) throws ProcessingException;
+  void sendMessage(MimeMessage message);
 
   /**
    * sends the message over the session given as an argument. Ensure to have set receiver email addresses, sender email
@@ -53,7 +53,7 @@ public interface ISMTPService extends IService {
    *          to send the message.
    * @throws ProcessingException
    */
-  void sendMessage(MimeMessage message, Session session) throws ProcessingException;
+  void sendMessage(MimeMessage message, Session session);
 
   String getHost();
 

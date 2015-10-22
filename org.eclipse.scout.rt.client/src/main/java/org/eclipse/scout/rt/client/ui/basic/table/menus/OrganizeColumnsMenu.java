@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.menus;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -45,7 +44,7 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsF
   }
 
   @Override
-  protected void execSelectionChanged(boolean selected) throws ProcessingException {
+  protected void execSelectionChanged(boolean selected) {
     super.execSelectionChanged(selected);
     if (selected) {
       getForm().reload();
@@ -53,7 +52,7 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsF
   }
 
   @Override
-  protected OrganizeColumnsForm createForm() throws ProcessingException {
+  protected OrganizeColumnsForm createForm() {
     return new OrganizeColumnsForm(m_table);
   }
 

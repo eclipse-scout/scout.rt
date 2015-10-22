@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDropRequestChain;
@@ -25,7 +24,7 @@ public interface IStringFieldExtension<OWNER extends AbstractStringField> extend
 
   void execDropRequest(StringFieldDropRequestChain chain, TransferObject transferObject);
 
-  void execAction(StringFieldLinkActionChain chain) throws ProcessingException;
+  void execAction(StringFieldLinkActionChain chain);
 
   TransferObject execDragRequest(StringFieldDragRequestChain chain);
 

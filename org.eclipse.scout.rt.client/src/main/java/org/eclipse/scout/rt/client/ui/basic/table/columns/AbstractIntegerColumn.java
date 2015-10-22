@@ -57,7 +57,7 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
    */
 
   @Override
-  protected Integer parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected Integer parseValueInternal(ITableRow row, Object rawValue) {
     Integer validValue = null;
     if (rawValue == null) {
       validValue = null;

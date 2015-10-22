@@ -119,7 +119,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   /**
    * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
    */
-  void initForm() throws ProcessingException;
+  void initForm();
 
   /**
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
@@ -129,7 +129,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
    * @throws ProcessingException
    */
-  Object computeExclusiveKey() throws ProcessingException;
+  Object computeExclusiveKey();
 
   /*
    * Runtime
@@ -198,13 +198,13 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *          automatically and set to the form using {@link #setHandler(IFormHandler)}. If this parameter is
    *          <code>null</code>, the current handler is used instead.
    */
-  void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType) throws ProcessingException;
+  void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType);
 
   /**
    * Like {@link #startWizardStep(IWizardStep, Class)} but without a custom handler type (uses the currently set
    * handler).
    */
-  void startWizardStep(IWizardStep<?> wizardStep) throws ProcessingException;
+  void startWizardStep(IWizardStep<?> wizardStep);
 
   /**
    * Starts the form using {@link #getHandler()}.
@@ -212,7 +212,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @throws ProcessingException
    *           if an error occurs in the handler.
    */
-  void start() throws ProcessingException;
+  void start();
 
   /**
    * @return <code>true</code> if this {@link IForm} is currently attached to the {@link IDesktop} and displayed.
@@ -248,13 +248,13 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   /**
    * Creates an empty form data.
    */
-  AbstractFormData createFormData() throws ProcessingException;
+  AbstractFormData createFormData();
 
   /**
    * fill a FormData structure to be sent to the backend<br>
    * the configurator is creating typed subclasses of FormData and FormFieldData
    */
-  void exportFormData(AbstractFormData target) throws ProcessingException;
+  void exportFormData(AbstractFormData target);
 
   /**
    * apply FormData to this form
@@ -263,7 +263,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *          the FormData to import
    * @throws ProcessingException
    */
-  void importFormData(AbstractFormData source) throws ProcessingException;
+  void importFormData(AbstractFormData source);
 
   /**
    * apply FormData to this form
@@ -275,7 +275,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *          caused by this import.
    * @throws ProcessingException
    */
-  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled) throws ProcessingException;
+  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled);
 
   /**
    * apply FormData to this form
@@ -290,7 +290,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @throws ProcessingException
    * @see IPropertyFilter
    */
-  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter) throws ProcessingException;
+  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter);
 
   /**
    * apply FormData to this form
@@ -308,7 +308,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @see IPropertyFilter#accept(org.eclipse.scout.commons.beans.FastPropertyDescriptor)
    * @see IFormFieldFilter#accept(IFormField)
    */
-  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter) throws ProcessingException;
+  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter);
 
   /**
    * @return the {@link IFormField} that owns the focus AND is inside this form.<br>
@@ -323,7 +323,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
 
   List<? extends IFormField> getInvalidFields();
 
-  void validateForm() throws ProcessingException;
+  void validateForm();
 
   boolean visitFields(IFormFieldVisitor visitor);
 
@@ -367,25 +367,25 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    */
   void structureChanged(IFormField causingField);
 
-  void doClose() throws ProcessingException;
+  void doClose();
 
-  void doCancel() throws ProcessingException;
+  void doCancel();
 
   /**
    * Save data and close the form.
    */
-  void doOk() throws ProcessingException;
+  void doOk();
 
   /**
    * Validate the form, save it, and make all fields as saved. The net result is that calling this method again on the
    * unchanged form will revalidate it, but will no longer save it.
    */
-  void doSave() throws ProcessingException;
+  void doSave();
 
   /**
    * similar to {@link #doSave()} but do NOT set fields to state {@link #isSaveNeeded()}=false
    */
-  void doSaveWithoutMarkerChange() throws ProcessingException;
+  void doSaveWithoutMarkerChange();
 
   void doReset();
 
@@ -628,15 +628,15 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   /**
    * XML export/import of form state
    */
-  void loadFromXmlString(String xml) throws ProcessingException;
+  void loadFromXmlString(String xml);
 
-  String storeToXmlString() throws ProcessingException;
+  String storeToXmlString();
 
-  Document storeToXml() throws ProcessingException;
+  Document storeToXml();
 
-  void storeToXml(Element root) throws ProcessingException;
+  void storeToXml(Element root);
 
-  void loadFromXml(Element root) throws ProcessingException;
+  void loadFromXml(Element root);
 
   /**
    * Wait until form is closed<br>
@@ -644,7 +644,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * If the form is non-modal this starts a sub event dispatcher that loops (and blocks) until form handling is false
    * (i.e. form has been closed)
    */
-  void waitFor() throws ProcessingException;
+  void waitFor();
 
   int WAIT_FOR_ERROR_CODE = 69218;
 

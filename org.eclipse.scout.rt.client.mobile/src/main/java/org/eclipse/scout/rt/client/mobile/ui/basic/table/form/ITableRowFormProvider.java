@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 
 /**
@@ -18,5 +17,5 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
  */
 public interface ITableRowFormProvider {
 
-  ITableRowForm createTableRowForm(ITableRow row) throws ProcessingException;
+  ITableRowForm createTableRowForm(ITableRow row);
 }

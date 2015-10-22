@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -46,14 +45,14 @@ import org.junit.runner.RunWith;
 public class FormWithTableFieldTest {
 
   @Test
-  public void testImportFormData() throws ProcessingException {
+  public void testImportFormData() {
     TableForm form = new TableForm();
     form.startModify();
     assertEquals(1, form.getLoremField().getTable().getRowCount());
   }
 
   @Test
-  public void testExportFormData() throws ProcessingException {
+  public void testExportFormData() {
     TableForm form = new TableForm();
     form.startNew();
     Table table = form.getLoremField().getTable();
@@ -75,7 +74,7 @@ public class FormWithTableFieldTest {
     /**
      * @throws org.eclipse.scout.commons.exception.ProcessingException
      */
-    public TableForm() throws ProcessingException {
+    public TableForm() {
       super();
     }
 
@@ -94,14 +93,14 @@ public class FormWithTableFieldTest {
     /**
      * @throws org.eclipse.scout.commons.exception.ProcessingException
      */
-    public void startModify() throws ProcessingException {
+    public void startModify() {
       startInternal(new ModifyHandler());
     }
 
     /**
      * @throws org.eclipse.scout.commons.exception.ProcessingException
      */
-    public void startNew() throws ProcessingException {
+    public void startNew() {
       startInternal(new NewHandler());
     }
 
@@ -152,7 +151,7 @@ public class FormWithTableFieldTest {
     public class ModifyHandler extends AbstractFormHandler {
 
       @Override
-      protected void execLoad() throws ProcessingException {
+      protected void execLoad() {
         TableFormData formData = new TableFormData();
         Lorem table = formData.getLorem();
         int i = table.addRow();

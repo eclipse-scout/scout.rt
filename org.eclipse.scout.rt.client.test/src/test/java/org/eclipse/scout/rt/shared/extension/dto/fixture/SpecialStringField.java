@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
@@ -26,7 +25,7 @@ public class SpecialStringField extends AbstractStringField {
   public static final String INIT_VAL = "init val of special string field";
 
   @Override
-  protected void execInitField() throws ProcessingException {
+  protected void execInitField() {
     super.execInitField();
     setValue(INIT_VAL);
   }

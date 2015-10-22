@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -41,7 +40,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public void initPage() throws ProcessingException {
+  public void initPage() {
   }
 
   @Override
@@ -91,7 +90,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public final void reloadPage() throws ProcessingException {
+  public final void reloadPage() {
   }
 
   @Override

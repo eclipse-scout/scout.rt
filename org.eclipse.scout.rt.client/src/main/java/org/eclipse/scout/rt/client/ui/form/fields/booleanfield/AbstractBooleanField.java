@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.booleanfield.IBooleanFieldExtension;
@@ -71,13 +70,13 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   }
 
   @Override
-  protected Boolean validateValueInternal(Boolean rawValue) throws ProcessingException {
+  protected Boolean validateValueInternal(Boolean rawValue) {
     return BooleanUtility.nvl(super.validateValueInternal(rawValue));
   }
 
   // convert string to a boolean
   @Override
-  protected Boolean parseValueInternal(String text) throws ProcessingException {
+  protected Boolean parseValueInternal(String text) {
     Boolean retVal = null;
     if (text != null && text.length() == 0) {
       text = null;
@@ -100,7 +99,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
    * A boolean field is considered empty if unchecked.
    */
   @Override
-  protected boolean execIsEmpty() throws ProcessingException {
+  protected boolean execIsEmpty() {
     return !isChecked();
   }
 

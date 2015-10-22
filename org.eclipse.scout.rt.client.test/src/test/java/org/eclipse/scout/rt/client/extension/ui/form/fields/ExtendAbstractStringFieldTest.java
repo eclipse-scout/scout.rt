@@ -58,12 +58,12 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
     /**
      * @throws ProcessingException
      */
-    public MyForm() throws ProcessingException {
+    public MyForm() {
       super();
     }
 
     @Override
-    public void start() throws ProcessingException {
+    public void start() {
       startInternal(new StartHandler());
     }
 
@@ -87,7 +87,7 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
       @Order(10)
       public class NameField extends AbstractStringField {
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           nameFieldExecInitFieldCounter.incrementAndGet();
         }
       }
@@ -95,7 +95,7 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
       @Order(20)
       public class PrenameField extends AbstractStringField {
         @Override
-        protected void execInitField() throws ProcessingException {
+        protected void execInitField() {
           prenameFieldExecInitFieldCounter.incrementAndGet();
         }
       }
@@ -114,7 +114,7 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
     }
 
     @Override
-    public void execInitField(FormFieldInitFieldChain chain) throws ProcessingException {
+    public void execInitField(FormFieldInitFieldChain chain) {
       allStringFieldExecInitFieldCounter.incrementAndGet();
       chain.execInitField();
     }

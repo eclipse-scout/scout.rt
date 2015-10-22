@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.status.Status;
@@ -54,7 +53,7 @@ public class AbstractFormTest {
    * {@link AbstractForm#classId()}
    */
   @Test
-  public void testClassIdAnnotated() throws ProcessingException {
+  public void testClassIdAnnotated() {
     TestFormWithClassId form = new TestFormWithClassId();
     assertEquals(FORM_TEST_CLASS_ID, form.classId());
     testClassIdSetter(form, FORM_TEST_CLASS_ID);
@@ -64,7 +63,7 @@ public class AbstractFormTest {
    * {@link AbstractForm#classId()}
    */
   @Test
-  public void testClassIdNoAnnotation() throws ProcessingException {
+  public void testClassIdNoAnnotation() {
     TestForm form = new TestForm();
     assertFalse("ClassId should always be set.", StringUtility.isNullOrEmpty(form.classId()));
     testClassIdSetter(form, form.classId());
@@ -82,7 +81,7 @@ public class AbstractFormTest {
    * Test {@link AbstractForm#classId()} in a wrapped form
    */
   @Test
-  public void testWrappedForm() throws ProcessingException {
+  public void testWrappedForm() {
     WrapperTestFormWithClassId form = new WrapperTestFormWithClassId();
     form.getEmbeddedField().setInnerForm(new TestFormWithClassId());
     String classId = form.getEmbeddedField().getInnerForm().classId();
@@ -94,7 +93,7 @@ public class AbstractFormTest {
    * Tests that validating a valid form should not result in any error.
    */
   @Test
-  public void testValidForm() throws ProcessingException {
+  public void testValidForm() {
     TestForm form = new TestForm();
     form.validateForm();
   }
@@ -103,7 +102,7 @@ public class AbstractFormTest {
    * Tests that validating a valid form with an ok status should not result in any error.
    */
   @Test
-  public void testValidForm_OkStatus() throws ProcessingException {
+  public void testValidForm_OkStatus() {
     TestForm form = new TestForm();
     form.getMainBox().addErrorStatus(Status.OK_STATUS);
     form.validateForm();
@@ -112,7 +111,7 @@ public class AbstractFormTest {
   /**
    * Tests that validating a valid form with an ok status should not result in any error.
    */
-  public void testValidForm_ErrorStatus() throws ProcessingException {
+  public void testValidForm_ErrorStatus() {
     String errorMessage = "";
     try {
       TestForm form = new TestForm();
@@ -131,7 +130,7 @@ public class AbstractFormTest {
    * Tests the html veto exception error message creation
    */
   @Test
-  public void testVetoExceptionHtmlMessage() throws ProcessingException {
+  public void testVetoExceptionHtmlMessage() {
     TestFormWithMandatoryField form = new TestFormWithMandatoryField();
     String htmlErrorMessage = "";
 
@@ -156,7 +155,7 @@ public class AbstractFormTest {
   @ClassId(FORM_TEST_CLASS_ID)
   class TestFormWithClassId extends AbstractForm {
 
-    public TestFormWithClassId() throws ProcessingException {
+    public TestFormWithClassId() {
       super();
     }
 
@@ -167,7 +166,7 @@ public class AbstractFormTest {
 
   class TestForm extends AbstractForm {
 
-    public TestForm() throws ProcessingException {
+    public TestForm() {
       super();
     }
 
@@ -188,7 +187,7 @@ public class AbstractFormTest {
 
   class TestFormWithMandatoryField extends TestForm {
 
-    public TestFormWithMandatoryField() throws ProcessingException {
+    public TestFormWithMandatoryField() {
       super();
     }
 
@@ -219,14 +218,14 @@ public class AbstractFormTest {
       return getFieldByClass(EmbeddedField.class);
     }
 
-    public WrapperTestFormWithClassId() throws ProcessingException {
+    public WrapperTestFormWithClassId() {
       super();
     }
 
     @Order(10.0)
     public class MainBox extends AbstractGroupBox {
       @Override
-      protected void execInitField() throws ProcessingException {
+      protected void execInitField() {
         getFieldByClass(EmbeddedField.class).setInnerForm(new TestFormWithClassId());
       }
 

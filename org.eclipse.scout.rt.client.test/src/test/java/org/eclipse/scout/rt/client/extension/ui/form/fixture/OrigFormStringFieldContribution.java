@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
 public class OrigFormStringFieldContribution extends AbstractStringField {
 
   @Override
-  protected String execValidateValue(String rawValue) throws ProcessingException {
+  protected String execValidateValue(String rawValue) {
     String validatedValue = super.execValidateValue(rawValue);
     ((OrigForm) getForm()).logOperation(OrigFormStringFieldContribution.class, OrigForm.EXEC_VALIDATE_VALUE_OPERATION_NAME);
     return validatedValue;

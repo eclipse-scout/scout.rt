@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.shared.extension.fixture;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -24,11 +23,11 @@ import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.TopBox.Na
 
 public class BasicForm extends AbstractForm {
 
-  public BasicForm() throws ProcessingException {
+  public BasicForm() {
     this(true);
   }
 
-  protected BasicForm(boolean callInitializer) throws ProcessingException {
+  protected BasicForm(boolean callInitializer) {
     super(callInitializer);
   }
 

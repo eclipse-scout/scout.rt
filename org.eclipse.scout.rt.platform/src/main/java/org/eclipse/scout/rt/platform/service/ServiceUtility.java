@@ -37,7 +37,7 @@ public final class ServiceUtility {
    * @return the reflective service operation that can be called using {@link #invoke(Method,Object,Object[])}
    * @throws ProcessingException
    */
-  public static Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) throws ProcessingException {
+  public static Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
     try {
       if (serviceClass == null) {
         throw new ProcessingException("service class is null");
@@ -58,7 +58,7 @@ public final class ServiceUtility {
    *           Invoke the service operation using reflection. The service supports OUT variables using {@link IHolder}
    *           objects
    */
-  public static Object invoke(Method serviceOperation, Object service, Object[] callerArgs) throws ProcessingException {
+  public static Object invoke(Method serviceOperation, Object service, Object[] callerArgs) {
     try {
       if (serviceOperation == null) {
         throw new ProcessingException("serviceOperation is null");

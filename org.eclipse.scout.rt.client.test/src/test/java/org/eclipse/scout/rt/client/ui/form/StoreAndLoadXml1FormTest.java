@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -80,7 +79,7 @@ public class StoreAndLoadXml1FormTest {
     private int m_primitiveInteger;
     private String m_text;
 
-    private DynamicFormWithProperties(String title, IGroupBox mainBox) throws ProcessingException {
+    private DynamicFormWithProperties(String title, IGroupBox mainBox) {
       super(title, mainBox);
     }
 

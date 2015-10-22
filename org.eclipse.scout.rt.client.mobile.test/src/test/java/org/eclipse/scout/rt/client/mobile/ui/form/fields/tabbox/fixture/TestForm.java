@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.TabBox;
@@ -33,7 +32,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 @FormData(value = TestFormData.class, sdkCommand = SdkCommand.CREATE)
 public class TestForm extends AbstractForm {
 
-  public TestForm() throws ProcessingException {
+  public TestForm() {
     super();
   }
 
@@ -41,7 +40,7 @@ public class TestForm extends AbstractForm {
     return getFieldByClass(CancelButton.class);
   }
 
-  public void startNew() throws ProcessingException {
+  public void startNew() {
     startInternal(new NewHandler());
   }
 

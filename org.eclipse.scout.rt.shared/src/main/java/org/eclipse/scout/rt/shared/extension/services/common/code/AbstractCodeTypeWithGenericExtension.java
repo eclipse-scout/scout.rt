@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.extension.services.common.code;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGenericChains.CodeTypeWithGenericCreateCodeChain;
 import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGenericChains.CodeTypeWithGenericCreateCodesChain;
@@ -39,25 +38,25 @@ public abstract class AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<? extends ICode<CODE_ID>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) throws ProcessingException {
+  public List<? extends ICode<CODE_ID>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) {
     return chain.execCreateCodes();
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public ICode<CODE_ID> execCreateCode(CodeTypeWithGenericCreateCodeChain chain, ICodeRow<CODE_ID> newRow) throws ProcessingException {
+  public ICode<CODE_ID> execCreateCode(CodeTypeWithGenericCreateCodeChain chain, ICodeRow<CODE_ID> newRow) {
     return chain.execCreateCode(newRow);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<? extends ICodeRow<CODE_ID>> execLoadCodes(CodeTypeWithGenericLoadCodesChain chain, Class<? extends ICodeRow<CODE_ID>> codeRowType) throws ProcessingException {
+  public List<? extends ICodeRow<CODE_ID>> execLoadCodes(CodeTypeWithGenericLoadCodesChain chain, Class<? extends ICodeRow<CODE_ID>> codeRowType) {
     return chain.execLoadCodes(codeRowType);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
+  public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) {
     chain.execOverwriteCode(oldCode, newCode);
   }
 }

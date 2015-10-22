@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.cache;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -31,7 +30,7 @@ public class ClusterNotificationCacheWrapper<K, V> extends AbstractCacheWrapper<
   }
 
   @Override
-  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) throws ProcessingException {
+  public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
     super.invalidate(filter, propagate);
     if (propagate) {
       InvalidateCacheNotification notification = new InvalidateCacheNotification(getCacheId(), filter);

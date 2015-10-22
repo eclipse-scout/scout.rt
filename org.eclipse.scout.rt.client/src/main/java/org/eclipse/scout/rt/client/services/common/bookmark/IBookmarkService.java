@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
@@ -29,12 +28,12 @@ public interface IBookmarkService extends IService {
   /**
    * (re)load bookmarks from back-end
    */
-  void loadBookmarks() throws ProcessingException;
+  void loadBookmarks();
 
   /**
    * store the BookmarkModel
    */
-  void storeBookmarks() throws ProcessingException;
+  void storeBookmarks();
 
   /**
    * @return life array of bookmarks
@@ -44,22 +43,22 @@ public interface IBookmarkService extends IService {
   /**
    * don't saves automatically
    */
-  void setStartBookmark() throws ProcessingException;
+  void setStartBookmark();
 
   /**
    * don't saves automatically
    */
-  void deleteStartBookmark() throws ProcessingException;
+  void deleteStartBookmark();
 
   /**
    * Convenience method that simply calls {@link IDesktop#activateBookmark(Bookmark, false)}
    */
-  void activate(Bookmark bm) throws ProcessingException;
+  void activate(Bookmark bm);
 
   /**
    * Finds the given bookmark among the user's bookmark and updates it with the currently visible view (analog to
    * setting start-up view).
    */
-  void updateBookmark(Bookmark bm) throws ProcessingException;
+  void updateBookmark(Bookmark bm);
 
 }

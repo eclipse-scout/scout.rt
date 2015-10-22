@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider;
 import java.util.Date;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemMovedChain;
@@ -30,22 +29,22 @@ public abstract class AbstractCalendarItemProviderExtension<OWNER extends Abstra
   }
 
   @Override
-  public void execLoadItems(CalendarItemProviderLoadItemsChain chain, Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
+  public void execLoadItems(CalendarItemProviderLoadItemsChain chain, Date minDate, Date maxDate, Set<ICalendarItem> result) {
     chain.execLoadItems(minDate, maxDate, result);
   }
 
   @Override
-  public void execItemAction(CalendarItemProviderItemActionChain chain, ICalendarItem item) throws ProcessingException {
+  public void execItemAction(CalendarItemProviderItemActionChain chain, ICalendarItem item) {
     chain.execItemAction(item);
   }
 
   @Override
-  public void execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain chain, IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
+  public void execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain chain, IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result) {
     chain.execLoadItemsInBackground(session, minDate, maxDate, result);
   }
 
   @Override
-  public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) throws ProcessingException {
+  public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) {
     chain.execItemMoved(item, newDate);
   }
 

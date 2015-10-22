@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.FirstTemplateBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.FirstTemplateBox.MiddleStringField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.MainBoxStringField;
@@ -22,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 
 public class MultiTemplateUsageForm extends AbstractForm {
 
-  public MultiTemplateUsageForm() throws ProcessingException {
+  public MultiTemplateUsageForm() {
     super();
   }
 

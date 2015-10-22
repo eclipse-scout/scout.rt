@@ -276,7 +276,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         does not exist.
    * @throws ProcessingException
    */
-  public AbstractFormFieldData findFieldByClass(Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, ClassIdentifier valueTypeIdentifier) throws ProcessingException {
+  public AbstractFormFieldData findFieldByClass(Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, ClassIdentifier valueTypeIdentifier) {
     if (breadthFirstMap == null) {
       breadthFirstMap = getAllFieldsRec();
     }
@@ -354,7 +354,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         does not exist.
    * @throws ProcessingException
    */
-  public AbstractPropertyData<?> findPropertyByClass(Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap, ClassIdentifier valueTypeClassIdentifier) throws ProcessingException {
+  public AbstractPropertyData<?> findPropertyByClass(Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap, ClassIdentifier valueTypeClassIdentifier) {
     if (breadthFirstMap == null) {
       breadthFirstMap = getAllPropertiesRec();
     }

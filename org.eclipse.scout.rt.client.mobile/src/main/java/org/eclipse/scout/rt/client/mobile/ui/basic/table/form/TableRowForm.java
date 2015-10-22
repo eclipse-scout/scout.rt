@@ -50,7 +50,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
   private P_TableListener m_tableListener;
   private TableRowMapper m_rowMapper;
 
-  public TableRowForm(ITableRow row) throws ProcessingException {
+  public TableRowForm(ITableRow row) {
     this(row, null);
   }
 
@@ -58,7 +58,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
    * @param rowField
    *          if set this field will be displayed instead of the auto generated column fields.
    */
-  public TableRowForm(ITableRow row, IFormField rowField) throws ProcessingException {
+  public TableRowForm(ITableRow row, IFormField rowField) {
     super(false);
     m_row = row;
     m_rowField = rowField;
@@ -75,7 +75,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
   }
 
   @Override
-  protected void execDisposeForm() throws ProcessingException {
+  protected void execDisposeForm() {
     getTable().removeTableListener(m_tableListener);
     if (m_columnFields != null) {
       for (IFormField formField : m_columnFields.values()) {
@@ -133,7 +133,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
   }
 
   @Override
-  public void start() throws ProcessingException {
+  public void start() {
     startInternal(new FormHandler());
   }
 
@@ -142,7 +142,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void execLoad() throws ProcessingException {
+    protected void execLoad() {
       m_rowMapper = new TableRowMapper(getRow());
       for (IColumn column : m_columnFields.keySet()) {
         IFormField field = m_columnFields.get(column);

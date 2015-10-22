@@ -26,10 +26,10 @@ public final class WizardProgressFieldChains {
       super(extensions);
     }
 
-    public void execWizardStepIndex(final int stepIndex) throws ProcessingException {
+    public void execWizardStepIndex(final int stepIndex) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IWizardProgressFieldExtension<? extends AbstractWizardProgressField> next) throws ProcessingException {
+        protected void callMethod(IWizardProgressFieldExtension<? extends AbstractWizardProgressField> next) {
           next.execWizardStepAction(WizardProgressFieldWizardStepActionChain.this, stepIndex);
         }
       };

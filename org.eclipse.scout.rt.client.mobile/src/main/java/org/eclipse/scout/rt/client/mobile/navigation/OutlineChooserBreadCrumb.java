@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -26,7 +25,7 @@ public class OutlineChooserBreadCrumb extends BreadCrumb {
   }
 
   @Override
-  public void activate() throws ProcessingException {
+  public void activate() {
     super.activate();
 
     //Clear any outline selection to make sure drill down works as expected again and again

@@ -139,22 +139,22 @@ public class FileServiceTest {
   private static class DummyRemoteFileService implements IRemoteFileService {
 
     @Override
-    public RemoteFile getRemoteFile(RemoteFile spec) throws ProcessingException {
+    public RemoteFile getRemoteFile(RemoteFile spec) {
       throw new ProcessingException("not implemented");
     }
 
     @Override
-    public RemoteFile getRemoteFileHeader(RemoteFile spec) throws ProcessingException {
+    public RemoteFile getRemoteFileHeader(RemoteFile spec) {
       throw new ProcessingException("not implemented");
     }
 
     @Override
-    public RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) throws ProcessingException {
+    public RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) {
       throw new ProcessingException("not implemented");
     }
 
     @Override
-    public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException {
+    public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) {
       try {
         RemoteFile r1 = new RemoteFile(new URL("file:" + TEST_PATH_1), false);
         RemoteFile r2 = new RemoteFile(new URL("file:" + TEST_PATH_2), false);
@@ -166,12 +166,12 @@ public class FileServiceTest {
     }
 
     @Override
-    public void putRemoteFile(RemoteFile spec) throws ProcessingException {
+    public void putRemoteFile(RemoteFile spec) {
       throw new ProcessingException("not implemented");
     }
 
     @Override
-    public void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException {
+    public void streamRemoteFile(RemoteFile spec, OutputStream out) {
       throw new ProcessingException("not implemented");
     }
 
