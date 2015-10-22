@@ -70,13 +70,6 @@ public class PageWithTable3Test {
   }
 
   private static void assertSortState(PageWithTable.Table table, List<Integer> expectedValues, List<Integer> expectedExplicitSortIndices) {
-    /*
-    System.out.println("--");
-    System.out.println(Arrays.toString(table.getValueColumn().getValues()));
-    for (IColumn<?> c : table.getColumns()) {
-      System.out.println("col " + c.getClass().getSimpleName() + ": " + c.isSortActive() + ", " + c.isSortExplicit() + ", " + c.getSortIndex() + " " + c.isSortAscending());
-    }
-     */
     List<Integer> actualExplicitSortIndices = new ArrayList<Integer>();
     for (IColumn<?> c : table.getColumnSet().getSortColumns()) {
       actualExplicitSortIndices.add(c.getColumnIndex());
