@@ -1004,9 +1004,9 @@ public class JsonTableTest {
 
     table.fill(2, false);
     table.fill(3, false);
-    table.getColumnSet().setSortColumn(table.getColumns().get(1), false, 0);
+    table.getColumnSet().setSortColumn(table.getColumns().get(1), false);
     table.fill(2, false);
-    table.getColumnSet().setSortColumn(table.getColumns().get(1), true, 0);
+    table.getColumnSet().setSortColumn(table.getColumns().get(1), true);
 
     // Apply event buffer --> only one insertion (with the correct order and a COLUMN_HEADERS_UPDATED event should remain)
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
