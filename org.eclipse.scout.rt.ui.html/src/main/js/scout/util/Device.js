@@ -5,11 +5,12 @@
  */
 scout.Device = function(userAgent) {
   this.userAgent = userAgent;
-  this.system;
   this.features = {};
+  this.system = scout.Device.System.UNKNOWN;
   this.type = scout.Device.Type.DESKTOP;
   this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
   this.browserVersion = 0;
+  this.scrollbarWidth;
 
   // --- device specific configuration
   // initialize with empty string so that it can be used without calling initUnselectableAttribute()
@@ -17,8 +18,11 @@ scout.Device = function(userAgent) {
   this.tableAdditionalDivRequired = false;
   this.focusManagerActive = true;
 
-  this.parseUserAgent(userAgent);
-  this.parseBrowserVersion(userAgent);
+  if (userAgent) {
+    this._parseSystem(userAgent);
+    this._parseBrowser(userAgent);
+    this._parseBrowserVersion(userAgent);
+  }
 };
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
@@ -28,10 +32,12 @@ scout.Device.SupportedBrowsers = {
   FIREFOX: 'Firefox',
   CHROME: 'Chrome',
   INTERNET_EXPLORER: 'InternetExplorer',
+  EDGE: 'Edge',
   SAFARI: 'Safari'
 };
 
 scout.Device.System = {
+  UNKNOWN: 'Unknown',
   IOS: 'IOS',
   ANDROID: 'ANDROID'
 };
@@ -54,6 +60,9 @@ scout.Device.prototype.bootstrap = function() {
   // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
   this.unselectableAttribute = this.getUnselectableAttribute();
   this.tableAdditionalDivRequired = this.isTableAdditionalDivRequired();
+  this.scrollbarWidth = this._detectScrollbarWidth();
+  this.type = this._detectType(this.userAgent);
+
 
   if (this.isIos()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
@@ -63,10 +72,10 @@ scout.Device.prototype.bootstrap = function() {
         $.log.info('FastClick script loaded and attached');
       }));
   }
+
   if (this.hasOnScreenKeyboard()) {
     // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
     this.focusManagerActive = false;
-
     deferreds.push(this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
         $.log.info('JQuery Mobile script loaded');
       }));
@@ -80,22 +89,26 @@ scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
     .done(doneFunc);
 };
 
-// FIXME AWE/CGU: find a better way to check for on-screen keyboard
-// must also work for Windows Surface devices. There's an ungly solution
-// described here: http://stackoverflow.com/questions/26531016/detect-windows-8-on-screen-keyboard-with-javascript
-// Some forum post suggest that it's not possible to detect a virtual keyboard
-// properly and that the user should decide whether or not the application should run
-// in a virtual keyboard mode, or not.
 scout.Device.prototype.hasOnScreenKeyboard = function() {
-  return this.isIos() || this.isAndroid();
+  return this.supportsFeature('_onScreenKeyboard', function() {
+    return this.isIos() || this.isAndroid() || this.isWindowsTablet();
+  }.bind(this));
 };
 
 scout.Device.prototype.isIos = function() {
-  return this.system === scout.Device.System.IOS;
+  return scout.Device.System.IOS === this.system;
 };
 
 scout.Device.prototype.isAndroid = function() {
-  return this.system === scout.Device.System.ANDROID;
+  return scout.Device.System.ANDROID === this.system;
+};
+
+/**
+ * The best way we have to detect a Microsoft Surface Tablet in table mode is to check if
+ * the scrollbar width is 0 pixel. In desktop mode the scrollbar width is > 0 pixel.
+ */
+scout.Device.prototype.isWindowsTablet = function() {
+  return scout.Device.SupportedBrowsers.EDGE === this.browser && this.scrollbarWidth === 0;
 };
 
 /**
@@ -116,31 +129,34 @@ scout.Device.prototype.isSupportedBrowser = function(browser, version) {
   return true;
 };
 
-scout.Device.prototype.parseUserAgent = function(userAgent) {
-  if (!userAgent) {
-    return;
-  }
-  this._parseSystem(userAgent);
-  this._parseBrowser(userAgent);
-};
-
 scout.Device.prototype._parseSystem = function(userAgent) {
-  var i, device;
-
-  if (userAgent.indexOf('iPhone') > -1) {
+  if (userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1) {
     this.system = scout.Device.System.IOS;
-    this.type = scout.Device.Type.MOBILE;
-  } else if (userAgent.indexOf('iPad') > -1) {
-    this.system = scout.Device.System.IOS;
-    this.type = scout.Device.Type.TABLET;
   } else if (userAgent.indexOf('Android') > -1) {
     this.system = scout.Device.System.ANDROID;
-    if (userAgent.indexOf('Mobile') > -1) {
-      this.type = scout.Device.Type.MOBILE;
-    } else {
-      this.type = scout.Device.Type.TABLET;
-    }
   }
+};
+
+/**
+ * Can not detect type until DOM is ready because we must create a DIV to measure the scrollbars.
+ */
+scout.Device.prototype._detectType = function(userAgent) {
+  if (scout.Device.System.ANDROID === this.system) {
+    if (userAgent.indexOf('Mobile') > -1) {
+      return scout.Device.Type.MOBILE;
+    } else {
+      return scout.Device.Type.TABLET;
+    }
+  } else if (scout.Device.System.IOS === this.system) {
+    if (userAgent.indexOf('iPad') > -1) {
+      return scout.Device.Type.TABLET;
+    } else {
+      return scout.Device.Type.MOBILE;
+    }
+  } else if (this.isWindowsTablet()) {
+    return scout.Device.Type.TABLET;
+  }
+  return scout.Device.Type.DESKTOP;
 };
 
 scout.Device.prototype._parseBrowser = function(userAgent) {
@@ -148,6 +164,10 @@ scout.Device.prototype._parseBrowser = function(userAgent) {
     this.browser = scout.Device.SupportedBrowsers.FIREFOX;
   } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
     this.browser = scout.Device.SupportedBrowsers.INTERNET_EXPLORER;
+  } else if (userAgent.indexOf('Edge') > -1) {
+    // must check for Edge before we do other checks, because the Edge user-agent string
+    // also contains matches for Chrome and Webkit.
+    this.browser = scout.Device.SupportedBrowsers.EDGE;
   } else if (userAgent.indexOf('Chrome') > -1) {
     this.browser = scout.Device.SupportedBrowsers.CHROME;
   } else if (userAgent.indexOf('Safari') > -1) {
@@ -162,9 +182,17 @@ scout.Device.prototype.supportsFeature = function(property, checkFunc) {
   return this.features[property];
 };
 
+/**
+ * Currently this method should be used when you want to check if the device is "touch only" -
+ * which means the user has no keyboard or mouse. Some hybrids like Surface tablets in desktop mode are
+ * still touch devices, but support keyboard and mouse at the same time. In such cases this method will
+ * return false, since the device is not touch only.
+ *
+ * Currently this method returns the same as hasOnScreenKeyboard(). Maybe the implementation here will be
+ * different in the future.
+ */
 scout.Device.prototype.supportsTouch = function() {
-  // Implement when needed, see https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
-  return this.hasOnScreenKeyboard();
+  return this.supportsFeature('_touch', this.hasOnScreenKeyboard.bind(this));
 };
 
 scout.Device.prototype.supportsFile = function() {
@@ -193,14 +221,9 @@ scout.Device.prototype.supportsDownloadInSameWindow = function() {
 };
 
 scout.Device.prototype.hasPrettyScrollbars = function() {
-  return this.supportsFeature('_prettyScrollbars', check.bind(this));
-
-  function check(property) {
-    var SYSTEM = scout.Device.System;
-    // TODO CGU add windows phone, what about desktop windows with touch support? Maybe add touch support to scrollbars?
-    return SYSTEM.IOS === this.system ||
-    SYSTEM.ANDROID === this.system;
-  }
+  return this.supportsFeature('_prettyScrollbars', function check(property) {
+    return this.scrollbarWidth === 0;
+  }.bind(this));
 };
 
 scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
@@ -208,23 +231,19 @@ scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
 };
 
 scout.Device.prototype.supportsCssProperty = function(property) {
-  return this.supportsFeature(property, check);
-
-  function check(property) {
-    var i;
+  return this.supportsFeature(property, function check(property) {
     if (document.body.style[property] !== undefined) {
       return true;
     }
 
     property = property.charAt(0).toUpperCase() + property.slice(1);
-    for (i = 0; i < scout.Device.vendorPrefixes.length; i++) {
+    for (var i = 0; i < scout.Device.vendorPrefixes.length; i++) {
       if (document.body.style[scout.Device.vendorPrefixes[i] + property] !== undefined) {
         return true;
       }
     }
-
     return false;
-  }
+  });
 };
 
 /**
@@ -247,7 +266,7 @@ scout.Device.prototype.getUnselectableAttribute = function() {
  * with a max-width and hidden overflow. Returns true if an additional div level is required.
  */
 scout.Device.prototype.isTableAdditionalDivRequired = function() {
-  return this.supportsFeature('_tableAdditionalDivRequired',  function(property) {
+  return this.supportsFeature('_tableAdditionalDivRequired', function(property) {
     var test = $('body').appendDiv();
     test.text('Scout');
     test.css('visibility', 'hidden');
@@ -274,9 +293,8 @@ scout.Device.prototype.supportsIframeSecurityAttribute = function() {
  * - 21     match: 21
  * - 21.1   match: 21.1
  * - 21.1.3 match: 21.1
- *
  */
-scout.Device.prototype.parseBrowserVersion = function(userAgent) {
+scout.Device.prototype._parseBrowserVersion = function(userAgent) {
   var versionRegex, browsers = scout.Device.SupportedBrowsers;
   if (this.browser === browsers.INTERNET_EXPLORER) {
     // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
@@ -287,6 +305,8 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
     } else {
       versionRegex = /rv:([0-9]+\.?[0-9]*)/;
     }
+  } else if (this.browser === browsers.EDGE) {
+    versionRegex = /Edge\/([0-9]+\.?[0-9]*)/;
   } else if (this.browser === browsers.SAFARI) {
     versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
   } else if (this.browser === browsers.FIREFOX) {
@@ -302,11 +322,29 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
   }
 };
 
+scout.Device.prototype._detectScrollbarWidth = function(userAgent) {
+  var $measure = $('<div>')
+    .attr('id', 'MeasureScrollbar')
+    .css('width', 50)
+    .css('height', 50)
+    .css('overflow-y', 'scroll')
+    .appendTo($('body')),
+    measureElement = $measure[0];
+  var scrollbarWidth = measureElement.offsetWidth - measureElement.clientWidth;
+  $measure.remove();
+  return scrollbarWidth;
+};
+
+scout.Device.prototype.toString = function() {
+  return 'scout.Device[' +
+    'system=' + this.system +
+    ' browser=' + this.browser +
+    ' browserVersion=' + this.browserVersion +
+    ' type=' + this.type +
+    ' scrollbarWidth=' + this.scrollbarWidth +
+    ' features=' + JSON.stringify(this.features) + ']';
+};
+
 // ------------ Singleton ----------------
 
 scout.device = new scout.Device(navigator.userAgent);
-
-//XXX AWE: do not check in
-//scout.device.system = scout.Device.System.IOS;
-//scout.device.type = scout.Device.Type.TABLET;
-//scout.device.focusManagerActive = false;

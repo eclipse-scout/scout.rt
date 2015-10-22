@@ -1,4 +1,4 @@
-// FIXME AWE/CGU: think about refactoring this code to a Scout.js class and use an
+// TODO AWE/CGU: think about refactoring this code to a Scout.js class and use an
 // instance of that new class in scout-module.js for the last line of code:
 // }(window.scout = window.scout || {}, jQuery));
 scout.sessions = [];

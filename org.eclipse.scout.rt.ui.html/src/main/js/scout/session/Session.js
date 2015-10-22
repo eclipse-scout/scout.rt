@@ -1009,7 +1009,7 @@ scout.Session.prototype._onInitialized = function(event) {
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
 
   var d = scout.device;
-  $.log.info('Session initialized. Detected user-agent: system=' + d.system + ' device=' + d.device + ' browser=' + d.browser);
+  $.log.info('Session initialized. Detected ' + scout.device);
 
   // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
   if (scout.fonts.loadingComplete) {
