@@ -467,6 +467,11 @@ scout.Table.prototype._sort = function() {
     return false;
   }
 
+  if (!sortColumns.length) {
+    // no sort column defined. nop
+    return true;
+  }
+
   // compare rows
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
