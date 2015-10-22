@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.DiscardChangesButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ConfigBox.NamedConfigTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.AddCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.DeselectAllButton;
@@ -99,8 +99,8 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(ColumnsTableField.class);
   }
 
-  public NamedConfigTableField getNamedConfigTableField() {
-    return getFieldByClass(NamedConfigTableField.class);
+  public ProfilesTableField getProfilesTableField() {
+    return getFieldByClass(ProfilesTableField.class);
   }
 
   public DeselectAllButton getDeselectAllButton() {
@@ -160,7 +160,7 @@ public class OrganizeColumnsForm extends AbstractForm {
       }
 
       @Order(5.0)
-      public class ConfigBox extends AbstractGroupBox {
+      public class ProfilesBox extends AbstractGroupBox {
 
         @Override
         protected int getConfiguredGridColumnCount() {
@@ -174,11 +174,11 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("Configurations");
+          return TEXTS.get("Profiles");
         }
 
         @Order(10.0)
-        public class NamedConfigTableField extends AbstractTableField<NamedConfigTableField.Table> {
+        public class ProfilesTableField extends AbstractTableField<ProfilesTableField.Table> {
 
           @Override
           protected int getConfiguredGridH() {
@@ -422,7 +422,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected String getConfiguredText() {
-                return TEXTS.get("Apply");
+                return TEXTS.get("Load");
               }
 
               @Override
@@ -807,9 +807,28 @@ public class OrganizeColumnsForm extends AbstractForm {
             @Override
             protected void execRowsSelected(List<? extends ITableRow> rows) {
               validateButtons();
+              refreshMenus();
+
             }
 
-            protected void sortSelectedColumn(boolean ascending) {
+            private void refreshMenus() {
+              ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
+              IColumn selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow);
+              if (selectedCol.isSortActive() && selectedCol.isSortAscending()) {
+                getMenuByClass(SortAscAdditionalMenu.class).setText("x");
+              }
+              else {
+                getMenuByClass(SortAscAdditionalMenu.class).setText("+");
+              }
+              if (selectedCol.isSortActive() && !selectedCol.isSortAscending()) {
+                getMenuByClass(SortDescAdditionalMenu.class).setText("x");
+              }
+              else {
+                getMenuByClass(SortDescAdditionalMenu.class).setText("+");
+              }
+            }
+
+            protected void sortSelectedColumn(boolean multiSort, boolean ascending) {
               ITableRow row = getColumnsTableField().getTable().getSelectedRow();
               try {
                 getColumnsTableField().getTable().setTableChanging(true);
@@ -819,7 +838,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                   m_table.getColumnSet().removeSortColumn(selectedCol);
                 }
                 else {
-                  m_table.getColumnSet().handleSortEvent(selectedCol, true, ascending);
+                  m_table.getColumnSet().handleSortEvent(selectedCol, multiSort, ascending);
                 }
                 m_table.sort();
 
@@ -829,6 +848,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               finally {
                 getColumnsTableField().getTable().setTableChanging(false);
               }
+              refreshMenus();
             }
 
             @Order(10.0)
@@ -915,11 +935,11 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected void execAction() {
-                sortSelectedColumn(true);
+                sortSelectedColumn(false, true);
               }
             }
 
-            @Order(10.0)
+            @Order(20.0)
             public class SortDescMenu extends AbstractMenu {
 
               @Override
@@ -939,7 +959,55 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected void execAction() {
-                sortSelectedColumn(false);
+                sortSelectedColumn(false, false);
+              }
+            }
+
+            @Order(30.0)
+            public class SortAscAdditionalMenu extends AbstractMenu {
+
+              @Override
+              protected boolean getConfiguredEnabled() {
+                return m_table.isSortEnabled();
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.LongArrowUp;
+              }
+
+              @Override
+              protected void execAction() {
+                sortSelectedColumn(true, true);
+              }
+            }
+
+            @Order(40.0)
+            public class SortDescAdditionalMenu extends AbstractMenu {
+
+              @Override
+              protected boolean getConfiguredEnabled() {
+                return m_table.isSortEnabled();
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.LongArrowDown;
+              }
+
+              @Override
+              protected void execAction() {
+                sortSelectedColumn(true, false);
               }
             }
           }
@@ -1378,7 +1446,7 @@ public class OrganizeColumnsForm extends AbstractForm {
       // the "organize columns" form is canceled:
       m_oldTableState = createTableStateSnpashot();
       getColumnsTableField().reloadTableData();
-      getNamedConfigTableField().reloadTableData();
+      getProfilesTableField().reloadTableData();
     }
     finally {
       m_loading = false;
