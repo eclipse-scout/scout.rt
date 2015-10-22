@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,21 +35,13 @@ public class PageWithTableGroupingTestHelper {
     //the expected grouping columns are the first sort columns, only sort columns follow.
     expectedGroupingColumns.addAll(expectedSortColumns);
 
-    List<IColumn> actualSortColumns = new ArrayList<>();
-
-    for (IColumn c : table.getColumnSet().getSortColumns()) {
-      if (c.isSortExplicit()) {
-        actualSortColumns.add(c);
-      }
-    }
-
-    assertTrue("sorted columns match", CollectionUtility.equalsCollection(actualSortColumns, expectedGroupingColumns));
+    assertTrue("sorted columns match", CollectionUtility.equalsCollection(table.getColumnSet().getSortColumns(), expectedGroupingColumns));
 
     //sanity check: grouped implies sorted
     //sanity check: grouped implies visible
     for (IColumn<?> c : table.getColumns()) {
       if (c.isGroupingActive()) {
-        assertTrue(c.isSortActive() && c.isSortExplicit());
+        assertTrue(c.isSortActive());
         assertTrue(c.isVisible());
       }
     }

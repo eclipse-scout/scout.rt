@@ -24,7 +24,6 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   private boolean m_sortAscending;
   private boolean m_sortActive;
   private boolean m_sortPermanent;
-  private boolean m_sortExplicit;
   private boolean m_groupingActive;
   private String m_iconId;
   private String m_text;
@@ -166,15 +165,6 @@ public class HeaderCell implements IHeaderCell, IStyleable {
 
   public void setSortPermanent(boolean b) {
     m_sortPermanent = b;
-  }
-
-  @Override
-  public boolean isSortExplicit() {
-    return m_sortExplicit;
-  }
-
-  public void setSortExplicit(boolean b) {
-    m_sortExplicit = b;
   }
 
 }

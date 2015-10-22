@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -176,7 +175,6 @@ public class ColumnSet {
     private int m_sortIndex;
     private boolean m_ascending;
     private boolean m_grouped;
-    private Boolean m_sortExplicit;
     private String m_aggregationFunction;
 
     public int getSortIndex() {
@@ -203,14 +201,6 @@ public class ColumnSet {
       m_grouped = grouped;
     }
 
-    public Boolean isSortExplicit() {
-      return m_sortExplicit;
-    }
-
-    public void setSortExplicit(Boolean sortExplicit) {
-      m_sortExplicit = sortExplicit;
-    }
-
     public String getAggregationFunction() {
       return m_aggregationFunction;
     }
@@ -230,7 +220,6 @@ public class ColumnSet {
     config.setSortIndex(prefs.getTableColumnSortIndex(col, col.getInitialSortIndex(), configName));
     config.setAscending(prefs.getTableColumnSortAscending(col, col.isInitialSortAscending(), configName));
     config.setGrouped(prefs.getTableColumnGrouped(col, col.isInitialGrouped(), configName));
-    config.setSortExplicit(prefs.getTableColumnSortExplicit(col, configName));
     if (col instanceof INumberColumn) {
       config.setAggregationFunction(prefs.getTableColumnAggregationFunction(col, ((INumberColumn) col).getInitialAggregationFunction(), configName));
     }
@@ -242,7 +231,6 @@ public class ColumnSet {
     config.setSortIndex(col.getInitialSortIndex());
     config.setAscending(col.isInitialSortAscending());
     config.setGrouped(col.isInitialGrouped());
-    config.setSortExplicit(null);
     if (col instanceof INumberColumn) {
       config.setAggregationFunction(((INumberColumn) col).getInitialAggregationFunction());
     }
@@ -298,15 +286,6 @@ public class ColumnSet {
       else {
         asc = columnConfigs.get(col).isAscending();
         addSortColumn(col, asc);
-      }
-    }
-
-    //restore explicit flag on user sort columns (after sort is built)
-    for (IColumn col : getUserSortColumns()) {
-      Boolean explicit = columnConfigs.get(col).isSortExplicit();
-      if (explicit != null) {
-        HeaderCell cell = (HeaderCell) col.getHeaderCell();
-        cell.setSortExplicit(explicit.booleanValue());
       }
     }
 
@@ -744,7 +723,7 @@ public class ColumnSet {
       m_table.setTableChanging(true);
       //
       if (multiSort) {
-        if (isSortColumn(col) && col.isSortExplicit()) {
+        if (isSortColumn(col)) {
           updateSortColumn(col, ascending);
         }
         else {
@@ -752,20 +731,16 @@ public class ColumnSet {
         }
       }
       else {
-        int explicitCount = 0;
         for (IColumn c : m_userSortColumns) {
           if (c != col) {
             ((HeaderCell) c.getHeaderCell()).setGroupingActive(false);
           }
-          if (c.isSortExplicit()) {
-            explicitCount++;
-          }
         }
-        if (isSortColumn(col) && col.isSortExplicit() && explicitCount == 1) {
+        if (isSortColumn(col) && getSortColumnCount() == 1) {
           updateSortColumn(col, ascending);
         }
         else {
-          setSortColumn(col, ascending, 5);
+          setSortColumn(col, ascending);
           ((HeaderCell) col.getHeaderCell()).setGroupingActive(false);
         }
       }
@@ -841,7 +816,7 @@ public class ColumnSet {
 
   public boolean isGroupingColumn(IColumn<?> col) {
     IColumn rCol = resolveColumn(col);
-    return rCol != null && isSortColumn(rCol) && rCol.isSortExplicit() && rCol.isGroupingActive();
+    return rCol != null && isSortColumn(rCol) && rCol.isGroupingActive();
   }
 
   public void updateGroupingColumn(IColumn<?> col, boolean ascending) {
@@ -902,7 +877,6 @@ public class ColumnSet {
     if (!isSortColumn(col)) {
       m_userSortColumns.add(index, col);
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
-      cell.setSortExplicit(true);
       cell.setSortActive(true);
       cell.setSortAscending(ascending);
       cell.setGroupingActive(true);
@@ -944,7 +918,6 @@ public class ColumnSet {
     if (!isSortColumn(col)) {
       m_userSortColumns.add(0, col);
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
-      cell.setSortExplicit(true);
       cell.setSortActive(true);
       cell.setSortAscending(ascending);
       cell.setGroupingActive(true);
@@ -1086,9 +1059,7 @@ public class ColumnSet {
   public SortSpec getSortSpec() {
     ArrayList<IColumn<?>> sortColumns = new ArrayList<IColumn<?>>();
     for (IColumn c : getSortColumns()) {
-      if (c.isSortExplicit()) {
-        sortColumns.add(c);
-      }
+      sortColumns.add(c);
     }
     if (sortColumns.size() > 0) {
       int[] indexes = new int[sortColumns.size()];
@@ -1110,7 +1081,6 @@ public class ColumnSet {
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
         cell.setSortActive(false);
         cell.setSortAscending(false);
-        cell.setSortExplicit(false);
       }
       m_userSortColumns.clear();
       List<IColumn<?>> colList = new ArrayList<IColumn<?>>();
@@ -1119,7 +1089,6 @@ public class ColumnSet {
         if (col != null && (!isSortColumn(col))) {
           HeaderCell cell = (HeaderCell) col.getHeaderCell();
           cell.setSortActive(true);
-          cell.setSortExplicit(true);
           cell.setSortAscending(spec.isColumnAscending(i));
           colList.add(col);
         }
@@ -1180,36 +1149,18 @@ public class ColumnSet {
   }
 
   /**
-   * add column at beginning of sort columns but keep sort history of max keepHistoryCount last columns
-   * <p>
    * The column is added as a user sort column
    */
-  public void setSortColumn(IColumn<?> col, boolean ascending, int keepHistoryCount) {
+  public void setSortColumn(IColumn<?> col, boolean ascending) {
     col = resolveColumn(col);
     if (col != null) {
-      m_userSortColumns.remove(col);
+      clearSortColumns();
       if (!isSortColumn(col)) {
-        while (m_userSortColumns.size() > keepHistoryCount) {
-          IColumn c = m_userSortColumns.remove(m_userSortColumns.size() - 1);
-          HeaderCell cell = (HeaderCell) c.getHeaderCell();
-          cell.setSortActive(false);
-          cell.setSortExplicit(false);
-          cell.setSortAscending(false);
-          cell.setGroupingActive(false);
-          rebuildHeaderCell(c);
-        }
-        for (IColumn c : m_userSortColumns) {
-          HeaderCell cell = (HeaderCell) c.getHeaderCell();
-          cell.setSortExplicit(false);
-          cell.setGroupingActive(false);
-          rebuildHeaderCell(c);
-        }
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
         cell.setSortActive(true);
-        cell.setSortExplicit(true);
         cell.setSortAscending(ascending);
         cell.setGroupingActive(false);
-        m_userSortColumns.add(0, col);
+        m_userSortColumns.add(col);
         rebuildHeaderCell(col);
         fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
       }
@@ -1227,21 +1178,8 @@ public class ColumnSet {
     if (col != null) {
       m_userSortColumns.remove(col);
       if (!isSortColumn(col)) {
-        for (Iterator<IColumn<?>> it = m_userSortColumns.iterator(); it.hasNext();) {
-          IColumn c = it.next();
-          if (!c.isSortExplicit()) {
-            it.remove();
-            HeaderCell cell = (HeaderCell) c.getHeaderCell();
-            cell.setSortActive(false);
-            cell.setSortExplicit(false);
-            cell.setSortAscending(false);
-            cell.setGroupingActive(false);
-            rebuildHeaderCell(c);
-          }
-        }
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
         cell.setSortActive(true);
-        cell.setSortExplicit(true);
         cell.setSortAscending(ascending);
         m_userSortColumns.add(col);
         rebuildHeaderCell(col);
@@ -1293,7 +1231,6 @@ public class ColumnSet {
       if (!isSortColumn(col)) {
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
         cell.setSortActive(false);
-        cell.setSortExplicit(false);
         cell.setGroupingActive(false);
         rebuildHeaderCell(col);
         fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
@@ -1318,7 +1255,6 @@ public class ColumnSet {
     for (IColumn col : userSortColumnsBackup) {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setSortActive(false);
-      cell.setSortExplicit(false);
       cell.setGroupingActive(false);
     }
     for (IColumn c : userSortColumnsBackup) {
@@ -1336,7 +1272,6 @@ public class ColumnSet {
     for (IColumn col : currentColumnList) {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setSortActive(false);
-      cell.setSortExplicit(false);
       cell.setSortPermanent(false);
       cell.setGroupingActive(false);
     }
@@ -1355,7 +1290,6 @@ public class ColumnSet {
     for (IColumn col : currentColumnList) {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setSortActive(false);
-      cell.setSortExplicit(false);
       cell.setSortPermanent(false);
       cell.setGroupingActive(false);
     }
@@ -1372,7 +1306,6 @@ public class ColumnSet {
       //
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setSortActive(true);
-      cell.setSortExplicit(true);
       cell.setSortPermanent(true);
       cell.setSortAscending(ascending);
       m_permanentHeadSortColumns.add(col);
@@ -1388,7 +1321,6 @@ public class ColumnSet {
       //
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setSortActive(true);
-      cell.setSortExplicit(true);
       cell.setSortPermanent(true);
       cell.setSortAscending(ascending);
       m_permanentTailSortColumns.add(col);

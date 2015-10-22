@@ -16,13 +16,6 @@ public interface IHeaderCell {
 
   int getColumnIndex();
 
-  /**
-   * When doing single column sort, all previous columns are kept as implicit history and are marked sortExplicit=false
-   * <p>
-   * When doing multi-column sort, all columns are kept as explicit history and are marked sortExplicit=true
-   */
-  boolean isSortExplicit();
-
   boolean isSortAscending();
 
   boolean isSortActive();

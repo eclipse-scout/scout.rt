@@ -1353,11 +1353,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public boolean isSortExplicit() {
-    return getHeaderCell().isSortExplicit();
-  }
-
-  @Override
   public boolean isSortAscending() {
     return getHeaderCell().isSortAscending();
   }

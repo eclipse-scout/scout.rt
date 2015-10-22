@@ -255,7 +255,7 @@ public class TableTest {
     table.initTable();
 
     table.setSortEnabled(true);
-    table.getColumnSet().setSortColumn(table.getFirstColumn(), false, 5);
+    table.getColumnSet().setSortColumn(table.getFirstColumn(), false);
 
     //ensure table state:
     assertEquals("SortEnabled", true, table.isSortEnabled());
@@ -293,8 +293,8 @@ public class TableTest {
     table.initTable();
 
     table.setSortEnabled(true);
-    table.getColumnSet().setSortColumn(table.getFirstColumn(), true, 5);
-    table.getColumnSet().setSortColumn(table.getSecondColumn(), false, 5);
+    table.getColumnSet().setSortColumn(table.getSecondColumn(), false);
+    table.getColumnSet().addSortColumn(table.getFirstColumn(), true);
 
     //ensure table state:
     assertEquals("SortEnabled", true, table.isSortEnabled());

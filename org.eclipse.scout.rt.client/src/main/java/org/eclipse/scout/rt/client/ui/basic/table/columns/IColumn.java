@@ -336,16 +336,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void setUiSortPossible(boolean uiSortPossible);
 
   /**
-   * <p>
-   * When doing single column sort, all previous columns are kept as implicit history and are marked sortExplicit=false
-   * <p>
-   * When doing multi-column sort, all columns are kept as explicit history and are marked sortExplicit=true
-   * <p>
-   * Convenience for {@link IHeaderCell#isSortExplicit()}
-   */
-  boolean isSortExplicit();
-
-  /**
    * Convenience for {@link IHeaderCell#isSortActive()}
    */
   boolean isSortActive();

@@ -343,7 +343,6 @@ public class ClientUIPreferences {
     int sortIndex = col.getSortIndex();
     boolean grouped = col.isGroupingActive();
     boolean sortUp = col.isSortAscending();
-    boolean sortExplicit = col.isSortExplicit();
     String aggregationFunction = null;
     if (col instanceof INumberColumn) {
       aggregationFunction = ((INumberColumn) col).getAggregationFunction();
@@ -372,6 +371,9 @@ public class ClientUIPreferences {
     else {
       m_prefs.remove(key);
     }
+    // lazy legacy migration: remove sort explicit state if it exists.
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
+    m_prefs.remove(key);
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
     if (sortIndex >= 0) {
@@ -383,14 +385,6 @@ public class ClientUIPreferences {
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC);
     if (sortIndex >= 0 && sortUp) {
-      m_prefs.put(key, "true");
-    }
-    else {
-      m_prefs.put(key, "false");
-    }
-    //
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
-    if (sortExplicit) {
       m_prefs.put(key, "true");
     }
     else {
@@ -435,6 +429,12 @@ public class ClientUIPreferences {
     m_prefs.remove(key);
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC);
+    m_prefs.remove(key);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_GROUPED);
+    m_prefs.remove(key);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION);
     m_prefs.remove(key);
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
@@ -492,6 +492,8 @@ public class ClientUIPreferences {
       if (sorting) {
         m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX));
         m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC));
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_GROUPED));
+        m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION));
         m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT));
       }
       if (widths) {
@@ -599,10 +601,13 @@ public class ClientUIPreferences {
         if (m_prefs.get(TABLE_COLUMN_SORT_ASC + keySuffix, null) != null) {
           return true;
         }
-        if (m_prefs.get(TABLE_COLUMN_SORT_EXPLICIT + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) {
           return true;
         }
-        if (m_prefs.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) {
+        if (m_prefs.get(TABLE_COLUMN_GROUPED + keySuffix, null) != null) {
+          return true;
+        }
+        if (m_prefs.get(TABLE_COLUMN_AGGR_FUNCTION + keySuffix, null) != null) {
           return true;
         }
       }
@@ -687,8 +692,20 @@ public class ClientUIPreferences {
       return defaultValue;
     }
 
-    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
+    //first, check if an explicit flag is set.
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
     String value = m_prefs.get(key, null);
+    if (value != null) {
+      Boolean b = TypeCastUtility.castValue(value, Boolean.class);
+      if (b != null && !b.booleanValue()) {
+        // Lazy legacy migration: if explicit was set to false,
+        // we ignore the stored sort index and return the default instead.
+        return defaultValue;
+      }
+    }
+
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
+    value = m_prefs.get(key, null);
     if (value != null) {
       Integer i = TypeCastUtility.castValue(value, Integer.class);
       return i.intValue();
@@ -736,19 +753,6 @@ public class ClientUIPreferences {
       return b != null ? b.booleanValue() : defaultValue;
     }
     return defaultValue;
-  }
-
-  public Boolean getTableColumnSortExplicit(IColumn col, String configName) {
-    if (m_prefs == null) {
-      return null;
-    }
-
-    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
-    String value = m_prefs.get(key, null);
-    if (value != null) {
-      return TypeCastUtility.castValue(value, Boolean.class);
-    }
-    return null;
   }
 
   public void setApplicationWindowPreferences(BoundsSpec r, boolean maximized) {

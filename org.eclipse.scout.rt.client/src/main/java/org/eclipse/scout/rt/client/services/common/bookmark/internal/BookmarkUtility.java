@@ -396,7 +396,7 @@ public final class BookmarkUtility {
         colState.setAggregationFunction(((INumberColumn) c).getAggregationFunction());
       }
 
-      if (columnSet.isUserSortColumn(c) && c.isSortExplicit()) {
+      if (columnSet.isUserSortColumn(c)) {
         int sortOrder = columnSet.getSortColumnIndex(c);
         if (sortOrder >= 0) {
           colState.setSortOrder(sortOrder);
@@ -479,13 +479,7 @@ public final class BookmarkUtility {
           }
         }
       }
-      HashSet<IColumn<?>> existingExplicitUserSortCols = new HashSet<IColumn<?>>();
-      for (IColumn<?> c : columnSet.getUserSortColumns()) {
-        if (c.isSortExplicit()) {
-          existingExplicitUserSortCols.add(c);
-        }
-      }
-      if (!sortColMap.values().containsAll(existingExplicitUserSortCols)) {
+      if (!sortColMap.values().containsAll(columnSet.getUserSortColumns())) {
         userSortValid = false;
       }
 

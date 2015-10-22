@@ -78,10 +78,8 @@ public class PageWithTable3Test {
     }
      */
     List<Integer> actualExplicitSortIndices = new ArrayList<Integer>();
-    for (IColumn<?> c : table.getColumns()) {
-      if (c.isSortActive() && c.isSortExplicit()) {
-        actualExplicitSortIndices.add(c.getColumnIndex());
-      }
+    for (IColumn<?> c : table.getColumnSet().getSortColumns()) {
+      actualExplicitSortIndices.add(c.getColumnIndex());
     }
     assertTrue(CollectionUtility.equalsCollection(expectedValues, table.getValueColumn().getValues()));
     assertTrue(CollectionUtility.equalsCollection(expectedExplicitSortIndices, actualExplicitSortIndices));
