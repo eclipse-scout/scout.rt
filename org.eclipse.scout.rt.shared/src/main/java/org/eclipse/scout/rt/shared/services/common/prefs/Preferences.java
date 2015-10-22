@@ -105,11 +105,6 @@ public class Preferences implements IPreferences {
     }
 
     IUserPreferencesStorageService service = BEANS.get(IUserPreferencesStorageService.class);
-    if (service == null) {
-      LOG.warn("No preferences storage service could be found!");
-      return false;
-    }
-
     service.flush(this);
     m_dirty = false;
     return true;
