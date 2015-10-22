@@ -47,7 +47,9 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
 
     aggregateValue = this.aggregateRow[c];
     if (aggregateValue === undefined) {
-      cell = {};
+      cell = {
+        empty: true
+      };
     } else {
       if (column.format) {
         decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);

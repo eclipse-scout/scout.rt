@@ -1483,24 +1483,44 @@ scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
 };
 
 scout.Table.prototype._removeAggregateRows = function(animate) {
-  var that = this;
+  var deferreds = [];
   animate = scout.helpers.nvl(animate, false);
-
   if (!animate) {
     this._aggregateRows.forEach(function(aggregateRow) {
+      if (!aggregateRow.$aggregateRow) {
+        return;
+      }
       aggregateRow.$aggregateRow.remove();
+      aggregateRow.$aggregateRow = null;
     }, this);
-    this.invalidateLayoutTree();
+    this.renderSelection();
+    this.updateScrollbars();
   } else {
-    this._aggregateRows.forEach(function(aggregateRow) {
+    this._aggregateRows.forEach(function(aggregateRow, i) {
+      if (!aggregateRow.$aggregateRow) {
+        return;
+      }
+
+      var deferred = $.Deferred();
+      deferreds.push(deferred);
+
       aggregateRow.$aggregateRow.slideUp({
         duration: 200,
+        progress: this.updateScrollbars.bind(this),
         complete: function() {
-          $.removeThis.call(this);
-          that.renderSelection();
-        }
+          aggregateRow.$aggregateRow.remove();
+          aggregateRow.$aggregateRow = null;
+          deferred.resolve();
+        }.bind(this)
       });
     }, this);
+
+    // when all animations have been finished
+    if (deferreds.length > 0) {
+      $.when.apply($, deferreds).done(function() {
+        this.renderSelection();
+      }.bind(this));
+    }
   }
 };
 
@@ -1509,6 +1529,10 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
   animate = scout.helpers.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
+    if (aggregateRow.$aggregateRow) {
+      // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
+      return;
+    }
     $aggregateRow = $.makeDiv('table-aggregate-row');
 
     row = aggregateRow.row;
@@ -1530,12 +1554,16 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
         };
       } else if (column.grouped) {
         cell = {
+          // value necessary for value based columns (e.g. checkbox column)
+          value: this.cellValue(column, row),
           text: column.cellTextForGrouping(row),
           horizontalAlignment: column.horizontalAlignment,
           cssClass: 'table-aggregate-cell'
         };
       } else {
-        cell = {};
+        cell = {
+          empty: true
+        };
       }
 
       $cell = $(column.buildCell(cell, {}));
@@ -1547,7 +1575,10 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
     if (animate) {
       $aggregateRow
         .hide()
-        .slideDown(300, this.updateScrollbars.bind(this));
+        .slideDown({
+          duration: 200,
+          progress: this.updateScrollbars.bind(this)
+        });
     }
   }, this);
 };
@@ -1721,6 +1752,7 @@ scout.Table.prototype._insertRows = function(rows) {
 
     this._renderRows(rows);
   }
+  this._group();
 };
 
 scout.Table.prototype._deleteRows = function(rows) {
@@ -1757,6 +1789,7 @@ scout.Table.prototype._deleteRows = function(rows) {
   if (filterChanged) {
     this._rowsFiltered();
   }
+  this._group();
   if (invalidate) {
     this.invalidateLayoutTree();
   }

@@ -14,6 +14,11 @@ scout.inherits(scout.CheckBoxColumn, scout.Column);
 scout.CheckBoxColumn.prototype.buildCell = function(cell, row) {
   var style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
   var enabled = row.enabled;
+  if (cell.empty) {
+    // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
+    return scout.CheckBoxColumn.parent.prototype.buildCell.call(this, cell, row);
+  }
+
   checked = cell.value;
   enabled = enabled && cell.editable;
   cssClass = this._cellCssClass(cell);
