@@ -51,7 +51,11 @@ scout.ModelAdapter.prototype._init = function(model) {
 
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
-    this._modelProperties.push(propertyName);
+    // if property is not yet in the array of property names -> add property
+    // the same property should exist only once in the array
+    if (this._modelProperties.indexOf(propertyName) === -1) {
+      this._modelProperties.push(propertyName);
+    }
     if (scout.helpers.isOneOf(propertyName, 'id', 'session', 'objectType')) {
       return; // Ignore (already set manually above)
     }

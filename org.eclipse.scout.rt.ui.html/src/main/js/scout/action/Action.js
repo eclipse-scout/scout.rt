@@ -1,7 +1,7 @@
 scout.Action = function() {
   this._hoverBound = false;
   scout.Action.parent.call(this);
-  this._addModelProperties('text');
+  this._addModelProperties('text', 'iconId', 'tooltipText', 'keyStroke', 'enabled', 'selected', 'visible', 'tabbable');
 
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
