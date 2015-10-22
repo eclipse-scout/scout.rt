@@ -7,6 +7,7 @@ scout.AggregateTableControl = function() {
   this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
+  this._tableAggregationFunctionHandler = this._onTableAggregationFunctionChanged.bind(this);
   this.cssClass = 'aggregate';
   this.height = 42;
   this.resizerVisible = false;
@@ -26,6 +27,7 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
+  this.table.on('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
 };
 
 scout.AggregateTableControl.prototype._removeContent = function() {
@@ -36,6 +38,7 @@ scout.AggregateTableControl.prototype._removeContent = function() {
   this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
+  this.table.off('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
 };
 
 scout.AggregateTableControl.prototype._renderAggregate = function() {
@@ -58,7 +61,7 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
       };
     }
 
-    $cell = $(column.buildCell(cell));
+    $cell = $(column.buildCell(cell, {}));
 
     // If aggregation is based on the selection and not on all rows -> mark it
     if (this.aggregateRow.selection) {
@@ -151,5 +154,10 @@ scout.AggregateTableControl.prototype._onTableRowsSelected = function(event) {
 };
 
 scout.AggregateTableControl.prototype._onTableColumnResized = function(event) {
+  this._rerenderAggregate();
+};
+
+scout.AggregateTableControl.prototype._onTableAggregationFunctionChanged = function(event) {
+  this._aggregate();
   this._rerenderAggregate();
 };

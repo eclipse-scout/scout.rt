@@ -792,13 +792,17 @@ describe("Table", function() {
       }
     }
 
+    function find$aggregateRows(table) {
+      return table.$data.find('.table-aggregate-row');
+    }
+
     function assertGroupingValues(table, column, values){
       var i, c, $sumCell;
       c = table.columns.indexOf(column);
-      expect(table.$aggregationRows().length).toBe(values.length);
+      expect(find$aggregateRows(table).length).toBe(values.length);
 
       for(i=0; i<values.length; i++){
-        $sumCell = table.$aggregationRows().eq(i).children().eq(c);
+        $sumCell = find$aggregateRows(table).eq(i).children().eq(c);
         $sumCell.find('.table-cell-icon').remove();
         expect($sumCell.text()).toBe(values[i]);
       }
@@ -821,14 +825,14 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column0, false);
-      expect(table.$aggregationRows().length).toBe(2);
+      expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
       assertGroupingValues(table, column3, ['10', '26']);
       assertGroupingValues(table, column4, ['30', '78']);
       removeGrouping(table, column0);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
     });
 
@@ -841,14 +845,14 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column1, false);
-      expect(table.$aggregationRows().length).toBe(2);
+      expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 1);
       assertGroupingValues(table, column3, ['14', '22']);
       assertGroupingValues(table, column4, ['42', '66']);
       removeGrouping(table, column1);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
     });
 
@@ -861,16 +865,16 @@ describe("Table", function() {
       prepareContent();
       render(table);
       column3.setAggregationFunction('avg');
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column1, true);
-      expect(table.$aggregationRows().length).toBe(4);
+      expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 0, 1);
       assertGroupingValues(table, column3, ['1.5', '3.5', '5.5', '7.5']);
       assertGroupingValues(table, column4, ['9', '21', '33', '45']);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
 
     });
@@ -883,18 +887,18 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column1, true);
       addGrouping(table, column2, true);
-      expect(table.$aggregationRows().length).toBe(8);
+      expect(find$aggregateRows(table).length).toBe(8);
       assertGroupingProperty(table, 0, 1, 2);
       assertGroupingValues(table, column3, ['1', '2', '3', '4', '5', '6', '7', '8']);
       assertGroupingValues(table, column4, ['3', '6', '9', '12','15', '18', '21', '24']);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
 
     });
@@ -908,16 +912,16 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column2, false);
       addGrouping(table, column1, true);
-      expect(table.$aggregationRows().length).toBe(4);
+      expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 2, 1);
       assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
       assertGroupingValues(table, column4, ['18', '30', '24', '36']);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
 
     });
@@ -931,16 +935,16 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column2, true);
       addGrouping(table, column1, false);
-      expect(table.$aggregationRows().length).toBe(2);
+      expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 1);
       assertGroupingValues(table, column3, ['14', '22']);
       assertGroupingValues(table, column4, ['42', '66']);
       removeGrouping(table, column1);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
     });
 
@@ -953,18 +957,18 @@ describe("Table", function() {
       prepareContent();
       render(table);
 
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       addGrouping(table, column0, false);
       addGrouping(table, column2, true);
       addGrouping(table, column1, true);
       removeGrouping(table, column0);
-      expect(table.$aggregationRows().length).toBe(4);
+      expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 1,2);
       assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
       assertGroupingValues(table, column4, ['18', '30', '24', '36']);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
-      expect(table.$aggregationRows().length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
     });
 

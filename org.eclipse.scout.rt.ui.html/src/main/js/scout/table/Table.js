@@ -23,6 +23,7 @@ scout.Table = function(model) {
   this._filteredRows = [];
   this._filteredRowsDirty = true;
   this.tooltips = [];
+  this._aggregateRows = [];
   this._animationRowLimit = 25;
   this._blockLoadThreshold = 100;
   this.menuBar;
@@ -52,7 +53,7 @@ scout.Table.prototype._init = function(model) {
     menuOrder: new scout.MenuItemsOrder(this.session, 'Table')
   });
   this.menuBar.bottom();
-  this._aggregationRows = [];
+  this._group();
 
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
@@ -583,9 +584,6 @@ scout.Table.prototype._renderRowOrderChanges = function() {
     });
   }
 
-  // update grouping if group by column is active
-  //  this._group();
-
   this.renderSelection();
 };
 
@@ -594,7 +592,9 @@ scout.Table.prototype._renderRowOrderChanges = function() {
  * @param remove true to remove the column from the sort columns
  */
 scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
-  var data, sorted;
+  var data, sorted,
+    // Animate if sort removes aggregate rows
+    animateAggregateRows = !multiSort;
 
   this._updateSortColumns(column, direction, multiSort, remove);
   if (this.header) {
@@ -610,13 +610,16 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   };
   if (sorted) {
     this._send('rowsSorted', data);
-    this._group();
-    this._renderRowOrderChanges();
-    this._renderAggregationRows();
     this._triggerRowOrderChanged();
+    if (this.rendered) {
+      this._removeAggregateRows(animateAggregateRows);
+      this._renderRowOrderChanges();
+    }
+    this._group();
   } else {
     // Delegate sorting to server when it is not possible on client side
     this._send('sortRows', data);
+    this._animateAggregateRows = animateAggregateRows;
   }
 };
 
@@ -730,38 +733,17 @@ scout.Table.prototype._isGroupingPossible = function(column) {
     return possible;
   }
 
-  //else: it is a tail sort column. grouping does not make sense.
+  // else: it is a tail sort column. grouping does not make sense.
   return false;
-
 };
+
 scout.Table.prototype.changeAggregation = function(column, func) {
-  var data;
   column.setAggregationFunction(func);
-  data = {
-    columnId: column.id,
-    aggregationFunction: func
-  };
-  this._send('aggregationFunctionChanged', data);
-  this._group();
-  if (this.rendered) {
-    this._renderAggregationRows(false);
-  }
-};
 
-scout.Table.prototype._onAggregationFunctionChanged = function(event) {
-  var eventParts = event.eventParts,
-    columnId, column, i, func;
-  //foreach
-  for (i = 0; i < eventParts.size; i++) {
-    columnId = eventParts[i].columnId;
-    func = eventParts[i].aggregationFunction;
-    column = this.columnById(columnId);
-    column.setAggregationFunction(func);
-  }
+  this._sendAggregationFunctionChanged(column);
+  this._triggerAggregationFunctionChanged(column);
+
   this._group();
-  if (this.rendered) {
-    this._renderAggregationRows(false);
-  }
 };
 
 scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove) {
@@ -995,11 +977,14 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       // Manual validation necessary due to set timeout
       that.validateLayoutTree();
     }, 0);
+  } else {
+    // when all blocks are rendered, render the aggregate rows
+    this._renderAggregateRows();
   }
 };
 
 scout.Table.prototype._removeRows = function($rows) {
-  $rows = $rows || this.$rows();
+  $rows = $rows || this.$rows(true);
   $rows.remove();
   this._renderEmptyData();
   this._triggerRowsDrawn($rows);
@@ -1030,10 +1015,6 @@ scout.Table.prototype._installRows = function($rows) {
     }
   });
   this.invalidateLayoutTree();
-
-  // update grouping if data was grouped
-  this._group();
-  this._renderAggregationRows();
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
@@ -1400,18 +1381,21 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   }
 };
 
-scout.Table.prototype._group = function() {
-  var column, alignment, rows, c, states, columnGroupingActive, row, value, nextRow, newGroup, summaryRow, hasCellTextForGroupingFunction,
+scout.Table.prototype._group = function(animate) {
+  var alignment, rows, states, columnGroupingActive, value, nextRow, newGroup,
     that = this,
     groupColumns = this._groupedColumns();
 
-  this._removeAggregationRows();
+  if (this.rendered) {
+    this._removeAggregateRows(animate);
+  }
+  this._aggregateRows.length = 0;
 
   columnGroupingActive = (groupColumns ? groupColumns.length > 0 : false);
-
   if (!columnGroupingActive) {
     return;
   }
+
   // prepare data
   rows = this.filteredRows();
   states = [];
@@ -1447,19 +1431,22 @@ scout.Table.prototype._group = function() {
     nextRow = rows[r + 1];
 
     // test if group is finished
-    newGroup = columnGroupingActive && ((r === rows.length - 1) || this._isNewGroup(groupColumns, row, nextRow));
+    newGroup = (r === rows.length - 1) || this._isNewGroup(groupColumns, row, nextRow);
     // if group is finished: add group row
 
     if (newGroup) {
       //finish aggregation
       this.columns.forEach(finish);
       //append sum row
-      this._addAggregationRow(states, row);
+      this._addAggregateRow(states, row);
       //reset after group
       this.columns.forEach(prepare);
     }
   }.bind(this));
 
+  if (this.rendered) {
+    this._renderAggregateRows(animate);
+  }
 };
 
 scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
@@ -1488,38 +1475,44 @@ scout.Table.prototype._groupedColumns = function() {
   });
 };
 
-scout.Table.prototype._addAggregationRow = function(contents, afterRow) {
-  this._aggregationRows.push({
+scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
+  this._aggregateRows.push({
     contents: contents.slice(),
     row: afterRow
   });
 };
 
-scout.Table.prototype._removeAggregationRows = function() {
-  this._aggregationRows.length = 0;
-};
-
-scout.Table.prototype._renderAggregationRows = function(animate) {
-  var c, cell, r, column, row, contents, alignment, $cell, $aggregationRow, that = this;
-  if (!arguments.length) {
-    animate = true;
-  }
+scout.Table.prototype._removeAggregateRows = function(animate) {
+  var that = this;
+  animate = scout.helpers.nvl(animate, false);
 
   if (!animate) {
-    //TODO: cgu: update scroll bar necessary here?
-    this.$aggregationRows().remove();
+    this._aggregateRows.forEach(function(aggregateRow) {
+      aggregateRow.$aggregateRow.remove();
+    }, this);
+    this.invalidateLayoutTree();
   } else {
-    this.$aggregationRows().animateAVCSD('height', 0, function() {
-      $.removeThis.call(this);
-      that.renderSelection();
-    }, that.updateScrollbars.bind(that));
+    this._aggregateRows.forEach(function(aggregateRow) {
+      aggregateRow.$aggregateRow.slideUp({
+        duration: 200,
+        complete: function() {
+          $.removeThis.call(this);
+          that.renderSelection();
+        }
+      });
+    }, this);
   }
+};
 
-  for (r = 0; r < this._aggregationRows.length; r++) {
-    $aggregationRow = $.makeDiv('table-aggregate-row');
+scout.Table.prototype._renderAggregateRows = function(animate) {
+  var c, cell, r, column, row, contents, alignment, $cell, $aggregateRow, that = this;
+  animate = scout.helpers.nvl(animate, false);
 
-    row = this._aggregationRows[r].row;
-    contents = this._aggregationRows[r].contents;
+  this._aggregateRows.forEach(function(aggregateRow, r) {
+    $aggregateRow = $.makeDiv('table-aggregate-row');
+
+    row = aggregateRow.row;
+    contents = aggregateRow.contents;
 
     for (c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
@@ -1530,32 +1523,33 @@ scout.Table.prototype._renderAggregationRows = function(animate) {
           aggrValue = decimalFormat.format(aggrValue);
         }
         cell = {
-            text: aggrValue,
-            iconId: column.aggrSymbol,
-            horizontalAlignment: column.horizontalAlignment,
-            cssClass: 'table-aggregate-cell'
-          };
+          text: aggrValue,
+          iconId: column.aggrSymbol,
+          horizontalAlignment: column.horizontalAlignment,
+          cssClass: 'table-aggregate-cell'
+        };
       } else if (column.grouped) {
         cell = {
           text: column.cellTextForGrouping(row),
-          horizontalAlignment: column.horizontalAlignment
+          horizontalAlignment: column.horizontalAlignment,
+          cssClass: 'table-aggregate-cell'
         };
       } else {
         cell = {};
       }
 
-      $cell = $(column.buildCell(cell));
-      $cell.appendTo($aggregationRow);
+      $cell = $(column.buildCell(cell, {}));
+      $cell.appendTo($aggregateRow);
     }
 
-    $aggregationRow.insertAfter(row.$row).width(this.rowWidth);
-
+    $aggregateRow.insertAfter(row.$row).width(this.rowWidth);
+    aggregateRow.$aggregateRow = $aggregateRow;
     if (animate) {
-      $aggregationRow
+      $aggregateRow
         .hide()
         .slideDown(300, this.updateScrollbars.bind(this));
     }
-  }
+  }, this);
 };
 
 scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove) {
@@ -1576,13 +1570,18 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   };
   if (sorted) {
     this._send('rowsGrouped', data);
-    this._renderRowOrderChanges();
     this._triggerRowOrderChanged();
-    this._group();
-    this._renderAggregationRows();
+    if (this.rendered) {
+      this._removeAggregateRows(true);
+      this._renderRowOrderChanges();
+    }
+    this._group(true);
   } else {
     // Delegate sorting to server when it is not possible on client side
     this._send('groupRows', data);
+
+    // hint to animate the aggregate after the row order changed event
+    this._animateAggregateRows = true;
   }
 };
 
@@ -2084,10 +2083,6 @@ scout.Table.prototype.$nextFilteredRows = function($row, includeAggrRows) {
   return $row.nextAll(this.newFilteredRowsSelector(includeAggrRows));
 };
 
-scout.Table.prototype.$aggregationRows = function() {
-  return this.$data.find('.table-aggregate-row');
-};
-
 scout.Table.prototype.$cellsForColIndex = function(colIndex, includeAggrRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ')';
   if (includeAggrRows) {
@@ -2125,7 +2120,7 @@ scout.Table.prototype.filter = function() {
     rowsToHide = [],
     rowsToShow = [];
 
-  this.$aggregationRows().hide();
+  this._removeAggregateRows();
 
   // Filter rows
   this.rows.forEach(function(row) {
@@ -2157,7 +2152,6 @@ scout.Table.prototype.filter = function() {
     this._rowsFiltered(rowsToHide);
     $(':animated', that.$data).promise().done(function() {
       that._group();
-      that._renderAggregationRows();
       that.renderSelection();
     });
   }
@@ -2423,6 +2417,14 @@ scout.Table.prototype._sendColumnMoved = function(column, index) {
   this._send('columnMoved', data);
 };
 
+scout.Table.prototype._sendAggregationFunctionChanged = function(column) {
+  var data = {
+    columnId: column.id,
+    aggregationFunction: column.aggregationFunction
+  };
+  this._send('aggregationFunctionChanged', data);
+};
+
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   var index;
 
@@ -2538,6 +2540,14 @@ scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dra
   };
 
   this.trigger('columnMoved', event);
+};
+
+scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
+  var event = {
+    column: column.id
+  };
+
+  this.trigger('aggregationFunctionChanged', event);
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
@@ -2804,13 +2814,15 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
     rows[newPos] = row;
   }
   this.rows = rows;
-  this._group();
 
   if (this.rendered) {
+    this._removeAggregateRows(this._animateAggregateRows);
     this._renderRowOrderChanges();
-    this._renderAggregationRows();
   }
   this._triggerRowOrderChanged();
+
+  this._group(this._animateAggregateRows);
+  this._animateAggregateRows = false;
 };
 
 /**
@@ -2900,6 +2912,21 @@ scout.Table.prototype._onRequestFocus = function() {
 
 scout.Table.prototype._onScrollToSelection = function() {
   this.revealSelection();
+};
+
+scout.Table.prototype._onAggregationFunctionChanged = function(event) {
+  var columnId, column, func;
+
+  event.eventParts.forEach(function(eventPart) {
+    columnId = eventPart.columnId;
+    func = eventPart.aggregationFunction;
+    column = this.columnById(columnId);
+    column.setAggregationFunction(func);
+
+    this._triggerAggregationFunctionChanged(column);
+  }, this);
+
+  this._group();
 };
 
 scout.Table.prototype.onModelAction = function(event) {
