@@ -37,12 +37,8 @@
   padding-top: 1px;
 }
 
-.table-aggregate {
-  overflow: hidden;
-}
-
 .table-row,
-.table-row-sum {
+.table-aggregate-row {
   position:relative;
   overflow: hidden;
   border-left: 0px solid transparent;
@@ -93,10 +89,6 @@
   position: relative;
   #scout.overflow-ellipsis();
   vertical-align: top; /* for multiline text */
-
-  .table-row-sum > & {
-    font-weight: bold;
-  }
 
   & > .width-fix {
     /* Some browsers (e.g. IE9) need an additional <div> with display:inline-block below the table-cell */
@@ -196,16 +188,20 @@
   }
 }
 
-.table-row-sum {
-  background-color: @table-aggregate-row-background-color;
+.table-aggregate {
+  overflow: hidden;
+}
 
-  & > .table-cell-icon {
-    color: @text-color;
-  }
+.table-aggregate-row {
+  background-color: @table-aggregate-row-background-color;
 }
 
 .table-aggregate-cell {
   font-weight: bold;
+
+  & > .table-cell-icon {
+    color: @text-color;
+  }
 
   /* if aggregation is based on selected rows */
   &.selection,

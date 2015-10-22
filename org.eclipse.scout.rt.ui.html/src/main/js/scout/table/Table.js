@@ -1516,7 +1516,7 @@ scout.Table.prototype._renderAggregationRows = function(animate) {
   }
 
   for (r = 0; r < this._aggregationRows.length; r++) {
-    $aggregationRow = $.makeDiv('table-row-sum');
+    $aggregationRow = $.makeDiv('table-aggregate-row');
 
     row = this._aggregationRows[r].row;
     contents = this._aggregationRows[r].contents;
@@ -2048,58 +2048,58 @@ scout.Table.prototype.filteredRows = function() {
 };
 
 //TODO CGU still necessary? maybe better remove and use rows(), filteredRows() and selectedRows instead
-scout.Table.prototype.$rows = function(includeSumRows) {
+scout.Table.prototype.$rows = function(includeAggrRows) {
   var selector = '.table-row';
-  if (includeSumRows) {
-    selector += ', .table-row-sum';
+  if (includeAggrRows) {
+    selector += ', .table-aggregate-row';
   }
   return this.$data.find(selector);
 };
 
-scout.Table.prototype.newFilteredRowsSelector = function(includeSumRows) {
+scout.Table.prototype.newFilteredRowsSelector = function(includeAggrRows) {
   var selector = '.table-row:not(.invisible)';
-  if (includeSumRows) {
-    selector += ', .table-row-sum:not(.invisible)';
+  if (includeAggrRows) {
+    selector += ', .table-aggregate-row:not(.invisible)';
   }
   return selector;
 };
 
-scout.Table.prototype.$filteredRows = function(includeSumRows) {
-  return this.$data.find(this.newFilteredRowsSelector(includeSumRows));
+scout.Table.prototype.$filteredRows = function(includeAggrRows) {
+  return this.$data.find(this.newFilteredRowsSelector(includeAggrRows));
 };
 
-scout.Table.prototype.$prevFilteredRow = function($row, includeSumRow) {
-  return $row.prevAll(this.newFilteredRowsSelector(includeSumRow)).first();
+scout.Table.prototype.$prevFilteredRow = function($row, includeAggrRow) {
+  return $row.prevAll(this.newFilteredRowsSelector(includeAggrRow)).first();
 };
 
-scout.Table.prototype.$prevFilteredRows = function($row, includeSumRows) {
-  return $row.prevAll(this.newFilteredRowsSelector(includeSumRows));
+scout.Table.prototype.$prevFilteredRows = function($row, includeAggrRows) {
+  return $row.prevAll(this.newFilteredRowsSelector(includeAggrRows));
 };
 
-scout.Table.prototype.$nextFilteredRow = function($row, includeSumRow) {
-  return $row.nextAll(this.newFilteredRowsSelector(includeSumRow)).first();
+scout.Table.prototype.$nextFilteredRow = function($row, includeAggrRow) {
+  return $row.nextAll(this.newFilteredRowsSelector(includeAggrRow)).first();
 };
 
-scout.Table.prototype.$nextFilteredRows = function($row, includeSumRows) {
-  return $row.nextAll(this.newFilteredRowsSelector(includeSumRows));
+scout.Table.prototype.$nextFilteredRows = function($row, includeAggrRows) {
+  return $row.nextAll(this.newFilteredRowsSelector(includeAggrRows));
 };
 
 scout.Table.prototype.$aggregationRows = function() {
-  return this.$data.find('.table-row-sum');
+  return this.$data.find('.table-aggregate-row');
 };
 
-scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
+scout.Table.prototype.$cellsForColIndex = function(colIndex, includeAggrRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ')';
-  if (includeSumRows) {
-    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ')';
+  if (includeAggrRows) {
+    selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ')';
   }
   return this.$data.find(selector);
 };
 
-scout.Table.prototype.$cellsForColIndexWidthFix = function(colIndex, includeSumRows) {
+scout.Table.prototype.$cellsForColIndexWidthFix = function(colIndex, includeAggrRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ') > .width-fix ';
-  if (includeSumRows) {
-    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ') > .width-fix';
+  if (includeAggrRows) {
+    selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ') > .width-fix';
   }
   return this.$data.find(selector);
 };

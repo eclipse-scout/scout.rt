@@ -67,6 +67,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.ascendingAdditionally",
         "ui.descendingAdditionally",
         "ui.Sum",
+        "ui.Total",
         "ui.overEverything",
         "ui.overSelection",
         "ui.grouped",
