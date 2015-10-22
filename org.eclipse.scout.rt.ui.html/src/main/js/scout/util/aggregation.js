@@ -1,88 +1,90 @@
 scout.aggregation = {
 
-    sumStart: function(){
-      return 0;
-    },
+  sumStart: function() {
+    return null;
+  },
 
-    sumStep: function(currentState, newVal) {
-      var val = newVal || 0;
-      currentState += val;
-      return currentState;
-    },
+  sumStep: function(currentState, newVal) {
+    if (typeof newVal === 'number') {
+      currentState = (currentState || 0) + newVal;
+    }
+    return currentState;
+  },
 
-    sumFinish: function(currentState) {
-      return currentState;
-    },
+  sumFinish: function(currentState) {
+    return currentState;
+  },
 
-    sumSymbol: scout.icons.SUM,
+  sumSymbol: scout.icons.SUM,
 
-    avgStart: function(){
-      return {sum: 0, count: 0};
-    },
+  avgStart: function() {
+    return {
+      sum: 0,
+      count: 0
+    };
+  },
 
-    avgStep: function(currentState, newVal) {
-      var val = newVal || 0;
-      if(newVal || newVal === 0){
-        currentState.sum += val;
-        currentState.count += 1;
-      }
-      return currentState;
-    },
+  avgStep: function(currentState, newVal) {
+    var val = newVal || 0;
+    if (typeof newVal === 'number') {
+      currentState.sum += newVal;
+      currentState.count += 1;
+    }
+    return currentState;
+  },
 
-    avgFinish: function(currentState) {
-      if(currentState.count && currentState.count > 0){
-        return (currentState.sum * 1.0) / currentState.count;
-      }
-    },
+  avgFinish: function(currentState) {
+    if (currentState.count && currentState.count > 0) {
+      return (currentState.sum * 1.0) / currentState.count;
+    }
+  },
 
-    avgSymbol: scout.icons.AVG,
+  avgSymbol: scout.icons.AVG,
 
-    minStart: function(){
-      return null;
-    },
+  minStart: function() {
+    return null;
+  },
 
-    minStep: function(currentState, newVal) {
-      if(newVal || newVal === 0){
-        if(currentState || currentState === 0){
-          if(newVal < currentState){
-            currentState = newVal;
-          }
-        }
-        else{
+  minStep: function(currentState, newVal) {
+    if (typeof newVal === 'number') {
+      if (typeof currentState === 'number') {
+        if (newVal < currentState) {
           currentState = newVal;
         }
+      } else {
+        currentState = newVal;
       }
-      return currentState;
-    },
+    }
+    return currentState;
+  },
 
-    minFinish: function(currentState) {
-      return currentState;
-    },
+  minFinish: function(currentState) {
+    return currentState;
+  },
 
-    minSymbol: scout.icons.MIN,
+  minSymbol: scout.icons.MIN,
 
-    maxStart: function(){
-      return null;
-    },
+  maxStart: function() {
+    return null;
+  },
 
-    maxStep: function(currentState, newVal) {
-      if(newVal || newVal === 0){
-        if(currentState || currentState === 0){
-          if(newVal > currentState){
-            currentState = newVal;
-          }
-        }
-        else{
+  maxStep: function(currentState, newVal) {
+    if (typeof newVal === 'number') {
+      if (typeof currentState === 'number') {
+        if (newVal > currentState) {
           currentState = newVal;
         }
+      } else {
+        currentState = newVal;
       }
-      return currentState;
-    },
+    }
+    return currentState;
+  },
 
-    maxFinish: function(currentState) {
-      return currentState;
-    },
+  maxFinish: function(currentState) {
+    return currentState;
+  },
 
-    maxSymbol: scout.icons.MAX
+  maxSymbol: scout.icons.MAX
 
 };
