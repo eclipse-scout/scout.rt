@@ -28,6 +28,12 @@ scout.FormField = function() {
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
   this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT; // (currently?) an UI-only property
+
+  /**
+   * Set this property to false when the form-field should stay enabled in offline case.
+   * By default the field will be disabled.
+   */
+  this.disabledWhenOffline = true;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -226,10 +232,11 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
 };
 
-scout.FormField.prototype._renderEnabled = function() {
-  this.$container.setEnabled(this.enabled);
+scout.FormField.prototype._renderEnabled = function(enabled) {
+  enabled = scout.helpers.nvl(enabled, this.enabled);
+  this.$container.setEnabled(enabled);
   if (this.$field) {
-    this.$field.setEnabled(this.enabled);
+    this.$field.setEnabled(enabled);
   }
 };
 
@@ -427,11 +434,13 @@ scout.FormField.prototype.getForm = function() {
 };
 
 scout.FormField.prototype._goOffline = function() {
-  this._renderEnabled(false);
+  if (this.disabledWhenOffline) {
+    this._renderEnabled(false);
+  }
 };
 
 scout.FormField.prototype._goOnline = function() {
-  if (this.enabled) {
+  if (this.disabledWhenOffline && this.enabled) {
     this._renderEnabled(true);
   }
 };

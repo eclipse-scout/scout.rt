@@ -5,6 +5,7 @@ scout.BasicField = function() {
   scout.BasicField.parent.call(this);
   this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
   this._keyUpListener;
+  this.disabledWhenOffline = false;
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 
