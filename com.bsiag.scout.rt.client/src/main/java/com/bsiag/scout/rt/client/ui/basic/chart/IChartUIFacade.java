@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
+package com.bsiag.scout.rt.client.ui.basic.chart;
 
 import java.math.BigDecimal;
 

@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.platform.BEANS;
 
-import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChartUIFacade;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
 

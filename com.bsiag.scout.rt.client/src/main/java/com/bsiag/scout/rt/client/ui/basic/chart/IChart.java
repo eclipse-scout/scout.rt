@@ -13,7 +13,6 @@ package com.bsiag.scout.rt.client.ui.basic.chart;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
-import com.bsiag.scout.rt.client.ui.form.fields.chartfield.IChartUIFacade;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 
 /**
