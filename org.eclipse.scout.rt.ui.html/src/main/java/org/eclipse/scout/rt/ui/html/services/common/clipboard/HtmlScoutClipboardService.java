@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.services.common.clipboard;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -52,13 +51,7 @@ public class HtmlScoutClipboardService implements IClipboardService {
   public void setTextContents(String textContents) {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(MimeType.TEXT_PLAIN);
-    BinaryResource binaryResource;
-    try {
-      binaryResource = new BinaryResource(MimeType.TEXT_PLAIN, textContents.getBytes(Encoding.UTF_8));
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new ProcessingException("Unsupported encoding", e);
-    }
+    BinaryResource binaryResource = new BinaryResource(MimeType.TEXT_PLAIN, textContents.getBytes(StandardCharsets.UTF_8));
     form.getClipboardField().setValue(Collections.singleton(binaryResource));
     form.startCopy();
   }
