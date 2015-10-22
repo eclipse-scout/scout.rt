@@ -26,7 +26,7 @@ public class AggregateTableControl extends AbstractTableControl implements IAggr
   @Override
   protected void initConfig() {
     super.initConfig();
-    setTooltipText(TEXTS.get("ui.Sum"));
+    setTooltipText(TEXTS.get("ui.Total"));
     setIconId(AbstractIcons.Sum);
   }
 
