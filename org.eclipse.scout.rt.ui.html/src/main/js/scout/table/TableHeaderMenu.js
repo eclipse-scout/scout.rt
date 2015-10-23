@@ -336,11 +336,19 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   function groupSort() {
-    groupColumn($(this), column, 'asc', false);
+    var direction = 'asc';
+    if(column.sortIndex >= 0 && (!column.sortAscending)){
+      direction = 'desc';
+    }
+    groupColumn($(this), column, direction, false);
   }
 
   function groupSortAdditional() {
-    groupColumn($(this), column, 'asc', true);
+    var direction = 'asc';
+    if(column.sortIndex >= 0 && (!column.sortAscending)){
+      direction = 'desc';
+    }
+    groupColumn($(this), column, direction, true);
   }
 
   function setAggregationFunction(func) {
