@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.eclipse.scout.rt.ui.html;
 
 import static org.junit.Assert.assertEquals;

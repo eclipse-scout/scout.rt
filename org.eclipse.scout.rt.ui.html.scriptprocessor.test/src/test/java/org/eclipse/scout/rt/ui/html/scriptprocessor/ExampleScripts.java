@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.scriptprocessor;
 
-/**
- *
- */
 public interface ExampleScripts {
   String JS_INPUT = ""
       + "var abc=function(){\n"
