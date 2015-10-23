@@ -9,6 +9,7 @@ scout.SvgField.prototype._render = function($parent) {
   this.addField($('<div>'));
   this.addMandatoryIndicator();
   this.addStatus();
+  this.loadingSupport = new scout.DefaultFieldLoadingSupport(this);
 };
 
 scout.SvgField.prototype._renderProperties = function() {
