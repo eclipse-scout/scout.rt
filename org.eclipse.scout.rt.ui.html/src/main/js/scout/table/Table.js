@@ -53,7 +53,6 @@ scout.Table.prototype._init = function(model) {
     menuOrder: new scout.MenuItemsOrder(this.session, 'Table')
   });
   this.menuBar.bottom();
-  this._group();
 
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
@@ -325,6 +324,7 @@ scout.Table.prototype._remove = function() {
   this.header = null;
   this.footer = null;
   this.attached = false;
+  this._removeAggregateRows();
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -625,8 +625,8 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   if (sorted) {
     this._send('rowsSorted', data);
     this._triggerRowOrderChanged();
+    this.clearAggregateRows(animateAggregateRows);
     if (this.rendered) {
-      this._removeAggregateRows(animateAggregateRows);
       this._renderRowOrderChanges();
     }
     this._group();
@@ -992,7 +992,9 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       that.validateLayoutTree();
     }, 0);
   } else {
-    // when all blocks are rendered, render the aggregate rows
+    // When all blocks are rendered, render the aggregate rows
+    // Grouping cannot be done in init() because row filter only works with rendered rows -> needs to be done always when rows get rendered
+    this._group();
     this._renderAggregateRows();
   }
 };
@@ -1395,15 +1397,19 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   }
 };
 
+scout.Table.prototype.clearAggregateRows = function(animate) {
+  if (this.rendered) {
+    this._removeAggregateRows(animate);
+  }
+  this._aggregateRows.length = 0;
+};
+
 scout.Table.prototype._group = function(animate) {
   var alignment, rows, states, columnGroupingActive, value, nextRow, newGroup,
     that = this,
     groupColumns = this._groupedColumns();
 
-  if (this.rendered) {
-    this._removeAggregateRows(animate);
-  }
-  this._aggregateRows.length = 0;
+  this.clearAggregateRows();
 
   columnGroupingActive = (groupColumns ? groupColumns.length > 0 : false);
   if (!columnGroupingActive) {
@@ -1616,8 +1622,8 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   if (sorted) {
     this._send('rowsGrouped', data);
     this._triggerRowOrderChanged();
+    this.clearAggregateRows(true);
     if (this.rendered) {
-      this._removeAggregateRows(true);
       this._renderRowOrderChanges();
     }
     this._group(true);
@@ -1766,7 +1772,6 @@ scout.Table.prototype._insertRows = function(rows) {
 
     this._renderRows(rows);
   }
-  this._group();
 };
 
 scout.Table.prototype._deleteRows = function(rows) {
@@ -2167,8 +2172,6 @@ scout.Table.prototype.filter = function() {
     rowsToHide = [],
     rowsToShow = [];
 
-  this._removeAggregateRows();
-
   // Filter rows
   this.rows.forEach(function(row) {
     var $row = row.$row;
@@ -2197,10 +2200,8 @@ scout.Table.prototype.filter = function() {
   // notify and regroup only if at least one row changed it's state
   if (rowsToShow.length > 0 || rowsToHide.length > 0) {
     this._rowsFiltered(rowsToHide);
-    $(':animated', that.$data).promise().done(function() {
-      that._group();
-      that.renderSelection();
-    });
+    this._group(useAnimation);
+    this.renderSelection();
   }
 };
 
@@ -2686,7 +2687,6 @@ scout.Table.prototype._syncFilters = function(filters) {
       this.addFilter(filter, false);
     }, this);
   }
-
 };
 
 scout.Table.prototype._renderFilters = function() {
@@ -2862,8 +2862,8 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   }
   this.rows = rows;
 
+  this.clearAggregateRows(this._animateAggregateRows);
   if (this.rendered) {
-    this._removeAggregateRows(this._animateAggregateRows);
     this._renderRowOrderChanges();
   }
   this._triggerRowOrderChanged();
