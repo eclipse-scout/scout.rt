@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
+import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.SortDescMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
@@ -556,9 +558,25 @@ public class OrganizeColumnsForm extends AbstractForm {
                     sb.append(col.getSortIndex() + 1);
                   }
                   if (col.isGroupingActive()) {
+                    // FIXME ASA when decided that we keep "G", instead of symbol: create translated text
                     sb.append("G");
                   }
                   getTable().getGroupAndSortColumn().setValue(row, sb.toString());
+
+                  // CustomColumn
+                  if (col instanceof ICustomColumn<?>) {
+                    // FIXME ASA when decided that we keep "C", instead of symbol: create translated text
+                    getTable().getCustomColumnColumn().setValue(row, "C");
+                  }
+
+                  // filter
+                  if (col.isColumnFilterActive()) {
+                    // FIXME ASA when decided that we keep "F", instead of symbol: create translated text
+                    getTable().getFilterColumn().setValue(row, "F");
+                  }
+
+                  //width
+                  getTable().getWidthColumn().setValue(row, col.getWidth());
 
                   rowList.add(row);
                 }
@@ -649,6 +667,10 @@ public class OrganizeColumnsForm extends AbstractForm {
 
             public CustomColumnColumn getCustomColumnColumn() {
               return getColumnSet().getColumnByClass(CustomColumnColumn.class);
+            }
+
+            public WidthColumn getWidthColumn() {
+              return getColumnSet().getColumnByClass(WidthColumn.class);
             }
 
             public TitleColumn getTitleColumn() {
@@ -742,8 +764,11 @@ public class OrganizeColumnsForm extends AbstractForm {
                   m_table.getColumnSet().removeGroupColumn(selectedCol);
                 }
                 else {
-                  // FIXME ASA when already sorted: read and use sort-direction
-                  m_table.getColumnSet().handleGroupingEvent(selectedCol, multiGroup, true);
+                  boolean ascending = true;
+                  if (selectedCol.isSortActive()) {
+                    ascending = selectedCol.isSortAscending();
+                  }
+                  m_table.getColumnSet().handleGroupingEvent(selectedCol, multiGroup, ascending);
                 }
                 m_table.sort();
 
@@ -820,6 +845,27 @@ public class OrganizeColumnsForm extends AbstractForm {
 
             }
 
+            @Order(70.0)
+            public class WidthColumn extends AbstractIntegerColumn {
+
+              @Override
+              protected boolean getConfiguredEditable() {
+                return true;
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 20;
+              }
+
+              @Override
+              protected void execCompleteEdit(ITableRow row, IFormField editingField) {
+                super.execCompleteEdit(row, editingField);
+                getKeyColumn().getValue(row).setWidth(getWidthColumn().getValue(row));
+              }
+
+            }
+
             @Order(10.0)
             public class SortAscMenu extends AbstractMenu {
 
@@ -892,7 +938,31 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
             }
 
-            @Order(34.0)
+            @Order(40.0)
+            public class SortDescAdditionalMenu extends AbstractMenu {
+
+              @Override
+              protected boolean getConfiguredEnabled() {
+                return m_table.isSortEnabled();
+              }
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.LongArrowDown;
+              }
+
+              @Override
+              protected void execAction() {
+                sortSelectedColumn(true, false);
+              }
+            }
+
+            @Order(44.0)
             public class GroupMenu extends AbstractMenu {
 
               @Override
@@ -916,7 +986,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
             }
 
-            @Order(36.0)
+            @Order(46.0)
             public class GroupAdditionalMenu extends AbstractMenu {
 
               @Override
@@ -937,30 +1007,6 @@ public class OrganizeColumnsForm extends AbstractForm {
               @Override
               protected void execAction() {
                 groupSelectedColumn(true);
-              }
-            }
-
-            @Order(40.0)
-            public class SortDescAdditionalMenu extends AbstractMenu {
-
-              @Override
-              protected boolean getConfiguredEnabled() {
-                return m_table.isSortEnabled();
-              }
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
-              }
-
-              @Override
-              protected String getConfiguredIconId() {
-                return AbstractIcons.LongArrowDown;
-              }
-
-              @Override
-              protected void execAction() {
-                sortSelectedColumn(true, false);
               }
             }
 
@@ -1146,18 +1192,53 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
 
               @Override
+              protected String getConfiguredKeyStroke() {
+                return AbstractKeyStroke.DELETE;
+              }
+
+              @Override
               protected void execAction() {
                 if (m_table != null) {
-                  if (m_table.getTableCustomizer() != null) {
-                    if (getColumnsTableField().getTable().getSelectedRow() != null) {
-                      IColumn<?> selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
-                      if (selectedCol instanceof ICustomColumn<?>) {
+                  for (ITableRow selectedRow : getSelectedRows()) {
+                    IColumn<?> selectedCol = getKeyColumn().getValue(selectedRow);
+                    if (selectedCol instanceof ICustomColumn<?>) {
+                      if (m_table.getTableCustomizer() != null) {
                         m_table.getTableCustomizer().removeColumn((ICustomColumn<?>) selectedCol);
                       }
                     }
+                    else {
+                      m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+                      setColumnVisible(selectedRow, false);
+                    }
+
                   }
                 }
-                getColumnsTableField().reloadTableData();
+                reloadTableData();
+              }
+            }
+
+            @Order(100.0)
+            public class RemoveFilterMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return "F x";
+              }
+
+              @Override
+              protected void execAction() {
+                if (m_table != null) {
+                  for (ITableRow selectedRow : getSelectedRows()) {
+                    IColumn<?> selectedCol = getKeyColumn().getValue(selectedRow);
+                    m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+                  }
+                }
+                reloadTableData();
               }
             }
 
