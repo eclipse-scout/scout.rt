@@ -58,7 +58,9 @@ scout.TableHeader.prototype._render = function($parent) {
 
     scout.tooltips.install($header, {
       parent: this,
-      tooltipText: this._headerItemTooltip.bind(this)
+      tooltipText: this._headerItemTooltip.bind(this),
+      arrowPosition: 50,
+      arrowPositionUnit: '%'
     });
 
     this._decorateHeader(column);
