@@ -18,27 +18,17 @@ import javax.jms.Message;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 
 /**
  * The <code>JmsRunContext</code> facilitates propagation of the <i>JMS Java Message Service</i> state. This context is
  * not intended to be propagated across different threads.
- * <p/>
+ * <p>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * state.
- * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
- * <ul>
- * <li>{@link Subject}</li>
- * <li>{@link NlsLocale#CURRENT}</li>
- * <li>{@link PropertyMap#CURRENT}</li>
- * </ul>
  *
  * @since 5.1
  * @see RunContext

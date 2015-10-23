@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -28,7 +27,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -39,21 +37,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * client state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
- * </p>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
- * <ul>
- * <li>{@link RunMonitor#CURRENT}</li>
- * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
- * <li>{@link NlsLocale#CURRENT}</li>
- * <li>{@link PropertyMap#CURRENT}</li>
- * <li>{@link ISession#CURRENT}</li>
- * <li>{@link UserAgent#CURRENT}</li>
- * <li>{@link ScoutTexts#CURRENT}</li>
- * <li>{@link IDesktop#CURRENT}</li>
- * <li>{@link IOutline#CURRENT}</li>
- * <li>{@link IForm#CURRENT}</li>
- * </ul>
  *
  * @since 5.1
  * @see ClientRunContexts

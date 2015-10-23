@@ -37,16 +37,7 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * A context typically represents a "snapshot" of the current calling state and is always associated with a
  * {@link RunMonitor}. This class facilitates propagation of that state among different threads, or allows temporary
  * state changes to be done for the time of executing some code.
- * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
- * <ul>
- * <li>{@link RunMonitor#CURRENT}</li>
- * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
- * <li>{@link NlsLocale#CURRENT}</li>
- * <li>{@link PropertyMap#CURRENT}</li>
- * </ul>
- * Implementers:<br/>
+ * <p>
  * Internally, the context is obtained by <code>BEANS.get(RunContext.class)</code>, meaning that the context can be
  * intercepted, or replaced. Thereto, the method {@link #interceptCallable(Callable)} can be overwritten to contribute
  * some additional behavior.
@@ -132,14 +123,14 @@ public class RunContext {
 
   /**
    * Method invoked to construct the context. Overwrite this method to contribute some behavior to the context.
-   * <p/>
+   * <p>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
    * chain from 'bottom-to-top'.
-   * <p/>
+   * <p>
    * To contribute on top of the chain (meaning that you are invoked <strong>after</strong> the contributions of super
    * classes and therefore can base on their contributed functionality), you can use constructions of the following
    * form:
-   * <p/>
+   * <p>
    * <code>
    *   Callable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
    *   Callable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
@@ -149,7 +140,7 @@ public class RunContext {
    * </p>
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
-   * <p/>
+   * <p>
    * <code>
    *   Callable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
    *   Callable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
@@ -186,12 +177,12 @@ public class RunContext {
    * <pre>
    * <code>
    *     RunMonitor monitor = BEANS.get(RunMonitor.class);
-   * 
+   *
    *     // Register your monitor to be cancelled as well
    *     RunMonitor.CURRENT.get().registerCancellable(monitor);
-   * 
+   *
    *     RunContexts.copyCurrent().withRunMonitor(monitor).run(new IRunnable() {
-   * 
+   *
    *       &#064;Override
    *       public void run() throws Exception {
    *         // do something

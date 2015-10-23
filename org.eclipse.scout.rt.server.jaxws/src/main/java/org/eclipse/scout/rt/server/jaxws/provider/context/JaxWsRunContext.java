@@ -23,29 +23,14 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 
 /**
  * The <code>JaxWsRunContext</code> facilitates propagation of the {@link JAX-WS} state like {@link WebServiceContext}.
- * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
- * <ul>
- * <li>{@link RunMonitor#CURRENT}</li>
- * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
- * <li>{@link NlsLocale#CURRENT}</li>
- * <li>{@link PropertyMap#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_REQUEST}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_RESPONSE}</li>
- * <li>{@link JaxWsRunContext#CURRENT_WEBSERVICE_CONTEXT}</li>
- * </ul>
  *
  * @since 5.1
  * @see RunContext

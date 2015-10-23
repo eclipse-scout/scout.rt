@@ -18,12 +18,10 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
@@ -41,11 +39,11 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 /**
  * The <code>ServerRunContext</code> controls propagation of server-side state and sets the transaction boundaries. To
  * control transaction scope, configure the <code>ServerRunContext</code> with the respective {@link TransactionScope}.
- * <p/>
+ * <p>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * server state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
- * <p/>
+ * <p>
  * A transaction scope controls in which transaction to run executables. By default, a new transaction is started, and
  * committed or rolled back upon completion.
  * <ul>
@@ -53,21 +51,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if not running in a transaction yet.</li>
  * <li>Use {@link TransactionScope#MANDATORY} to enforce that the caller is already running in a transaction. Otherwise,
  * a {@link TransactionRequiredException} is thrown.</li>
- * </ul>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
- * <ul>
- * <li>{@link RunMonitor#CURRENT}</li>
- * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
- * <li>{@link NlsLocale#CURRENT}</li>
- * <li>{@link PropertyMap#CURRENT}</li>
- * <li>{@link ISession#CURRENT}</li>
- * <li>{@link UserAgent#CURRENT}</li>
- * <li>{@link ClientNotificationNodeId#CURRENT}</li>
- * <li>{@link TransactionalClientNotificationCollector#CURRENT}</li>
- * <li>{@link ScoutTexts#CURRENT}</li>
- * <li>{@link ITransaction#CURRENT}</li>
- * <li>{@link OfflineState#CURRENT}</li>
  * </ul>
  *
  * @since 5.1

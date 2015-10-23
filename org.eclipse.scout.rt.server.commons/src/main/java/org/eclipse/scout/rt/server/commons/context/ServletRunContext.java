@@ -20,32 +20,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 
 /**
  * The <code>ServletRunContext</code> facilitates propagation of the {@link Servlet} state. This context is not intended
  * to be propagated across different threads.
- * <p/>
+ * <p>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * state.
- * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
- * <ul>
- * <li>{@link RunMonitor#CURRENT}</li>
- * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
- * <li>{@link NlsLocale#CURRENT}</li>
- * <li>{@link PropertyMap#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_REQUEST}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_RESPONSE}</li>
- * </ul>
  *
  * @since 5.1
  * @see RunContext
