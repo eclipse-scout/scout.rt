@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.ClearTableSelectionFormCloseListener;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabBoxTableField.Table;
@@ -161,7 +160,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
           rebuildTableRows();
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
 

@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -36,7 +35,7 @@ public class OutlineMediator {
     try {
       pageWithNodes.rebuildTableInternal();
     }
-    catch (ProcessingException e1) {
+    catch (RuntimeException e1) {
       BEANS.get(ExceptionHandler.class).handle(e1);
     }
   }

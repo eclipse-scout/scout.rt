@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.PageFieldChains.PageFieldPageChangedChain;
@@ -113,8 +112,8 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
               getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
             }
           }
-          catch (ProcessingException pe) {
-            BEANS.get(ExceptionHandler.class).handle(pe);
+          catch (RuntimeException ex) {
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }
       });

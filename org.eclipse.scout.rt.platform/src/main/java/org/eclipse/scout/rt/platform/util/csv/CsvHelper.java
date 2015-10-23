@@ -43,6 +43,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
@@ -178,18 +179,13 @@ public class CsvHelper {
   }
 
   public Object[][] importData(Reader reader, int headerRowCount, List<String> columnTypes, int rowCount) {
-    try {
-      if (columnTypes != null) {
-        setColumnTypes(columnTypes);
-      }
-      ArrayConsumer cons = new ArrayConsumer();
-      importData(cons, reader, false, false, headerRowCount, rowCount);
-      Object[][] result = cons.getData();
-      return result;
+    if (columnTypes != null) {
+      setColumnTypes(columnTypes);
     }
-    catch (Exception e) {
-      throw new ProcessingException(e.getMessage(), e);
-    }
+    ArrayConsumer cons = new ArrayConsumer();
+    importData(cons, reader, false, false, headerRowCount, rowCount);
+    Object[][] result = cons.getData();
+    return result;
   }
 
   public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount) {
@@ -257,8 +253,8 @@ public class CsvHelper {
             try {
               objList.add(importCell(cell, getColumnFormat(colIndex)));
             }
-            catch (ProcessingException e) {
-              throw new ProcessingException("colIndex=" + colIndex + " cell=" + cell, e);
+            catch (RuntimeException e) {
+              throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "cell=" + cell, "colIndex=" + colIndex);
             }
           }
         }
@@ -267,9 +263,8 @@ public class CsvHelper {
         lineNr++;
       }
     }
-    catch (Exception e) {
-      String previousMessage = (!StringUtility.isNullOrEmpty(e.getMessage())) ? " " + e.getMessage() : "";
-      throw new ProcessingException("lineNr=" + lineNr + previousMessage, e);
+    catch (IOException | RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "lineNr=" + lineNr);
     }
   }
 
@@ -291,10 +286,7 @@ public class CsvHelper {
         }
       }
     }
-    catch (UnsupportedEncodingException e) {
-      throw new ProcessingException(f.getAbsolutePath(), e);
-    }
-    catch (FileNotFoundException e) {
+    catch (UnsupportedEncodingException | FileNotFoundException e) {
       throw new ProcessingException(f.getAbsolutePath(), e);
     }
   }
@@ -496,7 +488,7 @@ public class CsvHelper {
         return f.parseObject(text.trim());
       }
       catch (ParseException e) {
-        throw new ProcessingException("text=" + text + " format=" + f, e);
+        throw new ProcessingException(String.format("Cannot parse '%s' using format '%s'", text, f), e);
       }
     }
     else {

@@ -180,7 +180,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * returns.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(190)
@@ -362,7 +361,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
       try {
         interceptSelectionChanged(b);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -440,13 +439,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private class P_UIFacade implements IButtonUIFacade {
     @Override
     public void fireButtonClickedFromUI() {
-      try {
-        if (isEnabled() && isVisible()) {
-          doClick();
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      if (isEnabled() && isVisible()) {
+        doClick();
       }
     }
 

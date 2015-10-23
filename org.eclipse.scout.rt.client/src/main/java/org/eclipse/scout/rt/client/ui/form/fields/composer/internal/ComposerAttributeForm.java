@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -246,7 +245,7 @@ public class ComposerAttributeForm extends AbstractForm {
               }
             }
           }
-          catch (ProcessingException e) {
+          catch (RuntimeException e) {
             BEANS.get(ExceptionHandler.class).handle(e);
           }
           // activate corresponding data field

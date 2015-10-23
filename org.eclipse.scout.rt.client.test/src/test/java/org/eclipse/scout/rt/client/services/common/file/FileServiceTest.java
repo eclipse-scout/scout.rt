@@ -125,9 +125,6 @@ public class FileServiceTest {
       assertTrue("Incorrect number of synchronized files", synchronizedFolder.listFiles().length == 2);
 
     }
-    catch (ProcessingException e) {
-      fail(e.getMessage());
-    }
     finally {
       TestingUtility.unregisterBeans(reg);
     }

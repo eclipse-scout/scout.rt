@@ -181,12 +181,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
 
     @Override
     public void refreshFromUI() {
-      try {
-        loadResources();
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      loadResources();
     }
 
     @Override

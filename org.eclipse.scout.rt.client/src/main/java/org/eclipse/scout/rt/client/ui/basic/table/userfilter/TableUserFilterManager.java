@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -119,8 +120,8 @@ public class TableUserFilterManager {
         addFilter(filterState);
       }
     }
-    catch (Exception t) {
-      throw new ProcessingException("Failed reading user filter data.", t);
+    catch (IOException | ClassNotFoundException e) {
+      throw new ProcessingException("Failed reading user filter data.", e);
     }
   }
 }

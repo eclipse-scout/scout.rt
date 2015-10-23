@@ -64,21 +64,21 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
 
     assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(new BigDecimal(getMaxPossibleValue()).toPlainString()));
     assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(new BigDecimal(getMinPossibleValue()).toPlainString()));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this,
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too big number.", this,
         new BigDecimal(getMaxPossibleValue().add(BigInteger.ONE)).toPlainString());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this,
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too small number.", this,
         new BigDecimal(getMinPossibleValue().subtract(BigInteger.ONE)).toPlainString());
   }
 
   @Test
   public void testParseValueInternalNotANumber() {
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string not representing a number.", this, "onethousend");
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string not representing a number.", this, "onethousend");
   }
 
   @Test
   public void testParseValueInternalDecimal() {
     // expecting RoundingMode.UNNECESSARY as default
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a decimal value.", this, formatWithFractionDigits(12.1, 1));
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a decimal value.", this, formatWithFractionDigits(12.1, 1));
     Assert.assertEquals("parsing failed", BigInteger.valueOf(12), parseValueInternal(formatWithFractionDigits(12.0, 1)));
 
     setRoundingMode(RoundingMode.HALF_UP);

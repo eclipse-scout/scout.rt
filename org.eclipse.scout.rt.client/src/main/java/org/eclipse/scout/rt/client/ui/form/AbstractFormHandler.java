@@ -203,93 +203,37 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   @Override
   public final void onLoad() {
-    try {
-      interceptLoad();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptLoad();
   }
 
   @Override
   public final void onPostLoad() {
-    try {
-      interceptPostLoad();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptPostLoad();
   }
 
   @Override
   public final boolean onCheckFields() {
-    try {
-      return interceptCheckFields();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    return interceptCheckFields();
   }
 
   @Override
   public final boolean onValidate() {
-    try {
-      return interceptValidate();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    return interceptValidate();
   }
 
   @Override
   public final void onStore() {
-    try {
-      interceptStore();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptStore();
   }
 
   @Override
   public final void onDiscard() {
-    try {
-      interceptDiscard();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptDiscard();
   }
 
   @Override
   public final void onFinally() {
-    try {
-      interceptFinally();
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptFinally();
   }
 
   /**

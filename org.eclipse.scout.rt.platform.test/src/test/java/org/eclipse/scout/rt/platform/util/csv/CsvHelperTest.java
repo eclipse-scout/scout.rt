@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util.csv;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyListOf;
@@ -25,8 +26,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -67,16 +70,19 @@ public class CsvHelperTest {
 
     Reader reader = new FileReader(m_testFile);
     IDataConsumer dataConsumer = mock(IDataConsumer.class);
-    doThrow(ProcessingException.class).when(dataConsumer).processRow(eq(2), anyListOf(Object.class)); //Throw an exception in the 2nd line
+    ProcessingException pe = new ProcessingException();
+    doThrow(pe).when(dataConsumer).processRow(eq(2), anyListOf(Object.class)); //Throw an exception in the 2nd line
     try {
       m_csvHelper.importData(dataConsumer, reader, true, true, 1);
       fail("No exception was thrown! Expected ProcessingException");
     }
     catch (ProcessingException e) {
-      String message = e.getMessage();
-      assertTrue(message.contains("lineNr=2"));
-      assertTrue(!message.contains("colIndex="));
-      assertTrue(!message.contains("cell="));
+      HashSet<String> contextMessages = CollectionUtility.hashSet(e.getStatus().getContextMessages());
+      assertTrue(contextMessages.remove("lineNr=2"));
+      assertEquals(1, contextMessages.size());
+      String msg = CollectionUtility.firstElement(contextMessages);
+      assertFalse(msg.startsWith("colIndex="));
+      assertFalse(msg.startsWith("cell="));
     }
   }
 
@@ -98,10 +104,10 @@ public class CsvHelperTest {
       fail("No exception was thrown! Expected ProcessingException");
     }
     catch (ProcessingException e) {
-      String message = e.getMessage();
-      assertTrue(message.contains("lineNr=3"));
-      assertTrue(message.contains("colIndex=2"));
-      assertTrue(message.contains("cell=d"));
+      HashSet<String> contextMessages = CollectionUtility.hashSet(e.getStatus().getContextMessages());
+      assertTrue(contextMessages.contains("lineNr=3"));
+      assertTrue(contextMessages.contains("colIndex=2"));
+      assertTrue(contextMessages.contains("cell=d"));
     }
   }
 

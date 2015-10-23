@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
@@ -191,7 +190,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
                 menu.handleOwnerValueChanged(ownerValue);
               }
             }
-            catch (ProcessingException e) {
+            catch (RuntimeException e) {
               LOG.error("error during handle owner value changed.", e);
             }
           }
@@ -214,7 +213,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
             try {
               menu.handleOwnerValueChanged(null);
             }
-            catch (ProcessingException e) {
+            catch (RuntimeException e) {
               LOG.error("error during handle owner value changed.", e);
             }
           }

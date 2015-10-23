@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -118,7 +117,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
           try {
             refreshStatus();
           }
-          catch (ProcessingException e) {
+          catch (RuntimeException e) {
             LOG.warn(null, e);
           }
         }

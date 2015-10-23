@@ -1493,7 +1493,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Default implementation just calls {@link #interceptIsSaveNeeded()}<br>
    * For thread-safety-reason this method is final
-   *
    */
   @Override
   public final void checkSaveNeeded() {
@@ -1501,7 +1500,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       try {
         propertySupport.setPropertyBool(PROP_SAVE_NEEDED, m_touched || interceptIsSaveNeeded());
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -1523,7 +1522,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       interceptMarkSaved();
       checkSaveNeeded();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -1535,14 +1534,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Default implementation just calls {@link #interceptIsEmpty()}
-   *
    */
   protected final void checkEmpty() {
     if (isInitialized()) {
       try {
         propertySupport.setPropertyBool(PROP_EMPTY, interceptIsEmpty());
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -1986,7 +1984,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         try {
           interceptChangedMasterValue(newMasterValue);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }

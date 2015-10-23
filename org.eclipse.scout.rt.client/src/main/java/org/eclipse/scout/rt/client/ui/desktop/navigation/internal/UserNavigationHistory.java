@@ -19,7 +19,6 @@ import java.util.ListIterator;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -405,7 +404,7 @@ public class UserNavigationHistory {
         }
         newList.add(m);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("could not initialize menu for bookmark '" + b + "'.", e);
       }
     }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.cache;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -30,7 +29,7 @@ public class CacheNotificationHandler implements INotificationHandler<Invalidate
     try {
       handleNotificationImpl(notification);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Failed handling client notification " + notification, e);
     }
   }

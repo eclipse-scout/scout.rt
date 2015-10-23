@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
@@ -101,26 +100,22 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     return parseToBigDecimalInternal(text);
   }
 
-  public static void assertParseToBigDecimalInternalThrowsProcessingException(String msg, AbstractNumberField<?> field, String textValue) {
-    boolean exceptionOccured = false;
+  public static void assertParseToBigDecimalInternalThrowsRuntimeException(String msg, AbstractNumberField<?> field, String textValue) {
     try {
       field.parseToBigDecimalInternal(textValue);
+      fail(msg);
     }
-    catch (ProcessingException e) {
-      exceptionOccured = true;
+    catch (RuntimeException expected) {
     }
-    assertTrue(msg, exceptionOccured);
   }
 
-  public static <T extends Number> void assertValidateValueInternalThrowsProcessingException(String msg, AbstractNumberField<T> field, T rawValue) {
-    boolean exceptionOccured = false;
+  public static <T extends Number> void assertValidateValueInternalThrowsRuntimeException(String msg, AbstractNumberField<T> field, T rawValue) {
     try {
       field.validateValueInternal(rawValue);
+      fail(msg);
     }
-    catch (ProcessingException e) {
-      exceptionOccured = true;
+    catch (RuntimeException expected) {
     }
-    assertTrue(msg, exceptionOccured);
   }
 
   @Test
@@ -138,7 +133,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
       df.applyPattern("#,##0.00");
       setFormat(df);
       assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-      assertParseToBigDecimalInternalThrowsProcessingException("After setting a pattern without suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
+      assertParseToBigDecimalInternalThrowsRuntimeException("After setting a pattern without suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
 
       getFormatInternal().setPositiveSuffix(" SUF");
       getFormatInternal().setNegativeSuffix(" SUF");
@@ -150,7 +145,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
       getFormatInternal().setPositiveSuffix("");
       getFormatInternal().setNegativeSuffix("");
       assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-      assertParseToBigDecimalInternalThrowsProcessingException("After setting an empty suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
+      assertParseToBigDecimalInternalThrowsRuntimeException("After setting an empty suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
     }
   }
 
@@ -377,7 +372,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
         AbstractNumberField.createNumberWithinFormatLimits(format, format("12.12", decimalSeparator), 0, 2, "12345");
         fail("Exception should be thrown");
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException expected) {
         //okay, expected
       }
 
@@ -385,7 +380,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
         AbstractNumberField.createNumberWithinFormatLimits(format, null, 0, 0, "12345678.1234");
         fail("Exception should be thrown");
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException expected) {
         //okay, expected
       }
     }
@@ -399,8 +394,8 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
     setMaxValue(BigDecimal.valueOf(99));
     setMinValue(BigDecimal.valueOf(-99));
-    AbstractNumberFieldTest.assertValidateValueInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, BigDecimal.valueOf(100));
-    AbstractNumberFieldTest.assertValidateValueInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, BigDecimal.valueOf(-100));
+    AbstractNumberFieldTest.assertValidateValueInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too big number.", this, BigDecimal.valueOf(100));
+    AbstractNumberFieldTest.assertValidateValueInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too small number.", this, BigDecimal.valueOf(-100));
     assertEquals("expected to pass validation", BigDecimal.valueOf(99), validateValueInternal(BigDecimal.valueOf(99)));
     assertEquals("expected to pass validation", BigDecimal.valueOf(-99), validateValueInternal(BigDecimal.valueOf(-99)));
   }

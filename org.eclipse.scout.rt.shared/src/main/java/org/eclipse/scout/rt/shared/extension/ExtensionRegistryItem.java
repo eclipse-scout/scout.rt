@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.extension;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
 
@@ -48,7 +47,7 @@ public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
   @SuppressWarnings("unchecked")
   public <T> T createInstance(Object owner, Object declaringObject) {
     T resultingInstance = null;
-    ProcessingException ex = null;
+    RuntimeException ex = null;
     try {
       boolean isExtension = IExtension.class.isAssignableFrom(m_extensionClass);
       if (isExtension) {
@@ -68,7 +67,7 @@ public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
         }
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       ex = e;
     }
     if (resultingInstance == null) {

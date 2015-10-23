@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -35,7 +34,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -485,12 +483,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      try {
-        setValue(date);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
-      }
+      setValue(date);
     }
 
     @Override
@@ -498,12 +491,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       if (!isEnabled() || !isVisible() || !isHasDate()) {
         return;
       }
-      try {
-        interceptShiftDate(level, value);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      interceptShiftDate(level, value);
     }
 
     @Override
@@ -511,12 +499,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       if (!isEnabled() || !isVisible() || !isHasTime()) {
         return;
       }
-      try {
-        interceptShiftTime(level, value);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      interceptShiftTime(level, value);
     }
 
     @Override

@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -82,7 +81,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         }
       });
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn(String.format("Could not unregister session[%s] for remote notifications.", session), e);
     }
     // client session household
@@ -132,7 +131,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         }
       });
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn(String.format("Could not register session[%s] for remote notifications.", session), e);
     }
   }

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.ActiveOutlineObserver;
@@ -468,7 +467,7 @@ public class PageFormManager {
           }
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -495,7 +494,7 @@ public class PageFormManager {
           }
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

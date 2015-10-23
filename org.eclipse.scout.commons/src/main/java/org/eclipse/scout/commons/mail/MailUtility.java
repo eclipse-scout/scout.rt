@@ -154,10 +154,7 @@ public class MailUtility {
         }
       }
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
+    catch (MessagingException | IOException e) {
       throw new ProcessingException("Unexpected: ", e);
     }
   }
@@ -187,10 +184,7 @@ public class MailUtility {
         }
       }
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
+    catch (MessagingException | IOException e) {
       throw new ProcessingException("Unexpected: ", e);
     }
     return text;

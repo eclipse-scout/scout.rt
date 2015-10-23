@@ -79,12 +79,12 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    * SQL.insert(
    *     &quot;INSERT INTO BOOKMARKS(ID,BINARY) VALUES( SEQ.NEXTVAL, :kind, :folderData )&quot;,
    *     new NVPair(&quot;folderData&quot;, folderData));
-   * 
+   *
    * SQL.update(
    *     &quot;UPDATE BOOKMARKS SET BINARY=folderData WHERE ID=:id&quot;,
    *     new NVPair(&quot;id&quot;, id),
    *     new NVPair(&quot;folderData&quot;, folderData));
-   * 
+   *
    * SQL.delete(
    *     &quot;DELETE FROM BOOKMARKS WHERE ID=:id&quot;,
    *     new NVPair(&quot;id&quot;, id));
@@ -119,12 +119,12 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    * SQL.insert(
    *     &quot;INSERT INTO BOOKMARKS(ID,BINARY) VALUES( SEQ.NEXTVAL, :kind, :folderData )&quot;,
    *     new NVPair(&quot;folderData&quot;, folderData));
-   * 
+   *
    * SQL.update(
    *     &quot;UPDATE BOOKMARKS SET BINARY=folderData WHERE ID=:id&quot;,
    *     new NVPair(&quot;id&quot;, id),
    *     new NVPair(&quot;folderData&quot;, folderData));
-   * 
+   *
    * SQL.delete(
    *     &quot;DELETE FROM BOOKMARKS WHERE ID=:id&quot;,
    *     new NVPair(&quot;id&quot;, id));
@@ -167,7 +167,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
           return folder;
         }
       }
-      catch (ProcessingException p) {
+      catch (RuntimeException p) {
         LOG.warn("invalid bookmark folder binary data for id=" + id + ": " + p);
       }
     }
@@ -187,7 +187,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
           return folder;
         }
       }
-      catch (ProcessingException p) {
+      catch (RuntimeException p) {
         LOG.warn("invalid bookmark folder binary data for id=" + id + ": " + p);
       }
     }

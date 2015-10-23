@@ -33,7 +33,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -271,13 +270,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     m_hierarchy = getConfiguredIsHierarchy();
     m_maxLevel = getConfiguredMaxLevel();
     m_contributionHolder = new ContributionComposite(this);
-    try {
-      loadCodes();
-    }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("CodeTypeInit") + " " + m_text);
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
+    loadCodes();
   }
 
   protected ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> createLocalExtension() {

@@ -371,7 +371,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
           try {
             interceptChangedValue();
           }
-          catch (ProcessingException ex) {
+          catch (RuntimeException ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }
@@ -455,7 +455,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       try {
         interceptChangedValue();
       }
-      catch (ProcessingException ex) {
+      catch (RuntimeException ex) {
         BEANS.get(ExceptionHandler.class).handle(ex);
       }
       fireMasterChanged();

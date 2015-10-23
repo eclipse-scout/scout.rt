@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields.ColumnFieldBuilder;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
@@ -161,7 +160,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
     try {
       doClose();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -192,7 +191,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
           m_column.completeEdit(getRow(), field);
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
@@ -102,7 +101,7 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
         try {
           sortedActions.add(ActionButtonBarUtility.convertButtonToAction(scoutButton));
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error("could not initialize actions.", e);
         }
       }
@@ -125,7 +124,7 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
     try {
       actions.addAll(convertCustomProcessButtons());
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("could not initialze actions.", e);
     }
 

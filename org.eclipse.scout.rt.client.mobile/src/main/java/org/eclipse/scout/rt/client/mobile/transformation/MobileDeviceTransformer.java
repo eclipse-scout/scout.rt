@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
@@ -483,12 +482,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
     protected void onPageChanged(OutlineEvent e) {
       IPage page = (IPage) e.getChildNode();
-      try {
-        transformPageDetailForm(page);
-      }
-      catch (ProcessingException e1) {
-        throw new RuntimeException(e1);
-      }
+      transformPageDetailForm(page);
     }
   }
 }

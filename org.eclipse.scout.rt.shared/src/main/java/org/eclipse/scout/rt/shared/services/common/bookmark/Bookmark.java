@@ -195,10 +195,7 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
       Bookmark bm = SerializationUtility.createObjectSerializer().deserialize(data, Bookmark.class);
       importData(bm);
     }
-    catch (IOException e) {
-      throw new ProcessingException("title: " + getTitle(), e);
-    }
-    catch (ClassNotFoundException e) {
+    catch (IOException | ClassNotFoundException e) {
       throw new ProcessingException("title: " + getTitle(), e);
     }
     m_serializedData = data;
@@ -217,8 +214,8 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
         crc.update(a);
       }
     }
-    catch (ProcessingException e) {
-      LOG.warn(null, e);
+    catch (RuntimeException e) {
+      LOG.warn("CRC computation failed", e);
     }
     return crc.getValue();
   }

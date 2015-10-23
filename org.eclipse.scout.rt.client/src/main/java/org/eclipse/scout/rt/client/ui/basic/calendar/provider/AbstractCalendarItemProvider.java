@@ -333,28 +333,12 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
 
   @Override
   public void onItemAction(ICalendarItem item) {
-    try {
-      interceptItemAction(item);
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptItemAction(item);
   }
 
   @Override
   public void onItemMoved(ICalendarItem item, Date newDate) {
-    try {
-      interceptItemMoved(item, newDate);
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Unexpected", e);
-    }
+    interceptItemMoved(item, newDate);
   }
 
   private void ensureItemsLoadedInternal(Date minDate, Date maxDate) {

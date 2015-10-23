@@ -305,7 +305,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       try {
         ActionUtility.initActions(getMenus());
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("could not initialize actions.", e);
       }
       interceptInitTreeNode();

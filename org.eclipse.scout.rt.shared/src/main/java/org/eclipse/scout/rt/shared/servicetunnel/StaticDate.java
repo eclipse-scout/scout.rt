@@ -39,27 +39,22 @@ public class StaticDate implements java.io.Serializable {
   }
 
   public Date getDate() {
-    try {
-      Calendar cal = new GregorianCalendar();
-      long l = m_textAsLong;
-      cal.set(Calendar.MILLISECOND, (int) (l % 1000));
-      l = l / 1000;
-      cal.set(Calendar.SECOND, (int) (l % 100));
-      l = l / 100;
-      cal.set(Calendar.MINUTE, (int) (l % 100));
-      l = l / 100;
-      cal.set(Calendar.HOUR_OF_DAY, (int) (l % 100));
-      l = l / 100;
-      cal.set(Calendar.DATE, (int) (l % 100));
-      l = l / 100;
-      cal.set(Calendar.MONTH, (int) (l % 100));
-      l = l / 100;
-      cal.set(Calendar.YEAR, (int) (l));
-      return cal.getTime();
-    }
-    catch (Exception e) {
-      throw new RuntimeException("parsing " + m_textAsLong, e);
-    }
+    Calendar cal = new GregorianCalendar();
+    long l = m_textAsLong;
+    cal.set(Calendar.MILLISECOND, (int) (l % 1000));
+    l = l / 1000;
+    cal.set(Calendar.SECOND, (int) (l % 100));
+    l = l / 100;
+    cal.set(Calendar.MINUTE, (int) (l % 100));
+    l = l / 100;
+    cal.set(Calendar.HOUR_OF_DAY, (int) (l % 100));
+    l = l / 100;
+    cal.set(Calendar.DATE, (int) (l % 100));
+    l = l / 100;
+    cal.set(Calendar.MONTH, (int) (l % 100));
+    l = l / 100;
+    cal.set(Calendar.YEAR, (int) (l));
+    return cal.getTime();
   }
 
   @Override

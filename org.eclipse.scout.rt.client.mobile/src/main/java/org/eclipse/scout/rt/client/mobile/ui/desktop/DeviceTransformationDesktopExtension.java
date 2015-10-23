@@ -14,7 +14,6 @@ import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
@@ -143,7 +142,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     try {
       getDeviceTransformer().transformForm(form);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
 

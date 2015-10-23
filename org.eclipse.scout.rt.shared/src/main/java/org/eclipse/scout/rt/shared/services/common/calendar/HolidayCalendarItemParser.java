@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.w3c.dom.Element;
@@ -73,12 +72,7 @@ public class HolidayCalendarItemParser {
   }
 
   public HolidayCalendarItemParser(InputStream xmlResource, String displayFileName) {
-    try {
-      m_xml = XmlUtility.getXmlDocument(xmlResource).getDocumentElement();
-    }
-    catch (Exception t) {
-      throw new ProcessingException("loading " + displayFileName, t);
-    }
+    m_xml = XmlUtility.getXmlDocument(xmlResource).getDocumentElement();
   }
 
   public Set<? extends ICalendarItem> getItems(Locale loc, Date minDate, Date maxDate) {

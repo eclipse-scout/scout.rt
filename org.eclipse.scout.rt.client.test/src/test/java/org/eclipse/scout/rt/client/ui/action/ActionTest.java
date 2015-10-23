@@ -109,10 +109,9 @@ public class ActionTest {
    */
   @Test
   public void testCombineKeyStrokes() throws Exception {
-    final BaseAction testAction = new BaseAction();
-    assertEquals("", testAction.combineKeyStrokes());
-    assertEquals(IKeyStroke.F1, testAction.combineKeyStrokes(IKeyStroke.F1));
-    assertEquals(IKeyStroke.CONTROL + IKeyStroke.KEY_STROKE_SEPARATOR + IKeyStroke.F1, testAction.combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.F1));
+    assertEquals("", AbstractAction.combineKeyStrokes());
+    assertEquals(IKeyStroke.F1, AbstractAction.combineKeyStrokes(IKeyStroke.F1));
+    assertEquals(IKeyStroke.CONTROL + IKeyStroke.KEY_STROKE_SEPARATOR + IKeyStroke.F1, AbstractAction.combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.F1));
   }
 
   /**

@@ -220,23 +220,18 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
     if (getLookupCall() != null) {
       // Use the LookupCall
-      try {
-        List<ILookupRow<T>> lookupRows = getLookupRows();
-        for (ILookupRow<T> row : lookupRows) {
-          IRadioButton<T> radioButton = createEmptyRadioButtonForLookupRow();
-          radioButton.setEnabled(row.isEnabled());
-          radioButton.setLabel(row.getText());
-          radioButton.setRadioValue(row.getKey());
-          radioButton.setTooltipText(row.getTooltipText());
-          radioButton.setBackgroundColor(row.getBackgroundColor());
-          radioButton.setForegroundColor(row.getForegroundColor());
-          radioButton.setFont(row.getFont());
-          radioButton.setEnabled(row.isActive());
-          fields.addLast(radioButton);
-        }
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException(this.getClass().getSimpleName(), e));
+      List<ILookupRow<T>> lookupRows = getLookupRows();
+      for (ILookupRow<T> row : lookupRows) {
+        IRadioButton<T> radioButton = createEmptyRadioButtonForLookupRow();
+        radioButton.setEnabled(row.isEnabled());
+        radioButton.setLabel(row.getText());
+        radioButton.setRadioValue(row.getKey());
+        radioButton.setTooltipText(row.getTooltipText());
+        radioButton.setBackgroundColor(row.getBackgroundColor());
+        radioButton.setForegroundColor(row.getForegroundColor());
+        radioButton.setFont(row.getFont());
+        radioButton.setEnabled(row.isActive());
+        fields.addLast(radioButton);
       }
     }
   }

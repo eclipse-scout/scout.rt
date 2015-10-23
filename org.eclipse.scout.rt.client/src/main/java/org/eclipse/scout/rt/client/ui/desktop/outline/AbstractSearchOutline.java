@@ -10,11 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
@@ -82,9 +79,6 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
         pushUIProcessor();
         setProperty(PROP_SEARCH_QUERY, query);
         AbstractSearchOutline.this.search();
-      }
-      catch (ProcessingException se) {
-        BEANS.get(ExceptionHandler.class).handle(se);
       }
       finally {
         popUIProcessor();

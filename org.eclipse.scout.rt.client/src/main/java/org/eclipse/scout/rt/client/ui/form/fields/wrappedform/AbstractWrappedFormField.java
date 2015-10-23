@@ -109,7 +109,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     try {
       uninstallInnerForm();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       // May occur during form life cycle management (start, close).
       throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
     }

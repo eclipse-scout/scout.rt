@@ -324,7 +324,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           desktop.activateBookmark(bm, false);
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -339,7 +339,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           getTree().unloadNode(this);
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -489,7 +489,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       try {
         return (IPage) getTree().resolveVirtualNode(getChildNode(childIndex));
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("failed to create the real page from the virtual page", e);
       }
     }
@@ -503,7 +503,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       try {
         getTree().resolveVirtualNodes(getChildNodes());
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("failed to create the real page from the virtual page", e);
       }
     }
@@ -535,11 +535,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       interceptDisposePage();
       disposeDetailForm();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
     // automatically remove all data change listeners
     if (m_internalDataChangeListener != null) {
@@ -673,12 +670,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void setDetailForm(IForm form) {
     m_detailForm = form;
     if (m_detailForm != null) {
-      try {
-        decorateDetailForm();
-      }
-      catch (ProcessingException e) {
-        throw new RuntimeException("Decoration of detail form failed", e);
-      }
+      decorateDetailForm();
     }
     firePageChanged(this);
     if (isSelectedNode()) {

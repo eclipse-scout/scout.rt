@@ -20,7 +20,6 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -174,7 +173,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
       boolean b = other.execCheckLevel(level);
       return b;
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new SecurityException(e);
     }
   }
@@ -182,7 +181,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
   /**
    * Only called in the backend. Frontend uses proxy cache. Called by {@link #implies(Permission)} when level has value
    * #LEVEL_UNDEFINED
-   * 
+   *
    * @param requiredLevel
    *          default implementation calls {@link #execCheckLevelData(int)} and returns true if data yields rows and
    *          first rows first value is 1
@@ -195,7 +194,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
 
   /**
    * called by {@link #implies(Permission)} via execCheckLevel when level has value #LEVEL_UNDEFINED
-   * 
+   *
    * @param requiredLevel
    * @return data with data[0][0]=1 as true
    */

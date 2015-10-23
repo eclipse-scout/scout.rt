@@ -523,7 +523,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * {@link AbstractTableField#reloadTableData()} or via {@link AbstractForm#importFormData(AbstractFormData)}.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(10)
@@ -534,7 +533,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Called when the surrounding table is disposed. This method may execute additional cleanup.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(15)
@@ -1591,11 +1589,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     try {
       interceptDecorateCell(cell, row);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("Exception decorating cell", e);
-    }
-    catch (Exception e) {
-      LOG.error("Unexpected exception decorating cell ", e);
     }
   }
 

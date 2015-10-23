@@ -366,7 +366,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * Please double check if implementing this method! Consider using {@link #interceptAction()} instead. If no other
    * option ensure super call when overriding this method.
-   *
    */
   protected void doActionInternal() {
     interceptAction();
@@ -701,13 +700,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   protected class P_UIFacade implements IActionUIFacade {
     @Override
     public void fireActionFromUI() {
-      try {
-        if (isThisAndParentsEnabled() && isThisAndParentsVisible()) {
-          doAction();
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      if (isThisAndParentsEnabled() && isThisAndParentsVisible()) {
+        doAction();
       }
     }
 

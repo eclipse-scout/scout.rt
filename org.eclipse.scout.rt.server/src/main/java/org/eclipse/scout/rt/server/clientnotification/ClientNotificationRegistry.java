@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -378,7 +377,7 @@ public class ClientNotificationRegistry {
       }
       txMember.addNotification(message);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("Could not register transaction member. The notification will be processed immediately", e);
       publish(Collections.singleton(message));
     }
@@ -398,7 +397,7 @@ public class ClientNotificationRegistry {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
       service.publish(new ClientNotificationClusterNotification(filteredMessages));
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Failed to publish client notification", e);
     }
   }

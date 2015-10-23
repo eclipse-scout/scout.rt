@@ -325,7 +325,7 @@ public class BookmarkViewForm extends AbstractForm {
         try {
           BEANS.get(IBookmarkService.class).loadBookmarks();
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error("Could not reload bookmarks.", e);
         }
       }

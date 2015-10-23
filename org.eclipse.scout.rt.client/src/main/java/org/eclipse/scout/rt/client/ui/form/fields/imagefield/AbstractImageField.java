@@ -497,12 +497,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     @Override
     public TransferObject fireDragRequestFromUI() {
       TransferObject t = null;
-      try {
-        t = interceptDragRequest();
-      }
-      catch (ProcessingException e) {
-        LOG.warn(null, e);
-      }
+      t = interceptDragRequest();
       return t;
     }
 
@@ -512,12 +507,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
         //can not drop anything into field if its disabled.
         return;
       }
-      try {
-        interceptDropRequest(scoutTransferable);
-      }
-      catch (ProcessingException e) {
-        LOG.warn(null, e);
-      }
+      interceptDropRequest(scoutTransferable);
     }
 
   }// end private class

@@ -309,7 +309,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   @ConfigOperation
   @Order(30)
-  protected Connection execCreateConnection() throws Throwable {
+  protected Connection execCreateConnection() {
     return leaseConnectionInternal();
   }
 
@@ -529,12 +529,12 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   /*
    * Internals
    */
-  private Connection leaseConnection() throws Throwable {
+  private Connection leaseConnection() {
     Connection conn = execCreateConnection();
     return conn;
   }
 
-  private Connection leaseConnectionInternal() throws Throwable {
+  private Connection leaseConnectionInternal() {
     try {
       if (isDirectJdbcConnection()) {
         // get connection from internal pool
@@ -602,19 +602,11 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
     SqlTransactionMember member = (SqlTransactionMember) tx.getMember(getTransactionMemberId());
     if (member == null) {
-      try {
-        Connection connection = leaseConnection();
-        member = new SqlTransactionMember(getTransactionMemberId(), connection);
-        tx.registerMember(member);
-        // this is the start of the transaction
-        execBeginTransaction();
-      }
-      catch (ProcessingException e) {
-        throw e;
-      }
-      catch (Throwable e) {
-        throw new ProcessingException("Failed to get SQL connection", e);
-      }
+      Connection connection = leaseConnection();
+      member = new SqlTransactionMember(getTransactionMemberId(), connection);
+      tx.registerMember(member);
+      // this is the start of the transaction
+      execBeginTransaction();
     }
     return member.getConnection();
   }

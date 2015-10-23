@@ -18,7 +18,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -105,7 +104,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
     try {
       dispatchClientNotifications(serviceResponse.getNotifications());
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error during processing piggyback client notifictions.", e);
     }
   }

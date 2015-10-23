@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.UriUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -70,9 +69,6 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
       }
       Object result = serviceUtility.invoke(serviceOperation, service, req.getArgs());
       return new ServiceTunnelResponse(result, null, null);
-    }
-    catch (ProcessingException pe) {
-      return new ServiceTunnelResponse(null, null, pe);
     }
     catch (Throwable t) {
       return new ServiceTunnelResponse(null, null, t);

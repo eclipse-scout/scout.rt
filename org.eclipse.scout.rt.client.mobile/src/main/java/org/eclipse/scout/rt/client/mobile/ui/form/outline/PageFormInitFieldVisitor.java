@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -26,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
  * already.
  */
 public class PageFormInitFieldVisitor implements IFormFieldVisitor {
-  private ProcessingException m_firstEx;
+  private RuntimeException m_firstEx;
   private Set<IForm> m_formsToIgnore;
 
   public PageFormInitFieldVisitor() {
@@ -40,14 +39,9 @@ public class PageFormInitFieldVisitor implements IFormFieldVisitor {
         field.initField();
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       if (m_firstEx == null) {
         m_firstEx = e;
-      }
-    }
-    catch (Exception t) {
-      if (m_firstEx == null) {
-        m_firstEx = new ProcessingException("Unexpected", t);
       }
     }
     return true;

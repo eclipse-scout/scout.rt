@@ -60,7 +60,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
           try {
             execResultTableRowClicked(CollectionUtility.firstElement(e.getRows()));
           }
-          catch (ProcessingException e1) {
+          catch (RuntimeException e1) {
             LOG.warn("could not handle smart table selection.", e);
           }
         }
@@ -161,7 +161,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
         setStatus(null);
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("update proposal list", e);
     }
   }

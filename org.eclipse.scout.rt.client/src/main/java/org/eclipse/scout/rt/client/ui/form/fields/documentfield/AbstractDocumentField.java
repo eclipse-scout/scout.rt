@@ -8,7 +8,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -20,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.SaveAsData;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
@@ -131,7 +129,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   // main handler
   protected Object fireDocumentFieldEventInternal(DocumentFieldEvent e) {
     Object returnValue = null;
-    ProcessingException exception = null;
+    RuntimeException exception = null;
     DocumentFieldListener[] listeners = m_listenerList.getListeners(DocumentFieldListener.class);
     if (listeners != null && listeners.length > 0) {
       for (int i = 0; i < listeners.length; i++) {
@@ -141,7 +139,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
             returnValue = tmp;
           }
         }
-        catch (ProcessingException t) {
+        catch (RuntimeException t) {
           exception = t;
         }
       }
@@ -184,7 +182,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     try {
       fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_AUTORESIZE_DOCUMENT));
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("Could not auto resize document", e);
     }
   }
@@ -214,13 +212,8 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      try {
-        if (propertySupport.setPropertyBool(PROP_COM_READY, comReady)) {
-          interceptComReadyStatusChanged(comReady);
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      if (propertySupport.setPropertyBool(PROP_COM_READY, comReady)) {
+        interceptComReadyStatusChanged(comReady);
       }
     }
   }

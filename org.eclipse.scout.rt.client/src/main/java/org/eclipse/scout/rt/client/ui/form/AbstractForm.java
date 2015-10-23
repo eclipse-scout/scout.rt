@@ -121,6 +121,7 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -467,7 +468,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
    * <p>
    * This method is called in the process of the initialization. The UI is not ready yet.
-   *
    */
   @ConfigOperation
   @Order(10)
@@ -476,7 +476,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * This method is called when UI is ready.
-   *
    */
   @ConfigOperation
   @Order(11)
@@ -611,14 +610,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected final void interceptInitConfig() {
-    final Holder<ProcessingException> exceptionHolder = new Holder<ProcessingException>(ProcessingException.class, null);
+    final Holder<RuntimeException> exceptionHolder = new Holder<>(RuntimeException.class, null);
     m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
       @Override
       public void run() {
         try {
           initConfig();
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           exceptionHolder.setValue(e);
         }
       }
@@ -936,19 +935,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
             return;
           }
         }
-        catch (ProcessingException e) {
-          e.addContextMessage(AbstractForm.this.getClass().getSimpleName());
+        catch (RuntimeException e) {
           disposeFormInternal();
-          if (e instanceof VetoException) {
-            interceptOnVetoException((VetoException) e, e.getStatus().getCode());
+          ProcessingException pe = BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + AbstractForm.this.getClass().getName());
+          if (pe instanceof VetoException) {
+            VetoException ve = (VetoException) pe;
+            interceptOnVetoException(ve, ve.getStatus().getCode());
           }
-          else {
-            throw e;
-          }
-        }
-        catch (Exception e) {
-          disposeFormInternal();
-          throw new ProcessingException("failed showing " + getTitle(), e);
+          throw pe;
         }
 
         setButtonsArmed(true);
@@ -1060,7 +1054,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     // visit remaining fields (there could be an extension with properties e.g. on a groupbox)
-    final Holder<ProcessingException> exHolder = new Holder<ProcessingException>(ProcessingException.class);
+    final Holder<RuntimeException> exHolder = new Holder<>(RuntimeException.class);
     visitFields(new IFormFieldVisitor() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -1072,7 +1066,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         try {
           exportExtensionProperties(field, target);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           exHolder.setValue(e);
         }
         return exHolder.getValue() == null;
@@ -1434,18 +1428,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // add verbose form texts
     interceptAddSearchTerms(searchFilter);
     // override may add form data
-    try {
-      AbstractFormData data = createFormData();
-      if (data != null) {
-        exportFormData(data);
-        getSearchFilter().setFormData(data);
-      }
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Create form data", e);
+    AbstractFormData data = createFormData();
+    if (data != null) {
+      exportFormData(data);
+      getSearchFilter().setFormData(data);
     }
   }
 
@@ -1641,7 +1627,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         throw e;
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       // clear search
       if (m_searchFilter != null) {
         m_searchFilter.clear();
@@ -1652,13 +1638,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       // if exception was caught and suppressed, this form was after all successfully stored
       // normally this code is not reached since the exception will  be passed out
       m_formStored = true;
-    }
-    catch (Exception t) {
-      // clear search
-      if (m_searchFilter != null) {
-        m_searchFilter.clear();
-      }
-      throw new ProcessingException("form: " + getTitle(), t);
     }
     fireFormStoreAfter();
   }
@@ -1684,12 +1663,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * do not use or override this internal method
    */
-  protected void throwVetoExceptionInternal(ProcessingException e) {
-    if (e instanceof VetoException) {
-      if (!e.isConsumed()) {
-        interceptOnVetoException((VetoException) e, e.getStatus().getCode());
+  protected void throwVetoExceptionInternal(RuntimeException e) {
+    ProcessingException pe = BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
+    if (pe instanceof VetoException) {
+      if (!pe.isConsumed()) {
+        interceptOnVetoException((VetoException) pe, pe.getStatus().getCode());
         // if it was not re-thrown it is assumed to be consumed
-        e.consume();
+        pe.consume();
       }
     }
     throw e;
@@ -1823,10 +1803,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (!isFormStarted()) {
       return;
     }
-    m_closeType = IButton.SYSTEM_TYPE_CLOSE;
-    discardStateInternal();
-    doFinally();
-    disposeFormInternal();
+    try {
+      m_closeType = IButton.SYSTEM_TYPE_CLOSE;
+      discardStateInternal();
+      doFinally();
+      disposeFormInternal();
+    }
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
+    }
   }
 
   @Override
@@ -1873,9 +1858,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       doFinally();
       disposeFormInternal();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
-      throw e;
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -1897,16 +1882,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         return true;
       }
     };
-    visitFields(v);
     try {
+      visitFields(v);
       // init again
       initForm();
       // load again
       loadStateInternal();
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormReset") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -1933,7 +1917,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       doFinally();
       disposeFormInternal();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
       throwVetoExceptionInternal(e);
     }
@@ -1953,7 +1937,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       storeStateInternal();
       // do not set to "markSaved"
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
       throwVetoExceptionInternal(e);
     }
@@ -1975,7 +1959,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         markSaved();
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
       throwVetoExceptionInternal(e);
     }
@@ -2007,13 +1991,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       getHandler().onFinally();
     }
-    catch (ProcessingException se) {
-      se.addContextMessage(ScoutTexts.get("FormFinally") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(se);
-    }
-    catch (Exception t) {
-      ProcessingException e = new ProcessingException(ScoutTexts.get("FormFinally") + " " + getTitle(), t);
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2107,13 +2086,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }
       }
-      catch (ProcessingException se) {
-        se.addContextMessage(ScoutTexts.get("FormClosing") + " " + getTitle());
-        BEANS.get(ExceptionHandler.class).handle(se);
-      }
-      catch (Exception t) {
-        ProcessingException e = new ProcessingException(ScoutTexts.get("FormClosing") + " " + getTitle(), t);
-        BEANS.get(ExceptionHandler.class).handle(e);
+      catch (RuntimeException e) {
+        throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
       }
     }
   }
@@ -2286,7 +2260,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // add fields
     final Element xFields = root.getOwnerDocument().createElement("fields");
     root.appendChild(xFields);
-    final Holder<ProcessingException> exceptionHolder = new Holder<ProcessingException>(ProcessingException.class);
+    final Holder<RuntimeException> exceptionHolder = new Holder<>(RuntimeException.class);
     P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -2295,7 +2269,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           field.storeToXml(xField);
           xFields.appendChild(xField);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           exceptionHolder.setValue(e);
           return false;
         }
@@ -2413,9 +2387,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       firePrint(null, device, parameters);
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormPrint") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2424,9 +2397,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       firePrint(field, device, parameters);
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormPrint") + " " + (field != null ? field.getLabel() : getTitle()));
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "field=" + (field == null ? "<null>" : field.getClass().getName()));
     }
   }
 
@@ -2511,9 +2483,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_DISCARDED));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireDiscarded") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2529,9 +2500,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_PRINTED, outputFile));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFirePrinted") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2542,11 +2512,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       interceptFormActivated();
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_ACTIVATED));
-
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireActivated") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2557,28 +2525,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_CLOSED));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireClosed") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
   protected void fireFormEvent(FormEvent e) {
     EventListener[] listeners = m_listenerList.getListeners(FormListener.class);
     if (listeners != null && listeners.length > 0) {
-      ProcessingException pe = null;
+      RuntimeException pe = null;
       for (int i = 0; i < listeners.length; i++) {
         try {
           ((FormListener) listeners[i]).formChanged(e);
         }
-        catch (ProcessingException ex) {
+        catch (RuntimeException ex) {
           if (pe == null) {
             pe = ex;
-          }
-        }
-        catch (Exception t) {
-          if (pe == null) {
-            pe = new ProcessingException("Unexpected", t);
           }
         }
       }
@@ -2601,9 +2563,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_STRUCTURE_CHANGED, causingField));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireStructureChanged") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e,
+          "form=" + getClass().getName(),
+          "field=" + (causingField == null ? "<null>" : causingField.getClass().getName()));
     }
   }
 
@@ -2611,9 +2574,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_TO_FRONT));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireToFront") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2621,9 +2583,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_TO_BACK));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireToBack") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
     }
   }
 
@@ -2631,9 +2592,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_REQUEST_FOCUS, f));
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormFireRequestFocus") + " " + getTitle() + " for " + f.getLabel());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e,
+          "form=" + getClass().getName(),
+          "field=" + (f == null ? "<null>" : f.getClass().getName()));
     }
   }
 
@@ -2913,9 +2875,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
                 }
               }
             }
-            catch (ProcessingException se) {
-              se.addContextMessage(ScoutTexts.get("FormButtonClicked") + " " + getTitle() + "." + e.getButton().getLabel());
-              BEANS.get(ExceptionHandler.class).handle(se);
+            catch (RuntimeException ex) {
+              ProcessingException pe = BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(ex, "button=" + e.getButton().getClass().getName());
+              BEANS.get(ExceptionHandler.class).handle(pe);
             }
             if (m_currentValidateContentDescriptor != null) {
               m_currentValidateContentDescriptor.activateProblemLocation();
@@ -2983,9 +2945,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               }
               interceptTimer(timerId);
             }
-            catch (ProcessingException pe) {
-              pe.addContextMessage("%s %s.%s", ScoutTexts.get("FormTimerActivated"), getTitle(), timerId);
-              BEANS.get(ExceptionHandler.class).handle(pe);
+            catch (RuntimeException e) {
+              throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName(), "timerId=" + timerId);
             }
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Form timer")).awaitDone();
@@ -3023,9 +2984,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               try {
                 interceptCloseTimer();
               }
-              catch (ProcessingException se) {
-                se.addContextMessage(ScoutTexts.get("FormCloseTimerActivated") + " " + getTitle());
-                BEANS.get(ExceptionHandler.class).handle(se);
+              catch (RuntimeException e) {
+                throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
               }
             }
           }

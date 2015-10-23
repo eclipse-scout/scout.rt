@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +37,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlField
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
@@ -119,10 +119,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
       try {
         setValue(IOUtility.getContent(new InputStreamReader(url.openStream(), encoding)));
       }
-      catch (ProcessingException e) {
-        throw e;
-      }
-      catch (Exception e) {
+      catch (IOException e) {
         throw new ProcessingException("URL " + url, e);
       }
     }
@@ -187,12 +184,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      try {
-        doAppLinkAction(ref);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      doAppLinkAction(ref);
     }
   }
 

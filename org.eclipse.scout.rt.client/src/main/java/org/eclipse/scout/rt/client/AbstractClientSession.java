@@ -356,7 +356,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   /**
    * Initialize the properties of the client session. This method is called in the process of the initialization right
    * before the session is activated.
-   *
    */
   @ConfigOperation
   @Order(10)
@@ -366,7 +365,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   /**
    * This method is called just before the session is stopped and can be overwritten to persist properties of the client
    * session
-   *
    */
   @ConfigOperation
   @Order(20)
@@ -490,7 +488,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       }
       cancelRunningJobs();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("Encountered an error while waiting for running jobs to complete.", e);
     }
     finally {

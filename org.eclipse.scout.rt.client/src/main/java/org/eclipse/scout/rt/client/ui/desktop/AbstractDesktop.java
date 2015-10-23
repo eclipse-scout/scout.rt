@@ -94,6 +94,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -309,7 +310,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called while this desktop is initialized.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(10)
@@ -320,7 +320,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called after this desktop was opened and displayed on the GUI.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(20)
@@ -333,7 +332,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Subclasses can override this method to execute some custom code before the desktop gets into its closing state. The
    * default behavior is to do nothing. By throwing an explicit {@link VetoException} the closing process will be
    * stopped.
-   *
    */
   @ConfigOperation
   @Order(30)
@@ -344,7 +342,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called before this desktop is being closed.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(40)
@@ -355,7 +352,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called after a UI has been attached to this desktop. This desktop must not necessarily be open.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(50)
@@ -366,7 +362,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called after a UI has been detached from this desktop. This desktop must not necessarily be open.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(60)
@@ -593,7 +588,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       try {
         ks.initAction();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("could not initialize key stroke '" + ks + "'.", e);
       }
     }
@@ -871,7 +866,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     try {
       formKey = form.computeExclusiveKey();
     }
-    catch (final ProcessingException e) {
+    catch (final RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
       return CollectionUtility.emptyArrayList();
     }
@@ -1031,7 +1026,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       try {
         m_outline.getActivePage().ensureChildrenLoaded();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -1049,7 +1044,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         try {
           activateBookmark(bookmark);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
         }
       }
@@ -1463,9 +1458,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     try {
       firePrint(device, parameters);
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(ScoutTexts.get("FormPrint") + " " + getTitle());
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, ScoutTexts.get("FormPrint") + " " + getTitle());
     }
   }
 
@@ -1751,11 +1745,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             break;
           }
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           BEANS.get(ExceptionHandler.class).handle(e);
-        }
-        catch (Exception e) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException(oldOutline + " -> " + newOutline, e));
         }
       }
     }
@@ -1856,8 +1847,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-    catch (Exception ex) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", ex));
+    catch (RuntimeException ex) {
+      BEANS.get(ExceptionHandler.class).handle(ex);
     }
   }
 
@@ -1960,7 +1951,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         try {
           form.doClose();
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error("Exception while closing form", e);
         }
       }
@@ -2312,7 +2303,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           return false;
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("Error closing forms", e);
       }
     }
@@ -2333,11 +2324,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         catch (VetoException e) {
           continueClosing = false;
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           BEANS.get(ExceptionHandler.class).handle(e);
-        }
-        catch (Exception t) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Desktop before closing error", t));
         }
       }
     }

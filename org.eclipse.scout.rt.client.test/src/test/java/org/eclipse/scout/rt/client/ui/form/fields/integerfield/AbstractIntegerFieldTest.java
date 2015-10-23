@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.integerfield;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,7 +21,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
@@ -78,36 +77,32 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   public void testParseValueInternalAroundIntegerMinMaxValue() {
     assertEquals("parsing failed", Integer.valueOf(Integer.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Integer.MAX_VALUE).toPlainString()));
     assertEquals("parsing failed", Integer.valueOf(Integer.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Integer.MIN_VALUE).toPlainString()));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this,
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too big number.", this,
         BigDecimal.valueOf(Integer.MAX_VALUE).add(BigDecimal.ONE).toPlainString());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this,
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too small number.", this,
         BigDecimal.valueOf(Integer.MIN_VALUE).subtract(BigDecimal.ONE).toPlainString());
   }
 
   @Test
   public void testParseValueInternalNotANumber() {
-    boolean exceptionOccured = false;
     try {
       parseValueInternal("onethousend");
+      fail("Expected an exception when parsing a string not representing a number.");
     }
-    catch (ProcessingException e) {
-      exceptionOccured = true;
+    catch (RuntimeException expected) {
     }
-    assertTrue("Expected an exception when parsing a string not representing a number.", exceptionOccured);
   }
 
   @Test
   public void testParseValueInternalDecimal() {
     // expecting RoundingMode.UNNECESSARY as default
     NlsLocale.set(Locale.TRADITIONAL_CHINESE);
-    boolean exceptionOccured = false;
     try {
       parseValueInternal(formatWithFractionDigits(12.1, 1));
+      fail("Expected an exception when parsing a string representing a decimal value.");
     }
-    catch (ProcessingException e) {
-      exceptionOccured = true;
+    catch (RuntimeException expected) {
     }
-    assertTrue("Expected an exception when parsing a string representing a decimal value.", exceptionOccured);
     assertEquals("parsing failed", Integer.valueOf(12), parseValueInternal(formatWithFractionDigits(12.0, 1)));
 
     setRoundingMode(RoundingMode.HALF_UP);

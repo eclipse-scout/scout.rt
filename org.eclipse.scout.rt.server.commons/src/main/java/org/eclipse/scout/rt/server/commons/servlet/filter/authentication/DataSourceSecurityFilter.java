@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.SecurityUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -198,7 +197,7 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     try {
       return Base64Utility.encode(SecurityUtility.hash(pass.getBytes(UTF_8), DEFAULT_SALT));
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new ServletException("Unable to hash password", e);
     }
   }

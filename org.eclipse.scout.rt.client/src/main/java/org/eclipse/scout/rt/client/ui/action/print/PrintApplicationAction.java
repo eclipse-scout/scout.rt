@@ -20,8 +20,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -36,7 +34,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 public class PrintApplicationAction extends AbstractAction {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintApplicationAction.class);
 
   private final IDesktop m_desktop;
   private IFormFilter m_formFilter;
@@ -245,12 +242,7 @@ public class PrintApplicationAction extends AbstractAction {
     public void desktopChanged(DesktopEvent e) {
       if (e.getType() == DesktopEvent.TYPE_PRINTED) {
         getDesktop().removeDesktopListener(P_DesktopListener.this);
-        try {
-          executeNextTask();
-        }
-        catch (ProcessingException e1) {
-          LOG.warn("could not execute task.", e);
-        }
+        executeNextTask();
       }
     }
   }

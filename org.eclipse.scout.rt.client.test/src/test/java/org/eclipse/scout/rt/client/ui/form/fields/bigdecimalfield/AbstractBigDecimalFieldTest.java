@@ -13,13 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -66,8 +65,8 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
 
     assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(getMaxPossibleValue().toPlainString()));
     assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(getMinPossibleValue().toPlainString()));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, getMaxPossibleValue().add(BigDecimal.ONE).toPlainString());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, getMinPossibleValue().subtract(BigDecimal.ONE).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too big number.", this, getMaxPossibleValue().add(BigDecimal.ONE).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too small number.", this, getMinPossibleValue().subtract(BigDecimal.ONE).toPlainString());
   }
 
   @Test
@@ -101,14 +100,12 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
 
   @Test
   public void testParseValueInternalNotANumber() {
-    boolean exceptionOccured = false;
     try {
       parseValueInternal("onethousend");
+      fail("Expected an exception when parsing a string not representing a number.");
     }
-    catch (ProcessingException e) {
-      exceptionOccured = true;
+    catch (RuntimeException expected) {
     }
-    assertTrue("Expected an exception when parsing a string not representing a number.", exceptionOccured);
   }
 
   @Test

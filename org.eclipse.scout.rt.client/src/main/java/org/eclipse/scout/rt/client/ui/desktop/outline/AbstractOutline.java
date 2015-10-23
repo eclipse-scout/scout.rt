@@ -254,13 +254,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setBreadcrumbEnabled(getConfiguredBreadcrumbEnabled());
     // The outline must not display any menus because the detail form or table does
     getContextMenu().setVisibleGranted(false);
-    try {
-      ensureDefaultDetailFormCreated();
-      ensureDefaultDetailFormStarted();
-    }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
+    ensureDefaultDetailFormCreated();
+    ensureDefaultDetailFormStarted();
   }
 
   @Override
@@ -362,7 +357,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
           try {
             unloadNode(page);
           }
-          catch (ProcessingException e) {
+          catch (RuntimeException e) {
             BEANS.get(ExceptionHandler.class).handle(e);
           }
         }
@@ -382,7 +377,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
               selectNode(CollectionUtility.firstElement(children));
             }
           }
-          catch (ProcessingException e) {
+          catch (RuntimeException e) {
             LOG.warn(null, e);
           }
         }

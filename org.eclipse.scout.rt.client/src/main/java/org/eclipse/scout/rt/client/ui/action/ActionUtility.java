@@ -16,7 +16,6 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -121,21 +120,16 @@ public final class ActionUtility {
   }
 
   private static class InitActionVisitor implements IActionVisitor {
-    private ProcessingException m_firstEx;
+    private RuntimeException m_firstEx;
 
     @Override
     public int visit(IAction action) {
       try {
         action.initAction();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         if (m_firstEx == null) {
           m_firstEx = e;
-        }
-      }
-      catch (Exception t) {
-        if (m_firstEx == null) {
-          m_firstEx = new ProcessingException("Unexpected", t);
         }
       }
       return CONTINUE;

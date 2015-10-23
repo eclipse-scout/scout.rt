@@ -129,9 +129,6 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
         BEANS.get(IRemoteFileService.class).putRemoteFile(spec);
       }
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
     catch (IOException e) {
       throw new ProcessingException("", e);
     }

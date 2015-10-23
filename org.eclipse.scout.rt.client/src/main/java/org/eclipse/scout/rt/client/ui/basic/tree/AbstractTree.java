@@ -71,6 +71,7 @@ import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -595,7 +596,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
             try {
               interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
             }
-            catch (ProcessingException ex) {
+            catch (RuntimeException ex) {
               BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
@@ -1084,7 +1085,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         try {
           m_rootNode.ensureChildrenLoaded();
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error("expanding root node of " + getTitle(), e);
         }
       }
@@ -1171,7 +1172,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           node.setExpandedLazyInternal(lazy);
           fireNodeExpanded(node, b);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
@@ -1383,7 +1384,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         try {
           interceptAutoCheckChildNodes(nodes);
         }
-        catch (ProcessingException ex) {
+        catch (RuntimeException ex) {
           BEANS.get(ExceptionHandler.class).handle(ex);
         }
       }
@@ -1926,7 +1927,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     try {
       nodes = resolveVirtualNodes(nodes);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("could not resolve virtual nodes.", e);
     }
     if (nodes == null) {
@@ -2029,7 +2030,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         getRootNode().ensureChildrenLoaded();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -2058,7 +2059,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         getRootNode().ensureChildrenLoaded();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -2823,15 +2824,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           setTreeChanging(false);
         }
       }
-      catch (ProcessingException se) {
+      catch (RuntimeException e) {
         StringBuilder msg = new StringBuilder();
         for (ITreeNode node : nodes) {
           msg.append("[");
           msg.append(node.getCell().getText());
           msg.append("]");
         }
-        se.addContextMessage(msg.toString());
-        BEANS.get(ExceptionHandler.class).handle(se);
+        throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, msg.toString());
       }
       finally {
         popUIProcessor();
@@ -2862,9 +2862,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           setTreeChanging(false);
         }
       }
-      catch (ProcessingException se) {
-        se.addContextMessage(node.getCell().getText());
-        BEANS.get(ExceptionHandler.class).handle(se);
+      catch (RuntimeException e) {
+        if (node != null) {
+          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, node.getCell().getText());
+        }
+        throw e;
       }
       finally {
         popUIProcessor();
@@ -2895,9 +2897,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           setTreeChanging(false);
         }
       }
-      catch (ProcessingException se) {
-        se.addContextMessage(node.getCell().getText());
-        BEANS.get(ExceptionHandler.class).handle(se);
+      catch (RuntimeException e) {
+        if (node != null) {
+          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, node.getCell().getText());
+        }
+        throw e;
       }
       finally {
         popUIProcessor();
@@ -2936,9 +2940,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           setTreeChanging(false);
         }
       }
-      catch (ProcessingException se) {
-        se.addContextMessage(nodes.toString());
-        BEANS.get(ExceptionHandler.class).handle(se);
+      catch (RuntimeException e) {
+        if (nodes != null) {
+          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, nodes.toString());
+        }
+        throw e;
       }
       finally {
         popUIProcessor();
@@ -2954,9 +2960,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         if (node != null) {
           fireNodeClick(node, mouseButton);
         }
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();
@@ -2974,9 +2977,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           fireNodeAction(node);
         }
       }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
       finally {
         popUIProcessor();
       }
@@ -2989,10 +2989,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         //
         Collection<ITreeNode> nodes = resolveVirtualNodes(getSelectedNodes());
         return fireNodesDragRequest(nodes);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-        return null;
       }
       finally {
         popUIProcessor();
@@ -3021,9 +3017,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           fireNodeDropTargetChanged(node);
         }
       }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
       finally {
         popUIProcessor();
       }
@@ -3038,9 +3031,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         node = resolveVirtualNode(node);
         fireNodeDropAction(node, dropData);
       }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
       finally {
         popUIProcessor();
       }
@@ -3051,9 +3041,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         pushUIProcessor();
         doAppLinkAction(ref);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();

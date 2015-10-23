@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.security.Permissions;
 import java.util.Collection;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -73,7 +72,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
           s.publish(notification);
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("failed notifying cluster for permission changes", e);
       }
     }

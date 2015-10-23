@@ -205,7 +205,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       getTree().removeAllChildNodes(getTree().getRootNode());
       populateFolderContentRec(getTree().getRootNode(), getBookmarkRootFolder());
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error(null, e);
     }
     finally {
@@ -233,7 +233,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * The structure of the folders has changed, completely rebuild the model
-   *
    */
   private void rebuildBookmarkModel() {
     getTree().visitTree(new ITreeVisitor() {
@@ -279,7 +278,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * Only some values have changed, just save the model
-   *
    */
   private void refreshBookmarkModel() {
     getTree().visitTree(new ITreeVisitor() {
@@ -429,7 +427,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             }
           }
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error(null, e);
         }
         finally {
@@ -438,7 +436,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         try {
           rebuildBookmarkModel();
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error(null, e);
         }
       }
@@ -929,7 +927,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
                   success = true;
                   break;
                 }
-                catch (ProcessingException e) {
+                catch (RuntimeException e) {
                   success = false;
                 }
               }

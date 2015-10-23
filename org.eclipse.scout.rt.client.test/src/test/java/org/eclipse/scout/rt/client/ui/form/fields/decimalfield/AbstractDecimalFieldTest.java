@@ -115,7 +115,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
       DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
       df.applyPattern(getFormat().toPattern());
       setFormat(df);
-      AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.",
+      AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.",
           this, TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL));
 
       setPercent(true);
@@ -157,7 +157,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertFalse(isPercent());
     assertEquals("", getFormatInternal().getPositiveSuffix());
     assertEquals("", getFormatInternal().getNegativeSuffix());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
     assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
 
     setPercent(true);
@@ -171,7 +171,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertFalse(isPercent());
     assertEquals("", getFormatInternal().getPositiveSuffix());
     assertEquals("", getFormatInternal().getNegativeSuffix());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
     assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
 
     // manually setting suffixes

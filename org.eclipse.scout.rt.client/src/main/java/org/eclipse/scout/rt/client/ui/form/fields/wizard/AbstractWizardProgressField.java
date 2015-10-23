@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.client.ui.wizard.WizardEvent;
 import org.eclipse.scout.rt.client.ui.wizard.WizardListener;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 public class AbstractWizardProgressField extends AbstractFormField implements IWizardProgressField {
 
@@ -162,12 +161,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      try {
-        interceptWizardStepAction(stepIndex);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      interceptWizardStepAction(stepIndex);
     }
   }
 

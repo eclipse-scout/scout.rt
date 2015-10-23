@@ -634,7 +634,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       try {
         loadFromXml(m_initValue);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("unexpected error occured while restoring initial value", e);
         getTree().removeAllChildNodes(getTree().getRootNode());
       }
@@ -691,7 +691,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       storeToXml(element);
       m_initValue = element;
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("unexpected error occured while storing initial value", e);
     }
   }

@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -39,7 +38,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.Browser
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
@@ -308,12 +306,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      try {
-        interceptPostMessage(data, origin);
-      }
-      catch (ProcessingException pe) {
-        BEANS.get(ExceptionHandler.class).handle(pe);
-      }
+      interceptPostMessage(data, origin);
     }
 
     @Override

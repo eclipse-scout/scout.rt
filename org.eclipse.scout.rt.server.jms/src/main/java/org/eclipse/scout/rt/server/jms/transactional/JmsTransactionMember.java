@@ -88,10 +88,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
     try {
       getMessageProducer().send(getMessageSerializer().createMessage(message, getSession()));
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
+    catch (JMSException e) {
       throw new ProcessingException("Failed to send jms message", e);
     }
   }
@@ -110,10 +107,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
       }
       return getMessageSerializer().extractMessage(jmsMessage);
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
+    catch (JMSException e) {
       throw new ProcessingException("Failed to receive jms message", e);
     }
   }

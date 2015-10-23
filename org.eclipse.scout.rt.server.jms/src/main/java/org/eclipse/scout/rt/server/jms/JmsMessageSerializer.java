@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jms;
 
+import java.io.IOException;
+
 import javax.jms.BytesMessage;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
@@ -46,41 +50,56 @@ public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
   }
 
   @Override
-  public Message createMessage(T message, Session session) throws Exception {
+  public Message createMessage(T message, Session session) {
     if (LOG.isTraceEnabled()) {
       LOG.trace("creating JMS message: msgContent={0}", message);
     }
-    BytesMessage jmsMessage = session.createBytesMessage();
-    jmsMessage.writeBytes(getObjectSerializer().serialize(message));
-    if (LOG.isTraceEnabled()) {
-      jmsMessage.setStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT, message.toString());
+    try {
+      BytesMessage jmsMessage = session.createBytesMessage();
+      jmsMessage.writeBytes(getObjectSerializer().serialize(message));
+      if (LOG.isTraceEnabled()) {
+        jmsMessage.setStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT, message.toString());
+      }
+      return jmsMessage;
     }
-    return jmsMessage;
+    catch (JMSException | IOException e) {
+      throw new ProcessingException("Unexpected Exception", e);
+    }
   }
 
   @Override
-  public T extractMessage(Message jmsMessage) throws Exception {
+  public T extractMessage(Message jmsMessage) {
     if (LOG.isTraceEnabled()) {
-      LOG.trace("extracting JMS message: jmsMessageId={0}, messageContent={1}", jmsMessage.getJMSMessageID(), jmsMessage.getStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT));
+      try {
+        LOG.trace("extracting JMS message: jmsMessageId={0}, messageContent={1}", jmsMessage.getJMSMessageID(), jmsMessage.getStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT));
+      }
+      catch (JMSException e) {
+        LOG.trace("extracting JMS message: jmsMessageId=?, messageContent=?", e);
+      }
     }
-    if (!(jmsMessage instanceof BytesMessage)) {
-      LOG.warn("Received unexpect message content. Ignored.");
+    try {
+      if (!(jmsMessage instanceof BytesMessage)) {
+        LOG.warn("Received unexpect message content. Ignored.");
+        return null;
+      }
+
+      BytesMessage bm = (BytesMessage) jmsMessage;
+      long bodyLength = bm.getBodyLength();
+      if (bodyLength == Integer.MAX_VALUE) {
+        LOG.warn("received empty BytesMessage");
+      }
+      else if (bodyLength > Integer.MAX_VALUE) {
+        LOG.warn("received BytesMessage is too large (length = " + bodyLength + ")");
+      }
+      else {
+        byte[] buffer = new byte[(int) bodyLength];
+        bm.readBytes(buffer);
+        return getObjectSerializer().deserialize(buffer, getMessageType());
+      }
       return null;
     }
-
-    BytesMessage bm = (BytesMessage) jmsMessage;
-    long bodyLength = bm.getBodyLength();
-    if (bodyLength == Integer.MAX_VALUE) {
-      LOG.warn("received empty BytesMessage");
+    catch (ClassNotFoundException | JMSException | IOException e) {
+      throw new ProcessingException("Unexpected Exception", e);
     }
-    else if (bodyLength > Integer.MAX_VALUE) {
-      LOG.warn("received BytesMessage is too large (length = " + bodyLength + ")");
-    }
-    else {
-      byte[] buffer = new byte[(int) bodyLength];
-      bm.readBytes(buffer);
-      return getObjectSerializer().deserialize(buffer, getMessageType());
-    }
-    return null;
   }
 }

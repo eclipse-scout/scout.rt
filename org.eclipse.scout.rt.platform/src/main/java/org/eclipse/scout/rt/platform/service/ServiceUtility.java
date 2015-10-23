@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.HolderUtility;
@@ -30,14 +30,15 @@ public class ServiceUtility {
    * @return the reflective service operation that can be called using {@link #invoke(Method,Object,Object[])}
    */
   public Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
+    Assertions.assertNotNull(serviceClass, "service class is null");
     try {
       if (serviceClass == null) {
         throw new ProcessingException("service class is null");
       }
       return serviceClass.getMethod(operation, paramTypes);
     }
-    catch (Throwable t) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translate(t);
+    catch (NoSuchMethodException | SecurityException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e);
     }
   }
 
@@ -47,35 +48,17 @@ public class ServiceUtility {
    *           objects
    */
   public Object invoke(Method serviceOperation, Object service, Object[] callerArgs) {
+    Assertions.assertNotNull(serviceOperation, "serviceOperation is null");
+    Assertions.assertNotNull(service, "service is null");
+    if (callerArgs == null) {
+      callerArgs = new Object[0];
+    }
     try {
-      if (serviceOperation == null) {
-        throw new ProcessingException("serviceOperation is null");
-      }
-      if (service == null) {
-        throw new ProcessingException("service is null");
-      }
-      if (callerArgs == null) {
-        callerArgs = new Object[0];
-      }
-      Object data = serviceOperation.invoke(service, callerArgs);
+      final Object data = serviceOperation.invoke(service, callerArgs);
       return data;
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Throwable t) {
-      if (t instanceof InvocationTargetException) {
-        Throwable test = ((InvocationTargetException) t).getTargetException();
-        if (test != null) {
-          t = test;
-        }
-      }
-      if (t instanceof ProcessingException) {
-        throw (ProcessingException) t;
-      }
-      else {
-        throw new ProcessingException("service: " + service.getClass() + ", operation: " + serviceOperation.getName() + ", args: " + VerboseUtility.dumpObjects(callerArgs), t);
-      }
+    catch (Exception e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, String.format("service: %s, operation: %s, args: %s", service.getClass(), serviceOperation.getName(), VerboseUtility.dumpObjects(callerArgs)));
     }
   }
 

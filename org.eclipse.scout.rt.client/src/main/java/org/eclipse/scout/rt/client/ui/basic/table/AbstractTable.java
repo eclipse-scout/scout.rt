@@ -957,7 +957,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               try {
                 e.setDragObject(interceptDrag(e.getRows()));
               }
-              catch (ProcessingException ex) {
+              catch (RuntimeException ex) {
                 BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
@@ -968,7 +968,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               try {
                 interceptDrop(e.getFirstRow(), e.getDropObject());
               }
-              catch (ProcessingException ex) {
+              catch (RuntimeException ex) {
                 BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
@@ -979,7 +979,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               try {
                 e.setCopyObject(interceptCopy(e.getRows()));
               }
-              catch (ProcessingException ex) {
+              catch (RuntimeException ex) {
                 BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
@@ -993,7 +993,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               try {
                 interceptContentChanged();
               }
-              catch (ProcessingException ex) {
+              catch (RuntimeException ex) {
                 BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
@@ -1003,7 +1003,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             try {
               interceptRowsChecked(e.getRows());
             }
-            catch (ProcessingException ex) {
+            catch (RuntimeException ex) {
               BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
@@ -1156,7 +1156,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         initTable();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         LOG.error("Failed re-initializing table " + getClass().getName(), e);
       }
     }
@@ -2474,7 +2474,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -4482,7 +4482,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         //
         doAppLinkAction(ref);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
@@ -4516,19 +4516,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         m_editContext = null;
         row = resolveRow(row);
         if (row != null && col != null) {
-          try {
-            // ensure the editable row to be selected.
-            // This is crucial if the cell's value is changed right away in @{link IColumn#prepareEdit(ITableRow)}, e.g. in @{link AbstractBooleanColumn}
-            row.getTable().selectRow(row);
-            IFormField f = col.prepareEdit(row);
-            if (f != null) {
-              m_editContext = new P_CellEditorContext(row, col, f);
-            }
-            return f;
+          // ensure the editable row to be selected.
+          // This is crucial if the cell's value is changed right away in @{link IColumn#prepareEdit(ITableRow)}, e.g. in @{link AbstractBooleanColumn}
+          row.getTable().selectRow(row);
+          IFormField f = col.prepareEdit(row);
+          if (f != null) {
+            m_editContext = new P_CellEditorContext(row, col, f);
           }
-          catch (Exception e) {
-            BEANS.get(ExceptionHandler.class).handle(e);
-          }
+          return f;
         }
       }
       finally {
@@ -4548,9 +4543,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (m_editContext != null) {
           try {
             m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
-          }
-          catch (Exception e) {
-            BEANS.get(ExceptionHandler.class).handle(e);
           }
           finally {
             m_editContext = null;
@@ -4582,9 +4574,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           //
           m_reloadHandler.reload();
         }
-        catch (ProcessingException e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
-        }
         finally {
           popUIProcessor();
         }
@@ -4596,18 +4585,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         setTableChanging(true);
         resetDisplayableColumns();
-        try {
-          TableUserFilterManager m = getUserFilterManager();
-          if (m != null) {
-            m.reset();
-          }
-          ITableCustomizer cst = getTableCustomizer();
-          if (cst != null) {
-            cst.removeAllColumns();
-          }
+        TableUserFilterManager m = getUserFilterManager();
+        if (m != null) {
+          m.reset();
         }
-        catch (ProcessingException e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
+        ITableCustomizer cst = getTableCustomizer();
+        if (cst != null) {
+          cst.removeAllColumns();
         }
       }
       finally {
@@ -4648,9 +4632,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         //
         getUserFilterManager().addFilter(filter);
       }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
       finally {
         popUIProcessor();
       }
@@ -4662,9 +4643,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         pushUIProcessor();
         //
         getUserFilterManager().removeFilter(filter);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();

@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.internal.UserNavigationHistory;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
@@ -163,7 +162,7 @@ public class UserNavigationHistoryTest {
     try {
       history.stepBackward();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       //nop
     }
     history.addStep(bookmark2);

@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
 public abstract class AbstractFileChooserField extends AbstractValueField<BinaryResource> implements IFileChooserField {
@@ -186,17 +185,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      try {
-        IFileChooser fileChooser = getFileChooser();
-        List<BinaryResource> result = fileChooser.startChooser();
-        // If "cancel" was clicked, the result is empty. We do not want to override the existing value in
-        // this case. (It may also have been "OK with no file", but this state is not distinguishable.)
-        if (!result.isEmpty()) {
-          setValue(CollectionUtility.firstElement(result));
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      IFileChooser fileChooser = getFileChooser();
+      List<BinaryResource> result = fileChooser.startChooser();
+      // If "cancel" was clicked, the result is empty. We do not want to override the existing value in
+      // this case. (It may also have been "OK with no file", but this state is not distinguishable.)
+      if (!result.isEmpty()) {
+        setValue(CollectionUtility.firstElement(result));
       }
     }
   }

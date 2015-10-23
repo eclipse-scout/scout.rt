@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -33,7 +32,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldC
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -258,22 +256,12 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      try {
-        doAttachementAction(file);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      doAttachementAction(file);
     }
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      try {
-        doAppLinkAction(ref);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      doAppLinkAction(ref);
     }
 
   }

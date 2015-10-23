@@ -1029,7 +1029,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       activity.setObserver(null);
       interceptDecorateActivity(activity);
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
     finally {
@@ -1048,7 +1048,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       try {
         updateResource(resource);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

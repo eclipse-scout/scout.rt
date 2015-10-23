@@ -105,7 +105,7 @@ public class ProcessingException extends RuntimeException implements Serializabl
    *          arguments to be used in the message; see {@link String#format(String, Object...)}.
    */
   public void addContextMessage(String msg, Object... msgArgs) {
-    if (m_status != null) {
+    if (m_status != null && msg != null) {
       m_status.addContextMessage(String.format(msg, msgArgs));
     }
   }

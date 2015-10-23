@@ -11,11 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFacade {
@@ -52,17 +49,12 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     }
     LOG.debug("openProposalChooserFromUI");
     m_field.clearProposal();
-    try {
-      m_field.setDisplayText(text);
-      String searchText = toSearchText(text);
-      IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
-      IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), selectCurrentValue);
-      proposalChooser.dataFetchedDelegate(newResult, m_field.getConfiguredBrowseMaxRowCount());
-      m_field.doSearch(text, selectCurrentValue, false);
-    }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
+    m_field.setDisplayText(text);
+    String searchText = toSearchText(text);
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
+    IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), selectCurrentValue);
+    proposalChooser.dataFetchedDelegate(newResult, m_field.getConfiguredBrowseMaxRowCount());
+    m_field.doSearch(text, selectCurrentValue, false);
   }
 
   @Override
@@ -107,12 +99,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       if (!m_field.isProposalChooserRegistered()) {
         openProposalChooserFromUI(searchText, false);
       }
-      try {
-        m_field.getProposalChooser().forceProposalSelection();
-      }
-      catch (ProcessingException e) {
-        LOG.error("when forcing proposal selection", e);
-      }
+      m_field.getProposalChooser().forceProposalSelection();
     }
   }
 

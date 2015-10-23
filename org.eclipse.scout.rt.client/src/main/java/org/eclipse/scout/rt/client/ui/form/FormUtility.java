@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -99,21 +98,16 @@ public final class FormUtility {
   }
 
   private static class PostInitConfigFieldVisitor implements IFormFieldVisitor {
-    private ProcessingException m_firstEx;
+    private RuntimeException m_firstEx;
 
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         field.postInitConfig();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         if (m_firstEx == null) {
           m_firstEx = e;
-        }
-      }
-      catch (Exception t) {
-        if (m_firstEx == null) {
-          m_firstEx = new ProcessingException("Unexpected", t);
         }
       }
       return true;
@@ -127,7 +121,7 @@ public final class FormUtility {
   }
 
   private static class RebuildFieldGridVisitor implements IFormFieldVisitor {
-    private ProcessingException m_firstEx;
+    private RuntimeException m_firstEx;
 
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -136,9 +130,9 @@ public final class FormUtility {
           ((ICompositeField) field).rebuildFieldGrid();
         }
       }
-      catch (Exception t) {
+      catch (RuntimeException e) {
         if (m_firstEx == null) {
-          m_firstEx = new ProcessingException("Unexpected", t);
+          m_firstEx = e;
         }
       }
       return true;
@@ -152,21 +146,16 @@ public final class FormUtility {
   }
 
   private static class InitFieldVisitor implements IFormFieldVisitor {
-    private ProcessingException m_firstEx;
+    private RuntimeException m_firstEx;
 
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         field.initField();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         if (m_firstEx == null) {
           m_firstEx = e;
-        }
-      }
-      catch (Exception t) {
-        if (m_firstEx == null) {
-          m_firstEx = new ProcessingException("Unexpected", t);
         }
       }
       return true;

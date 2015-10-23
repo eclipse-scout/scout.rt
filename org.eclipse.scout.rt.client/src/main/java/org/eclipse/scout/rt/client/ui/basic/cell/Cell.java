@@ -64,7 +64,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     try {
       updateFrom(c);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       //should never happen
       LOG.error("Unexpected", e);
     }

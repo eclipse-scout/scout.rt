@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -23,7 +22,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.IBeanField
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * This field may be used if the value is relevant for the gui, and not just the display text.
@@ -84,12 +82,7 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      try {
-        doAppLinkAction(ref);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      doAppLinkAction(ref);
     }
   }
 }

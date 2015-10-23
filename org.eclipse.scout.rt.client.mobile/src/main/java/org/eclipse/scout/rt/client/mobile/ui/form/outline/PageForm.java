@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
@@ -680,7 +679,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
             handleTableRowsInserted(event);
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -708,7 +707,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
           }
         }
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

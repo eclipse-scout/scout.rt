@@ -110,7 +110,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       table.setReloadHandler(new PageReloadHandler(this));
       table.initTable();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
     }
     return table;
@@ -149,7 +149,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * Subclasses can override this method.<br/>
    * This implementation sets the title of the internal table used by this page to the path from the root node to this
    * page.
-   *
    */
   @Override
   protected void execPageActivated() {

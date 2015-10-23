@@ -832,7 +832,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       try {
         comp.getProvider().onItemAction(comp.getItem());
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
       fireCalendarEventInternal(new CalendarEvent(this, CalendarEvent.TYPE_COMPONENT_ACTION, comp));
@@ -972,12 +972,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         pushUIProcessor();
         comp = resolveComponent(comp);
         if (comp != null) {
-          try {
-            comp.getProvider().onItemMoved(comp.getItem(), newDate);
-          }
-          catch (Exception e) {
-            BEANS.get(ExceptionHandler.class).handle(e);
-          }
+          comp.getProvider().onItemMoved(comp.getItem(), newDate);
         }
         fireCalendarComponentAction();
       }

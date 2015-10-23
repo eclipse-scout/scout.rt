@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -207,12 +206,7 @@ public class PrintFormsAction extends AbstractAction {
           m_runnables.add(new Runnable() {
             @Override
             public void run() {
-              try {
-                f.doClose();
-              }
-              catch (ProcessingException e) {
-                LOG.error("could not close form '" + f.getClass().getSimpleName() + "'", e);
-              }
+              f.doClose();
             }
           });
         }

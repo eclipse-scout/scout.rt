@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.IActionNodeExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -34,7 +32,6 @@ import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 
 public abstract class AbstractActionNode<T extends IActionNode> extends AbstractAction implements IActionNode<T>, IContributionOwner {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractActionNode.class);
   private T m_parent;
   private IContributionOwner m_contributionHolder;
 
@@ -96,8 +93,8 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     try {
       injectActionNodesInternal(actionNodes);
     }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contribute action nodes.", e);
+    catch (RuntimeException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     // add
     setChildActions(actionNodes.getOrderedList());

@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -68,7 +67,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       //Attach as UI listener to make sure every "business logic" listener comes first
       getOriginalTable().addUITableListener(m_tableListener);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -294,7 +293,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         ITableRow row = addRowByArray(new Object[]{insertedRow, "", ""});
         getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
       }
-      catch (ProcessingException exception) {
+      catch (RuntimeException exception) {
         BEANS.get(ExceptionHandler.class).handle(exception);
       }
     }
@@ -311,22 +310,18 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
     try {
       setTableChanging(true);
-      try {
-        for (ITableRow originalRow : originalRows) {
-          ITableRow row = getRowMapColumn().findRow(originalRow);
-          if (row != null) {
-            getContentColumn().updateValue(row, originalRow, getDrillDownStyleMap());
-            if (isCheckable()) {
-              checkRow(row, originalRow.isChecked());
-            }
+      for (ITableRow originalRow : originalRows) {
+        ITableRow row = getRowMapColumn().findRow(originalRow);
+        if (row != null) {
+          getContentColumn().updateValue(row, originalRow, getDrillDownStyleMap());
+          if (isCheckable()) {
+            checkRow(row, originalRow.isChecked());
           }
-
         }
-
       }
-      catch (ProcessingException exception) {
-        BEANS.get(ExceptionHandler.class).handle(exception);
-      }
+    }
+    catch (RuntimeException exception) {
+      BEANS.get(ExceptionHandler.class).handle(exception);
     }
     finally {
       setTableChanging(false);

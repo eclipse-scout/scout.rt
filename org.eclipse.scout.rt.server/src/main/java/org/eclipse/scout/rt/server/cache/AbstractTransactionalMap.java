@@ -10,7 +10,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.eclipse.scout.rt.shared.cache.ICache;
@@ -99,12 +98,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     TM m = (TM) t.getMember(getTransactionMemberId());
     if (m == null && createIfNotExist) {
       m = createMapTransactionMember();
-      try {
-        t.registerMember(m);
-      }
-      catch (ProcessingException e) {
-        throw new RuntimeException(e.getCause());
-      }
+      t.registerMember(m);
     }
     return m;
   }

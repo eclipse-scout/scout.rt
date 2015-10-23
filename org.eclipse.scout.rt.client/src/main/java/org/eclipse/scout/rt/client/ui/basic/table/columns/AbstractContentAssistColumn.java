@@ -280,7 +280,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       }
 
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -293,7 +293,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
         List<? extends ILookupRow<?>> result = call.getDataByKey();
         applyLookupResult(row, result);
       }
-      catch (ProcessingException pe) {
+      catch (RuntimeException pe) {
         BEANS.get(ExceptionHandler.class).handle(pe);
       }
     }
@@ -307,7 +307,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
         List<? extends ILookupRow<?>> result = call.getDataByKey();
         applyLookupResult(row, result);
       }
-      catch (ProcessingException pe) {
+      catch (RuntimeException pe) {
         BEANS.get(ExceptionHandler.class).handle(pe);
       }
     }

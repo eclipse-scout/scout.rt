@@ -65,15 +65,11 @@ public final class SQL {
    */
   public static String getDriverName() {
     String driverName = null;
-    Connection conn;
     try {
-      conn = getConnection();
+      Connection conn = getConnection();
       driverName = conn.getMetaData().getDriverName();
     }
-    catch (ProcessingException e) {
-      // nop
-    }
-    catch (SQLException e) {
+    catch (SQLException | RuntimeException e) {
       // nop
     }
     return driverName;

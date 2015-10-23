@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -253,14 +254,12 @@ public class IOUtilityTest {
 
   @Test
   public void testReadLinesNonExistingFile() {
-    boolean processingExceptionOccured = false;
     try {
       IOUtility.readLines(new File("doesNotExist"), Encoding.UTF_8);
+      fail("Exptected a ProcessingException for non existing file.");
     }
-    catch (ProcessingException e) {
-      processingExceptionOccured = true;
+    catch (ProcessingException expected) {
     }
-    assertTrue("Exptected a ProcessingException for non existing file.", processingExceptionOccured);
   }
 
   @Test
@@ -320,18 +319,15 @@ public class IOUtilityTest {
     try {
       tempFile = createTextTempFile();
       pw = new PrintWriter(new FileOutputStream(tempFile, true));
-      boolean processingExceptionOccured = false;
       try {
         IOUtility.appendFile(pw, tempFile2);
+        fail("Exptected a ProcessingException for non existing file.");
       }
-      catch (ProcessingException e) {
-        processingExceptionOccured = true;
+      catch (ProcessingException expected) {
       }
       finally {
         pw.close();
       }
-      assertTrue("Exptected a ProcessingException for non existing file.", processingExceptionOccured);
-
     }
     finally {
       TestUtility.deleteTempFile(tempFile);

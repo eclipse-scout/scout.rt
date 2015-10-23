@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
@@ -90,8 +89,8 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
       try {
         m_subPage.ensureChildrenLoaded();
       }
-      catch (ProcessingException e1) {
-        BEANS.get(ExceptionHandler.class).handle(e1);
+      catch (RuntimeException e) {
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
 
       LOG.debug("Sub page activated: " + selectedPage);

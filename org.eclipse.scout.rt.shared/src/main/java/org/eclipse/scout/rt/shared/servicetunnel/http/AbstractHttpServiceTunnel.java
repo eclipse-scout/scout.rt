@@ -76,7 +76,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
         URL targetUrl = UriUtility.toUrl(url);
         return targetUrl;
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         throw new IllegalArgumentException("targetUrl: " + url, e);
       }
     }
@@ -138,7 +138,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
         urlConn.setRequestProperty(TOKEN_AUTH_HTTP_HEADER, token);
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new IOException(e);
     }
   }

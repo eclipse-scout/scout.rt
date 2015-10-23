@@ -19,7 +19,6 @@ import java.util.StringTokenizer;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
@@ -987,7 +986,7 @@ public class ClientUIPreferences {
     try {
       return Preferences.get(session, PREFERENCES_NODE_ID);
     }
-    catch (ProcessingException t) {
+    catch (RuntimeException t) {
       LOG.error("Unable to load preferences.", t);
     }
     return null;
@@ -1005,7 +1004,7 @@ public class ClientUIPreferences {
     try {
       m_prefs.flush();
     }
-    catch (ProcessingException t) {
+    catch (RuntimeException t) {
       LOG.error("Unable to flush preferences.", t);
     }
   }

@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -24,7 +23,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 
@@ -46,22 +44,17 @@ public class ClientExceptionHandler extends ExceptionHandler {
 
   @Override
   protected void handleProcessingException(final ProcessingException pe) {
+    super.handleProcessingException(pe);
+
     final IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
-      LOG.error("No session in current RunContext. ProcessingException cannot be visualized");
-      super.handleProcessingException(pe);
+      LOG.debug("No session in current RunContext. ProcessingException cannot be visualized");
       return;
     }
 
     // Only open the error dialog if not running headless.
     if (session.getDesktop() == null || !session.getDesktop().isOpened()) {
-      super.handleProcessingException(pe);
       return;
-    }
-
-    // Log the error if running in development mode or if not of the type VetoException.
-    if (Platform.get().inDevelopmentMode() || !(pe instanceof VetoException)) {
-      super.handleProcessingException(pe);
     }
 
     // Prevent loops while displaying the exception.

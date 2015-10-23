@@ -58,7 +58,6 @@ public class GlobalTrustManager {
   /**
    * Installs the global trustmanager for 'TLS' server socket protocol and the default trustmanager algorithm as
    * specified in the java security properties, or an implementation-specific default if no such property exists.
-   *
    */
   public void installGlobalTrustManager() {
     installGlobalTrustManager("TLS", TrustManagerFactory.getDefaultAlgorithm());
@@ -104,7 +103,7 @@ public class GlobalTrustManager {
       }
       trustedCerts = installTrustedCertificates(certRemoteFiles);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Could not access folder '" + PATH_CERTS + "' to import trusted certificates.", e);
     }
 

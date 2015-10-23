@@ -15,8 +15,8 @@ import javax.jms.Session;
 
 public interface IJmsMessageSerializer<T> {
 
-  Message createMessage(T message, Session session) throws Exception;
+  Message createMessage(T message, Session session);
 
-  T extractMessage(Message jmsMessage) throws Exception;
+  T extractMessage(Message jmsMessage);
 
 }

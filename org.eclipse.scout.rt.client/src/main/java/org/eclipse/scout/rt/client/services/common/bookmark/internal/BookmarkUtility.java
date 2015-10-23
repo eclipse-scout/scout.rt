@@ -675,7 +675,7 @@ public final class BookmarkUtility {
         try {
           ufm.setSerializedData(newData);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           LOG.error("User filters could not be restored. ", e);
         }
       }

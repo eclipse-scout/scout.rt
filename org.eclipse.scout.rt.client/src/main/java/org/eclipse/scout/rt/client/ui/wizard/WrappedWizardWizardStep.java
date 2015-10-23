@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -42,7 +41,7 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
             try {
               m_parentWizard.doNextStep();
             }
-            catch (ProcessingException t) {
+            catch (RuntimeException t) {
               BEANS.get(ExceptionHandler.class).handle(t);
             }
             break;

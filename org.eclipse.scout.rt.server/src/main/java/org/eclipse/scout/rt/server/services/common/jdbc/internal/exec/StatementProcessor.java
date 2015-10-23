@@ -49,6 +49,8 @@ import org.eclipse.scout.commons.parsers.token.FunctionInputToken;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
@@ -174,12 +176,8 @@ public class StatementProcessor implements IStatementProcessor {
         m_outputList.add(out);
       }
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(createSqlDump(true, false));
-      throw e;
-    }
-    catch (Throwable e) {
-      throw new ProcessingException(createSqlDump(true, false), e);
+    catch (RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
     }
   }
 
@@ -287,12 +285,8 @@ public class StatementProcessor implements IStatementProcessor {
       }
       return rows.toArray(new Object[rows.size()][]);
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(createSqlDump(true, false));
-      throw e;
-    }
-    catch (Throwable e) {
-      throw new ProcessingException(createSqlDump(true, false), e);
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
     }
     finally {
       releasePreparedStatementAndResultSet(ps, cache, rs);
@@ -342,12 +336,8 @@ public class StatementProcessor implements IStatementProcessor {
         monitor.postFetchData(conn, ps, rs, null);
       }
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(createSqlDump(true, false));
-      throw e;
-    }
-    catch (Throwable e) {
-      throw new ProcessingException(createSqlDump(true, false), e);
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
     }
     finally {
       releasePreparedStatementAndResultSet(ps, cache, rs);
@@ -402,12 +392,8 @@ public class StatementProcessor implements IStatementProcessor {
       finishOutputBatch();
       handler.finished(conn, ps, rs, rowCount);
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(createSqlDump(true, false));
-      throw e;
-    }
-    catch (Throwable e) {
-      throw new ProcessingException(createSqlDump(true, false), e);
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
     }
     finally {
       releasePreparedStatementAndResultSet(ps, cache, rs);
@@ -443,12 +429,8 @@ public class StatementProcessor implements IStatementProcessor {
       }
       return rowCount;
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(createSqlDump(true, false));
-      throw e;
-    }
-    catch (Throwable e) {
-      throw new ProcessingException(createSqlDump(true, false), e);
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
     }
     finally {
       cache.releasePreparedStatement(ps);
@@ -487,12 +469,8 @@ public class StatementProcessor implements IStatementProcessor {
       finishOutputBatch();
       return status;
     }
-    catch (ProcessingException e) {
-      e.addContextMessage(createSqlDump(true, false));
-      throw e;
-    }
-    catch (Throwable e) {
-      throw new ProcessingException(createSqlDump(true, false), e);
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
     }
     finally {
       cache.releaseCallableStatement(cs);
@@ -1146,7 +1124,7 @@ public class StatementProcessor implements IStatementProcessor {
         try {
           input = createInputRec(bindToken, newPath, ((IHolder) o).getValue(), nullType);
         }
-        catch (ProcessingException pe) {
+        catch (RuntimeException pe) {
           // nop, see below
         }
       }

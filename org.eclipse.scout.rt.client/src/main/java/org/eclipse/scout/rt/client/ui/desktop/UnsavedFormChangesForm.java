@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -126,7 +125,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
             try {
               f.validateForm();
             }
-            catch (ProcessingException e) {
+            catch (RuntimeException e) {
               invalidForms.add(f);
             }
           }

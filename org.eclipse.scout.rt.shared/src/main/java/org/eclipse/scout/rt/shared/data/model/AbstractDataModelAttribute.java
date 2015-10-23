@@ -738,7 +738,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
         return sb.toString();
       }
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.warn("Execution of lookup call failed", e);
     }
     return "";

@@ -143,7 +143,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     try {
       loadRootNode();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }

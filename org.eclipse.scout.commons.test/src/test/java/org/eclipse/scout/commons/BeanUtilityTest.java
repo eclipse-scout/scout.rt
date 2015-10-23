@@ -19,12 +19,11 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 /**
  * JUnit tests for {@link BeanUtility}
- * 
+ *
  * @since 3.8.1
  */
 public class BeanUtilityTest {
@@ -80,7 +79,7 @@ public class BeanUtilityTest {
       Constructor<AmbiguousSignaturesConstructor> ctor = BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, AExt.class, BExt.class);
       fail("Expected ambiguous constructor but got '" + ctor.toString() + "'");
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       // ok
     }
   }

@@ -451,7 +451,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
               try {
                 interceptAnyFieldChanged((IFormField) e.getSource());
               }
-              catch (Exception t) {
+              catch (RuntimeException t) {
                 LOG.error("" + e.getSource() + " " + e.getPropertyName() + "=" + e.getNewValue(), t);
               }
             }
@@ -472,7 +472,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
       });
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
     }
   }
@@ -834,7 +834,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         try {
           interceptActiveStepChanged();
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
@@ -850,7 +850,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     try {
       interceptRefreshButtonPolicy();
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -1068,7 +1068,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           m_containerForm = null;
         }
       }
-      catch (Exception e) {
+      catch (RuntimeException e) {
         LOG.error("closing " + getTitle(), e);
       }
       // dispose all steps
@@ -1079,7 +1079,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         try {
           step.dispose();
         }
-        catch (Exception t) {
+        catch (RuntimeException t) {
           LOG.error("closing " + getTitle(), t);
         }
       }
@@ -1128,15 +1128,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doNextStep() {
     if (isOpen()) {
-      try {
-        interceptNextStep();
-      }
-      catch (ProcessingException pe) {
-        throw pe;
-      }
-      catch (Exception t) {
-        throw new ProcessingException("Unexpected", t);
-      }
+      interceptNextStep();
     }
   }
 
@@ -1146,15 +1138,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doPreviousStep() {
     if (isOpen()) {
-      try {
-        interceptPreviousStep();
-      }
-      catch (ProcessingException pe) {
-        throw pe;
-      }
-      catch (Exception t) {
-        throw new ProcessingException("Unexpected", t);
-      }
+      interceptPreviousStep();
     }
   }
 
@@ -1169,13 +1153,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         setCloseTypeInternal(CloseType.Finished);
         interceptFinish();
       }
-      catch (ProcessingException pe) {
+      finally {
         setCloseTypeInternal(oldType);
-        throw pe;
-      }
-      catch (Exception t) {
-        setCloseTypeInternal(oldType);
-        throw new ProcessingException("Unexpected", t);
       }
     }
   }
@@ -1191,13 +1170,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         setCloseTypeInternal(CloseType.Cancelled);
         interceptCancel();
       }
-      catch (ProcessingException pe) {
+      finally {
         setCloseTypeInternal(oldType);
-        throw pe;
-      }
-      catch (Exception e) {
-        setCloseTypeInternal(oldType);
-        throw new ProcessingException("Unexpected", e);
       }
     }
   }
@@ -1213,13 +1187,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         setCloseTypeInternal(CloseType.Suspended);
         interceptSuspend();
       }
-      catch (ProcessingException pe) {
+      finally {
         setCloseTypeInternal(oldType);
-        throw pe;
-      }
-      catch (Exception t) {
-        setCloseTypeInternal(oldType);
-        throw new ProcessingException("Unexpected", t);
       }
     }
   }
@@ -1229,15 +1198,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Override
   public void doReset() {
-    try {
-      interceptReset();
-    }
-    catch (ProcessingException pe) {
-      throw pe;
-    }
-    catch (Exception t) {
-      throw new ProcessingException("Unexpected", t);
-    }
+    interceptReset();
   }
 
   @SuppressWarnings("deprecation")

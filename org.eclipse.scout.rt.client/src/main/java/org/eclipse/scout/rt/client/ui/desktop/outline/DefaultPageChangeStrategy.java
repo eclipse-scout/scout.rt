@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -42,7 +41,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
       try {
         activePage.ensureChildrenLoaded();
       }
-      catch (ProcessingException e1) {
+      catch (RuntimeException e1) {
         BEANS.get(ExceptionHandler.class).handle(e1);
       }
       if (activePage instanceof IPageWithTable) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.exception;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,7 +48,6 @@ public class ProcessingExceptionTranslatorTest {
     RuntimeException re1 = new RuntimeException();
 
     // test 'normal cases'
-    assertSame(pe1, exceptionTranslator.translate(pe1));
     assertSame(pe1, exceptionTranslator.translate(pe1));
     assertSame(pe1, exceptionTranslator.translate(reWithPe));
     assertSame(e1, exceptionTranslator.translate(e1).getCause());
@@ -112,6 +112,35 @@ public class ProcessingExceptionTranslatorTest {
 
     ExecutionException ee4 = new ExecutionException(reWithPe);
     assertSame(reWithPe.getCause(), exceptionTranslator.translate(ee4));
+  }
+
+  @Test
+  public void testTranslateAndAddContextMessage() {
+    ProcessingExceptionTranslator exceptionTranslator = new ProcessingExceptionTranslator();
+
+    ProcessingException pe1 = new ProcessingException();
+    assertSame(pe1, exceptionTranslator.translateAndAddContextMessages(pe1, (String[]) null));
+
+    pe1 = new ProcessingException();
+    assertSame(pe1, exceptionTranslator.translateAndAddContextMessages(pe1, "message 1"));
+    assertTrue(pe1.getStatus().getContextMessages().contains("message 1"));
+
+    pe1 = new ProcessingException();
+    assertSame(pe1, exceptionTranslator.translateAndAddContextMessages(pe1, "message 1", "message 2"));
+    assertTrue(pe1.getStatus().getContextMessages().contains("message 1"));
+    assertTrue(pe1.getStatus().getContextMessages().contains("message 2"));
+
+    Exception e1 = new Exception();
+    ProcessingException e1Translated = exceptionTranslator.translateAndAddContextMessages(e1, "message");
+    assertTrue(e1Translated instanceof ProcessingException);
+    assertTrue(e1Translated.getStatus().getContextMessages().contains("message"));
+
+    Exception e2 = new Exception();
+    ProcessingException e2Translated = exceptionTranslator.translateAndAddContextMessages(e2, "message 1", "message 2");
+    assertTrue(e2Translated instanceof ProcessingException);
+    assertTrue(e2Translated.getStatus().getContextMessages().contains("message 1"));
+    assertTrue(e2Translated.getStatus().getContextMessages().contains("message 2"));
+
   }
 
   @Test

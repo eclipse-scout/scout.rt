@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
@@ -148,7 +147,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
           }
           proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
