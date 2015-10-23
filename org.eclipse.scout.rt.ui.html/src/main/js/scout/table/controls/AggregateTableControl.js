@@ -46,7 +46,7 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
     var aggregateValue, decimalFormat, cell, $cell;
 
     aggregateValue = this.aggregateRow[c];
-    if (aggregateValue === undefined) {
+    if (aggregateValue === undefined || aggregateValue === null) {
       cell = {
         empty: true
       };
