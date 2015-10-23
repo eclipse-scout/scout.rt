@@ -15,9 +15,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
-/**
- *
- */
 @Extends(MainBox.class)
 @FormData(value = SpecialStringFieldData.class, sdkCommand = FormData.SdkCommand.CREATE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
 public class SpecialStringField extends AbstractStringField {

@@ -30,9 +30,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
-/**
- *
- */
 public abstract class AbstractContextMenu extends AbstractMenu implements IContextMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContextMenu.class);
 

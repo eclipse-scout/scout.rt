@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.platform.service.internal;
 
 import org.eclipse.scout.rt.platform.service.IService;
 
-/**
- *
- */
 public interface ITestService extends IService {
 
 }

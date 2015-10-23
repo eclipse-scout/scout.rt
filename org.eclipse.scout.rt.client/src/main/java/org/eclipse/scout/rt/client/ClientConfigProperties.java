@@ -16,9 +16,6 @@ import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public final class ClientConfigProperties {
   private ClientConfigProperties() {
   }

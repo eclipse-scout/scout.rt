@@ -200,7 +200,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    *
    * @param pageList
    *          live collection to add pages to the outline tree
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)
@@ -230,7 +229,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    * @see #ensureDefaultDetailFormCreated()
    * @see #ensureDefaultDetailFormStarted()
    */

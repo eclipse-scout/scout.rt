@@ -59,7 +59,6 @@ public class GlobalTrustManager {
    * Installs the global trustmanager for 'TLS' server socket protocol and the default trustmanager algorithm as
    * specified in the java security properties, or an implementation-specific default if no such property exists.
    *
-   * @throws ProcessingException
    */
   public void installGlobalTrustManager() {
     installGlobalTrustManager("TLS", TrustManagerFactory.getDefaultAlgorithm());
@@ -74,7 +73,6 @@ public class GlobalTrustManager {
    *          certificates located not only in keystore but also in 'externalfiles/certificates' folder.
    * @param tmAlgorithm
    *          {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
-   * @throws ProcessingException
    */
   public void installGlobalTrustManager(String protocol, String tmAlgorithm) {
     X509TrustManager globalTrustManager;

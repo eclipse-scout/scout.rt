@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.commons.status.Status;
@@ -78,7 +77,6 @@ public class FormFieldTest {
   /**
    * Tests that {@link AbstractFormField#classId()} returns the annotation value for {@link ClassId}.
    *
-   * @throws ProcessingException
    */
   @Test
   public void testClassIdAnnotatedInForm() {
@@ -114,7 +112,6 @@ public class FormFieldTest {
   /**
    * Tests the generated {@link AbstractFormField#classId()} for injected sibling fields.
    *
-   * @throws ProcessingException
    */
   @Test
   public void testClassIdInjectedFields() {
@@ -124,7 +121,6 @@ public class FormFieldTest {
   /**
    * Tests the generated {@link AbstractFormField#classId()} for injected sibling fields.
    *
-   * @throws ProcessingException
    */
   @Test
   public void testClassIdTemplateGroupBox() {

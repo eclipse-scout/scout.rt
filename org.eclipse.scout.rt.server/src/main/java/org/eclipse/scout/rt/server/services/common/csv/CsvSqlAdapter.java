@@ -76,7 +76,6 @@ public class CsvSqlAdapter {
    *          the csv types of the corresponding column
    * @param writeColumnTypes
    *          the sql types of the corresponding column
-   * @throws ProcessingException
    */
   public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
       List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) {
@@ -132,7 +131,6 @@ public class CsvSqlAdapter {
    *          the csv types of the corresponding column
    * @param writeColumnTypes
    *          the sql types of the corresponding column
-   * @throws ProcessingException
    */
   public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumNames,
       List<String> csvColumnTypes, boolean writeColumnTypes) {
@@ -167,7 +165,6 @@ public class CsvSqlAdapter {
    * Export sql data into a file
    *
    * @param params
-   * @throws ProcessingException
    */
   public void exportData(CsvSqlSettings params) {
     final CsvHelper h = new CsvHelper(params.getContentLocale(), params.getColSeparator(), params.getTextDelimiter(), "\n");

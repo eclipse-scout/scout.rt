@@ -18,9 +18,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table;
 
-/**
- *
- */
 @PageData(OrigPageWithTableData.class)
 public class OrigPageWithTable extends AbstractPageWithTable<Table> {
   @Order(1000.0)

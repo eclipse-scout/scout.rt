@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -64,7 +63,6 @@ public class ColumnEditableTest {
   /**
    * Tests, if a field in the editable column is valid
    *
-   * @throws ProcessingException
    */
   @Test
   public void testFieldInEditableColumn() {

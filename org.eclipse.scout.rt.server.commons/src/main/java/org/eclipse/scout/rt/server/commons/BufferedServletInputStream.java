@@ -18,9 +18,6 @@ import javax.servlet.ServletInputStream;
 
 import org.eclipse.scout.commons.IOUtility;
 
-/**
- *
- */
 public class BufferedServletInputStream extends ServletInputStream {
 
   private final ByteArrayInputStream m_data;

@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import java.util.EventListener;
 
-/**
- *
- */
 public interface ContextMenuListener extends EventListener {
 
   void contextMenuChanged(ContextMenuEvent event);

@@ -147,7 +147,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    * loadIncremnental only loads the roots, whereas !loadIncremental loads the complete tree. Normally the latter is
    * configured together with {@link IContentAssistField#isBrowseAutoExpandAll()}
    *
-   * @throws ProcessingException
    */
   @Override
   protected void init() {
@@ -199,7 +198,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    * Called when the initial tree has been loaded and the form is therefore ready to accept
    * {@link #update(boolean, boolean)} requests.
    *
-   * @throws ProcessingException
    */
   private void commitPopulateInitialTree() {
     updateActiveFilter();

@@ -84,9 +84,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    * print a form using properties printDevice, printParameters
    */
   public static final int TYPE_PRINT = 900;
-  /**
-   *
-   */
+
   public static final int TYPE_PRINTED = 901;
 
   /**

@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 public final class ScoutAssert {
 
@@ -124,7 +123,6 @@ public final class ScoutAssert {
    * @param actualFile
    * @param charsetName
    *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
-   * @throws ProcessingException
    */
   public static void assertTextFileEquals(File expectedFile, File actualFile, String charsetName) {
     if (!expectedFile.exists()) {

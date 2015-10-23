@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains.BasicFieldExecChangedDisplayTextChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 
-/**
- *
- */
 public abstract class AbstractBasicFieldExtension<VALUE, OWNER extends AbstractBasicField<VALUE>>
     extends AbstractValueFieldExtension<VALUE, OWNER>
     implements IBasicFieldExtension<VALUE, OWNER> {

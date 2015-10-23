@@ -25,9 +25,6 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.shared.TierState.Tier;
 
-/**
- *
- */
 public final class SharedConfigProperties {
 
   private SharedConfigProperties() {

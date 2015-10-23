@@ -17,9 +17,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFi
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldLinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
-/**
- *
- */
 public abstract class AbstractStringFieldExtension<OWNER extends AbstractStringField> extends AbstractBasicFieldExtension<String, OWNER> implements IStringFieldExtension<OWNER> {
 
   /**

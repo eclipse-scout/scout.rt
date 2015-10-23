@@ -15,7 +15,6 @@ import java.security.Permission;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
@@ -43,9 +42,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   int HORIZONTAL_ALIGNMENT_LEFT = -1;
   int HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
-  /**
-   * @throws ProcessingException
-   */
   void initAction();
 
   /**

@@ -334,7 +334,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    *
    * @param text
    * @return
-   * @throws ProcessingException
    */
   protected BigDecimal parseToBigDecimalInternal(String text) {
     BigDecimal retVal = null;

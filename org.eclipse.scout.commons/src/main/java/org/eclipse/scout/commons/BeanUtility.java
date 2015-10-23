@@ -179,7 +179,6 @@ public final class BeanUtility {
    * @param parameters
    *          The parameter objects the new instance is initialized with.
    * @return Returns a new instance of the given class or <code>null</code>, if no matching constructor can be found.
-   * @throws ProcessingException
    * @since 3.8.1
    */
   public static <T> T createInstance(Class<T> c, Object... parameters) {
@@ -207,7 +206,6 @@ public final class BeanUtility {
    * @param parameters
    *          The parameter objects the new instance is initialized with.
    * @return Returns a new instance of the given class or <code>null</code>, if no matching constructor can be found.
-   * @throws ProcessingException
    * @since 3.8.1
    */
   public static <T> T createInstance(Class<T> c, Class<?>[] parameterTypes, Object[] parameters) {

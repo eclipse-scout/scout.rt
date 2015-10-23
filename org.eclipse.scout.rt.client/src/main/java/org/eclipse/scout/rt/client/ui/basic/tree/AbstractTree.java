@@ -493,7 +493,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    *
    * @param nodes
    *          list of nodes which have been checked or unchecked (never null).
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)

@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action;
 
-/**
- *
- */
 public interface IActionFilter {
 
   boolean accept(IAction action);

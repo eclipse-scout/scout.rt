@@ -16,9 +16,6 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboardField;
 
-/**
- *
- */
 public interface IClipboardFieldExtension<OWNER extends AbstractClipboardField> extends IValueFieldExtension<Collection<BinaryResource>, OWNER> {
 
 }

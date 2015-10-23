@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.eclipse.scout.rt.client;
 
 import static org.junit.Assert.assertTrue;

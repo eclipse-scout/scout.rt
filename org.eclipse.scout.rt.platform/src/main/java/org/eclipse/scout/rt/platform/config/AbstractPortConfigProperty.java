@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public abstract class AbstractPortConfigProperty extends AbstractPositiveIntegerConfigProperty {
 
   @Override

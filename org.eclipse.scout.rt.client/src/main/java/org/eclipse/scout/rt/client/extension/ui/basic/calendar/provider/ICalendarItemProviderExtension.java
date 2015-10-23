@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarIt
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
-/**
- *
- */
 public interface ICalendarItemProviderExtension<OWNER extends AbstractCalendarItemProvider> extends IExtension<OWNER> {
 
   void execLoadItems(CalendarItemProviderLoadItemsChain chain, Date minDate, Date maxDate, Set<ICalendarItem> result);

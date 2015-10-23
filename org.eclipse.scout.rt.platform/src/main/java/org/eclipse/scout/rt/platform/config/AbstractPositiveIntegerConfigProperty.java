@@ -15,9 +15,6 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public abstract class AbstractPositiveIntegerConfigProperty extends AbstractConfigProperty<Integer> {
 
   private static final Pattern INT_PAT = Pattern.compile("^\\d{1,9}$");

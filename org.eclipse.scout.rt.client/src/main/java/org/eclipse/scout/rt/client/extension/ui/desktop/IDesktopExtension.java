@@ -33,9 +33,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface IDesktopExtension<DESKTOP extends AbstractDesktop> extends IExtension<DESKTOP> {
 
   /**

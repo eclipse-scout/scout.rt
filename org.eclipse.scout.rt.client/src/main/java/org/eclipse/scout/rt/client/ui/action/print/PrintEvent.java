@@ -14,9 +14,6 @@ import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
-/**
- *
- */
 public class PrintEvent extends EventObject implements IModelEvent {
 
   private static final long serialVersionUID = 1L;

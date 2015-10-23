@@ -205,7 +205,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    *
    * @param filter
    *          a search filter, guaranteed not to be {@code null}
-   * @throws ProcessingException
    * @since 3.10.0-M1
    */
   @ConfigOperation
@@ -225,7 +224,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * This default implementation does the following: It queries methods {@link #isSearchActive()} and
    * {@link #isSearchRequired()} and then calls {@link #interceptLoadData(SearchFilter)} if appropriate.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(100)
@@ -269,7 +267,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param row
    *          a table row for which a new child page should be created
    * @return a new child page for {@code row}
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(110)
@@ -301,7 +298,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param row
    *          a table row for which a new virtual child page should be created
    * @return a new virtual child page for {@code row}
-   * @throws ProcessingException
    * @see VirtualPage
    * @see IVirtualTreeNode
    */
@@ -327,7 +323,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param node
    *          the virtual tree node to be resolved
    * @return a new real tree node, replacing the virtual tree node
-   * @throws ProcessingException
    */
   @Override
   protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) {
@@ -416,7 +411,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * creates the search form, but doesn't start it
    *
    * @return {@link ISearchForm} or <code>null</code> if the search form could not be created.
-   * @throws ProcessingException
    */
   protected ISearchForm createSearchForm() {
     final Class<? extends ISearchForm> configuredSearchForm = getConfiguredSearchForm();
@@ -560,7 +554,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    * @see #ensureSearchFormCreated()
    * @see #ensureSearchFormStarted()
    */

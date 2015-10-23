@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface ITreeNodeExtension<OWNER extends AbstractTreeNode> extends IExtension<OWNER> {
 
   void execDecorateCell(TreeNodeDecorateCellChain chain, Cell cell);

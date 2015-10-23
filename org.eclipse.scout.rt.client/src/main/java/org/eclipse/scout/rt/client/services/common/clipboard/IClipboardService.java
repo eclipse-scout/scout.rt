@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.services.common.clipboard;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.platform.service.IService;
@@ -31,7 +30,6 @@ public interface IClipboardService extends IService {
    * clipboard is a UI resource.
    *
    * @param transferObject
-   * @throws ProcessingException
    */
   void setContents(TransferObject transferObject);
 
@@ -41,7 +39,6 @@ public interface IClipboardService extends IService {
    * content types of the {@link BinaryResource} which are returned, see {@link BinaryResource#getContentType()}.
    *
    * @param allowedMimeTypes
-   * @throws ProcessingException
    */
   Collection<BinaryResource> getClipboardContents(MimeType... allowedMimeTypes);
 
@@ -50,7 +47,6 @@ public interface IClipboardService extends IService {
    * for semantics.
    *
    * @param textContents
-   * @throws ProcessingException
    */
   void setTextContents(String textContents);
 

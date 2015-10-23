@@ -4,9 +4,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- */
 public class DynamicAnnotationTest {
 
   @Test

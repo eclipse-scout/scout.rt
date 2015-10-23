@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.notification.AbstractObservableNotificationHandler;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClientNotification;
 
-/**
- *
- */
 public class BookmarkClientNotificationHandler extends AbstractObservableNotificationHandler<BookmarkChangedClientNotification> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkClientNotificationHandler.class);
 

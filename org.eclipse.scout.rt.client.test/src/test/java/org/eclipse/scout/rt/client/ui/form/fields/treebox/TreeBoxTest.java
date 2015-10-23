@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -209,7 +208,6 @@ public class TreeBoxTest {
   /**
    * Tests that the content is valid for a filled mandatory field. {@link #isContentValid()}
    *
-   * @throws ProcessingException
    */
   @Test
   public void testContentValid() {
@@ -223,7 +221,6 @@ public class TreeBoxTest {
   /**
    * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
    *
-   * @throws ProcessingException
    */
   @Test
   public void testContentInvalid() {
@@ -236,7 +233,6 @@ public class TreeBoxTest {
   /**
    * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
    *
-   * @throws ProcessingException
    */
   @Test
   public void testContentInvalidError() {

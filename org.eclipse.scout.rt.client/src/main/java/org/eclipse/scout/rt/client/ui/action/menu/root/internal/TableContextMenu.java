@@ -60,9 +60,6 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     handleOwnerEnabledChanged();
   }
 
-  /**
-   *
-   */
   protected void handleOwnerEnabledChanged() {
     if (getOwner() != null) {
       final boolean enabled = getOwner().isEnabled();

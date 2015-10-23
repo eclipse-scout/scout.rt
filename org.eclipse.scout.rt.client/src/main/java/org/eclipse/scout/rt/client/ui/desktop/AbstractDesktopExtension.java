@@ -150,7 +150,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
@@ -169,7 +168,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(12)
@@ -184,7 +182,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(14)
@@ -199,7 +196,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(15)
@@ -214,7 +210,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(20)
@@ -229,7 +224,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(25)
@@ -248,7 +242,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *          new outline that is active after the change
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)
@@ -284,7 +277,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *          is the search form of the new (selected) page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @Order(40)
   @ConfigOperation
@@ -303,7 +295,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *          is the detail form of the new (selected) page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @Order(50)
   @ConfigOperation
@@ -322,7 +313,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *          is the table of the new (selected) table page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @Order(60)
   @ConfigOperation
@@ -339,7 +329,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *          the table page that has been (re)loaded
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @Order(62)
   @ConfigOperation
@@ -360,7 +349,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    *          a live list to add menus to the tray
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   @Order(70)
   @ConfigOperation

@@ -14,9 +14,6 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-/**
- *
- */
 public class ContentAssistFormEvent extends FormEvent {
 
   public static final int TYPE_NEW_LINK_EVENT = 10000;

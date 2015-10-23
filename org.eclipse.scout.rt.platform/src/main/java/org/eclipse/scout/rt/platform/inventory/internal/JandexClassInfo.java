@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 
-/**
- *
- */
 public class JandexClassInfo implements IClassInfo {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;

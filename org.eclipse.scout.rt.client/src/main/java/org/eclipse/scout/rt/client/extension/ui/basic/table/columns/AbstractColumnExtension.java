@@ -25,9 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends AbstractExtension<OWNER> implements IColumnExtension<VALUE, OWNER> {
 
   public AbstractColumnExtension(OWNER owner) {

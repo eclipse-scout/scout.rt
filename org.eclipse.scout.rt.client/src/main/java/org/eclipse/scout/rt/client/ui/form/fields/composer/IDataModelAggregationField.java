@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 
-/**
- *
- */
 public interface IDataModelAggregationField extends ISmartField<Integer> {
 
 }

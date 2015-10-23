@@ -105,7 +105,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    *          <li>for {@link ITable} it is the current selection {@link List} of {@link ITableRow}'s.</li>
    *          <li>for {@link IValueField} it is the current value.</li>
    *          </ul>
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50.0)

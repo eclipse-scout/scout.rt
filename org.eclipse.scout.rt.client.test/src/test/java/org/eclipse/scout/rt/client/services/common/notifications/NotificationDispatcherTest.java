@@ -41,9 +41,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-/**
- *
- */
 @RunWith(ClientTestRunner.class)
 @RunWithClientSession(TestEnvironmentClientSession.class)
 @RunWithSubject("anna")

@@ -16,9 +16,6 @@ import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelect
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface IActionExtension<OWNER extends AbstractAction> extends IExtension<OWNER> {
 
   void execSelectionChanged(ActionSelectionChangedChain chain, boolean selection);

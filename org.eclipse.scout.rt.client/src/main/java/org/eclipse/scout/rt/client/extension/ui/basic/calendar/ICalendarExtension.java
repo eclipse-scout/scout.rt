@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface ICalendarExtension<OWNER extends AbstractCalendar> extends IExtension<OWNER> {
 
   void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider);

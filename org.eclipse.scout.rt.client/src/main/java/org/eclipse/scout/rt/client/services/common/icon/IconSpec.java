@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.icon;
 
-/**
- *
- */
 public class IconSpec {
   private String m_name;
   private byte[] m_content;

@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service.internal;
 
-/**
- *
- */
 public class TestService implements ITestService {
 
 }

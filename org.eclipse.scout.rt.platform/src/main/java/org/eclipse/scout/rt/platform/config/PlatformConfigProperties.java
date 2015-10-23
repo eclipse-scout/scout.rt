@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.job.internal.FutureSet;
 
-/**
- *
- */
 public final class PlatformConfigProperties {
 
   private PlatformConfigProperties() {

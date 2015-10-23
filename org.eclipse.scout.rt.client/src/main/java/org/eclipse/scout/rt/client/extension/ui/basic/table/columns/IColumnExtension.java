@@ -25,9 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface IColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends IExtension<OWNER> {
 
   void execCompleteEdit(ColumnCompleteEditChain<VALUE> chain, ITableRow row, IFormField editingField);

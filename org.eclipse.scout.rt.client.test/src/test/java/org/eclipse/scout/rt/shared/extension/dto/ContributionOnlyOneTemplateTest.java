@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.PropertyExtensionData;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- */
 public class ContributionOnlyOneTemplateTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testContributeToDtoInOnlyOneTemplate() throws Exception {

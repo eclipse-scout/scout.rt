@@ -23,9 +23,6 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.IndexView;
 
-/**
- *
- */
 public class JandexClassInventory implements IClassInventory {
 
   private final IndexView m_index;

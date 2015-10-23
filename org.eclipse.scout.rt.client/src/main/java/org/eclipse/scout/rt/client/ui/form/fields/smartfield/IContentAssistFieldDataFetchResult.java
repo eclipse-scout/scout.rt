@@ -15,10 +15,6 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-/**
- *
- */
-
 public interface IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
   String getSearchText();
 

@@ -14,9 +14,6 @@ import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public abstract class AbstractBinaryConfigProperty extends AbstractConfigProperty<byte[]> {
 
   @Override

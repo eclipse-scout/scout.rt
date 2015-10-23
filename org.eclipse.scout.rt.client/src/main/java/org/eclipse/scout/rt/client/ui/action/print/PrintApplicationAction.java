@@ -35,9 +35,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
-/**
- *
- */
 public class PrintApplicationAction extends AbstractAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintApplicationAction.class);
 

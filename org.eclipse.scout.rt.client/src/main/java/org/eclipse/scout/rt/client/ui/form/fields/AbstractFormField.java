@@ -1494,7 +1494,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Default implementation just calls {@link #interceptIsSaveNeeded()}<br>
    * For thread-safety-reason this method is final
    *
-   * @throws ProcessingException
    */
   @Override
   public final void checkSaveNeeded() {
@@ -1537,7 +1536,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Default implementation just calls {@link #interceptIsEmpty()}
    *
-   * @throws ProcessingException
    */
   protected final void checkEmpty() {
     if (isInitialized()) {

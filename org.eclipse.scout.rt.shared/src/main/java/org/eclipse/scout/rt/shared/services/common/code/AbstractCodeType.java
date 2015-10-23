@@ -12,15 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeTypeExtension;
 
-/**
- *
- */
 public abstract class AbstractCodeType<CODE_TYPE_ID, CODE_ID> extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID> {
   private static final long serialVersionUID = 1L;
 
-  /**
-   *
-   */
   public AbstractCodeType() {
     super();
   }

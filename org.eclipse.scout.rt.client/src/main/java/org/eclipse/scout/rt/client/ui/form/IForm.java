@@ -127,7 +127,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *
    * @see AbstractDesktop#getSimilarViewForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
-   * @throws ProcessingException
    */
   Object computeExclusiveKey();
 
@@ -261,7 +260,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *
    * @param source
    *          the FormData to import
-   * @throws ProcessingException
    */
   void importFormData(AbstractFormData source);
 
@@ -273,7 +271,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @param valueChangeTriggersEnabled
    *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
    *          caused by this import.
-   * @throws ProcessingException
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled);
 
@@ -287,7 +284,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *          caused by this import.
    * @param filter
    *          a filter that can be used to specify which form properties should be imported
-   * @throws ProcessingException
    * @see IPropertyFilter
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter);
@@ -304,7 +300,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *          a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
    *          a filter that can be used to specify which form fields should be imported
-   * @throws ProcessingException
    * @see IPropertyFilter#accept(org.eclipse.scout.commons.beans.FastPropertyDescriptor)
    * @see IFormFieldFilter#accept(IFormField)
    */

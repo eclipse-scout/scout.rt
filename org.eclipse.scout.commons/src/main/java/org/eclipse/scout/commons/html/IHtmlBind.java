@@ -12,9 +12,6 @@ package org.eclipse.scout.commons.html;
 
 import java.util.Map;
 
-/**
- *
- */
 public interface IHtmlBind extends CharSequence {
 
   void replaceBinds(Map<String, String> bindMap);

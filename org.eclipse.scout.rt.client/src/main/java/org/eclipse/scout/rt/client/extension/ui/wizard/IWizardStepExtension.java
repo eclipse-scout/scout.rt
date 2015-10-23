@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface IWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends IExtension<OWNER> {
 
   void execDeactivate(WizardStepDeactivateChain<? extends IForm> chain, int stepKind);

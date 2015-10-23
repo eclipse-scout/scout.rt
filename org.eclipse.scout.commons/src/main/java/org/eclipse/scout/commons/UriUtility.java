@@ -41,7 +41,6 @@ public final class UriUtility {
    * 
    * @param uri
    * @return map with parsed query parameters. Never <code>null</code>.
-   * @throws ProcessingException
    */
   public static Map<String, String> getQueryParameters(URL url) {
     return getQueryParameters(url, null);
@@ -54,7 +53,6 @@ public final class UriUtility {
    * @param encoding
    *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
-   * @throws ProcessingException
    */
   public static Map<String, String> getQueryParameters(URL url, String encoding) {
     if (url == null) {
@@ -68,7 +66,6 @@ public final class UriUtility {
    * 
    * @param uri
    * @return map with parsed query parameters. Never <code>null</code>.
-   * @throws ProcessingException
    */
   public static Map<String, String> getQueryParameters(URI uri) {
     return getQueryParameters(uri, null);
@@ -81,7 +78,6 @@ public final class UriUtility {
    * @param encoding
    *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
-   * @throws ProcessingException
    */
   public static Map<String, String> getQueryParameters(URI uri, String encoding) {
     if (uri == null || uri.getQuery() == null) {
@@ -134,7 +130,6 @@ public final class UriUtility {
    * 
    * @param url
    * @return <code>null</code> if the given url is <code>null</code>.
-   * @throws ProcessingException
    */
   public static URI urlToUri(URL url) {
     if (url == null) {
@@ -153,7 +148,6 @@ public final class UriUtility {
    * 
    * @param uri
    * @return <code>null</code> if the given uri is <code>null</code>.
-   * @throws ProcessingException
    */
   public static URL uriToUrl(URI uri) {
     if (uri == null) {
@@ -172,7 +166,6 @@ public final class UriUtility {
    * 
    * @param uri
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URI} instance.
-   * @throws ProcessingException
    */
   public static URI toUri(String uri) {
     if (!StringUtility.hasText(uri)) {
@@ -191,7 +184,6 @@ public final class UriUtility {
    * 
    * @param url
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URL} instance.
-   * @throws ProcessingException
    */
   public static URL toUrl(String url) {
     if (!StringUtility.hasText(url)) {

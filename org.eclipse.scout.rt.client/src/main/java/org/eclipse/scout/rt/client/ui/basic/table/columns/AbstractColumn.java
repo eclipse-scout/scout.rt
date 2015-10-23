@@ -524,7 +524,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
@@ -536,7 +535,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(15)
@@ -555,7 +553,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * @param rawValue
    *          Raw value to parse.
    * @return Value in correct type, derived from rawValue.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(20)
@@ -576,7 +573,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * @param rawValue
    *          Already parsed raw value to validate.
    * @return Validated value
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)
@@ -593,7 +589,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *          Cell to decorate.
    * @param row
    *          Table row of cell.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(40)
@@ -607,7 +602,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *
    * @param cell
    *          Header cell to decorate.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50)
@@ -655,7 +649,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *          on which editing occurred.
    * @param editingField
    *          Field which was used to edit cell value (as returned by {@link #interceptPrepareEdit(ITableRow)}).
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(62)
@@ -766,7 +759,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *
    * @param row
    * @param newValue
-   * @throws ProcessingException
    */
   protected void applyValueInternal(ITableRow row, VALUE newValue) {
     if (!getTable().isSortEnabled()) {

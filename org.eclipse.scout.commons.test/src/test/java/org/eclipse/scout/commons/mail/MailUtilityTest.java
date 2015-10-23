@@ -365,7 +365,6 @@ public class MailUtilityTest {
    * @param attachmentFilenames
    *          Filenames of attachments (use {@link MimeUtility#encodeText(String)} in case the filename has
    *          non-supported chars)
-   * @throws ProcessingException
    * @throws IOException
    * @throws MessagingException
    */

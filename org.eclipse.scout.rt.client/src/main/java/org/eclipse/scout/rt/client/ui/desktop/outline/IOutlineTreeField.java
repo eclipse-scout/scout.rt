@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 
-/**
- *
- */
 public interface IOutlineTreeField extends ITreeField {
 
 }

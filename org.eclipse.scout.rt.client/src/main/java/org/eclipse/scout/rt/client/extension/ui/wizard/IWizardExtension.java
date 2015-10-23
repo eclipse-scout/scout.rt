@@ -30,9 +30,6 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface IWizardExtension<OWNER extends AbstractWizard> extends IExtension<OWNER> {
 
   void execActiveStepChanged(WizardActiveStepChangedChain chain);

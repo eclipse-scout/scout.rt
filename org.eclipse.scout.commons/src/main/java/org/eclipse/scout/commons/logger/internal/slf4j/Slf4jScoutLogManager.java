@@ -15,9 +15,6 @@ import java.io.File;
 import org.eclipse.scout.commons.logger.IScoutLogManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 
-/**
- *
- */
 public class Slf4jScoutLogManager implements IScoutLogManager {
 
   @Override

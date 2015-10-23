@@ -56,9 +56,6 @@ public class OutlineMenuWrapper implements IMenu {
     setup();
   }
 
-  /**
-   *
-   */
   protected void setup() {
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
     List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());

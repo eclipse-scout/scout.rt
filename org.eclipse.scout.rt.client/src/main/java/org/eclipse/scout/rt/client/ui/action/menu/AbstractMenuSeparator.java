@@ -14,9 +14,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 
-/**
- *
- */
 public abstract class AbstractMenuSeparator extends AbstractMenu {
 
   @Override

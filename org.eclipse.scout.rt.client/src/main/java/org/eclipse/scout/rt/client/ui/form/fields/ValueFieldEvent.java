@@ -14,9 +14,6 @@ import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
-/**
- *
- */
 public class ValueFieldEvent<T> extends EventObject implements IModelEvent {
 
   public static final int TYPE_CUT = 100;

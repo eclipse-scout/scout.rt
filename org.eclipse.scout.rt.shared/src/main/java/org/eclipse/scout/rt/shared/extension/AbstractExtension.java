@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-/**
- *
- */
 public abstract class AbstractExtension<OWNER extends IExtensibleObject> implements IExtension<OWNER> {
   private final OWNER m_owner;
 

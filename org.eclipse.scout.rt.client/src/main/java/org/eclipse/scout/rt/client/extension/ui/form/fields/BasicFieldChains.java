@@ -16,9 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
-/**
- *
- */
 public final class BasicFieldChains {
 
   private BasicFieldChains() {

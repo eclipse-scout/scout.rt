@@ -310,7 +310,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
@@ -322,7 +321,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(20)
@@ -336,7 +334,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * default behavior is to do nothing. By throwing an explicit {@link VetoException} the closing process will be
    * stopped.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)
@@ -348,7 +345,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(40)
@@ -360,7 +356,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50)
@@ -372,7 +367,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(60)
@@ -388,7 +382,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          old outline that was active before
    * @param newOutline
    *          new outline that is active after the change
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(70)
@@ -421,7 +414,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          is the search form of the old (not selected anymore) page or {@code null}
    * @param newForm
    *          is the search form of the new (selected) page or {@code null}
-   * @throws ProcessingException
    */
   @Order(90)
   @ConfigOperation
@@ -438,7 +430,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          is the detail form of the old (not selected anymore) page or {@code null}
    * @param newForm
    *          is the detail form of the new (selected) page or {@code null}
-   * @throws ProcessingException
    */
   @Order(100)
   @ConfigOperation
@@ -456,7 +447,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          is the table of the old (not selected anymore) table page or {@code null}
    * @param newTable
    *          is the table of the new (selected) table page or {@code null}
-   * @throws ProcessingException
    */
   @Order(110)
   @ConfigOperation
@@ -471,7 +461,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *
    * @param tablePage
    *          the table page that has been (re)loaded
-   * @throws ProcessingException
    */
   @Order(120)
   @ConfigOperation
@@ -493,7 +482,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *
    * @param menus
    *          a live list to add menus to the tray
-   * @throws ProcessingException
    */
   @Order(130)
   @ConfigOperation

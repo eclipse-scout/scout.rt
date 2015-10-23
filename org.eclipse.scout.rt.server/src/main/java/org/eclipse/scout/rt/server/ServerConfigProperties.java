@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
-/**
- *
- */
 public final class ServerConfigProperties {
   private ServerConfigProperties() {
   }

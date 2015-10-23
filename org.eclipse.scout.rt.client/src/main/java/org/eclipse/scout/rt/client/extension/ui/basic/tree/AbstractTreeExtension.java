@@ -31,9 +31,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends AbstractExtension<OWNER> implements ITreeExtension<OWNER> {
 
   public AbstractTreeExtension(OWNER owner) {

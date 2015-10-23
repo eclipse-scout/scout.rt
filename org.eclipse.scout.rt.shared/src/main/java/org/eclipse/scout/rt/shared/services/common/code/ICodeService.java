@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
@@ -46,7 +45,6 @@ public interface ICodeService extends IService {
   /**
    * reload code type
    *
-   * @throws ProcessingException
    * @return Non null unmodifiable list with reloaded code types.
    */
   <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type);
@@ -54,7 +52,6 @@ public interface ICodeService extends IService {
   /**
    * reload code types
    *
-   * @throws ProcessingException
    * @return Non null unmodifiable list with reloaded code types.
    */
   List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types);

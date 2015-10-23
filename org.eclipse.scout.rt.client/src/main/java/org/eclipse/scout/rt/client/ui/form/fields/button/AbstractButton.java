@@ -181,7 +181,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(190)
@@ -193,7 +192,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    *
    * @param selection
    *          the new selection state
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(210)

@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 
-/**
- *
- */
 public final class ActionUtility {
 
   private ActionUtility() {

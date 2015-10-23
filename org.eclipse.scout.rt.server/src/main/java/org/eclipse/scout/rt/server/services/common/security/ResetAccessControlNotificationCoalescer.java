@@ -16,9 +16,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.server.notification.ICoalescer;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 
-/**
- *
- */
 public class ResetAccessControlNotificationCoalescer implements ICoalescer<ResetAccessControlChangedNotification> {
 
   @Override

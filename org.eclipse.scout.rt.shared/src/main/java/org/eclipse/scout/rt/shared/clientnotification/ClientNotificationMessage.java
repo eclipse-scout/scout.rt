@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.shared.clientnotification;
 
 import java.io.Serializable;
 
-/**
- *
- */
 public class ClientNotificationMessage implements Serializable {
   private static final long serialVersionUID = 1L;
 

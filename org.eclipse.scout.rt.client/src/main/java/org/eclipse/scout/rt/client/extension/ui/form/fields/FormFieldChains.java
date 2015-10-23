@@ -17,9 +17,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-/**
- *
- */
 public class FormFieldChains {
 
   public static abstract class AbstractFormFieldChain extends AbstractExtensionChain<IFormFieldExtension<? extends AbstractFormField>> {

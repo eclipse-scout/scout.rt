@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.interceptor;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 
 /**
@@ -22,7 +21,6 @@ public interface IBeanInterceptor<T> {
    * A method is being called on a {@link IBeanInvocationContext}
    *
    * @return the result of the call
-   * @throws ProcessingException
    */
   Object invoke(IBeanInvocationContext<T> context);
 }

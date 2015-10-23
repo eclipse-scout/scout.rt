@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
-/**
- *
- */
 @Data(SingleFormExtensionData.class)
 public class SingleFormExtension extends AbstractFormExtension<OrigForm> {
 

@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -160,8 +159,6 @@ public class ClientNotificationDispatcher {
 
   /**
    * This method should only be used for debugging or test reasons. It waits for all notification jobs to be executed.
-   *
-   * @throws ProcessingException
    */
   public void waitForPendingNotifications() {
     final Set<IFuture<?>> futures = new HashSet<>();
@@ -175,9 +172,6 @@ public class ClientNotificationDispatcher {
   private class P_NotificationFutureCallback implements IDoneCallback<Void> {
     private IFuture<Void> m_furture;
 
-    /**
-     *
-     */
     public P_NotificationFutureCallback(IFuture<Void> furture) {
       m_furture = furture;
     }

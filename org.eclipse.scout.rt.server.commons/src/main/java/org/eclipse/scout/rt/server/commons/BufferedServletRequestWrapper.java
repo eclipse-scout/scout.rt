@@ -18,9 +18,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-/**
- *
- */
 public class BufferedServletRequestWrapper extends HttpServletRequestWrapper {
 
   private final BufferedServletInputStream m_buf;

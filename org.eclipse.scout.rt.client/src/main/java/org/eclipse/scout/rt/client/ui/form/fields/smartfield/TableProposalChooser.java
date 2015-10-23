@@ -200,7 +200,6 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
    * </p>
    *
    * @param row
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(130)

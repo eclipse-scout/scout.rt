@@ -16,9 +16,6 @@ import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains.DataModelAttributePrepareLookupChain;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-/**
- *
- */
 public interface IDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends IExtension<OWNER> {
 
   void execInitAttribute(DataModelAttributeInitAttributeChain chain);

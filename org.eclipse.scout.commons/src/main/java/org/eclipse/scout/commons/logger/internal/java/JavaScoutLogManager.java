@@ -170,7 +170,6 @@ public class JavaScoutLogManager implements IScoutLogManager {
    * To create a handler to record the log messages
    *
    * @return
-   * @throws ProcessingException
    */
   protected LogRecorderHandler createLogRecordingHandler() {
     try {

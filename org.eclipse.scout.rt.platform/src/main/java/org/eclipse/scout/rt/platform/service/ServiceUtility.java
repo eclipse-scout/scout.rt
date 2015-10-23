@@ -35,7 +35,6 @@ public final class ServiceUtility {
    * @param operation
    * @param paramTypes
    * @return the reflective service operation that can be called using {@link #invoke(Method,Object,Object[])}
-   * @throws ProcessingException
    */
   public static Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
     try {

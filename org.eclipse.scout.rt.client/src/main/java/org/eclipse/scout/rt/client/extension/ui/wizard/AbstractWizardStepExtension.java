@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends AbstractExtension<OWNER> implements IWizardStepExtension<FORM, OWNER> {
 
   /**

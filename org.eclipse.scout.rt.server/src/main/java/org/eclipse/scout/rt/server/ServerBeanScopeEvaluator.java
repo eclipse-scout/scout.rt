@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 
-/**
- *
- */
 public class ServerBeanScopeEvaluator implements IBeanScopeEvaluator {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerBeanScopeEvaluator.class);

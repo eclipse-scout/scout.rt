@@ -23,9 +23,6 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 
-/**
- *
- */
 public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvider {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultWizardStatusHtmlProvider.class);
 

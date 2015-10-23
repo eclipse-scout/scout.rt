@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -174,7 +173,6 @@ public class BasicPartDefinition implements DataModelConstants {
    *         <p>
    *         Default accepts when any of the value of the valueType set is set (isValueSet) and has a non-null value in
    *         the form data
-   * @throws ProcessingException
    */
   public boolean accept(AbstractFormData formData) {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
@@ -219,7 +217,6 @@ public class BasicPartDefinition implements DataModelConstants {
    *         <p>
    *         Only additional bind values - other than the bindValues passed to createStatementPart - must be added using
    *         {@link FormDataStatementBuilder#addBind(String, Object)}
-   * @throws ProcessingException
    */
   public EntityContribution createInstance(FormDataStatementBuilder builder, AbstractFormData formData, Map<String, String> parentAliasMap) {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();

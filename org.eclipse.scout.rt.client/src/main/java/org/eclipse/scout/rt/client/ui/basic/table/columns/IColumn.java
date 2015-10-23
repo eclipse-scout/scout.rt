@@ -120,7 +120,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    *
    * @param r
    * @param value
-   * @throws ProcessingException
    */
   void setValue(ITableRow r, VALUE value);
 
@@ -134,7 +133,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    *
    * @param r
    * @param value
-   * @throws ProcessingException
    */
   void setValue(int rowIndex, VALUE value);
 

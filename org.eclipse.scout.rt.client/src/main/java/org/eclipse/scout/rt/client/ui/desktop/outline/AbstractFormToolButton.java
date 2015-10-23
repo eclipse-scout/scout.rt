@@ -68,7 +68,6 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
    *
    * @param form
    *          the {@link IForm} to be initialized.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(120)

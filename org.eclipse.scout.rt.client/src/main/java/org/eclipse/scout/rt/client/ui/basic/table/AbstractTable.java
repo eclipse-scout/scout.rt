@@ -549,7 +549,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * @param rows
    *          Table rows that were dragged (unmodifiable list).
    * @return A transferable object representing the given rows.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
@@ -566,7 +565,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          Table row on which the transferable object was dropped (row may be null for empty space drop).
    * @param t
    *          Transferable object that was dropped on the row.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(20)
@@ -582,7 +580,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * @param rows
    *          The selected table rows to copy.
    * @return A transferable object representing the given rows or null to not populate the clipboard.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)
@@ -632,7 +629,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(40)
@@ -644,7 +640,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50)
@@ -656,7 +651,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(60)
@@ -668,7 +662,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(70)
@@ -684,7 +677,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          that was clicked (never null).
    * @param mouseButton
    *          the mouse button ({@link MouseButton}) which triggered this method
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(80)
@@ -701,7 +693,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *
    * @param row
    *          that was activated (never null).
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)
@@ -728,7 +719,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *
    * @param rows
    *          an unmodifiable list of the selected rows.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(100)
@@ -742,7 +732,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *
    * @param row
    *          that is going to be decorated.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(110)
@@ -761,7 +750,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          Path of URL ({@link URL#getPath()}).
    * @param local
    *          {@code true} if the url is not a valid external url but a local model url (http://local/...)
-   * @throws ProcessingException
    * @{@link Deprecated} use {@link #execAppLinkAction(String)} instead
    */
   @ConfigOperation
@@ -800,7 +788,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *
    * @param rows
    *          list of rows which have been checked or unchecked (never null).
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(130)
@@ -1697,7 +1684,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *
    * @param rowType
    * @return
-   * @throws ProcessingException
    * @since 3.8.2
    */
   @ConfigOperation
@@ -3847,7 +3833,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          {@code true} if the sorting is reset.
    * @param widths
    *          {@code true} if the column widths are reset.
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)

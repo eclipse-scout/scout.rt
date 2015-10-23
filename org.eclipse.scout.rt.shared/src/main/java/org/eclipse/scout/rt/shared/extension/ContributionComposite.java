@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-/**
- *
- */
 public final class ContributionComposite extends AbstractContributionComposite {
 
   private static final long serialVersionUID = 1L;

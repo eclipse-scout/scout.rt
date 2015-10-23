@@ -140,7 +140,6 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    * @param binary
    *          data
    * @return the {@link BookmarkFolder} created by the binary data
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)

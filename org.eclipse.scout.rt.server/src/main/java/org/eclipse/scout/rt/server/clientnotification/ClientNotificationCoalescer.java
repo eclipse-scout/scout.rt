@@ -26,9 +26,6 @@ import org.eclipse.scout.rt.server.notification.NotificationCoalescer;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
-/**
- *
- */
 @ApplicationScoped
 public class ClientNotificationCoalescer {
 

@@ -12,9 +12,6 @@ package org.eclipse.scout.commons;
 
 import java.io.Serializable;
 
-/**
- *
- */
 public class Range<VALUE_TYPE> implements Serializable {
 
   private static final long serialVersionUID = 1L;

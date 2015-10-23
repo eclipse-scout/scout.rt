@@ -262,7 +262,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    * @see #interceptPageActivated()
    */
   @ConfigOperation
@@ -275,7 +274,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50)
@@ -354,7 +352,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(60)
@@ -366,7 +363,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(70)
@@ -378,7 +374,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(80)
@@ -391,7 +386,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    * @see #ensureDetailFormCreated()
    * @see #ensureDetailFormStarted()
    */

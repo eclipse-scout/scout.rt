@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.FirstS
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.FirstUseOfTemplateBox;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox;
 
-/**
- *
- */
 @FormData(value = OrigFormData.class, sdkCommand = SdkCommand.CREATE)
 public class OrigForm extends AbstractForm {
 

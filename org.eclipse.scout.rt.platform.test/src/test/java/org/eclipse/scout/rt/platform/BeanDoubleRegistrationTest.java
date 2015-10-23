@@ -14,9 +14,6 @@ import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- */
 public class BeanDoubleRegistrationTest {
 
   @Test

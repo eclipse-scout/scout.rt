@@ -75,7 +75,6 @@ public class MailUtility {
    * @param message
    *          Message to look for body parts.
    * @return
-   * @throws ProcessingException
    */
   public static List<Part> getBodyParts(Part message) {
     List<Part> bodyCollector = new ArrayList<Part>();
@@ -89,7 +88,6 @@ public class MailUtility {
    * @param message
    *          Message to look for attachment parts.
    * @return
-   * @throws ProcessingException
    */
   public static List<Part> getAttachmentParts(Part message) {
     List<Part> attachmentCollector = new ArrayList<Part>();
@@ -110,7 +108,6 @@ public class MailUtility {
    *          Attachment collector (optional)
    * @param inlineAttachmentCollector
    *          Inline attachment collector (optional)
-   * @throws ProcessingException
    */
   public static void collectMailParts(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) {
     if (part == null) {
@@ -169,7 +166,6 @@ public class MailUtility {
    * @param part
    * @return the plainText part encoded with the encoding given in the MIME header or UTF-8 encoded or null if the
    *         plainText Part is not given
-   * @throws ProcessingException
    */
   public static String getPlainText(Part part) {
     String text = null;
@@ -252,7 +248,6 @@ public class MailUtility {
    * @param fileExtension
    *          e.g. "txt", "jpg"
    * @return
-   * @throws ProcessingException
    */
   public static DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) {
     try {
@@ -275,7 +270,6 @@ public class MailUtility {
    * @param mailMessage
    *          Definition of mime message properties.
    * @return Mime message
-   * @throws ProcessingException
    */
   public static MimeMessage createMimeMessage(MailMessage mailMessage) {
     if (mailMessage == null) {
@@ -392,7 +386,6 @@ public class MailUtility {
    *          Mime message to attach files to
    * @param attachments
    *          List of attachments (files).
-   * @throws ProcessingException
    * @since 4.1
    */
   public static void addAttachmentsToMimeMessage(MimeMessage msg, List<File> attachments) {
@@ -429,7 +422,6 @@ public class MailUtility {
    *          Mime message to attach files to
    * @param attachments
    *          List of attachments (binary resources).
-   * @throws ProcessingException
    * @since 6.0
    */
   public static void addResourcesAsAttachments(MimeMessage msg, List<BinaryResource> attachments) {
@@ -465,7 +457,6 @@ public class MailUtility {
    * @return Multipart to which attachments can be added
    * @throws IOException
    * @throws MessagingException
-   * @throws ProcessingException
    */
   private static Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException {
     Object messageContent = msg.getContent();

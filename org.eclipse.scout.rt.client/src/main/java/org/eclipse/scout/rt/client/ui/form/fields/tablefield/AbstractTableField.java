@@ -79,7 +79,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(190)
@@ -91,7 +90,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(200)
@@ -103,7 +101,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(210)
@@ -115,7 +112,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(220)
@@ -127,7 +123,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(230)

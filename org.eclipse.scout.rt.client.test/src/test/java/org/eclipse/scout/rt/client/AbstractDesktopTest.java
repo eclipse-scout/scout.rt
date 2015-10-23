@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.AbstractDesktopTest.CheckSaveTestForm.MainBox.MessageField;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -234,9 +233,6 @@ public class AbstractDesktopTest {
   @ClassId("d090cc19-ba7a-4f79-b147-e58765a837fb")
   class CheckSaveTestForm extends AbstractForm {
 
-    /**
-     * @throws ProcessingException
-     */
     public CheckSaveTestForm() {
       super();
     }

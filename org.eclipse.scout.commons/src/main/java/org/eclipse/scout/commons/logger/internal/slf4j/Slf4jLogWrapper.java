@@ -20,9 +20,6 @@ import org.eclipse.scout.commons.status.IStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- */
 public class Slf4jLogWrapper implements IScoutLogger {
   private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{([0-9]*)\\}", Pattern.DOTALL);
   private final Logger m_logger;

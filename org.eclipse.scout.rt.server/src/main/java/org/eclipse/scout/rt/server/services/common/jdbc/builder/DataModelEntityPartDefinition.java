@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
@@ -137,7 +136,6 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    * @return the result sql text; null if that part is to be ignored
    *         <p>
    *         default just returns the incoming stm (either {@link #getSelectClause()} or {@link #getWhereClause()})
-   * @throws ProcessingException
    */
   public String createInstance(FormDataStatementBuilder builder, ComposerEntityNodeData entityNodeData, EntityStrategy strategy, String stm, Map<String, String> parentAliasMap) {
     return stm;

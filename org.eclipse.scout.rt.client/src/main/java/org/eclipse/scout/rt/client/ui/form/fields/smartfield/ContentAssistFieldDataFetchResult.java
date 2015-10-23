@@ -16,9 +16,6 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-/**
- *
- */
 public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
 
   private final List<? extends ILookupRow<LOOKUP_KEY>> m_lookupRows;

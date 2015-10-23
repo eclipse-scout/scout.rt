@@ -58,9 +58,6 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.extension.AbstractContainerValidationService;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 
-/**
- *
- */
 @Order(-400)
 public class ClientContainerValidationService extends AbstractContainerValidationService {
 

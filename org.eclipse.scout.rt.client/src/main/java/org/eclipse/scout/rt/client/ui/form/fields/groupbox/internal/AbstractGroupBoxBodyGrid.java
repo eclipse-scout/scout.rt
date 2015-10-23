@@ -132,9 +132,6 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
     setGridRows(totalGridH);
   }
 
-  /**
-   *
-   */
   protected abstract void layoutAllDynamic(List<IFormField> fields);
 
   @Override

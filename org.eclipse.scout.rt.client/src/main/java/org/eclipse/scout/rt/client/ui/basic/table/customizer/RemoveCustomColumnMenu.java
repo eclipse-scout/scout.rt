@@ -59,9 +59,6 @@ public class RemoveCustomColumnMenu extends AbstractMenu {
     updateVisibility();
   }
 
-  /**
-   *
-   */
   private void updateVisibility() {
     ITableCustomizer cst = m_table.getTableCustomizer();
     IColumn<?> col = m_table.getContextColumn();

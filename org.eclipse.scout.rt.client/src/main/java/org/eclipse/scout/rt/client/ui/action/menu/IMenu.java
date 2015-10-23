@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -36,7 +35,6 @@ public interface IMenu extends IActionNode<IMenu> {
 
   /**
    * @param newValue
-   * @throws ProcessingException
    */
   void handleOwnerValueChanged(Object newValue);
 

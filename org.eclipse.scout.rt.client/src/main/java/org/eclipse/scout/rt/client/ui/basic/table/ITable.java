@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
@@ -716,7 +715,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param markAsInserted
    *          if <code>true</code>, the status of the new row is {@link ITableRow#STATUS_INSERTED}, otherwise the status
    *          {@link ITableRow#STATUS_NON_CHANGED}
-   * @throws ProcessingException
    */
   ITableRow addRow(boolean markAsInserted);
 
@@ -925,7 +923,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link IColumn#getColumnId()}.
    *
    * @param target
-   * @throws ProcessingException
    * @since 3.10.0-M3
    */
   void exportToTableBeanData(AbstractTableFieldBeanData target);
@@ -935,7 +932,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * properties to {@link IColumn}s is based on the property name and the {@link IColumn#getColumnId()}.
    *
    * @param source
-   * @throws ProcessingException
    * @since 3.10.0-M3
    */
   void importFromTableBeanData(AbstractTableFieldBeanData source);
@@ -946,7 +942,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    *
    * @param rowType
    * @return
-   * @throws ProcessingException
    * @since 3.10.0-M5
    */
   ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType);
@@ -968,7 +963,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Creates an empty table row. The created row is not added to the table yet.
    *
    * @return the created table row
-   * @throws ProcessingException
    */
   ITableRow createRow();
 
@@ -985,7 +979,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param dataMatrixOrReference
    *          Can be an Object[][] or an <code>AtomicReference&lt;Object&gt;</code>(that holds Object[][])
    * @return the list of the created table rows
-   * @throws ProcessingException
    */
   List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference);
 
@@ -1004,7 +997,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param rowStatus
    *          The row status to be set for each created table row
    * @return the list of the created table rows
-   * @throws ProcessingException
    */
   List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus);
 
@@ -1013,7 +1005,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    *
    * @param codes
    * @return the list of the created table rows
-   * @throws ProcessingException
    */
   List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes);
 
@@ -1023,7 +1014,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param rowValues
    *          The values to be filled into the new table row. Must be an array.
    * @return the created table row
-   * @throws ProcessingException
    */
   ITableRow createRow(Object rowValues);
 
@@ -1033,7 +1023,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param dataArray
    *          The values to be filled into the new table rows.
    * @return the list of the created table rows
-   * @throws ProcessingException
    */
   List<ITableRow> createRowsByArray(Object dataArray);
 
@@ -1046,7 +1035,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param rowStatus
    *          The row status to be set for each created table row
    * @return the list of the created table rows
-   * @throws ProcessingException
    */
   List<ITableRow> createRowsByArray(Object dataArray, int rowStatus);
 

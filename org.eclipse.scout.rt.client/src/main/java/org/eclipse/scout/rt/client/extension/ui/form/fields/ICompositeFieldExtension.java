@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 
-/**
- *
- */
 public interface ICompositeFieldExtension<OWNER extends AbstractCompositeField> extends IFormFieldExtension<OWNER> {
 
 }

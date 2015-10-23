@@ -16,9 +16,6 @@ import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelect
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER> implements IActionExtension<OWNER> {
 
   public AbstractActionExtension(OWNER owner) {

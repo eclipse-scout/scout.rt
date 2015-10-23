@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.AttributeStrategy;
@@ -150,7 +149,6 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    *         <p>
    *         Additional bind values - other than the parameter bindNames/bindValues - must be added using
    *         {@link FormDataStatementBuilder2#addBind(String, Object)}
-   * @throws ProcessingException
    */
   public EntityContribution createInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, AttributeStrategy strategy, String stm, List<String> bindNames, List<Object> bindValues,
       Map<String, String> parentAliasMap) {

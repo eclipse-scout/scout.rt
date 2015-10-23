@@ -53,9 +53,6 @@ public class AddCustomColumnMenu extends AbstractMenu {
     updateVisibility();
   }
 
-  /**
-   *
-   */
   private void updateVisibility() {
     setVisible(m_table.getTableCustomizer() != null);
   }

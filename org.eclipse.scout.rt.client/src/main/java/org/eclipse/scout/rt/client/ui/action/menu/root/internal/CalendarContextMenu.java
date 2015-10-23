@@ -44,9 +44,6 @@ public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICa
     handleOwnerValueChanged();
   }
 
-  /**
-   *
-   */
   protected void handleOwnerValueChanged() {
     if (getOwner() != null) {
       final CalendarComponent ownerValue = getOwner().getSelectedComponent();

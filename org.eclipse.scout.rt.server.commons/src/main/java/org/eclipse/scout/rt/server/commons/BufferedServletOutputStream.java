@@ -15,9 +15,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
 
-/**
- *
- */
 public class BufferedServletOutputStream extends ServletOutputStream {
 
   private final ByteArrayOutputStream m_buf;

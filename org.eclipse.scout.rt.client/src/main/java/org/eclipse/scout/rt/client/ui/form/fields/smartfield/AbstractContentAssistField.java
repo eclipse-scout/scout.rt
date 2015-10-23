@@ -813,7 +813,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * </p>
    *
    * @return {@link#IProposalChooser}
-   * @throws ProcessingException
    */
   protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser(boolean allowCustomText) {
     IProposalChooserProvider<LOOKUP_KEY> proposalChooserProvider = getProposalChooserProvider();

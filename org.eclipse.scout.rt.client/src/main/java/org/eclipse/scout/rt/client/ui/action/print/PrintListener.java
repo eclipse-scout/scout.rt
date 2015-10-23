@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.action.print;
 
 import java.util.EventListener;
 
-/**
- *
- */
 public interface PrintListener extends EventListener {
 
   void handlePrintEvent(PrintEvent e);

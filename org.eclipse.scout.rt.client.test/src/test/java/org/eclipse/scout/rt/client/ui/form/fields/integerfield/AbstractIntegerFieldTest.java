@@ -34,9 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- *
- */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)

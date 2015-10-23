@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.platform.config;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public abstract class AbstractBooleanConfigProperty extends AbstractConfigProperty<Boolean> {
   @Override
   protected Boolean parse(String value) {

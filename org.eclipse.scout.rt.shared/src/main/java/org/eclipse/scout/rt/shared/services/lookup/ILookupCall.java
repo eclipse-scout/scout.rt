@@ -14,13 +14,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
-/**
- *
- */
 @Bean
 public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
@@ -86,7 +82,6 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   /**
    * @return
-   * @throws ProcessingException
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByKey();
 
@@ -98,7 +93,6 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   /**
    * @return
-   * @throws ProcessingException
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByText();
 
@@ -110,7 +104,6 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   /**
    * @return
-   * @throws ProcessingException
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByAll();
 
@@ -122,7 +115,6 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   /**
    * @return
-   * @throws ProcessingException
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByRec();
 

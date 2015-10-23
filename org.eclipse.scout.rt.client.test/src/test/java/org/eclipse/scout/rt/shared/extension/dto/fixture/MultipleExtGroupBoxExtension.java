@@ -23,9 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDec
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
-/**
- *
- */
 @Extends(MainBox.class)
 @Data(MultipleExtGroupBoxExtensionData.class)
 public class MultipleExtGroupBoxExtension extends AbstractGroupBoxExtension<MainBox> {

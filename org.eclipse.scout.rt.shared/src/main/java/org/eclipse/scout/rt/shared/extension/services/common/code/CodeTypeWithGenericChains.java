@@ -18,9 +18,6 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGene
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 
-/**
- *
- */
 public final class CodeTypeWithGenericChains {
 
   private CodeTypeWithGenericChains() {

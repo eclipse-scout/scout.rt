@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -90,7 +89,6 @@ public class OfflineSharedVariableNotificationTest {
    * </ul>
    * A client notification should be sent in this case.
    *
-   * @throws ProcessingException
    */
   @Test
   public void testDefaultOffline() {
@@ -118,7 +116,6 @@ public class OfflineSharedVariableNotificationTest {
    * </ul>
    * A client notification should be sent in this case.
    *
-   * @throws ProcessingException
    */
   @Test
   public void testDefaultOfflineThreadOffline() {
@@ -145,7 +142,6 @@ public class OfflineSharedVariableNotificationTest {
    * </ul>
    * No client notification should be sent in this case.
    *
-   * @throws ProcessingException
    */
   @Test
   @Ignore

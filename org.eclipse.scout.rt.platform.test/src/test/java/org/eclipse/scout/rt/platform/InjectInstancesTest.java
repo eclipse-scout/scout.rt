@@ -22,9 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- *
- */
 @RunWith(PlatformTestRunner.class)
 public class InjectInstancesTest {
 

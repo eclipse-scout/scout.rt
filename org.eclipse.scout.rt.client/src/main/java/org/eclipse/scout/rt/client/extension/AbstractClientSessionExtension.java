@@ -15,9 +15,6 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLo
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
 
   public AbstractClientSessionExtension(OWNER owner) {

@@ -17,9 +17,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.Val
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
-/**
- *
- */
 public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>>
     extends AbstractFormFieldExtension<OWNER>
     implements IValueFieldExtension<VALUE, OWNER> {

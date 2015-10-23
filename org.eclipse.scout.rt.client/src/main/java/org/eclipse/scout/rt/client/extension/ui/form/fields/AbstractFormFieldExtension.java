@@ -23,9 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-/**
- *
- */
 public abstract class AbstractFormFieldExtension<OWNER_FIELD extends AbstractFormField> extends AbstractExtension<OWNER_FIELD>
     implements IFormFieldExtension<OWNER_FIELD> {
 

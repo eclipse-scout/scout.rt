@@ -14,9 +14,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExt
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.BottomBox.FirstNameField;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.TopBox.NameField;
 
-/**
- *
- */
 public class InvalidExtension {
 
   public class NameFieldExtension extends AbstractFormFieldExtension<NameField> {

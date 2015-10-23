@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandl
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface IFormHandlerExtension<OWNER extends AbstractFormHandler> extends IExtension<OWNER> {
 
   void execPostLoad(FormHandlerPostLoadChain chain);

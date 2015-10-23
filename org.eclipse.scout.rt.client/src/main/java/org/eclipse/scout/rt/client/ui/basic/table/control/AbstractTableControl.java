@@ -66,7 +66,6 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(120)

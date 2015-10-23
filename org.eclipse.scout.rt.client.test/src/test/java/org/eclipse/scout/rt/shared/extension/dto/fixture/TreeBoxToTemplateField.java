@@ -18,9 +18,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBox.GroupBoxInTemplateField;
 
-/**
- *
- */
 @Extends(GroupBoxInTemplateField.class)
 @FormData(value = TreeBoxToTemplateFieldData.class, sdkCommand = FormData.SdkCommand.CREATE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.DEFAULT)
 public class TreeBoxToTemplateField extends AbstractTreeBox<Integer> {

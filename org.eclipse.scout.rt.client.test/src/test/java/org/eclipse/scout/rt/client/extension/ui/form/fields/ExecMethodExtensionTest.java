@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ExecMethodExtensionTest.MyForm.MainBox.NameField;
@@ -57,9 +56,6 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
 
   public class MyForm extends AbstractForm {
 
-    /**
-     * @throws ProcessingException
-     */
     public MyForm() {
       super();
     }

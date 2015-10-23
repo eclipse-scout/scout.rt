@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -50,7 +49,6 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    * @see IDocumentField#saveAs(String, String).
    * @param name
    * @return
-   * @throws ProcessingException
    */
   RemoteFile saveAs(String name);
 

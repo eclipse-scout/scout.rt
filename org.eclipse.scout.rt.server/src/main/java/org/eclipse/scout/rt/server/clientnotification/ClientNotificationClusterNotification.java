@@ -16,9 +16,6 @@ import java.util.Collection;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
-/**
- *
- */
 public class ClientNotificationClusterNotification implements Serializable {
   private static final long serialVersionUID = -8513131031858145786L;
   private final Collection<? extends ClientNotificationMessage> m_cnMessages;

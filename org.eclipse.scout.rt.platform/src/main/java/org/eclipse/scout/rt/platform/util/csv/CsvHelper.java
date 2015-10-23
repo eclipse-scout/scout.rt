@@ -214,7 +214,6 @@ public class CsvHelper {
    *          may be negative if unknown
    * @param allowVariableColumnCount
    *          true if not all lines have the same number of columns
-   * @throws ProcessingException
    */
   public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount, boolean allowVariableColumnCount) {
     String cell = null;
@@ -590,7 +589,6 @@ public class CsvHelper {
   /**
    * @param reader
    * @return the current row in the reader as cell tokens based on this helpers context
-   * @throws ProcessingException
    */
   public List<String> getCurrentRow(Reader reader) {
     BufferedReader bufferedReader = null;

@@ -115,7 +115,6 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
    *
    * @param notifications
    *          the notifications to dispatch
-   * @throws ProcessingException
    */
   protected void dispatchClientNotifications(final List<ClientNotificationMessage> notifications) {
     if (CollectionUtility.isEmpty(notifications)) {

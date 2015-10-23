@@ -14,9 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 
-/**
- *
- */
 public class MethodState {
 
   private Object m_returnValue;

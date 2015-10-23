@@ -34,9 +34,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-/**
- *
- */
 public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<OWNER> {
 
   void execDrop(TreeDropChain chain, ITreeNode node, TransferObject t);

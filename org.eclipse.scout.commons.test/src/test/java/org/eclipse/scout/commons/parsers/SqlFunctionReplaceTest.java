@@ -18,9 +18,6 @@ import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.junit.Test;
 
-/**
- *
- */
 public class SqlFunctionReplaceTest {
 
   /**

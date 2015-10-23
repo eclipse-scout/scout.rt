@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 
-/**
- *
- */
 public interface IOutlineTableField extends ITableField<ITable> {
 
 }

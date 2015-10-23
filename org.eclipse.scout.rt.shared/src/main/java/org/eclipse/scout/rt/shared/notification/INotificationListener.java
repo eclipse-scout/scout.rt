@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.shared.notification;
 import java.io.Serializable;
 import java.util.EventListener;
 
-/**
- *
- */
 public interface INotificationListener<T extends Serializable> extends EventListener {
 
   void handleNotification(T notification);

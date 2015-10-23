@@ -18,9 +18,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
 
-/**
- *
- */
 public abstract class AbstractContainerValidationService implements IExtensionRegistrationValidatorService {
 
   private final Map<Class<?>, Set<Class<?>>> m_possibleContributionsByContainer;

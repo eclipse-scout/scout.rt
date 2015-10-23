@@ -457,7 +457,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    *
    * @see AbstractDesktop#getSimilarViewForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
-   * @throws ProcessingException
    */
   @Override
   public Object computeExclusiveKey() {
@@ -469,7 +468,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * <p>
    * This method is called in the process of the initialization. The UI is not ready yet.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
@@ -479,7 +477,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * This method is called when UI is ready.
    *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(11)

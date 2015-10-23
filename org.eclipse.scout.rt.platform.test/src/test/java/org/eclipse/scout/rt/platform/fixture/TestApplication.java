@@ -15,9 +15,6 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public class TestApplication implements IPlatformListener {
 
   private static TestApplication instance;

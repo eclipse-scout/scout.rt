@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
-/**
- *
- */
 public interface ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER extends ICodeType<CODE_TYPE_ID, CODE_ID>> extends IExtension<OWNER> {
 
   List<? extends ICode<CODE_ID>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain);

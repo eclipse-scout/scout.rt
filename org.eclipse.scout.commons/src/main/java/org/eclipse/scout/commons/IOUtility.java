@@ -69,7 +69,6 @@ public final class IOUtility {
    * @param charsetName
    *          The name of the {@link Charset}.
    * @return A {@link String} containing the content of the given {@link InputStream}.
-   * @throws ProcessingException
    */
   public static String getContent(InputStream stream, String charsetName) {
     try {
@@ -87,7 +86,6 @@ public final class IOUtility {
    * @param stream
    *          The {@link InputStream} to read from.
    * @return The content of the given {@link InputStream}.
-   * @throws ProcessingException
    */
   public static String getContentUtf8(InputStream stream) {
     return getContent(stream, Encoding.UTF_8);
@@ -377,7 +375,6 @@ public final class IOUtility {
    * @param content
    *          If no content is given, an empty file will be created
    * @return A new temporary file with specified content
-   * @throws ProcessingException
    */
   public static File createTempFile(String fileName, byte[] content) {
     try {
@@ -421,7 +418,6 @@ public final class IOUtility {
    *          The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
    * @param content
    * @return A new temporary file with the specified content
-   * @throws ProcessingException
    */
   public static File createTempFile(String prefix, String suffix, byte[] content) {
     File f = null;

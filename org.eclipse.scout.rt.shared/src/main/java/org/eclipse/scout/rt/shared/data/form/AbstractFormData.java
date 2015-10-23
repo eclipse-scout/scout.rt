@@ -274,7 +274,6 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *          The class identifier to be searched in the form data.
    * @return Returns the form data's {@link AbstractFormFieldData} of the given valueType or <code>null</code>, if it
    *         does not exist.
-   * @throws ProcessingException
    */
   public AbstractFormFieldData findFieldByClass(Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, ClassIdentifier valueTypeIdentifier) {
     if (breadthFirstMap == null) {
@@ -352,7 +351,6 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *          The type to be searched in the form data.
    * @return Returns the form data's {@link AbstractPropertyData} of the given valueType or <code>null</code>, if it
    *         does not exist.
-   * @throws ProcessingException
    */
   public AbstractPropertyData<?> findPropertyByClass(Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap, ClassIdentifier valueTypeClassIdentifier) {
     if (breadthFirstMap == null) {

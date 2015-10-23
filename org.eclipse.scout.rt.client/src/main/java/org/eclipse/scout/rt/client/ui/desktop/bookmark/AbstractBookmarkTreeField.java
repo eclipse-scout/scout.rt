@@ -164,7 +164,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * @param bookmarks
    *          selected for deletion
    * @return the row-level permission to delete bookmarks, default is {@link getDeletePermission()}
-   * @throws ProcessingException
    */
   protected Permission getDeletePermission(List<Bookmark> bookmarks) {
     return getDeletePermission();
@@ -174,7 +173,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * @param bookmarks
    *          selected for update
    * @return the row-level permission to update bookmarks, default is {@link getUpdatePermission()}
-   * @throws ProcessingException
    */
   protected Permission getUpdatePermission(List<Bookmark> bookmarks) {
     return getUpdatePermission();
@@ -184,7 +182,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * @param bookmark
    *          selected for publishing
    * @return the row-level permission to publish this bookmark, default is {@link getPublishPermission()}
-   * @throws ProcessingException
    */
   protected Permission getPublishPermission(Bookmark bookmark) {
     return getPublishPermission();
@@ -237,7 +234,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   /**
    * The structure of the folders has changed, completely rebuild the model
    *
-   * @throws ProcessingException
    */
   private void rebuildBookmarkModel() {
     getTree().visitTree(new ITreeVisitor() {
@@ -284,7 +280,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   /**
    * Only some values have changed, just save the model
    *
-   * @throws ProcessingException
    */
   private void refreshBookmarkModel() {
     getTree().visitTree(new ITreeVisitor() {

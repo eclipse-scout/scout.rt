@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
@@ -43,28 +42,24 @@ public interface IBookmarkForm extends IForm {
 
   /**
    * @return the folder where the bookmark is located
-   * @throws ProcessingException
    */
   BookmarkFolder getFolder();
 
   /**
    * @param folder
    *          the folder where the bookmark is located
-   * @throws ProcessingException
    */
   void setFolder(BookmarkFolder folder);
 
   /**
    * Opens the form for modification of an existing bookmark
    * 
-   * @throws ProcessingException
    */
   void startModify();
 
   /**
    * Opens the form for creation of a new bookmark
    * 
-   * @throws ProcessingException
    */
   void startNew();
 }

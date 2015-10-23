@@ -17,9 +17,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBox.GroupBoxInTemplateField.SecondStringInTemplateField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBox.GroupBoxInTemplateField.ThirdStringInTemplateField;
 
-/**
- *
- */
 @FormData(value = AbstractTemplateBoxData.class, sdkCommand = FormData.SdkCommand.CREATE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTemplateBox extends AbstractGroupBox {
 

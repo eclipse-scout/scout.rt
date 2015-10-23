@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.smtp;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.mail.MailUtility;
 import org.eclipse.scout.rt.platform.service.IService;
 
@@ -40,7 +39,6 @@ public interface ISMTPService extends IService {
    * subject and body parts.
    *
    * @param message
-   * @throws ProcessingException
    * @see {@link MailUtility} to create a message
    */
   void sendMessage(MimeMessage message);
@@ -51,7 +49,6 @@ public interface ISMTPService extends IService {
    *
    * @param session
    *          to send the message.
-   * @throws ProcessingException
    */
   void sendMessage(MimeMessage message, Session session);
 

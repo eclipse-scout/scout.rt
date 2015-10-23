@@ -12,9 +12,6 @@ package org.eclipse.scout.commons.html.internal;
 
 import org.eclipse.scout.commons.html.IStyleElement;
 
-/**
- *
- */
 public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElement {
 
   public StyleElementBuilder(CharSequence... elements) {

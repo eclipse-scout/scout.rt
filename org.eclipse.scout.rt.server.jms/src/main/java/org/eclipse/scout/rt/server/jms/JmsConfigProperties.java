@@ -14,9 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 
-/**
- *
- */
 public final class JmsConfigProperties {
   private JmsConfigProperties() {
   }

@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
-/**
- *
- */
 public final class DesktopChains {
 
   private DesktopChains() {

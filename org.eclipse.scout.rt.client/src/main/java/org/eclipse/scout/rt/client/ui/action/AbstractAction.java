@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -242,7 +241,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    *
    * @param selection
    *          the new selection state
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(32)
@@ -369,7 +367,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * Please double check if implementing this method! Consider using {@link #interceptAction()} instead. If no other
    * option ensure super call when overriding this method.
    *
-   * @throws ProcessingException
    */
   protected void doActionInternal() {
     interceptAction();

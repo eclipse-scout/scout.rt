@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-/**
- *
- */
 public abstract class AbstractExtensionRegistryItem {
 
   private final long m_order;

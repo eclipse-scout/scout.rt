@@ -83,7 +83,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    *
    * @param pageList
    *          live collection to add child pages to this page
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)
@@ -151,7 +150,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * This implementation sets the title of the internal table used by this page to the path from the root node to this
    * page.
    *
-   * @throws ProcessingException
    */
   @Override
   protected void execPageActivated() {

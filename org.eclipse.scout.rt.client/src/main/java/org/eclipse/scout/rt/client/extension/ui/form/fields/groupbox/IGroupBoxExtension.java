@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 
-/**
- *
- */
 public interface IGroupBoxExtension<OWNER extends AbstractGroupBox> extends ICompositeFieldExtension<OWNER> {
 
 }

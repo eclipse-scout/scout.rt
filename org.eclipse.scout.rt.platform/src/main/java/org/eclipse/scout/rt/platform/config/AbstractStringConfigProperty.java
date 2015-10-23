@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.commons.StringUtility;
 
-/**
- *
- */
 public abstract class AbstractStringConfigProperty extends AbstractConfigProperty<String> {
 
   @Override

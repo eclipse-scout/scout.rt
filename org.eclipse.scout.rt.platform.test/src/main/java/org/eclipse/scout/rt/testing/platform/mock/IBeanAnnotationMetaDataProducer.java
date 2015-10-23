@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.testing.platform.mock;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 
-/**
- *
- */
 @Bean
 public interface IBeanAnnotationMetaDataProducer {
 

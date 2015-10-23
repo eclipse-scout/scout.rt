@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -60,7 +59,6 @@ public interface IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand initDelegate();
 
@@ -69,7 +67,6 @@ public interface IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand desktopOpenedDelegate();
 
@@ -79,7 +76,6 @@ public interface IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand desktopBeforeClosingDelegate();
 
@@ -88,7 +84,6 @@ public interface IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand desktopClosingDelegate();
 
@@ -97,7 +92,6 @@ public interface IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand guiAttachedDelegate();
 
@@ -106,7 +100,6 @@ public interface IDesktopExtension {
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand guiDetachedDelegate();
 
@@ -119,7 +112,6 @@ public interface IDesktopExtension {
    *          new outline that is active after the change
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline);
 
@@ -133,7 +125,6 @@ public interface IDesktopExtension {
    *          contains the form that will be added to the core desktop
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder);
 
@@ -146,7 +137,6 @@ public interface IDesktopExtension {
    *          is the search form of the new (selected) page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm);
 
@@ -159,7 +149,6 @@ public interface IDesktopExtension {
    *          is the detail form of the new (selected) page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm);
 
@@ -172,7 +161,6 @@ public interface IDesktopExtension {
    *          is the table of the new (selected) table page or {@code null}
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable);
 
@@ -183,7 +171,6 @@ public interface IDesktopExtension {
    *          the table page that has been (re)loaded
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage);
 
@@ -198,7 +185,6 @@ public interface IDesktopExtension {
    *          a live list to add menus to the tray
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
-   * @throws ProcessingException
    */
   ContributionCommand addTrayMenusDelegate(List<IMenu> menus);
 

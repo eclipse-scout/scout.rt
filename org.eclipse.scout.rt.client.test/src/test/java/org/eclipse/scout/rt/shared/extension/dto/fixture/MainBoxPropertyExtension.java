@@ -15,9 +15,6 @@ import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
-/**
- *
- */
 @Extends(MainBox.class)
 @Data(PropertyExtensionData.class)
 public class MainBoxPropertyExtension extends AbstractGroupBoxExtension<MainBox> {

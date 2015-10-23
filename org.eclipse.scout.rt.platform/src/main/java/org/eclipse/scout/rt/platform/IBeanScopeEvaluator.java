@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-/**
- *
- */
 @ApplicationScoped
 public interface IBeanScopeEvaluator {
   Object getCurrentScope();

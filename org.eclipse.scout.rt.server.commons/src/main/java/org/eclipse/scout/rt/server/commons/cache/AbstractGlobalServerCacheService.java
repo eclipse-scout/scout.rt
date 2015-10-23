@@ -16,9 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
-/**
- *
- */
 public abstract class AbstractGlobalServerCacheService extends AbstractHttpSessionCacheService implements IGlobalServerCacheService {
 
   @Override

@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractCalendarExtension<OWNER extends AbstractCalendar> extends AbstractExtension<OWNER> implements ICalendarExtension<OWNER> {
 
   /**

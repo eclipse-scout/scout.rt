@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.EventListener;
 
-/**
- *
- */
 public interface ValueFieldListener extends EventListener {
   void valueFieldChanged(ValueFieldEvent event);
 }

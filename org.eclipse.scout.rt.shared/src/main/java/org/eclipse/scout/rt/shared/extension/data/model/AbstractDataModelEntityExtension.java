@@ -14,9 +14,6 @@ import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
 
-/**
- *
- */
 public abstract class AbstractDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
   private static final long serialVersionUID = 1L;
 

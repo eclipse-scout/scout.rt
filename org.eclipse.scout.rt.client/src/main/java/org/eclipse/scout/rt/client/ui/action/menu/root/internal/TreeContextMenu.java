@@ -28,9 +28,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 
-/**
- *
- */
 public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
   private Set<? extends ITreeNode> m_currentSelection;
 
@@ -62,9 +59,6 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     handleOwnerEnabledChanged();
   }
 
-  /**
-   *
-   */
   protected void handleOwnerEnabledChanged() {
     if (getOwner() != null) {
       final boolean enabled = getOwner().isEnabled();

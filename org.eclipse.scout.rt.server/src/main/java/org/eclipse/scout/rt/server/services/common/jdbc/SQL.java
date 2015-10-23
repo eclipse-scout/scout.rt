@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,15 +28,15 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
  * <h4>Usage</h4>
  * <p>
  * Example:
- * 
+ *
  * <pre>
  * Object[][] queryResult = SQL.select(&quot;SELECT PERSON_NR, PERSON_NAME FROM PERSON&quot;);
  * Long firstPersonNr = queryResult[0][0];
  * Long thirdPersonName = queryResult[2][1];
  * </pre>
- * 
+ *
  * Without this class the necessary code would look like this
- * 
+ *
  * <pre>
  * ISqlService service = BEANS.get(ISqlService.class);
  * Object[][] queryResult = service.select(&quot;SELECT PERSON_NR, PERSON_NAME FROM PERSON&quot;);
@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
  * Long thirdPersonName = queryResult[2][1];
  * </pre>
  * </p>
- * 
+ *
  * @see ISqlService
  */
 public final class SQL {
@@ -60,7 +60,7 @@ public final class SQL {
    * <p>
    * Note: {@link ProcessingException} and {@link SQLException} are caught without logging or rethrowing them again.
    * </p>
-   * 
+   *
    * @return the name of the JDBC driver used
    */
   public static String getDriverName() {
@@ -79,9 +79,6 @@ public final class SQL {
     return driverName;
   }
 
-  /**
-   * @throws ProcessingException
-   */
   public static Connection getConnection() {
     ISqlService service = BEANS.get(usedServiceType);
     return service.getConnection();

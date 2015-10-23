@@ -22,9 +22,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 
-/**
- *
- */
 public abstract class AbstractContributionComposite implements IContributionOwner, Serializable {
 
   private static final long serialVersionUID = 1L;

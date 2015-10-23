@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-/**
- *
- */
 public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> implements IValueFieldContextMenu {
 
   /**

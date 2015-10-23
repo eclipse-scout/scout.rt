@@ -32,9 +32,6 @@ import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.mockito.Mockito;
 
-/**
- *
- */
 public final class TestingUtility {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TestingUtility.class);

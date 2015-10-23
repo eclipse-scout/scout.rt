@@ -525,7 +525,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param contributions
    *          entity contributions that are used to replace markers in the given base statement.
    * @return Returns given base statement having all place holders replaced by the given entity contributions.
-   * @throws ProcessingException
    * @since 3.8.1
    */
   public String createSelectStatement(String stm, EntityContribution... contributions) {
@@ -739,7 +738,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * @param nodes
    * @return the complete string of all attribute contributions
-   * @throws ProcessingException
    */
   public EntityContribution buildTreeNodes(List<TreeNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) {
     EntityContribution contrib = new EntityContribution();

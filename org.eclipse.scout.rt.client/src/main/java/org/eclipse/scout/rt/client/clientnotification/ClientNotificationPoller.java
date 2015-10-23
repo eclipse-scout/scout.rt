@@ -34,9 +34,6 @@ import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
-/**
- *
- */
 @ApplicationScoped
 @CreateImmediately
 public class ClientNotificationPoller {

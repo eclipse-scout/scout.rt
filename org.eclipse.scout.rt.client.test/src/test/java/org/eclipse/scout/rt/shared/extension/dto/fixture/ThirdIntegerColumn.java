@@ -15,9 +15,6 @@ import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 
-/**
- *
- */
 @Order(3000.0)
 @Extends(OrigPageWithTable.class)
 @Data(ThirdIntegerColumnData.class)

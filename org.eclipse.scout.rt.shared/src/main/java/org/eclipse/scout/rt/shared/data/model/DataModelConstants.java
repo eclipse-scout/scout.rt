@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
-/**
- *
- */
 public interface DataModelConstants {
   /**
    * internal type for operators that inherit type of attribute (default)

@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html.internal;
 
-/**
- *
- */
 public class HtmlBindsTest {
 
 }

@@ -14,9 +14,6 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 
-/**
- *
- */
 public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> implements IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   private BasicPropertySupport propertySupport;

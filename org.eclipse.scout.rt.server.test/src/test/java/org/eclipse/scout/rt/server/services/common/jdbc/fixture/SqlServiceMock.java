@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 
-/**
- *
- */
 public class SqlServiceMock extends AbstractSqlService {
   private static IScoutLogger logger = ScoutLogManager.getLogger(SqlServiceMock.class);
 

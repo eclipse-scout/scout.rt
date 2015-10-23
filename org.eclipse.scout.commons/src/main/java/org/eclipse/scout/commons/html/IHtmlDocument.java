@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html;
 
-/**
- *
- */
 public interface IHtmlDocument extends IHtmlElement {
 
   String HTML5_DOCTYPE = "<!DOCTYPE html>";

@@ -33,9 +33,6 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-/**
- *
- */
 public interface IFormExtension<OWNER_FORM extends AbstractForm> extends IExtension<OWNER_FORM> {
 
   void execCloseTimer(FormCloseTimerChain chain);

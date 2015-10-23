@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverC
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-/**
- *
- */
 public class FormFieldContextMenu<T extends IFormField> extends AbstractPropertyObserverContextMenu<T> implements IFormFieldContextMenu {
 
   /**

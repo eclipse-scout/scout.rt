@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
-/**
- *
- */
 public class ClientBeanScopeEvaluator implements IBeanScopeEvaluator {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientBeanScopeEvaluator.class);

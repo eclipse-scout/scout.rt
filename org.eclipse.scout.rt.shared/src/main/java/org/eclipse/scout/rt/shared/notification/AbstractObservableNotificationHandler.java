@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 
-/**
- *
- */
 public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements INotificationHandler<T>, IGlobalSessionListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractObservableNotificationHandler.class);
 

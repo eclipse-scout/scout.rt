@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.shared.data.form;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 
-/**
- *
- */
 public interface IPropertyHolder extends IContributionOwner {
 
   /**

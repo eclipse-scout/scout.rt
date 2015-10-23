@@ -298,7 +298,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * The extension support for {@link AbstractCodeTypeWithGeneric#execCreateCodes()} method.
    *
    * @return
-   * @throws ProcessingException
    */
   protected final List<? extends CODE> interceptCreateCodes() {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
@@ -310,7 +309,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * The extension support for {@link AbstractCodeTypeWithGeneric#execCreateCode(ICodeRow)} method.
    *
    * @return
-   * @throws ProcessingException
    */
   protected final CODE interceptCreateCode(ICodeRow<CODE_ID> newRow) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
@@ -323,7 +321,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    *
    * @param codeRowType
    * @return
-   * @throws ProcessingException
    */
   protected List<? extends ICodeRow<CODE_ID>> interceptLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();

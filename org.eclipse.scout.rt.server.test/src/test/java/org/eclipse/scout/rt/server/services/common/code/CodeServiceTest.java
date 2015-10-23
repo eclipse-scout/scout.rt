@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
@@ -50,7 +49,6 @@ public class CodeServiceTest {
   /**
    * Tests that a client notification is created when reloading a code type {@link CodeService#reloadCodeType}
    *
-   * @throws ProcessingException
    */
   @Test
   public void testReloadCodeType() {

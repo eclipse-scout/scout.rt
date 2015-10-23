@@ -320,7 +320,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * {@link #filterLookup(LookupCall, List)}.
    *
    * @return
-   * @throws ProcessingException
    */
   protected List<ILookupRow<T>> getLookupRows() {
     List<ILookupRow<T>> data;

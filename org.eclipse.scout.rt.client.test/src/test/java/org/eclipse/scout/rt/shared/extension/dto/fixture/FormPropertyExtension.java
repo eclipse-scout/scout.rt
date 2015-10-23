@@ -14,9 +14,6 @@ import org.eclipse.scout.commons.annotations.Data;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 
-/**
- *
- */
 @Extends(OrigForm.class)
 @Data(PropertyExtensionData.class)
 public class FormPropertyExtension extends AbstractFormExtension<OrigForm> {
