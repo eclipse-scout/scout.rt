@@ -355,6 +355,15 @@ scout.Table.prototype._syncTableControls = function(controls) {
   }
 };
 
+/**
+ * @override
+ */
+scout.Table.prototype._onChildAdapterCreation = function(propertyName, model) {
+  if (propertyName === 'tableControls') {
+    model.table = this;
+  }
+};
+
 scout.Table.prototype._renderTableStatusVisible = function() {
   this._renderTableFooter();
 };
@@ -2875,6 +2884,7 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
     this._removeTableHeader();
     this._renderTableHeader();
   }
+  this.trigger('columnStructureChanged');
 };
 
 scout.Table.prototype._onColumnOrderChanged = function(columnIds) {

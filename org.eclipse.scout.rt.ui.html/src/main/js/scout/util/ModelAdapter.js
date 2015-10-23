@@ -233,12 +233,16 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
  */
 scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterOrIds) {
   return this._processAdapters(adapterOrIds, function(adapterOrId) {
-    var adapter;
+    var adapter, model;
     if (adapterOrId instanceof scout.ModelAdapter) {
       adapter = adapterOrId;
     } else {
+      model = this.session.getAdapterData(adapterOrId);
+      if (model) {
+        // Allow the creator to adapt the model of the child adapter
+        this._onChildAdapterCreation(propertyName, model);
+      }
       adapter = this.session.getOrCreateModelAdapter(adapterOrId, this);
-      this.onChildAdapterCreated(propertyName, adapter);
     }
     return adapter;
   }.bind(this));
@@ -469,9 +473,9 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
 };
 
 /**
- * Maybe overridden to influence creation. Default is emtpy.
+ * Maybe overridden to adapt the model. Default is empty.
  */
-scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
+scout.ModelAdapter.prototype._onChildAdapterCreation = function(propertyName, adapter) {
   // NOP may be implemented by subclasses
 };
 

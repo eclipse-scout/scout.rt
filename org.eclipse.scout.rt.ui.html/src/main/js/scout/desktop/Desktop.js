@@ -43,11 +43,11 @@ scout.DesktopStyle = {
   BENCH: 'BENCH'
 };
 
-scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) {
+scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) {
   if (propertyName === 'viewButtons') {
-    adapter.desktop = this;
+    model.desktop = this;
   } else if (propertyName === 'actions') {
-    adapter.desktop = this;
+    model.desktop = this;
   }
 };
 

@@ -1076,6 +1076,10 @@ scout.Session.prototype._getAdapterData = function(id) {
   return adapterData;
 };
 
+scout.Session.prototype.getAdapterData = function(id) {
+  return this._adapterDataCache[id];
+};
+
 scout.Session.prototype.registerChildWindow = function(childWindow) {
   if (!childWindow) {
     throw new Error("Missing argument 'childWindow'");

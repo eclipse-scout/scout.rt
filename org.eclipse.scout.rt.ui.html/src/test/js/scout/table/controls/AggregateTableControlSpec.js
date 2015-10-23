@@ -19,13 +19,13 @@ describe("AggregateTableControl", function() {
     jasmine.clock().uninstall();
   });
 
-  function createModel() {
+  function createModel(table) {
     var model = createSimpleModel('TableControl', session);
     $.extend({
       "enabled": true,
       "visible": true
     });
-
+    model.table = table;
     return model;
   }
 
@@ -78,20 +78,13 @@ describe("AggregateTableControl", function() {
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
 
-      tableControl = createAggregateTC(createModel());
+      tableControl = createAggregateTC(createModel(table));
       tableControl.selected = true;
       table.tableControls = [tableControl];
 
       column0 = model.columns[0];
       column1 = model.columns[1];
       column1.setAggregationFunction('sum');
-    }
-
-    function render(table) {
-      table.render(session.$entryPoint);
-      $colHeaders = table.header.$container.find('.table-header-item');
-      $header0 = $colHeaders.eq(0);
-      $header1 = $colHeaders.eq(1);
     }
 
     it("creates an aggregate row", function() {
@@ -148,6 +141,57 @@ describe("AggregateTableControl", function() {
       expect($aggrCell.text()).toBe('4000.00');
     });
 
+  });
+
+  describe("eanbled state", function() {
+    var columns, rows, model, table, tableControl;
+
+    function prepareTable() {
+      columns = [helper.createModelColumn(null, 'col1'),
+        helper.createModelColumn(null, 'col2')
+      ];
+      columns[0].index = 0;
+      columns[1].index = 1;
+      rows = helper.createModelRows(2, 3);
+      model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+    }
+
+    it("is false if there are no number columns", function() {
+      prepareTable();
+      var tcModel = createModel(table);
+      tcModel.enabled = true;
+      tcModel.selected = true;
+      tableControl = createAggregateTC(createModel(table));
+      table.tableControls = [tableControl];
+      table.render(session.$entryPoint);
+
+      expect(tableControl.enabled).toBe(false);
+      expect(tableControl.selected).toBe(false);
+    });
+
+    it("is true if there is at least one number column", function() {
+      columns = [
+        helper.createModelColumn(null, 'col1'),
+        helper.createModelColumn(null, 'col2', 'number')
+      ];
+      columns[0].index = 0;
+      columns[1].index = 1;
+      rows = helper.createModelRows(2, 3);
+      model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+      table.columns[1].setAggregationFunction('sum');
+
+      var tcModel = createModel(table);
+      tcModel.enabled = false;
+      tcModel.selected = true;
+      tableControl = createAggregateTC(tcModel);
+      table.tableControls = [tableControl];
+      table.render(session.$entryPoint);
+
+      expect(tableControl.enabled).toBe(true);
+      expect(tableControl.selected).toBe(true);
+    });
   });
 
 });

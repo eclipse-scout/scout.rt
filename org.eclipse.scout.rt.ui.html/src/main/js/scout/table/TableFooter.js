@@ -158,7 +158,6 @@ scout.TableFooter.prototype._renderControls = function() {
   if (controls) {
     controls.forEach(function(control) {
       control.tableFooter = this;
-      control.table = this.table;
       control.setParent(this);
       control.render(this._$controls);
     }.bind(this));

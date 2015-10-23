@@ -36,6 +36,11 @@ describe("ObjectFactory", function() {
       model.table = {};
       model.column = {};
       model.calculateCube = function() {};
+    } else if ('AggregateTableControl' === objectType) {
+      model.table = {
+        columns: [],
+        on: function(){}
+      };
     } else if ('TabBox' === objectType) {
       var tabItemId = 'tabItem' + id;
       model.selectedTab = 0;
