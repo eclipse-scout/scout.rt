@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -73,29 +71,6 @@ public class OrganizeColumnsFormTest {
     catch (NullPointerException e) {
       fail("Null-Argument should not lead to NullPointerException " + e);
     }
-  }
-
-  /**
-   * The table should be reset to the original state after the form has been canceled.
-   *
-   * @throws InterruptedException
-   */
-  @Test
-  public void testDiscardChanges() throws InterruptedException {
-    TestPage page = new TestOutline().getPage();
-    page.ensureChildrenLoaded();
-    ITable table = page.getTable();
-
-    OrganizeColumnsForm form = new OrganizeColumnsForm(table);
-    form.start();
-    form.reload();
-    // apply chages
-    form.getColumnsTableField().getTable().checkRow(0, false);
-    assertFalse(table.getColumns().get(0).isVisible());
-
-    // discard and check state
-    form.getDiscardChangesButton().doClick();
-    assertTrue(table.getColumns().get(0).isVisible());
   }
 
   public static class TestOutline extends AbstractOutline {

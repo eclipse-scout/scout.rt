@@ -39,6 +39,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Calendar = "font:\uE003";
   public static final String Clock = "font:\uE004";
   public static final String Checked = "font:\uE005";
+  public static final String Group = "font:\uE006";
   public static final String Wand = "font:\uE010";
   public static final String Phone = "font:\uE011";
   public static final String Target = "font:\uE020";
