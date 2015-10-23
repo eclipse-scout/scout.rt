@@ -5,5 +5,8 @@ scout.GraphLayout = function(graph) {
 scout.inherits(scout.GraphLayout, scout.AbstractLayout);
 
 scout.GraphLayout.prototype.layout = function($container) {
-  this.graph.onResize();
+  this.graph.updateGraph({
+    rebuild: false,
+    debounce: 200
+  });
 };

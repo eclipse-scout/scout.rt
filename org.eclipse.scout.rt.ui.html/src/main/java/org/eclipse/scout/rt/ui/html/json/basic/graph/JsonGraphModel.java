@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.form.fields.graphfield;
+package org.eclipse.scout.rt.ui.html.json.basic.graph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,12 +27,12 @@ import org.json.JSONObject;
 /**
  * @since 5.2
  */
-public class JsonGraph implements IJsonObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraph.class);
+public class JsonGraphModel implements IJsonObject {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraphModel.class);
 
   private GraphModel m_graphModel;
 
-  public JsonGraph(GraphModel model) {
+  public JsonGraphModel(GraphModel model) {
     m_graphModel = model;
   }
 
@@ -131,6 +131,6 @@ public class JsonGraph implements IJsonObject {
     if (model == null) {
       return null;
     }
-    return new JsonGraph(model).toJson();
+    return new JsonGraphModel(model).toJson();
   }
 }

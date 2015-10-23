@@ -1,7 +1,7 @@
-.graph {
+.graph-svg {
   width: 100%;
   height: 100%;
-  overflow:visible;
+  /* Prevent borders outside visible area */
   padding: 2px;
 }
 

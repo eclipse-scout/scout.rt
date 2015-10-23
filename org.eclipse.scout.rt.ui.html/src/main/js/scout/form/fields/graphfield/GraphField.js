@@ -1,49 +1,30 @@
 scout.GraphField = function() {
   scout.GraphField.parent.call(this);
+  this._addAdapterProperties(['graph']);
 };
-scout.inherits(scout.GraphField, scout.ValueField);
+scout.inherits(scout.GraphField, scout.FormField);
 
 scout.GraphField.prototype._render = function($parent) {
   this.addContainer($parent, 'graph-field');
   this.addLabel();
-  this.addField($.makeDiv());
   this.addStatus();
+  this._renderGraph();
 };
 
-scout.GraphField.prototype._renderProperties = function() {
-  scout.GraphField.parent.prototype._renderProperties.call(this);
-
-  this._renderValue();
-  this._renderLoading();
-};
-
-/**
- * @override
- */
-scout.GraphField.prototype._renderDisplayText = function() {
- // nop
-};
-
-scout.GraphField.prototype._renderValue = function() {
-  if (this.graphImpl) {
-    this.graphImpl.remove();
-    this.graphImpl = null;
+scout.GraphField.prototype._remove = function() {
+  if (this.graph) {
+    this.graph.remove();
   }
-  this.$field.empty();
-
-  if (!this.value) {
-    return;
-  }
-
-  var model = $.extend({}, this.value);
-  model.parent = this;
-  this.graphImpl = scout.create(scout.Graph, model);
-  this.graphImpl.render(this.$field);
 };
 
-scout.GraphField.prototype._renderLoading = function(loading) {
-  if (loading) {
-    return;
+scout.GraphField.prototype._renderGraph = function() {
+  if (this.graph) {
+    this.graph.render(this.$container);
+    this.addField(this.graph.$container);
   }
-  // XXX BSH
+};
+
+scout.GraphField.prototype._removeGraph = function(oldGraph) {
+  oldGraph.remove();
+  this.removeField();
 };

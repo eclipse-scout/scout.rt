@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
@@ -95,6 +96,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonDataModel;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
+import org.eclipse.scout.rt.ui.html.json.basic.graph.JsonGraph;
+import org.eclipse.scout.rt.ui.html.json.basic.graph.JsonGraphModel;
 import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
@@ -116,7 +119,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.clipboardfield.JsonClipboar
 import org.eclipse.scout.rt.ui.html.json.form.fields.colorfield.JsonColorField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield.JsonFileChooserField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraph;
 import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraphField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
@@ -353,6 +355,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IFileChooser) {
       return new JsonFileChooser<IFileChooser>((IFileChooser) model, session, id, parent);
     }
+    if (model instanceof IGraph) {
+      return new JsonGraph<IGraph>((IGraph) model, session, id, parent);
+    }
 
     if (model instanceof IChartTableControl) { // needs to be before ITableControl
       return new JsonChartTableControl<IChartTableControl>((IChartTableControl) model, session, id, parent);
@@ -412,7 +417,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonTableTextUserFilter((TableTextUserFilterState) object);
     }
     if (object instanceof GraphModel) {
-      return new JsonGraph((GraphModel) object);
+      return new JsonGraphModel((GraphModel) object);
     }
     return null;
   }

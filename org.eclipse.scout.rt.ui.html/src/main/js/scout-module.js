@@ -291,9 +291,10 @@ __include("scout/form/fields/treefield/TreeField.js");
 __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
-// Graph elements
+// Graph
 __include("scout/graph/Graph.js");
 __include("scout/graph/GraphLayout.js");
+__include("scout/graph/NetworkGraphRenderer.js");
 // More misc. elements
 __include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");

@@ -3,28 +3,29 @@
 
 scout.GraphTableControl = function() {
   scout.GraphTableControl.parent.call(this);
+  this._addAdapterProperties(['graph']);
 };
-
 scout.inherits(scout.GraphTableControl, scout.TableControl);
 
-
 scout.GraphTableControl.prototype._renderContent = function($parent) {
-  var model = $.extend({}, this.graph);
-  model.parent = this;
-  this.graphImpl = scout.create(scout.Graph, model);
-
-  this.graphImpl.render($parent);
+  this.$parent = $parent;
+  if (this.graph) {
+    this.graph.render(this.$parent);
+  }
 };
 
-scout.GraphTableControl.prototype._renderGraph = function(graph) {
-  if (this.contentRendered) {
-    this.removeContent();
+  scout.GraphTableControl.prototype._removeContent = function() {
+  if (this.graph) {
+    this.graph.remove();
   }
+};
+
+scout.GraphTableControl.prototype._renderGraph = function() {
   this.renderContent();
 };
 
-scout.GraphTableControl.prototype._removeContent = function($parent) {
-  this.graphImpl.remove();
+scout.GraphTableControl.prototype._removeGraph = function() {
+  this.removeContent();
 };
 
 scout.GraphTableControl.prototype.isContentAvailable = function() {
@@ -32,7 +33,7 @@ scout.GraphTableControl.prototype.isContentAvailable = function() {
 };
 
 scout.GraphTableControl.prototype.onResize = function() {
-  if (this.contentRendered) {
-    this.graphImpl.onResize();
+  if (this.contentRendered && this.graph) {
+    this.graph.htmlComp.revalidateLayout();
   }
 };

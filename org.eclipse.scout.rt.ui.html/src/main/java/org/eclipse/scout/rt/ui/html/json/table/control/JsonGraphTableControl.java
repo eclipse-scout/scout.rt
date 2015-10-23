@@ -11,13 +11,11 @@
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
-import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
-import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraph;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 
 public class JsonGraphTableControl<GRAPH_TABLE_CONTROL extends IGraphTableControl> extends JsonTableControl<GRAPH_TABLE_CONTROL> {
 
@@ -33,17 +31,10 @@ public class JsonGraphTableControl<GRAPH_TABLE_CONTROL extends IGraphTableContro
   @Override
   protected void initJsonProperties(GRAPH_TABLE_CONTROL model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<GRAPH_TABLE_CONTROL>(IGraphTableControl.PROP_GRAPH, model) {
-
+    putJsonProperty(new JsonAdapterProperty<GRAPH_TABLE_CONTROL>(IGraphTableControl.PROP_GRAPH, model, getUiSession()) {
       @Override
-      protected GraphModel modelValue() {
-        return getModel().getGraphModel();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        JsonGraph jsonGraph = (JsonGraph) MainJsonObjectFactory.get().createJsonObject(getModel().getGraphModel());
-        return jsonGraph.toJson();
+      protected IGraph modelValue() {
+        return getModel().getGraph();
       }
 
       @Override
