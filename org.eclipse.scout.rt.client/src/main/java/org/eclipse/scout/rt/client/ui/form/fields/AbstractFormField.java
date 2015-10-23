@@ -520,7 +520,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Subclasses can override this method. Default is 1.
    *
    * @return the number of rows to span
-   * @see #getConfiguredGridWeightY(), {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see {@link #getConfiguredGridWeightY()} comment about weightY logic which depends on the gridH value configured
+   *      here
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(105)
