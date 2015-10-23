@@ -30,7 +30,7 @@ describe("TableHeaderMenu", function() {
 
   function find$FilterItems(table) {
     var $menu = table.header._tableHeaderMenu.$container;
-    return $menu.find('.header-filter');
+    return $menu.find('.table-header-menu-filter');
   }
 
   function createSingleColumnTableByTexts(texts) {
@@ -222,8 +222,8 @@ describe("TableHeaderMenu", function() {
         table.render(session.$entryPoint);
         table.header.openTableHeaderMenu(column);
         var $menu = table.header._tableHeaderMenu.$container;
-        expect($menu.find('.header-command.sort-asc').length).toBe(1);
-        expect($menu.find('.header-command.sort-desc').length).toBe(1);
+        expect($menu.find('.table-header-menu-command.sort-asc').length).toBe(1);
+        expect($menu.find('.table-header-menu-command.sort-desc').length).toBe(1);
         table.header.closeTableHeaderMenu();
       });
 
@@ -234,8 +234,8 @@ describe("TableHeaderMenu", function() {
         table.render(session.$entryPoint);
         table.header.openTableHeaderMenu(column);
         var $menu = table.header._tableHeaderMenu.$container;
-        expect($menu.find('.header-command.sort-asc').length).toBe(0);
-        expect($menu.find('.header-command.sort-desc').length).toBe(0);
+        expect($menu.find('.table-header-menu-command.sort-asc').length).toBe(0);
+        expect($menu.find('.table-header-menu-command.sort-desc').length).toBe(0);
         table.header.closeTableHeaderMenu();
       });
 

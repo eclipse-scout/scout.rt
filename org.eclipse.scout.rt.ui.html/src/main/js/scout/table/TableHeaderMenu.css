@@ -33,11 +33,11 @@
   }
 }
 
-.header-group {
+.table-header-menu-group {
   padding: 10px 0px 35px 10px;
 }
 
-.header-group-filter {
+.table-header-menu-group-filter {
   padding: 10px 0px 7px 10px;
 }
 
@@ -50,7 +50,7 @@
   #scout.overflow-ellipsis-nowrap();
 }
 
-.header-command {
+.table-header-menu-command {
   float: left;
   width: 43px;
   margin-right: 10px;
@@ -177,26 +177,26 @@
     content: attr(data-icon);
   }
 
-   &.group-function::before {
+   &.aggregation-function::before {
     position: relative;
     top: 0px;
     font-size: 20px;
     line-height: 20px;
   }
 
-  &.sum.group-function::before {
+  &.sum.aggregation-function::before {
     content: @icon-sum;
   }
 
-  &.avg.group-function::before {
+  &.avg.aggregation-function::before {
     content: @icon-avg;
   }
 
-  &.max.group-function::before {
+  &.max.aggregation-function::before {
     content: @icon-max;
   }
 
-  &.min.group-function::before {
+  &.min.aggregation-function::before {
     content: @icon-min;
   }
 
@@ -259,20 +259,20 @@
   }
 }
 
-.header-filter-container {
+.table-header-menu-filter-container {
   position: relative;
   overflow:hidden;
   max-height: 226px;
   padding: 0;
 }
 
-.header-filter-container > .scrollbar {
+.table-header-menu-filter-container > .scrollbar {
   right: 14px;
   margin-top: 5px;
   margin-bottom: 5px;
 }
 
-.header-filter {
+.table-header-menu-filter {
   position:relative;
   width: 200px;
   float: left;
@@ -304,7 +304,7 @@
     color: @table-header-cmd-active-color;
   }
 
-  &.selected + .header-filter {
+  &.selected + .table-header-menu-filter {
     border-top: 1px solid @table-header-menu-background-color;
   }
 

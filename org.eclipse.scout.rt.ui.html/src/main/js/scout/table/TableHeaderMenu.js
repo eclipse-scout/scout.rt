@@ -25,174 +25,52 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
 };
 
 scout.TableHeaderMenu.prototype._render = function($parent) {
-  var table = this.table,
-    session = this.session,
-    $headerItem = this.$anchor,
-    column = $headerItem.data('column'),
-    pos = table.columns.indexOf(column),
-    that = this;
+  var $headerItem = this.$anchor,
+    column = $headerItem.data('column');
 
   this.$parent = $parent;
   this.column = column;
-
   $headerItem.select(true);
 
-  this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
-
-  // create container
-  var $menuHeader = $parent.appendDiv('table-header-menu');
-  this.$container = $menuHeader;
+  this.$container = $parent.appendDiv('table-header-menu');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-  this.$whiter = $menuHeader.appendDiv('table-header-menu-whiter');
+  this.$whiter = this.$container.appendDiv('table-header-menu-whiter');
 
   if (this.withFocusContext && this.focusableContainer) {
     this.$container.attr('tabindex', -1);
   }
 
-  // create buttons in command for order
-  if (table.header.columns.length > 1) {
-    this.$moving = $menuHeader.appendDiv('header-group');
-    this.$moving.appendDiv('header-text')
-      .data('label', session.text('ui.Move'));
-
-    this.$moving.appendDiv('header-command move-top')
-      .data('label', session.text('ui.toBegin'))
-      .click(moveTop);
-    this.$moving.appendDiv('header-command move-up')
-      .data('label', session.text('ui.forward'))
-      .click(moveUp);
-    this.$moving.appendDiv('header-command move-down')
-      .data('label', session.text('ui.backward'))
-      .click(moveDown);
-    this.$moving.appendDiv('header-command move-bottom')
-      .data('label', session.text('ui.toEnd'))
-      .click(moveBottom);
+  // Moving
+  if (this.table.header.columns.length > 1) {
+    this._renderMovingGroup();
   }
 
-  // create buttons in command for sorting
-  if (table.sortEnabled) {
-    this.$sorting = $menuHeader.appendDiv('header-group');
-    this.$sorting.appendDiv('header-text')
-      .data('label', session.text('ColumnSorting'));
-
-    if (!table.hasPermanentHeadOrTailSortColumns()) {
-      var $sortAsc = this.$sorting.appendDiv('header-command toggle sort-asc')
-        .data('label', session.text('ui.ascending'))
-        .click(this.remove.bind(this))
-        .click(function() {
-          sort('asc', false, $(this).hasClass('selected'));
-        });
-      var $sortDesc = this.$sorting.appendDiv('header-command toggle sort-desc')
-        .data('label', session.text('ui.descending'))
-        .click(this.remove.bind(this))
-        .click(function() {
-          sort('desc', false, $(this).hasClass('selected'));
-        });
-    }
-
-    var $sortAscAdd = this.$sorting.appendDiv('header-command toggle sort-asc-add')
-      .data('label', session.text('ui.ascendingAdditionally'))
-      .click(this.remove.bind(this))
-      .click(function() {
-        sort('asc', true, $(this).hasClass('selected'));
-      });
-    var $sortDescAdd = this.$sorting.appendDiv('header-command toggle sort-desc-add')
-      .data('label', session.text('ui.descendingAdditionally'))
-      .click(this.remove.bind(this))
-      .click(function() {
-        sort('desc', true, $(this).hasClass('selected'));
-      });
-
-    sortSelect();
+  // Sorting
+  if (this.table.sortEnabled) {
+    this._renderSortingGroup();
+    this._renderSelectedSorting();
   }
 
-  // create buttons in command for grouping, if there is at least one number column
-  var containsNumberColumn = scout.arrays.find(table.columns, function(column) {
+  // Grouping and aggregation
+  var containsNumberColumn = scout.arrays.find(this.table.columns, function(column) {
     return column.type === 'number';
   });
-
   if (containsNumberColumn) {
     if (column.type !== 'number') {
-
-      this.$grouping = $menuHeader.appendDiv('header-group');
-      this.$grouping.appendDiv('header-text')
-      .data('label', session.text('ui.Grouping'));
-
-      var $groupColumn = this.$grouping.appendDiv('header-command toggle group-column')
-        .data('label', session.text('ui.groupingApply'))
-        .click(this.remove.bind(this))
-        .click(groupSort);
-
-      var $groupColumnAdditional = this.$grouping.appendDiv('header-command toggle group-column-additional')
-        .data('label', session.text('ui.additionally'))
-        .click(this.remove.bind(this))
-        .click(groupSortAdditional);
+      this._renderGroupingGroup();
     } else {
-
-      this.$aggregation = $menuHeader.appendDiv('header-group');
-      this.$aggregation.appendDiv('header-text')
-      .data('label', session.text('ui.Aggregation'));
-
-      // functions for number columns:
-
-      var $aggregationFunctionSum = this.$aggregation.appendDiv('header-command group-function sum')
-        .data('label', session.text('ui.Sum'))
-        .click(this.remove.bind(this))
-        .click(function() {
-          setAggregationFunction('sum');
-        });
-
-      var $aggregationFunctionAvg = this.$aggregation.appendDiv('header-command group-function avg')
-        .data('label', session.text('ui.Average'))
-        .click(this.remove.bind(this))
-        .click(function() {
-          setAggregationFunction('avg');
-        });
-
-      var $aggregationFunctionMin = this.$aggregation.appendDiv('header-command group-function min')
-        .data('label', session.text('ui.Minimum'))
-        .click(this.remove.bind(this))
-        .click(function() {
-          setAggregationFunction('min');
-        });
-
-      var $aggregationFunctionMax = this.$aggregation.appendDiv('header-command group-function max')
-        .data('label', session.text('ui.Maximum'))
-        .click(this.remove.bind(this))
-        .click(function() {
-          setAggregationFunction('max');
-        });
+      this._renderAggregationGroup();
     }
-
-    groupSelect();
+    this._renderSelectedGrouping();
   }
 
-  // create buttons in command for coloring
+  // Coloring
   if (column.type === 'number') {
-    this.$coloring = $menuHeader.appendDiv('header-group');
-    this.$coloring.appendDiv('header-text')
-      .data('label', session.text('ui.ColorCells'));
-
-    this.$coloring.appendDiv('header-command color-red')
-      .data('label', session.text('ui.fromRedToGreen'))
-      .click(this.remove.bind(this))
-      .click(colorRed);
-    this.$coloring.appendDiv('header-command color-green')
-      .data('label', session.text('ui.fromGreenToRed'))
-      .click(this.remove.bind(this))
-      .click(colorGreen);
-    this.$coloring.appendDiv('header-command color-bar')
-      .data('label', session.text('ui.withBarGraph'))
-      .click(this.remove.bind(this))
-      .click(colorBar);
-    this.$coloring.appendDiv('header-command color-remove')
-      .data('label', session.text('ui.remove'))
-      .click(this.remove.bind(this))
-      .click(colorRemove);
+    this._renderColoringGroup();
   }
 
-  // filter
+  // Filtering
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
     this.filter = scout.create('ColumnUserFilter', {
@@ -211,39 +89,89 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     $elem.text($elem.data('label'));
   });
 
-  // set events to buttons
-  $menuHeader
-    .on('mouseenter click', '.header-command', enterCommand)
-    .on('mouseleave', '.header-command', leaveCommand);
+  this.$container
+    .on('mouseenter click', '.table-header-menu-command', this._onCommandMouseenterClick.bind(this))
+    .on('mouseleave', '.table-header-menu-command', this._onCommandMouseleave.bind(this));
+
+  this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
 
   // copy flags to menu
   if ($headerItem.hasClass('sort-asc')) {
-    $menuHeader.addClass('sort-asc');
+    this.$container.addClass('sort-asc');
   }
   if ($headerItem.hasClass('sort-desc')) {
-    $menuHeader.addClass('sort-desc');
+    this.$container.addClass('sort-desc');
   }
   if ($headerItem.hasClass('filter')) {
-    $menuHeader.addClass('filter');
+    this.$container.addClass('filter');
+  }
+};
+
+scout.TableHeaderMenu.prototype._remove = function() {
+  scout.scrollbars.uninstall(this.$filteringContainer, this.session);
+  this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
+  this.$headerItem.select(false);
+  scout.TableHeaderMenu.parent.prototype._remove.call(this);
+};
+
+scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
+  var iconPlus = '\uF067',
+    groupCount = this._groupColumnCount(),
+    func = this.column.aggregationFunction;
+
+  if (this.$groupColumnAdditional) {
+    this.$groupColumnAdditional.removeClass('selected');
   }
 
-  // event handling
-  function enterCommand() {
-    var $command = $(this),
-      $text = $command.siblings('.header-text'),
-      text = ($command.hasClass('selected') && $command.hasClass('toggle')) ? session.text('ui.remove') : $command.data('label');
-
-    $text.text($text.data('label') + ' ' + text);
+  if (this.$groupColumnAdditional) {
+    if (groupCount === 0 || this.column.grouped) {
+      this.$groupColumnAdditional.hide();
+    } else {
+      this.$groupColumnAdditional.show().attr('data-icon', iconPlus);
+    }
   }
 
-  function leaveCommand() {
-    var $command = $(this),
-      $text = $command.siblings('.header-text');
-
-    $text.text($text.data('label'));
+  if (this.$groupColumn && this.column.grouped) {
+    this.$groupColumn.addClass('selected');
+    this.$groupColumn.show();
   }
 
-  function moveTop() {
+  if (func) {
+    if (func === 'sum') {
+      this.$aggregationFunctionSum.addClass('selected');
+    } else if (func === 'avg') {
+      this.$aggregationFunctionAvg.addClass('selected');
+    } else if (func === 'min') {
+      this.$aggregationFunctionMin.addClass('selected');
+    } else if (func === 'max') {
+      this.$aggregationFunctionMax.addClass('selected');
+    }
+  }
+};
+
+scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
+  var table = this.table,
+    column = this.column,
+    pos = table.columns.indexOf(column);
+
+  this.$moving = this.$container.appendDiv('table-header-menu-group');
+  this.$moving.appendDiv('header-text')
+    .data('label', this.session.text('ui.Move'));
+
+  this.$moving.appendDiv('table-header-menu-command move-top')
+    .data('label', this.session.text('ui.toBegin'))
+    .click(moveToTop);
+  this.$moving.appendDiv('table-header-menu-command move-up')
+    .data('label', this.session.text('ui.forward'))
+    .click(moveUp);
+  this.$moving.appendDiv('table-header-menu-command move-down')
+    .data('label', this.session.text('ui.backward'))
+    .click(moveDown);
+  this.$moving.appendDiv('table-header-menu-command move-bottom')
+    .data('label', this.session.text('ui.toEnd'))
+    .click(moveToBottom);
+
+  function moveToTop() {
     table.moveColumn(column, pos, 0);
     pos = table.columns.indexOf(column);
   }
@@ -258,192 +186,229 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     pos = table.columns.indexOf(column);
   }
 
-  function moveBottom() {
+  function moveToBottom() {
     table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
     pos = table.columns.indexOf(column);
   }
+};
+
+scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
+  var table =
+    this.table,
+    column = this.column,
+    that = this;
+
+  this.$sorting = this.$container.appendDiv('table-header-menu-group');
+  this.$sorting.appendDiv('header-text')
+    .data('label', this.session.text('ColumnSorting'));
+
+  if (!table.hasPermanentHeadOrTailSortColumns()) {
+    this.$sortAsc = this.$sorting.appendDiv('table-header-menu-command toggle sort-asc')
+      .data('label', this.session.text('ui.ascending'))
+      .click(this.remove.bind(this))
+      .click(function() {
+        sort('asc', false, $(this).hasClass('selected'));
+      });
+    this.$sortDesc = this.$sorting.appendDiv('table-header-menu-command toggle sort-desc')
+      .data('label', this.session.text('ui.descending'))
+      .click(this.remove.bind(this))
+      .click(function() {
+        sort('desc', false, $(this).hasClass('selected'));
+      });
+  }
+
+  this.$sortAscAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort-asc-add')
+    .data('label', this.session.text('ui.ascendingAdditionally'))
+    .click(this.remove.bind(this))
+    .click(function() {
+      sort('asc', true, $(this).hasClass('selected'));
+    });
+  this.$sortDescAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort-desc-add')
+    .data('label', this.session.text('ui.descendingAdditionally'))
+    .click(this.remove.bind(this))
+    .click(function() {
+      sort('desc', true, $(this).hasClass('selected'));
+    });
 
   function sort(direction, multiSort, remove) {
     table.sort(column, direction, multiSort, remove);
 
-    sortSelect();
+    that._renderSelectedSorting();
+  }
+};
+
+scout.TableHeaderMenu.prototype._renderSelectedSorting = function() {
+  if (!this.table.sortEnabled) {
+    return;
   }
 
-  function sortSelect() {
-    if (!table.sortEnabled) {
-      return;
-    }
+  var addIcon = '\uF067',
+    sortCount = this._sortColumnCount();
 
-    var addIcon = '\uF067',
-      sortCount = getSortColumnCount();
+  $('.table-header-menu-command', this.$sorting).removeClass('selected');
 
-    $('.header-command', that.$sorting).removeClass('selected');
-
-    //TODO: fko cgu: use column properties instead of css class?
-    if (sortCount === 1 && !table.hasPermanentHeadOrTailSortColumns()) {
-      if ($headerItem.hasClass('sort-asc')) {
-        $sortAsc.addClass('selected');
-        addIcon = null;
-      } else if ($headerItem.hasClass('sort-desc')) {
-        $sortDesc.addClass('selected');
-        addIcon = null;
-      }
-    } else if (sortCount > 1 || table.hasPermanentHeadOrTailSortColumns()) {
-      if ($headerItem.hasClass('sort-asc')) {
-        $sortAscAdd.addClass('selected');
-        addIcon = column.sortIndex + 1;
-      } else if ($headerItem.hasClass('sort-desc')) {
-        $sortDescAdd.addClass('selected');
-        addIcon = column.sortIndex + 1;
-      }
-    } else {
+  //TODO: fko cgu: use column properties instead of css class?
+  if (sortCount === 1 && !this.table.hasPermanentHeadOrTailSortColumns()) {
+    if (this.$headerItem.hasClass('sort-asc')) {
+      this.$sortAsc.addClass('selected');
+      addIcon = null;
+    } else if (this.$headerItem.hasClass('sort-desc')) {
+      this.$sortDesc.addClass('selected');
       addIcon = null;
     }
-
-    if (addIcon) {
-      $sortAscAdd.show().attr('data-icon', addIcon);
-      $sortDescAdd.show().attr('data-icon', addIcon);
-    } else {
-      if (!table.hasPermanentHeadOrTailSortColumns()) {
-        $sortAscAdd.hide();
-        $sortDescAdd.hide();
-      }
+  } else if (sortCount > 1 || this.table.hasPermanentHeadOrTailSortColumns()) {
+    if (this.$headerItem.hasClass('sort-asc')) {
+      this.$sortAscAdd.addClass('selected');
+      addIcon = this.column.sortIndex + 1;
+    } else if (this.$headerItem.hasClass('sort-desc')) {
+      this.$sortDescAdd.addClass('selected');
+      addIcon = this.column.sortIndex + 1;
     }
+  } else {
+    addIcon = null;
   }
 
-  function getSortColumnCount() {
-    var sortCount = 0;
-
-    for (var i = 0; i < table.columns.length; i++) {
-      if (table.columns[i].sortActive) {
-        sortCount++;
-      }
+  if (addIcon) {
+    this.$sortAscAdd.show().attr('data-icon', addIcon);
+    this.$sortDescAdd.show().attr('data-icon', addIcon);
+  } else {
+    if (!this.table.hasPermanentHeadOrTailSortColumns()) {
+      this.$sortAscAdd.hide();
+      this.$sortDescAdd.hide();
     }
-
-    return sortCount;
   }
+};
 
-  function getGroupColumnCount() {
-    var groupCount = 0;
+scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
+  var that = this,
+    table = this.table,
+    column = this.column;
 
-    for (var i = 0; i < table.columns.length; i++) {
-      if (table.columns[i].grouped) {
-        groupCount++;
-      }
-    }
+  this.$grouping = this.$container.appendDiv('table-header-menu-group');
+  this.$grouping.appendDiv('header-text')
+    .data('label', this.session.text('ui.Grouping'));
 
-    return groupCount;
-  }
+  this.$groupColumn = this.$grouping.appendDiv('table-header-menu-command toggle group-column')
+    .data('label', this.session.text('ui.groupingApply'))
+    .click(this.remove.bind(this))
+    .click(onGroupClick);
 
-  function groupSort() {
+  this.$groupColumnAdditional = this.$grouping.appendDiv('table-header-menu-command toggle group-column-additional')
+    .data('label', this.session.text('ui.additionally'))
+    .click(this.remove.bind(this))
+    .click(onAdditionalGroupClick);
+
+  function onGroupClick() {
     var direction = 'asc';
-    if(column.sortIndex >= 0 && (!column.sortAscending)){
+    if (column.sortIndex >= 0 && (!column.sortAscending)) {
       direction = 'desc';
     }
     groupColumn($(this), column, direction, false);
   }
 
-  function groupSortAdditional() {
+  function onAdditionalGroupClick() {
     var direction = 'asc';
-    if(column.sortIndex >= 0 && (!column.sortAscending)){
+    if (column.sortIndex >= 0 && (!column.sortAscending)) {
       direction = 'desc';
     }
     groupColumn($(this), column, direction, true);
-  }
-
-  function setAggregationFunction(func) {
-    table.changeAggregation(column, func);
   }
 
   function groupColumn($command, column, direction, additional) {
     var remove = $command.isSelected();
     table.groupColumn(column, additional, direction, remove);
   }
+};
 
-  function doGroup($command) {
-    if ($command.isSelected()) {
-      table.removeGrouping();
-    } else {
-      table.group();
-    }
+scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
+  var table = this.table,
+    column = this.column;
+  this.$aggregation = this.$container.appendDiv('table-header-menu-group');
+  this.$aggregation.appendDiv('header-text')
+    .data('label', this.session.text('ui.Aggregation'));
 
-    sortSelect();
-    groupSelect();
+  this.$aggregationFunctionSum = this.$aggregation.appendDiv('table-header-menu-command aggregation-function sum')
+    .data('label', this.session.text('ui.Sum'))
+    .click(this.remove.bind(this))
+    .click(function() {
+      changeAggregation('sum');
+    });
+
+  this.$aggregationFunctionAvg = this.$aggregation.appendDiv('table-header-menu-command aggregation-function avg')
+    .data('label', this.session.text('ui.Average'))
+    .click(this.remove.bind(this))
+    .click(function() {
+      changeAggregation('avg');
+    });
+
+  this.$aggregationFunctionMin = this.$aggregation.appendDiv('table-header-menu-command aggregation-function min')
+    .data('label', this.session.text('ui.Minimum'))
+    .click(this.remove.bind(this))
+    .click(function() {
+      changeAggregation('min');
+    });
+
+  this.$aggregationFunctionMax = this.$aggregation.appendDiv('table-header-menu-command aggregation-function max')
+    .data('label', this.session.text('ui.Maximum'))
+    .click(this.remove.bind(this))
+    .click(function() {
+      changeAggregation('max');
+    });
+
+  function changeAggregation(func) {
+    table.changeAggregation(column, func);
   }
+};
 
-  function groupSelect() {
+scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
+  var table = this.table,
+    column = this.column;
+  this.$coloring = this.$container.appendDiv('table-header-menu-group');
+  this.$coloring.appendDiv('header-text')
+    .data('label', this.session.text('ui.ColorCells'));
 
-    var iconPlus = '\uF067',
-      groupCount = getGroupColumnCount(),
-      func = column.aggregationFunction;
+  this.$coloring.appendDiv('table-header-menu-command color-red')
+    .data('label', this.session.text('ui.fromRedToGreen'))
+    .click(this.remove.bind(this))
+    .click(onRedColorClick);
+  this.$coloring.appendDiv('table-header-menu-command color-green')
+    .data('label', this.session.text('ui.fromGreenToRed'))
+    .click(this.remove.bind(this))
+    .click(onGreenColorClick);
+  this.$coloring.appendDiv('table-header-menu-command color-bar')
+    .data('label', this.session.text('ui.withBarGraph'))
+    .click(this.remove.bind(this))
+    .click(onBarColorClick);
+  this.$coloring.appendDiv('table-header-menu-command color-remove')
+    .data('label', this.session.text('ui.remove'))
+    .click(this.remove.bind(this))
+    .click(onRemoveColorClick);
 
-    if ($groupColumnAdditional) {
-      $groupColumnAdditional.removeClass('selected');
-    }
-
-    if ($groupColumnAdditional) {
-      if (groupCount === 0 || column.grouped) {
-        $groupColumnAdditional.hide();
-      } else {
-        $groupColumnAdditional.show().attr('data-icon', iconPlus);
-      }
-    }
-
-    if ($groupColumn && column.grouped) {
-      $groupColumn.addClass('selected');
-      $groupColumn.show();
-    }
-
-    if(func){
-      if(func === 'sum'){
-        $aggregationFunctionSum.addClass('selected');
-      }
-      else if(func === 'avg'){
-        $aggregationFunctionAvg.addClass('selected');
-      }
-      else if(func === 'min'){
-        $aggregationFunctionMin.addClass('selected');
-      }
-      else if(func === 'max'){
-        $aggregationFunctionMax.addClass('selected');
-      }
-    }
-
-  }
-
-  function colorRed() {
+  function onRedColorClick() {
     table.colorData(column, 'red');
   }
 
-  function colorGreen() {
+  function onGreenColorClick() {
     table.colorData(column, 'green');
   }
 
-  function colorBar() {
+  function onBarColorClick() {
     table.colorData(column, 'bar');
   }
 
-  function colorRemove() {
+  function onRemoveColorClick() {
     table.colorData(column, 'remove');
   }
-
-};
-
-scout.TableHeaderMenu.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$filteringContainer, this.session);
-  this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
-  this.$headerItem.select(false);
-  scout.TableHeaderMenu.parent.prototype._remove.call(this);
 };
 
 scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
-  this.$filtering = this.$container.appendDiv('header-group-filter');
+  this.$filtering = this.$container.appendDiv('table-header-menu-group-filter');
   this.$filtering.appendDiv('header-text')
     .data('label', this.session.text('ui.FilterBy'));
 
-  this.$filteringContainer = this.$filtering.appendDiv('header-filter-container');
+  this.$filteringContainer = this.$filtering.appendDiv('table-header-menu-filter-container');
   this.filter.availableValues.forEach(function(availableValue, index, arr) {
-    var $filteringItem = this.$filteringContainer.appendDiv('header-filter').text(availableValue.text)
+    var $filteringItem = this.$filteringContainer.appendDiv('table-header-menu-filter').text(availableValue.text)
       .data('key', availableValue.key)
       .on('click', this._onFilterClick.bind(this));
 
@@ -465,13 +430,29 @@ scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
   return this.rendered && this.belongsTo($headerItem);
 };
 
-scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
-  // close popup only if source of event is not $headerItem or one of it's children.
-  if (this.$headerItem.isOrHas(event.target)) {
-    return;
+scout.TableHeaderMenu.prototype._sortColumnCount = function() {
+  var i, sortCount = 0;
+
+  for (i = 0; i < this.table.columns.length; i++) {
+    if (this.table.columns[i].sortActive) {
+      sortCount++;
+    }
   }
 
-  this.close();
+  return sortCount;
+};
+
+scout.TableHeaderMenu.prototype._groupColumnCount = function() {
+  var groupCount = 0,
+    i;
+
+  for (i = 0; i < this.table.columns.length; i++) {
+    if (this.table.columns[i].grouped) {
+      groupCount++;
+    }
+  }
+
+  return groupCount;
 };
 
 scout.TableHeaderMenu.prototype._computeWhitherWidth = function() {
@@ -543,4 +524,28 @@ scout.TableHeaderMenu.prototype._onFilterClick = function(event) {
 
   // callback to table
   this.table.filter();
+};
+
+scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
+  // close popup only if source of event is not $headerItem or one of it's children.
+  if (this.$headerItem.isOrHas(event.target)) {
+    return;
+  }
+
+  this.close();
+};
+
+scout.TableHeaderMenu.prototype._onCommandMouseenterClick = function(event) {
+  var $command = $(event.currentTarget),
+    $text = $command.siblings('.header-text'),
+    text = ($command.hasClass('selected') && $command.hasClass('toggle')) ? this.session.text('ui.remove') : $command.data('label');
+
+  $text.text($text.data('label') + ' ' + text);
+};
+
+scout.TableHeaderMenu.prototype._onCommandMouseleave = function(event) {
+  var $command = $(event.currentTarget),
+    $text = $command.siblings('.header-text');
+
+  $text.text($text.data('label'));
 };
