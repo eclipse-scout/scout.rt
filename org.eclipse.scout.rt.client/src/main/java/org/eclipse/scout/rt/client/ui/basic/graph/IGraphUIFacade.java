@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.graphfield;
+package org.eclipse.scout.rt.client.ui.basic.graph;
 
-import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.shared.data.basic.graph.GraphNode;
 
-public interface IGraphField<T extends IGraph> extends IFormField {
+/**
+ * @since 5.2
+ */
+public interface IGraphUIFacade {
 
-  String PROP_GRAPH = "graph";
+  void fireNodeActionFromUI(GraphNode node);
 
-  void setGraph(T graph);
-
-  T getGraph();
+  void fireAppLinkActionFromUI(String ref);
 }

@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.graphfield;
+package org.eclipse.scout.rt.client.ui.basic.graph;
 
-import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import java.util.EventListener;
 
-public interface IGraphField<T extends IGraph> extends IFormField {
+/**
+ * @since 5.2
+ */
+public interface GraphListener extends EventListener {
 
-  String PROP_GRAPH = "graph";
-
-  void setGraph(T graph);
-
-  T getGraph();
+  void graphChanged(GraphEvent e);
 }

@@ -5,6 +5,7 @@
 package org.eclipse.scout.rt.shared.data.basic.graph;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class GraphModel implements Serializable {
     return new GraphModel();
   }
 
-  public static GraphModel create(Set<GraphNode> nodes, Set<GraphEdge> edges) {
+  public static GraphModel create(Collection<GraphNode> nodes, Collection<GraphEdge> edges) {
     return create()
         .withNodes(nodes)
         .withEdges(edges);
@@ -37,7 +38,7 @@ public class GraphModel implements Serializable {
     return this;
   }
 
-  public GraphModel withNodes(Set<GraphNode> nodes) {
+  public GraphModel withNodes(Collection<GraphNode> nodes) {
     if (nodes != null) {
       getNodes().clear();
       for (GraphNode node : nodes) {
@@ -57,7 +58,7 @@ public class GraphModel implements Serializable {
     return this;
   }
 
-  public GraphModel withEdges(Set<GraphEdge> edges) {
+  public GraphModel withEdges(Collection<GraphEdge> edges) {
     if (edges != null) {
       getEdges().clear();
       for (GraphEdge edge : edges) {

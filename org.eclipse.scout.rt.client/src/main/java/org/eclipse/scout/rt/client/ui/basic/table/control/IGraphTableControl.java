@@ -11,13 +11,13 @@
 
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
+import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
 
-public interface IGraphTableControl extends ITableControl {
-  public static final String PROP_GRAPH = "graph";
+public interface IGraphTableControl<T extends IGraph> extends ITableControl {
 
-  void setGraphModel(GraphModel model);
+  String PROP_GRAPH = "graph";
 
-  GraphModel getGraphModel();
+  void setGraph(T graph);
 
+  T getGraph();
 }
