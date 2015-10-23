@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -35,9 +34,6 @@ public final class PageFieldChains {
         }
       };
       callChain(methodInvocation, oldPage, newPage);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 }

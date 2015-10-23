@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -38,10 +37,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, node, t);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -59,10 +54,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -80,10 +71,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, node);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -101,9 +88,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, nodes);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -122,10 +106,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, node);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -143,10 +123,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, node, mouseButton);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -164,10 +140,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, nodes);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -185,10 +157,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, nodes);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -206,10 +174,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, ref);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -227,10 +191,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, e);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -248,10 +208,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -269,10 +225,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, node, cell);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -290,9 +242,6 @@ public final class TreeChains {
         }
       };
       callChain(methodInvocation, node);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }

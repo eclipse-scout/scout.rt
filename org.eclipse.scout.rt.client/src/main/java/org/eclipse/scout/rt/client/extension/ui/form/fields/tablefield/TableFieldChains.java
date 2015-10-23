@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -36,10 +35,6 @@ public final class TableFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -57,10 +52,6 @@ public final class TableFieldChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -78,10 +69,6 @@ public final class TableFieldChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -99,10 +86,6 @@ public final class TableFieldChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 

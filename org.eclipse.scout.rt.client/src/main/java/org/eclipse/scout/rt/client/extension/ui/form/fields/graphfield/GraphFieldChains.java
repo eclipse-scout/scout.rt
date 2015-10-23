@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.graphfield.AbstractGraphField;
@@ -34,9 +33,6 @@ public final class GraphFieldChains {
         }
       };
       callChain(methodInvocation, ref);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 }

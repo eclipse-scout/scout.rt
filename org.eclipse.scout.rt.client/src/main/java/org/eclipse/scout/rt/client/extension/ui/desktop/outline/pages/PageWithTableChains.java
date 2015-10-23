@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -38,10 +37,6 @@ public final class PageWithTableChains {
         }
       };
       callChain(methodInvocation, filter);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -59,9 +54,6 @@ public final class PageWithTableChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -80,10 +72,6 @@ public final class PageWithTableChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -101,9 +89,6 @@ public final class PageWithTableChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -122,10 +107,6 @@ public final class PageWithTableChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

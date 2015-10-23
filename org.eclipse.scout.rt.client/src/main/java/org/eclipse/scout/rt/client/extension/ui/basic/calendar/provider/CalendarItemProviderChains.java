@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -36,10 +35,6 @@ public final class CalendarItemProviderChains {
         }
       };
       callChain(methodInvocation, minDate, maxDate, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -57,10 +52,6 @@ public final class CalendarItemProviderChains {
         }
       };
       callChain(methodInvocation, item);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -78,10 +69,6 @@ public final class CalendarItemProviderChains {
         }
       };
       callChain(methodInvocation, session, minDate, maxDate, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -99,10 +86,6 @@ public final class CalendarItemProviderChains {
         }
       };
       callChain(methodInvocation, item, newDate);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 

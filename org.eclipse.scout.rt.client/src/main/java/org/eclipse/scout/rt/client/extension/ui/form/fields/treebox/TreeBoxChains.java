@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.treebox;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -37,10 +36,6 @@ public final class TreeBoxChains {
         }
       };
       callChain(methodInvocation, newNode, treeLevel);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -58,10 +53,6 @@ public final class TreeBoxChains {
         }
       };
       callChain(methodInvocation, parentNode);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -79,10 +70,6 @@ public final class TreeBoxChains {
         }
       };
       callChain(methodInvocation, call, parent);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -100,10 +87,6 @@ public final class TreeBoxChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

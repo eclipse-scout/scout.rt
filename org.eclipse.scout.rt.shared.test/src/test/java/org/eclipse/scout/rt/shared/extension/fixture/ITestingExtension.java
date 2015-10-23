@@ -10,19 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.fixture;
 
-import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtension;
 
 /**
- * @since 4.2
+ * @since 5.2
  */
-public class TestingExtension extends AbstractExtension<TestingExtensibleObject> implements ITestingExtension {
+public interface ITestingExtension extends IExtension<TestingExtensibleObject> {
 
-  public TestingExtension(TestingExtensibleObject owner) {
-    super(owner);
-  }
-
-  @Override
-  public void execOperation(TestingExtensionChain<? extends ITestingExtension> chain) {
-    chain.execOperation();
-  }
+  void execOperation(TestingExtensionChain<? extends ITestingExtension> chain);
 }

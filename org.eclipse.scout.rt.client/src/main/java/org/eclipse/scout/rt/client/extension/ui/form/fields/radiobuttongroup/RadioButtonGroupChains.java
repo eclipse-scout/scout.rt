@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
@@ -53,10 +52,6 @@ public final class RadioButtonGroupChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

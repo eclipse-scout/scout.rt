@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -41,10 +40,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation, dataTypes);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -79,10 +74,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation, newMasterValue);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -100,10 +91,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -121,10 +108,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -160,10 +143,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -181,9 +160,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -202,9 +178,6 @@ public class FormFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }

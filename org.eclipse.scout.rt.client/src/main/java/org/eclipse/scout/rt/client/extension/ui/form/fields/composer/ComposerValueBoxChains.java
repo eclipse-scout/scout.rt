@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerValueBox;
@@ -34,10 +33,6 @@ public final class ComposerValueBoxChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

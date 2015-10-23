@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
@@ -36,9 +35,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation, resources);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -56,9 +52,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation, selectionRange);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -76,9 +69,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation, viewRange);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -96,9 +86,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation, displayMode);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -116,9 +103,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation, cell);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -136,9 +120,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -156,9 +137,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation, cell);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 
@@ -176,9 +154,6 @@ public final class PlannerChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 

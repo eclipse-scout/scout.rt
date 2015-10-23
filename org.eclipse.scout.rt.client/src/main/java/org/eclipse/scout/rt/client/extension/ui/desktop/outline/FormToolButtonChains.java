@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
@@ -35,9 +34,6 @@ public final class FormToolButtonChains {
         }
       };
       callChain(methodInvocation, form);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 }

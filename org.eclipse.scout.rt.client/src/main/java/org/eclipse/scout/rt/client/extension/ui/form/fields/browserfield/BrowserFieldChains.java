@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
@@ -34,10 +33,6 @@ public final class BrowserFieldChains {
         }
       };
       callChain(methodInvocation, data, origin);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

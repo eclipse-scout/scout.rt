@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -36,10 +35,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -57,10 +52,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -78,10 +69,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -99,9 +86,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -120,10 +104,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation, searchFilter);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -158,10 +138,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation, e, code);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -179,10 +155,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -200,10 +172,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -221,10 +189,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation, timerId);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -242,9 +206,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -263,10 +224,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -284,9 +241,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -305,10 +259,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation, kill, enabledButtonSystemTypes);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -326,10 +276,6 @@ public final class FormChains {
         }
       };
       callChain(methodInvocation, dataTypes);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

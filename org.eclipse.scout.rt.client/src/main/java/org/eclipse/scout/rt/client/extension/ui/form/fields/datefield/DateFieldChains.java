@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.datefield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -34,10 +33,6 @@ public final class DateFieldChains {
         }
       };
       callChain(methodInvocation, level, value);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -55,10 +50,6 @@ public final class DateFieldChains {
         }
       };
       callChain(methodInvocation, level, value);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

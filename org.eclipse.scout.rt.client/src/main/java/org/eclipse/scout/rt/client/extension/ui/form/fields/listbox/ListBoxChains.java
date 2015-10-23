@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.listbox;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -36,10 +35,6 @@ public final class ListBoxChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -57,9 +52,6 @@ public final class ListBoxChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -78,10 +70,6 @@ public final class ListBoxChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -99,10 +87,6 @@ public final class ListBoxChains {
         }
       };
       callChain(methodInvocation, call);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.action.menu;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -34,10 +33,6 @@ public final class MenuChains {
         }
       };
       callChain(methodInvocation, newOwnerValue);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

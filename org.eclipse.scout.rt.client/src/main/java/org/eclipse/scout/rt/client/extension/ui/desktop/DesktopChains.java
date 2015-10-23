@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -47,10 +46,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -68,10 +63,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -89,10 +80,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, menus);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -110,10 +97,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -131,10 +114,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, oldForm, newForm);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -152,10 +131,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, tablePage);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -173,10 +148,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, oldOutline, newOutline);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -194,12 +165,7 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, form);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-      else {
-        return methodInvocation.getReturnValue();
-      }
+      return methodInvocation.getReturnValue();
     }
   }
 
@@ -217,10 +183,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -238,10 +200,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, oldForm, newForm);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -259,10 +217,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation, oldTable, newTable);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -280,10 +234,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -301,10 +251,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

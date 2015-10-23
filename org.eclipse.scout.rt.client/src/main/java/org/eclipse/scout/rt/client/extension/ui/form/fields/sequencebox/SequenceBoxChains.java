@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -54,10 +53,6 @@ public final class SequenceBoxChains {
         }
       };
       callChain(methodInvocation, valueFields, changedIndex);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 

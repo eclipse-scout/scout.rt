@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssistField;
@@ -36,10 +35,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -57,9 +52,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, searchText);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -78,10 +70,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -99,10 +87,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -120,10 +104,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, text);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -141,10 +121,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, browseHint);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -162,10 +138,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -183,10 +155,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, parentKey);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -204,10 +172,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -225,10 +189,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, result);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -246,10 +206,6 @@ public final class ContentAssistFieldChains {
         }
       };
       callChain(methodInvocation, call, key);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -36,10 +35,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation, row, editingField);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -57,10 +52,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -78,9 +69,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation, row, rawValue);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -99,9 +87,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation, row, rawValue);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -120,9 +105,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -141,10 +123,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation, cell);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -162,10 +140,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation, cell, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -183,10 +157,6 @@ public final class ColumnChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

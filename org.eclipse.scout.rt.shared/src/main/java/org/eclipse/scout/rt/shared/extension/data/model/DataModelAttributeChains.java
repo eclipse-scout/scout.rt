@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.shared.extension.data.model;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -33,10 +32,6 @@ public final class DataModelAttributeChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -54,10 +49,6 @@ public final class DataModelAttributeChains {
         }
       };
       callChain(methodInvocation, call);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

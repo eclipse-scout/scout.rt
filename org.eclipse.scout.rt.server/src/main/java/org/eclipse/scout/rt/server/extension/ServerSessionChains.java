@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.server.extension;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -32,10 +31,6 @@ public final class ServerSessionChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

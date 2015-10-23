@@ -13,11 +13,17 @@ package org.eclipse.scout.rt.shared.extension;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.extension.fixture.ITestingExtension;
+import org.eclipse.scout.rt.shared.extension.fixture.LocalTestingExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.OtherTestingExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.TestingExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.fixture.TestingExtension;
@@ -31,6 +37,7 @@ import org.junit.Test;
 public class ExtensionChainTest {
 
   private TestingExtensibleObject m_owner;
+  private LocalTestingExtension m_localExtension;
   private TestingExtension m_extensionA;
   private TestingExtension m_extensionB;
   private OtherTestingExtension m_otherExtensionA;
@@ -39,6 +46,7 @@ public class ExtensionChainTest {
   @Before
   public void before() {
     m_owner = new TestingExtensibleObject();
+    m_localExtension = new LocalTestingExtension(m_owner);
     m_extensionA = new TestingExtension(m_owner);
     m_extensionB = new TestingExtension(m_owner);
     m_otherExtensionA = new OtherTestingExtension(m_owner);
@@ -172,6 +180,46 @@ public class ExtensionChainTest {
 
     chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_otherExtensionB, m_extensionA, m_extensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
+  }
+
+  @Test
+  public void testExtensionChainOperationWithLocalExtension() {
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.singletonList(m_localExtension), ITestingExtension.class);
+    chain.execOperation();
+  }
+
+  @Test
+  public void testExtensionChainOperationWithLocalAndAdditionalExtension() {
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_localExtension, m_extensionA), ITestingExtension.class);
+    chain.execOperation();
+  }
+
+  @Test
+  public void testExtensionChainOperationWithLocalExtensionThrowingException() {
+    ITestingExtension extension = mock(ITestingExtension.class);
+    doThrow(new ProcessingException()).when(extension).execOperation((TestingExtensionChain<?>) any(TestingExtensionChain.class));
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.singletonList(extension), ITestingExtension.class);
+    try {
+      chain.execOperation();
+      fail("expecting exception");
+    }
+    catch (ProcessingException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void testExtensionChainOperationWithTwoExtensionsThrowingException() {
+    ITestingExtension extension = mock(ITestingExtension.class);
+    doThrow(new ProcessingException()).when(extension).execOperation((TestingExtensionChain<?>) any(TestingExtensionChain.class));
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, extension), ITestingExtension.class);
+    try {
+      chain.execOperation();
+      fail("expecting exception");
+    }
+    catch (ProcessingException e) {
+      // expected
+    }
   }
 
   protected void doTestExtesionAAndExtensionB(TestingExtensionChain<TestingExtension> chain) {

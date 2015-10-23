@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -69,9 +68,6 @@ public final class TreeNodeChains {
         }
       };
       callChain(methodInvocation, node);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }

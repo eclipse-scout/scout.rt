@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
@@ -35,10 +34,6 @@ public final class PageWithNodesChains {
         }
       };
       callChain(methodInvocation, pageList);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

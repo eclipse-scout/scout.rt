@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -48,9 +47,6 @@ public final class ValueFieldChains {
         }
       };
       callChain(methodInvocation, rawValue);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -87,9 +83,6 @@ public final class ValueFieldChains {
         }
       };
       callChain(methodInvocation, rawValue);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -108,10 +101,6 @@ public final class ValueFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -129,9 +118,6 @@ public final class ValueFieldChains {
         }
       };
       callChain(methodInvocation, text);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }

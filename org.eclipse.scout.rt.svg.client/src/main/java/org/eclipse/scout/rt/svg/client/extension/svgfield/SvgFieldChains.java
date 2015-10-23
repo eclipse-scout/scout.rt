@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.svg.client.extension.svgfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -35,10 +34,6 @@ public final class SvgFieldChains {
         }
       };
       callChain(methodInvocation, e);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -56,10 +51,6 @@ public final class SvgFieldChains {
         }
       };
       callChain(methodInvocation, ref);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

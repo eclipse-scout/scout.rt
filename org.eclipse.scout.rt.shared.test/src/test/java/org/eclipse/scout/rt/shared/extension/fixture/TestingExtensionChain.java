@@ -18,9 +18,19 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 /**
  * @since 4.2
  */
-public class TestingExtensionChain<EXTENSION> extends AbstractExtensionChain<EXTENSION> {
+public class TestingExtensionChain<EXTENSION extends ITestingExtension> extends AbstractExtensionChain<EXTENSION> {
 
   public TestingExtensionChain(List<? extends IExtension<?>> extensions, Class<? extends IExtension> filterClass) {
     super(extensions, filterClass);
+  }
+
+  public void execOperation() {
+    MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+      @Override
+      protected void callMethod(EXTENSION next) {
+        next.execOperation(TestingExtensionChain.this);
+      }
+    };
+    callChain(methodInvocation);
   }
 }

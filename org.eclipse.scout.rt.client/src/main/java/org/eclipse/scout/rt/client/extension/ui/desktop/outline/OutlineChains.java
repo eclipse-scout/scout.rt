@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -35,10 +34,6 @@ public final class OutlineChains {
         }
       };
       callChain(methodInvocation, pageList);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 

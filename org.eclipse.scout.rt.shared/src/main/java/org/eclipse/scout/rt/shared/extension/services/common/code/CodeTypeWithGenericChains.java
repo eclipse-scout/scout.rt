@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.extension.services.common.code;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -53,9 +52,6 @@ public final class CodeTypeWithGenericChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -82,9 +78,6 @@ public final class CodeTypeWithGenericChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -110,9 +103,6 @@ public final class CodeTypeWithGenericChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -138,9 +128,6 @@ public final class CodeTypeWithGenericChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
     }
   }
 

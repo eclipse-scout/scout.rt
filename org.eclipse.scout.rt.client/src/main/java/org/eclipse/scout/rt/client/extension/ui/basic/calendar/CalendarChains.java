@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
@@ -54,10 +53,6 @@ public final class CalendarChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -75,10 +70,6 @@ public final class CalendarChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.treefield;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -53,10 +52,6 @@ public final class TreeFieldChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -74,10 +69,6 @@ public final class TreeFieldChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -95,10 +86,6 @@ public final class TreeFieldChains {
         }
       };
       callChain(methodInvocation, parentNode);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -116,10 +103,6 @@ public final class TreeFieldChains {
         }
       };
       callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

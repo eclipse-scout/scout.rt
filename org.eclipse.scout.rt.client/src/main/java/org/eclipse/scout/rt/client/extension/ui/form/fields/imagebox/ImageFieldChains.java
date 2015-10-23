@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
@@ -35,9 +34,6 @@ public final class ImageFieldChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
       return methodInvocation.getReturnValue();
     }
   }
@@ -56,10 +52,6 @@ public final class ImageFieldChains {
         }
       };
       callChain(methodInvocation, transferObject);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }

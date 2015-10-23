@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.wizard;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -33,10 +32,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation, stepKind);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -54,10 +49,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -75,10 +66,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation, activation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -96,10 +83,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation, stepKind);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -117,10 +100,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation, activation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -138,10 +117,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation, activation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 
@@ -159,10 +134,6 @@ public final class WizardStepChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
     }
   }
 }
