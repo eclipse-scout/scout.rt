@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
+import com.bsiag.scout.rt.client.ui.basic.chart.AbstractChart;
 import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
 
 /**
@@ -57,12 +58,12 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
 
   protected Class<? extends IChart> getConfiguredChart() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IChart>> f = ConfigurationUtility.filterClasses(dca, IChart.class);
-    if (f.size() == 1) {
-      return CollectionUtility.firstElement(f);
+    List<Class<IChart>> fc = ConfigurationUtility.filterClasses(dca, IChart.class);
+    if (fc.size() == 1) {
+      return CollectionUtility.firstElement(fc);
     }
     else {
-      for (Class<? extends IChart> c : f) {
+      for (Class<? extends IChart> c : fc) {
         if (c.getDeclaringClass() != AbstractChartField.class) {
           return c;
         }
@@ -73,20 +74,18 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
 
   @SuppressWarnings("unchecked")
   protected T createChart() {
-    List<IChart> contributedFields = m_contributionHolder.getContributionsByClass(IChart.class);
-    IChart result = CollectionUtility.firstElement(contributedFields);
+    List<IChart> contributedCharts = m_contributionHolder.getContributionsByClass(IChart.class);
+    IChart result = CollectionUtility.firstElement(contributedCharts);
     if (result != null) {
       return (T) result;
     }
-
     Class<? extends IChart> configuredChart = getConfiguredChart();
     if (configuredChart != null) {
       try {
         return (T) ConfigurationUtility.newInnerInstance(this, configuredChart);
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException(
-            "error creating instance of class '" + configuredChart.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Error while creating instance of class '" + configuredChart.getName() + "'.", e));
       }
     }
     return null;
@@ -98,8 +97,8 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
   }
 
   @Override
-  public void setChart(T newChart) {
-    setChartInternal(newChart);
+  public void setChart(T chart) {
+    setChartInternal(chart);
   }
 
   protected void setChartInternal(T chart) {
@@ -125,4 +124,7 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
 
   // TODO export import
   // TODO interception
+
+  public class Chart extends AbstractChart {
+  }
 }

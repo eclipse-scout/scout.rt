@@ -17,5 +17,5 @@ import java.util.EventListener;
  */
 public interface ChartListener extends EventListener {
 
-  void chartValueClicked(ChartEvent e);
+  void chartChanged(ChartEvent e);
 }

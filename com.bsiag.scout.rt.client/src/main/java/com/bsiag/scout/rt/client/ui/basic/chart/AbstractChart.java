@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
@@ -31,7 +32,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  */
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
 public abstract class AbstractChart extends AbstractPropertyObserver implements IChart {
-  // TODO make extendable
+  // TODO make extensible
 
   private IChartUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
@@ -151,12 +152,12 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   }
 
   public void fireValueClicked(int[] axesPosition, BigDecimal value) {
-    ChartEvent e = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
-    e.setAxesPosition(axesPosition);
-    e.setValue(value);
+    ChartEvent event = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
+    event.setAxesPosition(axesPosition);
+    event.setValue(value);
     ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
-    for (ChartListener l : listeners) {
-      l.chartValueClicked(e);
+    for (ChartListener listener : listeners) {
+      listener.chartChanged(event);
     }
   }
 
@@ -171,8 +172,8 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public void setAutoColor(boolean isAutoColor) {
-    propertySupport.setProperty(PROP_AUTO_COLOR, isAutoColor);
+  public void setAutoColor(boolean autoColor) {
+    propertySupport.setProperty(PROP_AUTO_COLOR, autoColor);
   }
 
   @Override
@@ -181,8 +182,8 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public void setChartData(IChartBean data) {
-    propertySupport.setProperty(PROP_CHART_DATA, data);
+  public void setChartData(IChartBean chartData) {
+    propertySupport.setProperty(PROP_CHART_DATA, chartData);
   }
 
   @Override
@@ -253,8 +254,15 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   protected class P_UIFacade implements IChartUIFacade {
 
     @Override
-    public void fireUIValueClicked(int[] axesPosition, BigDecimal value) {
-      fireValueClicked(axesPosition, value);
+    public void fireValueClickedFromUI(int[] axesPosition, BigDecimal value) {
+      try {
+        if (isEnabled() && isVisible()) {
+          fireValueClicked(axesPosition, value);
+        }
+      }
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(e);
+      }
     }
   }
 }

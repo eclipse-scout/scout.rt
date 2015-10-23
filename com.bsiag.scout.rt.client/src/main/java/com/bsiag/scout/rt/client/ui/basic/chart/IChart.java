@@ -22,7 +22,7 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
 
   int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
-  String PROP_CONTAINER = "chartContainer";
+  String PROP_CONTAINER = "container";
   String PROP_AUTO_COLOR = "autoColor";
   String PROP_CHART_TYPE = "chartType";
   String PROP_CHART_DATA = "chartData";
@@ -47,11 +47,11 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
 
   int getChartType();
 
-  void setAutoColor(boolean isAutoColor);
+  void setAutoColor(boolean autoColor);
 
   boolean isAutoColor();
 
-  void setChartData(IChartBean data);
+  void setChartData(IChartBean chartData);
 
   IChartBean getChartData();
 

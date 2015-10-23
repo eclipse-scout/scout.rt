@@ -21,7 +21,7 @@ public interface IChartField<T extends IChart> extends IFormField {
 
   String PROP_CHART = "chart";
 
-  void setChart(T newChart);
+  void setChart(T chart);
 
   T getChart();
 }

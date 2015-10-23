@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package com.bsiag.scout.rt.ui.html.json.form.fields.chartfield;
-
-import java.math.BigDecimal;
-import java.util.List;
+package com.bsiag.scout.rt.ui.html.json.basic.chart;
 
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -19,12 +16,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
-import com.bsiag.scout.rt.shared.data.basic.chart.IChartValueGroupBean;
 
 /**
  * @since 5.2
@@ -45,7 +39,6 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
   @Override
   protected void initJsonProperties(CHART model) {
     super.initJsonProperties(model);
-
     putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CHART_DATA, model) {
       @Override
       protected IChartBean modelValue() {
@@ -119,27 +112,6 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
 
   protected void handleUiValueClicked(JsonEvent event) {
     // TODO nbu
-    getModel().getUIFacade().fireUIValueClicked(new int[0], null);
-  }
-
-  protected JSONObject chartValueGroupBeanToJson(IChartValueGroupBean chartValueGroupBean) {
-    JSONObject jsonChartValueGroupBean = new JSONObject();
-    putProperty(jsonChartValueGroupBean, "groupName", chartValueGroupBean.getGroupName());
-    putProperty(jsonChartValueGroupBean, "color", chartValueGroupBean.getColorHexValue());
-    JSONArray jsonValues = new JSONArray();
-    for (BigDecimal value : chartValueGroupBean.getValues()) {
-      jsonValues.put(value);
-    }
-    putProperty(jsonChartValueGroupBean, "values", jsonValues);
-
-    return jsonChartValueGroupBean;
-  }
-
-  protected JSONArray axisToJson(List<String> axis) {
-    JSONArray jsonAxisValues = new JSONArray();
-    for (String axisValue : axis) {
-      jsonAxisValues.put(axisValue);
-    }
-    return jsonAxisValues;
+    getModel().getUIFacade().fireValueClickedFromUI(new int[0], null);
   }
 }
