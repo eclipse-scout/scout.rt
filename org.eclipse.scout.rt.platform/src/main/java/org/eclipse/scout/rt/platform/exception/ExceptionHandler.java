@@ -81,21 +81,21 @@ public class ExceptionHandler {
    */
   protected void handleProcessingException(final ProcessingException e) {
     final IProcessingStatus status = e.getStatus();
-    final String message = String.format("%s:%s", e.getClass().getSimpleName(), status);
 
     if (e instanceof VetoException) {
-      LOG.info(message);
+      LOG.info("{}:{}", e.getClass().getSimpleName(), status);
     }
     else {
       switch (status.getSeverity()) {
         case IProcessingStatus.INFO:
-          LOG.info(message, e);
+        case IProcessingStatus.OK:
+          LOG.info("", e);
           break;
         case IProcessingStatus.WARNING:
-          LOG.warn(message, e);
+          LOG.warn("", e);
           break;
         default:
-          LOG.error(message, e);
+          LOG.error("", e);
           break;
       }
     }
