@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -355,7 +354,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       final ClientRunContext ctx = ClientRunContexts.copyCurrent().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
       return BEANS.get(ClientSessionProvider.class).provide(ctx);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new UiException("Error while creating new client session", e);
     }
   }
@@ -925,7 +924,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getClientSession(), true))).awaitDone();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error during dispose of UI session", e);
     }
     finally {

@@ -48,7 +48,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
       ensureLoaded();
       m_filter.filter(json);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error while filtering default values", e);
     }
   }
@@ -59,7 +59,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
       ensureLoaded();
       m_filter.filter(json, objectType);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error while filtering default values", e);
     }
   }

@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -145,21 +144,16 @@ public final class JsonTestUtility {
 
   // copy from FormUtility
   private static class InitFieldVisitor implements IFormFieldVisitor {
-    private ProcessingException m_firstEx;
+    private RuntimeException m_firstEx;
 
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         field.initField();
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         if (m_firstEx == null) {
           m_firstEx = e;
-        }
-      }
-      catch (Throwable t) {
-        if (m_firstEx == null) {
-          m_firstEx = new ProcessingException("Unexpected", t);
         }
       }
       return true;

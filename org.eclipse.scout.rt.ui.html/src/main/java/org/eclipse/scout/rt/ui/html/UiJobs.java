@@ -6,7 +6,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -48,7 +47,7 @@ public class UiJobs {
       Filter filter = ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotBlocked();
       timeout = !Jobs.getJobManager().awaitDone(filter, AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new UiException("Interrupted while waiting for model jobs to complete [clientSession=%s]", e, clientSession);
     }
     if (timeout) {
@@ -87,7 +86,7 @@ public class UiJobs {
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       // FIXME [dwi] use translator to not work with ProcessingException
       throw new UiException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, callable.getClass().getName(), future);
     }
