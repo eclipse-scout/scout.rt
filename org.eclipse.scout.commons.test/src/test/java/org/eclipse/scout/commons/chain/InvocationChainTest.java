@@ -179,6 +179,11 @@ public class InvocationChainTest {
               protocol.add("interceptor1:after");
             }
           }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
         }).add(new IInvocationInterceptor<String>() {
 
           @Override
@@ -191,6 +196,11 @@ public class InvocationChainTest {
               protocol.add("interceptor2:after");
             }
           }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
         }).add(new IInvocationInterceptor<String>() {
 
           @Override
@@ -202,6 +212,28 @@ public class InvocationChainTest {
             finally {
               protocol.add("interceptor3:after");
             }
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
+        }).add(new IInvocationInterceptor<String>() {
+
+          @Override
+          public String intercept(Chain<String> chain) throws Exception {
+            protocol.add("interceptor4:before");
+            try {
+              return chain.continueChain();
+            }
+            finally {
+              protocol.add("interceptor4:after");
+            }
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return false;
           }
         }).invoke(new Callable<String>() {
 
@@ -243,12 +275,22 @@ public class InvocationChainTest {
                 protocol.add("interceptor1:after");
               }
             }
+
+            @Override
+            public boolean isEnabled() {
+              return true;
+            }
           }).add(new IInvocationInterceptor<String>() {
 
             @Override
             public String intercept(Chain<String> chain) throws Exception {
               protocol.add("interceptor2:before");
               throw exception;
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return true;
             }
           }).add(new IInvocationInterceptor<String>() {
 
@@ -261,6 +303,11 @@ public class InvocationChainTest {
               finally {
                 protocol.add("interceptor3:after");
               }
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return true;
             }
           }).invoke(new Callable<String>() {
 
@@ -300,12 +347,22 @@ public class InvocationChainTest {
               protocol.add("interceptor1:after");
             }
           }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
         }).add(new IInvocationInterceptor<String>() {
 
           @Override
           public String intercept(Chain<String> chain) throws Exception {
             protocol.add("interceptor2:before");
             return "interceptor2-result";
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
           }
         }).add(new IInvocationInterceptor<String>() {
 
@@ -318,6 +375,11 @@ public class InvocationChainTest {
             finally {
               protocol.add("interceptor3:after");
             }
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
           }
         }).invoke(new Callable<String>() {
 
@@ -353,6 +415,11 @@ public class InvocationChainTest {
               protocol.add("interceptor1:after");
             }
           }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
         }).add(new IInvocationInterceptor<String>() {
 
           @Override
@@ -365,6 +432,11 @@ public class InvocationChainTest {
               protocol.add("interceptor2:after");
             }
           }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
         }).add(new IInvocationInterceptor<String>() {
 
           @Override
@@ -376,6 +448,11 @@ public class InvocationChainTest {
             finally {
               protocol.add("interceptor3:after");
             }
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
           }
         }).invoke(new Callable<String>() {
 
@@ -438,6 +515,11 @@ public class InvocationChainTest {
               protocol.add("interceptor1:after");
             }
           }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
+          }
         }).add(new IInvocationDecorator() {
 
           @Override
@@ -475,6 +557,11 @@ public class InvocationChainTest {
             finally {
               protocol.add("interceptor2:after");
             }
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
           }
         }).add(new IInvocationDecorator() {
 
@@ -549,6 +636,11 @@ public class InvocationChainTest {
             finally {
               protocol.add("interceptor3:after");
             }
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return true;
           }
         }).add(new IInvocationDecorator() {
 
@@ -634,6 +726,11 @@ public class InvocationChainTest {
                 protocol.add("interceptor1:after");
               }
             }
+
+            @Override
+            public boolean isEnabled() {
+              return true;
+            }
           }).add(new IInvocationDecorator() {
 
             @Override
@@ -671,6 +768,11 @@ public class InvocationChainTest {
               finally {
                 protocol.add("interceptor2:after");
               }
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return true;
             }
           }).add(new IInvocationDecorator() {
 
@@ -749,6 +851,11 @@ public class InvocationChainTest {
           m_protocol.add(String.format("decorator%s:onAfter", m_index));
         }
       };
+    }
+
+    @Override
+    public boolean isEnabled() {
+      return true;
     }
   }
 }

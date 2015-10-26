@@ -231,4 +231,9 @@ public class TransactionProcessor<RESULT> implements IInvocationInterceptor<RESU
       return "";
     }
   }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
 }

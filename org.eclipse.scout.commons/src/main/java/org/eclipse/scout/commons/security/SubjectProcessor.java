@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.chain.IInvocationInterceptor;
 import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.chain.InvocationChain.Chain;
@@ -38,22 +39,22 @@ public class SubjectProcessor<RESULT> implements IInvocationInterceptor<RESULT> 
 
   @Override
   public RESULT intercept(final Chain<RESULT> chain) throws Exception {
-    if (m_subject == null || m_subject.equals(Subject.getSubject(AccessController.getContext()))) {
-      return chain.continueChain();
-    }
-    else {
-      try {
-        return Subject.doAs(m_subject, new PrivilegedExceptionAction<RESULT>() {
+    try {
+      return Subject.doAs(m_subject, new PrivilegedExceptionAction<RESULT>() {
 
-          @Override
-          public RESULT run() throws Exception {
-            return chain.continueChain();
-          }
-        });
-      }
-      catch (final PrivilegedActionException e) {
-        throw e.getException();
-      }
+        @Override
+        public RESULT run() throws Exception {
+          return chain.continueChain();
+        }
+      });
     }
+    catch (final PrivilegedActionException e) {
+      throw e.getException();
+    }
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return CompareUtility.notEquals(m_subject, Subject.getSubject(AccessController.getContext()));
   }
 }

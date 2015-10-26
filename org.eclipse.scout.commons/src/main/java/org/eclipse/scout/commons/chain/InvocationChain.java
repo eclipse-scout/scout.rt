@@ -177,7 +177,7 @@ public class InvocationChain<RESULT> {
           }
 
           // Let the interceptor to continue the chain.
-          if (next instanceof IInvocationInterceptor) {
+          if (next instanceof IInvocationInterceptor && ((IInvocationInterceptor) next).isEnabled()) {
             @SuppressWarnings("unchecked")
             final IInvocationInterceptor<RESULT> interceptor = ((IInvocationInterceptor<RESULT>) next);
             return interceptor.intercept(this);

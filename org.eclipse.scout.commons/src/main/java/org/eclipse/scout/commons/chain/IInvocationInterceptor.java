@@ -40,4 +40,11 @@ public interface IInvocationInterceptor<RESULT> extends IChainable {
    *           the exception to pass along to the invoker.
    */
   RESULT intercept(Chain<RESULT> chain) throws Exception;
+
+  /**
+   * Method invoked just before this interceptor is about to be invoked, and allows to prevent it from running.
+   *
+   * @return <code>true</code> to invoke this interceptor, or <code>false</code> otherwise.
+   */
+  boolean isEnabled();
 }

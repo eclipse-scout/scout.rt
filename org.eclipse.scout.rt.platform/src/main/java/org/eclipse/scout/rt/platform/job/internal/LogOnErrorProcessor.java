@@ -42,17 +42,20 @@ public class LogOnErrorProcessor<RESULT> implements IInvocationInterceptor<RESUL
       return chain.continueChain();
     }
     catch (final Throwable t) {
-      if (m_input.isLogOnError()) {
-        try {
-          BEANS.get(ExceptionHandler.class).handle(t);
-        }
-        catch (final Throwable unhandledThrowable) {
-          // NOOP: ExceptionHandler is not expected to throw an Exception; However, this catch-block is for safety purpose.
-        }
+      try {
+        BEANS.get(ExceptionHandler.class).handle(t);
+      }
+      catch (final Throwable unhandledThrowable) {
+        // NOOP: ExceptionHandler is not expected to throw an Exception; However, this catch-block is for safety purpose.
       }
 
       // Propagate the exception.
       throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return m_input.isLogOnError();
   }
 }

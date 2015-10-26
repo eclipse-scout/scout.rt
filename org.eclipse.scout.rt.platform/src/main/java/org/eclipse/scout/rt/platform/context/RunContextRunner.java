@@ -36,17 +36,17 @@ public class RunContextRunner<RESULT> implements IInvocationInterceptor<RESULT> 
 
   @Override
   public RESULT intercept(final Chain<RESULT> chain) throws Exception {
-    if (m_runContext == null) {
-      return chain.continueChain();
-    }
-    else {
-      return m_runContext.call(new Callable<RESULT>() {
+    return m_runContext.call(new Callable<RESULT>() {
 
-        @Override
-        public RESULT call() throws Exception {
-          return chain.continueChain();
-        }
-      }, BEANS.get(ExceptionTranslator.class));
-    }
+      @Override
+      public RESULT call() throws Exception {
+        return chain.continueChain();
+      }
+    }, BEANS.get(ExceptionTranslator.class));
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return m_runContext != null;
   }
 }
