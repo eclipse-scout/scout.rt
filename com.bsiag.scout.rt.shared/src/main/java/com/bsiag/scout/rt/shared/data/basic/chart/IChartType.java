@@ -23,6 +23,7 @@ public interface IChartType {
   final int FULFILLMENT = 6;
   final int SPEEDO = 7;
   final int SALESFUNNEL = 8;
+  final int VENN = 9;
 
   /**
    * PossibleValues see SpeedoChartRenderer.js:<br/>
