@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
@@ -255,13 +254,8 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
 
     @Override
     public void fireValueClickedFromUI(int[] axesPosition, BigDecimal value) {
-      try {
-        if (isEnabled() && isVisible()) {
-          fireValueClicked(axesPosition, value);
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      if (isEnabled() && isVisible()) {
+        fireValueClicked(axesPosition, value);
       }
     }
   }
