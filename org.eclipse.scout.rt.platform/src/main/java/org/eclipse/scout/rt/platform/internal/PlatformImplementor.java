@@ -102,10 +102,10 @@ public class PlatformImplementor implements IPlatform {
         changeState(State.BeanManagerValid, true);
         startCreateImmediatelyBeans();
       }
-      catch (Throwable t) {
-        LOG.error("Error during while starting platform", t);
+      catch (RuntimeException | Error e) {
+        LOG.error("Error during platform startup", e);
         changeState(State.PlatformInvalid, true);
-        throw t;
+        throw e;
       }
     }
     finally {
