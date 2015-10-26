@@ -7,9 +7,9 @@ scout.NetworkGraphRenderer = function(graph) {
   this.height = 0;
 
   // Constants
-  this.defaultEdgeLength = 100;
-  this.gravity = 0.0;
-  this.repulsion = 150;
+  this.defaultEdgeLength = 120;
+  this.gravity = 0.005;
+  this.repulsion = 200;
   this.radius = 10.0;
   this.minEnergy = 0.01; // epsilon
 
@@ -369,9 +369,6 @@ scout.NetworkGraphRenderer.prototype.step = function() {
   for (i = 0; i < n; i++) {
     n1 = this.nodes[i];
     f = this.energy * this.gravity;
-    if (n1.cssClass === 'center') { // FIXME FKO Replace by flag
-      f += ((1 - f) / 10); //make center node strive more to middle
-    }
     //gravity:
     //(dx, dy) is the vector from n1 to the center;
     dx = cx - n1.x; //n1 to center in x-coord;
