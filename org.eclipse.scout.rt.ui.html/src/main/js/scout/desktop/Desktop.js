@@ -116,6 +116,7 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
   }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
+  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
   keyStrokeContext.$scopeTarget = this.$bench;
   keyStrokeContext.registerKeyStroke(this.keyStrokes);
@@ -132,6 +133,7 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = functi
   }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
+  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
   keyStrokeContext.$scopeTarget = this.navigation.$viewButtons;
   keyStrokeContext.registerKeyStroke([
@@ -150,6 +152,7 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
   }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
+  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
   keyStrokeContext.$scopeTarget = this._$taskBar;
   keyStrokeContext.registerKeyStroke([

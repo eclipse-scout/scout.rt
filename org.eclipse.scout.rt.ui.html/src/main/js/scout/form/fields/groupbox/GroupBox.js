@@ -33,6 +33,7 @@ scout.GroupBox.prototype._init = function(model) {
  */
 scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.GroupBox.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
+  this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.keyStrokeContext.$bindTarget = function() {
     // keystrokes on a group box have form scope
     return this.getForm().$container;

@@ -41,6 +41,7 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   ]);
 
   this.formKeyStrokeContext = new scout.KeyStrokeContext();
+  this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
   this.formKeyStrokeContext.$bindTarget = function() {
     // keystrokes have form scope

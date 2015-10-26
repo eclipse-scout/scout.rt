@@ -28,12 +28,6 @@ scout.Form.prototype._init = function(model) {
   this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, renderGlassPanes);
 };
 
-scout.Form.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Form.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
-  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-};
-
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
 

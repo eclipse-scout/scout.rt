@@ -32,14 +32,14 @@ scout.InputFieldKeyStrokeContext = function() {
   ]);
 
   this.registerStopPropagationKeys(scout.keyStrokeModifier.SHIFT, [
-                                                                                                  scout.keys.RIGHT,
-                                                                                                  scout.keys.BACKSPACE,
-                                                                                                  scout.keys.LEFT,
-                                                                                                  scout.keys.HOME,
-                                                                                                  scout.keys.END,
-                                                                                                  scout.keys.NUMPAD_4,
-                                                                                                  scout.keys.NUMPAD_6
-                                                                                                ]);
+    scout.keys.RIGHT,
+    scout.keys.BACKSPACE,
+    scout.keys.LEFT,
+    scout.keys.HOME,
+    scout.keys.END,
+    scout.keys.NUMPAD_4,
+    scout.keys.NUMPAD_6
+  ]);
   this.registerStopPropagationKeys(scout.keyStrokeModifier.NONE, [
     scout.keys.SEMICOLON,
     scout.keys.DASH,
