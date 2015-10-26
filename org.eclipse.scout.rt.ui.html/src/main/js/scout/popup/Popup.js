@@ -196,8 +196,11 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
 scout.Popup.prototype._onPopupOpen = function(event) {
   // Make sure child popups don't close the parent popup, we must check parent hierarchy in both directions
   // Use case: Opening of a context menu or cell editor in a form popup
+  // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
+  // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
   if (!this.isOrHasWidget(event.popup) &&
-      !event.popup.isOrHasWidget(this)) {
+      !event.popup.isOrHasWidget(this) &&
+      !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
     this.close(event);
   }
 };
