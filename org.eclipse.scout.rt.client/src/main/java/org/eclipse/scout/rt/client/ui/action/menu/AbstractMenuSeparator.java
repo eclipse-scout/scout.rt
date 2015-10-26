@@ -10,20 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.Set;
-
-import org.eclipse.scout.commons.CollectionUtility;
-
 public abstract class AbstractMenuSeparator extends AbstractMenu {
 
   @Override
   protected final boolean getConfiguredSeparator() {
     return true;
-  }
-
-  @Override
-  protected final Set<? extends IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.emptyHashSet();
   }
 
   @Override
