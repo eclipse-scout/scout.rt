@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -272,7 +273,12 @@ public class OrganizeColumnsForm extends AbstractForm {
             @Override
             protected void execRowsSelected(List<? extends ITableRow> rows) {
               getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected());
-              getMenuByClass(RenameMenu.class).setVisible(isOnlyCustomConfigsSelected());
+              getMenuByClass(RenameMenu.class).setVisible(!isDefaultConfigSelected());
+              getMenuByClass(UpdateMenu.class).setVisible(!isDefaultConfigSelected());
+
+              getMenuByClass(DeleteMenu.class).setEnabled(!isDefaultConfigSelected());
+              getMenuByClass(RenameMenu.class).setEnabled(!isDefaultConfigSelected());
+              getMenuByClass(UpdateMenu.class).setEnabled(!isDefaultConfigSelected());
             }
 
             @Order(10.0)
@@ -481,6 +487,32 @@ public class OrganizeColumnsForm extends AbstractForm {
                   if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
                     String config = getConfigNameColumn().getValue(row);
                     deleteConfig(config);
+                  }
+                }
+              }
+            }
+
+            @Order(50.0)
+            public class UpdateMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("Update");
+              }
+
+              @Override
+              protected void execAction() {
+                List<ITableRow> rows = getSelectedRows();
+                for (ITableRow row : rows) {
+                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
+                    String config = getConfigNameColumn().getValue(row);
+                    deleteConfig(config);
+                    storeCurrentStateAsConfig(config);
                   }
                 }
               }
@@ -830,7 +862,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected int getConfiguredWidth() {
-                return 20;
+                return 40;
               }
 
             }
@@ -840,7 +872,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected int getConfiguredWidth() {
-                return 20;
+                return 40;
               }
 
             }
@@ -855,7 +887,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected int getConfiguredWidth() {
-                return 20;
+                return 40;
               }
 
               @Override
@@ -962,6 +994,10 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
             }
 
+            @Order(41.0)
+            public class MenuSeparator1 extends AbstractMenuSeparator {
+            }
+
             @Order(44.0)
             public class GroupMenu extends AbstractMenu {
 
@@ -1008,6 +1044,10 @@ public class OrganizeColumnsForm extends AbstractForm {
               protected void execAction() {
                 groupSelectedColumn(true);
               }
+            }
+
+            @Order(51.0)
+            public class MenuSeparator2 extends AbstractMenuSeparator {
             }
 
             @Order(50.0)
@@ -1084,6 +1124,10 @@ public class OrganizeColumnsForm extends AbstractForm {
                 }
                 return true;
               }
+            }
+
+            @Order(51.0)
+            public class MenuSeparator3 extends AbstractMenuSeparator {
             }
 
             @Order(70.0)
@@ -1207,7 +1251,9 @@ public class OrganizeColumnsForm extends AbstractForm {
                       }
                     }
                     else {
-                      m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+                      if (selectedCol.isColumnFilterActive()) {
+                        m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+                      }
                       setColumnVisible(selectedRow, false);
                     }
 
@@ -1235,7 +1281,9 @@ public class OrganizeColumnsForm extends AbstractForm {
                 if (m_table != null) {
                   for (ITableRow selectedRow : getSelectedRows()) {
                     IColumn<?> selectedCol = getKeyColumn().getValue(selectedRow);
-                    m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+                    if (selectedCol.isColumnFilterActive()) {
+                      m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+                    }
                   }
                 }
                 reloadTableData();
