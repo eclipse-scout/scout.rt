@@ -9,6 +9,7 @@ scout.TableHeader = function() {
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
   this.dragging = false;
+  this._renderedColumns = [];
 };
 scout.inherits(scout.TableHeader, scout.Widget);
 
@@ -16,7 +17,6 @@ scout.TableHeader.prototype._init = function(options) {
   scout.TableHeader.parent.prototype._init.call(this, options);
 
   this.table = options.table;
-  this.columns = this.table.columns;
   this.menuBar = scout.create(scout.MenuBar, {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -26,231 +26,22 @@ scout.TableHeader.prototype._init = function(options) {
 };
 
 scout.TableHeader.prototype._render = function($parent) {
-  var column, $header, $defaultCheckedColumHeader, $separator,
-    that = this,
-    columns = this.columns,
-    table = this.table;
-
-  this.$container = table.$data.beforeDiv('table-header');
-
-  for (var i = 0; i < columns.length; i++) {
-    column = columns[i];
-    var columnWidth = column.width;
-    var isFirstColumn = (i === 0);
-    var isLastColumn = (i === columns.length - 1);
-
-    if (isFirstColumn) {
-      columnWidth += table.rowBorderLeftWidth;
-    } else if (isLastColumn) {
-      columnWidth += table.rowBorderRightWidth;
-    }
-
-    $header = this.$container.appendDiv('table-header-item')
-      .data('column', column)
-      .css('min-width', columnWidth + 'px')
-      .css('max-width', columnWidth + 'px')
-      .on('click', this._onHeaderItemClick.bind(this))
-      .on('mousedown', dragHeader);
-    $header.toggleAttr('data-modelclass', !! column.modelClass, column.modelClass);
-    $header.toggleAttr('data-classid', !! column.classId, column.classId);
-
-    column.$header = $header;
-
-    scout.tooltips.install($header, {
-      parent: this,
-      tooltipText: this._headerItemTooltip.bind(this),
-      arrowPosition: 50,
-      arrowPositionUnit: '%'
-    });
-
-    this._decorateHeader(column);
-    $header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
-
-    if (!column.fixedWidth) {
-      $separator = this.$container.appendDiv('table-header-resize');
-      $separator.on('mousedown', '', resizeHeader);
-    }
-  }
+  this.$container = this.table.$data.beforeDiv('table-header');
 
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
   this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
-  if (this.columns.length === 0) {
-    // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
-    this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
-  }
 
   this.menuBar.render(this.$container);
   this._$menuBar = this.menuBar.$container;
   this.updateMenuBar();
-  this._reconcileScrollPos();
+
+  this._renderColumns();
 
   this.table.$data.on('scroll', this._tableDataScrollHandler);
   this.table.on('addFilter', this._tableAddRemoveFilterHandler);
   this.table.on('removeFilter', this._tableAddRemoveFilterHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
-
-  function resizeHeader(event) {
-    var startX = Math.floor(event.pageX),
-      $header = $(this).prev(),
-      column = $header.data('column'),
-      headerWidth = column.width;
-
-    column.resizingInProgress = true;
-
-    // Install resize helpers. Those helpers make sure the header and the data element keep their
-    // current width until the resizing has finished. Otherwise, make a column smaller while the
-    // table has been horizontally scrolled to the right would behave very strange.
-    that.$headerColumnResizeHelper = $.makeDiv('table-column-resize-helper')
-      .css('width', table.rowWidth + table.rowBorderWidth)
-      .appendTo(that.$container);
-    that.$dataColumnResizeHelper = $.makeDiv('table-column-resize-helper')
-      .css('width', table.rowWidth)
-      .appendTo(table.$data);
-
-    $(window)
-      .on('mousemove.tableheader', resizeMove)
-      .one('mouseup', resizeEnd);
-    $('body').addClass('col-resize');
-
-    // Prevent text selection in a form, don't stop propagation to allow others (e.g. cell editor) to react
-    event.preventDefault();
-
-    function resizeMove(event) {
-      var diff = Math.floor(event.pageX) - startX,
-        wHeader = headerWidth + diff;
-
-      wHeader = Math.max(wHeader, column.minWidth);
-      if (wHeader !== column.width) {
-        that.table.resizeColumn(column, wHeader);
-      }
-    }
-
-    function resizeEnd(event) {
-      delete column.resizingInProgress;
-
-      // Remove resize helpers
-      that.$headerColumnResizeHelper.remove();
-      that.$headerColumnResizeHelper = null;
-      that.$dataColumnResizeHelper.remove();
-      that.$dataColumnResizeHelper = null;
-
-      $(window).off('mousemove.tableheader');
-      $('body').removeClass('col-resize');
-
-      that.table.resizeColumn(column, column.width);
-    }
-  }
-
-  function dragHeader(event) {
-    var diff = 0,
-      startX = Math.floor(event.pageX),
-      $header = $(this),
-      column = $header.data('column'),
-      oldPos = that.table.columns.indexOf(column),
-      newPos = oldPos,
-      move = $header.outerWidth(),
-      $otherHeaders = $header.siblings('.table-header-item:not(.filler)');
-
-    that.dragging = false;
-    // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
-    that.columnMoved = false;
-
-    // start drag & drop events
-    $(window)
-      .on('mousemove.tableheader', '', dragMove)
-      .one('mouseup', '', dragEnd);
-
-    function dragMove(event) {
-      diff = Math.floor(event.pageX) - startX;
-      if (diff === 0) {
-        return;
-      }
-
-      that.dragging = true;
-
-      // change css of dragged header
-      $header.addClass('header-move');
-      that.$container.addClass('header-move');
-
-      // move dragged header
-      $header.css('left', diff);
-
-      // find other affected headers
-      var middle = realMiddle($header);
-
-      $otherHeaders.each(function(i) {
-        var m = realMiddle($(this));
-
-        if (middle < m && i < oldPos) {
-          $(this).css('left', move);
-        } else if (middle > m && i >= oldPos) {
-          $(this).css('left', -move);
-        } else {
-          $(this).css('left', 0);
-        }
-      });
-
-      if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
-        that._tableHeaderMenu.remove();
-        that._tableHeaderMenu = null;
-      }
-    }
-
-    function realWidth($div) {
-      var html = $div.html(),
-        width = $div.html('<span>' + html + '</span>').find('span:first').width();
-
-      $div.html(html);
-      return width;
-    }
-
-    function realMiddle($div) {
-      if ($div.hasClass('halign-right')) {
-        return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
-      } else {
-        return $div.offset().left + realWidth($div) / 2;
-      }
-    }
-
-    function dragEnd(event) {
-      $(window).off('mousemove.tableheader');
-
-      // in case of no movement: return
-      if (!that.dragging) {
-        return true;
-      }
-
-      // find new position of dragged header
-      var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
-      h.each(function(i) {
-        if ($(this).css('left') !== '0px') {
-          newPos = that.table.columns.indexOf(($(this).data('column')));
-          return false;
-        }
-      });
-
-      // move column
-      if (newPos > -1 && oldPos !== newPos) {
-        table.moveColumn($header.data('column'), oldPos, newPos, true);
-        that.dragging = false;
-        that.columnMoved = true;
-      } else {
-        $header.animateAVCSD('left', '', function() {
-          that.dragging = false;
-        });
-      }
-
-      // reset css of dragged header
-      $otherHeaders.each(function() {
-        $(this).css('left', '');
-      });
-
-      $header.css('background', '')
-        .removeClass('header-move');
-      that.$container.removeClass('header-move');
-    }
-  }
 };
 
 scout.TableHeader.prototype._remove = function() {
@@ -260,7 +51,79 @@ scout.TableHeader.prototype._remove = function() {
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('columnMoved', this._tableColumnMovedHandler);
 
+  this._removeColumns();
+
   scout.TableHeader.parent.prototype._remove.call(this);
+};
+
+scout.TableHeader.prototype.rerenderColumns = function() {
+  this._removeColumns();
+  this._renderColumns();
+};
+
+scout.TableHeader.prototype._renderColumns = function() {
+  this.table.columns.forEach(this._renderColumn, this);
+  if (this.table.columns.length === 0) {
+    // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
+    this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
+  }
+  this._reconcileScrollPos();
+};
+
+scout.TableHeader.prototype._renderColumn = function(column, index) {
+  var columnWidth = column.width,
+    isFirstColumn = (index === 0),
+    isLastColumn = (index === this.table.columns.length - 1);
+
+  if (isFirstColumn) {
+    columnWidth += this.table.rowBorderLeftWidth;
+  } else if (isLastColumn) {
+    columnWidth += this.table.rowBorderRightWidth;
+  }
+
+  var $header = this.$filler.beforeDiv('table-header-item')
+    .data('column', column)
+    .css('min-width', columnWidth + 'px')
+    .css('max-width', columnWidth + 'px')
+    .on('click', this._onHeaderItemClick.bind(this))
+    .on('mousedown', this._onHeaderItemMousedown.bind(this));
+  $header.toggleAttr('data-modelclass', !! column.modelClass, column.modelClass);
+  $header.toggleAttr('data-classid', !! column.classId, column.classId);
+
+  column.$header = $header;
+
+  scout.tooltips.install($header, {
+    parent: this,
+    tooltipText: this._headerItemTooltip.bind(this),
+    arrowPosition: 50,
+    arrowPositionUnit: '%'
+  });
+
+  this._decorateHeader(column);
+  $header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
+
+  if (!column.fixedWidth) {
+    var $separator = this.$filler.beforeDiv('table-header-resize');
+    $separator.on('mousedown', '', this._onSeparatorMousedown.bind(this));
+    column.$separator = $separator;
+  }
+  this._renderedColumns.push(column);
+};
+
+scout.TableHeader.prototype._removeColumns = function() {
+  this._renderedColumns.slice().forEach(this._removeColumn, this);
+};
+
+scout.TableHeader.prototype._removeColumn = function(column) {
+  if (column.$header) {
+    column.$header.remove();
+    column.$header = null;
+  }
+  if (column.$separator) {
+    column.$separator.remove();
+    column.$separator = null;
+  }
+  scout.arrays.remove(this._renderedColumns, column);
 };
 
 scout.TableHeader.prototype.resizeHeaderItem = function(column) {
@@ -415,7 +278,7 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
 
   if (column.sortActive) {
     sortDirection = column.sortAscending ? 'asc' : 'desc';
-    if (column.grouped){
+    if (column.grouped) {
       $header.addClass('group-' + sortDirection);
     }
     $header.addClass('sorted sort-' + sortDirection);
@@ -544,6 +407,170 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   }
 
   return false;
+};
+
+scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
+  var diff = 0,
+    that = this,
+    startX = Math.floor(event.pageX),
+    $header = $(event.currentTarget),
+    column = $header.data('column'),
+    oldPos = this.table.columns.indexOf(column),
+    newPos = oldPos,
+    move = $header.outerWidth(),
+    $otherHeaders = $header.siblings('.table-header-item:not(.filler)');
+
+  this.dragging = false;
+  // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
+  this.columnMoved = false;
+
+  // start drag & drop events
+  $(window)
+    .on('mousemove.tableheader', '', dragMove)
+    .one('mouseup', '', dragEnd);
+
+  function dragMove(event) {
+    diff = Math.floor(event.pageX) - startX;
+    if (diff === 0) {
+      return;
+    }
+
+    that.dragging = true;
+
+    // change css of dragged header
+    $header.addClass('header-move');
+    that.$container.addClass('header-move');
+
+    // move dragged header
+    $header.css('left', diff);
+
+    // find other affected headers
+    var middle = realMiddle($header);
+
+    $otherHeaders.each(function(i) {
+      var m = realMiddle($(this));
+
+      if (middle < m && i < oldPos) {
+        $(this).css('left', move);
+      } else if (middle > m && i >= oldPos) {
+        $(this).css('left', -move);
+      } else {
+        $(this).css('left', 0);
+      }
+    });
+
+    if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
+      that._tableHeaderMenu.remove();
+      that._tableHeaderMenu = null;
+    }
+  }
+
+  function realWidth($div) {
+    var html = $div.html(),
+      width = $div.html('<span>' + html + '</span>').find('span:first').width();
+
+    $div.html(html);
+    return width;
+  }
+
+  function realMiddle($div) {
+    if ($div.hasClass('halign-right')) {
+      return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
+    } else {
+      return $div.offset().left + realWidth($div) / 2;
+    }
+  }
+
+  function dragEnd(event) {
+    $(window).off('mousemove.tableheader');
+
+    // in case of no movement: return
+    if (!that.dragging) {
+      return true;
+    }
+
+    // find new position of dragged header
+    var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
+    h.each(function(i) {
+      if ($(this).css('left') !== '0px') {
+        newPos = that.table.columns.indexOf(($(this).data('column')));
+        return false;
+      }
+    });
+
+    // move column
+    if (newPos > -1 && oldPos !== newPos) {
+      that.table.moveColumn($header.data('column'), oldPos, newPos, true);
+      that.dragging = false;
+      that.columnMoved = true;
+    } else {
+      $header.animateAVCSD('left', '', function() {
+        that.dragging = false;
+      });
+    }
+
+    // reset css of dragged header
+    $otherHeaders.each(function() {
+      $(this).css('left', '');
+    });
+
+    $header.css('background', '')
+      .removeClass('header-move');
+    that.$container.removeClass('header-move');
+  }
+};
+
+scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
+  var startX = Math.floor(event.pageX),
+    $header = $(event.target).prev(),
+    column = $header.data('column'),
+    that = this,
+    headerWidth = column.width;
+
+  column.resizingInProgress = true;
+
+  // Install resize helpers. Those helpers make sure the header and the data element keep their
+  // current width until the resizing has finished. Otherwise, make a column smaller while the
+  // table has been horizontally scrolled to the right would behave very strange.
+  this.$headerColumnResizeHelper = $.makeDiv('table-column-resize-helper')
+    .css('width', this.table.rowWidth + this.table.rowBorderWidth)
+    .appendTo(this.$container);
+  this.$dataColumnResizeHelper = $.makeDiv('table-column-resize-helper')
+    .css('width', this.table.rowWidth)
+    .appendTo(this.table.$data);
+
+  $(window)
+    .on('mousemove.tableheader', resizeMove)
+    .one('mouseup', resizeEnd);
+  $('body').addClass('col-resize');
+
+  // Prevent text selection in a form, don't stop propagation to allow others (e.g. cell editor) to react
+  event.preventDefault();
+
+  function resizeMove(event) {
+    var diff = Math.floor(event.pageX) - startX,
+      wHeader = headerWidth + diff;
+
+    wHeader = Math.max(wHeader, column.minWidth);
+    if (wHeader !== column.width) {
+      that.table.resizeColumn(column, wHeader);
+    }
+  }
+
+  function resizeEnd(event) {
+    delete column.resizingInProgress;
+
+    // Remove resize helpers
+    that.$headerColumnResizeHelper.remove();
+    that.$headerColumnResizeHelper = null;
+    that.$dataColumnResizeHelper.remove();
+    that.$dataColumnResizeHelper = null;
+
+    $(window).off('mousemove.tableheader');
+    $('body').removeClass('col-resize');
+
+    that.table.resizeColumn(column, column.width);
+  }
 };
 
 scout.TableHeader.prototype._onTableDataScroll = function() {

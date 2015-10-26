@@ -2703,10 +2703,16 @@ scout.Table.prototype._renderRowIconVisible = function() {
 };
 
 scout.Table.prototype._redraw = function() {
-  this._removeTableHeader();
-  this._renderTableHeader();
+  this._rerenderHeaderColumns();
   this._removeRows();
   this._renderRows();
+};
+
+scout.Table.prototype._rerenderHeaderColumns = function() {
+  if (this.header) {
+    this.header.rerenderColumns();
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.Table.prototype._renderTableHeader = function() {
@@ -2881,8 +2887,10 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
   this._initColumns();
 
   if (this.rendered) {
-    this._removeTableHeader();
-    this._renderTableHeader();
+    this._updateRowWidth();
+    this.$rows(true).css('width', this.rowWidth);
+
+    this._rerenderHeaderColumns();
   }
   this.trigger('columnStructureChanged');
 };

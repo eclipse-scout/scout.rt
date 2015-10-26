@@ -42,7 +42,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Moving
-  if (this.table.header.columns.length > 1) {
+  if (this.table.columns.length > 1) {
     this._renderMovingGroup();
   }
 
