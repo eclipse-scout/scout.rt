@@ -231,6 +231,11 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     });
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getUiSession()) {
       @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<ITableControl>()).build();
+      }
+
+      @Override
       protected List<ITableControl> modelValue() {
         return getModel().getTableControls();
       }
