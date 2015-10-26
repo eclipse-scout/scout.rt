@@ -50,8 +50,10 @@ public class JsonMapTableControl<MAP_TABLE_CONTROL extends IMapTableControl> ext
       @Override
       public Object prepareValueForToJson(Object value) {
         JSONArray columnIds = new JSONArray();
-        for (IColumn column : (List<IColumn>) value) {
-          columnIds.put(m_jsonTable.getColumnId(column));
+        if (value != null) {
+          for (IColumn column : (List<IColumn>) value) {
+            columnIds.put(m_jsonTable.getColumnId(column));
+          }
         }
         return columnIds;
       }
@@ -77,5 +79,4 @@ public class JsonMapTableControl<MAP_TABLE_CONTROL extends IMapTableControl> ext
   protected void handleUiLoadContent() {
     addPropertyChangeEvent("map", new JSONObject(MAP));
   }
-
 }
