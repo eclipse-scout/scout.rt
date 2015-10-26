@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
@@ -29,22 +27,15 @@ public class SearchFormTableControl extends AbstractTableControl {
     setTooltipText(TEXTS.get("Search"));
   }
 
-  public void setSearchForm(ISearchForm searchForm) {
-    if (searchForm == null) {
-      setEnabled(false);
-    }
-    else {
-      // FIXME AWE: (table) check if this form listener is really needed. delete if not
-      setEnabled(true);
-      searchForm.addFormListener(new FormListener() {
-        @Override
-        public void formChanged(FormEvent e) {
-          if (e.getType() == FormEvent.TYPE_LOAD_COMPLETE) {
-            setForm(e.getForm());
-          }
-        }
-      });
-    }
+  @Override
+  public void setForm(IForm form) {
+    setEnabled(form != null);
+    super.setForm(form);
+  }
+
+  @Override
+  protected boolean getConfiguredEnabled() {
+    return false;
   }
 
   @Override

@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.control.AggregateTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -223,7 +224,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * {@link #interceptLoadData(SearchFilter)} or {@link #interceptLoadTableData(SearchFilter)} instead.<br/>
    * This default implementation does the following: It queries methods {@link #isSearchActive()} and
    * {@link #isSearchRequired()} and then calls {@link #interceptLoadData(SearchFilter)} if appropriate.
-   *
    */
   @ConfigOperation
   @Order(100)
@@ -467,7 +467,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       m_searchForm.setDisplayViewId(IForm.VIEW_ID_PAGE_SEARCH);
     }
     m_searchForm.setShowOnStart(false);
-    attachSearchTableControl();
     // listen for search action
     m_searchFormListener = new FormListener() {
       @Override
@@ -501,10 +500,32 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
-  private void attachSearchTableControl() {
-    SearchFormTableControl searchControl = new SearchFormTableControl();
-    searchControl.setSearchForm(m_searchForm);
-    getTable().addTableControl(0, searchControl);
+  @Override
+  protected void addDefaultTableControls() {
+    ITableControl control = createSearchFormTableControl();
+    if (control != null) {
+      getTable().addTableControl(control);
+    }
+
+    control = createAggregateTableControl();
+    if (control != null) {
+      getTable().addTableControl(control);
+    }
+  }
+
+  protected void linkSearchFormWithTableControl() {
+    SearchFormTableControl tableControl = getTable().getTableControl(SearchFormTableControl.class);
+    if (tableControl != null) {
+      tableControl.setForm(m_searchForm);
+    }
+  }
+
+  protected SearchFormTableControl createSearchFormTableControl() {
+    return new SearchFormTableControl();
+  }
+
+  protected ITableControl createAggregateTableControl() {
+    return new AggregateTableControl();
   }
 
   private void detachFromSearchFormInternal() {
@@ -583,6 +604,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     detachFromSearchFormInternal();
     m_searchForm = searchForm;
     attachToSearchFormInternal();
+    linkSearchFormWithTableControl();
   }
 
   @Override

@@ -273,7 +273,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Called after this page has been removed from its associated outline tree.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(50)
@@ -351,7 +350,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * called.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(60)
@@ -362,7 +360,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Called whenever this page is selected in the outline tree.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(70)
@@ -373,7 +370,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Called whenever this page is de-selected in the outline tree.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(80)
@@ -400,6 +396,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected void initConfig() {
     super.initConfig();
     m_table = initTable();
+    if (m_table != null) {
+      addDefaultTableControls();
+    }
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
   }
@@ -423,6 +422,14 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     finally {
       setInitializing(false);
     }
+  }
+
+  /**
+   * Adds default table controls to the table.
+   * <p>
+   * Default does nothing.
+   */
+  protected void addDefaultTableControls() {
   }
 
   @Override
