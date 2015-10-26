@@ -45,7 +45,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   /**
    * If set, this value is applied to the tile field chart's "autoColor" property.
    */
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   protected Boolean getConfiguredAutoColor() {
     return null;
@@ -54,7 +54,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   /**
    * If set, this value is applied to the tile field chart's "clickable" property.
    */
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   protected Boolean getConfiguredClickable() {
     return null;
@@ -63,7 +63,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   /**
    * If set, this value is applied to the tile field chart's "animated" property.
    */
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   protected Boolean getConfiguredAnimated() {
     return null;
