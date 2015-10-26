@@ -8,51 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.callable;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IChainable;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.chain.IInvocationInterceptor;
+import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.commons.chain.InvocationChain.Chain;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
- * Processor to log uncaught exceptions.
+ * Processor to log uncaught exceptions during job execution.
+ * <p>
+ * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * {@link Callable}.
  *
- * @param <RESULT>
- *          the result type of the job's computation.
  * @since 5.1
- * @see <i>design pattern: chain of responsibility</i>
  */
-public class LogOnErrorCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+public class LogOnErrorProcessor<RESULT> implements IInvocationInterceptor<RESULT> {
 
-  @Internal
-  protected final Callable<RESULT> m_next;
-  @Internal
   protected final JobInput m_input;
 
-  /**
-   * Creates a processor to translate computing exceptions into {@link ProcessingException}s.
-   *
-   * @param next
-   *          next processor in the chain; must not be <code>null</code>.
-   * @param input
-   *          input that describes the job.
-   */
-  public LogOnErrorCallable(final Callable<RESULT> next, final JobInput input) {
+  public LogOnErrorProcessor(final JobInput input) {
     m_input = input;
-    m_next = Assertions.assertNotNull(next);
   }
 
   @Override
-  public RESULT call() throws Exception {
+  public RESULT intercept(final Chain<RESULT> chain) throws Exception {
     try {
-      return m_next.call();
+      return chain.continueChain();
     }
     catch (final Throwable t) {
       if (m_input.isLogOnError()) {
@@ -67,10 +54,5 @@ public class LogOnErrorCallable<RESULT> implements Callable<RESULT>, IChainable<
       // Propagate the exception.
       throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
-  }
-
-  @Override
-  public Callable<RESULT> getNext() {
-    return m_next;
   }
 }

@@ -12,20 +12,23 @@ package org.eclipse.scout.rt.server.commons.context;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.logging.HttpRequestMethodContextValueProvider;
+import org.eclipse.scout.rt.server.commons.servlet.logging.HttpRequestUriContextValueProvider;
+import org.eclipse.scout.rt.server.commons.servlet.logging.HttpSessionIdContextValueProvider;
 
 /**
  * The <code>ServletRunContext</code> facilitates propagation of the {@link Servlet} state. This context is not intended
@@ -43,13 +46,15 @@ public class ServletRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c4 = new CurrentHttpServletRequestLogCallable<>(next);
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse);
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest);
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+    super.interceptInvocationChain(invocationChain);
 
-    return c1;
+    invocationChain
+        .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest))
+        .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpSessionIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestMethodContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestUriContextValueProvider.class)));
   }
 
   @Override

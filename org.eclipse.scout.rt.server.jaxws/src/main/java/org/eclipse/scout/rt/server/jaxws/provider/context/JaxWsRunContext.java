@@ -14,7 +14,6 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 
 /**
@@ -45,11 +45,9 @@ public class JaxWsRunContext extends ServletRunContext {
   protected WebServiceContext m_webServiceContext;
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(next, JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext);
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
-
-    return c1;
+  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+    super.interceptInvocationChain(invocationChain);
+    invocationChain.add(new ThreadLocalProcessor<>(JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
   }
 
   @Override

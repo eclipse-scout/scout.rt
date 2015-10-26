@@ -23,7 +23,9 @@ import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -39,15 +41,14 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerC
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerDispatcherThreadCountProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerKeepAliveTimeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerMaximumPoolSizeProperty;
+import org.eclipse.scout.rt.platform.context.RunContextRunner;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.callable.LogOnErrorCallable;
-import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
-import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -177,12 +178,12 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public IJobListenerRegistration addListener(IJobListener listener) {
+  public IJobListenerRegistration addListener(final IJobListener listener) {
     return addListener(null, listener);
   }
 
   @Override
-  public IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener) {
+  public IJobListenerRegistration addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
     return m_listeners.add(filter, listener);
   }
 
@@ -192,7 +193,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Creates the Future to interact with the executable once being executed.
+   * Creates the Future to interact with the executable.
    *
    * @param callable
    *          callable to be given to the executor for execution.
@@ -204,15 +205,17 @@ public class JobManager implements IJobManager, IPlatformListener {
   @Internal
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input, final boolean periodic) {
     Assertions.assertNotNull(input, "'JobInput' must not be null");
-    if (input.getRunContext() != null) {
-      Assertions.assertNotNull(input.getRunContext().getRunMonitor(), "'RunMonitor' required if providing a 'RunContext'");
-    }
 
-    // Ensure a job name to be set.
+    final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
+
     final JobInput inputCopy = input.copy().withName(StringUtility.nvl(input.getName(), callable.getClass().getName()));
+    final InvocationChain<RESULT> invocationChain = new InvocationChain<>();
+    final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, periodic, invocationChain, callable);
 
-    // Create the Future to be returned to the caller.
-    return interceptFuture(JobFutureTask.create(this, inputCopy, periodic, interceptCallable(callable, inputCopy)));
+    // Add functionality to be applied while executing the Callable (Thread-Locals, RunContext, ...).
+    interceptInvocationChain(invocationChain, futureTask, runMonitor, inputCopy);
+
+    return futureTask;
   }
 
   /**
@@ -250,56 +253,38 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Overwrite this method to contribute some behavior to the {@link Callable} given to the executor for execution.
-   * <p/>
-   * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
-   * chain from 'bottom-to-top'.
-   * <p/>
-   * To contribute on top of the chain (meaning that you are invoked <strong>after</strong> the contributions of super
-   * classes and therefore can base on their contributed functionality), you can use constructions of the following
-   * form:
-   * <p/>
-   * <code>
-   *   Callable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
-   *   Callable head = <i>super.interceptCallable(c1)</i>; // executed 1st<br/>
-   *   return head;
-   * </code>
-   * </p>
+   * Method invoked to intercept the invocation chain used to run the {@link Callable}. Overwrite this method to
+   * contribute some behavior to the execution of the {@link Callable}.
+   * <p>
+   * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br/>
+   * To contribute to the end of the chain (meaning that you are invoked <strong>after</strong> the contributions of
+   * super classes and therefore can base on their contributed functionality), you can use constructions of the
+   * following form:
+   *
+   * <pre>
+   * this.interceptInvocationChain(invocationChain, future, runMonitor, input);
+   * invocationChain.addLast(new YourDecorator());
+   * </pre>
+   *
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
-   * <p/>
-   * <code>
-   *   Callable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
-   *   Callable head = new YourInterceptor1(c1); // executed 1st<br/>
-   *   return head;
-   * </code>
    *
-   * @param next
-   *          subsequent chain element which is typically the {@link Callable} to be executed.
-   * @param input
-   *          describes the job to be executed.
-   * @return the head of the chain to be invoked first.
-   */
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final JobInput input) {
-    final Callable<RESULT> c3 = new RunContextCallable<RESULT>(next, input.getRunContext());
-    final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getName());
-    final Callable<RESULT> c1 = new LogOnErrorCallable<>(c2, input);
-
-    return c1;
-  }
-
-  /**
-   * Overwrite this method to adapt the Future representing a job to be executed.<br/>
-   * The default implementation simply returns the given future.
+   * <pre>
+   * this.interceptInvocationChain(invocationChain, future, runMonitor, input);
+   * invocationChain.addFirst(new YourDecorator());
+   * </pre>
    *
-   * @param future
-   *          Future to be adapted.
-   * @return adapted Future.
+   * @param invocationChain
+   *          The chain used to construct the context.
    */
-  protected <RESULT> JobFutureTask<RESULT> interceptFuture(final JobFutureTask<RESULT> future) {
-    return future;
+  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain, final JobFutureTask<?> future, final RunMonitor runMonitor, final JobInput input) {
+    invocationChain
+        .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
+        .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
+        .add(new LogOnErrorProcessor<RESULT>(input))
+        .add(new ThreadNameDecorator(input.getThreadName(), input.getName()))
+        .add(new RunContextRunner<RESULT>(input.getRunContext()))
+        .add(new FireJobLifecycleEventProcessor(JobEventType.ABOUT_TO_RUN, this, future));
   }
 
   @Override

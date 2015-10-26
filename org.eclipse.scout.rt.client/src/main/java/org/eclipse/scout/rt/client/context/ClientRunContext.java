@@ -12,23 +12,25 @@ package org.eclipse.scout.rt.client.context;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -51,17 +53,17 @@ public class ClientRunContext extends RunContext {
   protected IDesktop m_desktop;
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(next, IForm.CURRENT, m_form);
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, IOutline.CURRENT, m_outline);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, IDesktop.CURRENT, m_desktop);
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, m_userAgent);
-    final Callable<RESULT> c3 = new CurrentSessionLogCallable<>(c4);
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, m_session);
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+    super.interceptInvocationChain(invocationChain);
 
-    return c1;
+    invocationChain
+        .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
+        .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
+        .add(new ThreadLocalProcessor<>(IDesktop.CURRENT, m_desktop))
+        .add(new ThreadLocalProcessor<>(IOutline.CURRENT, m_outline))
+        .add(new ThreadLocalProcessor<>(IForm.CURRENT, m_form));
   }
 
   @Override
@@ -94,15 +96,20 @@ public class ClientRunContext extends RunContext {
     return this;
   }
 
+  /**
+   * @see #withSession(IClientSession, boolean)
+   */
   public IClientSession getSession() {
     return m_session;
   }
 
   /**
-   * Sets the session.
+   * Associates this context with the given {@link IClientSession}, meaning that any code running on behalf of this
+   * context has that {@link ISession} set in {@link ISession#CURRENT} thread-local.
    *
    * @param applySessionProperties
-   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}.
+   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}
+   *          directly onto this context.
    */
   public ClientRunContext withSession(final IClientSession session, final boolean applySessionProperties) {
     m_session = session;
@@ -112,29 +119,41 @@ public class ClientRunContext extends RunContext {
       m_userAgent = (session != null ? session.getUserAgent() : null);
       m_subject = (session != null ? session.getSubject() : null);
     }
-
     return this;
   }
 
+  /**
+   * @see #withUserAgent(UserAgent)
+   */
   public UserAgent getUserAgent() {
     return m_userAgent;
   }
 
+  /**
+   * Associates this context with the given {@link UserAgent}, meaning that any code running on behalf of this context
+   * has that {@link UserAgent} set in {@link UserAgent#CURRENT} thread-local.
+   */
   public ClientRunContext withUserAgent(final UserAgent userAgent) {
     m_userAgent = userAgent;
     return this;
   }
 
   /**
-   * Returns the {@link IForm} which is associated with this {@link ClientRunContext}, or <code>null</code> if not set.
+   * Returns the {@link IForm} which is associated with this context, or <code>null</code> if not set.
    */
   public IForm getForm() {
     return m_form;
   }
 
   /**
-   * Associates this {@link ClientRunContext} with a {@link IForm}. Typically, that information is set by the UI facade
-   * when dispatching a request from UI.
+   * Associates this context with the given {@link IForm}, meaning that any code running on behalf of this context has
+   * that {@link IForm} set in {@link IForm#CURRENT} thread-local.
+   * <p>
+   * That information is mainly used to determine the current calling model context, e.g. when opening a message-box to
+   * associate it with the proper {@link IDisplayParent}.
+   * <p>
+   * Typically, that information is set by the UI facade when dispatching a request from UI, or when constructing UI
+   * model elements.
    */
   public ClientRunContext withForm(final IForm form) {
     m_form = form;
@@ -142,16 +161,21 @@ public class ClientRunContext extends RunContext {
   }
 
   /**
-   * Returns the {@link IOutline} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
-   * set.
+   * Returns the {@link IOutline} which is associated with this context, or <code>null</code> if not set.
    */
   public IOutline getOutline() {
     return m_outline;
   }
 
   /**
-   * Associates this {@link ClientRunContext} with a {@link IOutline}. Typically, that information is set by the UI
-   * facade when dispatching a request from UI.
+   * Associates this context with the given {@link IOutline}, meaning that any code running on behalf of this context
+   * has that {@link IOutline} set in {@link IOutline#CURRENT} thread-local.
+   * <p>
+   * That information is mainly used to determine the current calling model context, e.g. when opening a message-box to
+   * associate it with the proper {@link IDisplayParent}.
+   * <p>
+   * Typically, that information is set by the UI facade when dispatching a request from UI, or when constructing UI
+   * model elements.
    */
   public ClientRunContext withOutline(final IOutline outline) {
     m_outline = outline;
@@ -159,16 +183,21 @@ public class ClientRunContext extends RunContext {
   }
 
   /**
-   * Returns the {@link IDesktop} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
-   * set.
+   * Returns the {@link IDesktop} which is associated with this context, or <code>null</code> if not set.
    */
   public IDesktop getDesktop() {
     return m_desktop;
   }
 
   /**
-   * Associates this {@link ClientRunContext} with a {@link IDesktop}. Typically, that information is set by the UI
-   * facade when dispatching a request from UI.
+   * Associates this context with the given {@link IDesktop}, meaning that any code running on behalf of this context
+   * has that {@link IDesktop} set in {@link IDesktop#CURRENT} thread-local.
+   * <p>
+   * That information is mainly used to determine the current calling model context, e.g. when opening a message-box to
+   * associate it with the proper {@link IDisplayParent}.
+   * <p>
+   * Typically, that information is set by the UI facade when dispatching a request from UI, or when constructing UI
+   * model elements.
    */
   public ClientRunContext withDesktop(final IDesktop desktop) {
     m_desktop = desktop;

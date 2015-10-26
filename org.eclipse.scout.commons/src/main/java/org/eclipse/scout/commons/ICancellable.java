@@ -8,14 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.context;
-
-import org.eclipse.scout.rt.platform.job.IFuture;
+package org.eclipse.scout.commons;
 
 /**
- * This is any kind of object interested in active cancellation of a {@link RunMonitor#cancel(boolean)}.
- * <p>
- * Note that a {@link IFuture} represents a {@link ICancellable} as well.
+ * This is any kind of object interested in active cancellation.
  *
  * @since 5.1
  */

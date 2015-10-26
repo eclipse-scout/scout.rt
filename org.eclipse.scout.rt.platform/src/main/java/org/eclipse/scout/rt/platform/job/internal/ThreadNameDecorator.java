@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.callable;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.commons.chain.IInvocationDecorator;
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -24,37 +24,25 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
- * Processor to decorate the thread-name of the worker-thread during the time of execution with the job name.
+ * Processor to decorate the thread-name of the worker-thread during the time of executing a job.
+ * <p>
+ * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * {@link Callable}.
  *
- * @param <RESULT>
- *          the result type of the job's computation.
  * @since 5.1
- * @see <i>design pattern: chain of responsibility</i>
  */
-public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+public class ThreadNameDecorator implements IInvocationDecorator {
 
-  private final Callable<RESULT> m_next;
   private final String m_threadName;
   private final String m_jobName;
 
-  /**
-   * Creates a processor to decorate the thread-name of the worker-thread with the job name.
-   *
-   * @param next
-   *          next processor in the chain; must not be <code>null</code>.
-   * @param threadName
-   *          the name to be used as thread-name.
-   * @param jobName
-   *          the job's identifier to be appended to the thread-name.
-   */
-  public ThreadNameDecorator(final Callable<RESULT> next, final String threadName, final String jobName) {
-    m_next = Assertions.assertNotNull(next);
+  public ThreadNameDecorator(final String threadName, final String jobName) {
     m_threadName = threadName;
     m_jobName = jobName;
   }
 
   @Override
-  public RESULT call() throws Exception {
+  public IUndecorator decorate() {
     final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
 
     // Install job listener to decorate the thread name
@@ -82,17 +70,15 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, IChainable
 
     // Update the name of the thread.
     currentThreadInfo.updateNameAndState(m_threadName, m_jobName, JobState.Running);
-    try {
-      return m_next.call();
-    }
-    finally {
-      listenerRegistration.dispose();
-      currentThreadInfo.updateNameAndState(null, null, JobState.Idle);
-    }
-  }
 
-  @Override
-  public Callable<RESULT> getNext() {
-    return m_next;
+    // Set origin thread name and state.
+    return new IUndecorator() {
+
+      @Override
+      public void undecorate() {
+        listenerRegistration.dispose();
+        currentThreadInfo.updateNameAndState(null, null, JobState.Idle);
+      }
+    };
   }
 }

@@ -22,17 +22,16 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
@@ -63,47 +62,31 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
 
   protected final JobManager m_jobManager;
-
+  protected final RunMonitor m_runMonitor;
   protected final JobInput m_input;
+  protected final boolean m_periodic;
   protected final Long m_expirationDate;
-  private volatile boolean m_blocked;
-  private final boolean m_periodic;
 
-  private final boolean m_runWithRunContext;
-  private final RunMonitor m_runMonitor;
+  protected volatile boolean m_blocked;
+  protected final DonePromise<RESULT> m_donePromise;
+  protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
-  private final DonePromise<RESULT> m_donePremise;
-
-  private final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
-
-  /**
-   * Factory method to create a {@link JobFutureTask} for the given {@link Callable}.
-   */
-  public static <RESULT> JobFutureTask<RESULT> create(final JobManager jobManager, final JobInput input, final boolean periodic, final Callable<RESULT> callable) {
-    final AtomicReference<JobFutureTask<RESULT>> futureTask = new AtomicReference<>();
-
-    // Provide the FutureTask with a wrapped Callable to control its execution.
-    final JobFutureTask<RESULT> task = new JobFutureTask<>(jobManager, input, periodic, new Callable<RESULT>() {
+  public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final boolean periodic, final InvocationChain<RESULT> invocationChain, final Callable<RESULT> callable) {
+    super(new Callable<RESULT>() {
 
       @Override
       public RESULT call() throws Exception {
-        return futureTask.get().invoke(callable);
+        return invocationChain.invoke(callable); // Run all processors as contained in the chain before invoking the Callable.
       }
     });
-    futureTask.set(task);
-    return task;
-  }
 
-  private JobFutureTask(final JobManager jobManager, final JobInput input, final boolean periodic, final Callable<RESULT> callable) {
-    super(callable);
     m_jobManager = jobManager;
-    m_donePremise = new DonePromise<>(this);
+    m_runMonitor = runMonitor;
     m_input = input;
     m_periodic = periodic;
-    m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
 
-    m_runWithRunContext = m_input.getRunContext() != null;
-    m_runMonitor = (m_runWithRunContext ? m_input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class));
+    m_donePromise = new DonePromise<>(this);
+    m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
 
     m_jobManager.registerFuture(this);
     m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
@@ -119,7 +102,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_runMonitor.unregisterCancellable(this);
     m_jobManager.unregisterFuture(this);
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
-    m_donePremise.onDone();
+    m_donePromise.onDone();
     m_listeners.clear();
 
     // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
@@ -156,22 +139,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     finally {
       m_jobManager.passMutexIfMutexOwner(this);
     }
-  }
-
-  /**
-   * Method invoked to finally execute the {@link Callable}.
-   *
-   * @see #run
-   */
-  protected RESULT invoke(final Callable<RESULT> target) throws Exception {
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, this));
-
-    // Callable to set the current RunMonitor. That is only required, if no RunContext is provided, because done by RunContext otherwise.
-    final Callable<RESULT> c2 = (m_runWithRunContext ? target : new InitThreadLocalCallable<>(target, RunMonitor.CURRENT, m_runMonitor));
-    // Callable to set the current Future.
-    final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, IFuture.CURRENT, this);
-
-    return c1.call();
   }
 
   @Override
@@ -330,7 +297,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public void whenDone(final IDoneCallback<RESULT> callback) {
-    m_donePremise.whenDone(callback);
+    m_donePromise.whenDone(callback);
   }
 
   @Override

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context.internal;
+package org.eclipse.scout.rt.server.context;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -22,12 +22,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.chain.InvocationChain.Chain;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.server.context.TransactionProcessor;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -45,14 +46,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 @RunWith(PlatformTestRunner.class)
-public class TwoPhaseTransactionBoundaryCallableTest {
+public class TransactionProcessorTest {
 
   private List<IBean<?>> m_beans;
 
   @Mock
   private ITransaction m_transaction;
   @Mock
-  private Callable<?> m_next;
+  private Chain<Object> m_chain;
 
   private List<Throwable> m_txErrors;
 
@@ -104,16 +105,16 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test(expected = TransactionRequiredException.class)
   public void testMandatoryWithoutExistingTransaction() throws Exception {
-    new TwoPhaseTransactionBoundaryCallable<>(m_next, null, TransactionScope.MANDATORY).call();
+    new TransactionProcessor<>(null, TransactionScope.MANDATORY).intercept(m_chain);
   }
 
   @Test
   public void testMandatoryWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, callingTransaction, TransactionScope.MANDATORY);
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY);
 
     // run the test
-    callable.call();
+    processor.intercept(m_chain);
 
     // verify
     verifyZeroInteractions(m_transaction);
@@ -123,12 +124,13 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Test
   public void testMandatoryWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, callingTransaction, TransactionScope.MANDATORY);
-    when(m_next.call()).thenThrow(new RuntimeException());
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY);
+
+    when(m_chain.continueChain()).thenThrow(new RuntimeException());
 
     // run the test
     try {
-      callable.call();
+      processor.intercept(m_chain);
       fail();
     }
     catch (Exception e) {
@@ -145,10 +147,10 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndSuccess() throws Exception {
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, null, TransactionScope.REQUIRES_NEW);
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW);
 
     // run the test
-    callable.call();
+    processor.intercept(m_chain);
 
     // verify
     verify(m_transaction, times(1)).release();
@@ -163,12 +165,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndError() throws Exception {
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, null, TransactionScope.REQUIRES_NEW);
-    when(m_next.call()).thenThrow(new RuntimeException());
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW);
+    when(m_chain.continueChain()).thenThrow(new RuntimeException());
 
     // run the test
     try {
-      callable.call();
+      processor.intercept(m_chain);
       fail();
     }
     catch (Exception e) {
@@ -188,10 +190,10 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Test
   public void testRequiresNewWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, callingTransaction, TransactionScope.REQUIRES_NEW);
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW);
 
     // run the test
-    callable.call();
+    processor.intercept(m_chain);
 
     // verify
     verifyZeroInteractions(callingTransaction);
@@ -208,12 +210,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Test
   public void testRequiresNewWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, callingTransaction, TransactionScope.REQUIRES_NEW);
-    when(m_next.call()).thenThrow(new RuntimeException());
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW);
+    when(m_chain.continueChain()).thenThrow(new RuntimeException());
 
     // run the test
     try {
-      callable.call();
+      processor.intercept(m_chain);
       fail();
     }
     catch (Exception e) {
@@ -232,10 +234,10 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndSuccess() throws Exception {
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, null, TransactionScope.REQUIRED);
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRED);
 
     // run the test
-    callable.call();
+    processor.intercept(m_chain);
 
     // verify
     verify(m_transaction, times(1)).release();
@@ -250,12 +252,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndError() throws Exception {
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, null, TransactionScope.REQUIRED);
-    when(m_next.call()).thenThrow(new RuntimeException());
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRED);
+    when(m_chain.continueChain()).thenThrow(new RuntimeException());
 
     // run the test
     try {
-      callable.call();
+      processor.intercept(m_chain);
       fail();
     }
     catch (Exception e) {
@@ -275,10 +277,10 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Test
   public void testRequiredWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, callingTransaction, TransactionScope.REQUIRED);
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED);
 
     // run the test
-    callable.call();
+    processor.intercept(m_chain);
 
     // verify
     verifyZeroInteractions(m_transaction);
@@ -288,12 +290,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Test
   public void testRequiredWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    Callable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, callingTransaction, TransactionScope.REQUIRED);
-    when(m_next.call()).thenThrow(new RuntimeException());
+    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED);
+    when(m_chain.continueChain()).thenThrow(new RuntimeException());
 
     // run the test
     try {
-      callable.call();
+      processor.intercept(m_chain);
       fail();
     }
     catch (Exception e) {

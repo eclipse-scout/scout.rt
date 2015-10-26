@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.callable;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
@@ -33,6 +34,7 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.job.internal.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -65,19 +67,20 @@ public class ThreadNameDecoratorTest {
   public void testThreadName() throws Exception {
     final StringHolder threadName = new StringHolder();
 
-    Callable<Void> next = new Callable<Void>() {
+    ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
+    IFuture.CURRENT.set(mockFuture());
+
+    InvocationChain<Void> invocationChain = new InvocationChain<Void>();
+    invocationChain.add(new ThreadNameDecorator("scout-client-thread", "123:job1"));
+    invocationChain.invoke(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
         threadName.setValue(Thread.currentThread().getName());
         return null;
       }
-    };
+    });
 
-    ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
-    IFuture.CURRENT.set(mockFuture());
-
-    new ThreadNameDecorator<Void>(next, "scout-client-thread", "123:job1").call();
     assertEquals("scout-client-thread-5 (Running) \"123:job1\"", threadName.getValue());
     assertEquals("scout-thread-5 (Idle)", Thread.currentThread().getName());
 
@@ -89,19 +92,20 @@ public class ThreadNameDecoratorTest {
   public void testThreadNameWithEmptyJobIdentifier() throws Exception {
     final StringHolder threadName = new StringHolder();
 
-    Callable<Void> next = new Callable<Void>() {
+    ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
+    IFuture.CURRENT.set(mockFuture());
+
+    InvocationChain<Void> invocationChain = new InvocationChain<Void>();
+    invocationChain.add(new ThreadNameDecorator("scout-client-thread", null));
+    invocationChain.invoke(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
         threadName.setValue(Thread.currentThread().getName());
         return null;
       }
-    };
+    });
 
-    ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
-    IFuture.CURRENT.set(mockFuture());
-
-    new ThreadNameDecorator<Void>(next, "scout-client-thread", null).call();
     assertEquals("scout-client-thread-5 (Running)", threadName.getValue());
     assertEquals("scout-thread-5 (Idle)", Thread.currentThread().getName());
 

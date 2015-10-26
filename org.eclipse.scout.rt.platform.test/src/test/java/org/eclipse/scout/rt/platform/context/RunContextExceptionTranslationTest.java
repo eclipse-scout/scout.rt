@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.junit.Test;
 
-public class RunContextTranslationTest {
+public class RunContextExceptionTranslationTest {
 
   @Test
   public void test() {

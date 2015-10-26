@@ -21,17 +21,19 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
+import org.eclipse.scout.rt.platform.logging.PrinicpalContextValueProvider;
 
 /**
  * A context typically represents a "snapshot" of the current calling state and is always associated with a
@@ -39,8 +41,8 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * state changes to be done for the time of executing some code.
  * <p>
  * Internally, the context is obtained by <code>BEANS.get(RunContext.class)</code>, meaning that the context can be
- * intercepted, or replaced. Thereto, the method {@link #interceptCallable(Callable)} can be overwritten to contribute
- * some additional behavior.
+ * intercepted, or replaced. Thereto, the method {@link #interceptInvocationChain(InvocationChain)} can be overwritten
+ * to contribute some additional behavior.
  *
  * @since 5.1
  */
@@ -108,7 +110,9 @@ public class RunContext {
    */
   public <RESULT, ERROR extends Throwable> RESULT call(final Callable<RESULT> callable, final IThrowableTranslator<? extends ERROR> throwableTranslator) throws ERROR {
     try {
-      return interceptCallable(callable).call();
+      final InvocationChain<RESULT> invocationChain = new InvocationChain<>();
+      interceptInvocationChain(invocationChain);
+      return invocationChain.invoke(callable);
     }
     catch (final Throwable t) {
       final ERROR error = throwableTranslator.translate(t);
@@ -122,44 +126,38 @@ public class RunContext {
   }
 
   /**
-   * Method invoked to construct the context. Overwrite this method to contribute some behavior to the context.
+   * Method invoked to intercept the invocation chain used to initialize this context. Overwrite this method to
+   * contribute some behavior to the context.
    * <p>
-   * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
-   * chain from 'bottom-to-top'.
-   * <p>
-   * To contribute on top of the chain (meaning that you are invoked <strong>after</strong> the contributions of super
-   * classes and therefore can base on their contributed functionality), you can use constructions of the following
-   * form:
-   * <p>
-   * <code>
-   *   Callable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
-   *   Callable head = <i>super.interceptCallable(c1)</i>; // executed 1st<br/>
-   *   return head;
-   * </code>
-   * </p>
+   * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br/>
+   * To contribute to the end of the chain (meaning that you are invoked <strong>after</strong> the contributions of
+   * super classes and therefore can base on their contributed functionality), you can use constructions of the
+   * following form:
+   *
+   * <pre>
+   * super.initInvocationChain(invocationChain);
+   * invocationChain.addLast(new YourDecorator());
+   * </pre>
+   *
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
-   * <p>
-   * <code>
-   *   Callable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
-   *   Callable head = new YourInterceptor1(c1); // executed 1st<br/>
-   *   return head;
-   * </code>
    *
-   * @param next
-   *          the callable to be run in the context.
-   * @return the head of the chain to be invoked first.
+   * <pre>
+   * super.initInvocationChain(invocationChain);
+   * invocationChain.addFirst(new YourDecorator());
+   * </pre>
+   *
+   * @param invocationChain
+   *          The chain used to construct the context.
    */
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, m_propertyMap);
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, NlsLocale.CURRENT, m_locale);
-    final Callable<RESULT> c3 = new CurrentSubjectLogCallable<>(c4);
-    final Callable<RESULT> c2 = new SubjectCallable<>(c3, m_subject);
-    final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor));
+  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
+    invocationChain
+        .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
+        .add(new SubjectProcessor<RESULT>(m_subject))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(PrinicpalContextValueProvider.class)))
+        .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
+        .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap));
 
-    return c1;
   }
 
   /**
@@ -196,37 +194,65 @@ public class RunContext {
     return this;
   }
 
+  /**
+   * @see #withSubject(Subject)
+   */
   public Subject getSubject() {
     return m_subject;
   }
 
+  /**
+   * Associates this context with the given {@link Subject}, meaning that any code running on behalf of this context is
+   * run as the given {@link Subject}.
+   */
   public RunContext withSubject(final Subject subject) {
     m_subject = subject;
     return this;
   }
 
+  /**
+   * @see #withLocale(Locale)
+   */
   public Locale getLocale() {
     return m_locale;
   }
 
+  /**
+   * Associates this context with the given {@link Locale}, meaning that any code running on behalf of this context has
+   * that {@link Locale} set in {@link NlsLocale#CURRENT} thread-local.
+   */
   public RunContext withLocale(final Locale locale) {
     m_locale = locale;
     return this;
   }
 
+  /**
+   * @see #withProperties(Map)
+   */
   public PropertyMap getPropertyMap() {
     return m_propertyMap;
   }
 
+  /**
+   * @see #withProperty(Object, Object)
+   */
   public Object getProperty(final Object key) {
     return m_propertyMap.get(key);
   }
 
+  /**
+   * Associates this context with the given 'key-value' property, meaning that any code running on behalf of this
+   * context has that property set in {@link PropertyMap#CURRENT} thread-local.
+   */
   public RunContext withProperty(final Object key, final Object value) {
     m_propertyMap.put(key, value);
     return this;
   }
 
+  /**
+   * Associates this context with the given 'key-value' properties, meaning that any code running on behalf of this
+   * context has those properties set in {@link PropertyMap#CURRENT} thread-local.
+   */
   public RunContext withProperties(final Map<?, ?> properties) {
     for (final Entry<?, ?> propertyEntry : properties.entrySet()) {
       withProperty(propertyEntry.getKey(), propertyEntry.getValue());

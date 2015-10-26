@@ -11,7 +11,8 @@
 package org.eclipse.scout.commons.chain;
 
 /**
- * Marker interface of processors participating in chain processing.
+ * Marker interface for processors participating in chain processing according to the design pattern
+ * 'chain-of-responsibility'.
  *
  * @since 5.2
  */

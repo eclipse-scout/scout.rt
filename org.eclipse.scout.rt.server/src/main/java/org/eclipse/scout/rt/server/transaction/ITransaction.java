@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.transaction;
 
+import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;

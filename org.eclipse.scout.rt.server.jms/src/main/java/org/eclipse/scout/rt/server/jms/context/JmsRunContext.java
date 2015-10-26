@@ -12,16 +12,16 @@ package org.eclipse.scout.rt.server.jms.context;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.jms.Message;
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 
 /**
  * The <code>JmsRunContext</code> facilitates propagation of the <i>JMS Java Message Service</i> state. This context is
@@ -43,11 +43,9 @@ public class JmsRunContext extends RunContext {
   protected Message m_jmsMessage;
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(next, CURRENT_JMS_MESSAGE, m_jmsMessage);
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
-
-    return c1;
+  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+    super.interceptInvocationChain(invocationChain);
+    invocationChain.add(new ThreadLocalProcessor<>(CURRENT_JMS_MESSAGE, m_jmsMessage));
   }
 
   @Override

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.context.internal;
+package org.eclipse.scout.commons.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -20,10 +20,12 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.junit.Test;
 
-public class SubjectCallableTest {
+public class SubjectProcessorTest {
 
   private Subject m_subject = new Subject();
 
@@ -31,18 +33,16 @@ public class SubjectCallableTest {
   public void test() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    Callable<String> callable = new Callable<String>() {
+    InvocationChain<String> invocationChain = new InvocationChain<>();
+    invocationChain.add(new SubjectProcessor<String>(m_subject));
+    String result = invocationChain.invoke(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
         actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
         return "result";
       }
-    };
-
-    // RUN THE TEST
-    SubjectCallable<String> testee = new SubjectCallable<String>(callable, m_subject);
-    String result = testee.call();
+    });
 
     // VERIFY
     assertEquals("result", result);
@@ -53,18 +53,16 @@ public class SubjectCallableTest {
   public void testWithoutSubject() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    Callable<String> callable = new Callable<String>() {
+    InvocationChain<String> invocationChain = new InvocationChain<>();
+    invocationChain.add(new SubjectProcessor<String>(null));
+    String result = invocationChain.invoke(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
         actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
         return "result";
       }
-    };
-
-    // RUN THE TEST
-    SubjectCallable<String> testee = new SubjectCallable<String>(callable, null);
-    String result = testee.call();
+    });
 
     // VERIFY
     assertEquals("result", result);
@@ -77,19 +75,17 @@ public class SubjectCallableTest {
 
     final Exception exception = new Exception("error");
 
-    Callable<String> callable = new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
-        throw exception;
-      }
-    };
-
-    // RUN THE TEST
-    SubjectCallable<String> testee = new SubjectCallable<String>(callable, m_subject);
+    InvocationChain<String> invocationChain = new InvocationChain<>();
+    invocationChain.add(new SubjectProcessor<String>(m_subject));
     try {
-      testee.call();
+      invocationChain.invoke(new Callable<String>() {
+
+        @Override
+        public String call() throws Exception {
+          actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+          throw exception;
+        }
+      });
       fail();
     }
     catch (Exception e) {
@@ -105,19 +101,18 @@ public class SubjectCallableTest {
 
     final RuntimeException runtimeException = new RuntimeException("error");
 
-    Callable<String> callable = new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
-        throw runtimeException;
-      }
-    };
-
     // RUN THE TEST
-    SubjectCallable<String> testee = new SubjectCallable<String>(callable, m_subject);
+    InvocationChain<String> invocationChain = new InvocationChain<>();
+    invocationChain.add(new SubjectProcessor<String>(m_subject));
     try {
-      testee.call();
+      invocationChain.invoke(new Callable<String>() {
+
+        @Override
+        public String call() throws Exception {
+          actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+          throw runtimeException;
+        }
+      });
       fail();
     }
     catch (Exception e) {

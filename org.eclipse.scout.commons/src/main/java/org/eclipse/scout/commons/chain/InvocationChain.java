@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.chain.IInvocationDecorator.IUndecorator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -40,66 +41,66 @@ public class InvocationChain<RESULT> {
   private final LinkedList<IChainable> m_chainables = new LinkedList<>();
 
   /**
-   * Registers the given decorator at the beginning of this chain to decorate the execution of a command.
+   * Adds the given decorator at the beginning of this chain to decorate the execution of a command.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> registerFirst(final IInvocationDecorator decorator) {
+  public InvocationChain<RESULT> addFirst(final IInvocationDecorator decorator) {
     m_chainables.addFirst(decorator);
     return this;
   }
 
   /**
-   * Registers the given interceptor at the beginning of this chain to wrap the execution of a command.
+   * Adds the given interceptor at the beginning of this chain to wrap the execution of a command.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> registerFirst(final IInvocationInterceptor<RESULT> interceptor) {
+  public InvocationChain<RESULT> addFirst(final IInvocationInterceptor<RESULT> interceptor) {
     m_chainables.addFirst(interceptor);
     return this;
   }
 
   /**
-   * Registers the given decorator at the end of this chain to decorate the execution of a command.
+   * Adds the given decorator at the end of this chain to decorate the execution of a command.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> registerLast(final IInvocationDecorator decorator) {
+  public InvocationChain<RESULT> addLast(final IInvocationDecorator decorator) {
     m_chainables.addLast(decorator);
     return this;
   }
 
   /**
-   * Registers the given interceptor at the end of this chain to wrap the execution of a command.
+   * Adds the given interceptor at the end of this chain to wrap the execution of a command.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> registerLast(final IInvocationInterceptor<RESULT> interceptor) {
+  public InvocationChain<RESULT> addLast(final IInvocationInterceptor<RESULT> interceptor) {
     m_chainables.add(interceptor);
     return this;
   }
 
   /**
-   * Registers the given decorator at the end of this chain to decorate the execution of a command.
+   * Adds the given decorator at the end of this chain to decorate the execution of a command.
    * <p>
-   * This method is equivalent to {@link #registerLast(IInvocationDecorator))}.
+   * This method is equivalent to {@link #addLast(IInvocationDecorator))}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> register(final IInvocationDecorator decorator) {
-    registerLast(decorator);
+  public InvocationChain<RESULT> add(final IInvocationDecorator decorator) {
+    addLast(decorator);
     return this;
   }
 
   /**
-   * Registers the given interceptor at the end of this chain to wrap the execution of a command.
+   * Adds the given interceptor at the end of this chain to wrap the execution of a command.
    * <p>
-   * This method is equivalent to {@link #registerLast(IInvocationInterceptor)}.
+   * This method is equivalent to {@link #addLast(IInvocationInterceptor)}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> register(final IInvocationInterceptor<RESULT> interceptor) {
-    registerLast(interceptor);
+  public InvocationChain<RESULT> add(final IInvocationInterceptor<RESULT> interceptor) {
+    addLast(interceptor);
     return this;
   }
 
@@ -114,7 +115,14 @@ public class InvocationChain<RESULT> {
   }
 
   /**
-   * Invokes {@link Callable#call()} and allows all registered chain elements to participate in the invocation.
+   * Returns the processors contained in this chain.
+   */
+  public List<IChainable> values() {
+    return m_chainables;
+  }
+
+  /**
+   * Invokes {@link Callable#call()} and lets all added processors to participate in the invocation.
    *
    * @param command
    *          the command to be executed.
@@ -153,7 +161,7 @@ public class InvocationChain<RESULT> {
      */
     public RESULT continueChain() throws Exception {
       // List of decorators invoked in this round.
-      final List<IInvocationDecorator> invokedDecorators = new ArrayList<>();
+      final List<IUndecorator> undecorators = new ArrayList<>();
 
       try {
         while (m_iterator.hasNext()) {
@@ -162,8 +170,10 @@ public class InvocationChain<RESULT> {
           // Let the decorator to perform some 'before-execution' actions.
           if (next instanceof IInvocationDecorator) {
             final IInvocationDecorator decorator = (IInvocationDecorator) next;
-            invokeOnBeforeSafe(decorator);
-            invokedDecorators.add(decorator);
+            final IUndecorator undecorator = decorateSafe(decorator);
+            if (undecorator != null) {
+              undecorators.add(undecorator);
+            }
           }
 
           // Let the interceptor to continue the chain.
@@ -179,27 +189,28 @@ public class InvocationChain<RESULT> {
       }
       finally {
         // Let the decorators to perform some 'after-execution' actions in reverse order.
-        for (int i = invokedDecorators.size() - 1; i >= 0; i--) {
-          invokeOnAfterSafe(invokedDecorators.get(i));
+        for (int i = undecorators.size() - 1; i >= 0; i--) {
+          undecorateSafe(undecorators.get(i));
         }
       }
     }
 
-    private void invokeOnBeforeSafe(final IInvocationDecorator decorator) {
+    private IUndecorator decorateSafe(final IInvocationDecorator decorator) {
       try {
-        decorator.onBefore();
+        return decorator.decorate();
       }
       catch (final RuntimeException e) {
-        LOG.error(String.format("Unexpected error during the 'before-decoration' of a command's execution. [decorator=%s, command=%s]", decorator.getClass().getSimpleName(), m_command), e);
+        LOG.error(String.format("Unexpected error during the decoration of a command's execution. [decorator=%s, command=%s]", decorator.getClass().getSimpleName(), m_command), e);
+        return null;
       }
     }
 
-    private void invokeOnAfterSafe(final IInvocationDecorator decorator) {
+    private void undecorateSafe(final IUndecorator undecorator) {
       try {
-        decorator.onAfter();
+        undecorator.undecorate();
       }
       catch (final RuntimeException e) {
-        LOG.error(String.format("Unexpected error during the 'after-decoration' of a command's execution. [decorator=%s, command=%s]", decorator.getClass().getSimpleName(), m_command), e);
+        LOG.error(String.format("Unexpected error during the undecoration of a command's execution. [undecorator=%s, command=%s]", undecorator.getClass().getSimpleName(), m_command), e);
       }
     }
   }

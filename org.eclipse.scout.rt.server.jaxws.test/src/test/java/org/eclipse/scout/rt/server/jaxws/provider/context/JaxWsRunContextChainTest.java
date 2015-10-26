@@ -10,194 +10,92 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.context;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.Callable;
+import java.util.Iterator;
 
-import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.commons.ThreadLocalProcessor;
+import org.eclipse.scout.commons.chain.IChainable;
+import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
 public class JaxWsRunContextChainTest {
-
-  @Mock
-  private Callable<Void> m_targetCallable;
-
-  @Before
-  public void before() {
-    MockitoAnnotations.initMocks(this);
-  }
 
   /**
    * Tests the correct order of interceptors in {@link JaxWsRunContext}.
    */
   @Test
   public void testCallableChain() throws Exception {
-    Callable<Void> actualCallable = new JaxWsRunContext().interceptCallable(m_targetCallable);
+    InvocationChain<Object> chain = new InvocationChain<Object>();
+    new JaxWsRunContext().interceptInvocationChain(chain);
 
-    // 1. Callable Chain
-    IChainable<?> last = assertCallableChain((IChainable<?>) actualCallable);
+    Iterator<IChainable> chainIterator = chain.values().iterator();
 
-    // 2. Target
-    assertSame(m_targetCallable, last.getNext());
-  }
+    // 1. ThreadLocalProcessor for RunMonitor.CURRENT
+    IChainable c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(RunMonitor.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-  /**
-   * Tests that new contributions can be installed after the default contributions.
-   */
-  @Test
-  public void testCallableChainWithContributionsAfter() throws Exception {
-    JaxWsRunContext jaxWsRunContext = new JaxWsRunContext() {
+    // 2. SubjectProcessor
+    c = (IChainable) chainIterator.next();
+    assertEquals(SubjectProcessor.class, c.getClass());
 
-      @Override
-      protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
-        Callable<RESULT> p2 = new Contribution2<>(next); // executed 3th
-        Callable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
-        Callable<RESULT> head = super.interceptCallable(p1); // executed 1st
-        return head;
-      }
-    };
+    // 3. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("subject.principal.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    Callable<Void> actualCallable = jaxWsRunContext.interceptCallable(m_targetCallable);
+    // 4. ThreadLocalProcessor for NlsLocale.CURRENT
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(NlsLocale.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 1. Callable Chain
-    IChainable<?> last = assertCallableChain((IChainable<?>) actualCallable);
+    // 5. ThreadLocalProcessor for PropertyMap.CURRENT
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 2. Contribution1
-    Contribution1 contribution1 = getNextAndAssert(last, Contribution1.class);
+    // 6. ThreadLocalProcessor for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 3. Contribution2
-    Contribution2 contribution2 = getNextAndAssert(contribution1, Contribution2.class);
+    // 7. ThreadLocalProcessor for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 4. Target
-    assertSame(m_targetCallable, contribution2.getNext());
-  }
+    // 8. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("http.session.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-  /**
-   * Tests that new contributions can be installed before the default contributions.
-   */
-  @Test
-  public void testCallableChainWithContributionsBefore() throws Exception {
-    JaxWsRunContext jaxWsRunContext = new JaxWsRunContext() {
+    // 9. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("http.request.uri", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-      @Override
-      protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
-        Callable<RESULT> p2 = super.interceptCallable(next); // executed 3th
-        Callable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
-        Callable<RESULT> head = new Contribution1<>(p1); // executed 1st
-        return head;
-      }
-    };
+    // 10. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("http.request.method", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    @SuppressWarnings("unchecked")
-    IChainable<Void> actualCallable = (IChainable<Void>) jaxWsRunContext.interceptCallable(m_targetCallable);
+    // 11. ThreadLocalProcessor for JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 1. Contribution1
-    assertTrue(Contribution1.class.equals(actualCallable.getClass()));
-
-    // 2. Contribution2
-    Contribution2 contribution2 = getNextAndAssert(actualCallable, Contribution2.class);
-
-    // 3. Callable Chain
-    IChainable<?> last = assertCallableChain((IChainable<?>) contribution2.getNext());
-
-    // 4. Target
-    assertSame(m_targetCallable, last.getNext());
-  }
-
-  private IChainable<?> assertCallableChain(IChainable<?> c1) throws Exception {
-    // 1. InitThreadLocalCallable for RunMonitor.CURRENT
-    assertTrue(InitThreadLocalCallable.class.equals(c1.getClass()));
-    assertSame(RunMonitor.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
-
-    // 2. SubjectCallable
-    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
-
-    // 3. SubjectLogCallable
-    CurrentSubjectLogCallable c3 = getNextAndAssert(c2, CurrentSubjectLogCallable.class);
-
-    // 4. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
-
-    // 5. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
-
-    // 6. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c7).getThreadLocal());
-
-    // 8. CurrentHttpServletRequestLogCallable
-    CurrentHttpServletRequestLogCallable c8 = getNextAndAssert(c7, CurrentHttpServletRequestLogCallable.class);
-
-    // 9. CurrentHttpServletRequestLogCallable
-    InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
-    assertSame(JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, ((InitThreadLocalCallable) c9).getThreadLocal());
-
-    return c9;
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getNextAndAssert(IChainable<?> c, Class<TYPE> expectedType) {
-    Callable<?> next = (Callable<?>) c.getNext();
-    assertTrue(expectedType.equals(next.getClass()));
-    return (TYPE) next;
-  }
-
-  private static class Contribution1<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
-
-    private final Callable<RESULT> m_next;
-
-    public Contribution1(Callable<RESULT> next) {
-      m_next = next;
-    }
-
-    @Override
-    public RESULT call() throws Exception {
-      return m_next.call();
-    }
-
-    @Override
-    public Callable<RESULT> getNext() {
-      return m_next;
-    }
-  }
-
-  private static class Contribution2<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
-
-    private final Callable<RESULT> m_next;
-
-    public Contribution2(Callable<RESULT> next) {
-      m_next = next;
-    }
-
-    @Override
-    public RESULT call() throws Exception {
-      return m_next.call();
-    }
-
-    @Override
-    public Callable<RESULT> getNext() {
-      return m_next;
-    }
+    assertFalse(chainIterator.hasNext());
   }
 }

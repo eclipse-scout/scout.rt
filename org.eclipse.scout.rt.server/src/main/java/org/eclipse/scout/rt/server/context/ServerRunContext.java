@@ -12,21 +12,21 @@ package org.eclipse.scout.rt.server.context;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.BooleanUtility;
+import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
-import org.eclipse.scout.rt.server.context.internal.CurrentSessionLogCallable;
-import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -67,18 +68,18 @@ public class ServerRunContext extends RunContext {
   protected boolean m_offline;
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, getTransaction(), m_transactionScope);
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, TransactionalClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ClientNotificationNodeId.CURRENT, m_notificationNodeId);
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, m_userAgent);
-    final Callable<RESULT> c4 = new CurrentSessionLogCallable<>(c5);
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, m_session);
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, m_offline);
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+    super.interceptInvocationChain(invocationChain);
 
-    return c1;
+    invocationChain
+        .add(new ThreadLocalProcessor<>(OfflineState.CURRENT, m_offline))
+        .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
+        .add(new ThreadLocalProcessor<>(ClientNotificationNodeId.CURRENT, m_notificationNodeId))
+        .add(new ThreadLocalProcessor<>(TransactionalClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
+        .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
+        .add(new TransactionProcessor<RESULT>(getTransaction(), m_transactionScope));
   }
 
   @Override
@@ -111,40 +112,57 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
+  /**
+   * @see #withSession(IServerSession)
+   */
   public IServerSession getSession() {
     return m_session;
   }
 
   /**
-   * Sets the session.
+   * Associates this context with the given {@link IServerSession}, meaning that any code running on behalf of this
+   * context has that {@link ISession} set in {@link ISession#CURRENT} thread-local.
    */
   public ServerRunContext withSession(final IServerSession session) {
     m_session = session;
     return this;
   }
 
+  /**
+   * @see #withUserAgent(UserAgent)
+   */
   public UserAgent getUserAgent() {
     return m_userAgent;
   }
 
+  /**
+   * Associates this context with the given {@link UserAgent}, meaning that any code running on behalf of this context
+   * has that {@link UserAgent} set in {@link UserAgent#CURRENT} thread-local.
+   */
   public ServerRunContext withUserAgent(final UserAgent userAgent) {
     m_userAgent = userAgent;
     return this;
   }
 
   /**
-   * The <code>id</code> of the 'client notification node' which triggered the ongoing service request.
+   * @see #withNotificationNodeId(String)
    */
   public String getNotificationNodeId() {
     return m_notificationNodeId;
   }
 
   /**
-   * Sets the <code>id</code> of the 'client notification node' which triggered the ongoing service request. If
-   * transactional notifications are issued by the current or any nested transaction, those will not be published to
-   * that client node, but included in the request's response instead (piggyback).
+   * Associates this context with the given 'notification ID', meaning that any code running on behalf of this context
+   * has that id set in {@link ClientNotificationNodeId#CURRENT} thread-local.
    * <p>
-   * A transactional notification is only sent to clients once the transaction is committed successfully.
+   * Every client node (that is every UI server node) has its unique 'node ID' which is included with every
+   * 'client-server' request, and is mainly used to publish client notifications. If transactional client notifications
+   * are issued by code running on behalf of this context, those will not be published to that client node, but included
+   * in the request's response instead (piggyback).
+   * <p>
+   * However, transactional notifications are only sent to clients upon successful commit of the transaction.
+   * <p>
+   * Typically, this node ID is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
   public ServerRunContext withNotificationNodeId(final String notificationNodeId) {
     m_notificationNodeId = notificationNodeId;
@@ -152,24 +170,32 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * The collector for transactional client notifications issued by the current or any nested transaction, and are to be
-   * included in the request's response upon successful commit (piggyback).
+   * @see #withTransactionalClientNotificationCollector(TransactionalClientNotificationCollector)
    */
   public TransactionalClientNotificationCollector getTransactionalClientNotificationCollector() {
     return m_transactionalClientNotificationCollector;
   }
 
   /**
-   * Sets the collector for all transactional notifications which are issued by the current or any nested transaction,
-   * and are to be included in the request's response upon successful commit (piggyback).
+   * Associates this context with the given {@link TransactionalClientNotificationCollector}, meaning that any code
+   * running on behalf of this context has that collector set in
+   * {@link TransactionalClientNotificationCollector#CURRENT} thread-local.
    * <p>
-   * A transactional notification is only sent to clients once the transaction is committed successfully.
+   * That collector is used to collect all transactional client notifications, which are to be published upon successful
+   * commit of the associated transaction, and which are addressed to the client node which triggered processing (see
+   * {@link #withNotificationNodeId(String)}). That way, transactional client notifications are not published
+   * immediately upon successful commit, but included in the client's response instead (piggyback).
+   * <p>
+   * Typically, that collector is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
   public ServerRunContext withTransactionalClientNotificationCollector(final TransactionalClientNotificationCollector collector) {
     m_transactionalClientNotificationCollector = collector;
     return this;
   }
 
+  /**
+   * @see #withTransactionScope(TransactionScope)
+   */
   public TransactionScope getTransactionScope() {
     return m_transactionScope;
   }
@@ -189,12 +215,15 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
+  /**
+   * @see #withTransaction(ITransaction)
+   */
   public ITransaction getTransaction() {
     return m_transaction;
   }
 
   /**
-   * Sets the transaction to be used. Has only an effect, if transaction scope is set to
+   * Sets the transaction to be used to run the runnable. Has only an effect, if transaction scope is set to
    * {@link TransactionScope#REQUIRED} or {@link TransactionScope#MANDATORY}. Normally, this property should not be set
    * manually.
    */

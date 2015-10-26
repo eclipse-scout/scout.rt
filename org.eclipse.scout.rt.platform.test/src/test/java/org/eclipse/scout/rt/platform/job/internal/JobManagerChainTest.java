@@ -8,61 +8,62 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.context;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 
 import java.util.Iterator;
 
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.chain.IChainable;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.security.SubjectProcessor;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
+import org.eclipse.scout.rt.platform.context.RunContextRunner;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class RunContextChainTest {
+public class JobManagerChainTest {
 
-  /**
-   * Tests the correct order of interceptors in {@link RunContext}.
-   */
   @Test
   public void testCallableChain() throws Exception {
     InvocationChain<Object> chain = new InvocationChain<Object>();
-    new RunContext().interceptInvocationChain(chain);
+
+    new JobManager().interceptInvocationChain(chain, mock(JobFutureTask.class), mock(RunMonitor.class), mock(JobInput.class));
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 
-    // 1. ThreadLocalProcessor for RunMonitor.CURRENT
+    // 1. ThreadLocalProcessor for IFuture.CURRENT
     IChainable c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(IFuture.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+
+    // 2. ThreadLocalProcessor for RunMonitor.CURRENT
+    c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(RunMonitor.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 2. SubjectProcessor
+    // 3. LogOnErrorProcessor
     c = (IChainable) chainIterator.next();
-    assertEquals(SubjectProcessor.class, c.getClass());
+    assertEquals(LogOnErrorProcessor.class, c.getClass());
 
-    // 3. DiagnosticContextValueProcessor
-    c = chainIterator.next();
-    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
-    assertEquals("subject.principal.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
+    // 4. ThreadNameDecorator
+    c = (IChainable) chainIterator.next();
+    assertEquals(ThreadNameDecorator.class, c.getClass());
 
-    // 4. ThreadLocalProcessor for NlsLocale.CURRENT
-    c = chainIterator.next();
-    assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(NlsLocale.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+    // 5. RunContextRunner
+    c = (IChainable) chainIterator.next();
+    assertEquals(RunContextRunner.class, c.getClass());
 
-    // 5. ThreadLocalProcessor for PropertyMap.CURRENT
-    c = chainIterator.next();
-    assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+    // 5. FireAboutToRunProcessor
+    c = (IChainable) chainIterator.next();
+    assertEquals(FireJobLifecycleEventProcessor.class, c.getClass());
 
     assertFalse(chainIterator.hasNext());
   }
