@@ -58,6 +58,11 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   }
 
   @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
+  }
+
+  @Override
   protected void initConfig() {
     m_outline = new SimpleOutline();
     super.initConfig();
@@ -184,6 +189,22 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     protected double getConfiguredGridWeightY() {
       return 0.001;
     }
+
+    @Override
+    protected boolean execCalculateVisible() {
+      return getInnerForm() != null;
+    }
+
+    @Override
+    protected void initConfig() {
+      super.initConfig();
+      addPropertyChangeListener(PROP_INNER_FORM, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          calculateVisibleInternal();
+        }
+      });
+    }
   }
 
   @Order(20)
@@ -208,15 +229,31 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     protected double getConfiguredGridWeightY() {
       return 1;
     }
+
+    @Override
+    protected boolean getConfiguredStatusVisible() {
+      return false;
+    }
+
+    @Override
+    protected boolean execCalculateVisible() {
+      return getTable() != null;
+    }
+
+    @Override
+    protected void initConfig() {
+      super.initConfig();
+      addPropertyChangeListener(PROP_TABLE, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          calculateVisibleInternal();
+        }
+      });
+    }
   }
 
   @Order(30)
   public class DetailFormField extends AbstractWrappedFormField<IForm> {
-
-    @Override
-    protected boolean getConfiguredVisible() {
-      return true;
-    }
 
     @Override
     protected int getConfiguredGridW() {
@@ -226,6 +263,17 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     @Override
     protected boolean execCalculateVisible() {
       return getInnerForm() != null;
+    }
+
+    @Override
+    protected void initConfig() {
+      super.initConfig();
+      addPropertyChangeListener(PROP_INNER_FORM, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          calculateVisibleInternal();
+        }
+      });
     }
   }
 
