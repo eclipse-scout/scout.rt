@@ -54,7 +54,15 @@ public interface IPlatform {
     /**
      * platform is now stopped and all resources and caches are released and disposed
      */
-    PlatformStopped
+    PlatformStopped,
+
+    /**
+     * This event signals that the start of the platform failed and that the platform now is invalid.
+     * <p>
+     * If the platform is in this state, calls to {@link IPlatform#getBeanManager()} will result in an
+     * {@link IllegalStateException}.
+     */
+    PlatformInvalid
   }
 
   /**
@@ -63,7 +71,11 @@ public interface IPlatform {
   State getState();
 
   /**
+   * Returns the bean manager of the platform.
+   *
    * @return The {@link IBeanManager} of the platform.
+   * @throws PlatformException
+   *           if the platform is in the {@link State#PlatformInvalid} state
    */
   IBeanManager getBeanManager();
 

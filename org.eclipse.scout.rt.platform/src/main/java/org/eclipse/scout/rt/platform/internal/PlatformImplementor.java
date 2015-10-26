@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +63,9 @@ public class PlatformImplementor implements IPlatform {
     // use lock to ensure the caller waits until the platform has been started completely
     m_platformLock.readLock().lock();
     try {
+      if (getState() == State.PlatformInvalid) {
+        throw new PlatformException("The platform is in an invalid state.");
+      }
       return m_beanContext;
     }
     finally {
@@ -81,28 +85,34 @@ public class PlatformImplementor implements IPlatform {
       if (stateLatch != null) {
         stateLatch.release();
       }
-
       if (m_state.get() != State.PlatformStopped) {
         throw new PlatformException("Platform is not stopped [m_state=" + m_state.get() + "]");
       }
 
-      m_beanContext = createBeanManager();
-      //now all IPlatformListener are registered and can receive platform events
-      changeState(State.BeanManagerPrepared, true);
+      try {
+        m_beanContext = createBeanManager();
+        //now all IPlatformListener are registered and can receive platform events
+        changeState(State.BeanManagerPrepared, true);
 
-      //validateBeanManager();
-      validateConfiguration();
-      initBeanScopeEvaluator();
-      initBeanDecorationFactory();
+        //validateBeanManager();
+        validateConfiguration();
+        initBeanScopeEvaluator();
+        initBeanDecorationFactory();
 
-      changeState(State.BeanManagerValid, true);
+        changeState(State.BeanManagerValid, true);
+        startCreateImmediatelyBeans();
+      }
+      catch (Throwable t) {
+        LOG.error("Error during while starting platform", t);
+        changeState(State.PlatformInvalid, true);
+        throw t;
+      }
     }
     finally {
       //since we are using a reentrant lock, platform beans can be accessed within platform listeners
       //lock has to be released after the State.BeanManagerValid change to make sure everything is initialized correctly, before beans can be accessed.
       m_platformLock.writeLock().unlock();
     }
-    startCreateImmediatelyBeans();
     changeState(State.PlatformStarted, true);
   }
 
@@ -229,30 +239,41 @@ public class PlatformImplementor implements IPlatform {
       return;
     }
 
-    State expectedCurrentState = getPreviousState(newState);
-    if (expectedCurrentState == null) {
+    EnumSet<State> possibleExpectedCurrentStates = getPreviousStates(newState);
+    if (possibleExpectedCurrentStates == null || possibleExpectedCurrentStates.size() == 0) {
       throw new IllegalStateException("Unknown state transition: '" + newState + "' has no preceeding state defined.");
     }
-    if (!m_state.compareAndSet(expectedCurrentState, newState) && throwOnIllegalStateChange) {
-      throw new PlatformException("Invalid state change. Current state (" + m_state.get() + ") cannot be changed to " + newState + ". A state change to " + newState + " is only allowed in state " + expectedCurrentState);
+
+    boolean changed = false;
+    for (State expectedCurrentState : possibleExpectedCurrentStates) {
+      changed = m_state.compareAndSet(expectedCurrentState, newState);
+      if (changed) {
+        break;
+      }
+    }
+    if (!changed && throwOnIllegalStateChange) {
+      throw new PlatformException(
+          "Invalid state change. Current state (" + m_state.get() + ") cannot be changed to " + newState + ". A state change to " + newState + " is only allowed in these states " + possibleExpectedCurrentStates);
     }
     fireStateEvent(newState);
   }
 
-  protected static State getPreviousState(State reference) {
+  protected static EnumSet<State> getPreviousStates(State reference) {
     switch (reference) {
       case BeanManagerPrepared:
-        return State.PlatformStopped;
+        return EnumSet.of(State.PlatformStopped);
       case BeanManagerValid:
-        return State.BeanManagerPrepared;
+        return EnumSet.of(State.BeanManagerPrepared);
       case PlatformStarted:
-        return State.BeanManagerValid;
+        return EnumSet.of(State.BeanManagerValid);
       case PlatformStopping:
-        return State.PlatformStarted;
+        return EnumSet.of(State.PlatformStarted);
       case PlatformStopped:
-        return State.PlatformStopping;
+        return EnumSet.of(State.PlatformStopping);
+      case PlatformInvalid:
+        return EnumSet.of(State.BeanManagerPrepared, State.BeanManagerValid, State.PlatformStopped);
     }
-    return null;
+    return EnumSet.noneOf(State.class);
   }
 
   protected void fireStateEvent(State newState) {
