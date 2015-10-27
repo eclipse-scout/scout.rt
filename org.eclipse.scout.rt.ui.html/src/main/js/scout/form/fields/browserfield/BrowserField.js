@@ -22,7 +22,7 @@ scout.BrowserField.prototype._renderProperties = function() {
   scout.BrowserField.parent.prototype._renderProperties.call(this);
   this._renderLocation();
   this._renderScrollBarsEnabled();
-  this._renderSandbox();
+  this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
 };
 
 scout.BrowserField.prototype._renderLocation = function() {
@@ -42,15 +42,21 @@ scout.BrowserField.prototype._renderScrollBarsEnabled = function() {
   }
 };
 
-scout.BrowserField.prototype._renderSandbox = function() {
+scout.BrowserField.prototype._renderSandboxEnabled = function() {
+  if (this.sandboxEnabled) {
+    this._renderSandboxPermissions();
+  } else {
+    this.$field.removeAttr('sandbox');
+    this.$field.removeAttr('security');
+  }
+};
+
+scout.BrowserField.prototype._renderSandboxPermissions = function() {
   if (this.sandboxEnabled) {
     this.$field.attr('sandbox', scout.helpers.nvl(this.sandboxPermissions, ''));
     if (scout.device.supportsIframeSecurityAttribute()) {
       this.$field.attr('security', 'restricted');
     }
-  } else {
-    this.$field.removeAttr('sandbox');
-    this.$field.removeAttr('security');
   }
 };
 
