@@ -352,7 +352,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
-      final ClientRunContext ctx = ClientRunContexts.empty().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
+      final ClientRunContext ctx = ClientRunContexts.copyCurrent().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
       return BEANS.get(ClientSessionProvider.class).provide(ctx);
     }
     catch (ProcessingException e) {
