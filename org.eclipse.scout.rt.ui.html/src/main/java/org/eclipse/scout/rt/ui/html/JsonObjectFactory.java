@@ -70,7 +70,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
-import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
@@ -78,7 +77,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
-import org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield.ITagCloudField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
@@ -131,7 +129,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.placeholder.JsonPlaceholder
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
-import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonProposalChooser;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
@@ -140,7 +137,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.tagcloudfield.JsonTagCloudField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressField;
@@ -221,12 +217,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IButton) {
       return new JsonButton<IButton>((IButton) model, session, id, parent);
-    }
-    if (model instanceof IRichTextField) {
-      return new JsonRichTextField<IRichTextField>((IRichTextField) model, session, id, parent);
-    }
-    if (model instanceof ITagCloudField) {
-      return new JsonTagCloudField<ITagCloudField>((ITagCloudField) model, session, id, parent);
     }
     if (model instanceof IStringField) {
       return new JsonStringField<IStringField>((IStringField) model, session, id, parent);

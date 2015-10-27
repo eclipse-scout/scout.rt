@@ -202,16 +202,6 @@ scout.defaultObjectFactories = [{
     return new scout.NumberField();
   }
 }, {
-  objectType: 'RichTextField',
-  create: function() {
-    return new scout.RichTextField();
-  }
-}, {
-  objectType: 'TagCloudField',
-  create: function() {
-    return new scout.TagCloudField();
-  }
-}, {
   objectType: 'StringField',
   create: function() {
     return new scout.StringField();
