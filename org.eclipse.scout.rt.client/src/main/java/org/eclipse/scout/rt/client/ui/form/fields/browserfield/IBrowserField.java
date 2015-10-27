@@ -42,7 +42,7 @@ public interface IBrowserField extends IFormField {
       return EnumSet.noneOf(SandboxPermission.class);
     }
 
-    public static Set<SandboxPermission> all() {
+    public static EnumSet<SandboxPermission> all() {
       return EnumSet.allOf(SandboxPermission.class);
     }
 
