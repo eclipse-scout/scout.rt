@@ -394,9 +394,11 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
 };
 
 scout.Desktop.prototype._attachOutlineContent = function() {
-  if (this._outlineContent) {
+  // Only re-attach content if it was not destroyed in the mean time. Otherweise, re-render it.
+  if (this._outlineContent && this._outlineContent.rendered && !this._outlineContent.destroyed) {
     this._outlineContent.attach();
-
+  } else {
+    this.outline.handleOutlineContent();
   }
 };
 
@@ -409,7 +411,7 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 /* communication with outline */
 
 scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
-  bringToFront = scout.helpers.nvl(bringToFront,true);
+  bringToFront = scout.helpers.nvl(bringToFront, true);
   if (this._outlineContent && this._outlineContent !== content) {
     this._outlineContent.remove();
     this._outlineContent = null;
@@ -437,8 +439,7 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
 
     content.htmlComp.validateLayout();
     content.htmlComp.validateRoot = true;
-  }
-  else if(!content.attached){
+  } else if (!content.attached) {
     content.attach();
   }
 
