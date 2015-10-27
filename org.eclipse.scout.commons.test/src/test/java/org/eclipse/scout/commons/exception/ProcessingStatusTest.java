@@ -13,6 +13,8 @@ package org.eclipse.scout.commons.exception;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -22,6 +24,8 @@ import org.junit.Test;
  * Tests for {@link ProcessingStatus}
  */
 public class ProcessingStatusTest {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ProcessingStatusTest.class);
 
   private IProcessingStatus m_infoStatus;
   private IProcessingStatus m_warningStatus;
@@ -96,7 +100,6 @@ public class ProcessingStatusTest {
   }
 
   @Test
-  @Ignore // FIXME [dwi|abr]
   public void testToStringWithProcessingExceptionStatus() {
     final int code = 22;
     final String exceptionMessage = "ex";
@@ -106,8 +109,37 @@ public class ProcessingStatusTest {
     final String psString = ps.toString();
     assertContainsStatusStrings(code, psString);
     assertContainsExceptionStrings(exceptionMessage, psString);
-    assertTrue(psString.contains(innerStatusMessage));
-    assertTrue(psString.contains("OK"));
+    assertFalse(psString.contains(innerStatusMessage));
+    assertTrue(psString.contains("INFO"));
+  }
+
+  @Test
+  @Ignore("This test is used only for verifying how exceptions are formatted using toString(), printStackTrace() and a logger instance.")
+  public void testExceptionFormatting() {
+    printException("NullPointer", new NullPointerException("npe message text"));
+    ProcessingException pe = new ProcessingException(new ProcessingStatus("pe message text", IStatus.OK));
+    printException("simple ProcessingException", pe);
+    ProcessingException wrappingPe = new ProcessingException("wrapping PE Title", "wrapping Processing Exception message", pe);
+    printException("wrapped ProcessingException", wrappingPe);
+    wrappingPe.addContextMessage("a=1234");
+    wrappingPe.addContextMessage("b=foo");
+    pe.addContextMessage("foo=bar");
+    pe.addContextMessage("interrupted");
+    printException("wrapped ProcessingException with status", wrappingPe);
+  }
+
+  private void printException(String msg, Throwable t) {
+    System.err.println("\n\n\n==============");
+    System.err.println("formatting " + msg);
+    System.err.println("==============");
+    System.err.println("Sys.err.println(t)");
+    System.err.println(t);
+    System.err.println("-------");
+    System.err.println("t.printStackTrace()");
+    t.printStackTrace();
+    System.err.println("-------");
+    System.err.println("LOG.error(\"logger message\", t)");
+    LOG.error("logger message", t);
   }
 
   private void assertContainsStatusStrings(final int code, final String psString) {
@@ -138,5 +170,4 @@ public class ProcessingStatusTest {
       }
     }
   }
-
 }

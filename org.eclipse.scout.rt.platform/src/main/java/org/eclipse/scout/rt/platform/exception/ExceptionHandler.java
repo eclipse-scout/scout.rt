@@ -83,7 +83,12 @@ public class ExceptionHandler {
     final IProcessingStatus status = e.getStatus();
 
     if (e instanceof VetoException) {
-      LOG.info("{}:{}", e.getClass().getSimpleName(), status);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("", e);
+      }
+      else {
+        LOG.info("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+      }
     }
     else {
       switch (status.getSeverity()) {

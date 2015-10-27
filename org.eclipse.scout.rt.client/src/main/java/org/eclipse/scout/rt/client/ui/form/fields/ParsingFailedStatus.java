@@ -29,7 +29,7 @@ public final class ParsingFailedStatus extends ScoutFieldStatus {
   }
 
   public ParsingFailedStatus(ProcessingException exception, String parseInputString) {
-    this(exception.getMessage(), parseInputString);
+    this(exception.getStatus().getMessage(), parseInputString);
   }
 
   public String getParseInputString() {

@@ -140,7 +140,7 @@ public class FormStoredWithVetoTest {
     catch (Throwable e) {
       assertTrue("VetoException expected [actual=" + e.getClass() + "]", e instanceof VetoException);
       assertFalse("exception.isConsumed()", ((VetoException) e).isConsumed());
-      assertEquals("exception.getMessage()", FormToStore.VETO_EXCEPTION_TEXT, e.getMessage());
+      assertEquals("exception.getMessage()", FormToStore.VETO_EXCEPTION_TEXT, ((VetoException) e).getStatus().getBody());
     }
   }
 }

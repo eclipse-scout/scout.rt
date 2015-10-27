@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.StringUtility;
 
 /**
  * Core exception in Scout.
@@ -141,19 +141,24 @@ public class ProcessingException extends RuntimeException implements Serializabl
   }
 
   @Override
-  public String toString() {
-    ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("message", getLocalizedMessage(), false);
-    if (m_status != null && (m_status.getException() == this || m_status.getException() == getCause())) { // to omit recursion
-      builder.attr("severity", m_status.getSeverityName());
-      builder.attr("code", m_status.getCode());
-      builder.attr("context", m_status.getContextMessages(), false);
+  public String getMessage() {
+    // custom getMessage method to get the same results from pe.toString(), pe.printStackTrace() and using a logger
+    String msg = super.getMessage();
+    if (m_status != null) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(StringUtility.hasText(msg) ? msg : "<empty>");
+      sb.append(" [severity=").append(m_status.getSeverityName());
+      if (m_status.getCode() != 0) {
+        sb.append(", code=").append(m_status.getCode());
+      }
+      String ctx = StringUtility.join(", ", m_status.getContextMessages());
+      if (StringUtility.hasText(ctx)) {
+        sb.append(", context={").append(ctx).append("}");
+      }
+      sb.append("]");
+      return sb.toString();
     }
-    else {
-      builder.attr("status", m_status, false);
-    }
-    builder.attr("consumed", isConsumed());
-    return builder.toString();
+    return msg;
   }
 
   /**

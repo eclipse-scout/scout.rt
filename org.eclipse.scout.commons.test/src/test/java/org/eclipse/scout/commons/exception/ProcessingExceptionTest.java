@@ -43,7 +43,7 @@ public class ProcessingExceptionTest {
     final int errorCode = -1;
 
     ProcessingException pe = new ProcessingException(m_body, testThrowable, errorCode, severity);
-    assertEquals(m_body, pe.getMessage());
+    assertEquals(m_body + " [severity=FATAL, code=-1]", pe.getMessage());
     assertEquals(testThrowable, pe.getCause());
 
     IStatus errorStatus = pe.getStatus();
@@ -59,14 +59,14 @@ public class ProcessingExceptionTest {
     assertEquals(IStatus.ERROR, s.getSeverity());
     assertEquals(m_body, s.getBody());
     assertEquals(m_title, s.getTitle());
-    assertEquals(String.format("%s\n%s", m_title, m_body), s.getMessage());
+    assertEquals(String.format("%s: %s", m_title, m_body), s.getMessage());
   }
 
   @Test
   public void testStatusEmptyTitle() {
     ProcessingException p2 = new ProcessingException(m_body);
     assertEquals(IStatus.ERROR, p2.getStatus().getSeverity());
-    assertEquals(m_body, p2.getMessage());
+    assertEquals(m_body + " [severity=ERROR]", p2.getMessage());
     assertEquals(m_body, p2.getStatus().getMessage());
     assertEquals(m_body, p2.getStatus().getBody());
     assertNull(p2.getStatus().getTitle());
@@ -91,8 +91,7 @@ public class ProcessingExceptionTest {
     assertFalse(exText.contains(m_title));
     assertTrue(exText.contains(m_body));
     assertFalse(exText.contains("VetoException"));
-    assertTrue(exText.contains("consumed"));
-    assertTrue(exText.contains("[context2,context1]"));
+    assertTrue(exText.contains("{context2, context1}"));
   }
 
   @Test
@@ -164,6 +163,6 @@ public class ProcessingExceptionTest {
   private void assertContainsExceptionAttributes(String exText) {
     assertTrue(exText.contains(m_body));
     assertTrue(exText.contains("ERROR"));
-    assertTrue(exText.contains("0"));
+    assertFalse(exText.contains("0"));
   }
 }

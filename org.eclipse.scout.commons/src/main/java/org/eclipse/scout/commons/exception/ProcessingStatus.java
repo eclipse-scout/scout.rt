@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
@@ -167,17 +168,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    */
   @Override
   public String getMessage() {
-    StringBuilder buf = new StringBuilder();
-    if (getTitle() != null) {
-      buf.append(getTitle());
-    }
-    if (getBody() != null) {
-      if (buf.length() > 0) {
-        buf.append("\n");
-      }
-      buf.append(getBody());
-    }
-    return buf.toString();
+    return StringUtility.join(": ", getTitle(), getBody());
   }
 
   @Override
@@ -266,11 +257,11 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
   @Override
   public String toString() {
     ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("title", getTitle(), false);
+    builder.attr("body", getBody(), false);
     builder.attr("severity", getSeverityName());
     builder.attr("code", getCode());
     builder.attr("context", getContextMessages(), false);
-    builder.attr("title", getTitle(), false);
-    builder.attr("body", getBody(), false);
     builder.attr("exception", m_exception, false);
     return builder.toString();
   }

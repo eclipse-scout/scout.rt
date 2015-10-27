@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -49,7 +49,7 @@ public class PlaceholderException extends Exception {
    * {@link PlaceholderException}</li>
    * <li>All other exceptions are transformed to {@link PlaceholderException}</li>
    * </ul>
-   * 
+   *
    * @param t
    * @return
    */
@@ -101,7 +101,7 @@ public class PlaceholderException extends Exception {
   /**
    * Creates a new instance of the given throwable using the given cause. The {@link IProcessingStatus} of the given
    * throwable is preserved if the given throwable is a {@link ProcessingException}.
-   * 
+   *
    * @param throwable
    * @param cause
    * @param processingStatus
@@ -124,12 +124,20 @@ public class PlaceholderException extends Exception {
       }
     }
 
+    final String message;
+    if (processingStatus != null && processingStatus.getMessage() != null) {
+      message = processingStatus.getMessage();
+    }
+    else {
+      message = throwable.getMessage();
+    }
+
     // 1. String, Throwable constructor
     if (transformedThrowable == null) {
       try {
         Constructor<? extends Throwable> ctor = clazz.getConstructor(String.class, Throwable.class);
         if (ctor != null) {
-          transformedThrowable = ctor.newInstance(throwable.getMessage(), cause);
+          transformedThrowable = ctor.newInstance(message, cause);
         }
       }
       catch (Exception e) {
@@ -142,7 +150,7 @@ public class PlaceholderException extends Exception {
       try {
         Constructor<? extends Throwable> ctor = clazz.getConstructor(String.class);
         if (ctor != null) {
-          transformedThrowable = ctor.newInstance(throwable.getMessage());
+          transformedThrowable = ctor.newInstance(message);
         }
       }
       catch (Exception e) {
@@ -151,7 +159,7 @@ public class PlaceholderException extends Exception {
     }
 
     // 3. Cause constructor
-    if (transformedThrowable == null && throwable.getMessage() == null) {
+    if (transformedThrowable == null && message == null) {
       try {
         Constructor<? extends Throwable> ctor = clazz.getConstructor(Throwable.class);
         if (ctor != null) {
