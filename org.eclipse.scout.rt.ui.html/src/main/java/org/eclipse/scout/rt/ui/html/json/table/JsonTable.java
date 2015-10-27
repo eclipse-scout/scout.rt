@@ -1246,7 +1246,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         continue;
       }
       JSONObject eventPart = new JSONObject();
-      putProperty(eventPart, "columnId", c.getColumnId());
+      putProperty(eventPart, "columnId", getColumnId(c));
       putProperty(eventPart, "aggregationFunction", ((INumberColumn) c).getAggregationFunction());
       eventParts.put(eventPart);
     }
