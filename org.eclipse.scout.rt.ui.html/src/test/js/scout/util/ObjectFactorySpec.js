@@ -35,7 +35,7 @@ describe("ObjectFactory", function() {
     } else if ('ColumnUserFilter' === objectType) {
       model.table = {};
       model.column = {};
-      model.calculateCube = function() {};
+      model.calculate = function() {};
     } else if ('AggregateTableControl' === objectType) {
       model.table = {
         columns: [],

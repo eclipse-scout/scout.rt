@@ -76,7 +76,6 @@ __include("scout/keystroke/ClickActiveElementKeyStroke.js");
 __include("scout/keystroke/FocusAdjacentElementKeyStroke.js");
 __include("scout/keystroke/CloseKeyStroke.js");
 // Misc. elements
-__include("scout/datamodel/DataModel.js");
 __include("scout/scrollbar/Scrollbar.js");
 __include("scout/scrollbar/scrollbars.js");
 __include("scout/splitter/Splitter.js");
@@ -124,6 +123,7 @@ __include("scout/filechooser/FileChooser.js");
 __include("scout/filechooser/FileChooserController.js");
 // Table
 __include("scout/table/Table.js");
+__include("scout/table/TableCube.js");
 __include("scout/table/TableFooter.js");
 __include("scout/table/TableFooterLayout.js");
 __include("scout/table/TableInfoFilterTooltip.js");
@@ -142,11 +142,6 @@ __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");
 __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
-__include("scout/table/controls/AnalysisTableControl.js"); // requires TableControl.js
-__include("scout/table/controls/ChartTableControl.js"); // requires TableControl.js
-__include("scout/table/controls/ChartTableControlMatrix.js"); // requires TableControl.js
-__include("scout/table/controls/GraphTableControl.js"); // requires TableControl.js
-__include("scout/table/controls/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/editor/CellEditorPopup.js");
 __include("scout/table/editor/CellEditorPopupLayout.js");
 __include("scout/table/editor/CellEditorCancelEditKeyStroke.js");
@@ -244,7 +239,6 @@ __include("scout/form/fields/colorfield/ColorField.js");
 __include("scout/form/fields/datefield/DateField.js");
 __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
 __include("scout/form/fields/filechooserfield/FileChooserField.js");
-__include("scout/form/fields/graphfield/GraphField.js");
 __include("scout/form/fields/groupbox/GroupBox.js");
 __include("scout/form/fields/groupbox/GroupBoxLayout.js");
 __include("scout/form/fields/groupbox/GroupBoxMenuItemsOrder.js");
@@ -289,10 +283,6 @@ __include("scout/form/fields/treefield/TreeField.js");
 __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
-// Graph
-__include("scout/graph/Graph.js");
-__include("scout/graph/GraphLayout.js");
-__include("scout/graph/NetworkGraphRenderer.js");
 // More misc. elements
 __include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");

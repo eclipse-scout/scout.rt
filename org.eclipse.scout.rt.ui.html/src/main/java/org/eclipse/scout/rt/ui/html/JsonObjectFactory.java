@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
@@ -31,12 +30,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.control.IAggregateTableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.IAggregateTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -59,7 +54,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.colorfield.IColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
-import org.eclipse.scout.rt.client.ui.form.fields.graphfield.IGraphField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
@@ -83,19 +77,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
-import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonByteArray;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
-import org.eclipse.scout.rt.ui.html.json.JsonDataModel;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
-import org.eclipse.scout.rt.ui.html.json.basic.graph.JsonGraph;
-import org.eclipse.scout.rt.ui.html.json.basic.graph.JsonGraphModel;
 import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
@@ -117,7 +106,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.clipboardfield.JsonClipboar
 import org.eclipse.scout.rt.ui.html.json.form.fields.colorfield.JsonColorField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield.JsonFileChooserField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraphField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
@@ -154,10 +142,6 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAggregateTableControl;
-import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
-import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
-import org.eclipse.scout.rt.ui.html.json.table.control.JsonGraphTableControl;
-import org.eclipse.scout.rt.ui.html.json.table.control.JsonMapTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
@@ -260,9 +244,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IBeanField) {
       return new JsonBeanField<IBeanField<?>>((IBeanField) model, session, id, parent);
     }
-    if (model instanceof IGraphField) {
-      return new JsonGraphField<IGraphField>((IGraphField) model, session, id, parent);
-    }
     if (model instanceof IFileChooserField) {
       return new JsonFileChooserField<IFileChooserField>((IFileChooserField) model, session, id, parent);
     }
@@ -330,9 +311,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IClientSession) {
       return new JsonClientSession<IClientSession>((IClientSession) model, session, id, parent);
     }
-    if (model instanceof IDataModel) {
-      return new JsonDataModel<IDataModel>((IDataModel) model, session, id, parent);
-    }
     if (model instanceof ICalendar) {
       return new JsonCalendar<ICalendar>((ICalendar) model, session, id, parent);
     }
@@ -344,22 +322,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IFileChooser) {
       return new JsonFileChooser<IFileChooser>((IFileChooser) model, session, id, parent);
-    }
-    if (model instanceof IGraph) {
-      return new JsonGraph<IGraph>((IGraph) model, session, id, parent);
-    }
-
-    if (model instanceof IChartTableControl) { // needs to be before ITableControl
-      return new JsonChartTableControl<IChartTableControl>((IChartTableControl) model, session, id, parent);
-    }
-    if (model instanceof IGraphTableControl) { // needs to be before ITableControl
-      return new JsonGraphTableControl<IGraphTableControl>((IGraphTableControl) model, session, id, parent);
-    }
-    if (model instanceof IMapTableControl) { // needs to be before ITableControl
-      return new JsonMapTableControl<IMapTableControl>((IMapTableControl) model, session, id, parent);
-    }
-    if (model instanceof IAnalysisTableControl) { // needs to be before ITableControl
-      return new JsonAnalysisTableControl<IAnalysisTableControl>((IAnalysisTableControl) model, session, id, parent);
     }
     if (model instanceof IAggregateTableControl) { // needs to be before ITableControl
       return new JsonAggregateTableControl<IAggregateTableControl>((IAggregateTableControl) model, session, id, parent);
@@ -405,9 +367,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof TableTextUserFilterState) {
       return new JsonTableTextUserFilter((TableTextUserFilterState) object);
-    }
-    if (object instanceof GraphModel) {
-      return new JsonGraphModel((GraphModel) object);
     }
     return null;
   }

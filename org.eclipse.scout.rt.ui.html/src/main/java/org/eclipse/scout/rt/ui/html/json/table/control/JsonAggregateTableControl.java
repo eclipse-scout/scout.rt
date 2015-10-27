@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
-import org.eclipse.scout.rt.client.ui.basic.table.control.IAggregateTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.IAggregateTableControl;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 

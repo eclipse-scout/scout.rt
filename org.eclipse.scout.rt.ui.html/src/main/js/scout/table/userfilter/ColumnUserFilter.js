@@ -16,23 +16,23 @@ scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
 scout.ColumnUserFilter.Type = 'column';
 
-scout.ColumnUserFilter.prototype.calculateCube = function() {
+scout.ColumnUserFilter.prototype.calculate = function() {
   var containsSelectedValue, reorderAxis,
     group = -1;
 
   if (this.column.type === 'date') {
     if (this.column.hasDate) {
       // Default grouping for date columns is year
-      group = scout.ChartTableControlMatrix.DateGroup.YEAR;
+      group = scout.TableCube.DateGroup.YEAR;
     }
     else {
       // No grouping for time columns
-      group = scout.ChartTableControlMatrix.DateGroup.NONE;
+      group = scout.TableCube.DateGroup.NONE;
     }
   }
-  this.matrix = new scout.ChartTableControlMatrix(this.table, this.session),
+  this.matrix = new scout.TableCube(this.table, this.session),
   this.xAxis = this.matrix.addAxis(this.column, group);
-  this.matrix.calculateCube();
+  this.matrix.calculate();
 
   this.selectedValues.forEach(function(selectedValue) {
     containsSelectedValue = false;
@@ -106,7 +106,7 @@ scout.ColumnUserFilter.prototype.createKey = function() {
 scout.ColumnUserFilter.prototype.accept = function($row) {
   if (!this.xAxis) {
     // Lazy calculation. It is not possible on init, because the table is not rendered yet.
-    this.calculateCube();
+    this.calculate();
   }
   var row = $row.data('row'),
     key = this.column.cellValueForGrouping(row),

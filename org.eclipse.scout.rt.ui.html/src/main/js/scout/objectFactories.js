@@ -42,31 +42,6 @@ scout.defaultObjectFactories = [{
     return new scout.FormToolButton();
   }
 }, {
-  objectType: 'DataModel',
-  create: function() {
-    return new scout.DataModel();
-  }
-}, {
-  objectType: 'ChartTableControl',
-  create: function() {
-    return new scout.ChartTableControl();
-  }
-}, {
-  objectType: 'MapTableControl',
-  create: function() {
-    return new scout.MapTableControl();
-  }
-}, {
-  objectType: 'GraphTableControl',
-  create: function() {
-    return new scout.GraphTableControl();
-  }
-}, {
-  objectType: 'AnalysisTableControl',
-  create: function() {
-    return new scout.AnalysisTableControl();
-  }
-}, {
   objectType: 'AggregateTableControl',
   create: function() {
     return new scout.AggregateTableControl();
@@ -331,16 +306,6 @@ scout.defaultObjectFactories = [{
   objectType: 'BeanField',
   create: function() {
     return new scout.BeanField();
-  }
-}, {
-  objectType: 'GraphField',
-  create: function() {
-    return new scout.GraphField();
-  }
-}, {
-  objectType: 'Graph',
-  create: function() {
-    return new scout.Graph();
   }
 }, {
   objectType: 'FileChooser',

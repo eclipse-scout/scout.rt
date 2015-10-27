@@ -80,7 +80,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     });
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
-  this.filter.calculateCube();
+  this.filter.calculate();
   this._renderFilterGroup();
 
   // name all label elements
