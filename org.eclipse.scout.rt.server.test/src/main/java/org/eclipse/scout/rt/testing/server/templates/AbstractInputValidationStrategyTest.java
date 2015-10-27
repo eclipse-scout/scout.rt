@@ -21,7 +21,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
+import org.eclipse.scout.rt.server.ServiceOperationInvoker;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
@@ -78,8 +78,8 @@ public abstract class AbstractInputValidationStrategyTest {
   protected boolean hasStrategyByPolicy(Method m) throws Exception {
     // check by policy
     String name = m.getName();
-    return DefaultTransactionDelegate.DEFAULT_QUERY_NAMES_PATTERN.matcher(name).matches() ||
-        DefaultTransactionDelegate.DEFAULT_PROCESS_NAMES_PATTERN.matcher(name).matches();
+    return ServiceOperationInvoker.DEFAULT_QUERY_NAMES_PATTERN.matcher(name).matches() ||
+        ServiceOperationInvoker.DEFAULT_PROCESS_NAMES_PATTERN.matcher(name).matches();
   }
 
   protected void checkStrategyByAnnotation(Class<?> serviceClass, Collection<Class<?>> interfacesHierarchy, Method base, Set<Method> collector) throws Exception {

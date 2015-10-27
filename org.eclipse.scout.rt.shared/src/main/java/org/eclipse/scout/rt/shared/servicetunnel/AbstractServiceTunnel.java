@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -41,7 +42,9 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       if (LOG.isDebugEnabled()) {
         LOG.debug("" + serviceInterfaceClass + "." + operation + "(" + Arrays.asList(callerArgs) + ")");
       }
-      Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
+
+      ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
+      Object[] serializableArgs = serviceUtility.filterHolderArguments(callerArgs);
       ServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
       beforeTunnel(request);
       ServiceTunnelResponse response = tunnel(request);
@@ -68,7 +71,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
         pe.setStackTrace(both);
         throw pe;
       }
-      ServiceUtility.updateHolderArguments(callerArgs, response.getOutVars(), false);
+      serviceUtility.updateHolderArguments(callerArgs, response.getOutVars(), false);
       return response.getData();
     }
     catch (Throwable t) {

@@ -76,13 +76,15 @@ public class OfflineDispatcherService implements IOfflineDispatcherService {
 
       @Override
       public ServiceTunnelResponse call() throws Exception {
+        final ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
+
         final Class<?> serviceClass = SerializationUtility.getClassLoader().loadClass(serviceTunnelRequest.getServiceInterfaceClassName());
         final Object service = Assertions.assertNotNull(BEANS.get(serviceClass), "service not found in service registry: %s", serviceClass);
-        final Method serviceOperation = ServiceUtility.getServiceOperation(serviceClass, serviceTunnelRequest.getOperation(), serviceTunnelRequest.getParameterTypes());
+        final Method serviceOperation = serviceUtility.getServiceOperation(serviceClass, serviceTunnelRequest.getOperation(), serviceTunnelRequest.getParameterTypes());
 
         final Object[] serviceArgs = serviceTunnelRequest.getArgs();
-        final Object result = ServiceUtility.invoke(serviceOperation, service, serviceArgs);
-        final Object[] outParams = ServiceUtility.extractHolderArguments(serviceArgs);
+        final Object result = serviceUtility.invoke(serviceOperation, service, serviceArgs);
+        final Object[] outParams = serviceUtility.extractHolderArguments(serviceArgs);
 
         return new ServiceTunnelResponse(result, outParams);
       }

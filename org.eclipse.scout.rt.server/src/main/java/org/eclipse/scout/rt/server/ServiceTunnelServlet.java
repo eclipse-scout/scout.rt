@@ -119,7 +119,8 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
           if (isSessionLess(serviceRequest)) {
-            processWithoutSession(serviceRequest);
+            // TODO [jgu] Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement        	  
+            invokeServiceWithoutSession(serviceRequest);
           }
           else {
             // Collector to collect transactional client notifications issued during processing of the current request.
@@ -173,23 +174,6 @@ public class ServiceTunnelServlet extends HttpServlet {
     return IClientNotificationService.class.isAssignableFrom(serviceInterfaceClass);
   }
 
-  /**
-   * Process request without creating a server session
-   */
-  protected void processWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, Exception {
-    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
-    Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceRequest.getOperation(), serviceRequest.getParameterTypes());
-    Object service = BEANS.get(serviceInterfaceClass);
-    if (service == null) {
-      throw new SecurityException("service registry does not contain a service of type " + serviceRequest.getServiceInterfaceClassName());
-    }
-    Object data = ServiceUtility.invoke(serviceOp, service, serviceRequest.getArgs());
-    Object[] outParameters = ServiceUtility.extractHolderArguments(serviceRequest.getArgs());
-    ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
-    serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());
-    serializeServiceResponse(serviceResponse);
-  }
-
   // === SERVICE INVOCATION ===
 
   /**
@@ -221,9 +205,29 @@ public class ServiceTunnelServlet extends HttpServlet {
 
       @Override
       public ServiceTunnelResponse call() throws Exception {
-        return BEANS.get(DefaultTransactionDelegate.class).invoke(serviceTunnelRequest);
+        return BEANS.get(ServiceOperationInvoker.class).invoke(serviceTunnelRequest);
       }
     }, BEANS.get(ExceptionTranslator.class));
+  }
+
+  /**
+   * Process request without creating a server session
+   */
+  protected void invokeServiceWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, Exception {
+    // TODO [jgu] Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
+    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
+
+    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
+    Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceRequest.getOperation(), serviceRequest.getParameterTypes());
+    Object service = BEANS.get(serviceInterfaceClass);
+    if (service == null) {
+      throw new SecurityException("service registry does not contain a service of type " + serviceRequest.getServiceInterfaceClassName());
+    }
+    Object data = serviceUtility.invoke(serviceOp, service, serviceRequest.getArgs());
+    Object[] outParameters = serviceUtility.extractHolderArguments(serviceRequest.getArgs());
+    ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
+    serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());
+    serializeServiceResponse(serviceResponse);
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

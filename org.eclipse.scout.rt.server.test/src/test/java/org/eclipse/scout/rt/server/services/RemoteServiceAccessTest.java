@@ -17,7 +17,7 @@ import java.security.Permissions;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
+import org.eclipse.scout.rt.server.ServiceOperationInvoker;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.ping.PingService;
@@ -30,7 +30,7 @@ public class RemoteServiceAccessTest {
 
   @Test
   public void testAnnotations() throws Exception {
-    DefaultTransactionDelegateMock bo = new DefaultTransactionDelegateMock();
+    ServiceOperationInvokerMock bo = new ServiceOperationInvokerMock();
     //
     assertNonAccessible(bo, IMockProcessService.class, Object.class.getMethod("hashCode"), IMockProcessService.class);
     //
@@ -63,11 +63,11 @@ public class RemoteServiceAccessTest {
     assertNonAccessible(bo, ISqlService.class, ISqlService.class.getMethod("commit"), AbstractSqlService.class);
   }
 
-  private static void assertAccessible(DefaultTransactionDelegateMock bo, Class<?> serviceInterfaceClass, Method serviceOp, Class<?> serviceImplClass) throws Exception {
+  private static void assertAccessible(ServiceOperationInvokerMock bo, Class<?> serviceInterfaceClass, Method serviceOp, Class<?> serviceImplClass) throws Exception {
     bo.test(serviceInterfaceClass, serviceOp, serviceImplClass);
   }
 
-  private static void assertNonAccessible(DefaultTransactionDelegateMock bo, Class<?> serviceInterfaceClass, Method serviceOp, Class<?> serviceImplClass) throws Exception {
+  private static void assertNonAccessible(ServiceOperationInvokerMock bo, Class<?> serviceInterfaceClass, Method serviceOp, Class<?> serviceImplClass) throws Exception {
     try {
       bo.test(serviceInterfaceClass, serviceOp, serviceImplClass);
     }
@@ -78,10 +78,10 @@ public class RemoteServiceAccessTest {
   }
 
   @Order(-10)
-  static class DefaultTransactionDelegateMock extends DefaultTransactionDelegate {
+  static class ServiceOperationInvokerMock extends ServiceOperationInvoker {
     private final Permissions m_permissionCollection;
 
-    public DefaultTransactionDelegateMock() {
+    public ServiceOperationInvokerMock() {
       super();
       m_permissionCollection = new Permissions();
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.shared.*", "*"));

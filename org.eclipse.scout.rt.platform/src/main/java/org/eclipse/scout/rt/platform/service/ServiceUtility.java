@@ -18,25 +18,18 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.HolderUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.service.internal.AbstractHolderArgumentVisitor;
 
-/**
- * Handle calls directly on current session (no remoting)
- */
-public final class ServiceUtility {
-
-  private ServiceUtility() {
-  }
+@ApplicationScoped
+public class ServiceUtility {
 
   /**
-   * @param service
-   * @param operation
-   * @param paramTypes
    * @return the reflective service operation that can be called using {@link #invoke(Method,Object,Object[])}
    */
-  public static Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
+  public Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
     try {
       if (serviceClass == null) {
         throw new ProcessingException("service class is null");
@@ -49,15 +42,11 @@ public final class ServiceUtility {
   }
 
   /**
-   * @param serviceOperation
-   * @param service
-   * @param callerArgs
-   * @return the service result
    * @throws ProcessingException
    *           Invoke the service operation using reflection. The service supports OUT variables using {@link IHolder}
    *           objects
    */
-  public static Object invoke(Method serviceOperation, Object service, Object[] callerArgs) {
+  public Object invoke(Method serviceOperation, Object service, Object[] callerArgs) {
     try {
       if (serviceOperation == null) {
         throw new ProcessingException("serviceOperation is null");
@@ -94,7 +83,7 @@ public final class ServiceUtility {
    * Holders and nvpairs need to be copied as value clones. A smartfield for example is a holder and must not go to
    * backend. NVPairs with holder values ae replaced by NVPair with serializable holder arguments
    */
-  public static Object[] filterHolderArguments(Object[] callerArgs) {
+  public Object[] filterHolderArguments(Object[] callerArgs) {
     Object[] serializableArgs = new Object[callerArgs.length];
     new AbstractHolderArgumentVisitor() {
       @SuppressWarnings("unchecked")
@@ -116,7 +105,7 @@ public final class ServiceUtility {
   /**
    * Extract holders and nvpairs in callerArgs (and eventually in sub-arrays)
    */
-  public static Object[] extractHolderArguments(Object[] callerArgs) {
+  public Object[] extractHolderArguments(Object[] callerArgs) {
     Object[] holderArgs = new Object[callerArgs.length];
     new AbstractHolderArgumentVisitor() {
       @Override
@@ -137,7 +126,7 @@ public final class ServiceUtility {
    *          if true deletes calerArgs that aren't out parameters
    */
   @SuppressWarnings("unchecked")
-  public static void updateHolderArguments(Object[] callerArgs, Object[] updatedArgs, final boolean clearNonOutArgs) {
+  public void updateHolderArguments(Object[] callerArgs, Object[] updatedArgs, final boolean clearNonOutArgs) {
     if (updatedArgs != null) {
       new AbstractHolderArgumentVisitor() {
         @Override

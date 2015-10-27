@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
@@ -44,39 +45,17 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.OutputValidation;
 
 /**
- * Delegate for scout dynamic business op invocation
- * <p>
- * Subclass this type to change/add validation checks or call {@link #setValidateInput(true)} to activate them.
- * <p>
- * Override {@link #validateInput(IValidationStrategy, Object, Method, Object[])} and/or
- * {@link #validateOutput(IValidationStrategy, Object, Method, Object, Object[])} to modifiy the default central
- * validation. You may use {@link #defaultValidateInput(IValidationStrategy, Object, Method, Object[])} and
- * {@link #defaultValidateOutput(IValidationStrategy, Object, Method, Object, Object[])}
- * <p>
- * Set the config.properties to activate default validation:
- *
- * <pre>
- *   org.eclipse.scout.rt.server.validateInput=true
- *   org.eclipse.scout.rt.server.validateOutput=false
- * </pre>
+ * Provides functionality to invoke service operations as described by {@link ServiceTunnelRequest} and to return the
+ * operations result in the form of a {@link ServiceTunnelResponse}.
  */
+// TODO [jgu] Remove validation as not functional anymore
+// TODO [jug] Remove class ServiceUtility and provide its functionality in this class
 @ApplicationScoped
-public class DefaultTransactionDelegate {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTransactionDelegate.class);
+public class ServiceOperationInvoker {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceOperationInvoker.class);
 
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
-
-  public DefaultTransactionDelegate() {
-    this(false);
-  }
-
-  /**
-   * @deprecated use DefaultTransactionDelegate, configure debug with logger configuration
-   */
-  @Deprecated
-  public DefaultTransactionDelegate(boolean debug) {
-  }
 
   public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) throws Exception {
     long t0 = System.nanoTime();
@@ -88,7 +67,7 @@ public class DefaultTransactionDelegate {
     catch (Throwable t) {
       ITransaction.CURRENT.get().addFailure(t);
       handleException(t, serviceReq);
-      response = new ServiceTunnelResponse(replaceOutboundException(t));
+      response = new ServiceTunnelResponse(interceptException(t));
     }
 
     long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
@@ -104,25 +83,6 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * security: do not send back original error and stack trace with details
-   * <p>
-   * default returns an empty exception or in case of a {@link VetoException} only its title, message, htmlMessage,
-   * error code and severity
-   */
-  protected Throwable replaceOutboundException(Throwable t) {
-    Throwable p;
-    if (t instanceof VetoException) {
-      VetoException ve = (VetoException) t;
-      p = new VetoException(ve.getStatus().getTitle(), ve.getStatus().getBody(), ve.getHtmlBody(), null, ve.getStatus().getCode(), ve.getStatus().getSeverity());
-    }
-    else {
-      p = new ProcessingException(ScoutTexts.get("RequestProblem"));
-    }
-    p.setStackTrace(new StackTraceElement[0]);
-    return p;
-  }
-
-  /**
    * This method is executed within a {@link IServerSession} context on behalf of a server job.
    */
   protected ServiceTunnelResponse invokeImpl(ServiceTunnelRequest serviceReq) throws Throwable {
@@ -132,11 +92,12 @@ public class DefaultTransactionDelegate {
       LOG.debug("started " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " by " + authenticatedUser + " at " + new Date());
     }
     CallInspector callInspector = getCallInspector(serviceReq, serverSession);
+    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
     ServiceTunnelResponse serviceRes = null;
     try {
       //do checks
       Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
-      Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
+      Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       Object[] args = serviceReq.getArgs();
 
       checkServiceAccess(serviceInterfaceClass, serviceOp, args);
@@ -144,8 +105,8 @@ public class DefaultTransactionDelegate {
       Object service = BEANS.get(serviceInterfaceClass);
       validateInput(service, serviceOp, args);
       //
-      Object data = ServiceUtility.invoke(serviceOp, service, args);
-      Object[] outParameters = ServiceUtility.extractHolderArguments(args);
+      Object data = serviceUtility.invoke(serviceOp, service, args);
+      Object[] outParameters = serviceUtility.extractHolderArguments(args);
       //
       //filter output
       validateOutput(service, serviceOp, data, outParameters);
@@ -279,12 +240,11 @@ public class DefaultTransactionDelegate {
   }
 
   private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
-    CallInspector callInspector = null;
-    SessionInspector sessionInspector = ProcessInspector.instance().getSessionInspector(serverSession, true);
+    SessionInspector sessionInspector = BEANS.get(ProcessInspector.class).getSessionInspector(serverSession, true);
     if (sessionInspector != null) {
-      callInspector = sessionInspector.requestCallInspector(serviceReq);
+      return sessionInspector.requestCallInspector(serviceReq);
     }
-    return callInspector;
+    return null;
   }
 
   protected void validateInput(Object service, Method serviceOp, Object[] args) throws Exception, InstantiationException, IllegalAccessException {
@@ -491,10 +451,10 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * Method invoked to handle service exceptions.
+   * Method invoked to handle a service exception.
    */
   protected void handleException(Throwable t, ServiceTunnelRequest serviceTunnelRequest) {
-    if (ITransaction.CURRENT.get().isCancelled()) {
+    if (RunMonitor.CURRENT.get().isCancelled()) {
       return;
     }
 
@@ -509,4 +469,24 @@ public class DefaultTransactionDelegate {
     }
   }
 
+  /**
+   * Method invoked to intercept a service exception before being put into the {@link ServiceTunnelResponse} to be sent
+   * to the client.
+   * <p>
+   * Security: do not send back original error and stack trace with implementation details.<br/>
+   * The default implementation returns an empty exception, or in case of a {@link VetoException} only its title,
+   * message, htmlMessage, error code and severity.
+   */
+  protected Throwable interceptException(Throwable t) {
+    Throwable p;
+    if (t instanceof VetoException) {
+      VetoException ve = (VetoException) t;
+      p = new VetoException(ve.getStatus().getTitle(), ve.getStatus().getBody(), ve.getHtmlBody(), null, ve.getStatus().getCode(), ve.getStatus().getSeverity());
+    }
+    else {
+      p = new ProcessingException(ScoutTexts.get("RequestProblem"));
+    }
+    p.setStackTrace(new StackTraceElement[0]);
+    return p;
+  }
 }

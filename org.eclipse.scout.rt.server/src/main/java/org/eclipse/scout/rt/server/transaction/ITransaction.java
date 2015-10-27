@@ -13,26 +13,19 @@ package org.eclipse.scout.rt.server.transaction;
 import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
-import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 
 /**
- * Whenever a remote service call is handled by the {@link ServiceTunnelServlet} it is dispatched to a
- * {@link DefaultTransactionDelegate} that runs in a {@link RunContext} with a {@link ITransaction}.
+ * Represents a transaction which multiple transaction members can participate for consistent commit or rollback.
  * <p>
- * Cancelling is done using {@link RunMonitor#cancel(boolean)} on {@link RunMonitor#CURRENT}
+ * Cancelling is done using {@link RunMonitor#cancel(boolean)} on {@link RunMonitor#CURRENT}, which in turn cancels all
+ * its associated members and (potentially) running SQL statements. A cancelled transaction does not accept any new
+ * members.
  * <p>
- * Whenever for example a sql statement is run, it registers/unregisters on the
+ * Whenever for example a SQL statement is run, it registers/unregisters on the
  * {@link AbstractSqlTransactionMember#registerActiveStatement(java.sql.Statement)} /
  * {@link AbstractSqlTransactionMember#unregisterActiveStatement(java.sql.Statement)}.
- * <p>
- * Thus canceling a {@link ITransaction#cancel(boolean))} also cancels all its members
- * {@link ITransactionMember#cancel()} and that cancels the (potentially) running statement.
- * <p>
- * A canceled transaction can only do a rollback and does not accept new members.
  * <p>
  *
  * @since 3.4

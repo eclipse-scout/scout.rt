@@ -56,8 +56,10 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
    */
   protected ServiceTunnelResponse mockServiceCall(ServiceTunnelRequest req) throws Exception {
     try {
+      ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
+
       Class<?> serviceInterface = Class.forName(req.getServiceInterfaceClassName());
-      Method serviceOperation = ServiceUtility.getServiceOperation(serviceInterface, req.getOperation(), req.getParameterTypes());
+      Method serviceOperation = serviceUtility.getServiceOperation(serviceInterface, req.getOperation(), req.getParameterTypes());
       Object service = null;
       for (Object t : BEANS.all(serviceInterface)) {
         if (Proxy.isProxyClass(t.getClass())) {
@@ -66,7 +68,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
         service = t;
         break;
       }
-      Object result = ServiceUtility.invoke(serviceOperation, service, req.getArgs());
+      Object result = serviceUtility.invoke(serviceOperation, service, req.getArgs());
       return new ServiceTunnelResponse(result, null, null);
     }
     catch (ProcessingException pe) {
