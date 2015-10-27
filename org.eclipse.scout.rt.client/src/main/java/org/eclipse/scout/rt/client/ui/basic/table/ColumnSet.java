@@ -66,6 +66,8 @@ public class ColumnSet {
 
   private final Map<Class<?>, Class<? extends IColumn>> m_columnReplacements;
 
+  private final P_ColumnListener m_columnListener = new P_ColumnListener();
+
   public ColumnSet(AbstractTable table, List<IColumn<?>> columns) {
     // process @Replace annotations
     List<Class<? extends IColumn>> columnArray = new ArrayList<Class<? extends IColumn>>(columns.size());
@@ -83,28 +85,7 @@ public class ColumnSet {
     m_userSortColumns = new ArrayList<IColumn<?>>();
     m_permanentHeadSortColumns = new ArrayList<IColumn<?>>();
     m_permanentTailSortColumns = new ArrayList<IColumn<?>>();
-    PropertyChangeListener columnListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        IColumn c = (IColumn) e.getSource();
-        if (IColumn.PROP_VIEW_COLUMN_INDEX_HINT.equals(e.getPropertyName())) {
-          return;
-        }
-        if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
-          resetColumnsViewOrder();
-          return;
-        }
-        if (INumberColumn.PROP_AGGREGATION_FUNCTION.equals(e.getPropertyName())) {
-          fireColumnAggregationChanged(c);
-          return;
-        }
-        if (c.isGroupingActive() && IColumn.PROP_VISIBLE.equals(e.getPropertyName())) {
-          onGroupedColumnInvisible(c); //also notifies table and to invalidate sorting.
-        }
-        //default:
-        updateColumnStructure(c);
-      }
-    };
+
     int index = 0;
     for (IColumn col : columns) {
       if (col instanceof AbstractColumn) {
@@ -115,7 +96,6 @@ public class ColumnSet {
       m_columns.add(col);
       m_classIndexes.put(col.getClass(), col);
       m_idIndexes.put(col.getColumnId(), col);
-      col.addPropertyChangeListener(columnListener);
       index++;
     }
     reorganizeIndexes();
@@ -169,6 +149,34 @@ public class ColumnSet {
       reorganizeIndexes();
     }
     checkMultiline();
+  }
+
+  protected void initColumns() {
+    for (IColumn<?> c : getColumns()) {
+      try {
+        c.initColumn();
+      }
+      catch (Exception t) {
+        LOG.error("column " + c, t);
+      }
+    }
+    initialize();
+    for (IColumn<?> c : getColumns()) {
+      c.removePropertyChangeListener(m_columnListener);
+      c.addPropertyChangeListener(m_columnListener);
+    }
+  }
+
+  protected void disposeColumns() {
+    for (IColumn<?> c : getColumns()) {
+      try {
+        c.disposeColumn();
+        c.removePropertyChangeListener(m_columnListener);
+      }
+      catch (Exception t) {
+        LOG.error("column " + c, t);
+      }
+    }
   }
 
   private static class P_SortingAndGroupingConfig {
@@ -1435,6 +1443,31 @@ public class ColumnSet {
         }
         m_table.setMultilineText(m);
       }
+    }
+  }
+
+  private class P_ColumnListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+      IColumn c = (IColumn) e.getSource();
+
+      if (IColumn.PROP_VIEW_COLUMN_INDEX_HINT.equals(e.getPropertyName())) {
+        return;
+      }
+      if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
+        resetColumnsViewOrder();
+        return;
+      }
+      if (INumberColumn.PROP_AGGREGATION_FUNCTION.equals(e.getPropertyName())) {
+        fireColumnAggregationChanged(c);
+        return;
+      }
+      if (c.isGroupingActive() && IColumn.PROP_VISIBLE.equals(e.getPropertyName())) {
+        onGroupedColumnInvisible(c); //also notifies table and to invalidate sorting.
+      }
+      //default:
+      updateColumnStructure(c);
     }
   }
 

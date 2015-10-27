@@ -65,6 +65,14 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         //remove all previous row related events
         remove(getRowRelatedEvents(), events.subList(0, i));
       }
+      else if (type == TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED) {
+        //ignore all previous aggregate function changes.
+        List<Integer> typesToDelete = CollectionUtility.arrayList(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+        if (isIgnorePrevious(type)) {
+          typesToDelete.add(type);
+        }
+        remove(typesToDelete, events.subList(0, i));
+      }
       else if (isIgnorePrevious(type)) {
         //remove all previous events of the same type
         remove(type, events.subList(0, i));

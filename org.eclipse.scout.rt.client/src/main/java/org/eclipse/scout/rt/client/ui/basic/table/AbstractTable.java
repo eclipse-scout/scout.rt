@@ -628,7 +628,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called after the table content changed, rows were added, removed or changed.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(40)
@@ -639,7 +638,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called after {@link AbstractColumn#execDecorateCell(Cell,ITableRow)} on the column to decorate the cell.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(50)
@@ -650,7 +648,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called during initialization of this table, after the columns were initialized.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(60)
@@ -661,7 +658,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called when this table is disposed, after the columns were disposed.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(70)
@@ -1031,26 +1027,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void initColumnsInternal() {
-    for (IColumn<?> c : getColumnSet().getColumns()) {
-      try {
-        c.initColumn();
-      }
-      catch (Exception t) {
-        LOG.error("column " + c, t);
-      }
-    }
-    getColumnSet().initialize();
+    getColumnSet().initColumns();
   }
 
   private void disposeColumnsInternal() {
-    for (IColumn<?> c : getColumnSet().getColumns()) {
-      try {
-        c.disposeColumn();
-      }
-      catch (Exception t) {
-        LOG.error("column " + c, t);
-      }
-    }
+    getColumnSet().disposeColumns();
   }
 
   // FIXME AWE/MVI: make TableControls extensible, check copy/paste code in this class
@@ -4413,6 +4394,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           return;
         }
         getColumnSet().setAggregationFunction((INumberColumn) c, function);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
       }
       finally {
         popUIProcessor();

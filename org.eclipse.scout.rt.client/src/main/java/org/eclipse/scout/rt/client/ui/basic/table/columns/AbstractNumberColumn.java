@@ -38,7 +38,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   private boolean m_validateOnAnyKey;
 
   private String m_initialAggregationFunction;
-  private String m_aggregationFunction;
 
   public AbstractNumberColumn() {
     super();

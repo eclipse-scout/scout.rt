@@ -449,6 +449,33 @@ public class TableEventBufferTest {
     assertEquals(3, events.get(1).getRowCount());
   }
 
+  @Test
+  public void testRemoveObsoleteAggregationChanges() {
+    ITable table = mock(ITable.class);
+    final TableEvent event1 = new TableEvent(table, TableEvent.TYPE_COLUMN_HEADERS_UPDATED);
+    final TableEvent event2 = new TableEvent(table, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+    final TableEvent event3 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    final TableEvent event4 = new TableEvent(table, TableEvent.TYPE_ALL_ROWS_DELETED);
+    final TableEvent event5 = new TableEvent(table, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+    final TableEvent event6 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    final TableEvent event7 = new TableEvent(table, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+    final TableEvent event8 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    m_testBuffer.add(event1);
+    m_testBuffer.add(event2);
+    m_testBuffer.add(event3);
+    m_testBuffer.add(event4);
+    m_testBuffer.add(event5);
+    m_testBuffer.add(event6);
+    m_testBuffer.add(event7);
+    m_testBuffer.add(event8);
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(4, events.size());
+    assertEquals(TableEvent.TYPE_COLUMN_HEADERS_UPDATED, events.get(0).getType());
+    assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, events.get(1).getType());
+    assertEquals(TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED, events.get(2).getType());
+    assertEquals(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, events.get(3).getType());
+  }
+
   private TableEvent createTestUpdateEvent() {
     return new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1));
   }
