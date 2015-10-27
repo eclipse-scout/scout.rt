@@ -107,6 +107,11 @@
 @chart-axis-line-color: @palette-gray-4;
 @chart-axis-text-color: @palette-gray-6;
 @chart-data-color: @palette-blue-3;
+@chart-data-color-one: @palette-blue-7;
+@chart-data-color-two: @palette-blue-6;
+@chart-data-color-three: @palette-blue-5;
+@chart-data-color-four: @palette-blue-3;
+@chart-data-color-five: @palette-blue-0;
 @chart-data-active-color: @palette-blue-7;
 @chart-data-text-color: @palette-white;
 @chart-empty-color: @palette-gray-4;
