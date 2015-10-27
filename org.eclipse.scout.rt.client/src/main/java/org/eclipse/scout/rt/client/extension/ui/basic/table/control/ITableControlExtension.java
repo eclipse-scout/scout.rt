@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table.control;
 
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
-import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 
 public interface ITableControlExtension<OWNER extends AbstractTableControl> extends IActionExtension<OWNER> {
 

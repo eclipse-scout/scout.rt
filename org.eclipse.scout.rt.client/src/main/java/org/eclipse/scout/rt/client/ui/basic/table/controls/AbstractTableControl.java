@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.control;
+package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
 import java.util.List;
 

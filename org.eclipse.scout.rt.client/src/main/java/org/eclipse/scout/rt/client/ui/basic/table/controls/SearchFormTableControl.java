@@ -8,25 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.control;
+package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class ChartTableControl extends AbstractTableControl implements IChartTableControl {
-
-  public ChartTableControl() {
-    this(true);
-  }
-
-  public ChartTableControl(boolean callInitializer) {
-    super(callInitializer);
-  }
+/**
+ * @since 5.1.0
+ */
+public class SearchFormTableControl extends AbstractTableControl {
 
   @Override
   protected void initConfig() {
     super.initConfig();
-    setTooltipText(TEXTS.get("ui.Chart"));
-    setIconId(AbstractIcons.Chart);
+    setIconId(AbstractIcons.Search);
+    setTooltipText(TEXTS.get("Search"));
+  }
+
+  @Override
+  public void setForm(IForm form) {
+    setEnabled(form != null);
+    super.setForm(form);
+  }
+
+  @Override
+  protected boolean getConfiguredEnabled() {
+    return false;
+  }
+
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.F6;
   }
 }

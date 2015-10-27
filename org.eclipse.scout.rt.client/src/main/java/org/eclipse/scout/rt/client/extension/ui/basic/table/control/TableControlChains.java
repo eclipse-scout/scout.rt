@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
-import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class TableControlChains {

@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.graphfield;
+package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
-import org.eclipse.scout.rt.client.ui.basic.graph.IGraph;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IGraphField<T extends IGraph> extends IFormField {
+/**
+ * @since 5.1.0
+ */
+public interface ITableControl extends IAction {
 
-  String PROP_GRAPH = "graph";
+  String PROP_FORM = "form";
 
-  void setGraph(T graph);
+  void setForm(IForm form);
 
-  T getGraph();
+  IForm getForm();
+
 }

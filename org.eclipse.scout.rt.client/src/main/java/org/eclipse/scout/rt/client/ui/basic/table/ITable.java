@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;

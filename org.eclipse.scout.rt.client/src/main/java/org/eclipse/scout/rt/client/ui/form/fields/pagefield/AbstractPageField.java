@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.PageFieldChains.PageFieldPageChangedChain;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;

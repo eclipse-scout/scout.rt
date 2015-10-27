@@ -8,14 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.graph;
+package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
-import java.util.EventListener;
+import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.TEXTS;
 
-/**
- * @since 5.2
- */
-public interface GraphListener extends EventListener {
+public class AggregateTableControl extends AbstractTableControl implements IAggregateTableControl {
 
-  void graphChanged(GraphEvent e);
+  public AggregateTableControl() {
+    this(true);
+  }
+
+  public AggregateTableControl(boolean callInitializer) {
+    super(callInitializer);
+  }
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+    setTooltipText(TEXTS.get("ui.Total"));
+    setIconId(AbstractIcons.Sum);
+  }
+
 }
