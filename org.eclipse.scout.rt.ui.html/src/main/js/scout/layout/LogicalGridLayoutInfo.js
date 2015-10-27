@@ -375,14 +375,17 @@ scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) 
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, weights) {
+  var i;
   var outSizes = scout.arrays.init(sizes.length, 0);
   if (targetSize <= 0) {
-    return [];
+    for (i = 0; i < sizes.length; i++) {
+      outSizes[i] = sizes[i][scout.LayoutConstants.MIN];
+    }
+    return outSizes;
   }
   var sumSize = 0;
   var tmpWeight = scout.arrays.init(weights.length, 0.0);
-  var sumWeight = 0,
-    i;
+  var sumWeight = 0;
   for (i = 0; i < sizes.length; i++) {
     outSizes[i] = sizes[i][scout.LayoutConstants.PREF];
     sumSize += outSizes[i];
