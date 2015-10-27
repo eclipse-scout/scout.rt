@@ -36,12 +36,10 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
-public abstract class AbstractStringField extends AbstractBasicField<String>implements IStringField {
+public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
-
-  // default is used
 
   public AbstractStringField() {
     this(true);
@@ -59,6 +57,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String>impl
   /*
    * Configuration
    */
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
   protected boolean getConfiguredHasAction() {
@@ -114,8 +113,8 @@ public abstract class AbstractStringField extends AbstractBasicField<String>impl
   }
 
   /**
-   * @return true if all characters of the string, with leading and trailing whitespace should be omitted. default is
-   *         true.
+   * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
+   *         value. default is true.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
