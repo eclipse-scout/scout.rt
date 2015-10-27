@@ -319,9 +319,9 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
 
 scout.ModelAdapter.prototype._fireBulkPropertyChange = function(oldProperties, newProperties) {
   var propertyChangeEvent = {
-      newProperties: newProperties,
-      oldProperties: oldProperties,
-      changedProperties: []
+    newProperties: newProperties,
+    oldProperties: oldProperties,
+    changedProperties: []
   };
   // To allow a listener to react only to properties that have really changed their value, we
   // calculate the list of "changedProperties". This may be relevant, when the value on the model
@@ -348,7 +348,6 @@ scout.ModelAdapter.prototype._firePropertyChange = function(propertyName, oldVal
   newProperties[propertyName] = newValue;
   this._fireBulkPropertyChange(oldProperties, newProperties);
 };
-
 
 /**
  * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
@@ -524,14 +523,13 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
   var s = 'scout.';
   if (!this.objectType && qualifier) {
     s += qualifier;
-  }
-  else {
+  } else {
     s += scout.helpers.nvl(this.objectType, 'NO_TYPE');
     if (qualifier) {
       s += '@' + qualifier;
     }
   }
-  s +=  '[' + this.session.partId + '-' + scout.helpers.nvl(this.id, 'NO_ID') + ']';
+  s += '[' + this.session.partId + '-' + scout.helpers.nvl(this.id, 'NO_ID') + ']';
   return s.replace(/\s/g, '');
 };
 
@@ -572,10 +570,14 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
       if (Array.isArray(adapterProperty)) {
         cloneProperty = [];
         adapterProperty.forEach(function(adapterPropertyElement) {
-          cloneProperty.push(adapterPropertyElement.cloneAdapter({parent: cloneAdapter}));
+          cloneProperty.push(adapterPropertyElement.cloneAdapter({
+            parent: cloneAdapter
+          }));
         }, this);
       } else {
-        cloneProperty = adapterProperty.cloneAdapter({parent: cloneAdapter});
+        cloneProperty = adapterProperty.cloneAdapter({
+          parent: cloneAdapter
+        });
       }
       cloneAdapter[propertyName] = cloneProperty;
     }

@@ -13,7 +13,6 @@ scout.MnemonicKeyStroke = function(keyStroke, field) {
 };
 scout.inherits(scout.MnemonicKeyStroke, scout.KeyStroke);
 
-
 /**
  * @override KeyStroke.js
  */

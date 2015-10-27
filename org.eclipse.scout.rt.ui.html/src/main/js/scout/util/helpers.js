@@ -72,8 +72,7 @@ scout.helpers = {
         // styles
         if (token === 'NULL' || token === '0') {
           // nop (undefined values)
-        }
-        else if (token === 'PLAIN') {
+        } else if (token === 'PLAIN') {
           // nop
         } else if (token === 'BOLD') {
           fontSpec.bold = true;
@@ -96,8 +95,7 @@ scout.helpers = {
     var cssColor = '';
     if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(color)) { // hex color
       cssColor = '#' + color;
-    }
-    else if (/^[A-Za-z0-9().,%-]+$/.test(color)) { // named colors or color functions
+    } else if (/^[A-Za-z0-9().,%-]+$/.test(color)) { // named colors or color functions
       cssColor = color;
     }
     return cssColor;
@@ -166,16 +164,16 @@ scout.helpers = {
       style += 'background-color: ' + cssBackgroundColor + '; ';
     }
     if (cssFontWeight) {
-      style += 'font-weight: '+ cssFontWeight +'; ';
+      style += 'font-weight: ' + cssFontWeight + '; ';
     }
     if (cssFontStyle) {
-      style += 'font-style: '+ cssFontStyle +'; ';
+      style += 'font-style: ' + cssFontStyle + '; ';
     }
     if (cssFontSize) {
-      style += 'font-size: '+ cssFontSize +'; ';
+      style += 'font-size: ' + cssFontSize + '; ';
     }
     if (cssFontFamily) {
-      style += 'font-family: '+ cssFontFamily +'; ';
+      style += 'font-family: ' + cssFontFamily + '; ';
     }
 
     return style;
@@ -197,8 +195,7 @@ scout.helpers = {
       var argsToCheck;
       if (arguments.length === 2 && Array.isArray(arguments[1])) {
         argsToCheck = arguments[1];
-      }
-      else {
+      } else {
         argsToCheck = Array.prototype.slice.call(arguments, 1);
       }
       return argsToCheck.indexOf(value) !== -1;

@@ -3,9 +3,9 @@
  * Avoids a lot of messy if/else code.
  */
 scout.NullDesktopNavigation = {
-    render: function($parent) {},
-    onOutlineChanged: function(outline) {},
-    bringToFront: function() {},
-    sendToBack: function() {},
-    onResize: function() {}
+  render: function($parent) {},
+  onOutlineChanged: function(outline) {},
+  bringToFront: function() {},
+  sendToBack: function() {},
+  onResize: function() {}
 };

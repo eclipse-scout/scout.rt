@@ -204,7 +204,7 @@ scout.DateField.prototype._renderAutoTimestamp = function() {
  */
 scout.DateField.prototype._renderErrorStatus = function() {
   scout.DateField.parent.prototype._renderErrorStatus.call(this);
-  var hasError = !! (this.errorStatus);
+  var hasError = !!(this.errorStatus);
 
   if (this.$dateField) {
     this.$dateField.toggleClass('has-error', hasError);
@@ -375,8 +375,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
       this._openDatePicker(pickerStartDate);
       this.renderDate(pickerStartDate);
       shiftDate = false; // don't shift if field has no value yet and popup was not open
-    }
-    else if (!this._popup.isOpen()) {
+    } else if (!this._popup.isOpen()) {
       // Otherwise, ensure picker is open
       this._openDatePicker(pickerStartDate);
     }
@@ -661,7 +660,7 @@ scout.DateField.prototype._setTimeDisplayText = function(displayText) {
  */
 scout.DateField.prototype._updateDisplayTextProperty = function() {
   var dateText = this.$dateField ? this.$dateField.val() : '',
-      timeText = this.$timeField ? this.$timeField.val() : '';
+    timeText = this.$timeField ? this.$timeField.val() : '';
   this.displayText = scout.strings.join(' ', dateText, timeText);
 };
 
@@ -782,7 +781,8 @@ scout.DateField.prototype._openDatePicker = function(date) {
       if (this.touch) {
         this._onDatePickerDateSelected({
           date: this._popup._field.timestampAsDate,
-          closeDatePicker: false});
+          closeDatePicker: false
+        });
       } else {
         this.getDatePicker().off('dateSelect', this._datePickerDateSelectedHandler);
         this._datePickerDateSelectedHandler = null;
@@ -840,8 +840,7 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
     var newTimestamp = null;
     if ((acceptDate && datePrediction.date) || (acceptTime && timePrediction.date)) {
       newTimestamp = this._newTimestampAsDate(
-          (acceptDate ? datePrediction.date : this.timestampAsDate),
-          (acceptTime ? timePrediction.date : this.timestampAsDate));
+        (acceptDate ? datePrediction.date : this.timestampAsDate), (acceptTime ? timePrediction.date : this.timestampAsDate));
     }
     this.updateTimestamp(newTimestamp);
     this.renderDate(this.timestampAsDate);

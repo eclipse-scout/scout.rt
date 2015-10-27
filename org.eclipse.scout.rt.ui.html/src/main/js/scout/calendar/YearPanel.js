@@ -131,8 +131,8 @@ scout.YearPanel.prototype._scrollYear = function() {
     return;
   }
   top = $month[0].offsetTop,
-  halfMonth = $month.outerHeight() / 2,
-  halfYear = $year.outerHeight() / 2;
+    halfMonth = $month.outerHeight() / 2,
+    halfYear = $year.outerHeight() / 2;
 
   this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
 };

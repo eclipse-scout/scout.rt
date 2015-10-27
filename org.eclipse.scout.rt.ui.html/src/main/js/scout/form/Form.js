@@ -44,7 +44,7 @@ scout.Form.prototype._renderForm = function($parent) {
   this.$container = $('<div>')
     .appendTo($parent)
     .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: rename class 'form' to view so we can use the displayHint as class-name
-  .data('model', this);
+    .data('model', this);
 
   if (this.isDialog()) {
     layout = new scout.DialogLayout(this);
@@ -252,7 +252,7 @@ scout.Form.prototype.attach = function() {
 
   // form is attached even if children are not yet
   this.attached = true;
-  if ((this.isView() || this.isDialog()) && this.session.desktop._outlineContent !== this ) {
+  if ((this.isView() || this.isDialog()) && this.session.desktop._outlineContent !== this) {
     //notify model this form is active
     this.session.desktop._setFormActivated(this);
   }

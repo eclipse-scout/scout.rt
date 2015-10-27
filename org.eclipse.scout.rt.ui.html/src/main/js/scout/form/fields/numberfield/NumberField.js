@@ -15,9 +15,7 @@ scout.NumberField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
   this.addField(
-    scout.fields.new$TextField().
-      blur(this._parse.bind(this)).
-      blur(this._onFieldBlur.bind(this)));
+    scout.fields.new$TextField().blur(this._parse.bind(this)).blur(this._onFieldBlur.bind(this)));
   this.addStatus();
 
   this._renderDecimalFormat();
@@ -33,7 +31,7 @@ scout.NumberField.prototype._renderDecimalFormat = function() {
   this._decimalFormat = this.decimalFormat ? new scout.DecimalFormat(this.session.locale, this.decimalFormat) : this.session.locale.decimalFormat;
 };
 
-scout.NumberField.prototype._parse = function () {
+scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
     input = input

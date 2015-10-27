@@ -109,7 +109,7 @@ scout.Menu.prototype.isTabTarget = function() {
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-  this.$container.toggleClass('menu-textandicon', !! textAndIcon);
+  this.$container.toggleClass('menu-textandicon', !!textAndIcon);
 };
 
 scout.Menu.prototype._closePopup = function() {

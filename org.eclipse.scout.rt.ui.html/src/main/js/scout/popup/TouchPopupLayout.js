@@ -15,7 +15,7 @@ scout.TouchPopupLayout.prototype.layout = function($container) {
 
   field.htmlComp.setBounds(new scout.Rectangle(fieldMargins.left, fieldMargins.top, fieldWidth, fieldHeight));
   this.popup._widgetContainerHtmlComp.setBounds(
-      new scout.Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
+    new scout.Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
 };
 
 /**

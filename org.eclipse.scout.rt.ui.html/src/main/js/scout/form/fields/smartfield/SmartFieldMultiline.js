@@ -74,4 +74,3 @@ scout.SmartFieldMultiline.prototype._readSearchText = function() {
   }
   return newDisplayText.join('\n');
 };
-

@@ -11,7 +11,7 @@ scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
     parent: this,
     dateFormat: options.dateFormat
   });
- 
+
   this._field._attachDatePickerDateSelectedHandler();
 };
 

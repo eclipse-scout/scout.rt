@@ -89,7 +89,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   });
 
   return false;
-},
+};
 
 scout.ClipboardField.prototype._onPaste = function(event) {
   var dataTransfer;

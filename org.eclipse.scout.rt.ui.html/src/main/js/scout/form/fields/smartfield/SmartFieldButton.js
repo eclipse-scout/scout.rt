@@ -19,8 +19,8 @@ scout.SmartFieldButton.prototype._render = function($parent) {
   this.addLabel();
 
   this.addField(scout.fields.new$TextField()
-      .attr('readonly', 'readonly')
-      .click(this._onClick.bind(this)));
+    .attr('readonly', 'readonly')
+    .click(this._onClick.bind(this)));
 
   this.addMandatoryIndicator();
   this.addIcon();
@@ -45,14 +45,12 @@ scout.SmartFieldButton.prototype.onCellEditorRendered = function(options) {
   }
 };
 
-scout.SmartFieldButton.prototype._renderProposalChooser = function() {
-};
+scout.SmartFieldButton.prototype._renderProposalChooser = function() {};
 
 /**
  * This method is called after a valid option has been selected in the proposal chooser.
  */
-scout.SmartFieldButton.prototype._removeProposalChooser = function() {
-};
+scout.SmartFieldButton.prototype._removeProposalChooser = function() {};
 
 scout.SmartFieldButton.prototype._onClick = function(e) {
   if (!this._popup.rendered) {
@@ -67,4 +65,3 @@ scout.SmartFieldButton.prototype._onClick = function(e) {
 scout.SmartFieldButton.prototype._fieldBounds = function() {
   return scout.graphics.offsetBounds(this.$field);
 };
-

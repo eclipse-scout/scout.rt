@@ -16,7 +16,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     $groupBoxTitle = this._groupBox._$groupBoxTitle,
     $pseudoStatus = this._groupBox.$pseudoStatus,
     containerSize = htmlContainer.getAvailableSize()
-      .subtract(htmlContainer.getInsets());
+    .subtract(htmlContainer.getInsets());
 
   if (htmlMenuBar) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
@@ -73,8 +73,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
     if (htmlMenuBar) {
       prefSize.height += htmlMenuBar.getPreferredSize(true).height;
     }
-  }
-  else {
+  } else {
     prefSize = new scout.Dimension(0, 0);
   }
   prefSize = prefSize.add(htmlContainer.getInsets());

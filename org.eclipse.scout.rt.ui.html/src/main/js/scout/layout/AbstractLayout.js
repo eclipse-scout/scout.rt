@@ -4,7 +4,7 @@
  * - layout
  * - preferredLayoutSize
  */
-scout.AbstractLayout = function() {
+scout.AbstractLayout = function() { //
 };
 
 /**
@@ -13,7 +13,7 @@ scout.AbstractLayout = function() {
  *
  * May be implemented by sub-class.
  */
-scout.AbstractLayout.prototype.invalidate = function() {
+scout.AbstractLayout.prototype.invalidate = function() { //
 };
 
 /**
@@ -22,7 +22,7 @@ scout.AbstractLayout.prototype.invalidate = function() {
  *
  * Must be implemented by sub-class.
  */
-scout.AbstractLayout.prototype.layout = function($container) {
+scout.AbstractLayout.prototype.layout = function($container) { //
 };
 
 /**

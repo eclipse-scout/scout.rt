@@ -174,7 +174,7 @@ scout.strings = {
   join: function(separator) {
     separator = this.asString(separator);
     var s = '';
-    for (var i = 1; i < arguments.length; i++ ) {
+    for (var i = 1; i < arguments.length; i++) {
       var arg = this.asString(arguments[i]);
       if (arg) {
         if (s && separator) {
@@ -217,7 +217,7 @@ scout.strings = {
     }
     string = this.asString(string);
     var s = '';
-    if(this.hasText(string)) {
+    if (this.hasText(string)) {
       s = string.charAt(0).toLowerCase() + string.slice(1);
     }
     return s;

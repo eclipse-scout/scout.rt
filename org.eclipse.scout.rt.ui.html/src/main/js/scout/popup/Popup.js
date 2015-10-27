@@ -199,8 +199,8 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
   // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
   if (!this.isOrHasWidget(event.popup) &&
-      !event.popup.isOrHasWidget(this) &&
-      !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
+    !event.popup.isOrHasWidget(this) &&
+    !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
     this.close(event);
   }
 };
@@ -216,7 +216,7 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   $container.addClass(openingDirectionY + ' ' + openingDirectionX);
   height = $container.outerHeight(true),
 
-  anchorBounds = this.getAnchorBounds();
+    anchorBounds = this.getAnchorBounds();
 
   x = anchorBounds.x;
   y = anchorBounds.y;
@@ -269,7 +269,7 @@ scout.Popup.prototype.adjustLocation = function($container, location, switchIfNe
     location = this.prefLocation($container, openingDirection);
   }
   left = location.x,
-  top = location.y;
+    top = location.y;
   if (overlap.x > 0) {
     // Move popup to the left until it gets fully visible
     left -= overlap.x;

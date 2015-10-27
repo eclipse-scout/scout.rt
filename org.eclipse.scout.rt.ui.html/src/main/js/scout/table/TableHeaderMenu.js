@@ -481,9 +481,9 @@ scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
   this.$container.setVisible(true);
   containerBounds = scout.graphics.offsetBounds(this.$container),
 
-  // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
-  // check left side of the header item (necessary if header item is moved outside on the left side of the table)
-  inView = isLocationInView(new scout.Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
+    // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
+    // check left side of the header item (necessary if header item is moved outside on the left side of the table)
+    inView = isLocationInView(new scout.Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
   if (!inView) {
     // if left side of the header is not in view, check if right side of the header and the menu, both must be visible)
     // check right side of the header item (necessary if header item is moved outside on the right side of the table)
@@ -497,8 +497,8 @@ scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
   // (bounds must be computed after setVisible, if it was hidden before bounds are not correct)
   containerBounds = scout.graphics.offsetBounds(this.$container);
   this.$whiter
-  // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
-  .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
+    // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
+    .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
     .width(this._computeWhitherWidth());
 };
 

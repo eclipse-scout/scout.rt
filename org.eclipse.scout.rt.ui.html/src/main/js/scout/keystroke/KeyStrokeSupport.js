@@ -31,4 +31,3 @@ scout.KeyStrokeSupport.prototype._updateKeyStrokes = function(newKeyStrokes, old
     }, this._adapter);
   }
 };
-

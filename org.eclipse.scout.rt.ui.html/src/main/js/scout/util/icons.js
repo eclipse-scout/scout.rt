@@ -29,8 +29,7 @@ scout.icons = {
         icon.font = tmp[0];
         icon.iconCharacter = tmp[1];
       }
-    }
-    else {
+    } else {
       icon.iconType = scout.Icon.IconType.BITMAP;
       icon.iconUrl = iconId;
     }

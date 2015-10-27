@@ -45,7 +45,6 @@ scout.StringField.prototype._render = function($parent) {
   $field.on('blur', this._onFieldBlur.bind(this))
     .on('select', this._onSelect.bind(this));
 
-
   // add drag and drop support
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
     scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,

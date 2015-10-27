@@ -169,7 +169,7 @@ scout.Widget.prototype.isOrHasWidget = function(widget) {
 };
 
 scout.Widget.prototype.hasWidget = function(widget) {
-  while (widget){
+  while (widget) {
     if (widget.parent === this) {
       return true;
     }
@@ -298,8 +298,8 @@ scout.Widget.prototype.off = function(type, func) {
 };
 
 scout.Widget.prototype.toString = function() {
-  return 'Widget[rendered=' +  this.rendered +
-      (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
+  return 'Widget[rendered=' + this.rendered +
+    (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

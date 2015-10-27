@@ -12,7 +12,6 @@ scout.TreeCompact = function() {
 };
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);
 
-
 scout.TreeCompact.prototype.init = function(model, session, register) {
   scout.TreeCompact.parent.prototype.init.call(this, model, session, register);
 
@@ -217,5 +216,7 @@ scout.TreeCompact.prototype._selectNode = function(node) {
     this._applyFilter('');
   }.bind(this), 100);
 
-  this._send('nodeAction', {nodeId: node.id});
+  this._send('nodeAction', {
+    nodeId: node.id
+  });
 };

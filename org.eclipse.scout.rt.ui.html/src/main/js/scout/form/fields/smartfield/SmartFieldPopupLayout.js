@@ -57,4 +57,3 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
 scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function($container) {
   return scout.HtmlComponent.optGet($container.children('.proposal-chooser'));
 };
-

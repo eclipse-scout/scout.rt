@@ -11,52 +11,52 @@ scout.inherits(scout.ProposalChooserLayout, scout.AbstractLayout);
  */
 scout.ProposalChooserLayout.TYPE_HANDLER = {
 
-    TABLE: {
-      _$table: null,
-      _$tableData: null,
-      _$tableRows: null,
-      cssSelector: '.table',
-      modifyDom: function($container) {
-        this._$table = $container.find('.table')
-          .css('display', 'inline-block')
-          .css('width', 'auto')
-          .css('height', 'auto');
-        this._$tableData = this._$table.children('.table-data')
-          .css('display', 'inline-block');
-        this._$tableRows = this._$tableData.children('.table-row')
-          .css('width', '');
-      },
-      restoreDom: function($container) {
-        this._$table
-          .css('display', 'block')
-          .css('width', '100%')
-          .css('height', '100%');
-        this._$tableData
-          .css('display', 'block');
-      }
+  TABLE: {
+    _$table: null,
+    _$tableData: null,
+    _$tableRows: null,
+    cssSelector: '.table',
+    modifyDom: function($container) {
+      this._$table = $container.find('.table')
+        .css('display', 'inline-block')
+        .css('width', 'auto')
+        .css('height', 'auto');
+      this._$tableData = this._$table.children('.table-data')
+        .css('display', 'inline-block');
+      this._$tableRows = this._$tableData.children('.table-row')
+        .css('width', '');
     },
-
-    TREE: {
-      _$tree: null,
-      _$treeData: null,
-      cssSelector: '.tree',
-      modifyDom: function($container) {
-        this._$tree = $container.find('.tree')
-          .css('display', 'inline-block')
-          .css('width', 'auto')
-          .css('height', 'auto');
-        this._$treeData = this._$tree.children('.tree-data')
-          .css('display', 'inline-block');
-      },
-      restoreDom: function($container) {
-        this._$tree
-          .css('display', 'block')
-          .css('width', '100%')
-          .css('height', '100%');
-        this._$treeData
-          .css('display', 'block');
-      }
+    restoreDom: function($container) {
+      this._$table
+        .css('display', 'block')
+        .css('width', '100%')
+        .css('height', '100%');
+      this._$tableData
+        .css('display', 'block');
     }
+  },
+
+  TREE: {
+    _$tree: null,
+    _$treeData: null,
+    cssSelector: '.tree',
+    modifyDom: function($container) {
+      this._$tree = $container.find('.tree')
+        .css('display', 'inline-block')
+        .css('width', 'auto')
+        .css('height', 'auto');
+      this._$treeData = this._$tree.children('.tree-data')
+        .css('display', 'inline-block');
+    },
+    restoreDom: function($container) {
+      this._$tree
+        .css('display', 'block')
+        .css('width', '100%')
+        .css('height', '100%');
+      this._$treeData
+        .css('display', 'block');
+    }
+  }
 };
 
 scout.ProposalChooserLayout.prototype._createTypeHandler = function(proposalChooser) {
@@ -109,8 +109,8 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
 
   $container.detach();
   var $measurementDiv = $.makeDiv('measurement')
-      .append($container)
-      .appendTo(this._proposalChooser.session.$entryPoint);
+    .append($container)
+    .appendTo(this._proposalChooser.session.$entryPoint);
   var prefSize = scout.graphics.getVisibleSize($measurementDiv);
 
   $container.detach();
@@ -122,4 +122,3 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   $container.css('display', 'block');
   return prefSize;
 };
-

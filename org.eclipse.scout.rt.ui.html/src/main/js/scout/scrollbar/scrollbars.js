@@ -305,7 +305,8 @@ scout.scrollbars = {
         left: '',
         top: '',
         width: '',
-        height: ''});
+        height: ''
+      });
     }.bind(this), 50);
   }
 };

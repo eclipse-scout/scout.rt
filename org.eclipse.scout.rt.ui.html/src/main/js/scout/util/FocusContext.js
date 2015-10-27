@@ -37,9 +37,9 @@ scout.FocusContext.prototype._dispose = function() {
 scout.FocusContext.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
     var activeElement = document.activeElement,
-        $focusableElements = this.$container.find(':tabbable'),
-        firstFocusableElement = $focusableElements.first()[0],
-        lastFocusableElement = $focusableElements.last()[0];
+      $focusableElements = this.$container.find(':tabbable'),
+      firstFocusableElement = $focusableElements.first()[0],
+      lastFocusableElement = $focusableElements.last()[0];
 
     // Forward Tab
     if (!event.shiftKey) {
@@ -89,7 +89,6 @@ scout.FocusContext.prototype._onFocusOut = function(event) {
 
   event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
 };
-
 
 /**
  * Method invoked once a child element of this context's $container is removed.

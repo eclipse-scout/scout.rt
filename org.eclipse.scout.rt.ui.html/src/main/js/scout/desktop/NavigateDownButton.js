@@ -54,7 +54,9 @@ scout.NavigateDownButton.prototype._drill = function() {
     if (parentNode) {
       parentNode.childNodes.forEach(function(childNode) {
         if (childNode.expanded && childNode !== drillNode) {
-          this.outline.collapseNode(childNode, {animateExpansion: false});
+          this.outline.collapseNode(childNode, {
+            animateExpansion: false
+          });
         }
       }.bind(this));
     }

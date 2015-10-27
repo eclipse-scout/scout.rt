@@ -109,7 +109,7 @@
     }
     var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
     if (cssClass) {
-        $svgElement.attrSVG('class', cssClass);
+      $svgElement.attrSVG('class', cssClass);
     }
     if (htmlContent) {
       $svgElement.html(htmlContent);
@@ -348,7 +348,7 @@
   };
 
   $.fn.select = function(selected) {
-    return this.toggleClass('selected', !! selected);
+    return this.toggleClass('selected', !!selected);
   };
 
   $.fn.isSelected = function() {
@@ -356,7 +356,7 @@
   };
 
   $.fn.setEnabled = function(enabled) {
-    enabled = !! enabled;
+    enabled = !!enabled;
     this.toggleClass('disabled', !enabled);
     // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
     if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
@@ -435,9 +435,8 @@
   };
 
   $.fn.placeholder = function(placeholder) {
-    return this.toggleAttr('placeholder', !! placeholder, placeholder);
+    return this.toggleAttr('placeholder', !!placeholder, placeholder);
   };
-
 
   $.fn.isVisible = function() {
     return elemVisible(this[0]);
@@ -462,7 +461,7 @@
       $elem = $elem.parent();
     }
     return $();
-  },
+  };
 
   /**
    * Returns every parent which is scrollable
@@ -478,7 +477,7 @@
       $elem = $elem.parent();
     }
     return $scrollParents;
-  },
+  };
 
   // most used animate
   $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
@@ -551,10 +550,11 @@
     this.cssWidth(oldWidth);
 
     // Then animate to new width
-    this.stop().animate({width: newWidth}, opts);
+    this.stop().animate({
+      width: newWidth
+    }, opts);
     return this;
   };
-
 
   // over engineered animate
   $.fn.widthToContent = function(opts) {
@@ -564,7 +564,6 @@
     this.cssWidthAnimated(oldW, newW, opts);
     return this;
   };
-
 
   $.fn.cssLeft = function(position) {
     return this.cssPxValue('left', position);
@@ -928,14 +927,14 @@
       doc = document,
       element = this[0];
     if (doc.body.createTextRange) {
-        range = document.body.createTextRange();
-        range.moveToElementText(element);
-        range.select();
+      range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
     } else if (window.getSelection) {
-        range = document.createRange();
-        range.selectNodeContents(element);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
+      range = document.createRange();
+      range.selectNodeContents(element);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
     }
   };
 

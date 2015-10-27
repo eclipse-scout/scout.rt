@@ -15,7 +15,7 @@ scout.TableLayout.prototype.layout = function($container) {
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
     containerSize = htmlContainer.getAvailableSize()
-      .subtract(htmlContainer.getInsets());
+    .subtract(htmlContainer.getInsets());
 
   if (menuBar.$container.isVisible()) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
@@ -29,7 +29,7 @@ scout.TableLayout.prototype.layout = function($container) {
   if (header) {
     height += scout.graphics.getSize(header.$container).height;
   }
-  $data.css('height', 'calc(100% - '+ height + 'px)');
+  $data.css('height', 'calc(100% - ' + height + 'px)');
 
   if (this.table.autoResizeColumns) {
     this._layoutColumns();
@@ -88,8 +88,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
   columns.forEach(function(column) {
     if (totalInitialWidth === 0) {
       weight = 1 / relevantColumns.length;
-    }
-    else {
+    } else {
       weight = column.initialWidth / totalInitialWidth;
     }
     newWidth = weight * availableWidth;
@@ -107,8 +106,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
   relevantColumns.forEach(function(column) {
     if (totalInitialWidth === 0) {
       weight = 1 / relevantColumns.length;
-    }
-    else {
+    } else {
       weight = column.initialWidth / totalInitialWidth;
     }
     newWidth = weight * availableWidth;

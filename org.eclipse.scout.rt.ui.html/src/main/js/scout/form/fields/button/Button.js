@@ -151,7 +151,9 @@ scout.Button.prototype.setSelected = function(selected) {
   if (this.rendered) {
     this._renderSelected(this.selected);
   }
-  this._send('selected', {selected: selected});
+  this._send('selected', {
+    selected: selected
+  });
 };
 
 /**
@@ -195,7 +197,7 @@ scout.Button.prototype._renderIconId = function() {
   this.$field.icon(this.iconId);
   if (this.iconId) {
     var $icon = this.$field.data('$icon');
-    $icon.toggleClass('with-label', !! this.label);
+    $icon.toggleClass('with-label', !!this.label);
   }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();

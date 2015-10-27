@@ -13,7 +13,8 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   this._destroyEllipsis();
   this._menuBar.rebuildItemsInternal();
 
-  var ellipsisSize, leftEnd = 0, rightEnd, overflown,
+  var ellipsisSize, leftEnd = 0,
+    rightEnd, overflown,
     oldOverflow = $container.css('overflow');
 
   // we cannot set overflow in MenuBar.css because overflow:hidden would cut off the

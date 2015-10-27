@@ -24,5 +24,8 @@ scout.ClickActiveElementKeyStroke.prototype._accept = function(event) {
  * @override KeyStroke.js
  */
 scout.ClickActiveElementKeyStroke.prototype.handle = function(event) {
-  event._$activeElement.trigger({ type: 'click', which: 1 });
+  event._$activeElement.trigger({
+    type: 'click',
+    which: 1
+  });
 };

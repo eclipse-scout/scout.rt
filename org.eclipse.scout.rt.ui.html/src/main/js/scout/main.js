@@ -29,7 +29,7 @@ scout._bootstrap = function(options) {
       scout.device.bootstrap(),
       scout.defaultValues.bootstrap(),
       scout.fonts.bootstrap(options.fonts)
-  ];
+    ];
 
   deferredValues.forEach(function(value) {
     if (Array.isArray(value)) {

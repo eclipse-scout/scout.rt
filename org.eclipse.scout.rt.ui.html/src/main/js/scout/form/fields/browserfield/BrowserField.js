@@ -37,8 +37,7 @@ scout.BrowserField.prototype._renderScrollBarsEnabled = function() {
   // which is deprecated in HTML5, but seems to do the trick.
   if (this.scrollBarsEnabled) {
     this.$field.removeAttr('scrolling');
-  }
-  else {
+  } else {
     this.$field.attr('scrolling', 'no');
   }
 };
@@ -59,7 +58,8 @@ scout.BrowserField.prototype._onPostMessage = function(event) {
   $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
   this._send('postMessage', {
     data: event.data,
-    origin: event.origin});
+    origin: event.origin
+  });
 };
 
 /**
@@ -70,4 +70,3 @@ scout.BrowserField.prototype._remove = function() {
   window.removeEventListener('message', this._postMessageListener);
   this._postMessageListener = null;
 };
-

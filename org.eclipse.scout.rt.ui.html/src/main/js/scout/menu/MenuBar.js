@@ -261,11 +261,10 @@ scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
 
 scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
   return scout.helpers.isOneOf(scout.keys.ENTER, keyStroke.which) &&
-      !keyStroke.ctrl &&
-      !keyStroke.alt  &&
-      !keyStroke.shift;
+    !keyStroke.ctrl &&
+    !keyStroke.alt &&
+    !keyStroke.shift;
 };
-
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   // Reverse the list if alignment is right to preserve the visible order specified by the

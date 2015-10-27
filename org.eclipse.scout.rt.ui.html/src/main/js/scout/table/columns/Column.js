@@ -67,7 +67,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
     }
   }
   var iconId = cell.iconId;
-  var icon = this._icon(iconId, !! text) || '';
+  var icon = this._icon(iconId, !!text) || '';
   var cssClass = this._cellCssClass(cell);
   var style = this._cellStyle(cell);
   var tooltipText = cell.tooltipText || '';

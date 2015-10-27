@@ -281,7 +281,7 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
     event.stopPropagation();
     event.preventDefault();
   });
-},
+};
 
 scout.Desktop.prototype._createSplitter = function($parent) {
   if (!this._hasNavigation()) {
@@ -702,8 +702,8 @@ scout.Desktop.prototype._addNullOutline = function(outline) {
     return;
   }
   var nullOutline = scout.create('Outline', {
-    parent: this
-  }),
+      parent: this
+    }),
     ovb = scout.create('OutlineViewButton', {
       parent: this,
       displayStyle: 'MENU',

@@ -63,22 +63,21 @@ scout.Device.prototype.bootstrap = function() {
   this.scrollbarWidth = this._detectScrollbarWidth();
   this.type = this._detectType(this.userAgent);
 
-
   if (this.isIos()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
     // With Chrome 32 the issue is solved, so no need to load the script for other devices than iOS
     deferreds.push(this._loadScriptDeferred('res/fastclickmod-1.0.1.min.js', function() {
-        FastClick.attach(document.body);
-        $.log.info('FastClick script loaded and attached');
-      }));
+      FastClick.attach(document.body);
+      $.log.info('FastClick script loaded and attached');
+    }));
   }
 
   if (this.hasOnScreenKeyboard()) {
     // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
     this.focusManagerActive = false;
     deferreds.push(this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
-        $.log.info('JQuery Mobile script loaded');
-      }));
+      $.log.info('JQuery Mobile script loaded');
+    }));
   }
   return deferreds;
 };
@@ -121,9 +120,9 @@ scout.Device.prototype.isSupportedBrowser = function(browser, version) {
   version = scout.helpers.nvl(version, this.browserVersion);
   var browsers = scout.Device.SupportedBrowsers;
   if ((browser === browsers.INTERNET_EXPLORER && version < 9) ||
-      (browser === browsers.CHROME && version < 23) ||
-      (browser === browsers.FIREFOX && version < 21) ||
-      (browser === browsers.SAFARI && version < 7)) {
+    (browser === browsers.CHROME && version < 23) ||
+    (browser === browsers.FIREFOX && version < 21) ||
+    (browser === browsers.SAFARI && version < 7)) {
     return false;
   }
   return true;
@@ -160,7 +159,7 @@ scout.Device.prototype._detectType = function(userAgent) {
 };
 
 scout.Device.prototype._parseBrowser = function(userAgent) {
-  if (userAgent.indexOf('Firefox')  > -1) {
+  if (userAgent.indexOf('Firefox') > -1) {
     this.browser = scout.Device.SupportedBrowsers.FIREFOX;
   } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
     this.browser = scout.Device.SupportedBrowsers.INTERNET_EXPLORER;

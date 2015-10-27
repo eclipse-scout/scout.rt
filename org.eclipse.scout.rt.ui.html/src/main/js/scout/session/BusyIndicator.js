@@ -8,7 +8,7 @@ scout.inherits(scout.BusyIndicator, scout.Widget);
 scout.BusyIndicator.prototype._init = function(options) {
   scout.BusyIndicator.parent.prototype._init.call(this, options);
 
-  this._cancellable = (options.cancellable === undefined ? true : !! options.cancellable);
+  this._cancellable = (options.cancellable === undefined ? true : !!options.cancellable);
 };
 
 scout.BusyIndicator.prototype._initKeyStrokeContext = function(keyStrokeContext) {

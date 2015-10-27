@@ -184,10 +184,10 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
 scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
   var firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
     $candidates = $container
-      .find(':focusable')
-      .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
-      .not(this.$entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback. */
-      .filter(filter || scout.filters.returnTrue);
+    .find(':focusable')
+    .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
+    .not(this.$entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback. */
+    .filter(filter || scout.filters.returnTrue);
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];

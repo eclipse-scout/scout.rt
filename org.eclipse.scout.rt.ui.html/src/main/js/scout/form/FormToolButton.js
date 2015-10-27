@@ -39,7 +39,7 @@ scout.FormToolButton.prototype._createPopup = function() {
  * @override
  */
 scout.FormToolButton.prototype._doActionTogglesPopup = function() {
-  return !! this.form;
+  return !!this.form;
 };
 
 /**

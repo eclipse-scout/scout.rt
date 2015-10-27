@@ -21,7 +21,7 @@ scout.RangeKeyStroke.prototype._accept = function(event) {
   if (event.ctrlKey !== this.ctrl ||
     event.altKey !== this.alt ||
     event.shiftKey !== this.shift
-    ) {
+  ) {
     return false;
   }
 

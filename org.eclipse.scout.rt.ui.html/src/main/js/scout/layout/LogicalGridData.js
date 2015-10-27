@@ -62,9 +62,9 @@ scout.LogicalGridData.prototype.validate = function() {
   this.heightHint = data.heightInPixel;
 
   // when having the label on top, the the row size has to be increased
-   if (this.model.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
-     this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
-   }
+  if (this.model.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+    this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
+  }
 };
 
 scout.LogicalGridData.prototype._inheritWeightY = function() {
@@ -73,8 +73,7 @@ scout.LogicalGridData.prototype._inheritWeightY = function() {
     var data = this.model.gridData;
     if (data.weightY >= 0) {
       d = data.weightY;
-    }
-    else {
+    } else {
       d = data.h >= 2 ? data.h : 0;
     }
   }
@@ -83,10 +82,10 @@ scout.LogicalGridData.prototype._inheritWeightY = function() {
 
 scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
   var found = false,
-      sumWy = 0;
+    sumWy = 0;
   if (f instanceof scout.CompositeField) {
     var i, inheritWeightY, child, children = f.getFields();
-    for (i=0; i<children.length; i++) {
+    for (i = 0; i < children.length; i++) {
       child = children[i];
       if (child.visible) {
         var data = child.gridData;
@@ -96,22 +95,19 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
             found = true;
             sumWy += inheritWeightY;
           }
-        }
-        else {
+        } else {
           found = true;
           sumWy += data.weightY;
         }
       }
     }
-  }
-  else {
+  } else {
     sumWy = (f.gridData.h >= 2 ? f.gridData.h : 0);
     found = true;
   }
   if (found) {
     return sumWy;
-  }
-  else {
+  } else {
     return null;
   }
 };

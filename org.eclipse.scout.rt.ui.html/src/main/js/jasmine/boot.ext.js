@@ -12,7 +12,7 @@ if (!Function.prototype.bind) {
     var fn = this,
       args = Array.prototype.slice.call(arguments, 1);
     return function() {
-      return fn.apply(context || this, args.concat( Array.prototype.slice.call(arguments) ));
+      return fn.apply(context || this, args.concat(Array.prototype.slice.call(arguments)));
     };
   };
 }

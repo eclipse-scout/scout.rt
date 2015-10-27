@@ -73,8 +73,8 @@ scout.TableCube.prototype.addData = function(data, dataGroup) {
     };
     dataAxis.group = function(array) {
       var sum = array.reduce(function(a, b) {
-        return a + b;
-      }),
+          return a + b;
+        }),
         count = array.reduce(function(a, b) {
           return (b === null ? a : a + 1);
         }, 0);

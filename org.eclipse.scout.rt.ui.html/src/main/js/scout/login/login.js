@@ -7,13 +7,13 @@ scout.login = {
    */
   init: function(opts) {
     var $buttonDiv, texts, defaultOpts = {
-        texts: {
-          'ui.login': 'Login',
-          'ui.loginFailed': 'Login failed',
-          'ui.user': 'User',
-          'ui.password': 'Password'
-        }
-      };
+      texts: {
+        'ui.login': 'Login',
+        'ui.loginFailed': 'Login failed',
+        'ui.user': 'User',
+        'ui.password': 'Password'
+      }
+    };
     this.options = $.extend({}, defaultOpts, opts);
     texts = new scout.Texts(this.options.texts);
     this.$form = $('<form>')

@@ -39,7 +39,7 @@ scout.SmartFieldTouchPopup.prototype._onContainerMouseDown = function(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
-//  return false;
+  //  return false;
   // FIXME AWE: (popups) durch das prevent default here, wird verhindert, dass ein text-field im popup den fokus bekommen kann
   // müssen wir für mobile und editierbare tabellen (?) noch lösen
 };

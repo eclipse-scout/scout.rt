@@ -44,7 +44,9 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
       return;
     }
     if (this.options.cloneMenuItems) {
-      menu = menu.cloneAdapter({parent: this});
+      menu = menu.cloneAdapter({
+        parent: this
+      });
     } else {
       menu.setParent(this);
     }
@@ -77,7 +79,6 @@ scout.ContextMenuPopup.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$body, this.session);
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
 };
-
 
 /**
  * @override PopupWithHead.js

@@ -51,7 +51,10 @@ scout.SplitBox.prototype._render = function($parent) {
     }
     if (this.splitterEnabled) {
       // Update mouse position (see resizeMove() for details)
-      var mousePosition = { x: event.clientX, y: event.clientY };
+      var mousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
 
       // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
       $(window)
@@ -87,7 +90,10 @@ scout.SplitBox.prototype._render = function($parent) {
         // When holding the mouse, but not moving it, a 'mousemove' event is fired every second nevertheless.
         return;
       }
-      mousePosition = { x: event.clientX, y: event.clientY };
+      mousePosition = {
+        x: event.clientX,
+        y: event.clientY
+      };
 
       if (this.splitHorizontal) { // "|"
         // Calculate target splitter position (in area)
@@ -98,8 +104,7 @@ scout.SplitBox.prototype._render = function($parent) {
         if (targetSplitterPositionLeft < SNAP_SIZE) {
           targetSplitterPositionLeft = 0;
           tempSplitterOffsetX = 0;
-        }
-        else if (splitAreaSize.width - targetSplitterPositionLeft < SNAP_SIZE) {
+        } else if (splitAreaSize.width - targetSplitterPositionLeft < SNAP_SIZE) {
           targetSplitterPositionLeft = splitAreaSize.width;
           tempSplitterOffsetX = splitterSize.width;
         }
@@ -118,14 +123,13 @@ scout.SplitBox.prototype._render = function($parent) {
         if (targetSplitterPositionTop < SNAP_SIZE) {
           targetSplitterPositionTop = 0;
           tempSplitterOffsetY = 0;
-        }
-        else if (splitAreaSize.height - targetSplitterPositionTop < SNAP_SIZE) {
+        } else if (splitAreaSize.height - targetSplitterPositionTop < SNAP_SIZE) {
           targetSplitterPositionTop = splitAreaSize.height;
           tempSplitterOffsetY = splitterSize.height;
         }
 
         // Update temporary splitter
-        $tempSplitter.cssTop(targetSplitterPositionTop- tempSplitterOffsetY);
+        $tempSplitter.cssTop(targetSplitterPositionTop - tempSplitterOffsetY);
         // Normalize target position
         newSplitterPosition = targetSplitterPositionTop / splitAreaSize.height;
       }

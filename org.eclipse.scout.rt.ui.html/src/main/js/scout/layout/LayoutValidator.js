@@ -38,7 +38,7 @@ scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
  * Layouts all invalid components (as long as they haven't been removed).
  */
 scout.LayoutValidator.prototype.validate = function() {
-  this._invalidComponents.forEach(function(comp){
+  this._invalidComponents.forEach(function(comp) {
     if (comp.isAttached()) { // don't layout components which don't exist anymore or are detached from the DOM
       comp.validateLayout();
     }

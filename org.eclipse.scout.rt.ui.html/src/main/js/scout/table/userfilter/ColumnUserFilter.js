@@ -24,14 +24,13 @@ scout.ColumnUserFilter.prototype.calculate = function() {
     if (this.column.hasDate) {
       // Default grouping for date columns is year
       group = scout.TableCube.DateGroup.YEAR;
-    }
-    else {
+    } else {
       // No grouping for time columns
       group = scout.TableCube.DateGroup.NONE;
     }
   }
   this.matrix = new scout.TableCube(this.table, this.session),
-  this.xAxis = this.matrix.addAxis(this.column, group);
+    this.xAxis = this.matrix.addAxis(this.column, group);
   this.matrix.calculate();
 
   this.selectedValues.forEach(function(selectedValue) {
@@ -63,7 +62,10 @@ scout.ColumnUserFilter.prototype.calculate = function() {
     if (this._useTextInsteadOfNormValue(key)) {
       key = text;
     }
-    this.availableValues.push({key: key, text: text});
+    this.availableValues.push({
+      key: key,
+      text: text
+    });
   }, this);
 };
 

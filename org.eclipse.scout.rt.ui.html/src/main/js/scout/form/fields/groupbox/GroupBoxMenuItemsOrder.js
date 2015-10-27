@@ -1,5 +1,4 @@
-scout.GroupBoxMenuItemsOrder = function() {
-};
+scout.GroupBoxMenuItemsOrder = function() {};
 
 scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
   var leftButtons = [],
@@ -33,4 +32,3 @@ scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
     right: rightButtons.concat(rightMenus)
   };
 };
-

@@ -43,7 +43,9 @@ scout.FormLayout.prototype._titleHeight = function($container) {
   // the render() method is called (they'll become visible later, when the fade-in
   // animation is completed). That's why we must calculate the title size here:
   var height = 0,
-    insets = scout.graphics.getInsets($container.children('.title-box'), {includeMargin: true});
+    insets = scout.graphics.getInsets($container.children('.title-box'), {
+      includeMargin: true
+    });
   if (this._form.title) {
     height += scout.graphics.measureString(this._form.title, 'font-text-large').height;
   }

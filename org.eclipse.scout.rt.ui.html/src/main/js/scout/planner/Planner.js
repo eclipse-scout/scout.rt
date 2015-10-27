@@ -754,7 +754,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
       this.lastRange.to = this.lastRange.from;
     }
   }
-  var rangeSelected = !! (this.startRange && this.lastRange);
+  var rangeSelected = !!(this.startRange && this.lastRange);
   var $startRow = this.startRow.$resource,
     $lastRow = this.lastRow.$resource;
 

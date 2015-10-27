@@ -57,11 +57,11 @@ scout.ViewButton.prototype._renderText = function() {
 scout.ViewButton.prototype._renderSelected = function() {
   scout.ViewButton.parent.prototype._renderSelected.call(this);
   if (this._isTab()) {
-      scout.tooltips.install(this.$container, {
-        parent: this,
-        text: this.text
-      });
-    }
+    scout.tooltips.install(this.$container, {
+      parent: this,
+      text: this.text
+    });
+  }
 };
 
 /**

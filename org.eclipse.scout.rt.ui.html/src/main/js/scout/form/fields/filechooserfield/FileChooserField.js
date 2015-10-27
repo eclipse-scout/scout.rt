@@ -16,12 +16,12 @@ scout.FileChooserField.prototype._render = function($parent) {
   this.addMandatoryIndicator();
 
   this.addField(scout.fields.new$TextField()
-      .on('blur', this._onFieldBlur.bind(this))
-      .on('dragenter', this._onDragEnterOrOver.bind(this))
-      .on('dragover', this._onDragEnterOrOver.bind(this))
-      .on('drop', this._onDrop.bind(this))
-      .on('keydown', this._onKeydown.bind(this))
-      );
+    .on('blur', this._onFieldBlur.bind(this))
+    .on('dragenter', this._onDragEnterOrOver.bind(this))
+    .on('dragover', this._onDragEnterOrOver.bind(this))
+    .on('drop', this._onDrop.bind(this))
+    .on('keydown', this._onKeydown.bind(this))
+  );
 
   this.addIcon();
   this.addStatus();
@@ -40,7 +40,7 @@ scout.FileChooserField.prototype._onDragEnterOrOver = function(event) {
 };
 
 scout.FileChooserField.prototype._onDrop = function(event) {
-  if(scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+  if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -59,8 +59,7 @@ scout.FileChooserField.prototype._onKeydown = function(event) {
   return true;
 };
 
-scout.FileChooserField.prototype._onClick = function(event) {
-};
+scout.FileChooserField.prototype._onClick = function(event) {};
 
 scout.FileChooserField.prototype._onIconClick = function(event) {
   scout.FileChooserField.parent.prototype._onIconClick.call(this, event);
@@ -70,4 +69,3 @@ scout.FileChooserField.prototype._onIconClick = function(event) {
 scout.FileChooserField.prototype.openFileChooser = function() {
   this._send('chooseFile');
 };
-

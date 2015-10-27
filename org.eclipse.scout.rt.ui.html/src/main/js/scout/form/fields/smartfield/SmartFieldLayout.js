@@ -25,7 +25,6 @@ scout.SmartFieldLayout.prototype.layout = function($container) {
   }
 };
 
-
 /**
  * Layout for icon in multiline smart-field works a bit different because the icon here is _inside_
  * an additional field container, which contains the INPUT field and the icon.

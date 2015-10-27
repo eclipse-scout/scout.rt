@@ -42,7 +42,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
     }
 
     $part = $day
-      .appendDiv('calendar-component', this.item.subject )
+      .appendDiv('calendar-component', this.item.subject)
       .addClass(this.item.cssClass)
       .data('component', this)
       .data('partDay', partDay)
@@ -62,7 +62,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
           fromDate = scout.dates.parseJsonDate(this.fromDate),
           toDate = scout.dates.parseJsonDate(this.toDate),
           partFrom = fromDate.getHours() + fromDate.getMinutes() / 60,
-          partTo =  toDate.getHours() + toDate.getMinutes() / 60;
+          partTo = toDate.getHours() + toDate.getMinutes() / 60;
 
         // position and height depending on start and end date
         $part.addClass('component-day');
@@ -88,7 +88,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
 scout.CalendarComponent.prototype._findDayInGrid = function(date) {
   var $day;
   $('.calendar-day', this.parent.$grid)
-    .each(function () {
+    .each(function() {
       if (scout.dates.isSameDay($(this).data('date'), date)) {
         $day = $(this);
         return;
@@ -108,12 +108,12 @@ scout.CalendarComponent.prototype._arrangeTask = function(taskOffset) {
 };
 
 scout.CalendarComponent.prototype._isDayPart = function() {
-  return !this.parent._isMonth()  && !this.fullDay;
+  return !this.parent._isMonth() && !this.fullDay;
 };
 
 scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
   var y1Top = this.parent._dayPosition(y1),
-      y2Top = this.parent._dayPosition(y2);
+    y2Top = this.parent._dayPosition(y2);
   return $part
     .css('top', y1Top + '%')
     .css('height', y2Top - y1Top + '%');
@@ -138,7 +138,9 @@ scout.CalendarComponent.prototype.setSelected = function(selected) {
   var oldSelected = this._selected;
   this._selected = selected;
   if (oldSelected !== selected) {
-    this.events.trigger('selected', {selected: selected});
+    this.events.trigger('selected', {
+      selected: selected
+    });
     this._renderSelected();
   }
 };
@@ -165,7 +167,10 @@ scout.CalendarComponent.prototype._description = function() {
 
   // subject
   if (scout.strings.hasText(this.item.subject)) {
-    descParts.push({text: this.item.subject, cssClass: 'bold'});
+    descParts.push({
+      text: this.item.subject,
+      cssClass: 'bold'
+    });
   }
 
   // time-range
@@ -178,12 +183,17 @@ scout.CalendarComponent.prototype._description = function() {
   }
 
   if (scout.strings.hasText(range)) {
-    descParts.push({text: range, cssClass: 'small'});
+    descParts.push({
+      text: range,
+      cssClass: 'small'
+    });
   }
 
   // body
   if (scout.strings.hasText(this.item.body)) {
-    descParts.push({text: this.item.body});
+    descParts.push({
+      text: this.item.body
+    });
   }
 
   // build text

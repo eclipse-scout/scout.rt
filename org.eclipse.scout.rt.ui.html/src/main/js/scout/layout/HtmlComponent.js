@@ -240,7 +240,6 @@ scout.HtmlComponent.prototype.isVisible = function() {
   return this.$comp.isVisible();
 };
 
-
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**

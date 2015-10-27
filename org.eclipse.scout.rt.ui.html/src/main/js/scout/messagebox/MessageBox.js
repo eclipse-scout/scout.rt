@@ -164,7 +164,9 @@ scout.MessageBox.prototype._renderCopyPasteText = function(text) {
 };
 
 scout.MessageBox.prototype._onButtonClick = function(event, option) {
-  this._send('action', {option: option});
+  this._send('action', {
+    option: option
+  });
 };
 
 scout.MessageBox.prototype.onModelAction = function(event) {

@@ -186,6 +186,6 @@ scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
 };
 
 scout.keyStrokeMode = {
-    UP: 'keyup',
-    DOWN: 'keydown'
+  UP: 'keyup',
+  DOWN: 'keydown'
 };

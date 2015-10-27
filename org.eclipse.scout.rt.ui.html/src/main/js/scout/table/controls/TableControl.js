@@ -165,7 +165,6 @@ scout.TableControl.prototype.isContentAvailable = function() {
   return !!this.form;
 };
 
-
 scout.TableControl.prototype.toggle = function() {
   if (this.tableFooter.selectedControl === this) {
     this.setSelected(false, true);

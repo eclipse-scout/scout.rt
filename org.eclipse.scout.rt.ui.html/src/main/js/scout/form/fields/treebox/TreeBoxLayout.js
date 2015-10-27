@@ -66,7 +66,6 @@ scout.TreeBoxLayout.prototype.preferredLayoutSize = function($container) {
 
 };
 
-
 scout.TreeBoxLayout.prototype.naturalSize = function(formField) {
   return new scout.Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
 };

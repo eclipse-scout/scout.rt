@@ -71,8 +71,7 @@ function insertLineNumbers(filename, text) {
     if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
       // also if line is endMLBC AND beginMLBC
       insideBlockComment = true;
-    }
-    else if (lineIsEndOfMultilineBlockComment(line, insideBlockComment)) {
+    } else if (lineIsEndOfMultilineBlockComment(line, insideBlockComment)) {
       insideBlockComment = false;
     }
     lineNo++;

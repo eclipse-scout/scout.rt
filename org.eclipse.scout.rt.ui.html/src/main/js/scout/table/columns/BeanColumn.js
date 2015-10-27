@@ -13,7 +13,7 @@ scout.BeanColumn.prototype.buildCellForRow = function(row) {
   value = this.table.cellValue(this, row);
   this._renderValue($cell, value);
   if (scout.device.tableAdditionalDivRequired) {
-    $cell.html('<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */) + 'px; ' + '">' + $cell.html() + '</div>');
+    $cell.html('<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ) + 'px; ' + '">' + $cell.html() + '</div>');
   }
   return $cell[0].outerHTML;
 };

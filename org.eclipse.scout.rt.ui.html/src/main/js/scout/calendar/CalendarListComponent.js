@@ -18,13 +18,13 @@ scout.CalendarListComponent = function(partDay, source) {
 scout.CalendarListComponent.prototype.render = function($parent) {
   var source = this.source;
   this.$container = $parent
-   .appendDiv('calendar-component')
-   .data('partDay', this.partDay)
-   .addClass(source.item.cssClass)
-   .toggleClass('comp-selected', source._selected)
-   .mousedown(source._onMousedown.bind(source))
-   .on('contextmenu', source._onContextMenu.bind(source))
-   .html(source._description());
+    .appendDiv('calendar-component')
+    .data('partDay', this.partDay)
+    .addClass(source.item.cssClass)
+    .toggleClass('comp-selected', source._selected)
+    .mousedown(source._onMousedown.bind(source))
+    .on('contextmenu', source._onContextMenu.bind(source))
+    .html(source._description());
 };
 
 scout.CalendarListComponent.prototype.remove = function() {

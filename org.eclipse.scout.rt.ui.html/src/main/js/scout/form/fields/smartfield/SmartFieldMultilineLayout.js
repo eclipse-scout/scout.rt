@@ -11,9 +11,8 @@ scout.SmartFieldMultilineLayout.prototype.layout = function($container) {
     $inputField = $container.children('.multiline'),
     $multilines = $container.children('.multiline-field'),
     innerSize = htmlContainer.getAvailableSize()
-      .subtract(htmlContainer.getInsets());
+    .subtract(htmlContainer.getInsets());
 
   $inputField.cssHeight(scout.HtmlEnvironment.formRowHeight);
   $multilines.cssHeight(innerSize.height - scout.HtmlEnvironment.formRowHeight);
 };
-

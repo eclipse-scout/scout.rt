@@ -90,7 +90,6 @@ scout.TabBox.prototype._removeTabContent = function() {
   }, this);
 };
 
-
 scout.TabBox.prototype.rebuildTabs = function() {
   // FIXME AWE: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
   // DOM element which currently has the focus - the focus is lost. An other solution would be, to render the
@@ -110,7 +109,9 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
     var oldSelectedTab = this.selectedTab;
     this.selectedTab = tabIndex;
     if (scout.helpers.nvl(notifyServer, true)) {
-      this._send('selected', {tabIndex: tabIndex});
+      this._send('selected', {
+        tabIndex: tabIndex
+      });
     }
 
     this.tabItems[oldSelectedTab].setTabActive(false);
@@ -126,7 +127,9 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
 
       var $tabContent = this._$tabContent.children().first();
       if ($tabContent.length > 0) {
-        this.session.detachHelper.beforeDetach($tabContent, {storeFocus: false});
+        this.session.detachHelper.beforeDetach($tabContent, {
+          storeFocus: false
+        });
         $tabContent.detach();
         this._$tabContentCache[oldSelectedTab] = $tabContent;
       }
@@ -155,7 +158,7 @@ scout.TabBox.prototype._onKeyDown = function(event) {
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
     var tabItem = this.tabItems[tabIndex];
     if (tabItem._tabRendered) {
-        this._selectTab(tabItem);
+      this._selectTab(tabItem);
     }
   }
 };
@@ -163,14 +166,14 @@ scout.TabBox.prototype._onKeyDown = function(event) {
 scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualIndex, keyStroke) {
   var modifier = keyStroke === scout.keys.LEFT ? -1 : 1;
   var endFunc = function(i) {
-    if (keyStroke === scout.keys.LEFT){
-      return i >=0;
+    if (keyStroke === scout.keys.LEFT) {
+      return i >= 0;
     }
     return i < this.tabItems.length;
   }.bind(this);
-  for(var i = actualIndex+modifier; endFunc(i); i=i+modifier){
+  for (var i = actualIndex + modifier; endFunc(i); i = i + modifier) {
     var tabItem = this.tabItems[i];
-    if(tabItem.visible){
+    if (tabItem.visible) {
       return i;
     }
   }

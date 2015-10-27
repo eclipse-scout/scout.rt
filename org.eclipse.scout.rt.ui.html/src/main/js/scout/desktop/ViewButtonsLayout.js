@@ -14,7 +14,7 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     fixedWidth = 0,
     containerBounds = this._htmlComp.getBounds(),
     tabs = $container.children().length,
-    tabWidth = (containerBounds.width/tabs);
+    tabWidth = (containerBounds.width / tabs);
   $container.children().each(function() {
     var $tab = $(this);
     $tab.removeAttr('style');

@@ -86,7 +86,7 @@ scout.TableFooter.prototype._render = function($parent) {
 
   this.table.on('rowsDrawn', this._tableRowsDrawnHandler);
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
-  this.table.on('addFilter',this._tableAddFilterHandler);
+  this.table.on('addFilter', this._tableAddFilterHandler);
   this.table.on('removeFilter', this._tableRemoveFilterHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('statusChanged', this._tableStatusChangedHandler);
@@ -100,7 +100,7 @@ scout.TableFooter.prototype._remove = function() {
 
   this.table.off('rowsDrawn', this._tableRowsDrawnHandler);
   this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
-  this.table.off('addFilter',this._tableAddFilterHandler);
+  this.table.off('addFilter', this._tableAddFilterHandler);
   this.table.off('removeFilter', this._tableRemoveFilterHandler);
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('statusChanged', this._tableStatusChangedHandler);

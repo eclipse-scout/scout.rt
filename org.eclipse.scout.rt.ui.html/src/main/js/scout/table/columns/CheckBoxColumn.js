@@ -24,7 +24,7 @@ scout.CheckBoxColumn.prototype.buildCell = function(cell, row) {
   cssClass = this._cellCssClass(cell);
   style = this._cellStyle(cell);
   if (!enabled) {
-    cssClass +=' disabled';
+    cssClass += ' disabled';
   }
   tooltipText = cell.tooltipText;
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');

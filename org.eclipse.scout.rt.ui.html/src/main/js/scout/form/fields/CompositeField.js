@@ -9,4 +9,3 @@ scout.inherits(scout.CompositeField, scout.FormField);
 scout.CompositeField.prototype.getFields = function() {
   throw new Error('Not implemented');
 };
-

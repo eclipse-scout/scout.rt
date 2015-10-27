@@ -1,4 +1,4 @@
-scout.DetailTableTreeFilter = function() {
+scout.DetailTableTreeFilter = function() { //
 };
 
 /**

@@ -23,7 +23,7 @@ scout.CellEditorPopupLayout.prototype.preferredLayoutSize = function($container)
 
   cellBounds = scout.graphics.bounds($cell, false, true);
   rowBounds = scout.graphics.bounds($row, false, true);
-  margin = this.cellEditorPopup.$container.cssMarginLeft();  
+  margin = this.cellEditorPopup.$container.cssMarginLeft();
   if (margin < 0) {
     // extend the width if the popup has a negative margin (used for the first cell)
     cellBounds.width = cellBounds.width + -margin;

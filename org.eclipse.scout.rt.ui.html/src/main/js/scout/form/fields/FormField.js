@@ -111,7 +111,7 @@ scout.FormField.prototype._renderMandatory = function() {
 };
 
 scout.FormField.prototype._renderErrorStatus = function() {
-  var hasError = !! (this.errorStatus);
+  var hasError = !!(this.errorStatus);
 
   this.$container.toggleClass('has-error', hasError);
   if (this.$field) {
@@ -210,7 +210,7 @@ scout.FormField.prototype._updateStatusVisible = function() {
  */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
-    hasError = !! (this.errorStatus),
+    hasError = !!(this.errorStatus),
     hasTooltip = this.tooltipText;
 
   return !this.suppressStatus && (statusVisible || hasError || hasTooltip || (this._hasMenus() && this.menusVisible));
@@ -352,8 +352,8 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
       // showing menus is more important than showing tooltips
       if (!this.contextPopup || !this.contextPopup.rendered) {
         if (!menus.some(function(menuItem) {
-          return menuItem.visible;
-        })) {
+            return menuItem.visible;
+          })) {
           return; // at least one menu item must be visible
         }
         this.contextPopup = scout.create(scout.ContextMenuPopup, {

@@ -19,7 +19,6 @@ scout.menus = {
     var filteredMenus = [],
       separatorCount = 0;
 
-
     menus.forEach(function(menu) {
       var childMenus = menu.childActions;
       if (childMenus.length > 0) {
@@ -61,10 +60,9 @@ scout.menus = {
     return scout.menus._checkType(menu, types);
   },
 
-
-  _enableDisableMenuKeyStroke:function(menu, activated, exclude){
-    if(activated){
-      menu.excludedByFilter=exclude;
+  _enableDisableMenuKeyStroke: function(menu, activated, exclude) {
+    if (activated) {
+      menu.excludedByFilter = exclude;
     }
   },
 

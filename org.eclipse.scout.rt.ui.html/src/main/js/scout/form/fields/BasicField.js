@@ -57,8 +57,7 @@ scout.BasicField.prototype._checkDisplayTextChanged = function(displayText, whil
       if (whileTyping) {
         // Remember that we sent some events to the server with "whileTyping=true".
         this._displayTextChangedWhileTyping = true;
-      }
-      else {
+      } else {
         if (!this._displayTextChangedWhileTyping) {
           // If there were no "whileTyping=true" events, don't send anything to the server.
           return false;
@@ -98,7 +97,7 @@ scout.BasicField.prototype._removeDisabledOverlay = function() {
 
 scout.BasicField.prototype._createCopyContextMenu = function(event) {
   if (!this.visible ||
-      !scout.strings.hasText(this.displayText)) {
+    !scout.strings.hasText(this.displayText)) {
     return;
   }
 

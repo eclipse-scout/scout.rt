@@ -8,7 +8,7 @@ scout.CalendarLayout.prototype.layout = function($container) {
   var height = 0;
 
   height += $container.cssMarginTop() + $container.cssMarginBottom();
-  $container.css('height', 'calc(100% - '+ height + 'px)');
+  $container.css('height', 'calc(100% - ' + height + 'px)');
 
   this.calendar.layoutSize();
   this.calendar.layoutYearPanel();

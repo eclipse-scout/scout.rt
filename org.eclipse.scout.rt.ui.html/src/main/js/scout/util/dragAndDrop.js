@@ -107,7 +107,7 @@ scout.dragAndDrop = {
     return false;
   },
 
-  handler: function(that, supportedScoutTypesArray, dropTypeCallback, dropMaximumSizeCallback, additionalDropPropertiesCallback, allowedTypesCallback){
+  handler: function(that, supportedScoutTypesArray, dropTypeCallback, dropMaximumSizeCallback, additionalDropPropertiesCallback, allowedTypesCallback) {
     supportedScoutTypesArray = scout.arrays.ensure(supportedScoutTypesArray);
 
     // create handler
@@ -132,17 +132,17 @@ scout.dragAndDrop = {
 
       onDrop: function(event) {
         if (handlerInternal.supportedScoutTypesArray.indexOf(scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
-            handlerInternal.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
-            scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+          handlerInternal.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
+          scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
           event.stopPropagation();
           event.preventDefault();
 
           var files = event.originalEvent.dataTransfer.files;
           if (files.length >= 1) {
             that.session.uploadFiles(that, files,
-                handlerInternal.additionalDropProperties ? handlerInternal.additionalDropProperties(event) : undefined,
-                handlerInternal.dropSize ? handlerInternal.dropSize() : undefined,
-                handlerInternal.allowedTypes ? handlerInternal.allowedTypes() : undefined);
+              handlerInternal.additionalDropProperties ? handlerInternal.additionalDropProperties(event) : undefined,
+              handlerInternal.dropSize ? handlerInternal.dropSize() : undefined,
+              handlerInternal.allowedTypes ? handlerInternal.allowedTypes() : undefined);
           }
         }
       }

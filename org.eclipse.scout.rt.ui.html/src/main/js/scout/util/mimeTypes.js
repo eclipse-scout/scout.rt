@@ -18,20 +18,16 @@ scout.mimeTypes = {
     if (type === this.TEXT_PLAIN) {
       filename = 'Text';
       extension = '.txt';
-    }
-    else if (type === this.IMAGE_PNG) {
+    } else if (type === this.IMAGE_PNG) {
       filename = 'Picture';
       extension = '.png';
-    }
-    else if (type === this.IMAGE_JPG) {
+    } else if (type === this.IMAGE_JPG) {
       filename = 'Picture';
       extension = '.jpg';
-    }
-    else if (type === this.IMAGE_JPEG) {
+    } else if (type === this.IMAGE_JPEG) {
       filename = 'Picture';
       extension = '.jpeg';
-    }
-    else if (type === this.IMAGE_GIF) {
+    } else if (type === this.IMAGE_GIF) {
       filename = 'Picture';
       extension = '.gif';
     }

@@ -233,8 +233,7 @@ scout.DatePicker.prototype._build$DateBox = function() {
 
     if (scout.dates.isSameDay(start, this.preselectedDate)) {
       cl += ' date-picker-preselected';
-    }
-    else if (scout.dates.isSameDay(start, this.selectedDate)) {
+    } else if (scout.dates.isSameDay(start, this.selectedDate)) {
       cl += ' date-picker-selected';
     }
 

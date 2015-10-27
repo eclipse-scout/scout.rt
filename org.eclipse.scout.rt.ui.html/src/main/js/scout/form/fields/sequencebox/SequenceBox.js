@@ -74,7 +74,7 @@ scout.SequenceBox.prototype._getLastVisibleField = function() {
     return;
   }
 
-  return visibleFields[visibleFields.length -1];
+  return visibleFields[visibleFields.length - 1];
 };
 
 /**

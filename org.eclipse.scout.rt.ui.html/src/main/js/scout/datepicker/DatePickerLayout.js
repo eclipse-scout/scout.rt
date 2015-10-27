@@ -20,7 +20,7 @@ scout.DatePickerLayout.SIDE_RATIO = 1.3918;
 
 scout.DatePickerLayout.prototype.layout = function($container) {
   var
-    // DOM elements
+  // DOM elements
     $header = $container.find('.date-picker-header'),
     $scrollable = $container.find('.date-picker-scrollable'),
     $month = $container.find('.date-picker-month'),

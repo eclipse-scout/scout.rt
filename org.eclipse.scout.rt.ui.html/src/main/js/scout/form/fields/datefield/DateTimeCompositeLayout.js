@@ -29,11 +29,11 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     var dateFieldMargins = htmlDateField.getMargins();
     var timeFieldMargins = htmlTimeField.getMargins();
     var compositeMargins = new scout.Insets(
-        Math.max(dateFieldMargins.top, timeFieldMargins.top),
-        Math.max(dateFieldMargins.right, timeFieldMargins.right),
-        Math.max(dateFieldMargins.bottom, timeFieldMargins.bottom),
-        Math.max(dateFieldMargins.left, timeFieldMargins.left)
-      );
+      Math.max(dateFieldMargins.top, timeFieldMargins.top),
+      Math.max(dateFieldMargins.right, timeFieldMargins.right),
+      Math.max(dateFieldMargins.bottom, timeFieldMargins.bottom),
+      Math.max(dateFieldMargins.left, timeFieldMargins.left)
+    );
     var compositeSize = availableSize.subtract(compositeMargins);
     var hgap = this._hgap();
     var totalWidth = compositeSize.width - hgap;
@@ -119,11 +119,11 @@ scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($containe
     prefSize.width = this.MIN_DATE_FIELD_WIDTH + this._hgap() + this.MIN_TIME_FIELD_WIDTH;
   }
   // --- Date only ---
-  else if (this._dateField.hasDate ) {
+  else if (this._dateField.hasDate) {
     prefSize.width = this.MIN_DATE_FIELD_WIDTH;
   }
   // --- Time only ---
-  else if (this._dateField.hasTime ) {
+  else if (this._dateField.hasTime) {
     prefSize.width = this.MIN_TIME_FIELD_WIDTH;
   }
   return prefSize;

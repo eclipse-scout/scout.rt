@@ -39,8 +39,7 @@ scout.DecimalFormat = function(locale, pattern) {
     this.negativeSuffix = negativePrefixAndSuffix.suffix;
     // from now on, only look at the positive subpattern
     pattern = split[0];
-  }
-  else {
+  } else {
     // No, there is no negative subpattern, so the positive prefix/suffix are used for both positive and negative numbers.
     // Check if there is a minus sign in the prefix/suffix.
     if (this.positivePrefix.indexOf(SYMBOLS.minusSign) !== -1 || this.positiveSuffix.indexOf(SYMBOLS.minusSign) !== -1) {
@@ -49,8 +48,7 @@ scout.DecimalFormat = function(locale, pattern) {
       this.negativeSuffix = this.positiveSuffix.replace(SYMBOLS.minusSign, locale.decimalFormatSymbols.minusSign);
       this.positivePrefix = this.positivePrefix.replace(SYMBOLS.minusSign, '');
       this.positiveSuffix = this.positiveSuffix.replace(SYMBOLS.minusSign, '');
-    }
-    else {
+    } else {
       // No, there is no minus sign in the prefix/suffix. Therefore, use the default negativePrefix/Suffix, but append the positivePrefix/Suffix
       this.negativePrefix = this.positivePrefix + this.negativePrefix;
       this.negativeSuffix = this.negativeSuffix + this.positiveSuffix;
@@ -82,8 +80,8 @@ scout.DecimalFormat = function(locale, pattern) {
   // before or after any 'digit-like' character in the given pattern string.
   function findPrefixAndSuffix(pattern) {
     var result = {
-        prefix: '',
-        suffix: ''
+      prefix: '',
+      suffix: ''
     };
     // Find prefix (anything before the first 'digit-like' character)
     var digitLikeCharacters = SYMBOLS.digit + SYMBOLS.zeroDigit + SYMBOLS.decimalSeparator + SYMBOLS.groupingSeparator;

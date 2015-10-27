@@ -97,8 +97,7 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
   if (this._tooltip && this._tooltip.rendered) {
     // update existing tooltip
     this._tooltip.setText(text);
-  }
-  else {
+  } else {
     // create new tooltip
     var options = $.extend({
       $anchor: $comp,

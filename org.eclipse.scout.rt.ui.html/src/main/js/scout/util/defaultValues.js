@@ -40,7 +40,7 @@ scout.defaultValues = {
     // For all object types in the defaults that don't have a hierarchy yet, add a dummy hierarchy with one element
     for (var objectType in this._defaults) {
       if (!this._objectTypeHierarchyFlat[objectType]) {
-        this._objectTypeHierarchyFlat[objectType] = [ objectType ];
+        this._objectTypeHierarchyFlat[objectType] = [objectType];
       }
     }
   },
@@ -53,7 +53,7 @@ scout.defaultValues = {
       throw new Error('Argument \'targetMap\' must not be null');
     }
     for (var objectType in json) {
-      var newCurrentParentObjectTypes = [ objectType ];
+      var newCurrentParentObjectTypes = [objectType];
       if (currentParentObjectTypes) {
         newCurrentParentObjectTypes = newCurrentParentObjectTypes.concat(currentParentObjectTypes);
       }
@@ -81,8 +81,7 @@ scout.defaultValues = {
       for (var i = 0; i < object.length; i++) {
         this.applyTo(object[i], objectType);
       }
-    }
-    else if (typeof object === 'object') {
+    } else if (typeof object === 'object') {
       objectType = objectType || object.objectType;
       if (objectType) {
         this._applyToInternal(object, objectType);

@@ -26,4 +26,3 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
     table.prepareCellEdit(pos.row.id, pos.column.id);
   }
 };
-

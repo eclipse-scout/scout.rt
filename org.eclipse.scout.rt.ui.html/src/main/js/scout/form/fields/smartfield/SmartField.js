@@ -179,7 +179,7 @@ scout.SmartField.prototype._onIconClick = function(event) {
 };
 
 scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
-  var doPrevent = !! this.proposalChooser;
+  var doPrevent = !!this.proposalChooser;
   $.log.trace('(SmartField#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
   return doPrevent;
 };
@@ -278,7 +278,9 @@ scout.SmartField.prototype._proposalTyped = function() {
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
     $.log.debug('(SmartField#_proposalTyped) send searchText=' + searchText);
-    this._send('proposalTyped', {searchText: searchText});
+    this._send('proposalTyped', {
+      searchText: searchText
+    });
   }.bind(this), this.DEBOUNCE_DELAY);
 };
 
@@ -326,7 +328,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   this._sendTimeoutId = null;
 
   forceClose = scout.helpers.nvl(forceClose, false);
-  var proposalChooserOpen = !! this.proposalChooser,
+  var proposalChooserOpen = !!this.proposalChooser,
     searchText = this._readSearchText();
 
   $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);

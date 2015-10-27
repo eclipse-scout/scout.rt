@@ -29,7 +29,7 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
   }
   if (htmlChild) {
     return htmlChild.getPreferredSize();
-  } else{
+  } else {
     return new scout.Dimension(1, 1);
   }
 };

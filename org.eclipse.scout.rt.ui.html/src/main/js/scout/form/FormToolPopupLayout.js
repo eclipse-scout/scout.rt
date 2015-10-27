@@ -24,7 +24,9 @@ scout.FormToolPopupLayout.prototype.preferredLayoutSize = function($container) {
 
   prefSize = htmlForm.getPreferredSize()
     .add(htmlComp.getInsets())
-    .add(scout.graphics.getInsets(this.popup.$body, {includeMargin: true}))
+    .add(scout.graphics.getInsets(this.popup.$body, {
+      includeMargin: true
+    }))
     .add(htmlForm.getMargins());
 
   return prefSize;

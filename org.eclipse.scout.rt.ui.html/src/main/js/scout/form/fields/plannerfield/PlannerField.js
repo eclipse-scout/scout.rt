@@ -29,5 +29,4 @@ scout.PlannerField.prototype._removePlanner = function(oldPlanner) {
   this.removeField();
 };
 
-scout.PlannerField.prototype._renderSplitterPosition = function() {
-};
+scout.PlannerField.prototype._renderSplitterPosition = function() {};

@@ -26,8 +26,7 @@ scout.logging = {
           .done(function(script, textStatus) {
             initLog4Javascript();
           });
-      }
-      else {
+      } else {
         initLog4Javascript();
       }
     } else {

@@ -256,7 +256,9 @@ scout.Action.prototype.setSelected = function(selected) {
 };
 
 scout.Action.prototype.sendSelected = function() {
-  this._send('selected', {selected: this.selected});
+  this._send('selected', {
+    selected: this.selected
+  });
 };
 
 scout.Action.prototype._syncKeyStroke = function(keyStroke) {

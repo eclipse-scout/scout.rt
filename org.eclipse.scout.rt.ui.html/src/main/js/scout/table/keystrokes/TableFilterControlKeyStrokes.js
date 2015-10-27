@@ -50,10 +50,10 @@ scout.TableFilterControlKeyStrokes.prototype.checkAndDrawKeyBox = function($cont
 scout.TableFilterControlKeyStrokes.prototype.accept = function(event) {
   var elementType = document.activeElement.tagName.toLowerCase();
 
-  if (document.activeElement.className !== 'table-text-filter' &&(elementType === 'textarea' || elementType === 'input')) {
+  if (document.activeElement.className !== 'table-text-filter' && (elementType === 'textarea' || elementType === 'input')) {
     return false;
   }
 
   return event && ((event.which >= 65 && event.which <= 90) || (event.which >= 48 && event.which <= 57)) && // a-z
-  event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift;
+    event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift;
 };

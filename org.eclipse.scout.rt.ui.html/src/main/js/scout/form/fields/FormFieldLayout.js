@@ -85,10 +85,10 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (formField.$fieldContainer) {
     // Calculate the additional field offset (because of label, mandatory indicator etc.) without the containerInset.
     fieldOffset = new scout.Insets(
-        top - containerPadding.top,
-        right - containerPadding.right,
-        bottom - containerPadding.bottom,
-        left - containerPadding.left);
+      top - containerPadding.top,
+      right - containerPadding.right,
+      bottom - containerPadding.bottom,
+      left - containerPadding.left);
     // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
     fieldSize = htmlContainer.getAvailableSize()
       .subtract(htmlContainer.getInsets())
@@ -137,12 +137,14 @@ scout.FormFieldLayout.prototype._layoutDisabledOverlay = function(formField) {
     $field = formField.$field;
   if ($disabledOverlay) {
     var pos = $field.position(),
-      padding = scout.graphics.getInsets($field, {includePadding: true});
+      padding = scout.graphics.getInsets($field, {
+        includePadding: true
+      });
     $disabledOverlay
       .css('top', pos.top)
       .css('left', pos.left)
       .width($field.width() + padding.horizontal())
-      .height($field.height()  + padding.vertical());
+      .height($field.height() + padding.vertical());
   }
 };
 

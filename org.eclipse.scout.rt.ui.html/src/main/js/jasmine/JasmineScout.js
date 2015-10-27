@@ -206,7 +206,8 @@ var jasmineScoutMatchers = {
         if (!Array.isArray(expected)) {
           expected = [expected];
         }
-        var result = {}, i;
+        var result = {},
+          i;
 
         var actualEvents = [];
         if (actual) {
@@ -246,7 +247,8 @@ var jasmineScoutMatchers = {
         if (!Array.isArray(expected)) {
           expected = [expected];
         }
-        var result = {}, i;
+        var result = {},
+          i;
 
         var actualEvents = [];
         if (actual) {

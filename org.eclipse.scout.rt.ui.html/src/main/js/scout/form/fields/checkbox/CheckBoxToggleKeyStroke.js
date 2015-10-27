@@ -2,7 +2,7 @@ scout.CheckBoxToggleKeyStroke = function(checkbox) {
   scout.CheckBoxToggleKeyStroke.parent.call(this);
   this.field = checkbox;
   this.which = [scout.keys.SPACE];
-  if(!(this.field.owner instanceof scout.Table)){
+  if (!(this.field.owner instanceof scout.Table)) {
     this.which.push(scout.keys.ENTER);
   }
   this.renderingHints.render = false;

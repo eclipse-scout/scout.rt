@@ -19,7 +19,7 @@ scout.PlannerLayout.prototype.layout = function($container) {
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.planner.htmlComp,
     containerSize = htmlContainer.getAvailableSize()
-      .subtract(htmlContainer.getInsets());
+    .subtract(htmlContainer.getInsets());
 
   if (menuBar.$container.isVisible()) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
@@ -45,8 +45,8 @@ scout.PlannerLayout.prototype.layout = function($container) {
     gridHeight += menuBarHeight;
   }
 
-  $yearContainer.css('height', 'calc(100% - '+ yearContainerHeight + 'px)');
-  $grid.css('height', 'calc(100% - '+ gridHeight + 'px)');
+  $yearContainer.css('height', 'calc(100% - ' + yearContainerHeight + 'px)');
+  $grid.css('height', 'calc(100% - ' + gridHeight + 'px)');
 
   this._updateMinWidth();
   this._layoutScaleLines();
@@ -89,7 +89,7 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
   }
 
   $smallScaleItems = $timelineSmall.children('.scale-item'),
-  $largeScaleItems = $timelineLarge.children('.scale-item');
+    $largeScaleItems = $timelineLarge.children('.scale-item');
 
   // First loop through every item and set height to 0 in order to get the correct scrollHeight
   $largeScaleItems.each(function() {
