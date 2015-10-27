@@ -86,9 +86,9 @@ public class ServiceTunnelServlet extends HttpServlet {
 
         @Override
         public void run() throws Exception {
-          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-          serverRunContext.withUserAgent(UserAgent.createDefault());
-          serverRunContext.withProperty(SESSION_ID, UUID.randomUUID().toString());
+          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+              .withUserAgent(UserAgent.createDefault())
+              .withProperty(SESSION_ID, UUID.randomUUID().toString());
           serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
           invokeAdminService(serverRunContext);
@@ -119,7 +119,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
           if (isSessionLess(serviceRequest)) {
-            // TODO [jgu] Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement        	  
+            // TODO [jgu] Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
             invokeServiceWithoutSession(serviceRequest);
           }
           else {
@@ -127,13 +127,13 @@ public class ServiceTunnelServlet extends HttpServlet {
             TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
             // Enable global cancellation of the service request.
             RunMonitor runMonitor = BEANS.get(RunMonitor.class);
-            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-            serverRunContext.withLocale(serviceRequest.getLocale());
-            serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-            serverRunContext.withRunMonitor(runMonitor);
-            serverRunContext.withTransactionalClientNotificationCollector(transactionalClientNotificationCollector);
-            serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
-            serverRunContext.withProperty(SESSION_ID, serviceRequest.getSessionId());
+            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+                .withLocale(serviceRequest.getLocale())
+                .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
+                .withRunMonitor(runMonitor)
+                .withTransactionalClientNotificationCollector(transactionalClientNotificationCollector)
+                .withNotificationNodeId(serviceRequest.getClientNotificationNodeId())
+                .withProperty(SESSION_ID, serviceRequest.getSessionId());
             serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
             IServerSession session = serverRunContext.getSession();
