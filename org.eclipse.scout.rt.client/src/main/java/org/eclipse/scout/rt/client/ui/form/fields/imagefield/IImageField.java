@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
+package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
 import java.util.List;
 
