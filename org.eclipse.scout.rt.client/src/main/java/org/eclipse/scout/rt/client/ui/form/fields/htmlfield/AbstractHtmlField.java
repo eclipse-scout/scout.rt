@@ -33,30 +33,18 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
-import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
-/**
- * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
- * <p>
- * See also {@link AbstractBrowserField} for html viewing and {@link AbstractDocumentField} for html editing (requires a
- * fragment such as microsoft word editor)
- */
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
 
   private IHtmlFieldUIFacade m_uiFacade;
-  private boolean m_htmlEditor;
   private boolean m_scrollBarEnabled;
   private Set<BinaryResource> m_attachments;
-  private Boolean m_monitorSpelling = null; // If null the application-wide
 
   public AbstractHtmlField() {
     this(true);
@@ -69,19 +57,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   /*
    * Configuration
    */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(230)
-  @ValidationRule(ValidationRule.MAX_LENGTH)
-  protected int getConfiguredMaxLength() {
-    return Integer.MAX_VALUE;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(240)
-  protected boolean getConfiguredHtmlEditor() {
-    return false;
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
   protected boolean getConfiguredScrollBarEnabled() {
@@ -130,29 +105,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
-    m_htmlEditor = getConfiguredHtmlEditor();
     m_scrollBarEnabled = getConfiguredScrollBarEnabled();
-    setMaxLength(getConfiguredMaxLength());
     setHtmlEnabled(true);
-  }
-
-  @Override
-  public int getMaxLength() {
-    int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
-    if (len <= 0) {
-      len = 200;
-    }
-    return len;
-  }
-
-  @Override
-  public void setMaxLength(int len) {
-    if (len > 0) {
-      propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
-    }
-    if (isInitialized()) {
-      setValue(getValue());
-    }
   }
 
   @Override
@@ -187,22 +141,12 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
-  public boolean isHtmlEditor() {
-    return m_htmlEditor;
-  }
-
-  @Override
   protected String validateValueInternal(String rawValue) {
     String validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     validValue = rawValue;
     if (validValue != null && validValue.length() == 0) {
       validValue = null;
-    }
-    if (validValue != null) {
-      if (validValue.length() > getMaxLength()) {
-        validValue = validValue.substring(0, getMaxLength());
-      }
     }
     return validValue;
   }
@@ -219,13 +163,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
       text = null;
     }
     return text;
-  }
-
-  @Override
-  public void insertImage(String imageUrl) {
-    if (imageUrl != null) {
-      propertySupport.firePropertyChange(PROP_INSERT_IMAGE, null, imageUrl);
-    }
   }
 
   /**
@@ -247,20 +184,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   private class P_UIFacade implements IHtmlFieldUIFacade {
-
-    @Override
-    public void parseAndSetValueFromUI(String htmlText) {
-      if (!isEnabled() || !isVisible()) {
-        return;
-      }
-      if (isHtmlEditor()) {
-        if (htmlText != null && htmlText.length() == 0) {
-          htmlText = null;
-        }
-        // parse always, validity might change even if text is same
-        parseAndSetValue(htmlText);
-      }
-    }
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
@@ -286,32 +209,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   public void scrollToEnd() {
     propertySupport.setPropertyAlwaysFire(PROP_SCROLLBAR_SCROLL_TO_END, null);
-  }
-
-  /**
-   * Returns whether this html component is spell checkable.
-   */
-  @Override
-  public boolean isSpellCheckEnabled() {
-    return (this.isEnabled() && this.isEnabledGranted() && (!(this.getForm() instanceof ISearchForm)));
-  }
-
-  /**
-   * Returns whether this html component should be monitored for spelling errors in the background ("check as you type"
-   * ).<br>
-   * If it is not defined, null is returned, then the application default is used.
-   */
-  @Override
-  public Boolean isSpellCheckAsYouTypeEnabled() {
-    return m_monitorSpelling;
-  }
-
-  /**
-   * Sets whether to monitor this html component for spelling errors in the background ("check as you type").<br>
-   * Use null for application default.
-   */
-  public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
-    m_monitorSpelling = Boolean.valueOf(monitorSpelling);
   }
 
   @Override

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
@@ -19,34 +18,28 @@ import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
-import org.eclipse.scout.rt.client.ui.form.fields.documentfield.IDocumentField;
+import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 
 /**
- * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
+ * With a html field it is possible to display custom html content.
  * <p>
- * You can use local urls that call back to the field itself and can be handled by overriding
- * {@link AbstractHtmlField#execHyperlinkAction(URL, String, boolean)} A local URL is one of the form http://local/...
- * <p>
- * See also the {@link IBrowserField} for html viewing and {@link IDocumentField} for html editing (requires a fragment
- * such as microsoft word editor)
+ * Compared to {@link ILabelField} with {@link ILabelField#isHtmlEnabled()} = true it provides some more functionality
+ * like scrolling. <br>
+ * Compared to the {@link IBrowserField}, the content is embedded directly into the main html document without using an
+ * iframe.
+ * 
+ * @see IBrowserField
+ * @see ILabelField
  */
 public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlCapable {
 
-  String PROP_MAX_LENGTH = "maxLength";
   String PROP_SCROLLBARS_ENABLED = "scrollBarsEnabled";
-  String PROP_INSERT_IMAGE = "insertImage";
   String PROP_SCROLLBAR_SCROLL_TO_END = "scrollToEnd";
   String PROP_SCROLLBAR_SCROLL_TO_ANCHOR = "scrollToPosition";
-
-  void setMaxLength(int len);
 
   void setScrollToAnchor(String anchorName);
 
   String getScrollToAnchor();
-
-  int getMaxLength();
-
-  boolean isHtmlEditor();
 
   boolean isScrollBarEnabled();
 
@@ -66,19 +59,4 @@ public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlC
   void setAttachments(Collection<? extends BinaryResource> attachments);
 
   String getPlainText();
-
-  /** Insert a new image at the caret position. */
-  void insertImage(String imageUrl);
-
-  /**
-   * Returns whether this field is spell checkable.
-   */
-  boolean isSpellCheckEnabled();
-
-  /**
-   * Returns whether this field should be monitored for spelling errors in the background ("check as you type"). If it
-   * is not defined, null is returned, then the application default is used.
-   */
-  Boolean isSpellCheckAsYouTypeEnabled();
-
 }

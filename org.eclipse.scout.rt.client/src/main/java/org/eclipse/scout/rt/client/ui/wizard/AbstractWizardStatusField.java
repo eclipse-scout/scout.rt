@@ -50,16 +50,6 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   }
 
   @Override
-  protected int getConfiguredMaxLength() {
-    return 1000000;
-  }
-
-  @Override
-  protected boolean getConfiguredHtmlEditor() {
-    return false;
-  }
-
-  @Override
   protected boolean getConfiguredScrollBarEnabled() {
     return false;
   }

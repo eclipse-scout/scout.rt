@@ -12,7 +12,5 @@ package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
 public interface IHtmlFieldUIFacade {
 
-  void parseAndSetValueFromUI(String htmlText);
-
   void fireAppLinkActionFromUI(String ref);
 }
