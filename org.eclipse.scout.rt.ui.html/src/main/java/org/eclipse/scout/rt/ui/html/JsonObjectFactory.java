@@ -56,7 +56,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
-import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
+import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
