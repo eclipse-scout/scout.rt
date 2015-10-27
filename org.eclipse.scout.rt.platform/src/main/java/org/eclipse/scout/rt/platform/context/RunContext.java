@@ -154,7 +154,7 @@ public class RunContext {
     invocationChain
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<RESULT>(m_subject))
-        .add(new DiagnosticContextValueProcessor(BEANS.get(PrinicpalContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor<>(BEANS.get(PrinicpalContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap));
 

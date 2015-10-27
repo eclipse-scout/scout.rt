@@ -13,15 +13,12 @@ package org.eclipse.scout.rt.server.context;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.chain.IInvocationInterceptor;
+import org.eclipse.scout.commons.chain.IInvocationDecorator;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.chain.InvocationChain.Chain;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -38,202 +35,153 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  *
  * @since 5.1
  */
-public class TransactionProcessor<RESULT> implements IInvocationInterceptor<RESULT> {
+public class TransactionProcessor<RESULT> implements IInvocationDecorator<RESULT> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TransactionProcessor.class);
 
   protected final TransactionScope m_transactionScope;
-  protected final ITransaction m_transaction;
+  protected final ITransaction m_callerTransaction;
 
-  public TransactionProcessor(final ITransaction transaction, final TransactionScope transactionScope) {
+  public TransactionProcessor(final ITransaction callerTransaction, final TransactionScope transactionScope) {
     m_transactionScope = (transactionScope != null ? transactionScope : TransactionScope.REQUIRES_NEW);
-    m_transaction = transaction;
+    m_callerTransaction = callerTransaction;
   }
 
   @Override
-  public RESULT intercept(final Chain<RESULT> chain) throws Exception {
+  public IUndecorator<RESULT> decorate() {
     switch (m_transactionScope) {
-      case MANDATORY:
-        return handleMandatoryTransaction(chain);
       case REQUIRES_NEW:
-        return handleRequiresNewTransaction(chain);
+        return requiresNew();
       case REQUIRED:
-        return handleRequiredTransaction(chain);
+        return required(m_callerTransaction);
+      case MANDATORY:
+        return mandatory(m_callerTransaction);
       default:
         return Assertions.fail("Unsupported transaction scope [%s]", m_transactionScope);
     }
   }
 
   /**
-   * Ensures a caller transaction to exist and continues the chain.
+   * Decorates the calling context to run in a new transaction, which upon completion is committed or rolled back.
    */
-  @Internal
-  protected RESULT handleMandatoryTransaction(final Chain<RESULT> chain) throws Exception {
-    if (m_transaction == null) {
+  protected IUndecorator<RESULT> requiresNew() {
+    final ITransaction newTransaction = BEANS.get(ITransaction.class);
+    final Registration threadLocalRegistration = registerTransactionInThreadLocal(newTransaction);
+    final Registration monitorRegistration = registerTransactionInRunMonitor(newTransaction);
+
+    return new IUndecorator<RESULT>() {
+
+      @Override
+      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
+        addTransactionalFailureIfNotNull(invocationException);
+        BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(ITransaction.CURRENT.get());
+        threadLocalRegistration.undo();
+        monitorRegistration.undo();
+      }
+    };
+  }
+
+  /**
+   * Decorates the calling context to run on behalf of the current caller transaction. If not available, a new
+   * transaction is started and upon completion, that transaction is committed or rolled back.
+   */
+  protected IUndecorator<RESULT> required(final ITransaction callerTransaction) {
+    if (callerTransaction != null) {
+      return mandatory(callerTransaction);
+    }
+    else {
+      return requiresNew();
+    }
+  }
+
+  /**
+   * Ensures a caller transaction to exist and decorates the calling context to run on behalf of that transaction.
+   */
+  protected IUndecorator<RESULT> mandatory(final ITransaction callerTransaction) {
+    if (callerTransaction == null) {
       throw new TransactionRequiredException();
     }
-    else {
-      return continueChainInTransaction(chain, m_transaction);
-    }
+
+    final Registration threadLocalRegistration = registerTransactionInThreadLocal(callerTransaction);
+
+    return new IUndecorator<RESULT>() {
+
+      @Override
+      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
+        addTransactionalFailureIfNotNull(invocationException);
+        threadLocalRegistration.undo();
+      }
+    };
   }
 
   /**
-   * Creates a new transaction and continues the chain. Upon completion, the transaction is committed or rolled back.
+   * Registers the given transaction in the current {@link RunMonitor}, so it is cancelled once the monitor gets
+   * cancelled.
+   *
+   * @return the 'undo-action' to unregister the transaction from the monitor.
    */
-  @Internal
-  protected RESULT handleRequiresNewTransaction(final Chain<RESULT> chain) throws Exception {
-    final ITransaction newTransaction = BEANS.get(ITransaction.class);
+  protected Registration registerTransactionInRunMonitor(final ITransaction transaction) {
+    RunMonitor.CURRENT.get().registerCancellable(transaction);
 
-    RunMonitor.CURRENT.get().registerCancellable(newTransaction);
-    try {
-      return continueChainInTransaction(chain, newTransaction);
-    }
-    finally {
-      endTransactionSafe(newTransaction);
-      RunMonitor.CURRENT.get().unregisterCancellable(newTransaction);
-    }
+    // Return the 'undo-action' to unregister the transaction from the monitor.
+    return new Registration() {
+
+      @Override
+      public void undo() {
+        RunMonitor.CURRENT.get().unregisterCancellable(transaction);
+      }
+    };
   }
 
   /**
-   * Continues the chain on behalf of the current caller transaction. If not available, a new transaction is started and
-   * upon completion, that transaction is committed or rolled back.
+   * Registers the given transaction in {@link ITransaction#CURRENT} thread-local, so it becomes the active transaction.
+   *
+   * @return the 'undo-action' to restore the thread-local value.
    */
-  @Internal
-  protected RESULT handleRequiredTransaction(final Chain<RESULT> chain) throws Exception {
-    if (m_transaction != null) {
-      return continueChainInTransaction(chain, m_transaction);
-    }
-    else {
-      return handleRequiresNewTransaction(chain);
-    }
-  }
-
-  /**
-   * Registers the given transaction on {@link ITransaction#CURRENT}, delegates control to the next processor and
-   * registers exceptions on the given transaction.
-   */
-  @Internal
-  protected RESULT continueChainInTransaction(final Chain<RESULT> chain, final ITransaction transaction) throws Exception {
-    final ITransaction originTransaction = ITransaction.CURRENT.get();
-
+  protected Registration registerTransactionInThreadLocal(final ITransaction transaction) {
+    final ITransaction oldTransaction = ITransaction.CURRENT.get();
     ITransaction.CURRENT.set(transaction);
-    try {
-      return chain.continueChain();
-    }
-    catch (final Exception | Error e) {
-      transaction.addFailure(e);
-      throw e;
-    }
-    finally {
-      if (originTransaction == null) {
-        ITransaction.CURRENT.remove();
+
+    // Return the 'undo-action' to restore the thread-local value.
+    return new Registration() {
+
+      @Override
+      public void undo() {
+        if (oldTransaction == null) {
+          ITransaction.CURRENT.remove();
+        }
+        else {
+          ITransaction.CURRENT.set(oldTransaction);
+        }
       }
-      else {
-        ITransaction.CURRENT.set(originTransaction);
-      }
-    }
+    };
   }
 
   /**
-   * Commits the transaction on success, or rolls it back on error.
+   * In case the given failure is not <code>null</code>, that failure is added to the current transaction as
+   * transactional failure. Upon completion, that causes a roll back of the transaction.
    */
-  @Internal
-  protected void endTransactionSafe(final ITransaction tx) {
-    boolean commitSuccess = false;
-    if (tx.hasFailures()) {
-      commitSuccess = false;
-    }
-    else {
-      // Commit the XA transaction in 2PC-style.
-      commitSuccess = (commitPhase1Safe(tx) && commitPhase2Safe(tx));
+  protected void addTransactionalFailureIfNotNull(final Throwable failure) {
+    if (failure == null) {
+      return;
     }
 
-    if (!commitSuccess) {
-      // Rollback the XA transaction because at least one XA member rejected the voting for commit or the final commit failed unexpectedly.
-      rollbackSafe(tx);
-    }
-
-    releaseSafe(tx);
-  }
-
-  // === Utility methods for a safe interaction with a ITransaction ===
-
-  /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
-   * @see ITransaction#commitPhase1()
-   */
-  @Internal
-  protected boolean commitPhase1Safe(final ITransaction tx) {
     try {
-      return tx.commitPhase1();
+      ITransaction.CURRENT.get().addFailure(failure);
     }
     catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to commit XA transaction [2PC-phase='voting', job=%s, tx=%s]", getCurrentJobName(), tx), e);
-      return false;
+      LOG.error("Unexpected: Failed to register failure on transaction", e);
     }
   }
 
   /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
-   * @see ITransaction#commitPhase2()
+   * Represents a registration which can be undone.
    */
-  @Internal
-  protected boolean commitPhase2Safe(final ITransaction tx) {
-    try {
-      tx.commitPhase2();
-      return true;
-    }
-    catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to commit XA transaction [2PC-phase='commit', job=%s, tx=%s]", getCurrentJobName(), tx), e);
-      return false;
-    }
-  }
+  protected interface Registration {
 
-  /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
-   * @see ITransaction#rollback()
-   */
-  @Internal
-  protected boolean rollbackSafe(final ITransaction tx) {
-    try {
-      tx.rollback();
-      return true;
-    }
-    catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to rollback XA transaction [job=%s, tx=%s]", getCurrentJobName(), tx), e);
-      return false;
-    }
-  }
-
-  /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
-   * @see ITransaction#release()
-   */
-  @Internal
-  protected boolean releaseSafe(final ITransaction tx) {
-    try {
-      tx.release();
-      return true;
-    }
-    catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to release XA transaction members [job=%s, tx=%s]", getCurrentJobName(), tx), e);
-      return false;
-    }
-  }
-
-  @Internal
-  protected String getCurrentJobName() {
-    final IFuture<?> future = IFuture.CURRENT.get();
-    if (future != null) {
-      return future.getJobInput().getName();
-    }
-    else {
-      return "";
-    }
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
+    /**
+     * Invoke to undo the registration.
+     */
+    void undo();
   }
 }

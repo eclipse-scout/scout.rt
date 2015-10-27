@@ -281,10 +281,10 @@ public class JobManager implements IJobManager, IPlatformListener {
     invocationChain
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
-        .add(new LogOnErrorProcessor<RESULT>(input))
+        .add(new LogOnErrorProcessor<>(input))
         .add(new ThreadNameDecorator(input.getThreadName(), input.getName()))
         .add(new RunContextRunner<RESULT>(input.getRunContext()))
-        .add(new FireJobLifecycleEventProcessor(JobEventType.ABOUT_TO_RUN, this, future));
+        .add(new FireJobLifecycleEventProcessor<>(JobEventType.ABOUT_TO_RUN, this, future));
   }
 
   @Override

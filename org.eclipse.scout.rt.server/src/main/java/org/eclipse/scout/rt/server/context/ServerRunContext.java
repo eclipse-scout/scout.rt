@@ -74,12 +74,12 @@ public class ServerRunContext extends RunContext {
     invocationChain
         .add(new ThreadLocalProcessor<>(OfflineState.CURRENT, m_offline))
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
-        .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(ClientNotificationNodeId.CURRENT, m_notificationNodeId))
         .add(new ThreadLocalProcessor<>(TransactionalClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
-        .add(new TransactionProcessor<RESULT>(getTransaction(), m_transactionScope));
+        .add(new TransactionProcessor<>(getTransaction(), m_transactionScope));
   }
 
   @Override

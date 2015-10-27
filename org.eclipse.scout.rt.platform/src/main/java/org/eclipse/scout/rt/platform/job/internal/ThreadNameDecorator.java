@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  *
  * @since 5.1
  */
-public class ThreadNameDecorator implements IInvocationDecorator {
+public class ThreadNameDecorator<RESULT> implements IInvocationDecorator<RESULT> {
 
   private final String m_threadName;
   private final String m_jobName;
@@ -42,7 +42,7 @@ public class ThreadNameDecorator implements IInvocationDecorator {
   }
 
   @Override
-  public IUndecorator decorate() {
+  public IUndecorator<RESULT> decorate() throws Exception {
     final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
 
     // Install job listener to decorate the thread name
@@ -72,10 +72,10 @@ public class ThreadNameDecorator implements IInvocationDecorator {
     currentThreadInfo.updateNameAndState(m_threadName, m_jobName, JobState.Running);
 
     // Set origin thread name and state.
-    return new IUndecorator() {
+    return new IUndecorator<RESULT>() {
 
       @Override
-      public void undecorate() {
+      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
         listenerRegistration.dispose();
         currentThreadInfo.updateNameAndState(null, null, JobState.Idle);
       }

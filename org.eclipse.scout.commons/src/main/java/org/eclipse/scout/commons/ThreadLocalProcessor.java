@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.chain.InvocationChain;
  *
  * @since 5.1
  */
-public class ThreadLocalProcessor<THREAD_LOCAL> implements IInvocationDecorator {
+public class ThreadLocalProcessor<RESULT, THREAD_LOCAL> implements IInvocationDecorator<RESULT> {
 
   protected final ThreadLocal<THREAD_LOCAL> m_threadLocal;
   protected final THREAD_LOCAL m_value;
@@ -34,15 +34,15 @@ public class ThreadLocalProcessor<THREAD_LOCAL> implements IInvocationDecorator 
   }
 
   @Override
-  public IUndecorator decorate() {
+  public IUndecorator<RESULT> decorate() throws Exception {
     final THREAD_LOCAL originValue = m_threadLocal.get();
     m_threadLocal.set(m_value);
 
-    // Set origin value upon completion of the command.
-    return new IUndecorator() {
+    // Restore value upon completion of the command.
+    return new IUndecorator<RESULT>() {
 
       @Override
-      public void undecorate() {
+      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
         if (originValue == null) {
           m_threadLocal.remove();
         }

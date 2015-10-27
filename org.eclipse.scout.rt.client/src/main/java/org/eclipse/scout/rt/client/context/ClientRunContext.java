@@ -58,7 +58,7 @@ public class ClientRunContext extends RunContext {
 
     invocationChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
-        .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
         .add(new ThreadLocalProcessor<>(IDesktop.CURRENT, m_desktop))

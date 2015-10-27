@@ -12,12 +12,10 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.chain.IInvocationInterceptor;
+import org.eclipse.scout.commons.chain.IInvocationDecorator;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.chain.InvocationChain.Chain;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
@@ -28,7 +26,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  *
  * @since 5.1
  */
-public class LogOnErrorProcessor<RESULT> implements IInvocationInterceptor<RESULT> {
+public class LogOnErrorProcessor<RESULT> implements IInvocationDecorator<RESULT> {
 
   protected final JobInput m_input;
 
@@ -37,25 +35,19 @@ public class LogOnErrorProcessor<RESULT> implements IInvocationInterceptor<RESUL
   }
 
   @Override
-  public RESULT intercept(final Chain<RESULT> chain) throws Exception {
-    try {
-      return chain.continueChain();
+  public IUndecorator<RESULT> decorate() throws Exception {
+    if (!m_input.isLogOnError()) {
+      return null;
     }
-    catch (final Throwable t) {
-      try {
-        BEANS.get(ExceptionHandler.class).handle(t);
-      }
-      catch (final Throwable unhandledThrowable) {
-        // NOOP: ExceptionHandler is not expected to throw an Exception; However, this catch-block is for safety purpose.
-      }
 
-      // Propagate the exception.
-      throw BEANS.get(ExceptionTranslator.class).translate(t);
-    }
-  }
+    return new IUndecorator<RESULT>() {
 
-  @Override
-  public boolean isEnabled() {
-    return m_input.isLogOnError();
+      @Override
+      public void undecorate(final RESULT result, final Throwable throwable) {
+        if (throwable != null) {
+          BEANS.get(ExceptionHandler.class).handle(throwable);
+        }
+      }
+    };
   }
 }

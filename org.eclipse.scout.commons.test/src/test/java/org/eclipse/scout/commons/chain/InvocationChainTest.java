@@ -51,12 +51,12 @@ public class InvocationChainTest {
         .add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator1:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator1:onAfter");
               }
             };
@@ -65,7 +65,7 @@ public class InvocationChainTest {
         .add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator2:onBefore");
             return null;
           }
@@ -73,12 +73,12 @@ public class InvocationChainTest {
         .add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator3:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator3:onAfter");
               }
             };
@@ -107,58 +107,61 @@ public class InvocationChainTest {
   public void testDecoratorChainWithException() throws Exception {
     final List<String> protocol = new ArrayList<String>();
 
-    String result = new InvocationChain<String>()
-        .add(new IInvocationDecorator() {
+    final Exception exception = new Exception();
+    try {
+      new InvocationChain<String>()
+          .add(new IInvocationDecorator() {
 
-          @Override
-          public IUndecorator decorate() {
-            protocol.add("decorator1:onBefore");
-            return new IUndecorator() {
+            @Override
+            public IUndecorator decorate() throws Exception {
+              protocol.add("decorator1:onBefore");
+              return new IUndecorator<String>() {
 
-              @Override
-              public void undecorate() {
-                protocol.add("decorator1:onAfter");
-              }
-            };
-          }
-        }).add(new IInvocationDecorator() {
+                @Override
+                public void undecorate(String invocationResult, Throwable invocationException) {
+                  protocol.add("decorator1:onAfter");
+                  throw new RuntimeException();
+                }
+              };
+            }
+          }).add(new IInvocationDecorator() {
 
-          @Override
-          public IUndecorator decorate() {
-            protocol.add("decorator2:onBefore");
-            throw new RuntimeException();
-          }
-        }).add(new IInvocationDecorator() {
+            @Override
+            public IUndecorator decorate() throws Exception {
+              protocol.add("decorator2:onBefore");
+              throw exception;
+            }
+          }).add(new IInvocationDecorator() {
 
-          @Override
-          public IUndecorator decorate() {
-            protocol.add("decorator3:onBefore");
-            return new IUndecorator() {
+            @Override
+            public IUndecorator decorate() throws Exception {
+              protocol.add("decorator3:onBefore");
+              return new IUndecorator<String>() {
 
-              @Override
-              public void undecorate() {
-                protocol.add("decorator3:onAfter");
-                throw new RuntimeException();
-              }
-            };
-          }
-        }).invoke(new Callable<String>() {
+                @Override
+                public void undecorate(String invocationResult, Throwable invocationException) {
+                  protocol.add("decorator3:onAfter");
+                }
+              };
+            }
+          }).invoke(new Callable<String>() {
 
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
-        });
+            @Override
+            public String call() throws Exception {
+              protocol.add("command:call");
+              return "command-result";
+            }
+          });
+      fail();
+    }
+    catch (Exception e) {
+      assertSame(exception, e);
+    }
 
     // assert
-    assertEquals("command-result", result);
     assertEquals(Arrays.asList(
         "decorator1:onBefore",
         "decorator2:onBefore",
-        "decorator3:onBefore",
-        "command:call",
-        "decorator3:onAfter",
         "decorator1:onAfter"), protocol);
   }
 
@@ -480,12 +483,12 @@ public class InvocationChainTest {
         .add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator1:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator1:onAfter");
               }
             };
@@ -493,12 +496,12 @@ public class InvocationChainTest {
         }).add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator2:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator2:onAfter");
               }
             };
@@ -523,12 +526,12 @@ public class InvocationChainTest {
         }).add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator3:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator3:onAfter");
               }
             };
@@ -536,12 +539,12 @@ public class InvocationChainTest {
         }).add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator4:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator4:onAfter");
               }
             };
@@ -566,12 +569,12 @@ public class InvocationChainTest {
         }).add(new IInvocationDecorator() {
 
           @Override
-          public IUndecorator decorate() {
+          public IUndecorator decorate() throws Exception {
             protocol.add("decorator5:onBefore");
-            return new IUndecorator() {
+            return new IUndecorator<String>() {
 
               @Override
-              public void undecorate() {
+              public void undecorate(String invocationResult, Throwable invocationException) {
                 protocol.add("decorator5:onAfter");
               }
             };
@@ -606,82 +609,6 @@ public class InvocationChainTest {
   }
 
   @Test
-  public void testMixed1() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
-
-    String result = new InvocationChain<String>()
-        .add(new IInvocationDecorator() {
-
-          @Override
-          public IUndecorator decorate() {
-            protocol.add("decorator1:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator1:onAfter");
-              }
-            };
-          }
-        })
-        .add((IInvocationInterceptor<String>) new DecoratorAndInterceptor<String>(2, protocol))
-        .add(new IInvocationInterceptor<String>() {
-
-          @Override
-          public String intercept(Chain<String> chain) throws Exception {
-            protocol.add("interceptor3:before");
-            try {
-              return chain.continueChain();
-            }
-            finally {
-              protocol.add("interceptor3:after");
-            }
-          }
-
-          @Override
-          public boolean isEnabled() {
-            return true;
-          }
-        }).add(new IInvocationDecorator() {
-
-          @Override
-          public IUndecorator decorate() {
-            protocol.add("decorator4:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator4:onAfter");
-              }
-            };
-          }
-        })
-        .invoke(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
-        });
-
-    // assert
-    assertEquals("command-result", result);
-    assertEquals(Arrays.asList(
-        "decorator1:onBefore",
-        "decorator2:onBefore",
-        "interceptor2:before",
-        "interceptor3:before",
-        "decorator4:onBefore",
-        "command:call",
-        "decorator4:onAfter",
-        "interceptor3:after",
-        "interceptor2:after",
-        "decorator2:onAfter",
-        "decorator1:onAfter"), protocol);
-  }
-
-  @Test
   public void testMixedWithException() throws Exception {
     final Exception exception = new Exception();
     final List<String> protocol = new ArrayList<String>();
@@ -691,12 +618,12 @@ public class InvocationChainTest {
           .add(new IInvocationDecorator() {
 
             @Override
-            public IUndecorator decorate() {
+            public IUndecorator decorate() throws Exception {
               protocol.add("decorator1:onBefore");
-              return new IUndecorator() {
+              return new IUndecorator<String>() {
 
                 @Override
-                public void undecorate() {
+                public void undecorate(String invocationResult, Throwable invocationException) {
                   protocol.add("decorator1:onAfter");
                 }
               };
@@ -704,12 +631,12 @@ public class InvocationChainTest {
           }).add(new IInvocationDecorator() {
 
             @Override
-            public IUndecorator decorate() {
+            public IUndecorator decorate() throws Exception {
               protocol.add("decorator2:onBefore");
-              return new IUndecorator() {
+              return new IUndecorator<String>() {
 
                 @Override
-                public void undecorate() {
+                public void undecorate(String invocationResult, Throwable invocationException) {
                   protocol.add("decorator2:onAfter");
                 }
               };
@@ -734,12 +661,12 @@ public class InvocationChainTest {
           }).add(new IInvocationDecorator() {
 
             @Override
-            public IUndecorator decorate() {
+            public IUndecorator decorate() throws Exception {
               protocol.add("decorator3:onBefore");
-              return new IUndecorator() {
+              return new IUndecorator<String>() {
 
                 @Override
-                public void undecorate() {
+                public void undecorate(String invocationResult, Throwable invocationException) {
                   protocol.add("decorator3:onAfter");
                 }
               };
@@ -747,12 +674,12 @@ public class InvocationChainTest {
           }).add(new IInvocationDecorator() {
 
             @Override
-            public IUndecorator decorate() {
+            public IUndecorator decorate() throws Exception {
               protocol.add("decorator4:onBefore");
-              return new IUndecorator() {
+              return new IUndecorator<String>() {
 
                 @Override
-                public void undecorate() {
+                public void undecorate(String invocationResult, Throwable invocationException) {
                   protocol.add("decorator4:onAfter");
                 }
               };
@@ -777,12 +704,12 @@ public class InvocationChainTest {
           }).add(new IInvocationDecorator() {
 
             @Override
-            public IUndecorator decorate() {
+            public IUndecorator decorate() throws Exception {
               protocol.add("decorator5:onBefore");
-              return new IUndecorator() {
+              return new IUndecorator<String>() {
 
                 @Override
-                public void undecorate() {
+                public void undecorate(String invocationResult, Throwable invocationException) {
                   protocol.add("decorator5:onAfter");
                 }
               };
@@ -818,44 +745,5 @@ public class InvocationChainTest {
         "interceptor1:after",
         "decorator2:onAfter",
         "decorator1:onAfter"), protocol);
-  }
-
-  private static class DecoratorAndInterceptor<RESULT> implements IInvocationDecorator, IInvocationInterceptor<RESULT> {
-
-    private int m_index;
-    private List<String> m_protocol;
-
-    public DecoratorAndInterceptor(int index, List<String> protocol) {
-      m_index = index;
-      m_protocol = protocol;
-    }
-
-    @Override
-    public RESULT intercept(Chain<RESULT> chain) throws Exception {
-      m_protocol.add(String.format("interceptor%s:before", m_index));
-      try {
-        return chain.continueChain();
-      }
-      finally {
-        m_protocol.add(String.format("interceptor%s:after", m_index));
-      }
-    }
-
-    @Override
-    public IUndecorator decorate() {
-      m_protocol.add(String.format("decorator%s:onBefore", m_index));
-      return new IUndecorator() {
-
-        @Override
-        public void undecorate() {
-          m_protocol.add(String.format("decorator%s:onAfter", m_index));
-        }
-      };
-    }
-
-    @Override
-    public boolean isEnabled() {
-      return true;
-    }
   }
 }

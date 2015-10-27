@@ -26,20 +26,20 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  *
  * @since 5.1
  */
-public class FireJobLifecycleEventProcessor implements IInvocationDecorator {
+public class FireJobLifecycleEventProcessor<RESULT> implements IInvocationDecorator<RESULT> {
 
   private final JobManager m_jobManager;
   private final JobEventType m_eventType;
-  private final IFuture<?> m_future;
+  private final IFuture<RESULT> m_future;
 
-  public FireJobLifecycleEventProcessor(final JobEventType eventType, final JobManager jobManager, final IFuture<?> future) {
+  public FireJobLifecycleEventProcessor(final JobEventType eventType, final JobManager jobManager, final IFuture<RESULT> future) {
     m_jobManager = jobManager;
     m_eventType = eventType;
     m_future = future;
   }
 
   @Override
-  public IUndecorator decorate() {
+  public IUndecorator<RESULT> decorate() throws Exception {
     m_jobManager.fireEvent(new JobEvent(m_jobManager, m_eventType, m_future));
     return null;
   }

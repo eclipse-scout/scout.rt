@@ -20,24 +20,32 @@ import java.util.concurrent.Callable;
  * @see IInvocationInterceptor
  * @since 5.2
  */
-public interface IInvocationDecorator extends IChainable {
+public interface IInvocationDecorator<RESULT> extends IChainable {
 
   /**
    * Method invoked prior to executing the {@link Callable command}.
    *
-   * @return the {@link IUndecorator} to be invoked after execution in order to roll back decoration, or
-   *         <code>null</code> to do nothing upon return of the command.
+   * @return the {@link IUndecorator} to be invoked after execution in order to revert decoration, or <code>null</code>
+   *         to do nothing upon return of the command.
+   * @throws Exception
+   *           throw exception to stop chain processing. The exception is propagated to the caller.
    */
-  IUndecorator decorate();
+  IUndecorator<RESULT> decorate() throws Exception;
 
   /**
    * Undecorator to roll back decoration.
    */
-  public interface IUndecorator {
+  public interface IUndecorator<RESULT> {
 
     /**
      * Method invoked after executed the {@link Callable}, and is invoked regardless of success or failure.
+     *
+     * @param invocationResult
+     *          the result returned by the {@link Callable}, or <code>null</code> if returned with an exception, or if
+     *          returned <code>null</code> as the result.
+     * @param invocationException
+     *          the exception if the callable returned with an exception.
      */
-    public void undecorate();
+    void undecorate(RESULT invocationResult, Throwable invocationException);
   }
 }

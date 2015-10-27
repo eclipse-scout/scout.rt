@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -22,13 +25,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.chain.InvocationChain.Chain;
+import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.context.TransactionProcessor;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -52,8 +56,6 @@ public class TransactionProcessorTest {
 
   @Mock
   private ITransaction m_transaction;
-  @Mock
-  private Chain<Object> m_chain;
 
   private List<Throwable> m_txErrors;
 
@@ -67,7 +69,7 @@ public class TransactionProcessorTest {
       public ITransaction produce(IBean<ITransaction> bean) {
         return m_transaction;
       }
-    }));
+    }), new BeanMetaData(ITransactionCommitProtocol.class).withOrder(Long.MAX_VALUE));
 
     // mock the transaction
     // ITransaction.commitPhase1
@@ -103,40 +105,73 @@ public class TransactionProcessorTest {
     m_txErrors.clear();
   }
 
-  @Test(expected = TransactionRequiredException.class)
+  @Test
   public void testMandatoryWithoutExistingTransaction() throws Exception {
-    new TransactionProcessor<>(null, TransactionScope.MANDATORY).intercept(m_chain);
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(null, TransactionScope.MANDATORY));
+
+    try {
+      chain.invoke(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          return "result";
+        }
+      });
+      fail();
+    }
+    catch (TransactionRequiredException e) {
+      assertTrue(true);
+    }
   }
 
   @Test
   public void testMandatoryWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    // run the test
-    processor.intercept(m_chain);
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
+    Object result = chain.invoke(new Callable<Object>() {
 
-    // verify
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
+
+    assertEquals("result", result);
+    assertSame(callingTransaction, actualTransaction.getValue());
     verifyZeroInteractions(m_transaction);
     verifyZeroInteractions(callingTransaction);
   }
 
   @Test
   public void testMandatoryWithExistingTransactionAndError() throws Exception {
+    final RuntimeException exception = new RuntimeException();
     ITransaction callingTransaction = mock(ITransaction.class);
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY);
 
-    when(m_chain.continueChain()).thenThrow(new RuntimeException());
+    final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    // run the test
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
     try {
-      processor.intercept(m_chain);
+      chain.invoke(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          actualTransaction.setValue(ITransaction.CURRENT.get());
+          throw exception;
+        }
+      });
       fail();
     }
     catch (Exception e) {
-      // verify
-      verifyZeroInteractions(m_transaction);
+      assertSame(exception, e);
 
+      assertSame(callingTransaction, actualTransaction.getValue());
+      verifyZeroInteractions(m_transaction);
       verify(callingTransaction, never()).commitPhase1();
       verify(callingTransaction, never()).commitPhase2();
       verify(callingTransaction, never()).rollback();
@@ -147,16 +182,26 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndSuccess() throws Exception {
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    // run the test
-    processor.intercept(m_chain);
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    Object result = chain.invoke(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
 
     // verify
+    assertSame(m_transaction, actualTransaction.getValue());
+    assertEquals("result", result);
+
     verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
-
     inOrder.verify(m_transaction, times(1)).commitPhase1();
     inOrder.verify(m_transaction, times(1)).commitPhase2();
     inOrder.verify(m_transaction, never()).rollback();
@@ -165,21 +210,30 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndError() throws Exception {
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW);
-    when(m_chain.continueChain()).thenThrow(new RuntimeException());
+    final RuntimeException exception = new RuntimeException();
 
-    // run the test
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
     try {
-      processor.intercept(m_chain);
+      chain.invoke(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          actualTransaction.setValue(ITransaction.CURRENT.get());
+          throw exception;
+        }
+      });
       fail();
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
+      assertSame(exception, e);
+      assertSame(m_transaction, actualTransaction.getValue());
 
-      // verify
       verify(m_transaction, times(1)).release();
 
       InOrder inOrder = Mockito.inOrder(m_transaction);
-
       inOrder.verify(m_transaction, never()).commitPhase1();
       inOrder.verify(m_transaction, never()).commitPhase2();
       inOrder.verify(m_transaction, times(1)).rollback();
@@ -190,17 +244,27 @@ public class TransactionProcessorTest {
   @Test
   public void testRequiresNewWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    // run the test
-    processor.intercept(m_chain);
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
+    Object result = chain.invoke(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
 
     // verify
+    assertSame(m_transaction, actualTransaction.getValue());
+    assertEquals("result", result);
+
     verifyZeroInteractions(callingTransaction);
     verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
-
     inOrder.verify(m_transaction, times(1)).commitPhase1();
     inOrder.verify(m_transaction, times(1)).commitPhase2();
     inOrder.verify(m_transaction, never()).rollback();
@@ -210,16 +274,27 @@ public class TransactionProcessorTest {
   @Test
   public void testRequiresNewWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW);
-    when(m_chain.continueChain()).thenThrow(new RuntimeException());
+    final RuntimeException exception = new RuntimeException();
 
-    // run the test
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
     try {
-      processor.intercept(m_chain);
+      chain.invoke(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          actualTransaction.setValue(ITransaction.CURRENT.get());
+          throw exception;
+        }
+      });
       fail();
     }
-    catch (Exception e) {
-      // verify
+    catch (RuntimeException e) {
+      assertSame(exception, e);
+      assertSame(m_transaction, actualTransaction.getValue());
+
       verifyZeroInteractions(callingTransaction);
       verify(m_transaction, times(1)).release();
 
@@ -234,16 +309,26 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndSuccess() throws Exception {
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRED);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    // run the test
-    processor.intercept(m_chain);
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRED));
+    Object result = chain.invoke(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
 
     // verify
+    assertEquals("result", result);
+    assertSame(m_transaction, actualTransaction.getValue());
+
     verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
-
     inOrder.verify(m_transaction, times(1)).commitPhase1();
     inOrder.verify(m_transaction, times(1)).commitPhase2();
     inOrder.verify(m_transaction, never()).rollback();
@@ -252,17 +337,27 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndError() throws Exception {
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(null, TransactionScope.REQUIRED);
-    when(m_chain.continueChain()).thenThrow(new RuntimeException());
+    final RuntimeException exception = new RuntimeException();
 
-    // run the test
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
     try {
-      processor.intercept(m_chain);
+      chain.invoke(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          actualTransaction.setValue(ITransaction.CURRENT.get());
+          throw exception;
+        }
+      });
       fail();
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
+      assertSame(exception, e);
+      assertSame(m_transaction, actualTransaction.getValue());
 
-      // verify
       verify(m_transaction, times(1)).release();
 
       InOrder inOrder = Mockito.inOrder(m_transaction);
@@ -277,12 +372,23 @@ public class TransactionProcessorTest {
   @Test
   public void testRequiredWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    // run the test
-    processor.intercept(m_chain);
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
+    Object result = chain.invoke(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
 
     // verify
+    assertEquals("result", result);
+    assertSame(callingTransaction, actualTransaction.getValue());
+
     verifyZeroInteractions(m_transaction);
     verifyZeroInteractions(callingTransaction);
   }
@@ -290,16 +396,28 @@ public class TransactionProcessorTest {
   @Test
   public void testRequiredWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    TransactionProcessor<Object> processor = new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED);
-    when(m_chain.continueChain()).thenThrow(new RuntimeException());
 
-    // run the test
+    final RuntimeException exception = new RuntimeException();
+
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+
+    InvocationChain<Object> chain = new InvocationChain<>();
+    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
     try {
-      processor.intercept(m_chain);
+      chain.invoke(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          actualTransaction.setValue(ITransaction.CURRENT.get());
+          throw exception;
+        }
+      });
       fail();
     }
-    catch (Exception e) {
-      // verify
+    catch (RuntimeException e) {
+      assertSame(exception, e);
+      assertSame(callingTransaction, actualTransaction.getValue());
+
       verifyZeroInteractions(m_transaction);
 
       verify(callingTransaction, never()).commitPhase1();
