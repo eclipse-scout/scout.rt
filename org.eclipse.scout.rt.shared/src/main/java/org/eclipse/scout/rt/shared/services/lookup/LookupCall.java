@@ -315,7 +315,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       try {
         caller.dataFetched(getDataByKey(), null);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         caller.dataFetched(null, e);
       }
       return null;
@@ -330,9 +330,11 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
               caller.dataFetched(rows, null);
             }
           }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(null, e);
+          catch (RuntimeException e) {
+            if (!RunMonitor.CURRENT.get().isCancelled()) {
+              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
+                caller.dataFetched(null, e);
+              }
             }
           }
         }
@@ -371,7 +373,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       try {
         caller.dataFetched(getDataByText(), null);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         caller.dataFetched(null, e);
       }
       return null;
@@ -386,9 +388,11 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
               caller.dataFetched(rows, null);
             }
           }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(null, e);
+          catch (RuntimeException e) {
+            if (!RunMonitor.CURRENT.get().isCancelled()) {
+              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
+                caller.dataFetched(null, e);
+              }
             }
           }
         }
@@ -427,7 +431,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       try {
         caller.dataFetched(getDataByAll(), null);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         caller.dataFetched(null, e);
       }
       return null;
@@ -442,9 +446,11 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
               caller.dataFetched(rows, null);
             }
           }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(null, e);
+          catch (RuntimeException e) {
+            if (!RunMonitor.CURRENT.get().isCancelled()) {
+              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
+                caller.dataFetched(null, e);
+              }
             }
           }
         }
@@ -482,7 +488,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       try {
         caller.dataFetched(getDataByRec(), null);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         caller.dataFetched(null, e);
       }
       return null;
@@ -497,9 +503,11 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
               caller.dataFetched(rows, null);
             }
           }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(null, e);
+          catch (RuntimeException e) {
+            if (!RunMonitor.CURRENT.get().isCancelled()) {
+              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
+                caller.dataFetched(null, e);
+              }
             }
           }
         }

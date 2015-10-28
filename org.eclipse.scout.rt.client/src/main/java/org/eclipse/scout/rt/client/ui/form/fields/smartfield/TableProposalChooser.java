@@ -104,12 +104,12 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
     List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
     boolean selectCurrentValue = false;
-    ProcessingException failed = null;
+    RuntimeException failed = null;
     String searchText = null;
     if (result != null) {
       rows = result.getLookupRows();
       selectCurrentValue = result.isSelectCurrentValue();
-      failed = result.getProcessingException();
+      failed = result.getException();
       searchText = result.getSearchText();
     }
     if (rows == null) {
@@ -143,7 +143,12 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
       String statusText = null;
       int severity = IStatus.INFO;
       if (failed != null) {
-        statusText = failed.getStatus().getMessage();
+        if (failed instanceof ProcessingException) {
+          statusText = ((ProcessingException) failed).getStatus().getMessage();
+        }
+        else {
+          statusText = failed.getMessage();
+        }
         severity = IStatus.ERROR;
       }
       else if (rows.size() <= 0) {

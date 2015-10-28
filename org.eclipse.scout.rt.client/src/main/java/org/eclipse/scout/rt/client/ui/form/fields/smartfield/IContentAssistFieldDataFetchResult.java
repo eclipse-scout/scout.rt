@@ -12,25 +12,14 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public interface IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
   String getSearchText();
 
-  /**
-   * @return
-   */
-  ProcessingException getProcessingException();
+  RuntimeException getException();
 
-  /**
-   * @return
-   */
   List<? extends ILookupRow<LOOKUP_KEY>> getLookupRows();
 
-  /**
-   * @return
-   */
   boolean isSelectCurrentValue();
-
 }

@@ -437,13 +437,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     // lookup call
     Class<? extends ILookupCall<LOOKUP_KEY>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
-      try {
-        ILookupCall<LOOKUP_KEY> call = BEANS.get(lookupCallClass);
-        setLookupCall(call);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
-      }
+      ILookupCall<LOOKUP_KEY> call = BEANS.get(lookupCallClass);
+      setLookupCall(call);
     }
     setWildcard(getConfiguredWildcard());
   }
@@ -664,7 +659,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   public void setUniquelyDefinedValue(boolean background) {
     ILookupCallFetcher<LOOKUP_KEY> fetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
+      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
         if (failed == null) {
           if (rows.size() == 1) {
             acceptProposal(rows.get(0));
@@ -1020,10 +1015,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) {
     final Holder<List<? extends ILookupRow<LOOKUP_KEY>>> rowsHolder = new Holder<List<? extends ILookupRow<LOOKUP_KEY>>>();
-    final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
+    final Holder<RuntimeException> failedHolder = new Holder<>(RuntimeException.class, new ProcessingException("callback was not invoked"));
     callTextLookupInternal(text, maxRowCount, new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
+      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
         rowsHolder.setValue(rows);
         failedHolder.setValue(failed);
       }
@@ -1045,7 +1040,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
+      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException failed) {
         IRunnable lookupRunnable = new IRunnable() {
           @Override
           public void run() throws Exception {
@@ -1055,7 +1050,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
                 filterTextLookup(call, result);
                 fetcher.dataFetched(cleanupResultList(result), null);
               }
-              catch (ProcessingException e) {
+              catch (RuntimeException e) {
                 fetcher.dataFetched(null, e);
               }
             }
@@ -1091,7 +1086,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           prepareTextLookup(call, text);
           return call.getDataByTextInBackground(internalFetcher);
         }
-        catch (ProcessingException e1) {
+        catch (RuntimeException e1) {
           internalFetcher.dataFetched(null, e1);
         }
       }
@@ -1100,7 +1095,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           prepareTextLookup(call, text);
           internalFetcher.dataFetched(call.getDataByText(), null);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           internalFetcher.dataFetched(null, e);
         }
       }
@@ -1119,10 +1114,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) {
     final Holder<List<? extends ILookupRow<LOOKUP_KEY>>> rowsHolder = new Holder<List<? extends ILookupRow<LOOKUP_KEY>>>();
-    final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
+    final Holder<RuntimeException> failedHolder = new Holder<>(RuntimeException.class, new ProcessingException("callback was not invoked"));
     callBrowseLookupInternal(browseHint, maxRowCount, activeState, new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
+      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
         rowsHolder.setValue(rows);
         failedHolder.setValue(failed);
       }
@@ -1150,7 +1145,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
+      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException failed) {
 
         IRunnable lookupRunnable = new IRunnable() {
           @Override
@@ -1161,7 +1156,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
                 filterBrowseLookup(call, result);
                 fetcher.dataFetched(cleanupResultList(result), null);
               }
-              catch (ProcessingException e) {
+              catch (RuntimeException e) {
                 fetcher.dataFetched(null, e);
               }
             }
@@ -1197,7 +1192,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           prepareBrowseLookup(call, browseHint, activeState);
           return call.getDataByAllInBackground(internalFetcher);
         }
-        catch (ProcessingException e1) {
+        catch (RuntimeException e1) {
           internalFetcher.dataFetched(null, e1);
         }
       }
@@ -1206,7 +1201,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           prepareBrowseLookup(call, browseHint, activeState);
           internalFetcher.dataFetched(call.getDataByAll(), null);
         }
-        catch (ProcessingException e) {
+        catch (RuntimeException e) {
           internalFetcher.dataFetched(null, e);
         }
       }

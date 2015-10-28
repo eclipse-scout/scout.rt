@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -53,7 +52,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
         }
         fetcher.dataFetched(rows, null);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         fetcher.dataFetched(null, e);
       }
     }
@@ -81,7 +80,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     }
 
     @Override
-    public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
+    public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
       setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(rows, failed, m_searchText, m_selectCurrentValue));
     }
   }

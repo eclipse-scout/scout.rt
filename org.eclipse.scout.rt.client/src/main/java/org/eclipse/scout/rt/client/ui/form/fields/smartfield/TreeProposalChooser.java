@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -161,7 +160,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       //go async to fetch data
       m_populateInitialTreeJob = m_contentAssistField.callBrowseLookupInBackground(m_contentAssistField.getWildcard(), 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
         @Override
-        public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
+        public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
           if (failed == null) {
             try {
               setStatusVisible(false);
@@ -179,8 +178,8 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
                 m_model.setTreeChanging(false);
               }
             }
-            catch (ProcessingException pe) {
-              failed = pe;
+            catch (RuntimeException e) {
+              failed = e;
             }
           }
           if (failed != null) {

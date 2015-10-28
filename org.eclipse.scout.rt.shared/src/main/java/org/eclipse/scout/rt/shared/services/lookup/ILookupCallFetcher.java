@@ -27,12 +27,12 @@ public interface ILookupCallFetcher<T> {
 
   /**
    * This method may be called in a background thread out of the scout session context
-   * 
+   *
    * @param rows
    *          that were fetched from the data provider
    * @param failed
    *          null if ok, not null if any error occured during fetch
    */
-  void dataFetched(List<? extends ILookupRow<T>> rows, ProcessingException failed);
+  void dataFetched(List<? extends ILookupRow<T>> rows, RuntimeException failed);
 
 }
