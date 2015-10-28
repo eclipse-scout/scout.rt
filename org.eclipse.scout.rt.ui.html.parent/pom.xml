@@ -27,7 +27,6 @@
     <module>../org.eclipse.scout.rt.ui.html.test</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor.test</module>
-    <module>../org.eclipse.scout.rt.officeaddin.parent</module>
     <module>../org.eclipse.scout.rt.svg.ui.html</module>
   </modules>
 
@@ -61,18 +60,6 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt.officeaddin</groupId>
-        <artifactId>org.eclipse.scout.rt.officeaddin.client</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt.officeaddin</groupId>
-        <artifactId>org.eclipse.scout.rt.officeaddin.ui.html</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
 
