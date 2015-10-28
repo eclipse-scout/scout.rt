@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.longfield.ILongFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("cfc961a1-195f-491d-94c5-762f9d86efee")
 public abstract class AbstractLongField extends AbstractNumberField<Long> implements ILongField {
@@ -36,7 +35,6 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   @Override
   @ConfigProperty(ConfigProperty.LONG)
   @Order(250)
-  @ValidationRule(ValidationRule.MIN_VALUE)
   protected Long getConfiguredMinValue() {
     return Long.MIN_VALUE;
   }
@@ -44,7 +42,6 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   @Override
   @ConfigProperty(ConfigProperty.LONG)
   @Order(260)
-  @ValidationRule(ValidationRule.MAX_VALUE)
   protected Long getConfiguredMaxValue() {
     return Long.MAX_VALUE;
   }

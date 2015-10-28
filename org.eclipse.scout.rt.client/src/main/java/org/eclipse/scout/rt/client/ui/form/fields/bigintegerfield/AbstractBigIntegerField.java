@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.bigintegerfield.IBigIntegerFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("4c09f9f0-84fe-4c6c-95dd-1f51e92058d8")
 public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInteger> implements IBigIntegerField {
@@ -38,7 +37,6 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
    */
   @ConfigProperty(ConfigProperty.BIG_INTEGER)
   @Order(250)
-  @ValidationRule(ValidationRule.MIN_VALUE)
   @Override
   protected BigInteger getConfiguredMinValue() {
     return AbstractBigIntegerField.DEFAULT_MIN_VALUE;
@@ -47,7 +45,6 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   @Override
   @ConfigProperty(ConfigProperty.BIG_INTEGER)
   @Order(260)
-  @ValidationRule(ValidationRule.MAX_VALUE)
   protected BigInteger getConfiguredMaxValue() {
     return AbstractBigIntegerField.DEFAULT_MAX_VALUE;
   }

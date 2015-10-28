@@ -15,11 +15,8 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 @TunnelToServer
-@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IBookmarkStorageService extends IService {
 
   /**
@@ -48,7 +45,6 @@ public interface IBookmarkStorageService extends IService {
    *          is a map that contains for example userId=scott or something like ou=eclipse.org, department=dev It is up
    *          to the implementation to define and handle the target group parameter
    */
-  @InputValidation(IValidationStrategy.NO_CHECK.class)
   void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup);
 
 }

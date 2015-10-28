@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.RadioButtonGroupGrid;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -90,7 +89,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
-  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends ILookupCall<T>> getConfiguredLookupCall() {
     return null;
   }
@@ -102,7 +100,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
-  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?, T>> getConfiguredCodeType() {
     return null;
   }

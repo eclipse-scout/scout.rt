@@ -14,8 +14,6 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
  * Common definition of a password management service that may be used by projects to manage a private set of users in
@@ -28,7 +26,6 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
  * In order to use, register it in the extension "org.eclipse.scout.rt.client.serviceProxy"
  */
 @TunnelToServer
-@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IPasswordManagementService extends IService {
 
   /**

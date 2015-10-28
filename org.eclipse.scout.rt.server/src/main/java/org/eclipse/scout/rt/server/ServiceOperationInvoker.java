@@ -38,18 +38,11 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.validate.DefaultValidator;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.IValidator;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
-import org.eclipse.scout.rt.shared.validate.OutputValidation;
 
 /**
  * Provides functionality to invoke service operations as described by {@link ServiceTunnelRequest} and to return the
  * operations result in the form of a {@link ServiceTunnelResponse}.
  */
-// TODO [jgu] Remove validation as not functional anymore
-// TODO [jug] Remove class ServiceUtility and provide its functionality in this class
 @ApplicationScoped
 public class ServiceOperationInvoker {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceOperationInvoker.class);
@@ -78,10 +71,6 @@ public class ServiceOperationInvoker {
     return response;
   }
 
-  protected IValidator createValidator(IValidationStrategy validationStrategy) {
-    return new DefaultValidator(validationStrategy);
-  }
-
   /**
    * This method is executed within a {@link IServerSession} context on behalf of a server job.
    */
@@ -99,17 +88,12 @@ public class ServiceOperationInvoker {
       Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
       Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       Object[] args = serviceReq.getArgs();
-
       checkServiceAccess(serviceInterfaceClass, serviceOp, args);
-      //
       Object service = BEANS.get(serviceInterfaceClass);
-      validateInput(service, serviceOp, args);
-      //
+
       Object data = serviceUtility.invoke(serviceOp, service, args);
       Object[] outParameters = serviceUtility.extractHolderArguments(args);
-      //
-      //filter output
-      validateOutput(service, serviceOp, data, outParameters);
+
       serviceRes = new ServiceTunnelResponse(data, outParameters);
       return serviceRes;
     }
@@ -245,209 +229,6 @@ public class ServiceOperationInvoker {
       return sessionInspector.requestCallInspector(serviceReq);
     }
     return null;
-  }
-
-  protected void validateInput(Object service, Method serviceOp, Object[] args) throws Exception, InstantiationException, IllegalAccessException {
-    if (isValidateInput() && args != null && args.length > 0) {
-      Class<? extends IValidationStrategy> validationStrategyClass = findInputValidationStrategyByAnnotation(service, serviceOp);
-      if (validationStrategyClass == null) {
-        validationStrategyClass = findInputValidationStrategyByPolicy(service, serviceOp);
-      }
-      if (validationStrategyClass == null) {
-        throw new SecurityException("input validation failed (no strategy defined)");
-      }
-      validateInput(validationStrategyClass.newInstance(), service, serviceOp, args);
-    }
-  }
-
-  protected boolean isValidateInput() {
-    return false;
-  }
-
-  protected void validateOutput(Object service, Method serviceOp, Object data, Object[] outParameters) throws Exception, InstantiationException, IllegalAccessException {
-    if (isValidateOutput() && data != null || (outParameters != null && outParameters.length > 0)) {
-      Class<? extends IValidationStrategy> validationStrategyClass = findOutputValidationStrategyByAnnotation(service, serviceOp);
-      if (validationStrategyClass == null) {
-        validationStrategyClass = findOutputValidationStrategyByPolicy(service, serviceOp);
-      }
-      if (validationStrategyClass == null) {
-        throw new SecurityException("output validation failed");
-      }
-      validateOutput(validationStrategyClass.newInstance(), service, serviceOp, data, outParameters);
-    }
-  }
-
-  protected boolean isValidateOutput() {
-    return false;
-  }
-
-  /**
-   * Validate inbound data.Called by {@link #invokeImpl(IServiceTunnelRequest)}.
-   * <p>
-   * For default handling use
-   *
-   * <pre>
-   * the validation methods of {@link #createValidator(IValidationStrategy)}
-   * </pre>
-   * <p>
-   * Override this method to do central input validation inside the transaction context.
-   * <p>
-   * This method is part of the protected api and can be overridden.
-   *
-   * @param validationStrategy
-   *          may be null, add corresponding null handling.
-   */
-  protected void validateInput(IValidationStrategy validationStrategy, Object service, Method op, Object[] args) throws Exception {
-    //defaultValidateInput(validationStrategy, service, op, args);
-  }
-
-  protected void defaultValidateInput(IValidationStrategy validationStrategy, Object service, Method op, Object[] args) throws Exception {
-    createValidator(validationStrategy).validateMethodCall(op, args);
-  }
-
-  /**
-   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(IServiceTunnelRequest)}. Override this
-   * method to do central output validation inside the transaction context.
-   * <p>
-   * This method is part of the protected api and can be overridden.
-   */
-  protected void validateOutput(IValidationStrategy validationStrategy, Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
-    //defaultValidateOutput(validationStrategy, service, op, returnValue, outArgs);
-  }
-
-  protected void defaultValidateOutput(IValidationStrategy validationStrategy, Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
-    if ((outArgs != null && outArgs.length > 0) || returnValue != null) {
-      IValidator v = createValidator(validationStrategy);
-      if (outArgs != null && outArgs.length > 0) {
-        for (Object arg : outArgs) {
-          v.validateParameter(arg, null);
-        }
-      }
-      if (returnValue != null) {
-        v.validateParameter(returnValue, null);
-      }
-    }
-  }
-
-  /**
-   * Pass 1 tries to find a {@link InputValidation} annotation
-   */
-  protected Class<? extends IValidationStrategy> findInputValidationStrategyByAnnotation(Object serviceImpl, Method op) {
-    Class<?> c = serviceImpl.getClass();
-    while (c != null) {
-      //method level
-      Method m = null;
-      try {
-        m = c.getMethod(op.getName(), op.getParameterTypes());
-      }
-      catch (Throwable t) {
-        //nop
-      }
-      if (m != null) {
-        InputValidation ann = m.getAnnotation(InputValidation.class);
-        if (ann != null) {
-          return ann.value();
-        }
-      }
-      //type level
-      InputValidation ann = c.getAnnotation(InputValidation.class);
-      if (ann != null) {
-        return ann.value();
-      }
-      //next
-      if (c == op.getDeclaringClass()) {
-        break;
-      }
-      c = c.getSuperclass();
-      if (c == Object.class) {
-        //use interface at last
-        c = op.getDeclaringClass();
-      }
-    }
-    //continue
-    return null;
-  }
-
-  /**
-   * Pass 2 decides the strategy by java bean, collections framework and business process naming
-   *
-   * <pre>
-   * <i>Java bean naming</i>
-   * {@link IValidationStrategy.QUERY}: get*, is*
-   * {@link IValidationStrategy.PROCESS}: set*
-   * <p/>
-   * <i>Collections framework naming</i>
-   * {@link IValidationStrategy.QUERY}: get*
-   * {@link IValidationStrategy.PROCESS}: put*, add*, remove*
-   * <p/>
-   * <i>Business process naming</i>
-   * {@link IValidationStrategy.QUERY}: load*, read*, find*, has*, select*
-   * {@link IValidationStrategy.PROCESS}: store*, write*, create*, insert*, update*, delete*
-   * </pre>
-   */
-  protected Class<? extends IValidationStrategy> findInputValidationStrategyByPolicy(Object serviceImpl, Method op) {
-    if (DEFAULT_QUERY_NAMES_PATTERN.matcher(op.getName()).matches()) {
-      return IValidationStrategy.QUERY.class;
-    }
-    if (DEFAULT_PROCESS_NAMES_PATTERN.matcher(op.getName()).matches()) {
-      return IValidationStrategy.PROCESS.class;
-    }
-    //
-    warnMissingInputValidation(serviceImpl, op);
-    return IValidationStrategy.QUERY.class;
-  }
-
-  protected void warnMissingInputValidation(Object serviceImpl, Method op) {
-    LOG.warn("Legacy security hint for: " + op.getDeclaringClass().getName() + "#" + op.getName() + ": missing either annotation " + InputValidation.class.getSimpleName() + " or override of server-side " + getClass().getSimpleName()
-        + "#findInputValidationStrategyByPolicy. To support legacy the QUERY strategy is used.");
-  }
-
-  /**
-   * Pass 1 tries to find a {@link OutputValidation} annotation
-   */
-  protected Class<? extends IValidationStrategy> findOutputValidationStrategyByAnnotation(Object serviceImpl, Method op) {
-    Class<?> c = serviceImpl.getClass();
-    while (c != null) {
-      //method level
-      Method m = null;
-      try {
-        m = c.getMethod(op.getName(), op.getParameterTypes());
-      }
-      catch (Throwable t) {
-        //nop
-      }
-      if (m != null) {
-        OutputValidation ann = m.getAnnotation(OutputValidation.class);
-        if (ann != null) {
-          return ann.value();
-        }
-      }
-      //type level
-      OutputValidation ann = c.getAnnotation(OutputValidation.class);
-      if (ann != null) {
-        return ann.value();
-      }
-      //next
-      if (c == op.getDeclaringClass()) {
-        break;
-      }
-      c = c.getSuperclass();
-      if (c == Object.class) {
-        //use interface at last
-        c = op.getDeclaringClass();
-      }
-    }
-    //continue
-    return null;
-  }
-
-  /**
-   * Pass 2 decides the strategy by policy (custom override recommended)
-   * <p>
-   * Default does no checks
-   */
-  protected Class<? extends IValidationStrategy> findOutputValidationStrategyByPolicy(Object serviceImpl, Method op) {
-    return IValidationStrategy.NO_CHECK.class;
   }
 
   /**

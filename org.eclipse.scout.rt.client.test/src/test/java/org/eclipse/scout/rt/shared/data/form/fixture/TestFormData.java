@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.shared.data.form.fixture;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 public class TestFormData extends AbstractFormData {
@@ -63,15 +62,6 @@ public class TestFormData extends AbstractFormData {
 
     public Text1() {
     }
-
-    /**
-     * list of derived validation rules.
-     */
-    @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
-      super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
-    }
   }
 
   public static class Text2 extends AbstractValueFieldData<String> {
@@ -79,30 +69,12 @@ public class TestFormData extends AbstractFormData {
 
     public Text2() {
     }
-
-    /**
-     * list of derived validation rules.
-     */
-    @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
-      super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
-    }
   }
 
   public static class Text3 extends AbstractValueFieldData<String> {
     private static final long serialVersionUID = 1L;
 
     public Text3() {
-    }
-
-    /**
-     * list of derived validation rules.
-     */
-    @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
-      super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 
@@ -115,15 +87,6 @@ public class TestFormData extends AbstractFormData {
     @Override
     public String getFieldId() {
       return "customId";
-    }
-
-    /**
-     * list of derived validation rules.
-     */
-    @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
-      super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 }

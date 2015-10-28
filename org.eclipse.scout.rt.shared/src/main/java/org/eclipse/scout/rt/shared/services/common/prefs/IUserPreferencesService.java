@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.shared.services.common.prefs;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
  * Service capable to get user preferences.
@@ -22,7 +20,6 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
  * @since 5.1
  * @see Preferences#get(ISession, String)
  */
-@InputValidation(IValidationStrategy.NO_CHECK.class)
 public interface IUserPreferencesService extends IService {
 
   /**

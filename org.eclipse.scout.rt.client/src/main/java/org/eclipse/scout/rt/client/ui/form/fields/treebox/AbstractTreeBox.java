@@ -58,7 +58,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -132,14 +131,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
-  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends ILookupCall<T>> getConfiguredLookupCall() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
-  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?, T>> getConfiguredCodeType() {
     return null;
   }

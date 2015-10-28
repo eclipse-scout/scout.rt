@@ -16,11 +16,8 @@ import java.io.OutputStream;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 @TunnelToServer
-@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IRemoteFileService extends IService {
 
   /**

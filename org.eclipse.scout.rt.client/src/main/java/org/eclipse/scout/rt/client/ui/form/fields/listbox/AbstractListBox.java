@@ -68,7 +68,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -109,14 +108,12 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
-  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends ILookupCall<KEY>> getConfiguredLookupCall() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
-  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?, KEY>> getConfiguredCodeType() {
     return null;
   }

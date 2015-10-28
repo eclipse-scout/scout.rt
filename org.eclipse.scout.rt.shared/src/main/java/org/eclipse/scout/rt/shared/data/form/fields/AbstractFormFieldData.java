@@ -88,15 +88,6 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     }
   }
 
-  public Map<String/*rule name*/, Object/*rule value*/> getValidationRules() {
-    HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-    initValidationRules(ruleMap);
-    return ruleMap;
-  }
-
-  protected void initValidationRules(Map<String/*rule name*/, Object/*rule value*/> ruleMap) {
-  }
-
   public String getFieldId() {
     Class<?> c = getClass();
     while (c.isAnnotationPresent(Replace.class)) {

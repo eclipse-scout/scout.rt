@@ -13,14 +13,11 @@ package org.eclipse.scout.rt.shared.services.common.offline;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
  * This service is representing a local server on the frontend used to process server logic similiar to the backend in
  * transactions and with transaction support. <br>
  */
-@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {
 
   ServiceTunnelResponse dispatch(final ServiceTunnelRequest request);

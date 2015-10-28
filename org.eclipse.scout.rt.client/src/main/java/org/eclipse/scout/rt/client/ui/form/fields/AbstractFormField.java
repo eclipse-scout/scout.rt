@@ -66,7 +66,6 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -260,7 +259,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(45)
-  @ValidationRule(ValidationRule.MANDATORY)
   protected boolean getConfiguredMandatory() {
     return false;
   }
@@ -660,14 +658,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @ConfigProperty(ConfigProperty.MASTER_FIELD)
   @Order(170)
-  @ValidationRule(ValidationRule.MASTER_VALUE_FIELD)
   protected Class<? extends IValueField> getConfiguredMasterField() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
-  @ValidationRule(ValidationRule.MASTER_VALUE_REQUIRED)
   protected boolean getConfiguredMasterRequired() {
     return false;
   }

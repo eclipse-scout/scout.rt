@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.bigdecimalfield.IBigDecimalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("68508a2e-690c-46e2-aa78-062e1504c0ac")
 public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDecimal> implements IBigDecimalField {
@@ -38,7 +37,6 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Override
   @ConfigProperty(ConfigProperty.BIG_DECIMAL)
   @Order(300)
-  @ValidationRule(ValidationRule.MIN_VALUE)
   protected BigDecimal getConfiguredMinValue() {
     return AbstractBigDecimalField.DEFAULT_MIN_VALUE;
   }
@@ -46,7 +44,6 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Override
   @ConfigProperty(ConfigProperty.BIG_DECIMAL)
   @Order(310)
-  @ValidationRule(ValidationRule.MAX_VALUE)
   protected BigDecimal getConfiguredMaxValue() {
     return AbstractBigDecimalField.DEFAULT_MAX_VALUE;
   }

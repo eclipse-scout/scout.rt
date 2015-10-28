@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
 public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
@@ -89,7 +88,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
-  @ValidationRule(ValidationRule.MAX_LENGTH)
   protected int getConfiguredMaxLength() {
     return 4000;
   }

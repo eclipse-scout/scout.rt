@@ -10,10 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.fixture;
 
-import java.util.Map;
-
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 public class FormDataWithArray extends AbstractFormData {
@@ -41,16 +38,6 @@ public class FormDataWithArray extends AbstractFormData {
 
     public PersonNr() {
     }
-
-    /**
-     * list of derived validation rules.
-     */
-    @Override
-    protected void initValidationRules(Map<String, Object> ruleMap) {
-      super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_VALUE, Long.MAX_VALUE);
-      ruleMap.put(ValidationRule.MIN_VALUE, Long.MIN_VALUE);
-    }
   }
 
   public static class Roles extends AbstractValueFieldData<Long[]> {
@@ -66,15 +53,6 @@ public class FormDataWithArray extends AbstractFormData {
     private static final long serialVersionUID = 1L;
 
     public Value() {
-    }
-
-    /**
-     * list of derived validation rules.
-     */
-    @Override
-    protected void initValidationRules(Map<String, Object> ruleMap) {
-      super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 }

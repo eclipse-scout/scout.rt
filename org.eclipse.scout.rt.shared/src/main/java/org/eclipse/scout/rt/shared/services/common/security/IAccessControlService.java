@@ -17,8 +17,6 @@ import java.util.Collection;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
  * Access control facility. The default implementation in
@@ -26,7 +24,6 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
  * permissions per user principal for maximum performance when using stateless request/response patterns as in
  * webservice environments.
  */
-@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IAccessControlService extends IService {
 
   String getUserIdOfCurrentSubject();

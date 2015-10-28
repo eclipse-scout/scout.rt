@@ -17,10 +17,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
-@InputValidation(IValidationStrategy.PROCESS.class)
 public interface ICodeService extends IService {
 
   <T extends ICodeType<?, ?>> T getCodeType(Class<T> type);

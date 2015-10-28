@@ -15,8 +15,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
  * Provides cancellation support for operations initiated by the client.
@@ -38,6 +36,5 @@ public interface IRunMonitorCancelService extends IService {
    *          <code>requestSequence</code> to identify the {@link RunMonitor} to cancel.
    * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
    */
-  @InputValidation(IValidationStrategy.NO_CHECK.class)
   boolean cancel(long requestSequence);
 }

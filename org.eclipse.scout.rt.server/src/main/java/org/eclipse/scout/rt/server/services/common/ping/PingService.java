@@ -12,14 +12,11 @@ package org.eclipse.scout.rt.server.services.common.ping;
 
 import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 @Server
 public class PingService implements IPingService {
 
   @Override
-  @InputValidation(IValidationStrategy.QUERY.class)
   public String ping(String s) {
     return s;
   }

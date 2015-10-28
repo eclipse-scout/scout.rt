@@ -57,7 +57,6 @@ import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -178,7 +177,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(260)
-  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?, LOOKUP_KEY>> getConfiguredCodeType() {
     return null;
   }
@@ -190,7 +188,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(250)
-  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends ILookupCall<LOOKUP_KEY>> getConfiguredLookupCall() {
     return null;
   }
