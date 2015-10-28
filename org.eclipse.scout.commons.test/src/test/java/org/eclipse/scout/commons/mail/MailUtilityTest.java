@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.mail;
 
-import static org.eclipse.scout.commons.mail.MailUtilityTest.MailParticipantUtility.createMailParticipant;
-import static org.eclipse.scout.commons.mail.MailUtilityTest.MailParticipantUtility.createMailParticipants;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -153,15 +151,15 @@ public class MailUtilityTest {
     verifyMimeMessage(plainTextAndHtmlMessage, plainText, html);
 
     MailMessage definition =
-        new MailMessage().withSubject("Subject").withBodyPlainText(plainText).withBodyHtml(html).withSender(createMailParticipant("info@example.org")).withToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@example.org")));
+        new MailMessage().withSubject("Subject").withBodyPlainText(plainText).withBodyHtml(html).withSender(createMailParticipant("info@example.org")).addToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@example.org")));
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     final String attachmentContentId = "mycontentid";
     definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null), null, null, attachmentContentId));
-    definition.withCcRecipient(createMailParticipant("cc1@example.org"));
-    definition.withCcRecipient(createMailParticipant("cc2@example.org"));
-    definition.withBccRecipient(createMailParticipant("bcc1@example.org"));
-    definition.withBccRecipient(createMailParticipant("bcc2@example.org"));
-    definition.withBccRecipient(createMailParticipant("bcc3@example.org"));
+    definition.addCcRecipient(createMailParticipant("cc1@example.org"));
+    definition.addCcRecipient(createMailParticipant("cc2@example.org"));
+    definition.addBccRecipient(createMailParticipant("bcc1@example.org"));
+    definition.addBccRecipient(createMailParticipant("bcc2@example.org"));
+    definition.addBccRecipient(createMailParticipant("bcc3@example.org"));
     MimeMessage msg = MailUtility.createMimeMessage(definition);
     verifyMimeMessage(msg, plainText, html, "sample1.dat");
     // exactly one, already verified by verify method
@@ -282,9 +280,9 @@ public class MailUtilityTest {
   @Test
   public void testMimeMessageDefinitionRecipients() {
     MailMessage definition = new MailMessage();
-    definition.withToRecipient(createMailParticipant("to@example.org"));
-    definition.withCcRecipient(createMailParticipant("cc@example.org"));
-    definition.withBccRecipient(createMailParticipant("bcc@example.org"));
+    definition.addToRecipient(createMailParticipant("to@example.org"));
+    definition.addCcRecipient(createMailParticipant("cc@example.org"));
+    definition.addBccRecipient(createMailParticipant("bcc@example.org"));
 
     Assert.assertEquals("Number of TO recipients is wrong", 1, definition.getToRecipients().size());
     Assert.assertEquals("Number of CC recipients is wrong", 1, definition.getCcRecipients().size());
@@ -309,9 +307,9 @@ public class MailUtilityTest {
     Assert.assertEquals("Number of CC recipients is wrong", 0, definition.getCcRecipients().size());
     Assert.assertEquals("Number of BCC recipients is wrong", 0, definition.getBccRecipients().size());
 
-    definition.withToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@exapmle.org", "to2@example.org")));
-    definition.withCcRecipients(createMailParticipants(CollectionUtility.arrayList("cc1@exapmle.org", "cc2@example.org", "cc3@example.org")));
-    definition.withBccRecipients(createMailParticipants(CollectionUtility.arrayList("bcc1@exapmle.org", "bcc2@example.org", "bcc3@example.org", "bcc4@example.org")));
+    definition.addToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@exapmle.org", "to2@example.org")));
+    definition.addCcRecipients(createMailParticipants(CollectionUtility.arrayList("cc1@exapmle.org", "cc2@example.org", "cc3@example.org")));
+    definition.addBccRecipients(createMailParticipants(CollectionUtility.arrayList("bcc1@exapmle.org", "bcc2@example.org", "bcc3@example.org", "bcc4@example.org")));
 
     Assert.assertEquals("Number of TO recipients is wrong", 2, definition.getToRecipients().size());
     Assert.assertEquals("Number of CC recipients is wrong", 3, definition.getCcRecipients().size());
@@ -416,23 +414,20 @@ public class MailUtilityTest {
   }
 
   /**
-   * Testing only. Utility class to easily create a list of participants.
+   * Helper method for test.
    */
-  static class MailParticipantUtility extends MailParticipant {
+  protected static MailParticipant createMailParticipant(String email) {
+    return new MailParticipant().withEmail(email);
+  }
 
-    private static final long serialVersionUID = 1L;
-
-    static MailParticipant createMailParticipant(String email) {
-      return new MailParticipant(email);
+  /**
+   * Helper method for test.
+   */
+  protected static List<MailParticipant> createMailParticipants(List<String> emails) {
+    List<MailParticipant> participants = new ArrayList<MailParticipant>();
+    for (String email : emails) {
+      participants.add(new MailParticipant().withEmail(email));
     }
-
-    static List<MailParticipant> createMailParticipants(List<String> emails) {
-      List<MailParticipant> participants = new ArrayList<MailParticipant>();
-      for (String email : emails) {
-        participants.add(new MailParticipant(email));
-      }
-      return participants;
-    }
-
+    return participants;
   }
 }

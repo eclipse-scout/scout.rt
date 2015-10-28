@@ -25,7 +25,7 @@ public class MailMessage {
   private final List<MailParticipant> m_ccRecipients = new ArrayList<MailParticipant>();
   private final List<MailParticipant> m_bccRecipients = new ArrayList<MailParticipant>();
   private MailParticipant m_sender;
-  private final List<MailParticipant> m_replyToRecipients = new ArrayList<MailParticipant>();
+  private final List<MailParticipant> m_replyTos = new ArrayList<MailParticipant>();
   private String m_subject;
   private String m_bodyPlainText;
   private String m_bodyHtml;
@@ -50,7 +50,7 @@ public class MailMessage {
    * @param toRecipient
    *          TO recipient to add
    */
-  public MailMessage withToRecipient(MailParticipant toRecipient) {
+  public MailMessage addToRecipient(MailParticipant toRecipient) {
     m_toRecipients.add(toRecipient);
     return this;
   }
@@ -61,7 +61,7 @@ public class MailMessage {
    * @param toRecipients
    *          TO recipients to add
    */
-  public MailMessage withToRecipients(Collection<MailParticipant> toRecipients) {
+  public MailMessage addToRecipients(Collection<MailParticipant> toRecipients) {
     if (toRecipients != null) {
       m_toRecipients.addAll(toRecipients);
     }
@@ -89,7 +89,7 @@ public class MailMessage {
    * @param ccRecipient
    *          CC recipient to add
    */
-  public MailMessage withCcRecipient(MailParticipant ccRecipient) {
+  public MailMessage addCcRecipient(MailParticipant ccRecipient) {
     m_ccRecipients.add(ccRecipient);
     return this;
   }
@@ -100,7 +100,7 @@ public class MailMessage {
    * @param ccRecipients
    *          CC recipients to add
    */
-  public MailMessage withCcRecipients(Collection<MailParticipant> ccRecipients) {
+  public MailMessage addCcRecipients(Collection<MailParticipant> ccRecipients) {
     if (ccRecipients != null) {
       m_ccRecipients.addAll(ccRecipients);
     }
@@ -128,7 +128,7 @@ public class MailMessage {
    * @param bccRecipient
    *          BCC recipient to add
    */
-  public MailMessage withBccRecipient(MailParticipant bccRecipient) {
+  public MailMessage addBccRecipient(MailParticipant bccRecipient) {
     m_bccRecipients.add(bccRecipient);
     return this;
   }
@@ -139,7 +139,7 @@ public class MailMessage {
    * @param bccRecipients
    *          BCC recipients to add
    */
-  public MailMessage withBccRecipients(Collection<MailParticipant> bccRecipients) {
+  public MailMessage addBccRecipients(Collection<MailParticipant> bccRecipients) {
     if (bccRecipients != null) {
       m_bccRecipients.addAll(bccRecipients);
     }
@@ -173,41 +173,41 @@ public class MailMessage {
   }
 
   /**
-   * @return an unmodifiable list of reply TO recipients.
+   * @return an unmodifiable list of reply TO's.
    */
-  public List<MailParticipant> getReplyToRecipients() {
-    return Collections.unmodifiableList(m_replyToRecipients);
+  public List<MailParticipant> getReplyTos() {
+    return Collections.unmodifiableList(m_replyTos);
   }
 
   /**
    * Adds the recipient to the reply TO list.
    *
-   * @param replyToRecipient
+   * @param replyTo
    *          TO recipient to add
    */
-  public MailMessage withReplyToRecipient(MailParticipant replyToRecipient) {
-    m_replyToRecipients.add(replyToRecipient);
+  public MailMessage addReplyTo(MailParticipant replyTo) {
+    m_replyTos.add(replyTo);
     return this;
   }
 
   /**
    * Adds the recipients to the reply TO list.
    *
-   * @param replyToRecipients
+   * @param replyTos
    *          reply TO recipients to add
    */
-  public MailMessage withReplyToRecipients(Collection<MailParticipant> replyToRecipients) {
-    if (replyToRecipients != null) {
-      m_replyToRecipients.addAll(replyToRecipients);
+  public MailMessage addReplyTos(Collection<MailParticipant> replyTos) {
+    if (replyTos != null) {
+      m_replyTos.addAll(replyTos);
     }
     return this;
   }
 
   /**
-   * Clears the list of the reply TO recipients.
+   * Clears the list of the reply TO's.
    */
-  public MailMessage clearReplyToRecipients() {
-    m_replyToRecipients.clear();
+  public MailMessage clearReplyTos() {
+    m_replyTos.clear();
     return this;
   }
 

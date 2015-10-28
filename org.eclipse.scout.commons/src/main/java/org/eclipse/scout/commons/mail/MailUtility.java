@@ -36,6 +36,7 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -296,8 +297,8 @@ public class MailUtility {
         m.setFrom(addrSender);
         m.setSender(addrSender);
       }
-      if (!CollectionUtility.isEmpty(mailMessage.getReplyToRecipients())) {
-        m.setReplyTo(createInternetAddresses(mailMessage.getReplyToRecipients()));
+      if (!CollectionUtility.isEmpty(mailMessage.getReplyTos())) {
+        m.setReplyTo(createInternetAddresses(mailMessage.getReplyTos()));
       }
       if (StringUtility.hasText(mailMessage.getSubject())) {
         m.setSubject(mailMessage.getSubject(), Encoding.UTF_8);
@@ -515,7 +516,18 @@ public class MailUtility {
     return type;
   }
 
-  private static InternetAddress createInternetAddress(MailParticipant participant) throws MessagingException {
+  /**
+   * Creates an Internet address for the given mail participant.
+   *
+   * @param participant
+   *          Participant
+   * @return Internet address (or {@code null} if not participant is provided)
+   */
+  public static InternetAddress createInternetAddress(MailParticipant participant) {
+    if (participant == null) {
+      return null;
+    }
+
     try {
       InternetAddress internetAddress = new InternetAddress(IDN.toASCII(participant.getEmail()));
       if (StringUtility.hasText(participant.getName())) {
@@ -523,8 +535,8 @@ public class MailUtility {
       }
       return internetAddress;
     }
-    catch (UnsupportedEncodingException e) {
-      throw new MessagingException("Failed to create internet address", e);
+    catch (UnsupportedEncodingException | AddressException e) {
+      throw new ProcessingException("Failed to create internet address for " + participant.toString(), e);
     }
   }
 
@@ -535,7 +547,7 @@ public class MailUtility {
    * Array instead of list is returned in order to directly used to result with
    * {@link MimeMessage#setRecipients(javax.mail.Message.RecipientType, javax.mail.Address[])}.
    */
-  private static InternetAddress[] createInternetAddresses(List<MailParticipant> participants) throws MessagingException {
+  private static InternetAddress[] createInternetAddresses(List<MailParticipant> participants) {
     if (CollectionUtility.isEmpty(participants)) {
       return null;
     }
