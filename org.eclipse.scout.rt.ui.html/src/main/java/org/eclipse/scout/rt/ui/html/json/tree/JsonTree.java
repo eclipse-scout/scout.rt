@@ -755,6 +755,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());
+    putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
     putChildNodeIndex(json, node);
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();

@@ -19,6 +19,7 @@ Try these to switch between fonts:
 @font-size-normal: 13px;
 @font-size-plus: 14px;
 @font-size-large: 16px;
+@font-size-extra-large: 32px;
 
 @font-face {
   font-family: scoutIcons;

@@ -531,6 +531,10 @@ scout.Tree.prototype.clearSelection = function() {
   this.selectNodes([]);
 };
 
+scout.Tree.prototype.selectNode = function(node, notifyServer, debounceSend) {
+  this.selectNodes(node);
+};
+
 scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.helpers.nvl(notifyServer, true);
@@ -564,6 +568,10 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this._renderSelection();
     this._renderMenus();
   }
+};
+
+scout.Tree.prototype.deselectNode = function(node) {
+  this.deselectNodes(node);
 };
 
 scout.Tree.prototype.deselectNodes = function(nodes) {

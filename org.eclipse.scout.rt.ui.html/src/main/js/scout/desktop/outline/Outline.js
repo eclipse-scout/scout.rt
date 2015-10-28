@@ -22,7 +22,7 @@ scout.Outline.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, model.session);
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
-  this.outlineOverview = scout.create(scout.OutlineOverview, {
+  this.outlineOverview = scout.create('OutlineOverview', {
     parent: this,
     outline: this
   });
