@@ -201,14 +201,14 @@ public class ScriptFileBuilder {
     }
     buf.write(content.substring(pos).getBytes(Encoding.UTF_8));
 
-    String macroContent = buf.toString();
+    String macroContent = buf.toString(Encoding.UTF_8);
     if (compileAndMinify) {
       macroContent = compileAndMinifyContent(script.getFileType(), macroContent);
     }
     return new ScriptOutput(pathInfo, macroContent.getBytes(Encoding.UTF_8), lastModified);
   }
 
-  private String compileAndMinifyContent(FileType fileType, String content) throws IOException {
+  protected String compileAndMinifyContent(FileType fileType, String content) throws IOException {
     content = compileContent(fileType, content);
     if (isMinifyEnabled()) {
       content = minifyContent(fileType, content);
