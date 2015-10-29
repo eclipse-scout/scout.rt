@@ -51,7 +51,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final int m_maxUserIdleTime = CONFIG.getPropertyValue(MaxUserIdleTimeProperty.class).intValue();
 
   private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
-  private final JsonProtocolHelper m_jsonProtocolHelper = BEANS.get(JsonProtocolHelper.class);
+  private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
   public boolean handlePost(final UiServlet servlet, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -67,7 +67,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // never cache json requests
       m_httpCacheControl.disableCacheHeaders(req, resp);
 
-      JSONObject jsonObject = m_jsonProtocolHelper.readJsonRequest(req);
+      JSONObject jsonObject = m_jsonRequestHelper.readJsonRequest(req);
       if (isPingRequest(jsonObject)) {
         handlePing(resp);
         return true;
@@ -96,11 +96,11 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
-        writeJsonResponse(resp, m_jsonProtocolHelper.createStartupFailedResponse());
+        writeJsonResponse(resp, m_jsonRequestHelper.createStartupFailedResponse());
       }
       else {
         LOG.error("Unexpected error while processing JSON request", e);
-        writeJsonResponse(resp, m_jsonProtocolHelper.createUnrecoverableFailureResponse());
+        writeJsonResponse(resp, m_jsonRequestHelper.createUnrecoverableFailureResponse());
       }
     }
     return true;
@@ -148,22 +148,22 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleEvents(HttpServletRequest req, HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     JSONObject jsonResp = uiSession.processJsonRequest(req, resp, jsonReq);
     if (jsonResp == null) {
-      jsonResp = m_jsonProtocolHelper.createEmptyResponse();
+      jsonResp = m_jsonRequestHelper.createEmptyResponse();
     }
     writeJsonResponse(resp, jsonResp);
   }
 
   protected void handleUiSessionDisposed(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     if (jsonReq.isPollForBackgroundJobsRequest()) { // TODO BSH isManualLogout?
-      writeJsonResponse(resp, m_jsonProtocolHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
+      writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
     }
     else {
-      writeJsonResponse(resp, m_jsonProtocolHelper.createSessionTimeoutResponse());
+      writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
     }
   }
 
   protected void handlePing(HttpServletResponse resp) throws IOException {
-    writeJsonResponse(resp, m_jsonProtocolHelper.createPingResponse());
+    writeJsonResponse(resp, m_jsonRequestHelper.createPingResponse());
   }
 
   protected void handleLog(HttpServletResponse resp, JSONObject jsonReqObj) throws IOException {
@@ -174,12 +174,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       message = message.substring(0, 10000) + "...";
     }
     LOG.error(message);
-    writeJsonResponse(resp, m_jsonProtocolHelper.createEmptyResponse());
+    writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }
 
   protected void handleCancel(HttpServletResponse resp, IUiSession uiSession) throws IOException {
     uiSession.processCancelRequest();
-    writeJsonResponse(resp, m_jsonProtocolHelper.createEmptyResponse());
+    writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }
 
   protected void handlePollForBackgroundJobs(IUiSession uiSession, long start) {
@@ -202,13 +202,13 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void handleSessionTimeout(HttpServletResponse resp, JsonRequest jsonReq) throws IOException {
     LOG.info("Request cannot be processed due to UI session timeout [id=" + jsonReq.getUiSessionId() + "]");
-    writeJsonResponse(resp, m_jsonProtocolHelper.createSessionTimeoutResponse());
+    writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
   protected void handleMaxIdeTimeout(HttpServletResponse resp, JsonRequest jsonReq, HttpSession httpSession, int idleSeconds, int maxIdleSeconds) throws IOException {
     LOG.info("Detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + maxIdleSeconds + ")");
     httpSession.invalidate();
-    writeJsonResponse(resp, m_jsonProtocolHelper.createSessionTimeoutResponse());
+    writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
   protected void handleUnload(HttpServletResponse resp, JsonRequest jsonReq, String uiSessionAttributeName, HttpSession httpSession, IUiSession uiSession) throws IOException {
@@ -223,7 +223,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         uiSession.uiSessionLock().unlock();
       }
     }
-    writeJsonResponse(resp, m_jsonProtocolHelper.createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
+    writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
   }
 
   /**
@@ -308,6 +308,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
    * Writes the given {@link JSONObject} into the given {@link ServletResponse}.
    */
   protected void writeJsonResponse(ServletResponse servletResponse, JSONObject jsonObject) throws IOException {
-    m_jsonProtocolHelper.writeResponse(servletResponse, jsonObject);
+    m_jsonRequestHelper.writeResponse(servletResponse, jsonObject);
   }
 }

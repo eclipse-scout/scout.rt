@@ -57,7 +57,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
-  private final JsonProtocolHelper m_jsonProtocolHelper = BEANS.get(JsonProtocolHelper.class);
+  private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
   public boolean handlePost(final UiServlet servlet, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -93,7 +93,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
-      writeJsonResponse(resp, m_jsonProtocolHelper.createUnrecoverableFailureResponse());
+      writeJsonResponse(resp, m_jsonRequestHelper.createUnrecoverableFailureResponse());
     }
     return true;
   }
@@ -123,12 +123,12 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     uiSession.uiSessionLock().lock();
     try {
       if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-        writeJsonResponse(httpServletResponse, m_jsonProtocolHelper.createSessionTimeoutResponse());
+        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createSessionTimeoutResponse());
         return;
       }
       JSONObject jsonResp = uiSession.processFileUpload(httpServletRequest, httpServletResponse, binaryResourceConsumer, uploadResources, uploadProperties);
       if (jsonResp == null) {
-        jsonResp = m_jsonProtocolHelper.createEmptyResponse();
+        jsonResp = m_jsonRequestHelper.createEmptyResponse();
       }
       writeJsonResponse(httpServletResponse, jsonResp);
     }
@@ -205,6 +205,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * Writes the given {@link JSONObject} into the given {@link ServletResponse}.
    */
   protected void writeJsonResponse(ServletResponse servletResponse, JSONObject jsonObject) throws IOException {
-    m_jsonProtocolHelper.writeResponse(servletResponse, jsonObject);
+    m_jsonRequestHelper.writeResponse(servletResponse, jsonObject);
   }
 }

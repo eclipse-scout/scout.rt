@@ -30,9 +30,9 @@ import org.json.JSONObject;
  * {@link ServletRequest}, or to write a JSON object into {@link ServletResponse}.
  */
 @ApplicationScoped
-public class JsonProtocolHelper {
+public class JsonRequestHelper {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonProtocolHelper.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonRequestHelper.class);
 
   /**
    * @return {@link JSONObject} to indicate that an unrecoverable failure occurred.
