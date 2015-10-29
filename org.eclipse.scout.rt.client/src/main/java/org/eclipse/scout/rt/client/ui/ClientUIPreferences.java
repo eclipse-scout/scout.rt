@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -233,82 +232,36 @@ public class ClientUIPreferences {
     return key;
   }
 
-  public Object getTableCustomizerData(String customizerKey) {
-    if (m_prefs == null) {
-      return null;
-    }
-    String key = TABLE_CUSTOMIZER_DATA + customizerKey;
-    byte[] serialData = m_prefs.getByteArray(key, null);
-    if (serialData != null) {
-      try {
-        Object customizerData = SerializationUtility.createObjectSerializer().deserialize(serialData, null);
-        return customizerData;
-      }
-      catch (Exception t) {
-        LOG.error("Failed reading custom table data for " + key + ": " + t);
-        m_prefs.remove(key);
-        return null;
-      }
-    }
-    else {
-      return null;
-    }
-  }
-
-  public void removeTableCustomizerData(ITable table, String configName) {
-    if (m_prefs == null) {
+  public void removeTableCustomizerData(ITableCustomizer customizer, String configName) {
+    if (m_prefs == null || customizer.getPreferencesKey() == null) {
       return;
     }
-    ITableCustomizer customizer = table.getTableCustomizer();
     if (customizer != null) {
-      m_prefs.remove(createTableCustomizerConfigKey(table, customizer.getClass(), configName));
+      m_prefs.remove(createTableCustomizerConfigKey(customizer, configName));
     }
   }
 
-  public void setTableCustomizerData(ITable table, ITableCustomizer customizer, String configName) {
-    if (m_prefs == null) {
+  public void setTableCustomizerData(ITableCustomizer customizer, String configName) {
+    if (m_prefs == null || customizer.getPreferencesKey() == null) {
       return;
     }
-    m_prefs.putByteArray(createTableCustomizerConfigKey(table, customizer.getClass(), configName), customizer.getSerializedData());
+    m_prefs.putByteArray(createTableCustomizerConfigKey(customizer, configName), customizer.getSerializedData());
   }
 
-  public byte[] getTableCustomizerData(ITable table, Class customizer, String configName) {
-    if (m_prefs == null) {
+  public byte[] getTableCustomizerData(ITableCustomizer customizer, String configName) {
+    if (m_prefs == null || customizer.getPreferencesKey() == null) {
       return null;
     }
-    return m_prefs.getByteArray(createTableCustomizerConfigKey(table, customizer, configName), null);
+    return m_prefs.getByteArray(createTableCustomizerConfigKey(customizer, configName), null);
   }
 
-  private String createTableCustomizerConfigKey(ITable table, Class customizer, String configName) {
+  protected String createTableCustomizerConfigKey(ITableCustomizer customizer, String configName) {
     StringBuilder sb = new StringBuilder();
     if (!StringUtility.isNullOrEmpty(configName)) {
       sb.append(configName).append(".");
     }
-    sb.append(TABLE_CUSTOMIZER_DATA).append(getTableKey(table)).append("#").append(customizer.getName());
+    sb.append(TABLE_CUSTOMIZER_DATA).append(customizer.getPreferencesKey());
     return sb.toString();
-  }
-
-  /**
-   * store customizer data to persistent store
-   */
-  public void setTableCustomizerData(String customizerKey, Object customizerData) {
-
-    String key = TABLE_CUSTOMIZER_DATA + customizerKey;
-    if (customizerData != null) {
-      try {
-        byte[] data = SerializationUtility.createObjectSerializer().serialize(customizerData);
-        m_prefs.putByteArray(key, data);
-      }
-      catch (Exception t) {
-        LOG.error("Failed storing custom table data for " + key, t);
-        m_prefs.remove(key);
-      }
-    }
-    else {
-      m_prefs.remove(key);
-    }
-    //
-    flush();
   }
 
   /**
@@ -568,7 +521,7 @@ public class ClientUIPreferences {
     configs.remove(name);
     m_prefs.putList(key, new ArrayList<String>(configs));
     removeAllTableColumnPreferences(table, true, true, true, true, name);
-    removeTableCustomizerData(table, name);
+    removeTableCustomizerData(table.getTableCustomizer(), name);
   }
 
   public void addTableColumnsConfig(ITable table, String name) {

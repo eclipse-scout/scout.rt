@@ -1509,7 +1509,7 @@ public class OrganizeColumnsForm extends AbstractForm {
       prefs.addTableColumnsConfig(m_table, configName);
       prefs.setAllTableColumnPreferences(m_table, configName);
       if (m_table.getTableCustomizer() != null) {
-        prefs.setTableCustomizerData(m_table, m_table.getTableCustomizer(), configName);
+        prefs.setTableCustomizerData(m_table.getTableCustomizer(), configName);
       }
     }
   }
@@ -1529,7 +1529,7 @@ public class OrganizeColumnsForm extends AbstractForm {
   protected void applyViewForConfig(String configName) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     if (m_table.getTableCustomizer() != null) {
-      byte[] tableCustomizerData = prefs.getTableCustomizerData(m_table, m_table.getTableCustomizer().getClass(), configName);
+      byte[] tableCustomizerData = prefs.getTableCustomizerData(m_table.getTableCustomizer(), configName);
       if (tableCustomizerData != null) {
         m_table.getTableCustomizer().removeAllColumns();
         m_table.getTableCustomizer().setSerializedData(tableCustomizerData);

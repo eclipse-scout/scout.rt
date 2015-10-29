@@ -47,4 +47,5 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
   public void setSerializedData(byte[] data) {
 
   }
+
 }

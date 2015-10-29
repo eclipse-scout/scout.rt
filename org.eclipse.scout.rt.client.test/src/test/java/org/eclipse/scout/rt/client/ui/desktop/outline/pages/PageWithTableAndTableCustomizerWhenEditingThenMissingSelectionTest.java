@@ -128,6 +128,11 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
           }
           return new byte[]{1, 2, 3, 4};
         }
+
+        @Override
+        public String getPreferencesKey() {
+          return null;
+        }
       });
       registerDataChangeListener("Account");
     }

@@ -56,4 +56,15 @@ public interface ITableCustomizer {
    */
   void setSerializedData(byte[] data);
 
+  /**
+   * Get a key which identifies both: the table this instance refers to and the concrete implementation of the
+   * customizer.
+   * <p>
+   * This key will be used when persisting the customizer's serialized state in the application's preferences.
+   *
+   * @return either the key or null if this customizer is volatile and should therefore not be persisted in the
+   *         preferences
+   */
+  String getPreferencesKey();
+
 }
