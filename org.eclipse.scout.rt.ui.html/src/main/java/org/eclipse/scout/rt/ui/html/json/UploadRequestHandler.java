@@ -32,18 +32,21 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
-import org.slf4j.MDC;
 
 /**
  * This handler contributes to the {@link UiServlet} as the POST handler for /upload
@@ -55,7 +58,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   @Override
-  public boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(final UiServlet servlet, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     //serve only /upload
     String pathInfo = req.getPathInfo();
     Matcher matcher = PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
@@ -71,71 +74,68 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     try {
-      long start = System.nanoTime();
-      String oldScoutSessionId = MDC.get(MDC_SCOUT_SESSION_ID);
-      String oldScoutUiSessionId = MDC.get(MDC_SCOUT_UI_SESSION_ID);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("started");
-      }
-
       // Resolve session
-      MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSessionId);
       IUiSession uiSession = resolveUiSession(req, uiSessionId);
-      IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
 
-      // Read uploaded data
-      Map<String, String> uploadProperties = new HashMap<String, String>();
-      List<BinaryResource> uploadResources = new ArrayList<>();
-      readUploadData(req, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
+      // Associate subsequent processing with the uiSession.
+      UiRunContexts.copyCurrent()
+          .withSession(uiSession)
+          .withProperty("targetAdapterId", targetAdapterId)
+          .run(new IRunnable() {
 
-      if (uploadProperties.containsKey("legacyFormTextPlainAnswer")) {
-        resp.setContentType("text/plain");
-      }
-
-      try {
-        MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
-        MDC.put(MDC_SCOUT_SESSION_ID, uiSession.getClientSessionId());
-
-        // GUI requests for the same session must be processed consecutively
-        uiSession.uiSessionLock().lock();
-        try {
-          if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-            writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createSessionTimeoutResponse());
-            return true;
-          }
-          JSONObject jsonResp = uiSession.processFileUpload(req, resp, binaryResourceConsumer, uploadResources, uploadProperties);
-          if (jsonResp == null) {
-            jsonResp = BEANS.get(JsonProtocolHelper.class).createEmptyResponse();
-          }
-          writeJsonResponse(resp, jsonResp);
-        }
-        finally {
-          uiSession.uiSessionLock().unlock();
-        }
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
-        }
-      }
-      finally {
-        if (oldScoutSessionId != null) {
-          MDC.put(MDC_SCOUT_SESSION_ID, oldScoutSessionId);
-        }
-        else {
-          MDC.remove(MDC_SCOUT_SESSION_ID);
-        }
-        if (oldScoutUiSessionId != null) {
-          MDC.put(MDC_SCOUT_UI_SESSION_ID, oldScoutUiSessionId);
-        }
-        else {
-          MDC.remove(MDC_SCOUT_UI_SESSION_ID);
-        }
-      }
+            @Override
+            public void run() throws Exception {
+              handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp);
+            }
+          }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
       writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createUnrecoverableFailureResponse());
     }
     return true;
+  }
+
+  /**
+   * Method invoked to handle a file upload request from UI.
+   */
+  protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, FileUploadException {
+    long start = System.nanoTime();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Fileupload started");
+    }
+
+    String targetAdapterId = (String) PropertyMap.CURRENT.get().get("targetAdapterId");
+    IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
+
+    // Read uploaded data
+    Map<String, String> uploadProperties = new HashMap<String, String>();
+    List<BinaryResource> uploadResources = new ArrayList<>();
+    readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
+
+    if (uploadProperties.containsKey("legacyFormTextPlainAnswer")) {
+      httpServletResponse.setContentType("text/plain");
+    }
+
+    // GUI requests for the same session must be processed consecutively
+    uiSession.uiSessionLock().lock();
+    try {
+      if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
+        writeJsonResponse(httpServletResponse, BEANS.get(JsonProtocolHelper.class).createSessionTimeoutResponse());
+        return;
+      }
+      JSONObject jsonResp = uiSession.processFileUpload(httpServletRequest, httpServletResponse, binaryResourceConsumer, uploadResources, uploadProperties);
+      if (jsonResp == null) {
+        jsonResp = BEANS.get(JsonProtocolHelper.class).createEmptyResponse();
+      }
+      writeJsonResponse(httpServletResponse, jsonResp);
+    }
+    finally {
+      uiSession.uiSessionLock().unlock();
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+    }
   }
 
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {

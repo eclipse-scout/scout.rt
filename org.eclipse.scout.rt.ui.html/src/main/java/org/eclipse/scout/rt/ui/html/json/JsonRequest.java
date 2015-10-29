@@ -22,6 +22,11 @@ import org.json.JSONObject;
 public class JsonRequest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonRequest.class);
 
+  /**
+   * The {@link JsonRequest} which is currently associated with the current thread.
+   */
+  public static final ThreadLocal<JsonRequest> CURRENT = new ThreadLocal<>();
+
   public static final String PROP_STARTUP = "startup";
   public static final String PROP_UNLOAD = "unload";
   public static final String PROP_LOG = "log";

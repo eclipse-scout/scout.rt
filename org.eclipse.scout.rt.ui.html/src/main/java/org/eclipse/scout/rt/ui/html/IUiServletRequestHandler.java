@@ -24,9 +24,6 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 @ApplicationScoped
 public interface IUiServletRequestHandler {
 
-  String MDC_SCOUT_SESSION_ID = "scout.session.id";
-  String MDC_SCOUT_UI_SESSION_ID = "scout.ui.session.id";
-
   /**
    * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
    *         <code>false</code> is returned, other handlers may handle the request afterwards.

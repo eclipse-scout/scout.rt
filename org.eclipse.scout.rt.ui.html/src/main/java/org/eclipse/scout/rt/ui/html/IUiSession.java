@@ -34,6 +34,11 @@ import org.json.JSONObject;
 public interface IUiSession {
 
   /**
+   * The {@link IUiSession} which is currently associated with the current thread.
+   */
+  ThreadLocal<IUiSession> CURRENT = new ThreadLocal<>();
+
+  /**
    * Prefix for name of HTTP session attribute that is used to store the associated {@link IUiSession}s.
    * <p>
    * The full attribute name is: <b><code>{@link #HTTP_SESSION_ATTRIBUTE_PREFIX} + uiSessionId</code></b>

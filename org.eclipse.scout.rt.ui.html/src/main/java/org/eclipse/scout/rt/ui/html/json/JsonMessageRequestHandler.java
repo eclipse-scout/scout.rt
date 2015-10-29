@@ -20,15 +20,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
+import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.json.JSONObject;
@@ -48,7 +51,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final int m_maxUserIdleTime = CONFIG.getPropertyValue(MaxUserIdleTimeProperty.class).intValue();
 
   @Override
-  public boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(final UiServlet servlet, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     // serve only /json
     String pathInfo = req.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
@@ -73,59 +76,17 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         return true;
       }
 
-      long start = System.nanoTime();
-      String oldScoutSessionId = MDC.get(MDC_SCOUT_SESSION_ID);
-      String oldScoutUiSessionId = MDC.get(MDC_SCOUT_UI_SESSION_ID);
-      try {
-        MDC.put(MDC_SCOUT_SESSION_ID, uiSession.getClientSessionId());
-        MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("JSON request started");
-        }
+      // Associate subsequent processing with the uiSession and jsonRequest.
+      UiRunContexts.copyCurrent()
+          .withSession(uiSession)
+          .withJsonRequest(jsonReq)
+          .run(new IRunnable() {
 
-        if (jsonReq.isLogRequest()) {
-          handleLog(resp, jsonObject);
-          return true;
-        }
-
-        if (jsonReq.isPollForBackgroundJobsRequest()) {
-          handlePollForBackgroundJobs(uiSession, start);
-        }
-        else if (jsonReq.isCancelRequest()) {
-          handleCancel(resp, uiSession);
-          return true;
-        }
-
-        // GUI requests for the same session must be processed consecutively
-        uiSession.uiSessionLock().lock();
-        try {
-          if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-            handleUiSessionDisposed(resp, uiSession, jsonReq);
-            return true;
-          }
-          handleEvents(req, resp, uiSession, jsonReq);
-        }
-        finally {
-          uiSession.uiSessionLock().unlock();
-        }
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("JSON request completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
-        }
-      }
-      finally {
-        if (oldScoutSessionId != null) {
-          MDC.put(MDC_SCOUT_SESSION_ID, oldScoutSessionId);
-        }
-        else {
-          MDC.remove(MDC_SCOUT_SESSION_ID);
-        }
-        if (oldScoutUiSessionId != null) {
-          MDC.put(MDC_SCOUT_UI_SESSION_ID, oldScoutUiSessionId);
-        }
-        else {
-          MDC.remove(MDC_SCOUT_UI_SESSION_ID);
-        }
-      }
+            @Override
+            public void run() throws Exception {
+              handleJsonRequest(IUiSession.CURRENT.get(), JsonRequest.CURRENT.get(), req, resp);
+            }
+          }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
       if (jsonReq == null || uiSession == null || jsonReq.isStartupRequest()) {
@@ -140,6 +101,45 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
     }
     return true;
+  }
+
+  /**
+   * Method invoked to handle a JSON request from UI.
+   */
+  protected void handleJsonRequest(IUiSession uiSession, JsonRequest jsonRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    long start = System.nanoTime();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("JSON request started");
+    }
+
+    if (jsonRequest.isLogRequest()) {
+      handleLog(httpServletResponse, jsonRequest.getRequestObject());
+      return;
+    }
+
+    if (jsonRequest.isPollForBackgroundJobsRequest()) {
+      handlePollForBackgroundJobs(uiSession, start);
+    }
+    else if (jsonRequest.isCancelRequest()) {
+      handleCancel(httpServletResponse, uiSession);
+      return;
+    }
+
+    // GUI requests for the same session must be processed consecutively
+    uiSession.uiSessionLock().lock();
+    try {
+      if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
+        handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
+        return;
+      }
+      handleEvents(httpServletRequest, httpServletResponse, uiSession, jsonRequest);
+    }
+    finally {
+      uiSession.uiSessionLock().unlock();
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("JSON request completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+    }
   }
 
   protected void handleEvents(HttpServletRequest req, HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
