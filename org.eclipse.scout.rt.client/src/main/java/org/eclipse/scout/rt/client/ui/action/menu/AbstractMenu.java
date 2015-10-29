@@ -68,7 +68,8 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
         TreeMenuType.SingleSelection,
         ValueFieldMenuType.NotNull,
         CalendarMenuType.CalendarComponent,
-        PlannerMenuType.Activity);
+        PlannerMenuType.Activity,
+        TabBoxMenuType.Header);
   }
 
   @Override

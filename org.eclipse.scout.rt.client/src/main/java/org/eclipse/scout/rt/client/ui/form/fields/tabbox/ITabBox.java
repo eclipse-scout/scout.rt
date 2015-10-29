@@ -12,10 +12,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 
-public interface ITabBox extends ICompositeField {
+public interface ITabBox extends ICompositeField, IContextMenuOwner {
 
   /**
    * {@link IGroupBox}
@@ -23,6 +26,11 @@ public interface ITabBox extends ICompositeField {
   String PROP_SELECTED_TAB = "selectedTab";
 
   String PROP_MARK_STRATEGY = "markStrategy";
+
+  /**
+   * {@link IContextMenu}
+   */
+  String PROP_CONTEXT_MENU = "contextMenu";
 
   /**
    * Define the default mark strategy of the tabs. This means the marker is set on the tabs if at least one field is not
@@ -48,6 +56,9 @@ public interface ITabBox extends ICompositeField {
   int getMarkStrategy();
 
   void setMarkStrategy(int markStrategy);
+
+  @Override
+  IFormFieldContextMenu getContextMenu();
 
   ITabBoxUIFacade getUIFacade();
 }

@@ -15,17 +15,25 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.ITabBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -102,6 +110,33 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         }
       }
     });
+    initMenus();
+  }
+
+  private void initMenus() {
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
+      try {
+        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
+      }
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+      }
+    }
+    menus.addAllOrdered(contributedMenus);
+    try {
+      injectMenusInternal(menus);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    // set container on menus
+    IFormFieldContextMenu contextMenu = new FormFieldContextMenu<ITabBox>(this, menus.getOrderedList());
+    contextMenu.setContainerInternal(this);
+    setContextMenu(contextMenu);
   }
 
   /*
@@ -192,6 +227,42 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   public IGroupBox getSelectedTab() {
     return (IGroupBox) propertySupport.getProperty(PROP_SELECTED_TAB);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to add and/or remove menus<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
+   *
+   * @param menus
+   *          live and mutable collection of configured menus
+   */
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  }
+
+  protected void setContextMenu(IFormFieldContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
+  }
+
+  @Override
+  public IFormFieldContextMenu getContextMenu() {
+    return (IFormFieldContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   @Override
