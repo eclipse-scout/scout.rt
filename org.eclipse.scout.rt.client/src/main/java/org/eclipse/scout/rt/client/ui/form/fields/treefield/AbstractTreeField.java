@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.ITreeFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldLoadChildNodesChain;
@@ -157,12 +156,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     if (tree == null) {
       Class<? extends ITree> configuredTree = getConfiguredTree();
       if (configuredTree != null) {
-        try {
-          tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
-        }
-        catch (Exception e) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredTree.getName() + "'.", e));
-        }
+        tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
       }
     }
     setTreeInternal(tree);

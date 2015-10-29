@@ -21,9 +21,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -42,8 +39,6 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractButton.class);
-
   private final EventListenerList m_listenerList = new EventListenerList();
   private int m_systemType;
   private int m_displayStyle;
@@ -219,23 +214,11 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu;
-      try {
-        menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menus.addOrdered(menu);
     }
-
     menus.addAllOrdered(contributedMenus);
-
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
+    injectMenusInternal(menus);
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);

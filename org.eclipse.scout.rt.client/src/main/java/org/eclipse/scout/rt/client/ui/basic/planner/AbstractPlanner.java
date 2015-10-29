@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -306,13 +305,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menus.addOrdered(menu);
     }
     m_contributionHolder = new ContributionComposite(this);
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);

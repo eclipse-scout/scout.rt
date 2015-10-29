@@ -26,11 +26,9 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -203,12 +201,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
     OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
     for (Class<? extends IDataModelAttribute> c : configuredAttributes) {
-      try {
-        attributes.addOrdered(ConfigurationUtility.newInnerInstance(this, c));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
-      }
+      attributes.addOrdered(ConfigurationUtility.newInnerInstance(this, c));
     }
 
     attributes.addAllOrdered(contributedAttributes);
@@ -430,19 +423,14 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       Set<IDataModelEntity> newConfiguredInstances = new HashSet<IDataModelEntity>(numEntities);
       OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
       for (Class<? extends IDataModelEntity> c : configuredEntities) {
-        try {
-          //check if a parent is of same type, in that case use reference
-          IDataModelEntity e = instanceMap.get(c);
-          if (e == null) {
-            e = ConfigurationUtility.newInnerInstance(this, c);
-            newConfiguredInstances.add(e);
-            instanceMap.put(c, e);
-          }
-          entities.addOrdered(e);
+        //check if a parent is of same type, in that case use reference
+        IDataModelEntity e = instanceMap.get(c);
+        if (e == null) {
+          e = ConfigurationUtility.newInnerInstance(this, c);
+          newConfiguredInstances.add(e);
+          instanceMap.put(c, e);
         }
-        catch (Exception ex) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
-        }
+        entities.addOrdered(e);
       }
       newConfiguredInstances.addAll(contributedEntities);
       entities.addAllOrdered(contributedEntities);

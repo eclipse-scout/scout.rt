@@ -30,7 +30,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -57,7 +56,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -299,67 +297,57 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     setFilterCheckedNodesValue(getConfiguredFilterCheckedNodes());
     setAutoExpandAll(getConfiguredAutoExpandAll());
     setLoadIncremental(getConfiguredLoadIncremental());
-    try {
-      List<ITree> contributedFields = m_contributionHolder.getContributionsByClass(ITree.class);
-      m_tree = CollectionUtility.firstElement(contributedFields);
-      if (m_tree == null) {
-        Class<? extends ITree> configuredTree = getConfiguredTree();
-        if (configuredTree != null) {
-          m_tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
-        }
-      }
-      if (m_tree != null) {
-        if (m_tree instanceof AbstractTree) {
-          ((AbstractTree) m_tree).setContainerInternal(this);
-        }
-        m_tree.setRootNode(getTreeNodeBuilder().createTreeNode(new LookupRow(null, "Root"), ITreeNode.STATUS_NON_CHANGED, false));
-        m_tree.setAutoDiscardOnDelete(false);
-        updateActiveNodesFilter();
-        updateCheckedNodesFilter();
-        m_tree.addTreeListener(
-            new TreeAdapter() {
-              @Override
-              public void treeChanged(TreeEvent e) {
-                switch (e.getType()) {
-                  case TreeEvent.TYPE_NODES_SELECTED: {
-                    if (!getTree().isCheckable()) {
-                      syncTreeToValue();
-                    }
-                    break;
-                  }
-                  case TreeEvent.TYPE_NODES_CHECKED: {
-                    if (getTree().isCheckable()) {
-                      syncTreeToValue();
-                    }
-                    break;
-                  }
-                }
-              }
-            });
-        m_tree.setEnabled(isEnabled());
-        // default icon
-        if (this.getConfiguredIconId() != null) {
-          m_tree.setDefaultIconId(this.getConfiguredIconId());
-        }
-      }
-      else {
-        LOG.warn("there is no inner class of type ITree in " + getClass().getName());
+    List<ITree> contributedTrees = m_contributionHolder.getContributionsByClass(ITree.class);
+    m_tree = CollectionUtility.firstElement(contributedTrees);
+    if (m_tree == null) {
+      Class<? extends ITree> configuredTree = getConfiguredTree();
+      if (configuredTree != null) {
+        m_tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
       }
     }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
+    if (m_tree != null) {
+      if (m_tree instanceof AbstractTree) {
+        ((AbstractTree) m_tree).setContainerInternal(this);
+      }
+      m_tree.setRootNode(getTreeNodeBuilder().createTreeNode(new LookupRow(null, "Root"), ITreeNode.STATUS_NON_CHANGED, false));
+      m_tree.setAutoDiscardOnDelete(false);
+      updateActiveNodesFilter();
+      updateCheckedNodesFilter();
+      m_tree.addTreeListener(
+          new TreeAdapter() {
+            @Override
+            public void treeChanged(TreeEvent e) {
+              switch (e.getType()) {
+                case TreeEvent.TYPE_NODES_SELECTED: {
+                  if (!getTree().isCheckable()) {
+                    syncTreeToValue();
+                  }
+                  break;
+                }
+                case TreeEvent.TYPE_NODES_CHECKED: {
+                  if (getTree().isCheckable()) {
+                    syncTreeToValue();
+                  }
+                  break;
+                }
+              }
+            }
+          });
+      m_tree.setEnabled(isEnabled());
+      // default icon
+      if (this.getConfiguredIconId() != null) {
+        m_tree.setDefaultIconId(this.getConfiguredIconId());
+      }
+    }
+    else {
+      LOG.warn("there is no inner class of type ITree in " + getClass().getName());
     }
     getTree().setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
 
     Class<? extends ILookupCall<T>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
-      try {
-        ILookupCall<T> call = BEANS.get(lookupCallClass);
-        setLookupCall(call);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
-      }
+      ILookupCall<T> call = BEANS.get(lookupCallClass);
+      setLookupCall(call);
     }
     // code type
     if (getConfiguredCodeType() != null) {
@@ -390,12 +378,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
     List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
-      try {
-        fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
-      }
-      catch (Exception t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
-      }
+      fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
     }
     fieldList.addAll(contributedFields);
     Collections.sort(fieldList, new OrderedComparator());

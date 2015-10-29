@@ -287,20 +287,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
     menus.addAllOrdered(contributedMenus);
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
+    injectMenusInternal(menus);
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     // set container on menus
     IFormFieldContextMenu contextMenu = new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList());

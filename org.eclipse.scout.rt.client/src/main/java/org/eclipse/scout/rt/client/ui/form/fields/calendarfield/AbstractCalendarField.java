@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalendarFieldExtension;
@@ -29,15 +28,13 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("0b1ac83b-6fa4-4e12-88d0-680ed168e914")
 public abstract class AbstractCalendarField<T extends ICalendar> extends AbstractValueField<Date> implements ICalendarField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarField.class);
 
   private T m_calendar;
-  private OptimisticLock m_valueSelectionMediator;
+  private final OptimisticLock m_valueSelectionMediator;
 
   public AbstractCalendarField() {
     this(true);
@@ -45,6 +42,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
 
   public AbstractCalendarField(boolean callInitializer) {
     super(callInitializer);
+    m_valueSelectionMediator = new OptimisticLock();
   }
 
   /*
@@ -65,49 +63,43 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   @Override
   @SuppressWarnings("unchecked")
   protected void initConfig() {
-    m_valueSelectionMediator = new OptimisticLock();
 
     super.initConfig();
 
     List<ICalendar> contributedCalendars = m_contributionHolder.getContributionsByClass(ICalendar.class);
     m_calendar = (T) CollectionUtility.firstElement(contributedCalendars);
 
-    try {
-      if (m_calendar == null) {
-        Class<? extends ICalendar> configuredCalendar = getConfiguredCalendar();
-        m_calendar = (T) ConfigurationUtility.newInnerInstance(this, configuredCalendar);
-      }
-
-      if (m_calendar != null) {
-        if (m_calendar instanceof AbstractCalendar) {
-          ((AbstractCalendar) m_calendar).setContainerInternal(this);
-        }
-
-        // restore calendar settings
-        ClientUIPreferences env = ClientUIPreferences.getInstance();
-        m_calendar.setDisplayMode(env.getCalendarDisplayMode(ICalendar.DISPLAY_MODE_MONTH));
-        m_calendar.setDisplayCondensed(env.getCalendarDisplayCondensed(true));
-        /*
-         * add observer for: - selected date sync - persistence of calendar
-         * settings
-         */
-        m_calendar.addPropertyChangeListener(
-            new PropertyChangeListener() {
-              @Override
-              public void propertyChange(PropertyChangeEvent e) {
-                if (e.getPropertyName().equals(ICalendar.PROP_SELECTED_DATE)) {
-                  syncCalendarToCalendarField();
-                }
-              }
-            });
-        syncCalendarToCalendarField();
-      }
-      else {
-        LOG.warn("there is no inner class of type ICalendar in " + getClass().getName());
-      }
+    if (m_calendar == null) {
+      Class<? extends ICalendar> configuredCalendar = getConfiguredCalendar();
+      m_calendar = (T) ConfigurationUtility.newInnerInstance(this, configuredCalendar);
     }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating calendar of calendar field '" + getClass().getName() + "'.", e));
+
+    if (m_calendar != null) {
+      if (m_calendar instanceof AbstractCalendar) {
+        ((AbstractCalendar) m_calendar).setContainerInternal(this);
+      }
+
+      // restore calendar settings
+      ClientUIPreferences env = ClientUIPreferences.getInstance();
+      m_calendar.setDisplayMode(env.getCalendarDisplayMode(ICalendar.DISPLAY_MODE_MONTH));
+      m_calendar.setDisplayCondensed(env.getCalendarDisplayCondensed(true));
+      /*
+       * add observer for: - selected date sync - persistence of calendar
+       * settings
+       */
+      m_calendar.addPropertyChangeListener(
+          new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+              if (e.getPropertyName().equals(ICalendar.PROP_SELECTED_DATE)) {
+                syncCalendarToCalendarField();
+              }
+            }
+          });
+      syncCalendarToCalendarField();
+    }
+    else {
+      LOG.warn("there is no inner class of type ICalendar in " + getClass().getName());
     }
   }
 

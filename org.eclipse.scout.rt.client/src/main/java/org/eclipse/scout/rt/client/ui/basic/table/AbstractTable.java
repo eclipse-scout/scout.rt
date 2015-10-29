@@ -47,7 +47,6 @@ import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -891,17 +890,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_menuReplacementMapping = replacements;
     }
     for (Class<? extends IMenu> clazz : ma) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        String className = "null";
-        if (clazz != null) {
-          className = clazz.getName();
-        }
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
-      }
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
+      menus.addOrdered(menu);
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     menus.addAllOrdered(contributedMenus);
@@ -926,19 +916,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<Class<? extends IKeyStroke>> ksClasses = getConfiguredKeyStrokes();
     ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
     for (Class<? extends IKeyStroke> clazz : ksClasses) {
-      try {
-        IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
-        ks.initAction();
-        if (ks.getKeyStroke() != null) {
-          ksList.add(ks);
-        }
-      }
-      catch (Exception e) {
-        String className = "null";
-        if (clazz != null) {
-          className = clazz.getName();
-        }
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
+      IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
+      ks.initAction();
+      if (ks.getKeyStroke() != null) {
+        ksList.add(ks);
       }
     }
     //add ENTER key stroke when default menu is used or execRowAction has an override
@@ -1054,18 +1035,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
     OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
     for (Class<? extends ITableControl> clazz : tcs) {
-      try {
-        ITableControl tableControl = ConfigurationUtility.newInnerInstance(this, clazz);
-        ((AbstractTableControl) tableControl).setTable(this);
-        tableControls.addOrdered(tableControl);
-      }
-      catch (Exception e) {
-        String className = "null";
-        if (clazz != null) {
-          className = clazz.getName();
-        }
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
-      }
+      ITableControl tableControl = ConfigurationUtility.newInnerInstance(this, clazz);
+      ((AbstractTableControl) tableControl).setTable(this);
+      tableControls.addOrdered(tableControl);
     }
     m_tableControls = tableControls.getOrderedList();
   }
@@ -1076,17 +1048,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     // configured columns
     for (Class<? extends IColumn> clazz : ca) {
-      try {
-        IColumn<?> column = ConfigurationUtility.newInnerInstance(this, clazz);
-        columns.addOrdered(column);
-      }
-      catch (Exception e) {
-        String className = "null";
-        if (clazz != null) {
-          className = clazz.getName();
-        }
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
-      }
+      IColumn<?> column = ConfigurationUtility.newInnerInstance(this, clazz);
+      columns.addOrdered(column);
     }
 
     // contributed columns

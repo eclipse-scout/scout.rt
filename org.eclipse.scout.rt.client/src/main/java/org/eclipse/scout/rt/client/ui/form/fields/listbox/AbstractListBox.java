@@ -31,7 +31,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -65,7 +64,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -282,65 +280,55 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     setFilterActiveRowsValue(TriState.TRUE);
     setFilterCheckedRows(getConfiguredFilterCheckedRows());
     setFilterCheckedRowsValue(getConfiguredFilterCheckedRows());
-    try {
-      List<ITable> contributedTables = m_contributionHolder.getContributionsByClass(ITable.class);
-      m_table = CollectionUtility.firstElement(contributedTables);
-      if (m_table == null) {
-        Class<? extends ITable> configuredTable = getConfiguredTable();
-        if (configuredTable != null) {
-          m_table = ConfigurationUtility.newInnerInstance(this, configuredTable);
-        }
-      }
-
-      if (m_table != null) {
-        if (m_table instanceof AbstractTable) {
-          ((AbstractTable) m_table).setContainerInternal(this);
-        }
-        updateActiveRowsFilter();
-        updateCheckedRowsFilter();
-        m_table.addTableListener(new TableAdapter() {
-          @Override
-          public void tableChanged(TableEvent e) {
-            switch (e.getType()) {
-              case TableEvent.TYPE_ROWS_SELECTED: {
-                if (!getTable().isCheckable()) {
-                  syncTableToValue();
-                }
-                break;
-              }
-              case TableEvent.TYPE_ROWS_CHECKED: {
-                if (getTable().isCheckable()) {
-                  syncTableToValue();
-                }
-                break;
-              }
-            }
-          }
-        });
-        // default icon
-        if (m_table.getDefaultIconId() == null && this.getConfiguredIconId() != null) {
-          m_table.setDefaultIconId(this.getConfiguredIconId());
-        }
-        m_table.setEnabled(isEnabled());
-      }
-      else {
-        LOG.warn("there is no inner class of type ITable in " + getClass().getName());
+    List<ITable> contributedTables = m_contributionHolder.getContributionsByClass(ITable.class);
+    m_table = CollectionUtility.firstElement(contributedTables);
+    if (m_table == null) {
+      Class<? extends ITable> configuredTable = getConfiguredTable();
+      if (configuredTable != null) {
+        m_table = ConfigurationUtility.newInnerInstance(this, configuredTable);
       }
     }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredTable().getName() + "'.", e));
+
+    if (m_table != null) {
+      if (m_table instanceof AbstractTable) {
+        ((AbstractTable) m_table).setContainerInternal(this);
+      }
+      updateActiveRowsFilter();
+      updateCheckedRowsFilter();
+      m_table.addTableListener(new TableAdapter() {
+        @Override
+        public void tableChanged(TableEvent e) {
+          switch (e.getType()) {
+            case TableEvent.TYPE_ROWS_SELECTED: {
+              if (!getTable().isCheckable()) {
+                syncTableToValue();
+              }
+              break;
+            }
+            case TableEvent.TYPE_ROWS_CHECKED: {
+              if (getTable().isCheckable()) {
+                syncTableToValue();
+              }
+              break;
+            }
+          }
+        }
+      });
+      // default icon
+      if (m_table.getDefaultIconId() == null && this.getConfiguredIconId() != null) {
+        m_table.setDefaultIconId(this.getConfiguredIconId());
+      }
+      m_table.setEnabled(isEnabled());
+    }
+    else {
+      LOG.warn("there is no inner class of type ITable in " + getClass().getName());
     }
 
     // lookup call
     Class<? extends ILookupCall<KEY>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
-      try {
-        ILookupCall<KEY> call = BEANS.get(lookupCallClass);
-        setLookupCall(call);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
-      }
+      ILookupCall<KEY> call = BEANS.get(lookupCallClass);
+      setLookupCall(call);
     }
     // code type
     if (getConfiguredCodeType() != null) {
@@ -367,16 +355,10 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     // add fields
     List<Class<IFormField>> fieldClasses = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
-
     List<IFormField> fieldList = new ArrayList<IFormField>(fieldClasses.size() + contributedFields.size());
     for (Class<? extends IFormField> fieldClazz : fieldClasses) {
-      try {
-        IFormField f = ConfigurationUtility.newInnerInstance(this, fieldClazz);
-        fieldList.add(f);
-      }// end try
-      catch (Exception t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
-      }
+      IFormField f = ConfigurationUtility.newInnerInstance(this, fieldClazz);
+      fieldList.add(f);
     }
     fieldList.addAll(contributedFields);
     Collections.sort(fieldList, new OrderedComparator());

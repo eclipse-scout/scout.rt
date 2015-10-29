@@ -49,7 +49,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.RadioButtonGroupGrid;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -144,25 +143,15 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     // Configured LookupCall
     Class<? extends ILookupCall<T>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
-      try {
-        ILookupCall<T> call = BEANS.get(lookupCallClass);
-        setLookupCall(call);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
-      }
+      ILookupCall<T> call = BEANS.get(lookupCallClass);
+      setLookupCall(call);
     }
     // add fields
     List<Class<IFormField>> configuredFields = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
     OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
-      try {
-        fields.addOrdered(ConfigurationUtility.newInnerInstance(this, fieldClazz));
-      }
-      catch (Exception t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
-      }
+      fields.addOrdered(ConfigurationUtility.newInnerInstance(this, fieldClazz));
     }
     fields.addAllOrdered(contributedFields);
     injectFieldsInternal(fields);

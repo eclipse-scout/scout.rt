@@ -408,7 +408,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
       // Run the initialization on behalf of the container form.
       ClientRunContexts.copyCurrent().withForm(m_containerForm).run(new IRunnable() {
-
         @Override
         public void run() throws Exception {
           setDisplayHint(getConfiguredDisplayHint());
@@ -429,13 +428,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           List<IWizardStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWizardStep.class);
           OrderedCollection<IWizardStep<? extends IForm>> steps = new OrderedCollection<IWizardStep<? extends IForm>>();
           for (Class<? extends IWizardStep<? extends IForm>> element : configuredAvailableSteps) {
-            try {
-              IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(AbstractWizard.this, element);
-              steps.addOrdered(step);
-            }
-            catch (Exception e) {
-              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
-            }
+            IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(AbstractWizard.this, element);
+            steps.addOrdered(step);
           }
           for (IWizardStep step : contributedSteps) {
             steps.addOrdered(step);

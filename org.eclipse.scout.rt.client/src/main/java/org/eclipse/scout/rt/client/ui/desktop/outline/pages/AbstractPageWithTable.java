@@ -361,33 +361,28 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @SuppressWarnings("unchecked")
   protected T initTable() {
     T table = null;
-    try {
-      List<ITable> contributedFields = m_contributionHolder.getContributionsByClass(ITable.class);
-      table = (T) CollectionUtility.firstElement(contributedFields);
-      if (table == null) {
-        Class<? extends ITable> tableClass = getConfiguredTable();
-        if (tableClass != null) {
-          table = (T) ConfigurationUtility.newInnerInstance(this, tableClass);
-        }
-        else {
-          LOG.warn("there is no inner class of type ITable in " + getClass().getName());
-        }
+    List<ITable> contributedFields = m_contributionHolder.getContributionsByClass(ITable.class);
+    table = (T) CollectionUtility.firstElement(contributedFields);
+    if (table == null) {
+      Class<? extends ITable> tableClass = getConfiguredTable();
+      if (tableClass != null) {
+        table = (T) ConfigurationUtility.newInnerInstance(this, tableClass);
       }
-      if (table != null) {
-        if (table instanceof AbstractTable) {
-          ((AbstractTable) table).setContainerInternal(this);
-        }
-        table.addTableListener(new P_TableListener());
-        table.setEnabled(isEnabled());
-        table.setAutoDiscardOnDelete(true);
-        table.setUserPreferenceContext(getUserPreferenceContext());
-        table.setTableStatusVisible(getConfiguredTableStatusVisible());
-        table.setReloadHandler(new PageReloadHandler(this));
-        table.initTable();
+      else {
+        LOG.warn("there is no inner class of type ITable in " + getClass().getName());
       }
     }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
+    if (table != null) {
+      if (table instanceof AbstractTable) {
+        ((AbstractTable) table).setContainerInternal(this);
+      }
+      table.addTableListener(new P_TableListener());
+      table.setEnabled(isEnabled());
+      table.setAutoDiscardOnDelete(true);
+      table.setUserPreferenceContext(getUserPreferenceContext());
+      table.setTableStatusVisible(getConfiguredTableStatusVisible());
+      table.setReloadHandler(new PageReloadHandler(this));
+      table.initTable();
     }
     return table;
   }

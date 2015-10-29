@@ -31,8 +31,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -146,13 +144,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
     OrderedCollection<CODE> codes = new OrderedCollection<CODE>();
     for (Class<? extends ICode> codeClazz : configuredCodes) {
-      try {
-        CODE code = (CODE) ConfigurationUtility.newInnerInstance(this, codeClazz);
-        codes.addOrdered(code);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + codeClazz.getName() + "'.", e));
-      }
+      CODE code = (CODE) ConfigurationUtility.newInnerInstance(this, codeClazz);
+      codes.addOrdered(code);
     }
     for (ICode c : contributedCodes) {
       codes.addOrdered((CODE) c);

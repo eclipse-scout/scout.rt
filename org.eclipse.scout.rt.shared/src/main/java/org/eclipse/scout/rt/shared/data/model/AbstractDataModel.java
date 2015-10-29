@@ -18,11 +18,8 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -77,13 +74,8 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
 
     OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
     for (Class<? extends IDataModelAttribute> attributeClazz : filtered) {
-      try {
-        IDataModelAttribute a = ConfigurationUtility.newInnerInstance(holder, attributeClazz);
-        attributes.addOrdered(a);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + attributeClazz.getName() + "'.", e));
-      }
+      IDataModelAttribute a = ConfigurationUtility.newInnerInstance(holder, attributeClazz);
+      attributes.addOrdered(a);
     }
     attributes.addAllOrdered(contributedAttributes);
     ExtensionUtility.moveModelObjects(attributes);
@@ -97,12 +89,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
 
     OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
     for (Class<? extends IDataModelEntity> dataModelEntityClazz : filtered) {
-      try {
-        entities.addOrdered(ConfigurationUtility.newInnerInstance(holder, dataModelEntityClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + dataModelEntityClazz.getName() + "'.", e));
-      }
+      entities.addOrdered(ConfigurationUtility.newInnerInstance(holder, dataModelEntityClazz));
     }
 
     entities.addAllOrdered(contributedEntities);

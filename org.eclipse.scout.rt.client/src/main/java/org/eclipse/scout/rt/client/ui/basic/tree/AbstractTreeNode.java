@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -39,7 +38,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -218,13 +216,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menus.addOrdered(menu);
     }
 
     try {

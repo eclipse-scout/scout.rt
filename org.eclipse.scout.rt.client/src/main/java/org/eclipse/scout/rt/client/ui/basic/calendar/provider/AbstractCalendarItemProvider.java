@@ -41,9 +41,7 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -191,14 +189,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menu.initAction();
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menu.initAction();
+      menus.addOrdered(menu);
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     menus.addAllOrdered(contributedMenus);

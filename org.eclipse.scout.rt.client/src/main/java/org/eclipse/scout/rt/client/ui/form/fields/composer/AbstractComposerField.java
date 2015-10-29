@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -59,7 +58,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.RootNode;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
@@ -318,56 +316,51 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     super.initConfig();
     m_dataModel = interceptCreateDataModel();
     // tree
-    try {
-      List<ITree> contributedTrees = m_contributionHolder.getContributionsByClass(ITree.class);
-      m_tree = CollectionUtility.firstElement(contributedTrees);
+    List<ITree> contributedTrees = m_contributionHolder.getContributionsByClass(ITree.class);
+    m_tree = CollectionUtility.firstElement(contributedTrees);
 
-      if (m_tree == null) {
-        Class<? extends ITree> configuredTree = getConfiguredTree();
-        if (configuredTree != null) {
-          m_tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
-        }
-      }
-
-      if (m_tree != null) {
-        RootNode rootNode = interceptCreateRootNode();
-        rootNode.getCellForUpdate().setText(getLabel());
-        m_tree.setRootNode(rootNode);
-        m_tree.setNodeExpanded(rootNode, true);
-        m_tree.setEnabled(isEnabled());
-        m_tree.addTreeListener(
-            new TreeAdapter() {
-              @Override
-              public void treeChanged(TreeEvent e) {
-                switch (e.getType()) {
-                  case TreeEvent.TYPE_NODES_DELETED:
-                  case TreeEvent.TYPE_NODES_INSERTED:
-                  case TreeEvent.TYPE_NODES_UPDATED:
-                  case TreeEvent.TYPE_NODES_CHECKED: {
-                    checkSaveNeeded();
-                    checkEmpty();
-                    break;
-                  }
-                }
-              }
-            });
-
-        // local enabled listener
-        addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            if (m_tree != null) {
-              m_tree.setEnabled(isEnabled());
-            }
-          }
-        });
-      }
-      else {
-        LOG.warn("there is no inner class of type ITree in " + getClass().getName());
+    if (m_tree == null) {
+      Class<? extends ITree> configuredTree = getConfiguredTree();
+      if (configuredTree != null) {
+        m_tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
       }
     }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating tree for composer field '" + getClass().getName() + "'.", e));
+
+    if (m_tree != null) {
+      RootNode rootNode = interceptCreateRootNode();
+      rootNode.getCellForUpdate().setText(getLabel());
+      m_tree.setRootNode(rootNode);
+      m_tree.setNodeExpanded(rootNode, true);
+      m_tree.setEnabled(isEnabled());
+      m_tree.addTreeListener(
+          new TreeAdapter() {
+            @Override
+            public void treeChanged(TreeEvent e) {
+              switch (e.getType()) {
+                case TreeEvent.TYPE_NODES_DELETED:
+                case TreeEvent.TYPE_NODES_INSERTED:
+                case TreeEvent.TYPE_NODES_UPDATED:
+                case TreeEvent.TYPE_NODES_CHECKED: {
+                  checkSaveNeeded();
+                  checkEmpty();
+                  break;
+                }
+              }
+            }
+          });
+
+      // local enabled listener
+      addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent e) {
+          if (m_tree != null) {
+            m_tree.setEnabled(isEnabled());
+          }
+        }
+      });
+    }
+    else {
+      LOG.warn("there is no inner class of type ITree in " + getClass().getName());
     }
   }
 

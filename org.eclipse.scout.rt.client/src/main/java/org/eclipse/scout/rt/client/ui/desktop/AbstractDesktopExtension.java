@@ -124,12 +124,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @Override
   public void contributeActions(Collection<IAction> actions) {
     for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
-      try {
-        actions.add(ConfigurationUtility.newInnerInstance(this, actionClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + actionClazz.getName() + "'.", e));
-      }
+      actions.add(ConfigurationUtility.newInnerInstance(this, actionClazz));
     }
   }
 

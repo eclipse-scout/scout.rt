@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
@@ -45,8 +44,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -78,7 +75,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called when the table data is reloaded, i.e. when {@link #reloadTableData()} is called.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(190)
@@ -89,7 +85,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called for batch processing when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(200)
@@ -100,7 +95,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called to handle deleted rows when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(210)
@@ -111,7 +105,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called to handle inserted rows when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(220)
@@ -122,7 +115,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called to handle updated rows when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(230)
@@ -180,12 +172,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
     Class<? extends ITable> configuredTable = getConfiguredTable();
     if (configuredTable != null) {
-      try {
-        return (T) ConfigurationUtility.newInnerInstance(this, configuredTable);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredTable.getName() + "'.", e));
-      }
+      return (T) ConfigurationUtility.newInnerInstance(this, configuredTable);
     }
     return null;
   }

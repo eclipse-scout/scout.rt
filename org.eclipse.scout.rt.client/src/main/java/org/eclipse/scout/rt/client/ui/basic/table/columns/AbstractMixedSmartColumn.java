@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartF
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -259,12 +258,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
       Class[] menuCandidates = ConfigurationUtility.getDeclaredPublicClasses(AbstractMixedSmartColumn.this.getClass());
       List<Class<IMenu>> menuClazzes = ConfigurationUtility.filterClasses(menuCandidates, IMenu.class);
       for (Class<? extends IMenu> menuClazz : menuClazzes) {
-        try {
-          menus.addOrdered(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
-        }
-        catch (Exception e) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException(this.getClass().getSimpleName(), e));
-        }
+        menus.addOrdered(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
       }
 
       List<IMenu> contributedMenus = AbstractMixedSmartColumn.this.m_contributionHolder.getContributionsByClass(IMenu.class);

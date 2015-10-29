@@ -1919,15 +1919,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
     Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>(configuredKeyStrokes.size() + contributedKeyStrokes.size());
     for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
-      try {
-        IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
-        ks.initAction();
-        if (ks.getKeyStroke() != null) {
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", e));
+      IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
+      ks.initAction();
+      if (ks.getKeyStroke() != null) {
+        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
     }
 

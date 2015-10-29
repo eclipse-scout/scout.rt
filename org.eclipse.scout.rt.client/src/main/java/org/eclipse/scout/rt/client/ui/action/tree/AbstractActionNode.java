@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.IActionNodeExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -75,15 +74,9 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     List<Class<? extends IActionNode>> configuredChildActions = getConfiguredChildActions();
     OrderedCollection<T> actionNodes = new OrderedCollection<T>();
     for (Class<? extends IActionNode> a : configuredChildActions) {
-
-      try {
-        IActionNode node = ConfigurationUtility.newInnerInstance(this, a);
-        node.setParent(this);
-        actionNodes.addOrdered((T) node);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + a.getName() + "'.", e));
-      }
+      IActionNode node = ConfigurationUtility.newInnerInstance(this, a);
+      node.setParent(this);
+      actionNodes.addOrdered((T) node);
     }
     m_contributionHolder = new ContributionComposite(this);
     List<IActionNode> contributedActions = m_contributionHolder.getContributionsByClass(IActionNode.class);

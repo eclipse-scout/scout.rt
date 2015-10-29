@@ -11,6 +11,7 @@
 package org.eclipse.scout.commons;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -39,15 +41,10 @@ public final class ConfigurationUtility {
 
   /**
    * Filters the given class array and sorts the remaining elements according to their {@link Order} annotation.
-   * <p>
-   * By default, the method throws an {@link IllegalArgumentException} if one of the remaining classes is not annotated
-   * by {@link Order}. The behavior can be switched off by setting the system property
-   * <code>bsi.debug.innerclass.order</code> to an arbitrary value.
    *
    * @param classes
    * @param filter
    * @return
-   * @throws IllegalArgumentException
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<? extends T>> sortFilteredClassesByOrderAnnotation(List<? extends Class> classes, Class<T> filter) {
@@ -166,8 +163,8 @@ public final class ConfigurationUtility {
   /**
    * @return Returns <code>true</code> if the given class is annotated by {@link InjectFieldTo} or {@link Replace}.
    *         Otherwise <code>false</code>.
-   *         <p/>
-   *         <b>Note:</b> This method throws a {@link NullPointerException} if the given class is null.
+   * @throws NullPointerException
+   *           if the given class is null.
    */
   public static boolean isInjectFieldAnnotationPresent(Class<?> c) {
     return c.isAnnotationPresent(InjectFieldTo.class) || c.isAnnotationPresent(Replace.class);
@@ -180,13 +177,30 @@ public final class ConfigurationUtility {
     return c.getClasses();
   }
 
-  public static <T> T newInnerInstance(Object instance, Class<T> innerClass) throws Exception {
-    if (innerClass.getDeclaringClass() != null && (innerClass.getModifiers() & Modifier.STATIC) == 0) {
-      Constructor<T> c = innerClass.getDeclaredConstructor(new Class[]{innerClass.getDeclaringClass()});
-      return c.newInstance(new Object[]{instance});
+  public static <T> T newInnerInstance(Object instance, Class<T> innerClass) {
+    try {
+      if (innerClass.getDeclaringClass() != null && (innerClass.getModifiers() & Modifier.STATIC) == 0) {
+        Constructor<T> c = innerClass.getDeclaredConstructor(new Class[]{innerClass.getDeclaringClass()});
+        return c.newInstance(new Object[]{instance});
+      }
+      else {
+        return innerClass.newInstance();
+      }
     }
-    else {
-      return innerClass.newInstance();
+    catch (InvocationTargetException ite) {
+      Throwable t = ite.getCause();
+      while (t != null) {
+        if (t instanceof ProcessingException) {
+          ProcessingException pe = (ProcessingException) t;
+          pe.addContextMessage("InnerClass=" + innerClass);
+          throw pe;
+        }
+        t = t.getCause();
+      }
+      throw new ProcessingException("Error creating instance of '" + innerClass + "'.", ite.getCause());
+    }
+    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+      throw new ProcessingException("Error creating instance of '" + innerClass + "'.", e);
     }
   }
 
@@ -280,7 +294,7 @@ public final class ConfigurationUtility {
    * <pre>
    * public class A {
    * }
-   * 
+   *
    * &#064;Replace
    * public class B extends A {
    * }
@@ -322,7 +336,7 @@ public final class ConfigurationUtility {
    * <pre>
    * public class A {
    * }
-   * 
+   *
    * &#064;Replace
    * public class B extends A {
    * }

@@ -16,13 +16,10 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 public class TestMenus {
 
@@ -31,12 +28,7 @@ public class TestMenus {
   public TestMenus() {
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
-      try {
-        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();

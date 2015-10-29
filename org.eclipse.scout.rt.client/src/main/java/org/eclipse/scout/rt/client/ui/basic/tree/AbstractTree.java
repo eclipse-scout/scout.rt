@@ -31,7 +31,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -623,12 +622,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(configuredKeyStrokes.size());
     for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
-      try {
-        ksList.add(ConfigurationUtility.newInnerInstance(this, keystrokeClazz));
-      }
-      catch (Exception t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
-      }
+      ksList.add(ConfigurationUtility.newInnerInstance(this, keystrokeClazz));
     }
     //ticket 87370: add ENTER key stroke when execNodeAction has an override
     if (ConfigurationUtility.isMethodOverwrite(AbstractTree.class, "execNodeAction", new Class[]{ITreeNode.class}, this.getClass())) {
@@ -652,13 +646,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menus.addOrdered(menu);
     }
     try {
       injectMenusInternal(menus);

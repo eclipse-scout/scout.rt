@@ -21,9 +21,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -38,14 +35,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 
 @ClassId("480ea07e-9cec-4591-ba73-4bb9aa45a60d")
 public abstract class AbstractImageField extends AbstractFormField implements IImageField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractImageField.class);
-
   private IImageFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
   private IContextMenu m_contextMenu;
@@ -197,21 +191,10 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
     menus.addAllOrdered(contributedMenus);
-
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
+    injectMenusInternal(menus);
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     m_contextMenu = new FormFieldContextMenu<IImageField>(this, menus.getOrderedList());
     m_contextMenu.setContainerInternal(this);

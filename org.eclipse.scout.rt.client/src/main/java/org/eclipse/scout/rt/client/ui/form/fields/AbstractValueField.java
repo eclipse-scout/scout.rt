@@ -123,12 +123,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
 
     menus.addAllOrdered(contributedMenus);

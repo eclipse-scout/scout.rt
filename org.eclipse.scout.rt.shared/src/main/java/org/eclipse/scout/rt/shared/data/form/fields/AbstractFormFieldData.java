@@ -17,9 +17,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
@@ -53,26 +50,16 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     List<Class<AbstractPropertyData>> configuredPropertyDatas = getConfiguredPropertyDatas();
     Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> propMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>(configuredPropertyDatas.size());
     for (Class<AbstractPropertyData> propertyDataClazz : configuredPropertyDatas) {
-      try {
-        AbstractPropertyData p = ConfigurationUtility.newInnerInstance(this, propertyDataClazz);
-        propMap.put(p.getClass(), p);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + propertyDataClazz.getName() + "'.", e));
-      }
+      AbstractPropertyData p = ConfigurationUtility.newInnerInstance(this, propertyDataClazz);
+      propMap.put(p.getClass(), p);
     }
 
     // add fields
     List<Class<? extends AbstractFormFieldData>> fieldDataClasses = getConfiguredFieldDatas();
     Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> map = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>(fieldDataClasses.size());
     for (Class<? extends AbstractFormFieldData> formFieldDataClazz : fieldDataClasses) {
-      try {
-        AbstractFormFieldData f = ConfigurationUtility.newInnerInstance(this, formFieldDataClazz);
-        map.put(f.getClass(), f);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + formFieldDataClazz.getName() + "'.", e));
-      }
+      AbstractFormFieldData f = ConfigurationUtility.newInnerInstance(this, formFieldDataClazz);
+      map.put(f.getClass(), f);
     }
 
     if (!propMap.isEmpty()) {

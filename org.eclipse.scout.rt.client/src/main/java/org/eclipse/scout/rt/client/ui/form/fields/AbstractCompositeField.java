@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.DefaultFormFieldInjection;
@@ -38,8 +37,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
@@ -116,13 +113,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       // create instances
       OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
       for (Class<? extends IFormField> clazz : configuredFields) {
-        try {
-          IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
-          fields.addOrdered(f);
-        }// end try
-        catch (Exception t) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + clazz.getName() + "'.", t));
-        }
+        IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
+        fields.addOrdered(f);
       }
 
       // handle contributions
@@ -473,7 +465,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   /**
    * Sets the property on the field and on every child.
-   * 
+   *
    * @see #getConfiguredStatusVisible()
    */
   @Override

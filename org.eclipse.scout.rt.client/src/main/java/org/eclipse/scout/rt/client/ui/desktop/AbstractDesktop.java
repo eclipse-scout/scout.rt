@@ -2090,12 +2090,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     @Override
     public void contributeActions(Collection<IAction> actions) {
       for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
-        try {
-          actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));
-        }
-        catch (Exception e) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + actionClazz.getName() + "'.", e));
-        }
+        actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));
       }
     }
 

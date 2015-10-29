@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
@@ -605,19 +604,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (getConfiguredDetailForm() == null) {
       return null;
     }
-    try {
-      return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IForm>() {
-
-        @Override
-        public IForm call() throws Exception {
-          return getConfiguredDetailForm().newInstance();
-        }
-      });
-    }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredDetailForm().getName() + "'.", e));
-    }
-    return null;
+    return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IForm>() {
+      @Override
+      public IForm call() throws Exception {
+        return getConfiguredDetailForm().newInstance();
+      }
+    });
   }
 
   /**

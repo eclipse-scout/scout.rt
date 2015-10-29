@@ -653,18 +653,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         rootBox = CollectionUtility.firstElement(contributedFields);
         if (rootBox == null) {
           Class<? extends IGroupBox> mainBoxClass = getConfiguredMainBox();
-          try {
+          if (mainBoxClass != null) {
             rootBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
-          }
-          catch (Exception t) {
-            String mainBoxName = null;
-            if (mainBoxClass == null) {
-              mainBoxName = "null";
-            }
-            else {
-              mainBoxName = mainBoxClass.getName();
-            }
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + mainBoxName + "'.", t));
           }
         }
         m_mainBox = rootBox;
@@ -961,13 +951,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType) {
     if (handlerType != null) {
-      try {
-        IFormHandler formHandler = ConfigurationUtility.newInnerInstance(this, handlerType);
-        setHandler(formHandler);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + handlerType.getName() + "'.", e));
-      }
+      IFormHandler formHandler = ConfigurationUtility.newInnerInstance(this, handlerType);
+      setHandler(formHandler);
     }
     m_wizardStep = wizardStep;
     setShowOnStart(false);

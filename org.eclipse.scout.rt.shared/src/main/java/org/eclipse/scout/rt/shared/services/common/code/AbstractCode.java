@@ -25,9 +25,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -255,13 +252,8 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
 
     List<ICode<T>> codes = new ArrayList<ICode<T>>(configuredCodes.size() + contributedCodes.size());
     for (Class<? extends ICode> codeClazz : configuredCodes) {
-      try {
-        ICode<T> code = ConfigurationUtility.newInnerInstance(this, codeClazz);
-        codes.add(code);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + codeClazz.getName() + "'.", e));
-      }
+      ICode<T> code = ConfigurationUtility.newInnerInstance(this, codeClazz);
+      codes.add(code);
     }
     for (ICode<?> c : contributedCodes) {
       codes.add((ICode<T>) c);

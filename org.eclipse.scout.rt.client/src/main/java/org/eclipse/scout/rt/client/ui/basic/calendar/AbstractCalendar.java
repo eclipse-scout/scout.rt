@@ -234,13 +234,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menus.addOrdered(menu);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menus.addOrdered(menu);
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     menus.addAllOrdered(contributedMenus);
