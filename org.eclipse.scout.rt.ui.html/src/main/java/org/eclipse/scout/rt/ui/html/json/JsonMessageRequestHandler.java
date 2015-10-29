@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -25,6 +26,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -38,7 +40,7 @@ import org.slf4j.MDC;
  * Provides the {@link MDC#put(String, String)} properties {@value #MDC_SCOUT_SESSION_ID}
  */
 @Order(10)
-public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
+public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestHandler.class);
 
   private static final int BACKGROUND_POLLING_INTERVAL_SECONDS = 60;
@@ -59,13 +61,13 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
       // never cache json requests
       BEANS.get(IHttpCacheControl.class).disableCacheHeaders(req, resp);
 
-      JSONObject jsonReqObj = decodeJSONRequest(req);
-      if (isPingRequest(jsonReqObj)) {
+      JSONObject jsonObject = BEANS.get(JsonProtocolHelper.class).readJsonRequest(req);
+      if (isPingRequest(jsonObject)) {
         handlePing(resp);
         return true;
       }
 
-      jsonReq = new JsonRequest(jsonReqObj);
+      jsonReq = new JsonRequest(jsonObject);
       uiSession = getOrCreateUiSession(req, resp, jsonReq);
       if (uiSession == null) {
         return true;
@@ -82,7 +84,7 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
         }
 
         if (jsonReq.isLogRequest()) {
-          handleLog(resp, jsonReqObj);
+          handleLog(resp, jsonObject);
           return true;
         }
 
@@ -130,11 +132,11 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
-        writeResponse(resp, createStartupFailedResponse());
+        writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createStartupFailedResponse());
       }
       else {
         LOG.error("Unexpected error while processing JSON request", e);
-        writeResponse(resp, createUnrecoverableFailureResponse());
+        writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createUnrecoverableFailureResponse());
       }
     }
     return true;
@@ -143,22 +145,22 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
   protected void handleEvents(HttpServletRequest req, HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     JSONObject jsonResp = uiSession.processJsonRequest(req, resp, jsonReq);
     if (jsonResp == null) {
-      jsonResp = createEmptyResponse();
+      jsonResp = BEANS.get(JsonProtocolHelper.class).createEmptyResponse();
     }
-    writeResponse(resp, jsonResp);
+    writeJsonResponse(resp, jsonResp);
   }
 
   protected void handleUiSessionDisposed(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     if (jsonReq.isPollForBackgroundJobsRequest()) { // TODO BSH isManualLogout?
-      writeResponse(resp, createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
+      writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
     }
     else {
-      writeResponse(resp, createSessionTimeoutResponse());
+      writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createSessionTimeoutResponse());
     }
   }
 
   protected void handlePing(HttpServletResponse resp) throws IOException {
-    writeResponse(resp, createPingResponse());
+    writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createPingResponse());
   }
 
   protected void handleLog(HttpServletResponse resp, JSONObject jsonReqObj) throws IOException {
@@ -169,12 +171,12 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
       message = message.substring(0, 10000) + "...";
     }
     LOG.error(message);
-    writeResponse(resp, createEmptyResponse());
+    writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createEmptyResponse());
   }
 
   protected void handleCancel(HttpServletResponse resp, IUiSession uiSession) throws IOException {
     uiSession.processCancelRequest();
-    writeResponse(resp, createEmptyResponse());
+    writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createEmptyResponse());
   }
 
   protected void handlePollForBackgroundJobs(IUiSession uiSession, long start) {
@@ -197,13 +199,13 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
 
   protected void handleSessionTimeout(HttpServletResponse resp, JsonRequest jsonReq) throws IOException {
     LOG.info("Request cannot be processed due to UI session timeout [id=" + jsonReq.getUiSessionId() + "]");
-    writeResponse(resp, createSessionTimeoutResponse());
+    writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createSessionTimeoutResponse());
   }
 
   protected void handleMaxIdeTimeout(HttpServletResponse resp, JsonRequest jsonReq, HttpSession httpSession, int idleSeconds, int maxIdleSeconds) throws IOException {
     LOG.info("Detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + maxIdleSeconds + ")");
     httpSession.invalidate();
-    writeResponse(resp, createSessionTimeoutResponse());
+    writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createSessionTimeoutResponse());
   }
 
   protected void handleUnload(HttpServletResponse resp, JsonRequest jsonReq, String uiSessionAttributeName, HttpSession httpSession, IUiSession uiSession) throws IOException {
@@ -218,7 +220,7 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
         uiSession.uiSessionLock().unlock();
       }
     }
-    writeResponse(resp, createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
+    writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
   }
 
   /**
@@ -297,5 +299,12 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
       }
       return lock;
     }
+  }
+
+  /**
+   * Writes the given {@link JSONObject} into the given {@link ServletResponse}.
+   */
+  protected void writeJsonResponse(ServletResponse servletResponse, JSONObject jsonObject) throws IOException {
+    BEANS.get(JsonProtocolHelper.class).writeResponse(servletResponse, jsonObject);
   }
 }

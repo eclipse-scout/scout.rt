@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,6 +37,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
@@ -46,7 +49,7 @@ import org.slf4j.MDC;
  * This handler contributes to the {@link UiServlet} as the POST handler for /upload
  */
 @Order(30)
-public class UploadRequestHandler extends AbstractJsonRequestHandler {
+public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestHandler.class);
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
@@ -97,14 +100,14 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
         uiSession.uiSessionLock().lock();
         try {
           if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-            writeResponse(resp, createSessionTimeoutResponse());
+            writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createSessionTimeoutResponse());
             return true;
           }
           JSONObject jsonResp = uiSession.processFileUpload(req, resp, binaryResourceConsumer, uploadResources, uploadProperties);
           if (jsonResp == null) {
-            jsonResp = createEmptyResponse();
+            jsonResp = BEANS.get(JsonProtocolHelper.class).createEmptyResponse();
           }
-          writeResponse(resp, jsonResp);
+          writeJsonResponse(resp, jsonResp);
         }
         finally {
           uiSession.uiSessionLock().unlock();
@@ -130,7 +133,7 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
-      writeResponse(resp, createUnrecoverableFailureResponse());
+      writeJsonResponse(resp, BEANS.get(JsonProtocolHelper.class).createUnrecoverableFailureResponse());
     }
     return true;
   }
@@ -194,5 +197,12 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
       throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
     }
     return (IBinaryResourceConsumer) jsonAdapter;
+  }
+
+  /**
+   * Writes the given {@link JSONObject} into the given {@link ServletResponse}.
+   */
+  protected void writeJsonResponse(ServletResponse servletResponse, JSONObject jsonObject) throws IOException {
+    BEANS.get(JsonProtocolHelper.class).writeResponse(servletResponse, jsonObject);
   }
 }
