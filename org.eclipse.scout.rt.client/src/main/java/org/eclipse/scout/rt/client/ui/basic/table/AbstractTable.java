@@ -391,6 +391,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * Configures whether the header row is enabled. In a disabled header, it is not possible to move or resize the
+   * columns and the table header menu cannot be opened.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if the header row is enabled, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(70)
+  protected boolean getConfiguredHeaderEnabled() {
+    return true;
+  }
+
+  /**
    * Configures whether the columns are auto resized. If true, all columns are resized so that the table never needs
    * horizontal scrolling. This is especially useful for tables inside a form.
    * <p>
@@ -848,6 +862,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setDefaultIconId(getConfiguredDefaultIconId());
     setRowIconVisible(getConfiguredRowIconVisible());
     setHeaderVisible(getConfiguredHeaderVisible());
+    setHeaderEnabled(getConfiguredHeaderEnabled());
     setAutoResizeColumns(getConfiguredAutoResizeColumns());
     setCheckable(getConfiguredCheckable());
     setMultiCheck(getConfiguredMultiCheck());
@@ -3763,6 +3778,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setHeaderVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_HEADER_VISIBLE, b);
+  }
+
+  @Override
+  public boolean isHeaderEnabled() {
+    return propertySupport.getPropertyBool(PROP_HEADER_ENABLED);
+  }
+
+  @Override
+  public void setHeaderEnabled(boolean headerEnabled) {
+    propertySupport.setPropertyBool(PROP_HEADER_ENABLED, headerEnabled);
   }
 
   @Override

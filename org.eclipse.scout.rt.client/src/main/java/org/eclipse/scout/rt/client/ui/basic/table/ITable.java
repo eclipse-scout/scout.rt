@@ -92,6 +92,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Boolean
    */
+  String PROP_HEADER_ENABLED = "headerEnabled";
+  /**
+   * Boolean
+   */
   String PROP_KEYBOARD_NAVIGATION = "keyboardNavigation";
   /**
    * Boolean
@@ -448,6 +452,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   boolean isHeaderVisible();
 
   void setHeaderVisible(boolean b);
+
+  boolean isHeaderEnabled();
+
+  void setHeaderEnabled(boolean headerEnabled);
 
   boolean isMultilineText();
 
