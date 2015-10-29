@@ -224,9 +224,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
-      // Handle detach
-      handleDetach(jsonStartupReq, httpSession);
-
       // Start desktop
       fireDesktopOpened();
 
@@ -384,17 +381,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
     }, uiJobs.newModelJobInput("startUp jsonClientSession", clientSession, false), RuntimeExceptionTranslator.class);
-  }
-
-  protected void handleDetach(JsonStartupRequest jsonStartupReq, HttpSession httpSession) {
-    String parentUiSessionId = jsonStartupReq.getParentUiSessionId();
-    if (parentUiSessionId != null) {
-      IUiSession parentUiSession = (IUiSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentUiSessionId);
-      if (parentUiSession != null) {
-        LOG.info("Attaching uiSession '" + m_uiSessionId + "' to parentUiSession '" + parentUiSessionId + "'");
-        // TODO BSH Detach | Actually do something
-      }
-    }
   }
 
   protected void fireDesktopOpened() {

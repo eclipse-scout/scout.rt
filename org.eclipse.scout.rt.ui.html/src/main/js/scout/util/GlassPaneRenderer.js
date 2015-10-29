@@ -34,12 +34,12 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
 };
 
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
-  // Remove glasspanes.
+  // Remove glasspanes
   this._$glassPanes.forEach(function($glassPane) {
-    $glassPane.fadeOutAndRemove();
+    $glassPane.remove();
   });
 
-  // Unregister glasspane targets from focus manager.
+  // Unregister glasspane targets from focus manager
   this._$glassPaneTargets.forEach(function($glassPaneTarget) {
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }, this);

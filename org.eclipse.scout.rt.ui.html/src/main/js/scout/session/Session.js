@@ -54,7 +54,6 @@ scout.Session = function($entryPoint, options) {
   this.$entryPoint = $entryPoint;
   this.uiSessionId = options.uiSessionId;
   this.partId = scout.helpers.nvl(options.portletPartId, 0);
-  this.parentUiSession;
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type);
   this.suppressErrors = scout.helpers.nvl(options.suppressErrors, false);
@@ -63,7 +62,6 @@ scout.Session = function($entryPoint, options) {
   this.locale;
   this._asyncEvents = [];
   this._asyncResponses = [];
-  this._childWindows = []; // for detached windows
   this._deferred;
   this._startup;
   this._unload;
@@ -93,7 +91,6 @@ scout.Session = function($entryPoint, options) {
   });
 
   this._initCustomParams();
-  this._registerWithParentUiSession();
 
   // Install focus management for this session.
   this.focusManager = new scout.FocusManager(this, options);
@@ -112,36 +109,6 @@ scout.Session.prototype._initCustomParams = function() {
   var customParamMap = scoutUrl.parameterMap;
   for (var prop in customParamMap) {
     this._customParams[prop] = customParamMap[prop];
-  }
-};
-
-/**
- * If this is a popup window, re-registers the session with the parent session. This
- * can be the case if the user reloaded the popup window.
- */
-// TODO BSH Detach | Check if there is another way
-scout.Session.prototype._registerWithParentUiSession = function() {
-  var openerScout;
-  try {
-    openerScout = window.opener && window.opener.scout;
-  } catch (err) {
-    // Catch security exceptions of the following type:
-    //   "DOMException: Blocked a frame with origin <url> from accessing a cross-origin frame."
-    //
-    // This should never happen, but apparently it does sometimes. To prevent the UI session
-    // from not being started, we catch catch the exception and silently ignore it.
-    return;
-  }
-
-  if (openerScout && openerScout.sessions) {
-    // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js/_onFormClosed)
-    if (openerScout.sessions.length > 1) {
-      window.close();
-      throw new Error('Too many scout sessions');
-    }
-    var parentUiSession = openerScout.sessions[0];
-    parentUiSession.registerChildWindow(window);
-    this.parentUiSession = parentUiSession; // TODO BSH Detach | Get from options instead?
   }
 };
 
@@ -285,9 +252,6 @@ scout.Session.prototype._sendNow = function() {
     request.startup = true;
     if (this.clientSessionId) {
       request.clientSessionId = this.clientSessionId;
-    }
-    if (this.parentUiSession) {
-      request.parentUiSessionId = this.parentUiSession.uiSessionId;
     }
     if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
       request.userAgent = this.userAgent;
@@ -963,13 +927,6 @@ scout.Session.prototype.init = function() {
   this._startup = true;
   this._sendNow();
 
-  // Ask if child windows should be closed as well
-  $(window).on('beforeunload', function() {
-    if (this._childWindows.length > 0) {
-      return 'There are windows in DETACHED state.'; // TODO BSH Detach | Text
-    }
-  }.bind(this));
-
   // Destroy UI session on server when page is closed or reloaded
   $(window).on('unload.' + this.id, this._onWindowUnload.bind(this));
 };
@@ -1064,11 +1021,7 @@ scout.Session.prototype._onWindowUnload = function() {
   // Destroy UI session on server
   this._unload = true;
   this._sendNow();
-
-  // If child windows are open, they have to be closed as well
-  this._childWindows.forEach(function(childWindow) {
-    childWindow.close();
-  });
+  this.desktop.formController.closePopupWindows();
 };
 
 /**
@@ -1085,23 +1038,6 @@ scout.Session.prototype._getAdapterData = function(id) {
 
 scout.Session.prototype.getAdapterData = function(id) {
   return this._adapterDataCache[id];
-};
-
-scout.Session.prototype.registerChildWindow = function(childWindow) {
-  if (!childWindow) {
-    throw new Error("Missing argument 'childWindow'");
-  }
-
-  // Add to list of open child windows
-  this._childWindows.push(childWindow);
-
-  // When the child window is closed, remove it again from the list
-  $(childWindow).on('unload', function() {
-    var i = this._childWindows.indexOf(childWindow);
-    if (i > -1) {
-      this._childWindows.splice(i, 1);
-    }
-  }.bind(this));
 };
 
 scout.Session.prototype.text = function(textKey) {

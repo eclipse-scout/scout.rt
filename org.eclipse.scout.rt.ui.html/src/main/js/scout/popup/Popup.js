@@ -83,7 +83,22 @@ scout.Popup.prototype._open = function($parent, event) {
 
 scout.Popup.prototype.render = function($parent, event) {
   this.openEvent = event;
-  scout.Popup.parent.prototype.render.call(this, $parent || this.session.$entryPoint);
+  var $popupParent;
+  if ($parent) {
+    $popupParent = $parent;
+  } else {
+    // check if DOM element belongs to a popup-window. If that's the case
+    // use the $container of the popup-window, to render the popup, otherwise
+    // simply render it on the desktop of the main-window.
+    var element = this.parent.$container[0],
+      ownerWindow = element.ownerDocument.defaultView;
+    if (ownerWindow.popupWindow) {
+      $popupParent = ownerWindow.popupWindow.$container;
+    } else {
+      $popupParent = this.session.$entryPoint;
+    }
+  }
+  scout.Popup.parent.prototype.render.call(this, $popupParent);
 };
 
 scout.Popup.prototype._render = function($parent) {

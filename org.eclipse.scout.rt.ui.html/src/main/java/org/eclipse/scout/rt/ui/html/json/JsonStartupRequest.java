@@ -33,7 +33,6 @@ import org.json.JSONObject;
 public class JsonStartupRequest extends JsonRequest {
 
   public static final String PROP_CLIENT_SESSION_ID = "clientSessionId";
-  public static final String PROP_PARENT_UI_SESSION_ID = "parentUiSessionId";
   public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_CUSTOM_PARAMS = "customParams";
 
@@ -46,13 +45,6 @@ public class JsonStartupRequest extends JsonRequest {
    */
   public String getClientSessionId() {
     return getRequestObject().optString(PROP_CLIENT_SESSION_ID, null);
-  }
-
-  /**
-   * @return parentUiSessionId or <code>null</code> (optional attribute)
-   */
-  public String getParentUiSessionId() {
-    return getRequestObject().optString(PROP_PARENT_UI_SESSION_ID, null);
   }
 
   /**

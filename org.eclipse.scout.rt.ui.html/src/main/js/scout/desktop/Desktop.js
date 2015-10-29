@@ -42,7 +42,7 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
   this.viewTabsController = new scout.ViewTabsController(this);
-  this.formController = new scout.FormController(this, model.session);
+  this.formController = new scout.DesktopFormController(this, model.session);
   this.messageBoxController = new scout.MessageBoxController(this, model.session);
   this.fileChooserController = new scout.FileChooserController(this, model.session);
   this._addNullOutline(model.outline);
@@ -472,10 +472,11 @@ scout.Desktop.prototype.setBenchVisible = function(visible) {
 };
 
 scout.Desktop.prototype._onModelFormShow = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var form, displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent), true);
-    //register listener to recover active form when child dialog is removed
+    form = this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent);
+    this._setFormActivated(form, true);
+    // register listener to recover active form when child dialog is removed
     displayParent.formController.registerAndRender(event.form, event.position);
   }
 };

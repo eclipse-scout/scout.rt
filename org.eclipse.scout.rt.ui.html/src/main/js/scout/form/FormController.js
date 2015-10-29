@@ -25,11 +25,17 @@ scout.FormController = function(displayParent, session) {
 scout.FormController.prototype.registerAndRender = function(formAdapterId, position) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
   form.displayParent = this._displayParent;
-  if (form.displayHint === 'view') {
+  if (form.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+    this._renderPopupWindow(form);
+  } else if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._renderView(form, true, position);
   } else {
     this._renderDialog(form, true);
   }
+};
+
+scout.FormController.prototype._renderPopupWindow = function(formAdapterId, position) {
+  throw new Error('popup window only supported by DesktopFormController');
 };
 
 /**
@@ -41,11 +47,17 @@ scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
     return;
   }
 
-  if (form.displayHint === 'view') {
+  if (form.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+    this._removePopupWindow(form);
+  } else if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._removeView(form);
   } else {
     this._removeDialog(form);
   }
+};
+
+scout.FormController.prototype._removePopupWindow = function(form) {
+  throw new Error('popup window only supported by DesktopFormController');
 };
 
 /**
@@ -68,7 +80,8 @@ scout.FormController.prototype.render = function() {
 scout.FormController.prototype.activateForm = function(formAdapterId) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
 
-  if (form.displayHint === 'view') {
+  // FIXME AWE: handle popupWindow
+  if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._activateView(form);
   } else {
     this._activateDialog(form);
@@ -126,19 +139,24 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return;
   }
 
-  dialog.render(this.session.desktop.$container);
+  // FIXME AWE: mit DWI besprechen: sollen wir popupwindows als dialog behandeln oder als "eigene" property
+  // also analog desktop.dialogs - desktop.popupWindows?
+  if (dialog.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+    this._renderPopupWindow(dialog);
+  } else {
+    dialog.render(this.session.desktop.$container);
 
-  this._layoutDialog(dialog);
+    this._layoutDialog(dialog);
 
-  // Only display the dialog if its 'displayParent' is visible to the user.
-  if (!this._displayParent.inFront()) {
-    dialog.detach();
+    // Only display the dialog if its 'displayParent' is visible to the user.
+    if (!this._displayParent.inFront()) {
+      dialog.detach();
+    }
   }
 };
 
 scout.FormController.prototype._removeView = function(view) {
   scout.arrays.remove(this._displayParent.views, view);
-
   if (view.rendered) {
     view.remove();
   }
@@ -146,7 +164,6 @@ scout.FormController.prototype._removeView = function(view) {
 
 scout.FormController.prototype._removeDialog = function(dialog) {
   scout.arrays.remove(this._displayParent.dialogs, dialog);
-
   if (dialog.rendered) {
     dialog.remove();
   }

@@ -122,6 +122,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.Average",
         "ui.Minimum",
         "ui.Maximum",
-        "ui.Aggregation"));
+        "ui.Aggregation",
+        "ui.loadingPopupWindow"));
   }
 }

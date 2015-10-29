@@ -196,6 +196,7 @@ __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/DetailTableTreeFilter.js");
 __include("scout/desktop/NullDesktopNavigation.js");
+__include("scout/desktop/PopupWindow.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/ViewTabsController.js");
@@ -291,6 +292,7 @@ __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
 // More misc. elements
+__include("scout/desktop/DesktopFormController.js");
 __include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");
 __include("scout/desktop/NavigateUpButton.js");

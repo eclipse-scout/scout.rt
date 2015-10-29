@@ -62,8 +62,14 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
   if (messageBox.rendered) {
     return;
   }
-
-  messageBox.render(this.session.desktop.$container);
+  // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup window
+  var $mbParent;
+  if (this._displayParent.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+    $mbParent = this._displayParent.popupWindow.$container;
+  } else {
+    $mbParent = this.session.desktop.$container;
+  }
+  messageBox.render($mbParent);
 
   // Only display the message box if its 'displayParent' is visible to the user.
   if (!this._displayParent.inFront()) {

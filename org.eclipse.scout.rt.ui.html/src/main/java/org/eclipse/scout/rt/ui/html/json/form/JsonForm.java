@@ -43,6 +43,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_FORM_FIELD = "formField";
   public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
   public static final String PROP_INITIAL_FOCUS = "initialFocus";
+  public static final String PROP_CACHE_BOUNDS = "cacheBounds";
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
@@ -84,6 +85,12 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
       @Override
       public Object prepareValueForToJson(Object value) {
         return BinaryResourceUrlUtility.createIconUrl((String) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_CACHE_BOUNDS, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isCacheBounds();
       }
     });
   }
