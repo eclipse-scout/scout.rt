@@ -59,6 +59,9 @@
     </dependency>
   </dependencies>
 
+  <!-- primarily for license header generation -->
+  <inceptionYear>2014</inceptionYear>
+
   <build>
     <plugins>
       <plugin>
