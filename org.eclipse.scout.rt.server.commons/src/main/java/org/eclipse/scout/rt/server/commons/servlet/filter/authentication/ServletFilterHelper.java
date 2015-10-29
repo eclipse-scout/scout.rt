@@ -23,12 +23,12 @@ import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * @since 5.0
  */
-@Bean
+@ApplicationScoped
 public class ServletFilterHelper {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServletFilterHelper.class);
 
