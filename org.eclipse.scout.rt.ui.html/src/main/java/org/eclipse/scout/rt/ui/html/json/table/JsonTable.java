@@ -193,6 +193,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         return getModel().isHeaderVisible();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HEADER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHeaderEnabled();
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEYBOARD_NAVIGATION, model) {
       @Override
       protected Boolean modelValue() {

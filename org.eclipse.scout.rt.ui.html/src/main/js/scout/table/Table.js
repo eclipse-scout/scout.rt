@@ -142,6 +142,7 @@ scout.Table.prototype._insertCheckBoxColumn = function() {
     fixedPosition: true,
     guiOnly: true,
     disallowHeaderMenu: true,
+    showSeparator: false,
     width: scout.Column.NARROW_MIN_WIDTH,
     table: this
   });
@@ -158,6 +159,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
       fixedPosition: true,
       guiOnly: true,
       disallowHeaderMenu: true,
+      showSeparator: false,
       width: scout.Column.NARROW_MIN_WIDTH,
       table: this
     });
@@ -398,7 +400,8 @@ scout.Table.prototype._hasVisibleTableControls = function() {
 scout.Table.prototype._createHeader = function() {
   return scout.create(scout.TableHeader, {
     parent: this,
-    table: this
+    table: this,
+    enabled: this.headerEnabled
   });
 };
 
@@ -2599,6 +2602,12 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
+  this._renderTableHeader();
+};
+
+scout.Table.prototype._renderHeaderEnabled = function() {
+  // Rebuild the table header when this property changes
+  this._removeTableHeader();
   this._renderTableHeader();
 };
 

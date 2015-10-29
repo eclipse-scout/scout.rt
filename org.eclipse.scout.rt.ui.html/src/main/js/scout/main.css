@@ -81,6 +81,14 @@ body {
   }
 }
 
+.hidden {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
 *, *::before, *::after {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;

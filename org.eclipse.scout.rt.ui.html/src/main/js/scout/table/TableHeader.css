@@ -55,6 +55,8 @@
 
   &.disabled {
     cursor: default;
+    /* Override default disabled text color, because "disabled" in the table header means something different */
+    color: @text-color;
   }
 
   &.empty {
@@ -94,7 +96,8 @@
     }
   }
 
-  &:hover, &.header-move {
+  &.not(.disabled):hover,
+  &.header-move {
     color: @hover-color;
   }
 
@@ -165,8 +168,11 @@
   margin-left: -8px;
   background-color: @border-color;
   background-clip: content-box;
-  cursor: col-resize;
   z-index: 1;
+
+  &:not(.disabled) {
+    cursor: col-resize;
+  }
 
   .header-move & {
     /* Hide separators while moving, because their position will not be updated until the move-end event */

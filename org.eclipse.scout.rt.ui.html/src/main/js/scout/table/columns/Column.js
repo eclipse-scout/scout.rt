@@ -1,5 +1,6 @@
 scout.Column = function() {
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
+  this.showSeparator = true; // currently a UI-only property, defaults to true
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 80;
