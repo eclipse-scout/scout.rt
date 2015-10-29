@@ -16,6 +16,7 @@ classes
 
 # Maven #
 target/
+.surefire-*
 .flattened-pom.xml
 
 # settings files are handled in rt-feature project and settings files should not be changed (can be enforecd with 'git add .settings -f')
