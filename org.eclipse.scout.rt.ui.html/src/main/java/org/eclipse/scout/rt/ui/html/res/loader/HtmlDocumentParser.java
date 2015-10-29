@@ -149,7 +149,7 @@ public class HtmlDocumentParser {
   }
 
   protected void replaceMessageTags() {
-    // <scout:message key="ui.javascriptDisabledTitle" />
+    // <scout:message key="ui.JavaScriptDisabledTitle" />
     Matcher m = PATTERN_MESSAGE_TAG.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {

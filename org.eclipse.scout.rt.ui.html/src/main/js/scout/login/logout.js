@@ -15,21 +15,21 @@ scout.logout = {
       defaultOpts = {
         loginUrl: sessionStorage.getItem('scout:loginUrl') || './',
         texts: {
-          'ui.logoutSuccessful': 'Good bye!',
-          'ui.loginAgain': 'Login again'
+          'ui.LogoutSuccessful': 'Good bye!',
+          'ui.LoginAgain': 'Login again'
         }
       };
     var options = $.extend({}, defaultOpts, opts);
     var texts = new scout.Texts(options.texts);
     var $box = $('<div>')
       .addClass('box-with-logo small centered')
-      .html(scout.strings.nl2br(texts.get('ui.logoutSuccessful')))
+      .html(scout.strings.nl2br(texts.get('ui.LogoutSuccessful')))
       .appendTo($('body'));
     var $buttonBar = $('<div>')
       .addClass('button')
       .appendTo($box);
     $('<button>')
-      .text(texts.get('ui.loginAgain'))
+      .text(texts.get('ui.LoginAgain'))
       .on('click', loginAgain)
       .appendTo($buttonBar);
 

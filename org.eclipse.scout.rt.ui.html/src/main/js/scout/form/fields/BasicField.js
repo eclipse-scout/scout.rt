@@ -114,7 +114,7 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
   var field = this;
   var menu = scout.create('Menu', {
     parent: this,
-    text: this.session.text('ui.copy')
+    text: this.session.text('ui.Copy')
   });
   menu.remoteHandler = function(event) {
     if ('doAction' === event.type) {

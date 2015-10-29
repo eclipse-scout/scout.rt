@@ -56,7 +56,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.groupedByWeekday",
         "ui.groupedByMonth",
         "ui.groupedByYear",
-        "ui.otherValues",
+        "ui.OtherValues",
         "ui.Count",
         "ui.ConnectionInterrupted",
         "ui.ConnectionReestablished",
@@ -123,6 +123,6 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.Minimum",
         "ui.Maximum",
         "ui.Aggregation",
-        "ui.loadingPopupWindow"));
+        "ui.LoadingPopupWindow"));
   }
 }
