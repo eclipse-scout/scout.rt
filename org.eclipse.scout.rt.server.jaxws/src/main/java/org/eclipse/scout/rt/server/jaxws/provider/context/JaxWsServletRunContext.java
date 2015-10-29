@@ -81,13 +81,20 @@ public class JaxWsServletRunContext extends ServletRunContext {
     return this;
   }
 
+  /**
+   * @see #withWebServiceContext(WebServiceContext)
+   */
   public WebServiceContext getWebServiceContext() {
     return m_webServiceContext;
   }
 
   /**
-   * Sets the given {@link WebServiceContext}, its associated HTTP Servlet request and response, and its associated
-   * Subject if present.
+   * Associates this context with the given {@link WebServiceContext}, meaning that any code running on behalf of this
+   * context has that {@link WebServiceContext} set in {@link JaxWsServletRunContext#CURRENT_WEBSERVICE_CONTEXT}
+   * thread-local.
+   * <p>
+   * Also, the associated {@link HttpServletRequest} , {@link HttpServletResponse} and {@link Subject} (if applicable)
+   * is set.
    */
   public JaxWsServletRunContext withWebServiceContext(final WebServiceContext webServiceContext) {
     m_webServiceContext = webServiceContext;
