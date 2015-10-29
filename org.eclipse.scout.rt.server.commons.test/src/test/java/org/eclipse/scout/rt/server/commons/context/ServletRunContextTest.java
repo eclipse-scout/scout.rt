@@ -54,15 +54,8 @@ public class ServletRunContextTest {
   }
 
   @Test
-  public void testEmpty() {
-    ServletRunContext runContext = ServletRunContexts.empty();
-    assertNull(runContext.getServletRequest());
-    assertNull(runContext.getServletResponse());
-  }
-
-  @Test
   public void testCopy() {
-    ServletRunContext runContext = ServletRunContexts.empty();
+    ServletRunContext runContext = ServletRunContexts.copyCurrent();
     runContext.getPropertyMap().put("A", "B");
     runContext.withSubject(new Subject());
     runContext.withLocale(Locale.CANADA_FRENCH);

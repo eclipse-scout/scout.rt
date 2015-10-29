@@ -135,9 +135,7 @@ public class ServletRunContext extends RunContext {
 
   @Override
   protected void fillEmptyValues() {
-    super.fillEmptyValues();
-    m_servletRequest = null;
-    m_servletResponse = null;
+    throw new UnsupportedOperationException(); // not supported to not loose context information accidentally (e.g. the authenticated subject)
   }
 
   @Override

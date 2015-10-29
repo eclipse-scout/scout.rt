@@ -30,12 +30,13 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 
 /**
- * The <code>JaxWsRunContext</code> facilitates propagation of the {@link JAX-WS} state like {@link WebServiceContext}.
+ * The <code>JaxWsServletRunContext</code> facilitates propagation of the {@link JAX-WS} state like
+ * {@link WebServiceContext}.
  *
  * @since 5.1
- * @see RunContext
+ * @see ServletRunContext
  */
-public class JaxWsRunContext extends ServletRunContext {
+public class JaxWsServletRunContext extends ServletRunContext {
 
   /**
    * The {@link WebServiceContext} which is currently associated with the current thread.
@@ -47,35 +48,35 @@ public class JaxWsRunContext extends ServletRunContext {
   @Override
   protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
     super.interceptInvocationChain(invocationChain);
-    invocationChain.add(new ThreadLocalProcessor<>(JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
+    invocationChain.add(new ThreadLocalProcessor<>(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
   }
 
   @Override
-  public JaxWsRunContext withRunMonitor(final RunMonitor runMonitor) {
+  public JaxWsServletRunContext withRunMonitor(final RunMonitor runMonitor) {
     super.withRunMonitor(runMonitor);
     return this;
   }
 
   @Override
-  public JaxWsRunContext withSubject(final Subject subject) {
+  public JaxWsServletRunContext withSubject(final Subject subject) {
     super.withSubject(subject);
     return this;
   }
 
   @Override
-  public JaxWsRunContext withLocale(final Locale locale) {
+  public JaxWsServletRunContext withLocale(final Locale locale) {
     super.withLocale(locale);
     return this;
   }
 
   @Override
-  public JaxWsRunContext withProperty(final Object key, final Object value) {
+  public JaxWsServletRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;
   }
 
   @Override
-  public JaxWsRunContext withProperties(final Map<?, ?> properties) {
+  public JaxWsServletRunContext withProperties(final Map<?, ?> properties) {
     super.withProperties(properties);
     return this;
   }
@@ -88,7 +89,7 @@ public class JaxWsRunContext extends ServletRunContext {
    * Sets the given {@link WebServiceContext}, its associated HTTP Servlet request and response, and its associated
    * Subject if present.
    */
-  public JaxWsRunContext withWebServiceContext(final WebServiceContext webServiceContext) {
+  public JaxWsServletRunContext withWebServiceContext(final WebServiceContext webServiceContext) {
     m_webServiceContext = webServiceContext;
     m_servletRequest = (HttpServletRequest) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_REQUEST);
     m_servletResponse = (HttpServletResponse) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
@@ -118,7 +119,7 @@ public class JaxWsRunContext extends ServletRunContext {
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final JaxWsRunContext originRunContext = (JaxWsRunContext) origin;
+    final JaxWsServletRunContext originRunContext = (JaxWsServletRunContext) origin;
     super.copyValues(originRunContext);
     m_webServiceContext = originRunContext.m_webServiceContext;
   }
@@ -126,18 +127,17 @@ public class JaxWsRunContext extends ServletRunContext {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_webServiceContext = JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT.get();
+    m_webServiceContext = JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT.get();
   }
 
   @Override
   protected void fillEmptyValues() {
-    super.fillEmptyValues();
-    m_webServiceContext = null;
+    throw new UnsupportedOperationException(); // not supported to not loose context information accidentally (e.g. the authenticated subject)
   }
 
   @Override
-  public JaxWsRunContext copy() {
-    final JaxWsRunContext copy = BEANS.get(JaxWsRunContext.class);
+  public JaxWsServletRunContext copy() {
+    final JaxWsServletRunContext copy = BEANS.get(JaxWsServletRunContext.class);
     copy.copyValues(this);
     return copy;
   }

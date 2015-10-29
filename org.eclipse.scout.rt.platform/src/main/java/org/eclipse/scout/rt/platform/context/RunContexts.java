@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.platform.BEANS;
  * Usage:
  *
  * <pre>
- * RunContexts.copyCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
- * 
+ * RunContexts.copyCurrent().withLocale(Locale.US).withSubject(...).run(new IRunnable() {
+ *
  *   &#064;Override
  *   public void run() throws Exception {
  *      // run code on behalf of the new context

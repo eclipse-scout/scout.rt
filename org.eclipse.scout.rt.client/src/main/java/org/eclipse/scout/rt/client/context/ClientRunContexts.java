@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
  * Usage:
  *
  * <pre>
- * ClientRunContexts.copyCurrent().locale(Locale.US).subject(...).session(...).run(new IRunnable() {
+ * ClientRunContexts.copyCurrent().withLocale(Locale.US).withSubject(...).withSession(...).run(new IRunnable() {
  *
  *   &#064;Override
  *   public void run() throws Exception {
@@ -42,9 +42,11 @@ public final class ClientRunContexts {
   }
 
   /**
-   * Creates an empty {@link ClientRunContext}. {@literal @}RunMonitor a new {@link RunMonitor} is created. However,
-   * even if there is a current {@link RunMonitor}, it is NOT registered as child monitor, meaning that it will not be
-   * cancelled once the current {@link RunMonitor} is cancelled.
+   * Creates an empty {@link ClientRunContext}.
+   *
+   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT
+   *             registered as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor}
+   *             is cancelled.
    */
   public static final ClientRunContext empty() {
     final ClientRunContext runContext = BEANS.get(ClientRunContext.class);
@@ -53,11 +55,12 @@ public final class ClientRunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling client context. {@literal @}RunMonitor a new {@link RunMonitor} is
-   * created, and if the current calling context contains a {@link RunMonitor}, it is also registered within that
-   * {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as well once the current
-   * calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling {@link RunContext} if the
-   * <i>returned</i> {@link RunContext} is cancelled.
+   * Creates a "snapshot" of the current calling client context.
+   *
+   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
+   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
+   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
    */
   public static ClientRunContext copyCurrent() {
     final ClientRunContext runContext = BEANS.get(ClientRunContext.class);

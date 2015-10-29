@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * Usage:
  *
  * <pre>
- * ServerRunContexts.copyCurrent().locale(Locale.US).subject(...).session(...).run(new IRunnable() {
- * 
+ * ServerRunContexts.copyCurrent().withLocale(Locale.US).withSubject(...).withSession(...).run(new IRunnable() {
+ *
  *   &#064;Override
  *   public void run() throws Exception {
  *      // run code on behalf of the new context

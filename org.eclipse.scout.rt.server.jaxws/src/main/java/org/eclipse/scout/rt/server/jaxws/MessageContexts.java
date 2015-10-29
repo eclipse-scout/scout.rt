@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  */
 public final class MessageContexts {
 
-  public static final String PROP_RUN_CONTEXT = MessageContexts.class.getName() + ".RunContext";
+  public static final String PROP_REQUEST_RUN_CONTEXT = MessageContexts.class.getName() + ".RunContext";
 
   private MessageContexts() {
   }
@@ -63,23 +63,24 @@ public final class MessageContexts {
   }
 
   /**
-   * Registers the given {@link RunContext} within {@link MessageContext} with scope 'application'.
+   * Registers the given {@link RunContext} for the ongoing request as described by {@link MessageContext}.
    */
-  public static void setRunContext(final MessageContext context, final RunContext runContext) {
+  public static void setRunContextForRequest(final MessageContext context, final RunContext runContext) {
     if (runContext == null) {
-      context.remove(PROP_RUN_CONTEXT);
+      context.remove(PROP_REQUEST_RUN_CONTEXT);
     }
     else {
-      context.put(PROP_RUN_CONTEXT, runContext);
-      context.setScope(PROP_RUN_CONTEXT, Scope.APPLICATION); // APPLICATION-SCOPE to be accessible in port type.
+      context.put(PROP_REQUEST_RUN_CONTEXT, runContext);
+      context.setScope(PROP_REQUEST_RUN_CONTEXT, Scope.APPLICATION); // APPLICATION-SCOPE to be accessible in port type.
     }
   }
 
   /**
-   * Returns the {@link RunContext} contained in {@link MessageContext}, or <code>null</code> if not found.
+   * Returns the {@link RunContext} of the ongoing request as described by {@link MessageContext}, or <code>null</code>
+   * if not set.
    */
-  public static RunContext getRunContext(final MessageContext messageContext) {
-    final Object runContext = messageContext.get(MessageContexts.PROP_RUN_CONTEXT);
+  public static RunContext getRunContextForRequest(final MessageContext messageContext) {
+    final Object runContext = messageContext.get(MessageContexts.PROP_REQUEST_RUN_CONTEXT);
     if (runContext instanceof RunContext) {
       return (RunContext) runContext;
     }
@@ -96,7 +97,7 @@ public final class MessageContexts {
    * if not found.
    */
   public static Subject getSubject(final MessageContext messageContext, final Subject defaultSubject) {
-    final RunContext runContext = MessageContexts.getRunContext(messageContext);
+    final RunContext runContext = MessageContexts.getRunContextForRequest(messageContext);
     if (runContext != null && runContext.getSubject() != null) {
       return runContext.getSubject();
     }

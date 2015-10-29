@@ -62,7 +62,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
-import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsRunContexts;
+import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsServletRunContexts;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
@@ -95,8 +95,8 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected static final String LOGGER_FIELD_NAME = "LOG";
   protected static final String WEBSERVICE_CONTEXT_FIELD_NAME = "m_webServiceContext";
   protected static final String HANDLE_UNDECLARED_FAULT_METHOD_NAME = "handleUndeclaredFault";
-  protected static final String JAXWS_RUN_CONTEXT_FIELD_NAME = "jaxwsRunContext";
-  protected static final String HANDLER_RUN_CONTEXT_FIELD_NAME = "handlerRunContext";
+  protected static final String SERVLET_RUN_CONTEXT_FIELD_NAME = "servletRunContext";
+  protected static final String REQUEST_RUN_CONTEXT_FIELD_NAME = "requestRunContext";
 
   private Logger m_logger;
 
@@ -268,14 +268,21 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected void addMethodProxyImplementation(final JCodeModel model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String portTypeQualifiedName) {
     final JBlock methodBody = method.body();
 
-    // Declare variables 'jaxwsRunContext' and 'handlerRunContext'.
-    final JVar jaxwsRunContext = methodBody.decl(JMod.FINAL, model.ref(RunContext.class), JAXWS_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsRunContexts.class).staticInvoke("empty").invoke("withWebServiceContext").arg(webServiceContext));
-    final JVar handlerRunContext = methodBody.decl(JMod.FINAL, model.ref(RunContext.class), HANDLER_RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class).staticInvoke("getRunContext").arg(webServiceContext.invoke("getMessageContext")));
+    // Declare variables 'servletRunContext' and 'requestRunContext'.
+    final JVar servletRunContext = methodBody
+        .decl(JMod.FINAL, model.ref(RunContext.class), SERVLET_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsServletRunContexts.class)
+            .staticInvoke("copyCurrent")
+            .invoke("withWebServiceContext")
+            .arg(webServiceContext));
+    final JVar requestRunContext = methodBody
+        .decl(JMod.FINAL, model.ref(RunContext.class), REQUEST_RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class)
+            .staticInvoke("getRunContextForRequest")
+            .arg(webServiceContext.invoke("getMessageContext")));
 
     final JTryBlock tryBlock = methodBody._try();
 
     // Invoke port type on behalf of RunContext.
-    final JInvocation runContextInvocation = createRunContextInvocation(model, jaxwsRunContext, handlerRunContext, voidMethod, method, portTypeQualifiedName);
+    final JInvocation runContextInvocation = createRunContextInvocation(model, servletRunContext, requestRunContext, voidMethod, method, portTypeQualifiedName);
     if (voidMethod) {
       tryBlock.body().add(runContextInvocation);
     }
@@ -309,18 +316,18 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
    * @return
    */
   @Internal
-  protected JInvocation createRunContextInvocation(final JCodeModel model, final JVar jaxwsRunContext, final JVar handlerRunContext, final boolean voidMethod, final JMethod portTypeMethod, final String portTypeName) {
-    final JDefinedClass jaxwsRunContextCallable;
-    final JDefinedClass handlerRunContextCallable;
+  protected JInvocation createRunContextInvocation(final JCodeModel model, final JVar servletRunContext, final JVar requestRunContext, final boolean voidMethod, final JMethod portTypeMethod, final String portTypeName) {
+    final JDefinedClass servletRunContextCallable;
+    final JDefinedClass requestRunContextCallable;
     final String runMethodName;
     if (voidMethod) {
-      jaxwsRunContextCallable = model.anonymousClass(IRunnable.class);
-      handlerRunContextCallable = model.anonymousClass(IRunnable.class);
+      servletRunContextCallable = model.anonymousClass(IRunnable.class);
+      requestRunContextCallable = model.anonymousClass(IRunnable.class);
       runMethodName = "run";
     }
     else {
-      jaxwsRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
-      handlerRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
+      servletRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
+      requestRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
       runMethodName = "call";
     }
 
@@ -330,38 +337,38 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
       beanInvocation.arg(parameter);
     }
 
-    // Implement HandlerRunContext callable.
-    final JMethod handlerRunContextRunMethod = handlerRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
-    handlerRunContextRunMethod.annotate(Override.class);
+    // Implement RequestRunContext callable.
+    final JMethod requestRunContextRunMethod = requestRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
+    requestRunContextRunMethod.annotate(Override.class);
     if (voidMethod) {
-      handlerRunContextRunMethod.body().add(beanInvocation);
+      requestRunContextRunMethod.body().add(beanInvocation);
     }
     else {
-      handlerRunContextRunMethod.body()._return(beanInvocation);
+      requestRunContextRunMethod.body()._return(beanInvocation);
     }
 
     // Create RunContext invocations.
     final JInvocation exceptionTranslator = model.ref(BEANS.class).staticInvoke("get").arg(model.ref(ExceptionTranslator.class).dotclass());
 
-    final JInvocation jaxwsRunContextInvocation = jaxwsRunContext.invoke(runMethodName).arg(JExpr._new(jaxwsRunContextCallable)).arg(exceptionTranslator);
-    final JInvocation handlerRunContextInvocation = handlerRunContext.invoke(runMethodName).arg(JExpr._new(handlerRunContextCallable)).arg(exceptionTranslator);
+    final JInvocation servletRunContextInvocation = servletRunContext.invoke(runMethodName).arg(JExpr._new(servletRunContextCallable)).arg(exceptionTranslator);
+    final JInvocation requestRunContextInvocation = requestRunContext.invoke(runMethodName).arg(JExpr._new(requestRunContextCallable)).arg(exceptionTranslator);
 
-    // Implement JaxWsRunContext callable.
-    final JMethod jaxwsRunContextRunMethod = jaxwsRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
-    jaxwsRunContextRunMethod.annotate(Override.class);
+    // Implement ServletRunContext callable.
+    final JMethod servletRunContextRunMethod = servletRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
+    servletRunContextRunMethod.annotate(Override.class);
 
-    final JConditionalEx jaxWsRunContextCondition = new JConditionalEx(jaxwsRunContextRunMethod.body());
+    final JConditionalEx servletRunContextCondition = new JConditionalEx(servletRunContextRunMethod.body());
 
     // Assemble the methods.
     if (voidMethod) {
-      jaxWsRunContextCondition._if(handlerRunContext.eq(JExpr._null())).add(beanInvocation); // directly invoke Bean method.
-      jaxWsRunContextCondition._else().add(handlerRunContextInvocation); // call HandlerRunContext to invoke Bean method.
+      servletRunContextCondition._if(requestRunContext.eq(JExpr._null())).add(beanInvocation); // directly invoke Bean method.
+      servletRunContextCondition._else().add(requestRunContextInvocation); // call RequestRunContext to invoke Bean method.
     }
     else {
-      jaxWsRunContextCondition._if(handlerRunContext.eq(JExpr._null()))._return(beanInvocation); // directly invoke Bean method.
-      jaxWsRunContextCondition._else()._return(handlerRunContextInvocation); // call HandlerRunContext to invoke Bean method.
+      servletRunContextCondition._if(requestRunContext.eq(JExpr._null()))._return(beanInvocation); // directly invoke Bean method.
+      servletRunContextCondition._else()._return(requestRunContextInvocation); // call RequestRunContext to invoke Bean method.
     }
-    return jaxwsRunContextInvocation;
+    return servletRunContextInvocation;
   }
 
   /**

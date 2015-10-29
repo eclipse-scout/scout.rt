@@ -80,14 +80,14 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       // Check whether the request is already authenticated, e.g. by the container.
       final Subject currentSubject = Subject.getSubject(AccessController.getContext());
       if (currentSubject != null && !currentSubject.getPrincipals().isEmpty()) {
-        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(currentSubject).withTransactionScope(TransactionScope.REQUIRES_NEW));
+        MessageContexts.setRunContextForRequest(messageContext, m_requestRunContextProvider.provide(currentSubject).withTransactionScope(TransactionScope.REQUIRES_NEW));
         return true;
       }
 
       // Authenticate the request.
       final Subject subject = authenticateRequest(messageContext);
       if (subject != null) {
-        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(subject).withTransactionScope(TransactionScope.REQUIRES_NEW));
+        MessageContexts.setRunContextForRequest(messageContext, m_requestRunContextProvider.provide(subject).withTransactionScope(TransactionScope.REQUIRES_NEW));
         return true;
       }
       else {

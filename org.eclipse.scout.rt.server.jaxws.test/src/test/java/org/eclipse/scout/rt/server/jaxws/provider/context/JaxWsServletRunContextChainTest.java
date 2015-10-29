@@ -30,15 +30,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class JaxWsRunContextChainTest {
+public class JaxWsServletRunContextChainTest {
 
   /**
-   * Tests the correct order of interceptors in {@link JaxWsRunContext}.
+   * Tests the correct order of interceptors in {@link JaxWsServletRunContext}.
    */
   @Test
   public void testCallableChain() throws Exception {
     InvocationChain<Object> chain = new InvocationChain<Object>();
-    new JaxWsRunContext().interceptInvocationChain(chain);
+    new JaxWsServletRunContext().interceptInvocationChain(chain);
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 
@@ -94,7 +94,7 @@ public class JaxWsRunContextChainTest {
     // 11. ThreadLocalProcessor for JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, ((ThreadLocalProcessor) c).getThreadLocal());
+    assertSame(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     assertFalse(chainIterator.hasNext());
   }

@@ -114,7 +114,7 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ServletException {
-    ServletRunContexts.empty()
+    ServletRunContexts.copyCurrent()
         .withServletRequest(m_requestMock)
         .withServletResponse(m_responseMock)
         .run(new IRunnable() {
@@ -136,7 +136,7 @@ public class ServiceTunnelServletTest {
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
 
-    ServletRunContexts.empty().withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
+    ServletRunContexts.copyCurrent().withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -248,7 +248,7 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return ServletRunContexts.empty().withServletRequest(m_request).withServletResponse(m_response).call(new Callable<IServerSession>() {
+      return ServletRunContexts.copyCurrent().withServletRequest(m_request).withServletResponse(m_response).call(new Callable<IServerSession>() {
 
         @Override
         public IServerSession call() throws Exception {
