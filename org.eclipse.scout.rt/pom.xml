@@ -67,7 +67,8 @@
 
   <properties>
     <scout.base.version>5.2.0</scout.base.version>
-    <org.eclipse.scout.rt.version>5.2.0-SNAPSHOT</org.eclipse.scout.rt.version>
+    <base.version>${scout.base.version}</base.version>
+    <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>9.2.13.v20150730</jetty.version>
     <slf4j.version>1.7.12</slf4j.version>
 
@@ -342,6 +343,30 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-plugin</artifactId>
+          <configuration>
+            <basedir>${project.basedir}/..</basedir>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <flattenMode>bom</flattenMode>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <!-- primarily for license header generation -->
   <inceptionYear>2010</inceptionYear>
