@@ -145,9 +145,7 @@ public class UiRunContext extends RunContext {
 
   @Override
   protected void fillEmptyValues() {
-    super.fillEmptyValues();
-    m_session = null;
-    m_jsonRequest = null;
+    throw new UnsupportedOperationException(); // not supported to not loose context information accidentally (e.g. the authenticated subject)
   }
 
   @Override
