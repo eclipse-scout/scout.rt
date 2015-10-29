@@ -28,7 +28,7 @@ scout.SmartFieldButton.prototype._render = function($parent) {
   this.addContainer($parent, cssClass);
   this.addLabel();
 
-  this.addField(scout.fields.new$TextField()
+  this.addField(scout.fields.makeTextField(this.ownerDocument())
     .attr('readonly', 'readonly')
     .click(this._onClick.bind(this)));
 

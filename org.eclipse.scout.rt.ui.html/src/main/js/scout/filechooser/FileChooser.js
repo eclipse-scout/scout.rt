@@ -56,11 +56,10 @@ scout.FileChooser.prototype._render = function($parent) {
     }.bind(this));
 
   this.$content = this.$container.appendDiv('file-chooser-content');
-  this.$title = $.makeDiv('file-chooser-title')
-    .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'))
-    .appendTo(this.$content);
+  this.$title = this.$content.appendDiv('file-chooser-title')
+    .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'));
 
-  this.$fileInputField = $('<input>')
+  this.$fileInputField = $.makeElement(this.ownerDocument(), '<input>')
     .attr('type', 'file')
     .prop('multiple', this.multiSelect)
     .attr('accept', this.contentTypes)
@@ -79,16 +78,14 @@ scout.FileChooser.prototype._render = function($parent) {
       .text(this.session.text('ui.FileChooserHint'));
 
     // List of files
-    this.$files = $('<ul>')
-      .addClass('file-chooser-files')
-      .appendTo(this.$content);
+    this.$files = this.$content.appendElement('<ul>', 'file-chooser-files');
     scout.scrollbars.install(this.$files, {
       parent: this
     });
 
   } else {
     // legacy iframe code
-    this.$legacyFormTarget = $('<iframe>')
+    this.$legacyFormTarget = this.$container.appendElement('<iframe>')
       .attr('name', 'legacyFileUpload' + this.id)
       .on('load', function() {
         // Manually handle JSON response from iframe
@@ -105,28 +102,23 @@ scout.FileChooser.prototype._render = function($parent) {
           this.session.setBusy(false);
           this.session.layoutValidator.validate();
         }
-      }.bind(this))
-      .appendTo(this.$container);
+      }.bind(this));
     this.$fileInputField
       .attr('name', 'file')
       .addClass('legacy-upload-file-input');
-    this.$legacyForm = $('<form>')
+    this.$legacyForm = this.$content.appendElement('<form>', 'legacy-upload-form')
       .attr('action', 'upload/' + this.session.uiSessionId + '/' + this.id)
       .attr('enctype', 'multipart/form-data')
       .attr('method', 'post')
       .attr('target', 'legacyFileUpload' + this.id)
-      .addClass('legacy-upload-form')
-      .append(this.$fileInputField)
-      .appendTo(this.$content);
-    $('<input>')
+      .append(this.$fileInputField);
+    this.$legacyForm.appendElement('<input>')
       .attr('name', 'legacyFormTextPlainAnswer')
-      .attr('type', 'hidden')
-      .appendTo(this.$legacyForm);
+      .attr('type', 'hidden');
   }
 
   // Buttons
-  this.$buttons = $.makeDiv('file-chooser-buttons')
-    .appendTo(this.$container);
+  this.$buttons = this.$container.appendDiv('file-chooser-buttons');
   var boxButons = new scout.BoxButtons(this.$buttons);
   if (scout.device.supportsFile()) {
     this.$addFileButton = boxButons.addButton({
@@ -231,17 +223,12 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this._files = [file];
       this.$files.empty();
     }
-    var $file = $('<li>')
-      .addClass('file')
-      .text(file.name)
-      .appendTo(this.$files);
-    var $remove = $('<span>')
-      .appendTo($file)
-      .addClass('remove menu-item')
+    var $file = this.$files.appendElement('<li>', 'file')
+      .text(file.name);
+    var $remove = $file.appendSpan('remove menu-item')
       .on('click', this.removeFile.bind(this, file, $file));
-    var $removeLink = $('<a>')
-      .text(this.session.text('Remove'))
-      .addClass('remove-link');
+    var $removeLink = $.makeElement(this.ownerDocument(), '<a>', 'remove-link')
+      .text(this.session.text('Remove'));
     $remove
       .append(document.createTextNode('('))
       .append($removeLink)

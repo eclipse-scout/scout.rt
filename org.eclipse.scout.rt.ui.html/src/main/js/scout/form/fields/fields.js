@@ -10,16 +10,23 @@
  ******************************************************************************/
 scout.fields = {
 
-  new$TextField: function() {
-    return $('<input>')
+  /**
+   * @param theDocument HTML document reference used to create the INPUT element
+   * @returns an INPUT element as used in Scout forms.
+   */
+  makeTextField: function(theDocument) {
+    return $.makeElement(theDocument, '<input>')
       .attr('type', 'text')
       .attr('autocomplete', 'false') /* use false instead of off, off is currently ignored in chrome, false should work with all major browsers*/
       .disableSpellcheck();
   },
 
-  new$Icon: function() {
-    return $('<span>')
-      .addClass('icon');
+  appendIcon: function($field, cssClass) {
+    var $icon = $field.appendSpan('icon');
+    if (cssClass) {
+      $icon.addClass(cssClass);
+    }
+    return $icon;
   },
 
   initTouch: function(field, model) {
@@ -29,7 +36,7 @@ scout.fields = {
   },
 
   /**
-   * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #inputOrDiv().
+   * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #makeInputOrDiv().
    * Works as setter when called with 3 arguments, works a getter when called with 2 arguments.
    *
    * @return when called with 2 arguments: $field.text() or $field.val()
@@ -49,12 +56,17 @@ scout.fields = {
   /**
    * Creates a DIV element for touch-devices and an INPUT element for all other devices.
    */
-  inputOrDiv: function(field) {
+  makeInputOrDiv: function(field, cssClass) {
+    var $element;
     if (field.touch) {
-      return $.makeDiv('input-field');
+      $element = $.makeDiv(field.ownerDocument(), 'input-field');
     } else {
-      return scout.fields.new$TextField();
+      $element = scout.fields.makeTextField(field.ownerDocument());
     }
+    if (cssClass) {
+      $element.addClass(cssClass);
+    }
+    return $element;
   },
 
   // note: the INPUT element does not process the click event when the field is disabled

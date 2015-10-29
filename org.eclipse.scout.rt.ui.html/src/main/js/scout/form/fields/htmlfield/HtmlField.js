@@ -26,7 +26,7 @@ scout.HtmlField.prototype._render = function($parent) {
   this.addContainer($parent, 'html-field');
   this.addLabel();
 
-  this.addField($.makeDiv());
+  this.addField($.makeDiv(this.ownerDocument()));
   this.addStatus();
 };
 

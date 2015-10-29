@@ -15,7 +15,7 @@ scout.inherits(scout.ImageField, scout.FormField);
 
 scout.ImageField.prototype._render = function($parent) {
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
-  this.addFieldContainer($('<div>'));
+  this.addFieldContainer($.makeDiv(this.ownerDocument()));
 
   // add drag and drop event listeners to field container, img field might be hidden (e.g. if no image has been set)
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
@@ -28,9 +28,7 @@ scout.ImageField.prototype._render = function($parent) {
     }.bind(this));
   this.dragAndDropHandler.install(this.$fieldContainer);
 
-  var $field = $('<img>')
-    .addClass('image')
-    .appendTo(this.$fieldContainer)
+  var $field = this.$fieldContainer.appendElement('<img>', 'image')
     .on('load', this._onImageLoad.bind(this))
     .on('error', this._onImageError.bind(this));
 

@@ -19,7 +19,7 @@ scout.SequenceBox.prototype._render = function($parent) {
     env = scout.HtmlEnvironment;
   this.addContainer($parent, 'sequence-box');
   this.addLabel();
-  this.addField($('<div>'));
+  this.addField($.makeDiv(this.ownerDocument()));
   this.addStatus();
   this._handleStatus();
   var htmlComp = new scout.HtmlComponent(this.$field, this.session);

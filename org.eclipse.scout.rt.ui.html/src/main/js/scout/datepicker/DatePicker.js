@@ -33,8 +33,8 @@ scout.DatePicker.prototype._init = function(options) {
 };
 
 scout.DatePicker.prototype._render = function($parent) {
-  this.$container = $.makeDiv('date-picker')
-    .appendTo($parent)
+  this.$container = $parent
+    .appendDiv('date-picker')
     .on('swipe', this._onSwipe.bind(this));
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -210,7 +210,9 @@ scout.DatePicker.prototype._build$DateBox = function() {
   var weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
   var start = new Date(this.viewDate);
 
-  var $box = $.makeDiv('date-picker-month').data('viewDate', this.viewDate);
+  var $box = $
+    .makeDiv(this.ownerDocument(), 'date-picker-month')
+    .data('viewDate', this.viewDate);
 
   // Create weekday header
   for (i in weekdays) {

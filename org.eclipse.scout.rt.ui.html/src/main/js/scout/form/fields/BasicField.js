@@ -92,9 +92,9 @@ scout.BasicField.prototype._renderDisabledOverlay = function() {
   if (this.enabled) {
     this._removeDisabledOverlay();
   } else if (!this._$disabledOverlay) {
-    this._$disabledOverlay = $.makeDiv('disabled-overlay')
-      .on('contextmenu', this._createCopyContextMenu.bind(this))
-      .appendTo(this.$container);
+    this._$disabledOverlay = this.$container
+      .appendDiv('disabled-overlay')
+      .on('contextmenu', this._createCopyContextMenu.bind(this));
   }
 };
 

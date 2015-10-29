@@ -20,7 +20,7 @@ scout.TreeBox.prototype._render = function($parent) {
   this.addMandatoryIndicator();
   this.addStatus();
 
-  this.addFieldContainer($('<div>'));
+  this.addFieldContainer($.makeDiv(this.ownerDocument()));
   var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.TreeBoxLayout(this, this.tree, this.filterBox));
 

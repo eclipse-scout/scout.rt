@@ -45,13 +45,12 @@ scout.BoxButtons = function($parent, onClickHandler) {
 scout.BoxButtons.prototype.addButton = function(opts) {
   opts = opts || {};
 
-  var $button = $('<div>')
+  var $button = this._$parent.appendDiv()
     .text(scout.strings.removeAmpersand(opts.text))
     .attr('tabindex', opts.tabIndex || '0')
     .addClass('button')
     .unfocusable()
-    .setEnabled(scout.helpers.nvl(opts.enabled, true))
-    .appendTo(this._$parent);
+    .setEnabled(scout.helpers.nvl(opts.enabled, true));
 
   if (opts.onClick) {
     var onClick = opts.onClick;

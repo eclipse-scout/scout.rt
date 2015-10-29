@@ -16,14 +16,14 @@ scout.inherits(scout.LabelField, scout.ValueField);
 scout.LabelField.prototype._render = function($parent) {
   this.addContainer($parent, 'label-field');
   this.addLabel();
-  this.addField($('<div>'));
+  this.addField($.makeDiv(this.ownerDocument()));
   this.addStatus();
 };
 
 scout.LabelField.prototype._renderProperties = function() {
   scout.LabelField.parent.prototype._renderProperties.call(this);
   this._renderWrapText(this.wrapText);
-  //FIXME render selectable
+  // FIXME render selectable
 };
 
 /**

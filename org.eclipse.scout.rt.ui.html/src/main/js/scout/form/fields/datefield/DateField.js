@@ -65,7 +65,7 @@ scout.DateField.prototype._syncErrorStatus = function(errorStatus) {
 scout.DateField.prototype._render = function($parent) {
   this.addContainer($parent, 'date-field');
   this.addLabel();
-  this.addField($.makeDiv('date-time-composite'));
+  this.addField($.makeDiv(this.ownerDocument(), 'date-time-composite'));
   this.addStatus(this.$field);
   if (!this.embedded) {
     this.addMandatoryIndicator();
@@ -101,8 +101,7 @@ scout.DateField.prototype._remove = function() {
 scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
-    this.$dateField = scout.fields.inputOrDiv(this)
-      .addClass('date')
+    this.$dateField = scout.fields.makeInputOrDiv(this, 'date')
       .on('mousedown', this._onDateFieldClick.bind(this))
       .appendTo(this.$field);
     if (!this.touch) {
@@ -114,10 +113,8 @@ scout.DateField.prototype._renderHasDate = function() {
 
     new scout.HtmlComponent(this.$dateField, this.session);
 
-    this.$dateFieldIcon = scout.fields.new$Icon()
-      .addClass('date')
-      .on('mousedown', this._onDateIconClick.bind(this))
-      .appendTo(this.$field);
+    this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
+      .on('mousedown', this._onDateIconClick.bind(this));
 
     this.invalidateLayout();
 
@@ -135,8 +132,7 @@ scout.DateField.prototype._renderHasDate = function() {
 scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
-    this.$timeField = scout.fields.inputOrDiv(this)
-      .addClass('time')
+    this.$timeField = scout.fields.makeInputOrDiv(this, 'time')
       .on('mousedown', this._onTimeFieldClick.bind(this))
       .appendTo(this.$field);
     if (!this.touch) {
@@ -145,10 +141,8 @@ scout.DateField.prototype._renderHasTime = function() {
         .on('input', this._onTimeFieldInput.bind(this))
         .on('blur', this._onTimeFieldBlur.bind(this));
     }
-    this.$timeFieldIcon = scout.fields.new$Icon()
-      .addClass('time')
-      .on('mousedown', this._onTimeIconClick.bind(this))
-      .appendTo(this.$field);
+    this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
+      .on('mousedown', this._onTimeIconClick.bind(this));
     new scout.HtmlComponent(this.$timeField, this.session);
 
     this.invalidateLayout();

@@ -555,12 +555,12 @@ scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
   // Install resize helpers. Those helpers make sure the header and the data element keep their
   // current width until the resizing has finished. Otherwise, make a column smaller while the
   // table has been horizontally scrolled to the right would behave very strange.
-  this.$headerColumnResizeHelper = $.makeDiv('table-column-resize-helper')
-    .css('width', this.table.rowWidth + this.table.rowBorderWidth)
-    .appendTo(this.$container);
-  this.$dataColumnResizeHelper = $.makeDiv('table-column-resize-helper')
-    .css('width', this.table.rowWidth)
-    .appendTo(this.table.$data);
+  this.$headerColumnResizeHelper = this.$container
+    .appendDiv('table-column-resize-helper')
+    .css('width', this.table.rowWidth + this.table.rowBorderWidth);
+  this.$dataColumnResizeHelper = this.table.$data
+    .appendDiv('table-column-resize-helper')
+    .css('width', this.table.rowWidth);
 
   $(window)
     .on('mousemove.tableheader', resizeMove)

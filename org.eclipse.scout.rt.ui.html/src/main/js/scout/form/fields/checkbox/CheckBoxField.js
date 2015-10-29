@@ -28,14 +28,14 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addContainer($parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addField($('<div>'));
+  this.addField($.makeDiv(this.ownerDocument()));
 
-  this.$checkBox = $.makeDiv('check-box')
-    .appendTo(this.$field)
+  this.$checkBox = this.$field
+    .appendDiv('check-box')
     .on('mousedown', this._onMouseDown.bind(this));
 
-  this.$checkBoxLabel = $.makeDiv('label')
-    .appendTo(this.$field)
+  this.$checkBoxLabel = this.$field
+    .appendDiv(this.ownerDocument(), 'label')
     .on('mousedown', this._onMouseDown.bind(this));
 
   scout.tooltips.install(this.$checkBoxLabel, {

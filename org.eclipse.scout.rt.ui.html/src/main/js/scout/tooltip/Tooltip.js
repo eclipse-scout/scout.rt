@@ -56,17 +56,17 @@ scout.Tooltip.prototype._render = function($parent) {
   // Remember parent (necessary for detach helper)
   this.$parent = $parent;
 
-  this.$container = $.makeDiv('tooltip')
+  this.$container = $parent
+    .appendDiv('tooltip')
     .hide()
-    .data('tooltip', this)
-    .appendTo($parent);
+    .data('tooltip', this);
 
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
 
-  this.$arrow = $.makeDiv('tooltip-arrow').appendTo(this.$container);
-  this.$content = $.makeDiv('tooltip-content').appendTo(this.$container);
+  this.$arrow = this.$container.appendDiv('tooltip-arrow');
+  this.$content = this.$container.appendDiv('tooltip-content');
   this._renderText();
   this.$container.show();
 

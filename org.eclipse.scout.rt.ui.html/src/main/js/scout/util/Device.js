@@ -276,14 +276,15 @@ scout.Device.prototype.getUnselectableAttribute = function() {
  */
 scout.Device.prototype.isTableAdditionalDivRequired = function() {
   return this.supportsFeature('_tableAdditionalDivRequired', function(property) {
-    var test = $('body').appendDiv();
-    test.text('Scout');
-    test.css('visibility', 'hidden');
-    test.css('display', 'table-cell');
-    test.css('max-width', '1px');
-    test.css('overflow', 'hidden');
-    var result = test.width() > 1;
-    test.remove();
+    var $test = $('body')
+      .appendDiv()
+      .text('Scout')
+      .css('visibility', 'hidden')
+      .css('display', 'table-cell')
+      .css('max-width', '1px')
+      .css('overflow', 'hidden');
+    var result = $test.width() > 1;
+    $test.remove();
     return result;
   }.bind(this));
 };
@@ -332,12 +333,12 @@ scout.Device.prototype._parseBrowserVersion = function(userAgent) {
 };
 
 scout.Device.prototype._detectScrollbarWidth = function(userAgent) {
-  var $measure = $('<div>')
+  var $measure = $('body')
+    .appendDiv()
     .attr('id', 'MeasureScrollbar')
     .css('width', 50)
     .css('height', 50)
-    .css('overflow-y', 'scroll')
-    .appendTo($('body')),
+    .css('overflow-y', 'scroll'),
     measureElement = $measure[0];
   var scrollbarWidth = measureElement.offsetWidth - measureElement.clientWidth;
   $measure.remove();

@@ -23,7 +23,7 @@ scout.SplitBox.prototype._render = function($parent) {
   // This widget does not support label, mandatoryIndicator and status
 
   // Create split area
-  this._$splitArea = $.makeDiv('split-area');
+  this._$splitArea = $.makeDiv(this.ownerDocument(), 'split-area');
   this.addField(this._$splitArea);
   this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
@@ -37,10 +37,9 @@ scout.SplitBox.prototype._render = function($parent) {
     this.firstField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
 
     if (this.secondField) {
-      this._$splitter = $.makeDiv('splitter')
+      this._$splitter = this._$splitArea.appendDiv('splitter')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
-        .on('mousedown', resizeSplitter.bind(this))
-        .appendTo(this._$splitArea);
+        .on('mousedown', resizeSplitter.bind(this));
 
       this.secondField.render(this._$splitArea);
       this.secondField.$container
@@ -77,9 +76,9 @@ scout.SplitBox.prototype._render = function($parent) {
       var splitterSize = scout.graphics.getSize(this._$splitter, true);
 
       // Create temporary splitter
-      var $tempSplitter = $.makeDiv('temp-splitter')
-        .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
-        .appendTo(this._$splitArea);
+      var $tempSplitter = this._$splitArea
+        .makeDiv('temp-splitter')
+        .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
       if (this.splitHorizontal) { // "|"
         $tempSplitter.cssLeft(splitterPosition.left - splitAreaPosition.left);
       } else { // "--"

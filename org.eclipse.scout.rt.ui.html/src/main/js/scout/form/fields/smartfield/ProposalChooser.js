@@ -27,8 +27,7 @@ scout.ProposalChooser.prototype._render = function($parent) {
 
   // support for activeFilter
   if (this.activeFilter) {
-    var $activeFilter = $.makeDiv('active-filter')
-      .appendTo(this.$container);
+    var $activeFilter = this.$container.appendDiv('active-filter');
     this._appendOption($activeFilter, 'UNDEFINED', 'Alle');
     this._appendOption($activeFilter, 'TRUE', 'Aktive');
     this._appendOption($activeFilter, 'FALSE', 'Inaktive');
@@ -75,7 +74,7 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
 };
 
 scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {
-  var $radio = $('<input>')
+  var $radio = $.makeElement(this.ownerDocument(), '<input>')
     .attr('type', 'radio')
     .attr('name', 'activeState')
     .attr('value', value)
@@ -85,7 +84,7 @@ scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {
   }
   $parent
     .append($radio)
-    .append($('<label>').text(text));
+    .append($.makeElement(this.ownerDocument(), '<label>').text(text));
 };
 
 scout.ProposalChooser.prototype._onActiveFilterChanged = function(event) {

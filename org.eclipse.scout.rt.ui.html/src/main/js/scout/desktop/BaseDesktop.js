@@ -65,9 +65,10 @@ scout.BaseDesktop.prototype._goOffline = function() {
   }
   this.offline = true;
 
-  this.$offlineNotification = $.makeDiv('notification error');
+  this.$offlineNotification = $.makeDiv(this.ownerDocument(), 'notification error');
   this._$offlineMessage = this.$offlineNotification.appendDiv('notification-content offline-message');
-  this._$offlineMessage.appendDiv('offline-message-text')
+  this._$offlineMessage
+    .appendDiv('offline-message-text')
     .text(this.session.text('ui.ConnectionInterrupted'));
   var $reconnect = this._$offlineMessage.appendDiv('reconnect');
   $reconnect

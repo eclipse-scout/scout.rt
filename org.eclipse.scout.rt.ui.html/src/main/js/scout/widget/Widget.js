@@ -66,6 +66,19 @@ scout.Widget.prototype.render = function($parent) {
   this._postRender();
 };
 
+/**
+ * @returns the document object from the browser for the current $container instance.
+ * @throws an Error if document cannot be resolved
+ * @param $element (optional) if not set this.$container is used as $element to lookup the document
+ */
+scout.Widget.prototype.ownerDocument = function($element) {
+  var document = $.getDocument($element || this.$container);
+  if (!document) {
+    throw new Error('Could not resolve (HTML) document for $container');
+  }
+  return document;
+};
+
 // Currently only necessary for ModelAdapter
 scout.Widget.prototype._renderInternal = function($parent) {
   this._render($parent);

@@ -19,7 +19,7 @@ scout.ListBox.prototype._render = function($parent) {
 
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addFieldContainer($('<div>'));
+  this.addFieldContainer($.makeDiv(this.ownerDocument()));
 
   var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));

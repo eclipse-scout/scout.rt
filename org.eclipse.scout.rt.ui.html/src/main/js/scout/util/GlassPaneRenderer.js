@@ -22,7 +22,7 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
   this.findGlassPaneTargets().forEach(function($glassPaneTarget) {
     // Render glasspanes onto glasspane targets.
-    this._$glassPanes.push($.makeDiv('glasspane')
+    this._$glassPanes.push($.makeDiv($.getDocument($glassPaneTarget), 'glasspane')
       .on('mousedown', this._onMousedown.bind(this))
       .appendTo($glassPaneTarget));
     this._$glassPaneTargets.push($glassPaneTarget);

@@ -165,7 +165,7 @@ scout.MessageBox.prototype._renderHiddenText = function(text) {
     this.$hiddenText.remove();
   }
   if (text) {
-    this.$hiddenText = $('<!-- \n' + text.replace(/<!--|-->/g, '') + '\n -->').appendTo(this.$content);
+    this.$hiddenText = this.$content.appendElement('<!-- \n' + text.replace(/<!--|-->/g, '') + '\n -->');
   }
 };
 

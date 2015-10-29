@@ -27,7 +27,8 @@ scout.PopupWindow.prototype._onUnload = function() {
 
 scout.PopupWindow.prototype._onReady = function() {
   // set container (used as document-root from callers)
-  this.$container = $('.scout', this.myWindow.document);
+  var scoutElement = this.myWindow.document.getElementsByClassName('scout')[0];
+  this.$container = $(scoutElement);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SingleLayout());
 

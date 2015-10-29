@@ -102,7 +102,7 @@ scout.Popup.prototype.render = function($parent, event) {
 };
 
 scout.Popup.prototype._render = function($parent) {
-  this.$container = $.makeDiv('popup').appendTo($parent);
+  this.$container = $parent.appendDiv('popup');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
@@ -122,10 +122,8 @@ scout.Popup.prototype._remove = function() {
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
-
   // remove all clean-up handlers
   this._detachCloseHandler();
-
   scout.Popup.parent.prototype._remove.call(this);
 };
 

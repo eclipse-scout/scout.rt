@@ -1044,7 +1044,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
 scout.Tree.prototype._$buildNode = function(node, $parent) {
   var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
-  var $node = $.makeDiv('tree-node')
+  var $node = $.makeDiv(this.ownerDocument(), 'tree-node')
     .data('node', node)
     .attr('data-nodeid', node.id)
     .attr('data-level', level)
@@ -1226,8 +1226,8 @@ scout.Tree.prototype._renderTreeItemControl = function($node) {
 scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   var $node = node.$node,
     $controlItem = $node.prependDiv('tree-node-checkbox');
-  var $checkboxDiv = $.makeDiv('check-box')
-    .appendTo($controlItem)
+  var $checkboxDiv = $controlItem
+    .appendDiv('check-box')
     .toggleClass('checked', node.checked)
     .toggleClass('disabled', !(this.enabled && node.enabled));
 

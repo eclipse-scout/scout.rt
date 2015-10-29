@@ -77,7 +77,7 @@ scout.SmartField.prototype._render = function($parent) {
   this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
   this.addLabel();
 
-  var $field = scout.fields.inputOrDiv(this)
+  var $field = scout.fields.makeInputOrDiv(this)
     .click(this._onClick.bind(this));
   if (!this.touch) {
     $field

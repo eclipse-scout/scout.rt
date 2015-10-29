@@ -24,9 +24,9 @@ scout.SmartFieldPopup.prototype._createLayout = function() {
 };
 
 scout.SmartFieldPopup.prototype._render = function($parent) {
-  this.$container = $.makeDiv('smart-field-popup')
-    .on('mousedown', this._onContainerMouseDown.bind(this))
-    .appendTo($parent);
+  this.$container = $parent
+    .appendDiv('smart-field-popup')
+    .on('mousedown', this._onContainerMouseDown.bind(this));
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());

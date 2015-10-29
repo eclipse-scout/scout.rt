@@ -459,7 +459,7 @@ scout.FormField.prototype._goOnline = function() {
  * Appends a LABEL element to this.$container and sets the this.$label property.
  */
 scout.FormField.prototype.addLabel = function() {
-  this.$label = $('<label>').appendTo(this.$container);
+  this.$label = this.$container.appendElement('<label>');
 };
 
 /**
@@ -477,9 +477,9 @@ scout.FormField.prototype.addField = function($field) {
  * Call this method before addField if you'd like to have a different field container than $field.
  */
 scout.FormField.prototype.addFieldContainer = function($fieldContainer) {
-  this.$fieldContainer = $fieldContainer;
-  this.$fieldContainer.addClass('field');
-  $fieldContainer.appendTo(this.$container);
+  this.$fieldContainer = $fieldContainer
+    .addClass('field')
+    .appendTo(this.$container);
 };
 
 /**
@@ -494,10 +494,9 @@ scout.FormField.prototype.removeField = function() {
  * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
  */
 scout.FormField.prototype.addStatus = function() {
-  this.$status = $('<span>')
-    .addClass('status')
-    .on('mousedown', this._onStatusMousedown.bind(this))
-    .appendTo(this.$container);
+  this.$status = this.$container
+    .appendSpan('status')
+    .on('mousedown', this._onStatusMousedown.bind(this));
 };
 
 /**
@@ -506,15 +505,11 @@ scout.FormField.prototype.addStatus = function() {
  * This makes it possible to make components without a status as width as components with a status.
  */
 scout.FormField.prototype.addPseudoStatus = function() {
-  this.$pseudoStatus = $('<span>')
-    .addClass('status')
-    .appendTo(this.$container);
+  this.$pseudoStatus =  this.$container.appendSpan('status');
 };
 
 scout.FormField.prototype.addMandatoryIndicator = function() {
-  this.$mandatory = $('<span>')
-    .addClass('mandatory-indicator')
-    .appendTo(this.$container);
+  this.$mandatory = this.$container.appendSpan('mandatory-indicator');
 };
 
 /**
@@ -526,9 +521,8 @@ scout.FormField.prototype.addIcon = function($parent) {
   if (!$parent) {
     $parent = this.$container;
   }
-  this.$icon = scout.fields.new$Icon()
-    .click(this._onIconClick.bind(this))
-    .appendTo($parent);
+  this.$icon = scout.fields.appendIcon($parent)
+    .click(this._onIconClick.bind(this));
 };
 
 scout.FormField.prototype._onIconClick = function(event) {
@@ -546,14 +540,10 @@ scout.FormField.prototype._onIconClick = function(event) {
  *
  */
 scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
-  this.$container = $.makeDiv()
-    .addClass('form-field')
-    .appendTo($parent);
-
+  this.$container = $parent.appendDiv('form-field');
   if (cssClass) {
     this.$container.addClass(cssClass);
   }
-
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);
   htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));

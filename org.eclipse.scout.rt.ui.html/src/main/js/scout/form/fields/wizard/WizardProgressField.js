@@ -18,7 +18,7 @@ scout.inherits(scout.WizardProgressField, scout.FormField);
 scout.WizardProgressField.prototype._render = function($parent) {
   this.addContainer($parent, 'wizard-progress-field', new scout.WizardProgressFieldLayout(this));
 
-  this._$wizardSteps = $.makeDiv('wizard-steps');
+  this._$wizardSteps = $.makeDiv(this.ownerDocument(), 'wizard-steps');
   this.addField(this._$wizardSteps);
 
   scout.scrollbars.install(this._$wizardSteps, {
@@ -42,9 +42,9 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
     var $wizardStep, $content, $title, $subTitle, $separator;
 
     // Step
-    $wizardStep = $.makeDiv('wizard-step')
-      .data('wizard-step', wizardStep)
-      .appendTo(this._$wizardSteps);
+    $wizardStep = this._$wizardSteps
+      .appendDiv('wizard-step')
+      .data('wizard-step', wizardStep);
     wizardStep.$wizardStep = $wizardStep;
     if (wizardStep.enabled && wizardStep.actionEnabled) {
       $wizardStep.addClass('action-enabled');

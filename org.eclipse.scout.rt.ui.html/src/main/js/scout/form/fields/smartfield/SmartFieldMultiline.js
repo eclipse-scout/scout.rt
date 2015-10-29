@@ -20,12 +20,11 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
 
   this.addContainer($parent, 'smart-field', new scout.SmartFieldLayout(this));
   this.addLabel();
-  this.addFieldContainer($('<div>'));
+  this.addFieldContainer($.makeDiv(this.ownerDocument()));
   htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 
-  $field = scout.fields.inputOrDiv(this)
-    .addClass('multiline')
+  $field = scout.fields.makeInputOrDiv(this, 'multiline')
     .click(this._onClick.bind(this))
     .appendTo(this.$fieldContainer);
   if (!this.touch) {
@@ -36,9 +35,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
       .keydown(this._onKeyDown.bind(this));
   }
   this.addField($field);
-  this._$multilineField = $.makeDiv('multiline-field')
-    .appendTo(this.$fieldContainer);
-
+  this._$multilineField = this.$fieldContainer.appendDiv('multiline-field');
   if (!this.embedded) {
     this.addMandatoryIndicator();
   }

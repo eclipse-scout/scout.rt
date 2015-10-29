@@ -51,11 +51,10 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$controls = this.$container.appendDiv('table-controls');
 
   // --- info section ---
-  this._$info = this.$container
-    .appendDiv('table-info');
+  this._$info = this.$container.appendDiv('table-info');
 
   // text filter
-  this._$textFilter = scout.fields.new$TextField()
+  this._$textFilter = scout.fields.makeTextField(this.ownerDocument())
     .addClass('table-text-filter')
     .appendTo(this._$info)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
@@ -84,9 +83,8 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$infoTableStatus = this._$info
     .appendDiv('table-info-item table-info-status')
     .on('mousedown', this._onStatusMousedown.bind(this));
-  this._$infoTableStatusIcon = $('<span>')
-    .addClass('font-icon icon')
-    .appendTo(this._$infoTableStatus);
+  this._$infoTableStatusIcon = this._$infoTableStatus
+    .appendSpan('font-icon icon');
 
   // ------
 

@@ -86,9 +86,9 @@ scout.DatePickerLayout.prototype.layout = function($container) {
  * measures the size and removes the DIV immediately after measurement.
  */
 scout.DatePickerLayout.prototype._measureDaySize = function($month) {
-  var $tmpDay = $.makeDiv('date-picker-day')
-    .text('30') // because the string 30 is wider than 11
-    .appendTo($month),
+  var $tmpDay = $month
+      .appendDiv('date-picker-day')
+      .text('30'), // because the string 30 is wider than 11
     size = scout.graphics.getSize($tmpDay);
   $tmpDay.remove();
   return size;

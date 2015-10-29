@@ -44,15 +44,16 @@ scout.StringField.prototype._render = function($parent) {
 
   var $field;
   if (this.multilineText) {
-    $field = $('<textarea>').
-    on('DOMMouseScroll mousewheel', function(event) {
-      // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
-      event.stopPropagation();
+    $field = $.makeElement(this.ownerDocument(), '<textarea>')
+      .on('DOMMouseScroll mousewheel', function(event) {
+        // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
+        event.stopPropagation();
     });
   } else {
-    $field = scout.fields.new$TextField();
+    $field = scout.fields.makeTextField(this.ownerDocument());
   }
-  $field.on('blur', this._onFieldBlur.bind(this))
+  $field
+    .on('blur', this._onFieldBlur.bind(this))
     .on('select', this._onSelect.bind(this));
 
   // add drag and drop support

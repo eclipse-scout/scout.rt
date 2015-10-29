@@ -36,25 +36,23 @@ scout.TreeCompact.prototype.init = function(model, session, register) {
 scout.TreeCompact.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('compact-tree');
 
-  this.$filter = $('<input>').
-  attr('type', 'text').
-  placeholder(this.session.text('ui.FilterBy_')).
-  addClass('text-field').
-  appendTo(this.$container).
-  on('input', this._onInput.bind(this)).
-  keydown(this._onKeyDown.bind(this));
+  this.$filter = this.$container.appendElement('<input>', 'text-field')
+    .attr('type', 'text')
+    .placeholder(this.session.text('ui.FilterBy_'))
+    .on('input', this._onInput.bind(this))
+    .keydown(this._onKeyDown.bind(this));
 
   var layout = new scout.TreeCompactLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
 
-  this.$nodesWrapper = $.makeDiv('nodes-wrapper').appendTo(this.$container);
+  this.$nodesWrapper = this.$container.appendDiv('nodes-wrapper');
   scout.scrollbars.install(this.$nodesWrapper, {
     parent: this,
     invertColors: true,
     borderless: true
   });
-  this.$nodes = $.makeDiv('nodes').appendTo(this.$nodesWrapper);
+  this.$nodes = this.$nodesWrapper.appendDiv('nodes');
   this._renderNodes();
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
@@ -68,16 +66,16 @@ scout.TreeCompact.prototype._renderNodes = function(filter) {
   var i, j, node, $node, childNode, $childNode;
   for (i = 0; i < this.nodes.length; i++) {
     node = this.nodes[i];
-    $node = $.makeDiv('section').appendTo(this.$nodes);
-    $.makeDiv('title').appendTo($node).text(node.text);
+    $node = this.$nodes.appendDiv('section');
+    $node.appendDiv('title').text(node.text);
     this._domMap[node.id] = $node;
     for (j = 0; j < node.childNodes.length; j++) {
       childNode = node.childNodes[j];
-      $childNode = $.makeDiv('process').
-      data('node', childNode).
-      click(this._onNodeClick.bind(this)).
-      text(childNode.text).
-      appendTo($node);
+      $childNode = $node
+        .appendDiv('process')
+        .data('node', childNode)
+        .click(this._onNodeClick.bind(this))
+        .text(childNode.text);
       this._domMap[childNode.id] = $childNode;
     }
   }

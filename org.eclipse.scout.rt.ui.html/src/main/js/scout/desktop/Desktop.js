@@ -580,10 +580,8 @@ scout.Desktop.prototype.onModelAction = function(event) {
 
 scout.Desktop.prototype._openUriInIFrame = function(uri) {
   // Create a hidden iframe and set the URI as src attribute value
-  var $iframe = $('<iframe>')
-    .addClass('download-frame')
+  var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
     .attr('tabindex', -1)
-    .appendTo(this.session.$entryPoint)
     .attr('src', uri);
 
   // Remove the iframe again after 10s (should be enough to get the download started)
@@ -610,24 +608,20 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
 
   if (!popup) {
     // Popup blocker detected
-    var $notification = $.makeDiv('notification');
+    var $notification = $.makeDiv(this.ownerDocument(), 'notification');
     var $notificationContent = $notification
       .appendDiv('notification-content notification-closable');
-    $.makeDiv('close')
+    $notificationContent.appendDiv('close')
       .on('click', function() {
         this.removeNotification($notification);
-      }.bind(this))
-      .appendTo($notificationContent);
-    $.makeDiv('popup-blocked-title')
-      .text(this.session.text('ui.PopupBlockerDetected'))
-      .appendTo($notificationContent);
-    $('<a href="' + scout.strings.encode(uri) + '" target="_blank">')
-      .addClass('popup-blocked-link')
+      }.bind(this));
+    $notificationContent.appendDiv('popup-blocked-title')
+      .text(this.session.text('ui.PopupBlockerDetected'));
+    $notificationContent.appendElement('<a href="' + scout.strings.encode(uri) + '" target="_blank">', 'popup-blocked-link')
       .text(this.session.text('ui.OpenManually'))
       .on('click', function() {
         this.removeNotification($notification);
-      }.bind(this))
-      .appendTo($notificationContent);
+      }.bind(this));
     this.addNotification($notification);
   }
 };

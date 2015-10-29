@@ -25,7 +25,7 @@ scout.FileChooserField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  this.addField(scout.fields.new$TextField()
+  this.addField(scout.fields.makeTextField(this.ownerDocument())
     .on('blur', this._onFieldBlur.bind(this))
     .on('dragenter', this._onDragEnterOrOver.bind(this))
     .on('dragover', this._onDragEnterOrOver.bind(this))

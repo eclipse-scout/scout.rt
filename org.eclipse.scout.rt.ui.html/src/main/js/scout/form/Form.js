@@ -66,8 +66,7 @@ scout.Form.prototype._render = function($parent) {
 scout.Form.prototype._renderForm = function($parent) {
   var layout, $handle;
 
-  this.$container = $('<div>')
-    .appendTo($parent)
+  this.$container = $parent.appendDiv()
     .addClass(this.isDialog() ? 'dialog' : 'form')
     .data('model', this);
 

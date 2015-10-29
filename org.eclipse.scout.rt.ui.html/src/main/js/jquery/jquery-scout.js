@@ -28,8 +28,10 @@
     if (isHidden(elem.style)) {
       return false;
     }
+    // Must use correct window for element / computedStyle
+    var theWindow = elem.ownerDocument.defaultView;
     // Check if element itself is hidden by external style-sheet
-    if (isHidden(window.getComputedStyle(elem))) {
+    if (isHidden(theWindow.getComputedStyle(elem))) {
       return false;
     }
     // Else visible
@@ -82,49 +84,60 @@
     $.l = function() {};
   }
 
-  $.makeDiv = function(cssClass, htmlContent, id) {
-    if (id === 0) {
-      //Allow 0 as id (!id would result in false)
-      id = '0';
+  $.getDocument = function($element) {
+    return $element && $element.length ? $element[0].ownerDocument : null;
+  };
+
+  /**
+   * @param theDocument HTML document reference. We use the name 'theDocument' everywhere, to prevent accidental usage of global document variable
+   * @param element string. Example = &lt;input&gt;
+   */
+  $.makeElement = function(theDocument, element, cssClass) {
+    if (theDocument === undefined || element === undefined) {
+      return new Error('missing arguments: document, element');
     }
-    return $('<div' +
-      (id ? ' id="' + id + '"' : '') +
-      (cssClass ? ' class="' + cssClass + '"' : '') +
-      scout.device.unselectableAttribute +
-      '>' +
-      (htmlContent || '') +
-      '</div>'
-    );
-  };
-
-  $.makeSpan = function(cssClass, text) {
-    return $.make('<span>', cssClass, text);
-  };
-
-  $.make = function(element, cssClass, text) {
-    var $elem = $(element);
+    var $element = $(element, theDocument);
     if (cssClass) {
-      $elem.addClass(cssClass);
+      $element.addClass(cssClass);
     }
+    return $element;
+  };
+
+  $.makeDiv = function(theDocument, cssClass, htmlContent, id) {
+    var $div = $.makeElement(theDocument, '<div>', cssClass);
+    if (id !== undefined) {
+      $div.attr('id', id);
+    }
+    if (htmlContent) {
+      $div.html(htmlContent);
+    }
+    if (scout.device.unselectableAttribute) {
+      $div.attr('unselectable', 'on'); // FIXME AWE: unselectable / IE9 - make this correct
+    }
+    return $div;
+  };
+
+  $.makeSpan = function(theDocument, cssClass, text) {
+    return $.make(theDocument, '<span>', cssClass, text);
+  };
+
+  $.make = function(theDocument, element, cssClass, text) {
+    var $elem = $.makeElement(theDocument, element, cssClass);
     if (text) {
       $elem.text(text);
     }
     return $elem;
   };
 
-  $.makeSVG = function(type, cssClass, htmlContent, id) {
-    if (id === 0) {
-      //Allow 0 as id (!id would result in false)
-      id = '0';
-    }
-    var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
+  $.makeSVG = function(theDocument, type, cssClass, htmlContent, id) {
+    var $svgElement = $(theDocument.createElementNS('http://www.w3.org/2000/svg', type));
     if (cssClass) {
       $svgElement.attrSVG('class', cssClass);
     }
     if (htmlContent) {
       $svgElement.html(htmlContent);
     }
-    if (id) {
+    if (id !== undefined) {
       $svgElement.attrSVG('id', id);
     }
     return $svgElement;
@@ -229,35 +242,39 @@
 
   // prepend - and return new div for chaining
   $.fn.prependDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv(cssClass, htmlContent, id).prependTo(this);
+    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).prependTo(this);
   };
 
   // append - and return new div for chaining
   $.fn.appendDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv(cssClass, htmlContent, id).appendTo(this);
+    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).appendTo(this);
+  };
+
+  $.fn.appendElement = function(element, cssClass) {
+    return $.makeElement($.getDocument(this), element, cssClass).appendTo(this);
   };
 
   // insert after - and return new div for chaining
   $.fn.afterDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv(cssClass, htmlContent, id).insertAfter(this);
+    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).insertAfter(this);
   };
 
   // insert before - and return new div for chaining
   $.fn.beforeDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv(cssClass, htmlContent, id).insertBefore(this);
+    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).insertBefore(this);
   };
 
   $.fn.appendSpan = function(cssClass, text) {
-    return $.makeSpan(cssClass, text).appendTo(this);
+    return $.makeSpan($.getDocument(this), cssClass, text).appendTo(this);
   };
 
   $.fn.appendBr = function() {
-    return $('<br>').appendTo(this);
+    return $.makeElement($.getDocument(this), '<br>').appendTo(this);
   };
 
   // append svg
   $.fn.appendSVG = function(type, cssClass, htmlContent, id) {
-    return $.makeSVG(type, cssClass, htmlContent, id).appendTo(this);
+    return $.makeSVG($.getDocument(this), type, cssClass, htmlContent, id).appendTo(this);
   };
 
   $.pxToNumber = function(pixel) {

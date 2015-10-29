@@ -34,11 +34,9 @@ scout.TabItem.prototype.renderTab = function($parent) {
   if (this._tabRendered) {
     throw new Error('Tab already rendered');
   }
-  this.$tabContainer = $('<button>')
-    .addClass('tab-item')
+  this.$tabContainer = $parent.appendElement('<button>', 'tab-item')
     .data('tabItem', this)
-    .on('mousedown', this._onTabMouseDown.bind(this))
-    .appendTo($parent);
+    .on('mousedown', this._onTabMouseDown.bind(this));
 
   this._renderTabActive();
   this._renderLabel(this.label);

@@ -1563,7 +1563,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    $aggregateRow = $.makeDiv('table-aggregate-row');
+    $aggregateRow = $.makeDiv(this.ownerDocument(), 'table-aggregate-row');
 
     row = aggregateRow.row;
     contents = aggregateRow.contents;
@@ -2761,7 +2761,7 @@ scout.Table.prototype._removeTableHeader = function() {
 scout.Table.prototype._renderEmptyData = function(width) {
   if (this.header && this.rows.length === 0) {
     if (!this.$emptyData) {
-      this.$emptyData = $.makeDiv()
+      this.$emptyData = $.makeDiv(this.ownerDocument())
         .html('&nbsp;')
         .appendTo(this.$data);
     }
