@@ -233,23 +233,21 @@ public class ClientUIPreferences {
   }
 
   public void removeTableCustomizerData(ITableCustomizer customizer, String configName) {
-    if (m_prefs == null || customizer.getPreferencesKey() == null) {
+    if (m_prefs == null || customizer == null || customizer.getPreferencesKey() == null) {
       return;
     }
-    if (customizer != null) {
-      m_prefs.remove(createTableCustomizerConfigKey(customizer, configName));
-    }
+    m_prefs.remove(createTableCustomizerConfigKey(customizer, configName));
   }
 
   public void setTableCustomizerData(ITableCustomizer customizer, String configName) {
-    if (m_prefs == null || customizer.getPreferencesKey() == null) {
+    if (m_prefs == null || customizer == null || customizer.getPreferencesKey() == null) {
       return;
     }
     m_prefs.putByteArray(createTableCustomizerConfigKey(customizer, configName), customizer.getSerializedData());
   }
 
   public byte[] getTableCustomizerData(ITableCustomizer customizer, String configName) {
-    if (m_prefs == null || customizer.getPreferencesKey() == null) {
+    if (m_prefs == null || customizer == null || customizer.getPreferencesKey() == null) {
       return null;
     }
     return m_prefs.getByteArray(createTableCustomizerConfigKey(customizer, configName), null);

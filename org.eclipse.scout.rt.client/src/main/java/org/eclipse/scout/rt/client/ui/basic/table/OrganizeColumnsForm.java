@@ -28,13 +28,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.GroupAdditionalMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.GroupMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.SortAscAdditionalMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.SortAscMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.SortDescAdditionalMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.SortDescMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -907,7 +903,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -931,7 +927,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -955,7 +951,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -979,7 +975,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -1007,7 +1003,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -1031,7 +1027,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -1045,7 +1041,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
             }
 
-            @Order(51.0)
+            @Order(49.0)
             public class MenuSeparator2 extends AbstractMenuSeparator {
             }
 
@@ -1125,7 +1121,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               }
             }
 
-            @Order(51.0)
+            @Order(69.0)
             public class MenuSeparator3 extends AbstractMenuSeparator {
             }
 
@@ -1196,7 +1192,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
               }
 
               @Override
@@ -1249,12 +1245,13 @@ public class OrganizeColumnsForm extends AbstractForm {
                         m_table.getTableCustomizer().removeColumn((ICustomColumn<?>) selectedCol);
                       }
                     }
-                    else {
-                      if (selectedCol.isColumnFilterActive()) {
-                        m_table.getUserFilterManager().removeFilterByKey(selectedCol);
-                      }
-                      setColumnVisible(selectedRow, false);
-                    }
+                    // FIXME ASA either remove completely or elaborate
+//                    else {
+//                      if (selectedCol.isColumnFilterActive()) {
+//                        m_table.getUserFilterManager().removeFilterByKey(selectedCol);
+//                      }
+//                      setColumnVisible(selectedRow, false);
+//                    }
 
                   }
                 }
@@ -1388,17 +1385,25 @@ public class OrganizeColumnsForm extends AbstractForm {
   }
 
   private void enableDisableMenus() {
-    ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
-    boolean singleRowSelected = getColumnsTableField().getTable().getSelectedRows().size() == 1;
-    boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
+    boolean isCustomColumnSelected = false;
+    boolean isFilterActive = false;
+    List<ITableRow> selectedRows = getColumnsTableField().getTable().getSelectedRows();
+    for (ITableRow row : selectedRows) {
+      if (getColumnsTableField().getTable().getKeyColumn().getValue(row).isColumnFilterActive()) {
+        isFilterActive = true;
+      }
+      if (getColumnsTableField().getTable().getKeyColumn().getValue(row) instanceof ICustomColumn<?>) {
+        isCustomColumnSelected = true;
+      }
+    }
 
-    getColumnsTableField().getTable().getMenuByClass(ModifyCustomColumnMenu.class).setEnabled(singleRowSelected && isCustomColumn);
-    getColumnsTableField().getTable().getMenuByClass(SortAscMenu.class).setEnabled(singleRowSelected);
-    getColumnsTableField().getTable().getMenuByClass(SortDescMenu.class).setEnabled(singleRowSelected);
-    getColumnsTableField().getTable().getMenuByClass(SortAscAdditionalMenu.class).setEnabled(singleRowSelected);
-    getColumnsTableField().getTable().getMenuByClass(SortDescAdditionalMenu.class).setEnabled(singleRowSelected);
-    getColumnsTableField().getTable().getMenuByClass(GroupMenu.class).setEnabled(singleRowSelected);
-    getColumnsTableField().getTable().getMenuByClass(GroupAdditionalMenu.class).setEnabled(singleRowSelected);
+    getColumnsTableField().getTable().getMenuByClass(ModifyCustomColumnMenu.class).setEnabled(isCustomColumnSelected);
+    getColumnsTableField().getTable().getMenuByClass(ModifyCustomColumnMenu.class).setVisible(isCustomColumnSelected);
+    getColumnsTableField().getTable().getMenuByClass(RemoveMenu.class).setEnabled(isCustomColumnSelected);
+    getColumnsTableField().getTable().getMenuByClass(RemoveMenu.class).setVisible(isCustomColumnSelected);
+
+    getColumnsTableField().getTable().getMenuByClass(RemoveFilterMenu.class).setVisible(isFilterActive);
+
   }
 
   @Override
