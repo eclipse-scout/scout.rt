@@ -17,10 +17,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.AbstractChart;
 import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
@@ -81,12 +78,7 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
     }
     Class<? extends IChart> configuredChart = getConfiguredChart();
     if (configuredChart != null) {
-      try {
-        return (T) ConfigurationUtility.newInnerInstance(this, configuredChart);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Error while creating instance of class '" + configuredChart.getName() + "'.", e));
-      }
+      return (T) ConfigurationUtility.newInnerInstance(this, configuredChart);
     }
     return null;
   }
