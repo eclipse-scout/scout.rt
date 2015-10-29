@@ -75,6 +75,7 @@
   }
 
   &.sorted,
+  &.grouped,
   &.filtered {
     /* make room for icon */
     padding-right: @table-header-padding-right + @table-header-sort-icon-size-1;

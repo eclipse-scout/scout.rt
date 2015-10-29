@@ -310,7 +310,7 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
       $left.appendDiv().text('G');
     }
     if (filtered) {
-      $state.addClass('filtered');
+      $header.addClass('filtered');
       $state.addClass('filtered');
       $left.appendDiv().text('F');
     }
