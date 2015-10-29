@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -27,7 +30,7 @@ public class PagingTableRow extends TableRow {
     try {
       s_htmlCellTemplate = initHtmlCellTemplate();
     }
-    catch (Throwable e) {
+    catch (IOException e) {
       LOG.error("Couldn't load html template for page change cell.", e);
     }
   }
@@ -56,8 +59,8 @@ public class PagingTableRow extends TableRow {
     }
   }
 
-  private static String initHtmlCellTemplate() throws Throwable {
-    return new String(IOUtility.getContent(PagingTableRow.class.getResource("/org/eclipse/scout/rt/client/mobile/html/MobileTableCellMoreElements.html").openStream()), "iso-8859-1");
+  private static String initHtmlCellTemplate() throws IOException {
+    return new String(IOUtility.getContent(PagingTableRow.class.getResource("/org/eclipse/scout/rt/client/mobile/html/MobileTableCellMoreElements.html").openStream()), StandardCharsets.ISO_8859_1);
   }
 
   public enum Type {

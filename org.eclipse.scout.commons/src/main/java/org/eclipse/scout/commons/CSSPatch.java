@@ -212,7 +212,7 @@ public final class CSSPatch {
     }
     catch (Throwable t) {
       LOG.error("Failed patching CSS by adding key '" + s1 + "'", t);
-      return null;
     }
+    return null;
   }
 }

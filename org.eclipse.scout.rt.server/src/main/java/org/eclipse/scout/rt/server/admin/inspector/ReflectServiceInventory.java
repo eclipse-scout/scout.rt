@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -53,8 +53,8 @@ public class ReflectServiceInventory {
         }
       }
     }
-    catch (Throwable t) {
-      m_states.add("Failure to analyze properties: " + t);
+    catch (Exception e) {
+      m_states.add("Failure to analyze properties: " + e);
     }
     // operations
     Method[] methods = service.getClass().getMethods();

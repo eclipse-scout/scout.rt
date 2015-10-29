@@ -109,7 +109,7 @@ public class ClientSessionProvider {
     try {
       return ClientSessionProvider.cast(clientSession);
     }
-    catch (final ProcessingException e) {
+    catch (final ClassCastException e) {
       return null; // NOOP
     }
   }
@@ -117,11 +117,6 @@ public class ClientSessionProvider {
   @Internal
   @SuppressWarnings("unchecked")
   protected static <SESSION extends IClientSession> SESSION cast(final IClientSession clientSession) {
-    try {
-      return (SESSION) clientSession;
-    }
-    catch (final ClassCastException e) {
-      throw new ProcessingException(String.format("Wrong session class [actual=%s]", clientSession.getClass().getName()), e);
-    }
+    return (SESSION) clientSession;
   }
 }

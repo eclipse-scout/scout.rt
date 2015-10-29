@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -35,7 +36,7 @@ class TableBeanHolderOutput implements IBindOutput {
       m_beanType = m_getterMethod.getReturnType();
       m_setterMethod = m_holder.getRowType().getMethod("set" + Character.toUpperCase(columnName.charAt(0)) + columnName.substring(1), new Class[]{m_beanType});
     }
-    catch (Throwable e) {
+    catch (NoSuchMethodException | SecurityException e) {
       throw new ProcessingException("unexpected exception", e);
     }
     m_source = source;
@@ -99,7 +100,7 @@ class TableBeanHolderOutput implements IBindOutput {
       Object castValue = TypeCastUtility.castValue(value, m_beanType);
       m_setterMethod.invoke(m_holder.getRows()[m_batchIndex], new Object[]{castValue});
     }
-    catch (Throwable e) {
+    catch (IllegalAccessException | InvocationTargetException e) {
       throw new ProcessingException("unexpected exception", e);
     }
   }

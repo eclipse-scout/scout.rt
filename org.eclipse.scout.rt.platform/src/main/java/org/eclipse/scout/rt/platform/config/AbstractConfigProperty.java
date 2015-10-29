@@ -32,10 +32,12 @@ public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigProper
       catch (PlatformException t) {
         m_error = t;
       }
-      catch (Throwable t) {
-        m_error = new PlatformException(t.getMessage(), t);
+      catch (Exception e) {
+        m_error = new PlatformException(e.getMessage(), e);
       }
-      m_valueInitialized = true;
+      finally {
+        m_valueInitialized = true;
+      }
     }
     if (m_error != null) {
       throw m_error;

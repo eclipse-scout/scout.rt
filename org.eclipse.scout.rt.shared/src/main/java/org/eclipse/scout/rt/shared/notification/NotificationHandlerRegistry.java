@@ -36,7 +36,7 @@ public class NotificationHandlerRegistry {
       try {
         handler.handleNotification(notification);
       }
-      catch (Exception e) {
+      catch (RuntimeException e) {
         LOG.error(String.format("Handler '%s' notification with notification '%s' failed.", handler, notification), e);
       }
     }

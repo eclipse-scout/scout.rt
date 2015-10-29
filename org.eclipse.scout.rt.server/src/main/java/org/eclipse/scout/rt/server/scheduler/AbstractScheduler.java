@@ -80,8 +80,8 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
           try {
             job.setInterrupted(true);
           }
-          catch (Throwable t) {
-            LOG.error("" + job, t);
+          catch (RuntimeException t) {
+            LOG.error("Could not stop scheduler" + job, t);
           }
         }
       }
@@ -305,7 +305,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
         }
       }
     }
-    catch (Throwable t) {
+    catch (RuntimeException t) {
       LOG.error("" + job, t);
     }
   }
@@ -336,8 +336,8 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
         m_job.setInterrupted(false);
         handleJobExecution(m_job, m_signal);
       }
-      catch (Throwable t) {
-        LOG.error("uncaught exception", t);
+      catch (RuntimeException t) {
+        LOG.error("unexpected exception", t);
       }
       finally {
         // remove job from running queue
@@ -387,8 +387,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
             }
           }
         }
-        catch (Throwable t) {
-          t.printStackTrace();
+        catch (RuntimeException t) {
           LOG.error("unexpected error: ", t);
         }
       }

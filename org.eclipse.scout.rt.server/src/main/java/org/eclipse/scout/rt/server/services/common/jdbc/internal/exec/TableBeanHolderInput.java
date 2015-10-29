@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -40,7 +41,7 @@ class TableBeanHolderInput implements IBindInput {
     try {
       m_getterMethod = table.getRowType().getMethod("get" + Character.toUpperCase(columnName.charAt(0)) + columnName.substring(1));
     }
-    catch (Throwable e) {
+    catch (NoSuchMethodException | SecurityException e) {
       throw new ProcessingException("unexpected exception", e);
     }
     m_target = target;
@@ -96,7 +97,7 @@ class TableBeanHolderInput implements IBindInput {
       try {
         value = m_getterMethod.invoke(m_filteredRows[m_batchIndex]);
       }
-      catch (Throwable e) {
+      catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
         throw new ProcessingException("unexpected exception", e);
       }
     }

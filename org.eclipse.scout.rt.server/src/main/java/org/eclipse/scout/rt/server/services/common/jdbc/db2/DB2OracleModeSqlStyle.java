@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,19 +20,8 @@ public class DB2OracleModeSqlStyle extends DB2SqlStyle {
 
   @Override
   public void testConnection(Connection conn) throws SQLException {
-    Statement testStatement = null;
-    try {
-      testStatement = conn.createStatement();
+    try (Statement testStatement = conn.createStatement()) {
       testStatement.execute("SELECT 1 FROM DUAL");
-    }
-    finally {
-      if (testStatement != null) {
-        try {
-          testStatement.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 }

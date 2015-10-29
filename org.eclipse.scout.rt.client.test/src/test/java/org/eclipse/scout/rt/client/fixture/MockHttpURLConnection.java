@@ -69,7 +69,7 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
             mockHttpServlet(servletIn, servletOut);
             scRef.set(200);
           }
-          catch (Throwable f) {
+          catch (Exception e) {
             //nop
           }
         }

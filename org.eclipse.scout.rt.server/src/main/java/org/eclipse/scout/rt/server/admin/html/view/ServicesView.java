@@ -129,8 +129,8 @@ public class ServicesView extends DefaultView {
           }
           list.add(inspector);
         }
-        catch (Throwable t) {
-          LOG.warn("Failed inspecting service " + inspector.getService().getClass());
+        catch (RuntimeException e) {
+          LOG.warn("Failed inspecting service " + inspector.getService().getClass(), e);
         }
       }
     }
@@ -189,7 +189,7 @@ public class ServicesView extends DefaultView {
     try {
       inv = service.buildInventory();
     }
-    catch (Throwable t) {
+    catch (RuntimeException t) {
       p.raw("<font color=red>Inventory failed: " + t + "</font>");
       return;
     }

@@ -558,23 +558,12 @@ public class CsvHelper {
    *           Read only
    */
   public List<String> getColumnNames(File f) {
-    Reader r = null;
-    try {
-      r = new FileReader(f);
+    try (Reader r = new FileReader(f)) {
       List<String> result = getCurrentRow(r);
       return result;
     }
     catch (IOException e) {
       throw new ProcessingException(e.getMessage(), e);
-    }
-    finally {
-      if (r != null) {
-        try {
-          r.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 

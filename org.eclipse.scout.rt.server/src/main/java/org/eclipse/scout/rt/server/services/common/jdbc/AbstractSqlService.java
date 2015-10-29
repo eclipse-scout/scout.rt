@@ -373,7 +373,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         Object ret = codeClass.getField("ID").get(null);
         return ret != null ? ret : new LongHolder();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         throw new ProcessingException("ID of code '" + args[0] + "'", t);
       }
     }
@@ -392,7 +392,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         Object ret = m.invoke(null, (Object[]) args);
         return ret != null ? ret : new StringHolder();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         throw new ProcessingException("unknown function in DynamicNls, check 'getConfiguredNlsProvider' / 'getNlsProvider': get", t);
       }
     }
@@ -753,7 +753,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
               return c;
             }
           }
-          catch (Throwable t) {
+          catch (ClassNotFoundException t) {
             LOG.warn("Could not load class with lenient name '" + name + "'.");
           }
         }

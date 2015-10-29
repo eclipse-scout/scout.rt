@@ -33,6 +33,8 @@ import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,6 +56,8 @@ import org.w3c.dom.svg.SVGTransformable;
 public final class SVGUtility {
   public static final String SVG_NS = SVGDOMImplementation.SVG_NAMESPACE_URI;
   public static final String XLINK_NS = XMLConstants.XLINK_NAMESPACE_URI;
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SVGUtility.class);
 
   /**
    * Conversion of points/mm/inch and more see http://www.endmemo.com/convert/topography.php
@@ -88,12 +92,12 @@ public final class SVGUtility {
     try {
       cn = Class.forName("org.apache.xerces.parsers.SAXParser").getName();
     }
-    catch (Throwable t) {
+    catch (ClassNotFoundException t) {
       try {
         cn = Class.forName("com.sun.org.apache.xerces.internal.parsers.SAXParser").getName();
       }
-      catch (Exception e) {
-        throw new ProcessingException("Finding SAXParser", e);
+      catch (ClassNotFoundException e) {
+        throw new ProcessingException("Could not find SAXParser", e);
       }
     }
     SAXSVGDocumentFactory documentFactory = new SAXSVGDocumentFactory(cn);
@@ -108,8 +112,8 @@ public final class SVGUtility {
     try {
       doc.setDocumentURI("urn:svg");//needed to make anchors work but only works in dom level 3
     }
-    catch (Throwable t) {
-      //nop, dom level less than 3
+    catch (RuntimeException e) {
+      LOG.debug("Could not set document uri. Dom level seems to be lass than version 3", e);
     }
     return doc;
   }

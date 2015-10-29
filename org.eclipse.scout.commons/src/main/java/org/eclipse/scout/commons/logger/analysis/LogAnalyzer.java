@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -69,8 +69,7 @@ public class LogAnalyzer {
     m_totalCount = 0;
     m_filterCount = 0;
     m_categories = new ArrayList<LogCategory>();
-    BufferedReader r = new BufferedReader(in);
-    try {
+    try (BufferedReader r = new BufferedReader(in)) {
       String line;
       ArrayList<String> buf = null;
       while ((line = r.readLine()) != null) {
@@ -102,11 +101,6 @@ public class LogAnalyzer {
       System.out.println("TOTAL " + m_totalCount + " entries\nACCEPTED " + m_filterCount + " in " + m_categories.size() + " CATEGORIES");
     }
     finally {
-      try {
-        r.close();
-      }
-      catch (Throwable t) {
-      }
       try {
         out.close();
       }

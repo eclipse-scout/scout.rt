@@ -236,8 +236,7 @@ public final class FileUtility {
     destinationDir.mkdirs();
     destinationDir.setLastModified(archiveFile.lastModified());
     String localFile = destinationDir.getName();
-    JarFile jar = new JarFile(archiveFile);
-    try {
+    try (JarFile jar = new JarFile(archiveFile);) {
       Enumeration<JarEntry> entries = jar.entries();
       while (entries.hasMoreElements()) {
         JarEntry file = entries.nextElement();
@@ -281,15 +280,6 @@ public final class FileUtility {
           if (file.getTime() >= 0) {
             f.setLastModified(file.getTime());
           }
-        }
-      }
-    }
-    finally {
-      if (jar != null) {
-        try {
-          jar.close();
-        }
-        catch (Throwable t) {
         }
       }
     }
@@ -407,24 +397,13 @@ public final class FileUtility {
       // source can not be a directory
       throw new IOException("source is a directory: " + source);
     }
-    FileInputStream input = null;
-    try {
-      input = new FileInputStream(source);
+    try (FileInputStream input = new FileInputStream(source)) {
       byte[] data = new byte[(int) source.length()];
       int n = 0;
       while (n < data.length) {
         n += input.read(data, n, data.length - n);
       }
       return data;
-    }
-    finally {
-      if (input != null) {
-        try {
-          input.close();
-        }
-        catch (Throwable e) {
-        }
-      }
     }
   }
 
@@ -470,20 +449,9 @@ public final class FileUtility {
   }
 
   public static void compressArchive(File srcDir, File archiveFile) throws IOException {
-    JarOutputStream zOut = null;
-    try {
-      archiveFile.delete();
-      zOut = new JarOutputStream(new FileOutputStream(archiveFile));
+    archiveFile.delete();
+    try (JarOutputStream zOut = new JarOutputStream(new FileOutputStream(archiveFile))) {
       addFolderToJar(srcDir, srcDir, zOut);
-    }
-    finally {
-      if (zOut != null) {
-        try {
-          zOut.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 
@@ -581,25 +549,12 @@ public final class FileUtility {
     if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
       return false;
     }
-    DataInputStream in = null;
-    try {
-      in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+    try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
       int test = in.readInt();
       return test == 0x504b0304; // magic number of a zip file
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       return false;
-    }
-    finally {
-      if (in != null) {
-        try {
-          in.close();
-        }
-        catch (Throwable t) {
-          // nop
-        }
-        in = null;
-      }
     }
   }
 

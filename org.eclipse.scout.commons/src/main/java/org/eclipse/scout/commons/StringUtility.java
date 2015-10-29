@@ -1764,7 +1764,7 @@ public final class StringUtility {
       Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
       return pattern.matcher(s).matches();
     }
-    catch (Throwable t) {
+    catch (RuntimeException t) {
       return false;
     }
   }

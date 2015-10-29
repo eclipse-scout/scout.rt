@@ -75,7 +75,7 @@ public class PlaceholderException extends Exception {
         try {
           pe = (ProcessingException) transformWellKnownException(throwable, cause, newStatus);
         }
-        catch (Throwable fatal) {
+        catch (RuntimeException fatal) {
           // nop
         }
         if (pe == null) {

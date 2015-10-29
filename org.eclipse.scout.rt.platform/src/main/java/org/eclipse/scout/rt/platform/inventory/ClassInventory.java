@@ -39,7 +39,7 @@ public final class ClassInventory {
       LOG.info("Finished preparation of jandex class inventory in {0} ms", StringUtility.formatNanos(nanos));
       INSTANCE = new JandexClassInventory(index);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new PlatformException("Error while building class inventory", t);
     }
   }

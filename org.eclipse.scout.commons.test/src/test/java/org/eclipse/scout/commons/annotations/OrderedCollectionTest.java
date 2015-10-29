@@ -121,7 +121,7 @@ public class OrderedCollectionTest {
     try {
       c.addOrdered(m_ordered10);
     }
-    catch (Throwable t) {
+    catch (IllegalArgumentException e) {
       fail("expected to work");
     }
     c.addAt(new Ordered(), 2);
@@ -182,7 +182,7 @@ public class OrderedCollectionTest {
     try {
       c.addOrdered(m_ordered10);
     }
-    catch (Throwable t) {
+    catch (IllegalArgumentException t) {
       fail("expected to work");
     }
     c.addAllAt(Collections.singleton(new Ordered()), 2);

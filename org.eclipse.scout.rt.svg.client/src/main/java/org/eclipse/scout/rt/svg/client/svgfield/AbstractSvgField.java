@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.EventListener;
 import java.util.List;
 
@@ -121,9 +122,9 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
       try {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         SVGUtility.writeSVGDocument(doc, out, Encoding.UTF_8);
-        LOG.trace(getClass().getName() + ".setSvgDocument\n" + new String(out.toByteArray(), Encoding.UTF_8));
+        LOG.trace(getClass().getName() + ".setSvgDocument\n" + new String(out.toByteArray(), StandardCharsets.UTF_8));
       }
-      catch (Throwable t) {
+      catch (RuntimeException e) {
         //nop
       }
     }

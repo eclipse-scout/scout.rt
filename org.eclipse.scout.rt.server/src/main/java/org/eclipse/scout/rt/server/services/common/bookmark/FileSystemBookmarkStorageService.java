@@ -107,8 +107,8 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
         byte[] bytes = f.extractData();
         return SerializationUtility.createObjectSerializer().deserialize(bytes, BookmarkFolder.class);
       }
-      catch (Throwable t) {
-        LOG.error(null, t);
+      catch (Exception t) {
+        LOG.error("Could not deserialize bookmark folder", t);
       }
     }
     return null;

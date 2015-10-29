@@ -20,7 +20,7 @@ import java.io.OutputStream;
 
 /**
  * Base implementation of {@link IObjectSerializer}. Subclasses must provide a suitable {@link ObjectInputStream}.
- * 
+ *
  * @since 3.8.2
  */
 public abstract class AbstractObjectSerializer implements IObjectSerializer {
@@ -50,24 +50,9 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
     if (out == null) {
       return;
     }
-    ObjectOutputStream oos = null;
-    try {
-      oos = createObjectOutputStream(out, getObjectReplacer());
+    try (ObjectOutputStream oos = createObjectOutputStream(out, getObjectReplacer())) {
       oos.writeObject(o);
       oos.flush();
-    }
-    finally {
-      if (oos != null) {
-        try {
-          oos.close();
-        }
-        catch (Throwable t) {
-          // nop
-        }
-        finally {
-          oos = null;
-        }
-      }
     }
   }
 
@@ -84,9 +69,7 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
     if (in == null) {
       return null;
     }
-    ObjectInputStream ois = null;
-    try {
-      ois = createObjectInputStream(in, getObjectReplacer());
+    try (ObjectInputStream ois = createObjectInputStream(in, getObjectReplacer())) {
       Object o = ois.readObject();
       if (expectedType != null && !expectedType.isInstance(o)) {
         throw new IOException("deserialized object has unexpected type: expected '" + expectedType + "', actual '" + o.getClass() + "'.");
@@ -94,19 +77,6 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
       @SuppressWarnings("unchecked")
       T castedObject = (T) o;
       return castedObject;
-    }
-    finally {
-      if (ois != null) {
-        try {
-          ois.close();
-        }
-        catch (Throwable t) {
-          // nop
-        }
-        finally {
-          ois = null;
-        }
-      }
     }
   }
 

@@ -46,20 +46,8 @@ public class DerbySqlStyle extends AbstractSqlStyle {
 
   @Override
   public void testConnection(Connection conn) throws SQLException {
-    Statement testStatement = null;
-    try {
-      testStatement = conn.createStatement();
+    try (Statement testStatement = conn.createStatement()) {
       testStatement.execute("SELECT 1 FROM SYSIBM.SYSDUMMY1"); //same as VALUES(1)
-    }
-    finally {
-      if (testStatement != null) {
-        try {
-          testStatement.close();
-        }
-        catch (Throwable t) {
-          //NOP
-        }
-      }
     }
   }
 

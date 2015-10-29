@@ -607,8 +607,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
                 interceptDropTargetChanged(e.getNode());
               }
             }
-            catch (Throwable t) {
-              LOG.error("DropTargetChanged", t);
+            catch (RuntimeException ex) {
+              LOG.error("DropTargetChanged", ex);
             }
             break;
           }

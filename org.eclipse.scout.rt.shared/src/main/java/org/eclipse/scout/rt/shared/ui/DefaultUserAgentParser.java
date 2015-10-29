@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * Safari/535.19</li
  * </ul>
  * </p>
- * 
+ *
  * @since 3.8.0
  */
 public class DefaultUserAgentParser implements IUserAgentParser {
@@ -48,7 +48,7 @@ public class DefaultUserAgentParser implements IUserAgentParser {
 
       return UserAgent.create(uiLayer, uiDeviceType, uiDeviceId);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("UserAgentIdentifier could not be parsed. Exception occured while parsing. UserAgent: " + userAgent, t);
       return UserAgent.createDefault();
     }

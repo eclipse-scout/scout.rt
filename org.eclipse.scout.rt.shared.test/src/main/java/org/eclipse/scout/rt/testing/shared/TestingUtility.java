@@ -163,7 +163,7 @@ public final class TestingUtility {
       Map<?, ?> map = (Map<?, ?>) hashtableField.get(cache);
       map.clear();
     }
-    catch (Throwable t) {
+    catch (Exception e) {
       successful = false;
     }
     return successful;

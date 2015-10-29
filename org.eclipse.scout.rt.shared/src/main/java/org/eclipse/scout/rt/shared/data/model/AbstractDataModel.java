@@ -137,16 +137,16 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
       try {
         e.initEntity();
       }
-      catch (Throwable t) {
-        LOG.error("entity " + e, t);
+      catch (RuntimeException ex) {
+        LOG.error("entity " + e, ex);
       }
     }
     for (IDataModelAttribute a : getAttributes()) {
       try {
         a.initAttribute();
       }
-      catch (Throwable t) {
-        LOG.error("attribute " + a, t);
+      catch (RuntimeException ex) {
+        LOG.error("attribute " + a, ex);
       }
     }
   }

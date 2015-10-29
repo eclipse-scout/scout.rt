@@ -446,7 +446,7 @@ public final class SecurityUtility {
       sig.update(data);
       return sig.verify(signatureToVerify);
     }
-    catch (Throwable t) {
+    catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidKeyException | SignatureException t) {
       throw new ProcessingException("unable to verify signature", t);
     }
   }

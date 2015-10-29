@@ -259,9 +259,6 @@ public class InvocationContextTest {
         catch (CancellationException e) {
           verify(m_implementorSpecifics).closeSocket(same(m_port), anyString());
         }
-        catch (Throwable e) {
-          fail();
-        }
       }
     });
   }

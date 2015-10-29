@@ -837,7 +837,7 @@ public class StatementProcessor implements IStatementProcessor {
         registerOutputs((CallableStatement) ps);
       }
     }
-    catch (Throwable e) {
+    catch (SQLException e) {
       throw new ProcessingException("unexpected exception", e);
     }
   }
@@ -975,7 +975,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new TableHolderInput(table, null, path[0], bindToken);
         }
       }
-      catch (Throwable t) {
+      catch (NoSuchMethodException | SecurityException t) {
         found = false;
         // nop
       }
@@ -991,7 +991,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new TableHolderInput(table, filter.getFilteredRows(), path[0], bindToken);
         }
       }
-      catch (Throwable t) {
+      catch (NoSuchMethodException | SecurityException t) {
         // nop
         found = false;
       }
@@ -1006,7 +1006,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new TableBeanHolderInput(table, null, path[0], bindToken);
         }
       }
-      catch (Throwable t) {
+      catch (NoSuchMethodException | SecurityException t) {
         found = false;
         // nop
       }
@@ -1022,7 +1022,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new TableBeanHolderInput(table, filter.getFilteredRows(), path[0], bindToken);
         }
       }
-      catch (Throwable t) {
+      catch (NoSuchMethodException | SecurityException t) {
         // nop
         found = false;
       }
@@ -1037,7 +1037,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new BeanArrayHolderInput(holder, null, path[0], bindToken);
         }
       }
-      catch (Throwable t1) {
+      catch (NoSuchMethodException | SecurityException t1) {
         try {
           Method m = holder.getHolderType().getMethod("is" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
           if (m != null) {
@@ -1045,7 +1045,7 @@ public class StatementProcessor implements IStatementProcessor {
             return new BeanArrayHolderInput(holder, null, path[0], bindToken);
           }
         }
-        catch (Throwable t2) {
+        catch (NoSuchMethodException | SecurityException t2) {
           found = false;
           // nop
         }
@@ -1062,7 +1062,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new BeanArrayHolderInput(holder, filter.getFilteredBeans(), path[0], bindToken);
         }
       }
-      catch (Throwable t1) {
+      catch (NoSuchMethodException | SecurityException t1) {
         try {
           Method m = holder.getHolderType().getMethod("is" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
           if (m != null) {
@@ -1070,7 +1070,7 @@ public class StatementProcessor implements IStatementProcessor {
             return new BeanArrayHolderInput(holder, null, path[0], bindToken);
           }
         }
-        catch (Throwable t2) {
+        catch (NoSuchMethodException | SecurityException t2) {
           found = false;
           // nop
         }
@@ -1257,7 +1257,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new TableHolderOutput(table, path[0], bindToken);
         }
       }
-      catch (Throwable t) {
+      catch (NoSuchMethodException | SecurityException t) {
         // nop
         found = false;
       }
@@ -1272,7 +1272,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new TableBeanHolderOutput(table, path[0], bindToken);
         }
       }
-      catch (Throwable t) {
+      catch (NoSuchMethodException | SecurityException t) {
         // nop
         found = false;
       }
@@ -1287,7 +1287,7 @@ public class StatementProcessor implements IStatementProcessor {
           return new BeanArrayHolderOutput(holder, path[0], bindToken);
         }
       }
-      catch (Throwable t1) {
+      catch (NoSuchMethodException | SecurityException t1) {
         try {
           Method m = holder.getHolderType().getMethod("is" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
           if (m != null) {
@@ -1295,7 +1295,7 @@ public class StatementProcessor implements IStatementProcessor {
             return new BeanArrayHolderOutput(holder, path[0], bindToken);
           }
         }
-        catch (Throwable t2) {
+        catch (NoSuchMethodException | SecurityException t2) {
           found = false;
           // nop
         }

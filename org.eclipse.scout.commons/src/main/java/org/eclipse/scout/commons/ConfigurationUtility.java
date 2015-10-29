@@ -208,31 +208,28 @@ public final class ConfigurationUtility {
    * @return true if the declared method is overwritten in implementationType
    */
   public static boolean isMethodOverwrite(Class<?> declaringType, String methodName, Class[] parameterTypes, Class<?> implementationType) {
+    Assertions.assertNotNull(declaringType, "declaringType must not be null");
+    Assertions.assertNotNull(methodName, "methodName must not be null");
+    Method declaredMethod;
     try {
-      Method declaredMethod;
-      try {
-        declaredMethod = declaringType.getDeclaredMethod(methodName, parameterTypes);
-      }
-      catch (NoSuchMethodException e) {
-        LOG.error("cannot find declared method " + declaringType.getName() + "." + methodName, e);
-        return false;
-      }
-      Class<?> c = implementationType;
-      while (c != null && c != declaringType) {
-        try {
-          //check if method is avaliable
-          c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
-          return true;
-        }
-        catch (NoSuchMethodException e) {
-          //nop
-        }
-        //up
-        c = c.getSuperclass();
-      }
+      declaredMethod = declaringType.getDeclaredMethod(methodName, parameterTypes);
     }
-    catch (Throwable t) {
-      LOG.error("declaringType=" + declaringType + ", methodName=" + methodName + ", parameterTypes=" + parameterTypes + ", implementationType=" + implementationType, t);
+    catch (NoSuchMethodException | SecurityException e) {
+      LOG.error("cannot find declared method " + declaringType.getName() + "." + methodName, e);
+      return false;
+    }
+    Class<?> c = implementationType;
+    while (c != null && c != declaringType) {
+      try {
+        //check if method is avaliable
+        c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
+        return true;
+      }
+      catch (NoSuchMethodException | SecurityException e) {
+        //nop
+      }
+      //up
+      c = c.getSuperclass();
     }
     return false;
   }

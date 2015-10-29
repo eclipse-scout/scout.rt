@@ -858,7 +858,7 @@ public final class HTMLUtility {
         rawHtml = matcherBodyTag.replaceAll(contentBodyTag);
       }
     }
-    catch (Throwable e) {
+    catch (RuntimeException e) {
       LOG.warn("failed to eliminate vertical scrollbar", e);
     }
 
