@@ -30,6 +30,10 @@ scout.inherits(scout.TabBox, scout.CompositeField);
 scout.TabBox.prototype._init = function(model) {
   scout.TabBox.parent.prototype._init.call(this, model);
   this.tabItems[this.selectedTab].setTabActive(true);
+  this.menuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
+  });
 };
 
 scout.TabBox.prototype._render = function($parent) {
@@ -43,6 +47,8 @@ scout.TabBox.prototype._render = function($parent) {
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.TabAreaLayout(this));
 
+  this.menuBar.render(this._$tabArea);
+
   this._$tabContent = this.$container.appendDiv('tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
@@ -55,6 +61,7 @@ scout.TabBox.prototype._renderProperties = function() {
   scout.TabBox.parent.prototype._renderProperties.call(this);
   this._renderTabs();
   this._renderTabContent();
+  this._renderMenus();
 };
 
 /**
@@ -65,6 +72,9 @@ scout.TabBox.prototype._remove = function() {
   this._removeTabs();
   this._removeTabContent();
   this._$tabContentCache = [];
+  if (this.menuBar) {
+    this.menuBar.remove();
+  }
 };
 
 /**
@@ -206,6 +216,16 @@ scout.TabBox.prototype._renderTabContent = function($tabContent) {
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
   }
+};
+
+scout.TabBox.prototype._renderMenus = function() {
+  this.updateMenuBar();
+  // TODO BSH Key strokes?
+};
+
+scout.TabBox.prototype.updateMenuBar = function() {
+  var menuItems = scout.menus.filter(this.menus, ['TabBox.Header']);
+  this.menuBar.updateItems(menuItems);
 };
 
 /**

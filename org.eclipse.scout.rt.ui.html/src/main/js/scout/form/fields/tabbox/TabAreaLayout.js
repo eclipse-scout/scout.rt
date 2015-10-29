@@ -25,6 +25,12 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     clientWidth = tabArea.clientWidth,
     scrollWidth = tabArea.scrollWidth;
 
+  // If tab area contains a menubar, less space is available
+  var menubar = $container.children('.menubar')[0];
+  if (menubar) {
+    clientWidth -= menubar.clientWidth;
+  }
+
   this._overflowTabs = [];
   if (clientWidth < scrollWidth) {
 

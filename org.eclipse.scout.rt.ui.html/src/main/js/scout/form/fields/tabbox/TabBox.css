@@ -15,6 +15,7 @@
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
   white-space: nowrap;
+  position: relative;
 
   & > .tab-item {
     position: relative;
@@ -76,6 +77,23 @@
       font-size: 17px;
       color: @icon-color;
       content: @icon-ellipsis-v;
+    }
+  }
+
+  & > .menubar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-right: 0px;
+    padding-left: 12px;
+    width: auto;
+    border: none;
+    z-index: 1;
+    height: 100%;
+
+    & > .menu-item,
+    & > .menu-separator {
+      margin-right: 5px;
     }
   }
 }

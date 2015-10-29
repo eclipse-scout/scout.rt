@@ -31,7 +31,6 @@
   background-color: @table-header-background-color;
   width: auto;
   border: none;
-  border: none;
   z-index: 1;
   height: 100%;
 
@@ -41,11 +40,11 @@
     padding-top: 4px;
     padding-bottom: 4px;
     margin-right: 5px;
-  }
 
-  & > .menu-item > .font-icon {
-    height: auto;
-    line-height: normal;
+    & > .font-icon {
+      height: auto;
+      line-height: normal;
+    }
   }
 }
 
