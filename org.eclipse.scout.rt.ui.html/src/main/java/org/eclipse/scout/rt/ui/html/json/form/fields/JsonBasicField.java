@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -53,7 +52,7 @@ public class JsonBasicField<T extends IBasicField<?>> extends JsonValueField<T> 
     try {
       BEANS.get(IClipboardService.class).setTextContents(getModel().getDisplayText());
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 @tabbox-padding-x: 20px;
 @tabbox-focus-arrow-width: 15px;
 
@@ -5,6 +15,7 @@
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
   white-space: nowrap;
+  position: relative;
 
   & > .tab-item {
     position: relative;
@@ -66,6 +77,23 @@
       font-size: 17px;
       color: @icon-color;
       content: @icon-ellipsis-v;
+    }
+  }
+
+  & > .menubar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-right: 0px;
+    padding-left: 12px;
+    width: auto;
+    border: none;
+    z-index: 1;
+    height: 100%;
+
+    & > .menu-item,
+    & > .menu-separator {
+      margin-right: 5px;
     }
   }
 }

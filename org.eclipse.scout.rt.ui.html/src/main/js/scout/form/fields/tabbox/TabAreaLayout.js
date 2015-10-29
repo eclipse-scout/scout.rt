@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.TabAreaLayout = function(tabBox) {
   scout.TabAreaLayout.parent.call(this);
   this._tabBox = tabBox;
@@ -14,6 +24,12 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     tabArea = $container[0],
     clientWidth = tabArea.clientWidth,
     scrollWidth = tabArea.scrollWidth;
+
+  // If tab area contains a menubar, less space is available
+  var menubar = $container.children('.menubar')[0];
+  if (menubar) {
+    clientWidth -= menubar.clientWidth;
+  }
 
   this._overflowTabs = [];
   if (clientWidth < scrollWidth) {

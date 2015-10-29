@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.tree;
 
 import java.util.ArrayList;
@@ -755,6 +765,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());
+    putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
     putChildNodeIndex(json, node);
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();

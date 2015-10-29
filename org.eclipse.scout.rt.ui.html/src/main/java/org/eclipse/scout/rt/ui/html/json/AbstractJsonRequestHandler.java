@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -122,7 +120,7 @@ public abstract class AbstractJsonRequestHandler extends AbstractUiServletReques
       }
       return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
     }
-    catch (ProcessingException | IOException | JSONException e) {
+    catch (RuntimeException | IOException e) {
       throw new UiException(e.getMessage(), e);
     }
   }

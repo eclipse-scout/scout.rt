@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
@@ -22,7 +32,7 @@ scout.Outline.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, model.session);
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
-  this.outlineOverview = scout.create(scout.OutlineOverview, {
+  this.outlineOverview = scout.create('OutlineOverview', {
     parent: this,
     outline: this
   });

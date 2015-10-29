@@ -1,6 +1,13 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.Table = function(model) {
   scout.Table.parent.call(this, model);
   this.$container;
@@ -142,6 +149,7 @@ scout.Table.prototype._insertCheckBoxColumn = function() {
     fixedPosition: true,
     guiOnly: true,
     disallowHeaderMenu: true,
+    showSeparator: false,
     width: scout.Column.NARROW_MIN_WIDTH,
     table: this
   });
@@ -158,6 +166,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
       fixedPosition: true,
       guiOnly: true,
       disallowHeaderMenu: true,
+      showSeparator: false,
       width: scout.Column.NARROW_MIN_WIDTH,
       table: this
     });
@@ -398,7 +407,8 @@ scout.Table.prototype._hasVisibleTableControls = function() {
 scout.Table.prototype._createHeader = function() {
   return scout.create(scout.TableHeader, {
     parent: this,
-    table: this
+    table: this,
+    enabled: this.headerEnabled
   });
 };
 
@@ -2599,6 +2609,12 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
+  this._renderTableHeader();
+};
+
+scout.Table.prototype._renderHeaderEnabled = function() {
+  // Rebuild the table header when this property changes
+  this._removeTableHeader();
   this._renderTableHeader();
 };
 

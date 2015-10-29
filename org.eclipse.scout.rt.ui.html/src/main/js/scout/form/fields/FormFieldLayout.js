@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field.
  * This layout class works with a FormField instance, since we must access properties of the model.
@@ -90,10 +100,11 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       bottom - containerPadding.bottom,
       left - containerPadding.left);
     // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
+    var fieldMargins = scout.graphics.getMargins(formField.$fieldContainer);
     fieldSize = htmlContainer.getAvailableSize()
       .subtract(htmlContainer.getInsets())
       .subtract(fieldOffset)
-      .subtract(scout.graphics.getMargins(formField.$fieldContainer));
+      .subtract(fieldMargins);
     fieldBounds = new scout.Rectangle(left, top, fieldSize.width, fieldSize.height);
     if (formField.$fieldContainer.css('position') !== 'absolute') {
       fieldBounds.x = 0;
@@ -108,7 +119,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     formField.$field.toggleClass('compact', fieldBounds.width < this.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
-      formField.$label.cssWidth(fieldBounds.width);
+      formField.$label.cssWidth(fieldSize.add(fieldMargins).width);
     }
   }
 

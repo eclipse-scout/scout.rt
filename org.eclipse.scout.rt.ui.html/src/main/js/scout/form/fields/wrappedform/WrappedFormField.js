@@ -1,6 +1,13 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.WrappedFormField = function() {
   scout.WrappedFormField.parent.call(this);
   this._addAdapterProperties(['innerForm']);
@@ -23,7 +30,7 @@ scout.WrappedFormField.prototype._renderProperties = function() {
  */
 scout.WrappedFormField.prototype._renderInnerForm = function() {
   if (this.innerForm) {
-    this.innerForm.displayHint = 'view'; // by definition, an inner form is a view.
+    this.innerForm.displayHint = scout.Form.DisplayHint.VIEW; // by definition, an inner form is a view.
     this.innerForm.modal = false; // by definition, an inner form is not modal.
     this.innerForm.renderInitialFocusEnabled = false; // do not render initial focus of form
 

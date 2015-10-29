@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -225,9 +224,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
-      // Handle detach
-      handleDetach(jsonStartupReq, httpSession);
-
       // Start desktop
       fireDesktopOpened();
 
@@ -355,7 +351,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       final ClientRunContext ctx = ClientRunContexts.copyCurrent().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
       return BEANS.get(ClientSessionProvider.class).provide(ctx);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new UiException("Error while creating new client session", e);
     }
   }
@@ -385,17 +381,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
     }, uiJobs.newModelJobInput("startUp jsonClientSession", clientSession, false), RuntimeExceptionTranslator.class);
-  }
-
-  protected void handleDetach(JsonStartupRequest jsonStartupReq, HttpSession httpSession) {
-    String parentUiSessionId = jsonStartupReq.getParentUiSessionId();
-    if (parentUiSessionId != null) {
-      IUiSession parentUiSession = (IUiSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentUiSessionId);
-      if (parentUiSession != null) {
-        LOG.info("Attaching uiSession '" + m_uiSessionId + "' to parentUiSession '" + parentUiSessionId + "'");
-        // TODO BSH Detach | Actually do something
-      }
-    }
   }
 
   protected void fireDesktopOpened() {
@@ -925,7 +910,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getClientSession(), true))).awaitDone();
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error during dispose of UI session", e);
     }
     finally {

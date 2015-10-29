@@ -221,7 +221,8 @@
       },
       "BrowserField": null,
       "GroupBox": {
-        "TabItem": null
+        "TabItem": null,
+        "TileContainerBox": null
       },
       "ImageField": null,
       "ListBox": null,
@@ -235,6 +236,10 @@
       "TagCloudField": null,
       "TreeField": null,
       "TreeBox": null,
+      "TilePlaceholder": null,
+      "TileButton": {
+        "PageTileButton": null
+      },
       "ValueField": {
         "CheckBoxField": null,
         "CalendarField": null,

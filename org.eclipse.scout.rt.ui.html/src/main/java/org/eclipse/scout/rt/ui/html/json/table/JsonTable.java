@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -192,6 +191,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       @Override
       protected Boolean modelValue() {
         return getModel().isHeaderVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HEADER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHeaderEnabled();
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEYBOARD_NAVIGATION, model) {
@@ -679,7 +684,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       try {
         BEANS.get(IClipboardService.class).setContents(scoutTransferable);
       }
-      catch (ProcessingException e) {
+      catch (RuntimeException e) {
         throw new UiException("Unable to copy to clipboard.", e);
       }
     }

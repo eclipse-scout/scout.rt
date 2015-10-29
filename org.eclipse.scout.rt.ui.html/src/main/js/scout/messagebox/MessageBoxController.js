@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 /**
  * Controller with functionality to register and render message boxes.
  *
@@ -52,8 +62,14 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
   if (messageBox.rendered) {
     return;
   }
-
-  messageBox.render(this.session.desktop.$container);
+  // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup window
+  var $mbParent;
+  if (this._displayParent.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+    $mbParent = this._displayParent.popupWindow.$container;
+  } else {
+    $mbParent = this.session.desktop.$container;
+  }
+  messageBox.render($mbParent);
 
   // Only display the message box if its 'displayParent' is visible to the user.
   if (!this._displayParent.inFront()) {

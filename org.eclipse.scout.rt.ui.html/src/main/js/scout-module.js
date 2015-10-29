@@ -1,6 +1,13 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 
 __include("jquery/jquery-scout.js");
 // protects $ and undefined from being redefined by another library
@@ -189,6 +196,7 @@ __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/DetailTableTreeFilter.js");
 __include("scout/desktop/NullDesktopNavigation.js");
+__include("scout/desktop/PopupWindow.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/ViewTabsController.js");
@@ -284,6 +292,7 @@ __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
 // More misc. elements
+__include("scout/desktop/DesktopFormController.js");
 __include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");
 __include("scout/desktop/NavigateUpButton.js");

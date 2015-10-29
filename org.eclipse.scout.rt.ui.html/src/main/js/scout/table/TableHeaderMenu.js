@@ -1,6 +1,13 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 // FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
 scout.TableHeaderMenu = function() {
   scout.TableHeaderMenu.parent.call(this);

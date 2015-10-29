@@ -35,4 +35,7 @@
       <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
+
+  <!-- primarily for license header generation -->
+  <inceptionYear>2014</inceptionYear>
 </project>

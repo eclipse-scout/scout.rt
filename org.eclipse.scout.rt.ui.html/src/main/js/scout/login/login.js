@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.login = {
 
   /**
@@ -8,10 +18,10 @@ scout.login = {
   init: function(opts) {
     var $buttonDiv, texts, defaultOpts = {
       texts: {
-        'ui.login': 'Login',
-        'ui.loginFailed': 'Login failed',
-        'ui.user': 'User',
-        'ui.password': 'Password'
+        'ui.Login': 'Login',
+        'ui.LoginFailed': 'Login failed',
+        'ui.User': 'User',
+        'ui.Password': 'Password'
       }
     };
     this.options = $.extend({}, defaultOpts, opts);
@@ -29,11 +39,11 @@ scout.login = {
       .attr('type', 'text')
       .attr('autocapitalize', 'off')
       .attr('autocorrect', 'off')
-      .placeholder(texts.get('ui.user'))
+      .placeholder(texts.get('ui.User'))
       .appendTo(this.$container);
     this.$password = $('<input>')
       .attr('type', 'password')
-      .placeholder(texts.get('ui.password'))
+      .placeholder(texts.get('ui.Password'))
       .appendTo(this.$container);
     $buttonDiv = $('<div>')
       .attr('id', 'login-button')
@@ -42,7 +52,7 @@ scout.login = {
     this.$button = $('<button>')
       .addClass('default')
       .attr('type', 'submit')
-      .text(texts.get('ui.login'))
+      .text(texts.get('ui.Login'))
       .appendTo($buttonDiv);
 
     this.$user.focus();
@@ -101,7 +111,7 @@ scout.login = {
         this.$button
           .setEnabled(true)
           .html('')
-          .text(texts.get('ui.loginFailed'))
+          .text(texts.get('ui.LoginFailed'))
           .addClass('login-error');
         this.$user.focus();
         this.$user.one('input.resetLoginError', resetButtonText.bind(this));
@@ -120,7 +130,7 @@ scout.login = {
 
     function resetButtonText() {
       this.$button
-        .text(texts.get('ui.login'))
+        .text(texts.get('ui.Login'))
         .removeClass('login-error');
     }
   }

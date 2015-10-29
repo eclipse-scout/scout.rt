@@ -1,6 +1,13 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
 
@@ -17,6 +24,7 @@ scout.TableHeader.prototype._init = function(options) {
   scout.TableHeader.parent.prototype._init.call(this, options);
 
   this.table = options.table;
+  this.enabled = options.enabled;
   this.menuBar = scout.create(scout.MenuBar, {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -31,6 +39,9 @@ scout.TableHeader.prototype._render = function($parent) {
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
   this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
 
+  if (!this.enabled) {
+    this.menuBar.hiddenByUi = true;
+  }
   this.menuBar.render(this.$container);
   this._$menuBar = this.menuBar.$container;
   this.updateMenuBar();
@@ -82,13 +93,17 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   }
 
   var $header = this.$filler.beforeDiv('table-header-item')
+    .setEnabled(this.enabled)
     .data('column', column)
     .css('min-width', columnWidth + 'px')
-    .css('max-width', columnWidth + 'px')
-    .on('click', this._onHeaderItemClick.bind(this))
-    .on('mousedown', this._onHeaderItemMousedown.bind(this));
-  $header.toggleAttr('data-modelclass', !! column.modelClass, column.modelClass);
-  $header.toggleAttr('data-classid', !! column.classId, column.classId);
+    .css('max-width', columnWidth + 'px');
+  if (this.enabled) {
+    $header
+      .on('click', this._onHeaderItemClick.bind(this))
+      .on('mousedown', this._onHeaderItemMousedown.bind(this));
+  }
+  $header.toggleAttr('data-modelclass', !!column.modelClass, column.modelClass);
+  $header.toggleAttr('data-classid', !!column.classId, column.classId);
 
   column.$header = $header;
 
@@ -102,9 +117,17 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   this._decorateHeader(column);
   $header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
-  if (!column.fixedWidth) {
+  var showSeparator = column.showSeparator;
+  if (isLastColumn && !this.enabled) {
+    showSeparator = false;
+  }
+  if (showSeparator) {
     var $separator = this.$filler.beforeDiv('table-header-resize');
-    $separator.on('mousedown', '', this._onSeparatorMousedown.bind(this));
+    if (column.fixedWidth || !this.enabled) {
+      $separator.setEnabled(false);
+    } else {
+      $separator.on('mousedown', '', this._onSeparatorMousedown.bind(this));
+    }
     column.$separator = $separator;
   }
   this._renderedColumns.push(column);
@@ -135,7 +158,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     $header = column.$header,
     $headerResize,
     columnWidth = column.width,
-    menuBarWidth = this._$menuBar.outerWidth(),
+    menuBarWidth = (this._$menuBar.isVisible() ? this._$menuBar.outerWidth() : 0),
     isFirstColumn = this.table.columns.indexOf(column) === 0,
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
 
@@ -294,7 +317,7 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
       $left.appendDiv().text('G');
     }
     if (filtered) {
-      $state.addClass('filtered');
+      $header.addClass('filtered');
       $state.addClass('filtered');
       $left.appendDiv().text('F');
     }

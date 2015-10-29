@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 /**
  * Common base class for ValueFields having an HTML input field.
  */
@@ -104,7 +114,7 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
   var field = this;
   var menu = scout.create('Menu', {
     parent: this,
-    text: this.session.text('ui.copy')
+    text: this.session.text('ui.Copy')
   });
   menu.remoteHandler = function(event) {
     if ('doAction' === event.type) {

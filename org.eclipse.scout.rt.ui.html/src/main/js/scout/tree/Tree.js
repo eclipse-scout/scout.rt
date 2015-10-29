@@ -1,6 +1,13 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.Tree = function() {
   scout.Tree.parent.call(this);
   this.$data;
@@ -531,6 +538,10 @@ scout.Tree.prototype.clearSelection = function() {
   this.selectNodes([]);
 };
 
+scout.Tree.prototype.selectNode = function(node, notifyServer, debounceSend) {
+  this.selectNodes(node);
+};
+
 scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.helpers.nvl(notifyServer, true);
@@ -564,6 +575,10 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this._renderSelection();
     this._renderMenus();
   }
+};
+
+scout.Tree.prototype.deselectNode = function(node) {
+  this.deselectNodes(node);
 };
 
 scout.Tree.prototype.deselectNodes = function(nodes) {

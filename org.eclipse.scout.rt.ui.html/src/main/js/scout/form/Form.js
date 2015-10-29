@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.Form = function() {
   scout.Form.parent.call(this);
   this.rootGroupBox;
@@ -13,6 +23,13 @@ scout.Form = function() {
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
+scout.Form.DisplayHint = {
+  DIALOG: 'dialog',
+  POPUP_WINDOW: 'popupWindow',
+  POPUP_DIALOG: 'popupDialog',
+  VIEW: 'view'
+};
+
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
   if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
@@ -26,6 +43,14 @@ scout.Form.prototype._init = function(model) {
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
   this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, renderGlassPanes);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Form.prototype._renderProperties = function() {
+  scout.Form.parent.prototype._renderProperties.call(this);
+  this._updateTitle();
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -43,7 +68,7 @@ scout.Form.prototype._renderForm = function($parent) {
 
   this.$container = $('<div>')
     .appendTo($parent)
-    .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: rename class 'form' to view so we can use the displayHint as class-name
+    .addClass(this.isDialog() ? 'dialog' : 'form')
     .data('model', this);
 
   if (this.isDialog()) {
@@ -52,10 +77,9 @@ scout.Form.prototype._renderForm = function($parent) {
     this.$container.makeDraggable($handle);
 
     if (this.closable) {
-      this.$container.appendDiv('closable')
-        .on('click', function() {
-          this._send('formClosing');
-        }.bind(this));
+      this.$container
+        .appendDiv('closable')
+        .on('click', this.close.bind(this));
     }
     this.$container.resizable({
       start: function(event, ui) {
@@ -72,7 +96,7 @@ scout.Form.prototype._renderForm = function($parent) {
         return false;
       }.bind(this)
     });
-    this._updateDialogTitle();
+    this._updateTitle();
   } else {
     layout = new scout.FormLayout(this);
   }
@@ -91,6 +115,10 @@ scout.Form.prototype._renderForm = function($parent) {
   }
 };
 
+scout.Form.prototype.close = function() {
+  this._send('formClosing');
+};
+
 scout.Form.prototype._postRender = function() {
   this._installFocusContext();
 
@@ -104,7 +132,21 @@ scout.Form.prototype._postRender = function() {
   this.fileChooserController.render();
 };
 
-scout.Form.prototype._updateDialogTitle = function() {
+scout.Form.prototype._updateTitle = function() {
+  if (this.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+    this._updateTitleForWindow();
+  } else if (this.isDialog()) {
+    this._updateTitleForDom();
+  }
+};
+
+scout.Form.prototype._updateTitleForWindow = function() {
+  var formTitle = scout.strings.join(' - ', this.title, this.subTitle),
+    applicationTitle = this.session.desktop.title;
+  this.popupWindow.title(formTitle || applicationTitle);
+};
+
+scout.Form.prototype._updateTitleForDom = function() {
   if (this.title || this.subTitle) {
     var $titles = getOrAppendChildDiv(this.$container, 'title-box');
     // Render title
@@ -144,11 +186,11 @@ scout.Form.prototype._updateDialogTitle = function() {
 };
 
 scout.Form.prototype.isDialog = function() {
-  return this.displayHint === 'dialog';
+  return this.displayHint === scout.Form.DisplayHint.DIALOG;
 };
 
 scout.Form.prototype.isView = function() {
-  return this.displayHint === 'view';
+  return this.displayHint === scout.Form.DisplayHint.VIEW;
 };
 
 scout.Form.prototype._isClosable = function() {
@@ -188,21 +230,15 @@ scout.Form.prototype._remove = function() {
 };
 
 scout.Form.prototype._renderTitle = function() {
-  if (this.isDialog()) {
-    this._updateDialogTitle();
-  }
+  this._updateTitle();
 };
 
 scout.Form.prototype._renderSubTitle = function() {
-  if (this.isDialog()) {
-    this._updateDialogTitle();
-  }
+  this._updateTitle();
 };
 
 scout.Form.prototype._renderIconId = function() {
-  if (this.isDialog()) {
-    this._updateDialogTitle();
-  }
+  this._updateTitle();
 };
 
 scout.Form.prototype._onRequestFocus = function(formFieldId) {

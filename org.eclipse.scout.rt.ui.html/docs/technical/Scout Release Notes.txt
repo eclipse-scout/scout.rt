@@ -555,3 +555,11 @@ Behavior change of Table in AbstractTableField:
 Do not execute AbstractTable.execContentChanged() when
 valueChageTriggers flag on IFormField is false.
 --> see Ticket #159469 importFormFieldData auf TableField execContentChanged getriggered obwohl valueChangeTriggersEnabled=false
+
+ASA 29.10.2015
+Removed:
+ClientUIPreferences.getTableCustomizerData(String customizerKey)
+ClientUIPreferences.setTableCustomizerData(String customizerKey, Object customizerData)
+Replaced by:
+ClientUIPreferences.getTableCustomizerData(ITableCustomizer customizer, String configName)
+ClientUIPreferences.setTableCustomizerData(ITableCustomizer customizer, String configName)

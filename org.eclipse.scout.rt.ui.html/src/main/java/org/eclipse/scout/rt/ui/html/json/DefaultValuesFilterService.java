@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
       ensureLoaded();
       m_filter.filter(json);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error while filtering default values", e);
     }
   }
@@ -59,7 +59,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
       ensureLoaded();
       m_filter.filter(json, objectType);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       LOG.error("Error while filtering default values", e);
     }
   }

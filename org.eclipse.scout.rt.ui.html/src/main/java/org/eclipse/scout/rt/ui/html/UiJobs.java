@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.ui.html;
 
 import java.util.concurrent.Callable;
@@ -6,7 +16,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -48,7 +57,7 @@ public class UiJobs {
       Filter filter = ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotBlocked();
       timeout = !Jobs.getJobManager().awaitDone(filter, AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       throw new UiException("Interrupted while waiting for model jobs to complete [clientSession=%s]", e, clientSession);
     }
     if (timeout) {
@@ -87,7 +96,7 @@ public class UiJobs {
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       // FIXME [dwi] use translator to not work with ProcessingException
       throw new UiException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, callable.getClass().getName(), future);
     }
