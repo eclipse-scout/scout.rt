@@ -222,6 +222,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           m_managedTableListener = null;
         }
       }
+      if (isInitialized()) {
+        for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
+          m_table.setValueChangeTriggerEnabled(true);
+        }
+      }
     }
     m_table = table;
     if (m_table instanceof AbstractTable) {
@@ -233,6 +238,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         // m_table.setAutoDiscardOnDelete(false);
         m_managedTableListener = new P_ManagedTableListener();
         m_table.addTableListener(m_managedTableListener);
+      }
+      if (isInitialized()) {
+        for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
+          m_table.setValueChangeTriggerEnabled(false);
+        }
       }
       m_table.setEnabled(isEnabled());
     }
@@ -618,7 +628,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public void setValueChangeTriggerEnabled(boolean b) {
     super.setValueChangeTriggerEnabled(b);
-    if (isInitialized()) {
+    if (isInitialized() && getTable() != null) {
       getTable().setValueChangeTriggerEnabled(b);
     }
   }

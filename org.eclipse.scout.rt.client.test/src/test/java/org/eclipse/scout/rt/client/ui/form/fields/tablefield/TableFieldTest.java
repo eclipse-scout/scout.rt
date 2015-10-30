@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +21,7 @@ import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -30,7 +32,6 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -282,7 +283,128 @@ public class TableFieldTest {
     P_TableField tableField = createTableField(false);
     P_TableData tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, valueChangeTriggersEnabled);
-    Assert.assertEquals(valueChangeTriggersEnabled, tableField.m_execContentChangedCalled);
+    assertEquals(valueChangeTriggersEnabled, tableField.m_execContentChangedCalled);
+  }
+
+  @Test
+  public void testDelegatingValueChangedTriggerEnabledProperty() {
+    P_TableField tableField = createTableField(false);
+    assertValueChangeTriggerEnabledFlag(tableField, true);
+
+    // first call
+    tableField.setValueChangeTriggerEnabled(false);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // second call
+    tableField.setValueChangeTriggerEnabled(false);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // revert second call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // revert first call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, true);
+  }
+
+  @Test
+  public void testDelegatingValueChangedTriggerEnabledPropertySettingTableAfterInit() {
+    P_TableField tableField = createTableField(false);
+    tableField.setTable(null, true);
+    assertTrue(tableField.isValueChangeTriggerEnabled());
+
+    // first call
+    tableField.setValueChangeTriggerEnabled(false);
+    assertFalse(tableField.isValueChangeTriggerEnabled());
+
+    // second call
+    tableField.setValueChangeTriggerEnabled(false);
+    assertFalse(tableField.isValueChangeTriggerEnabled());
+
+    // set table
+    tableField.setTable(tableField.new Table(), true);
+
+    // revert second call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // revert first call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, true);
+  }
+
+  @Test
+  public void testDelegatingValueChangedTriggerEnabledPropertyExchangingTable() {
+    P_TableField tableField = createTableField(false);
+    assertValueChangeTriggerEnabledFlag(tableField, true);
+
+    // first call
+    tableField.setValueChangeTriggerEnabled(false);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // second call
+    tableField.setValueChangeTriggerEnabled(false);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    //exchanging the table; disabling the triggers on the table once before and once after
+    ITable firstTable = tableField.getTable();
+    firstTable.setValueChangeTriggerEnabled(false);
+    tableField.setTable(tableField.new Table(), true);
+    firstTable.setValueChangeTriggerEnabled(false);
+
+    // third call; should not affect firstField any more
+    tableField.setValueChangeTriggerEnabled(false);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // assert that removed first field now works independently
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+    assertFalse(firstTable.isValueChangeTriggerEnabled());
+    firstTable.setValueChangeTriggerEnabled(true);
+    assertFalse(firstTable.isValueChangeTriggerEnabled());
+    firstTable.setValueChangeTriggerEnabled(true);
+    // only after the second reset the trigger should be enabled
+    assertTrue(firstTable.isValueChangeTriggerEnabled());
+
+    // revert third call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // revert second call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, false);
+
+    // revert first call
+    tableField.setValueChangeTriggerEnabled(true);
+    assertValueChangeTriggerEnabledFlag(tableField, true);
+
+    // now exchange table with one that has it's trigger already disabled
+    org.eclipse.scout.rt.client.ui.form.fields.tablefield.TableFieldTest.P_TableField.Table newTable = tableField.new Table();
+    newTable.setValueChangeTriggerEnabled(false);
+    newTable.setValueChangeTriggerEnabled(false);
+    tableField.setTable(newTable, true);
+
+    assertTrue(tableField.isValueChangeTriggerEnabled());
+    assertFalse(tableField.getTable().isValueChangeTriggerEnabled());
+    newTable.setValueChangeTriggerEnabled(true);
+    assertTrue(tableField.isValueChangeTriggerEnabled());
+    assertFalse(tableField.getTable().isValueChangeTriggerEnabled());
+    // only after the second reset the trigger should be enabled on the table
+    newTable.setValueChangeTriggerEnabled(true);
+    assertTrue(firstTable.isValueChangeTriggerEnabled());
+  }
+
+  private void assertValueChangeTriggerEnabledFlag(P_TableField tableField, boolean isEnabledExpected) {
+    assertEquals(isEnabledExpected, tableField.isValueChangeTriggerEnabled());
+    assertEquals(isEnabledExpected, tableField.getTable().isValueChangeTriggerEnabled());
+  }
+
+  @Test
+  public void testDelegatingValueChangedTriggerEnabledPropertyNoTable() {
+    P_TableField tableField = createTableField(false);
+    tableField.setTable(null, true);
+    tableField.setValueChangeTriggerEnabled(false);
+    assertFalse(tableField.isValueChangeTriggerEnabled());
   }
 
   @Test

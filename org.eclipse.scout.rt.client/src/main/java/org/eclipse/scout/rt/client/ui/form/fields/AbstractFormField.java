@@ -96,7 +96,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
-  private int m_valueChangeTriggerEnabled = 1;// >=1 is true
+  protected int m_valueChangeTriggerEnabled = 1;// >=1 is true
   // master/slave
   private IValueField<?> m_masterField;
   private boolean m_masterRequired;
