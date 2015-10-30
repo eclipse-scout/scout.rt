@@ -352,11 +352,11 @@ public class Preferences implements IPreferences {
     }
   }
 
-  protected boolean isDirty() {
+  protected synchronized boolean isDirty() {
     return m_dirty;
   }
 
-  protected void setDirty(boolean dirty) {
+  protected synchronized void setDirty(boolean dirty) {
     m_dirty = dirty;
   }
 
