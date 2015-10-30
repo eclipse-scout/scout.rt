@@ -135,13 +135,23 @@ scout.TableFooter.prototype._renderResizer = function() {
     .on('mousedown', '', resize.bind(this));
 
   function resize(event) {
+    // Remember current height and start position
+    var startHeight = this.$controlContainer.height();
+    var startX = Math.floor(event.pageY);
     $(window)
       .on('mousemove.tablefooter', resizeMove.bind(this))
       .one('mouseup', resizeEnd.bind(this));
     $('body').addClass('row-resize');
 
     function resizeMove(event) {
-      var newHeight = this.table.$container.height() - event.pageY;
+      // Calculate position delta
+      var x = Math.floor(event.pageY);
+      var dx = x - startX;
+      // Ensure control container does not get bigger than the table
+      var maxHeight = this.table.$container.height() - this.table.footer.$container.height();
+      // Calculate new height of table control container
+      var newHeight = Math.min(startHeight - dx, maxHeight);
+
       this.$controlContainer.height(newHeight);
       this.$controlContent.outerHeight(newHeight);
       this._revalidateTableLayout();
@@ -468,12 +478,6 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
       this._hideTableStatusTooltip();
     }.bind(this), 5000);
   }
-};
-
-scout.TableFooter.prototype.onResize = function() {
-  this.table.tableControls.forEach(function(control) {
-    control.onResize();
-  });
 };
 
 scout.TableFooter.prototype.onControlSelected = function(control) {
