@@ -961,8 +961,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     numRowsLoaded = r;
 
     // append block of rows
-    $rows = $(rowString);
-    $rows.appendTo(this.$data);
+    $rows = this.$data.appendElement(rowString);
 
     // Link model and jQuery objects and render selection borders
     $rows.each(function(index, rowObject) {
