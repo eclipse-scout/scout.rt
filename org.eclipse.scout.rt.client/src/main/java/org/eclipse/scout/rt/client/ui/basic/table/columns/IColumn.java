@@ -233,6 +233,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   void setInitialAlwaysIncludeSortAtEnd(boolean b);
 
+  boolean isNullBiggestSortvalue();
+
+  void setNullBiggestSortvalue(boolean b);
+
   int getWidth();
 
   void setWidth(int w);
