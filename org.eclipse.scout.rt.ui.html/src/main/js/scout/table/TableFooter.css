@@ -38,7 +38,6 @@
   background-color: @background-color;
   bottom: @table-footer-height;
   width: 100%;
-  height: 0px;
   display: none;
   z-index: 1;
   /* Reset nowrap, forms may have fields which need wrapping (e.g. label field) */

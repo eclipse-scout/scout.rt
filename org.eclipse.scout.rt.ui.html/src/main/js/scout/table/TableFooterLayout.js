@@ -73,6 +73,11 @@ scout.TableFooterLayout.prototype.layout = function($container) {
   if (this._tableFooter._tableInfoTooltip && this._tableFooter._tableInfoTooltip.rendered) {
     this._tableFooter._tableInfoTooltip.position();
   }
+
+  // Let table controls update their content according to the new footer size
+  this._tableFooter.table.tableControls.forEach(function(control) {
+    control.onResize();
+  });
 };
 
 scout.TableFooterLayout.prototype._setInfoItemsSize = function($infoItems, animated) {

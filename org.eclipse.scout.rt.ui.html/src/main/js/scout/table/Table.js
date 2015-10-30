@@ -1171,13 +1171,7 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
 };
 
 // Only necessary if the table is a root html comp (outline table)
-// FIXME CGU what if a table on a form contains a footer?
-// also, if tree gets resized while a tablecontrol and a form is open, the content of the table control is not resized, because desktop does table.setSize after attaching
 scout.Table.prototype.onResize = function() {
-  if (this.footer) {
-    // Delegate window resize events to footer (actually only width changes are relevant)
-    this.footer.onResize();
-  }
   this.htmlComp.revalidateLayoutTree();
 };
 

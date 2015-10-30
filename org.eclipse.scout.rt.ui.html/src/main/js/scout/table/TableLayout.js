@@ -33,6 +33,8 @@ scout.TableLayout.prototype.layout = function($container) {
     height += menuBarSize.height;
   }
   if (footer) {
+    // Layout table footer and add size of footer (including the control content) to 'height'
+    footer.htmlComp.revalidateLayout();
     height += scout.graphics.getSize(footer.$container).height;
     height += scout.graphics.getSize(footer.$controlContainer).height;
   }
@@ -48,11 +50,6 @@ scout.TableLayout.prototype.layout = function($container) {
   // Size of last column may have to be adjusted due to the header menu items
   if (header) {
     header.resizeHeaderItem(lastColumn);
-  }
-
-  // Layout table footer
-  if (footer) {
-    footer.htmlComp.setSize(new scout.Dimension(containerSize.width, footer.$container.outerHeight()));
   }
 
   // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
