@@ -211,34 +211,33 @@ scout.graphics = {
   },
 
   debugOutput: function($comp) {
-    return 'meep'; // FIXME AWE:
-//    if (!$comp) {
-//      return 'undefined';
-//    }
-//    if (!($comp instanceof jQuery)) {
-//      $comp = $($comp);
-//    }
-//    if ($comp.length === 0) {
-//      return '$()';
-//    }
-//    var attrs = '';
-//    if ($comp.attr('id')) {
-//      attrs += 'id=' + $comp.attr('id');
-//    }
-//    if ($comp.attr('class')) {
-//      attrs += ' class=' + $comp.attr('class');
-//    }
-//    if ($comp.attr('data-modelclass')) {
-//      attrs += ' data-modelclass=' + $comp.attr('data-modelclass');
-//    }
-//    if (attrs.length === 0) {
-//      var html = scout.helpers.nvl($comp.html(), '');
-//      if (html.length > 30) {
-//        html = html.substring(0, 30) + '...';
-//      }
-//      attrs = html;
-//    }
-//    return 'Element[' + attrs.trim() + ']';
+    if (!$comp) {
+      return 'undefined';
+    }
+    if (!($comp instanceof jQuery)) {
+      $comp = $($comp);
+    }
+    if ($comp.length === 0) {
+      return '$()';
+    }
+    var attrs = '';
+    if ($comp.attr('id')) {
+      attrs += 'id=' + $comp.attr('id');
+    }
+    if ($comp.attr('class')) {
+      attrs += ' class=' + $comp.attr('class');
+    }
+    if ($comp.attr('data-modelclass')) {
+      attrs += ' data-modelclass=' + $comp.attr('data-modelclass');
+    }
+    if (attrs.length === 0) {
+      var html = scout.helpers.nvl($comp.html(), '');
+      if (html.length > 30) {
+        html = html.substring(0, 30) + '...';
+      }
+      attrs = html;
+    }
+    return 'Element[' + attrs.trim() + ']';
   }
 };
 
