@@ -98,7 +98,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_initialSortAscending;
   private boolean m_initialAlwaysIncludeSortAtBegin;
   private boolean m_initialAlwaysIncludeSortAtEnd;
-  private boolean m_nullBiggestsortValue;
 
   private final ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> m_objectExtensions;
 
@@ -460,22 +459,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(170)
   protected boolean getConfiguredAlwaysIncludeSortAtEnd() {
-    return false;
-  }
-
-  /**
-   * Configures whether null values in this column are treated as biggest or least values in a sorting context. If
-   * {@link ColumnSet.P_SortingAndGroupingConfig#isAscending()} is true null values will be the last values otherwise
-   * they are first.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   *
-   * @return {@code true} if this column treats null values as their biggest possible values in sorting, {@code false}
-   *         otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(175)
-  protected boolean getConfiguredNullBiggestSortvalue() {
     return false;
   }
 
@@ -843,7 +826,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setInitialSortAscending(getConfiguredSortAscending());
     setInitialAlwaysIncludeSortAtBegin(getConfiguredAlwaysIncludeSortAtBegin());
     setInitialAlwaysIncludeSortAtEnd(getConfiguredAlwaysIncludeSortAtEnd());
-    setNullBiggestSortvalue(getConfiguredNullBiggestSortvalue());
     setInitialGrouped(getConfiguredGrouped());
     setOrder(calculateViewOrder());
     setWidth(getConfiguredWidth());
@@ -1022,16 +1004,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setInitialAlwaysIncludeSortAtEnd(boolean b) {
     m_initialAlwaysIncludeSortAtEnd = b;
-  }
-
-  @Override
-  public boolean isNullBiggestSortvalue() {
-    return m_nullBiggestsortValue;
-  }
-
-  @Override
-  public void setNullBiggestSortvalue(boolean b) {
-    m_nullBiggestsortValue = b;
   }
 
   /**
@@ -1409,37 +1381,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     return false;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public int compareColumnValuesWithNullAlwaysAtBottom(Object o1, Object o2, boolean isSortAscending) {
-    int c;
-    if (o1 == null && o2 == null) {
-      c = 0;
-    }
-    else if (o1 == null) {
-      if (isSortAscending) {
-        c = 1;
-      }
-      else {
-        c = -1;
-      }
-    }
-    else if (o2 == null) {
-      if (isSortAscending) {
-        c = -1;
-      }
-      else {
-        c = 1;
-      }
-    }
-    else if ((o1 instanceof Comparable) && (o2 instanceof Comparable)) {
-      c = ((Comparable) o1).compareTo(o2);
-    }
-    else {
-      c = StringUtility.compareIgnoreCase(o1.toString(), o2.toString());
-    }
-    return c;
-  }
-
   /**
    * sorting of rows based on this column<br>
    * default: compare objects by Comparable interface or use value
@@ -1454,10 +1395,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       c = 0;
     }
     else if (o1 == null) {
-      c = isNullBiggestSortvalue() ? 1 : -1;
+      c = -1;
     }
     else if (o2 == null) {
-      c = isNullBiggestSortvalue() ? -1 : 1;
+      c = 1;
     }
     else if ((o1 instanceof Comparable) && (o2 instanceof Comparable)) {
       c = ((Comparable) o1).compareTo(o2);
