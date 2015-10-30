@@ -40,8 +40,10 @@ scout.DatePicker.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DatePickerLayout(this));
 
-  this._$header = this._build$Header().appendTo(this.$container);
-  this._$header.find('.date-picker-left-y, .date-picker-left-m, .date-picker-right-m, .date-picker-right-y').mousedown(this._onNavigationMouseDown.bind(this));
+  this._$header = this._append$Header();
+  this._$header
+    .find('.date-picker-left-y, .date-picker-left-m, .date-picker-right-m, .date-picker-right-y')
+    .mousedown(this._onNavigationMouseDown.bind(this));
 
   this.$container.appendDiv('date-picker-separator');
   this.$scrollable = this.$container.appendDiv('date-picker-scrollable');
@@ -259,7 +261,7 @@ scout.DatePicker.prototype._build$DateBox = function() {
   return $box;
 };
 
-scout.DatePicker.prototype._build$Header = function() {
+scout.DatePicker.prototype._append$Header = function() {
   var headerHtml =
     '<div class="date-picker-header">' +
     '  <div class="date-picker-left-y" data-shift="-12"></div>' +
@@ -268,7 +270,8 @@ scout.DatePicker.prototype._build$Header = function() {
     '  <div class="date-picker-right-m" data-shift="1"></div>' +
     '  <div class="date-picker-header-month"></div>' +
     '</div>';
-  return $(headerHtml)
+  return this.$container
+    .appendElement(headerHtml)
     .toggleClass('touch', scout.device.supportsTouch());
 };
 
