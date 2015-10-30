@@ -1021,7 +1021,9 @@ scout.Session.prototype._onWindowUnload = function() {
   // Destroy UI session on server
   this._unload = true;
   this._sendNow();
-  this.desktop.formController.closePopupWindows();
+  if (this.desktop) {
+    this.desktop.formController.closePopupWindows();
+  }
 };
 
 /**

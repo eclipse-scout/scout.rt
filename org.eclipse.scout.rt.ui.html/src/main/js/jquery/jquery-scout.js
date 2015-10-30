@@ -554,7 +554,7 @@
   };
 
   /**
-   * Animates to the current width, expects a data 'oldWidth'.
+   * Animates from old to new width
    */
   $.fn.cssWidthAnimated = function(oldWidth, newWidth, opts) {
     opts = opts || {};
@@ -563,7 +563,7 @@
     if (oldWidth === newWidth) {
       // No need to animate, make sure new width ist set
       this.cssWidth(newWidth);
-      return;
+      return this;
     }
 
     // Reset to old width first
@@ -572,6 +572,48 @@
     // Then animate to new width
     this.stop().animate({
       width: newWidth
+    }, opts);
+    return this;
+  };
+
+  $.fn.cssLeftAnimated = function(from, to, opts) {
+    opts = opts || {};
+    opts.duration = scout.helpers.nvl(opts.duration, 300);
+
+    if (from === to) {
+      // No need to animate, make sure new pos is set
+      this.cssLeft(to);
+      return this;
+    }
+
+    // Reset to from first
+    this.cssLeft(from);
+
+    // Then animate to new width
+    this.animate({
+      left: to
+    }, opts);
+
+    console.log(this.attr('id') + ' ' + from + ' ' + to );
+    return this;
+  };
+
+  $.fn.cssTopAnimated = function(from, to, opts) {
+    opts = opts || {};
+    opts.duration = scout.helpers.nvl(opts.duration, 300);
+
+    if (from === to) {
+      // No need to animate, make sure new pos is set
+      this.cssTop(to);
+      return this;
+    }
+
+    // Reset to from first
+    this.cssTop(from);
+
+    // Then animate to new pos
+    this.animate({
+      top: to
     }, opts);
     return this;
   };
