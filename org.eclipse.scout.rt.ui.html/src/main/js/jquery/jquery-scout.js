@@ -77,13 +77,9 @@
 
   // === $ extensions ===
 
-  // chris' shortcut
-  if (typeof console !== 'undefined' && console.log.bind) {
-    $.l = console.log.bind(console);
-  } else {
-    $.l = function() {};
-  }
-
+  /**
+   * @return HTML document reference (ownerDocument) of the given element
+   */
   $.getDocument = function($element) {
     return $element && $element.length ? $element[0].ownerDocument : null;
   };
@@ -91,14 +87,19 @@
   /**
    * @param theDocument HTML document reference. We use the name 'theDocument' everywhere, to prevent accidental usage of global document variable
    * @param element string. Example = &lt;input&gt;
+   * @param cssClass (optional) class attribute
+   * @param text (optional) adds a child text-node with given text (no HTML content)
    */
-  $.makeElement = function(theDocument, element, cssClass) {
+  $.makeElement = function(theDocument, element, cssClass, text) {
     if (theDocument === undefined || element === undefined) {
       return new Error('missing arguments: document, element');
     }
     var $element = $(element, theDocument);
     if (cssClass) {
       $element.addClass(cssClass);
+    }
+    if (text) {
+      $element.text(text);
     }
     return $element;
   };
@@ -118,29 +119,21 @@
   };
 
   $.makeSpan = function(theDocument, cssClass, text) {
-    return $.make(theDocument, '<span>', cssClass, text);
-  };
-
-  $.make = function(theDocument, element, cssClass, text) {
-    var $elem = $.makeElement(theDocument, element, cssClass);
-    if (text) {
-      $elem.text(text);
-    }
-    return $elem;
+    return $.makeElement(theDocument, '<span>', cssClass, text);
   };
 
   $.makeSVG = function(theDocument, type, cssClass, htmlContent, id) {
-    var $svgElement = $(theDocument.createElementNS('http://www.w3.org/2000/svg', type));
+    var $svg = $(theDocument.createElementNS('http://www.w3.org/2000/svg', type));
     if (cssClass) {
-      $svgElement.attrSVG('class', cssClass);
+      $svg.attrSVG('class', cssClass);
     }
     if (htmlContent) {
-      $svgElement.html(htmlContent);
+      $svg.html(htmlContent);
     }
     if (id !== undefined) {
-      $svgElement.attrSVG('id', id);
+      $svg.attrSVG('id', id);
     }
-    return $svgElement;
+    return $svg;
   };
 
   // used by some animate functions
@@ -250,8 +243,8 @@
     return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).appendTo(this);
   };
 
-  $.fn.appendElement = function(element, cssClass) {
-    return $.makeElement($.getDocument(this), element, cssClass).appendTo(this);
+  $.fn.appendElement = function(element, cssClass, text) {
+    return $.makeElement($.getDocument(this), element, cssClass, text).appendTo(this);
   };
 
   // insert after - and return new div for chaining
@@ -268,8 +261,8 @@
     return $.makeSpan($.getDocument(this), cssClass, text).appendTo(this);
   };
 
-  $.fn.appendBr = function() {
-    return $.makeElement($.getDocument(this), '<br>').appendTo(this);
+  $.fn.appendBr = function(cssClass) {
+    return $.makeElement($.getDocument(this), '<br>', cssClass).appendTo(this);
   };
 
   // append svg

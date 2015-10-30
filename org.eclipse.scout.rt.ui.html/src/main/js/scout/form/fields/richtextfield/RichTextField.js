@@ -171,7 +171,6 @@ scout.RichTextField.prototype._onChange = function(event) {
 
     for (i = 0; i < content.length; i++) {
       c = content[i];
-      $.l(c);
 
       // remove all styles but background-color
 //      if (c.removeAttribute) {
