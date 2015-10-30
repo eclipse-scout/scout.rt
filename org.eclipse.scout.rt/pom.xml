@@ -21,7 +21,7 @@
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
-  <version>5.2.0-SNAPSHOT</version>
+  <version>5.2.0.B001</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout RT Parent Module</name>
 
@@ -98,121 +98,121 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.commons</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.json</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.commons.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jms</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.mobile</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.jaxws.apt</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test.affix</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.0.B001</version>
       </dependency>
 
       <dependency>
