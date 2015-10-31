@@ -43,9 +43,28 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
     }
   }
 
-  public Object get(final Object key) {
+  /**
+   * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
+   */
+  @SuppressWarnings("unchecked")
+  public <RESULT> RESULT get(final Object key) {
     Assertions.assertNotNull(key, "Key must not be null");
-    return m_properties.get(key);
+    return (RESULT) m_properties.get(key);
+  }
+
+  /**
+   * Returns the value to which the specified key is mapped, or {@code defaultValue} if this map contains no mapping for
+   * the key.
+   */
+  @SuppressWarnings("unchecked")
+  public <RESULT> RESULT getOrDefault(final Object key, final RESULT defaultValue) {
+    Assertions.assertNotNull(key, "Key must not be null");
+    if (m_properties.containsKey(key)) {
+      return (RESULT) m_properties.get(key);
+    }
+    else {
+      return defaultValue;
+    }
   }
 
   public void put(final Object key, final Object value) {
