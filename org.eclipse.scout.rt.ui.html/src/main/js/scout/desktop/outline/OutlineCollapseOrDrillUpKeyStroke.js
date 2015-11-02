@@ -8,22 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.OutlineTreeCollapseOrDrillUpKeyStroke = function(tree) {
-  scout.OutlineTreeCollapseOrDrillUpKeyStroke.parent.call(this, tree);
+scout.OutlineCollapseOrDrillUpKeyStroke = function(tree) {
+  scout.OutlineCollapseOrDrillUpKeyStroke.parent.call(this, tree);
   this.which = [scout.keys.SUBTRACT];
   this.renderingHints.text = '-';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return (event._treeCurrentNode.expanded ? event._$treeCurrentNode : null);
   }.bind(this);
 };
-scout.inherits(scout.OutlineTreeCollapseOrDrillUpKeyStroke, scout.AbstractOutlineTreeNavigationKeyStroke);
+scout.inherits(scout.OutlineCollapseOrDrillUpKeyStroke, scout.AbstractOutlineNavigationKeyStroke);
 
-scout.OutlineTreeCollapseOrDrillUpKeyStroke.prototype._accept = function(event) {
+scout.OutlineCollapseOrDrillUpKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TreeCollapseOrDrillUpKeyStroke.parent.prototype._accept.call(this, event);
   return accepted && event._treeCurrentNode;
 };
 
-scout.OutlineTreeCollapseOrDrillUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.OutlineCollapseOrDrillUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
   if (currentNode.expanded) {
     this.field.collapseNode(currentNode);
     return null;

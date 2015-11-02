@@ -8,22 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.OutlineTreeExpandOrDrillDownKeyStroke = function(tree) {
-  scout.OutlineTreeExpandOrDrillDownKeyStroke.parent.call(this, tree);
+scout.OutlineExpandOrDrillDownKeyStroke = function(tree) {
+  scout.OutlineExpandOrDrillDownKeyStroke.parent.call(this, tree);
   this.which = [scout.keys.ADD];
   this.renderingHints.text = '+';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return (!event._treeCurrentNode.expanded ? event._$treeCurrentNode : null);
   }.bind(this);
 };
-scout.inherits(scout.OutlineTreeExpandOrDrillDownKeyStroke, scout.AbstractOutlineTreeNavigationKeyStroke);
+scout.inherits(scout.OutlineExpandOrDrillDownKeyStroke, scout.AbstractOutlineNavigationKeyStroke);
 
-scout.OutlineTreeExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.OutlineTreeExpandOrDrillDownKeyStroke.parent.prototype._accept.call(this, event);
+scout.OutlineExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.OutlineExpandOrDrillDownKeyStroke.parent.prototype._accept.call(this, event);
   return accepted && event._treeCurrentNode;
 };
 
-scout.OutlineTreeExpandOrDrillDownKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.OutlineExpandOrDrillDownKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
   if (!currentNode.expanded && !currentNode.leaf) {
     this.field.expandNode(currentNode);
     return null;

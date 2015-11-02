@@ -22,7 +22,3 @@ scout.TreeCollapseAllKeyStroke.prototype._handleInternal = function($currentNode
   this.field.collapseAll();
   return this.field.$nodes().first().data('node');
 };
-
-scout.TreeCollapseAllKeyStroke.prototype._accept = function(event) {
-  return scout.TreeCollapseAllKeyStroke.parent.prototype._accept.call(this, event);
-};

@@ -48,11 +48,11 @@ scout.Outline.prototype._createKeyStrokeContext = function() {
 scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   keyStrokeContext.registerKeyStroke([
       new scout.TreeSpaceKeyStroke(this),
-      new scout.OutlineTreeNavigationUpKeyStroke(this),
-      new scout.OutlineTreeNavigationDownKeyStroke(this),
-      new scout.OutlineTreeCollapseAllKeyStroke(this),
-      new scout.OutlineTreeCollapseOrDrillUpKeyStroke(this),
-      new scout.OutlineTreeExpandOrDrillDownKeyStroke(this)
+      new scout.OutlineNavigationUpKeyStroke(this),
+      new scout.OutlineNavigationDownKeyStroke(this),
+      new scout.OutlineNavigateToTopKeyStroke(this),
+      new scout.OutlineCollapseOrDrillUpKeyStroke(this),
+      new scout.OutlineExpandOrDrillDownKeyStroke(this)
     ]
     .concat(this.menus));
   keyStrokeContext.$bindTarget = function() {

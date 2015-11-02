@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.OutlineTreeNavigationUpKeyStroke = function(tree) {
-  scout.OutlineTreeNavigationUpKeyStroke.parent.call(this, tree);
+scout.OutlineNavigationUpKeyStroke = function(tree) {
+  scout.OutlineNavigationUpKeyStroke.parent.call(this, tree);
   this.which = [scout.keys.UP];
   this.renderingHints.text = '↑';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
@@ -20,9 +20,9 @@ scout.OutlineTreeNavigationUpKeyStroke = function(tree) {
     return $currentNode.prevAll('.tree-node:not(.hidden):first');
   }.bind(this);
 };
-scout.inherits(scout.OutlineTreeNavigationUpKeyStroke, scout.AbstractOutlineTreeNavigationKeyStroke);
+scout.inherits(scout.OutlineNavigationUpKeyStroke, scout.AbstractOutlineNavigationKeyStroke);
 
-scout.OutlineTreeNavigationUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.OutlineNavigationUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
   if ($currentNode.length === 0) {
     return this.field.$nodes().last().data('node');
   }
