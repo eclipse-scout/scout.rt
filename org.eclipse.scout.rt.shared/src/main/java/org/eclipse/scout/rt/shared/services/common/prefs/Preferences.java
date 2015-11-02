@@ -278,8 +278,6 @@ public class Preferences implements IPreferences {
 
   @Override
   public boolean putByteArray(String key, byte[] value) {
-    // FIXME ASA create unitTest (Null-handling)
-
     String encoded = null;
     if (value != null) {
       encoded = Base64Utility.encode(value);

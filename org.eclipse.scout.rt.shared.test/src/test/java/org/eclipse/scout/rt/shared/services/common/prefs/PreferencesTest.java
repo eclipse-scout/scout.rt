@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.prefs;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -83,6 +84,18 @@ public class PreferencesTest {
     }
     assertFalse(prefs.isDirty());
     assertTrue(svc.m_flushed);
+  }
+
+  @Test
+  public void testPutByteArray() throws Exception {
+    Preferences prefs = new Preferences("X", null);
+    assertNull(prefs.getByteArray("byte", null));
+    prefs.putByteArray("byte", new byte[]{(byte) 1, (byte) 2, (byte) 3});
+    assertArrayEquals(new byte[]{(byte) 1, (byte) 2, (byte) 3}, prefs.getByteArray("byte", null));
+
+    // remove
+    prefs.putByteArray("byte", null);
+    assertNull(prefs.getByteArray("byte", null));
   }
 
   @Test(expected = IllegalArgumentException.class)
