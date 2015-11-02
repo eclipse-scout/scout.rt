@@ -199,6 +199,221 @@ scout.Tree.prototype._renderProperties = function() {
   this._renderBreadcrumbEnabled();
 };
 
+scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
+  if (!nodes || nodes.length === 0) {
+    return;
+  }
+
+  $predecessor = $predecessor || $parent;
+  var parentNode = ($parent ? $parent.data('node') : null);
+
+  for (var i = 0; i < nodes.length; i++) {
+    var node = nodes[i];
+    var $node = this._$buildNode(node, $parent);
+
+    // If parent node wants its children to be lazy added to the tree, hide the DOM element, except
+    // the node is expanded, in which case we never hide it. (The last check provides a cheap
+    // way to retain most of the state when the page is reloaded).
+    if (!node.expanded && parentNode && parentNode.expandedLazy) {
+      $node.addClass('hidden');
+    }
+    // append first node and successors
+    if ($predecessor) {
+      $node.insertAfter($predecessor);
+    } else {
+      $node.prependTo(this.$data);
+    }
+
+    // if model demands children, create them
+    if (node.expanded && node.childNodes.length > 0) {
+      $predecessor = this._addNodes(node.childNodes, $node);
+    } else {
+      $predecessor = $node;
+    }
+  }
+
+  this.invalidateLayoutTree();
+
+  //return the last created node
+  return $predecessor;
+};
+
+/**
+ * @param parentNode optional. If provided, this node's state will be updated (e.g. it will be collapsed)
+ */
+scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
+  if (nodes.length === 0) {
+    return;
+  }
+
+  nodes.forEach(function(node) {
+    if (node.childNodes.length > 0) {
+      this._removeNodes(node.childNodes, node);
+    }
+    if (node.$node) {
+      node.$node.remove();
+      delete node.$node;
+    }
+  }, this);
+
+  //If every child node was deleted mark node as collapsed (independent of the model state)
+  //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
+  var $parentNode = (parentNode ? parentNode.$node : undefined);
+  if ($parentNode) {
+    if (!parentNode) {
+      parentNode = $parentNode.data('node');
+    }
+    var childNodesOfParent = parentNode.childNodes;
+    if (!childNodesOfParent || childNodesOfParent.length === 0) {
+      $parentNode.removeClass('expanded');
+      $parentNode.removeClass('lazy');
+    }
+  }
+
+  this.invalidateLayoutTree();
+};
+
+scout.Tree.prototype._$buildNode = function(node, $parent) {
+  var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
+
+  var $node = $.makeDiv(this.ownerDocument(), 'tree-node')
+    .data('node', node)
+    .attr('data-nodeid', node.id)
+    .attr('data-level', level)
+    .css('padding-left', this._computeTreeItemPaddingLeft(level));
+  node.$node = $node;
+
+  this._decorateNode(node);
+  this._renderTreeItemControl($node);
+
+  if (this.checkable) {
+    this._renderTreeItemCheckbox(node);
+  }
+
+  return $node;
+};
+
+scout.Tree.prototype._decorateNode = function(node) {
+  var formerClasses,
+    $node = node.$node;
+  if (!$node) {
+    // This node is not yet rendered, nothing to do
+    return;
+  }
+
+  formerClasses = 'tree-node';
+  if ($node.isSelected()) {
+    formerClasses += ' selected';
+  }
+  if ($node.hasClass('group')) {
+    formerClasses += ' group';
+  }
+  $node.removeClass();
+  $node.addClass(formerClasses);
+  $node.addClass(node.cssClass);
+  $node.toggleClass('leaf', !!node.leaf);
+  $node.toggleClass('expanded', (!!node.expanded && node.childNodes.length > 0));
+  $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
+  $node.setEnabled(!!node.enabled);
+  $node.children('.tree-node-checkbox')
+    .children('.check-box')
+    .toggleClass('disabled', !(this.enabled && node.enabled));
+
+  if (!node.parentNode && this.selectedNodes.length === 0) {
+    // Root nodes have class child-of-selected if no node is selected
+    $node.addClass('child-of-selected');
+  } else if (node.parentNode && this.selectedNodes.indexOf(node.parentNode) > -1) {
+    $node.addClass('child-of-selected');
+  }
+
+  // Replace only the "text part" of the node, leave control and checkbox untouched
+  var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
+  $node.empty();
+  if (node.htmlEnabled) {
+    $node.html(node.text);
+  } else {
+    $node.textOrNbsp(node.text);
+  }
+  $node.prepend(preservedChildren);
+
+  scout.helpers.legacyStyle(node, $node);
+
+  if (scout.strings.hasText(node.tooltipText)) {
+    $node.attr('title', node.tooltipText);
+  }
+
+  // apply node filter
+  if (this._applyFiltersForNode(node)) {
+    var newInvisibleNodes = [];
+    if (!node.filterAccepted) {
+      newInvisibleNodes.push(node);
+    }
+    this._nodesFiltered(newInvisibleNodes);
+  }
+  this._renderNodeFilterAccepted(node);
+
+  this.dragAndDropHandler.install($node);
+  // TODO BSH More attributes...
+  // iconId
+  // tooltipText
+
+  // If parent node is marked as 'lazy', check if any hidden child nodes remain.
+  if (node.parentNode && node.parentNode.$node.hasClass('lazy')) {
+    var hasHiddenNodes = node.parentNode.childNodes.some(function(childNode) {
+      if (!childNode.$node || childNode.$node.hasClass('hidden')) {
+        return true;
+      }
+      return false;
+    });
+    if (!hasHiddenNodes) {
+      // Remove 'lazy' from parent
+      node.parentNode.$node.removeClass('lazy');
+    }
+  }
+};
+
+scout.Tree.prototype._renderTreeItemControl = function($node) {
+  var $control = $node.prependDiv('tree-node-control');
+  if (this.checkable) {
+    $control.addClass('checkable');
+  }
+};
+
+scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
+  var $node = node.$node,
+    $controlItem = $node.prependDiv('tree-node-checkbox');
+  var $checkboxDiv = $controlItem
+    .appendDiv('check-box')
+    .toggleClass('checked', node.checked)
+    .toggleClass('disabled', !(this.enabled && node.enabled));
+
+  if (node.childrenChecked) {
+    $checkboxDiv.toggleClass('children-checked', true);
+  } else {
+    $checkboxDiv.toggleClass('children-checked', false);
+  }
+};
+
+scout.Tree.prototype._renderNodeChecked = function(node) {
+  if (!node.$node) {
+    // if node is not rendered, do nothing
+    return;
+  }
+
+  var $checkbox = node.$node
+    .children('.tree-node-checkbox')
+    .children('.check-box')
+    .toggleClass('checked', node.checked);
+};
+
+scout.Tree.prototype._renderNodeFilterAccepted = function(node) {
+  if (node.filterAccepted) {
+    this.showNode(node.$node);
+  } else {
+    this.hideNode(node.$node);
+  }
+};
+
 scout.Tree.prototype._renderMenus = function() {
   var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'], false, true);
   this.menuBar.updateItems(menuItems);
@@ -281,10 +496,174 @@ scout.Tree.prototype._renderBreadcrumbEnabled = function() {
   this.$container.toggleClass('breadcrumb', this.breadcrumbEnabled);
 };
 
-scout.Tree.prototype.onResize = function() {
-  if (this.rendered) {
-    this.htmlComp.revalidateLayoutTree();
+scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
+  animate = scout.helpers.nvl(animate, true);
+
+  var $node = node.$node,
+    expanded = node.expanded;
+
+  // Only render if node is rendered to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
+  if (!$node || $node.length === 0) {
+    return;
   }
+
+  // Only expand / collapse if there are child nodes
+  if (node.childNodes.length === 0) {
+    return true;
+  }
+
+  // Render lazy expansion
+  if (expanded && $node.hasClass('expanded') && !node.expandedLazy && $node.hasClass('lazy')) {
+    // If node is already expanded but only lazy -> expand completely
+    this._showAllNodes(node);
+  }
+  $node.toggleClass('lazy', expanded && node.expandedLazy);
+
+  if (expanded === $node.hasClass('expanded')) {
+    // Expansion state has not changed -> return
+    return;
+  }
+
+  // If there is already an animation is already going on for this node, stop it immediately
+  if (this._$animationWrapper) {
+    // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
+    // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
+    // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
+    // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
+    this._$animationWrapper.stop(false, true);
+  }
+
+  if (expanded) {
+    this._addNodes(node.childNodes, $node, $predecessor);
+    this._updateItemPath();
+
+    // animate opening
+    animate = animate && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
+    animate = animate && !$node.hasClass('leaf') && !$node.hasClass('expanded') && !this.breadcrumbEnabled;
+    if (animate) {
+      var $newNodes = scout.Tree.collectSubtree($node, false);
+      if ($newNodes.length) {
+        this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
+        var h = this._$animationWrapper.outerHeight();
+        this._$animationWrapper
+          .css('height', 0)
+          .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
+      }
+      $node.addClass('expanded');
+    }
+  } else {
+    $node.removeClass('expanded');
+
+    // animate closing
+    if (this.rendered) { // don't animate while rendering (not necessary, or may even lead to timing issues)
+      var $existingNodes = scout.Tree.collectSubtree($node, false);
+      if ($existingNodes.length) {
+        $existingNodes.each(function() {
+          // unlink '$nodes' from 'nodes' before deleting them
+          var node = $(this).data('node');
+          if (node) { // FIXME BSH Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
+            delete node.$node;
+          }
+        });
+        if (animate) {
+          this._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
+          this._$animationWrapper
+            .animateAVCSD('height', 0, onAnimationComplete.bind(this, false), this.revalidateLayoutTree.bind(this), 200);
+        } else {
+          $existingNodes.remove();
+          this.invalidateLayoutTree();
+        }
+      }
+    }
+  }
+
+  // ----- Helper functions -----
+
+  function onAnimationComplete(expanding) {
+    if (expanding) {
+      this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
+    } else {
+      this._$animationWrapper.remove();
+    }
+    this._$animationWrapper = null;
+  }
+};
+
+scout.Tree.prototype._renderSelection = function() {
+  var i, node, $node;
+
+  // Add children class to root nodes if no nodes are selected
+  if (this.selectedNodes.length === 0) {
+    this.nodes.forEach(function(childNode) {
+      childNode.$node.addClass('child-of-selected');
+    }, this);
+  }
+
+  this.selectedNodes.forEach(function(node) {
+    $node = node.$node;
+
+    // If $node is currently not displayed (due to a collapsed parent node), expand the parents
+    if (!$node) {
+      this._expandAllParentNodes(node);
+      $node = node.$node;
+      if (!$node || $node.length === 0) {
+        throw new Error('Still no node found. node=' + node);
+      }
+    }
+
+    $node.select(true);
+
+    // If node was previously hidden, show it!
+    $node.removeClass('hidden');
+
+    // Mark all ancestor nodes, especially necessary for bread crumb mode
+    var parentNode = node.parentNode;
+    while (parentNode) {
+      parentNode.$node.addClass('ancestor-of-selected');
+      parentNode = parentNode.parentNode;
+    }
+
+    // Mark all child nodes
+    if (node.expanded) {
+      node.childNodes.forEach(function(childNode) {
+        childNode.$node.addClass('child-of-selected');
+      }, this);
+    }
+  }, this);
+
+  this._updateItemPath();
+  if (this.scrollToSelection) {
+    // Execute delayed because tree may be not layouted yet
+    setTimeout(this.revealSelection.bind(this));
+  }
+};
+
+scout.Tree.prototype._removeSelection = function() {
+  // Remove children class on root nodes if no nodes were selected
+  if (this.selectedNodes.length === 0) {
+    this.nodes.forEach(function(childNode) {
+      childNode.$node.removeClass('child-of-selected');
+    }, this);
+  }
+
+  this.selectedNodes.forEach(function(node) {
+    var $node = node.$node;
+    if ($node) { // TODO BSH Check if $node can be undefined
+      $node.select(false);
+
+      // remove ancestor and child classes
+      var parentNode = node.parentNode;
+      while (parentNode) {
+        parentNode.$node.removeClass('ancestor-of-selected');
+        parentNode = parentNode.parentNode;
+      }
+      if (node.expanded) {
+        node.childNodes.forEach(function(childNode) {
+          childNode.$node.removeClass('child-of-selected');
+        }, this);
+      }
+    }
+  }, this);
 };
 
 scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {
@@ -459,99 +838,6 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   }
 };
 
-scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
-  animate = scout.helpers.nvl(animate, true);
-
-  var $node = node.$node,
-    expanded = node.expanded;
-
-  // Only render if node is rendered to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
-  if (!$node || $node.length === 0) {
-    return;
-  }
-
-  // Only expand / collapse if there are child nodes
-  if (node.childNodes.length === 0) {
-    return true;
-  }
-
-  // Render lazy expansion
-  if (expanded && $node.hasClass('expanded') && !node.expandedLazy && $node.hasClass('lazy')) {
-    // If node is already expanded but only lazy -> expand completely
-    this._showAllNodes(node);
-  }
-  $node.toggleClass('lazy', expanded && node.expandedLazy);
-
-  if (expanded === $node.hasClass('expanded')) {
-    // Expansion state has not changed -> return
-    return;
-  }
-
-  // If there is already an animation is already going on for this node, stop it immediately
-  if (this._$animationWrapper) {
-    // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
-    // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
-    // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
-    // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-    this._$animationWrapper.stop(false, true);
-  }
-
-  if (expanded) {
-    this._addNodes(node.childNodes, $node, $predecessor);
-    this._updateItemPath();
-
-    // animate opening
-    animate = animate && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
-    animate = animate && !$node.hasClass('leaf') && !$node.hasClass('expanded') && !this.breadcrumbEnabled;
-    if (animate) {
-      var $newNodes = scout.Tree.collectSubtree($node, false);
-      if ($newNodes.length) {
-        this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
-        var h = this._$animationWrapper.outerHeight();
-        this._$animationWrapper
-          .css('height', 0)
-          .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
-      }
-      $node.addClass('expanded');
-    }
-  } else {
-    $node.removeClass('expanded');
-
-    // animate closing
-    if (this.rendered) { // don't animate while rendering (not necessary, or may even lead to timing issues)
-      var $existingNodes = scout.Tree.collectSubtree($node, false);
-      if ($existingNodes.length) {
-        $existingNodes.each(function() {
-          // unlink '$nodes' from 'nodes' before deleting them
-          var node = $(this).data('node');
-          if (node) { // FIXME BSH Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
-            delete node.$node;
-          }
-        });
-        if (animate) {
-          this._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
-          this._$animationWrapper
-            .animateAVCSD('height', 0, onAnimationComplete.bind(this, false), this.revalidateLayoutTree.bind(this), 200);
-        } else {
-          $existingNodes.remove();
-          this.invalidateLayoutTree();
-        }
-      }
-    }
-  }
-
-  // ----- Helper functions -----
-
-  function onAnimationComplete(expanding) {
-    if (expanding) {
-      this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
-    } else {
-      this._$animationWrapper.remove();
-    }
-    this._$animationWrapper = null;
-  }
-};
-
 scout.Tree.prototype.scrollTo = function(node) {
   scout.scrollbars.scrollTo(this.$data, node.$node);
 };
@@ -589,7 +875,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
     // send delayed to avoid a lot of requests while selecting
     // coalesce: only send the latest selection changed event for a field
-    this._send('nodesSelected', eventData, debounceSend ? 250 : 0,  function(previous) {
+    this._send('nodesSelected', eventData, debounceSend ? 250 : 0, function(previous) {
       return this.id === previous.id && this.type === previous.type;
     });
   }
@@ -615,83 +901,6 @@ scout.Tree.prototype.deselectNodes = function(nodes) {
   if (scout.arrays.removeAll(selectedNodes, nodes)) {
     this.selectNodes(selectedNodes);
   }
-};
-
-scout.Tree.prototype._renderSelection = function() {
-  var i, node, $node;
-
-  // Add children class to root nodes if no nodes are selected
-  if (this.selectedNodes.length === 0) {
-    this.nodes.forEach(function(childNode) {
-      childNode.$node.addClass('child-of-selected');
-    }, this);
-  }
-
-  this.selectedNodes.forEach(function(node) {
-    $node = node.$node;
-
-    // If $node is currently not displayed (due to a collapsed parent node), expand the parents
-    if (!$node) {
-      this._expandAllParentNodes(node);
-      $node = node.$node;
-      if (!$node || $node.length === 0) {
-        throw new Error('Still no node found. node=' + node);
-      }
-    }
-
-    $node.select(true);
-
-    // If node was previously hidden, show it!
-    $node.removeClass('hidden');
-
-    // Mark all ancestor nodes, especially necessary for bread crumb mode
-    var parentNode = node.parentNode;
-    while (parentNode) {
-      parentNode.$node.addClass('ancestor-of-selected');
-      parentNode = parentNode.parentNode;
-    }
-
-    // Mark all child nodes
-    if (node.expanded) {
-      node.childNodes.forEach(function(childNode) {
-        childNode.$node.addClass('child-of-selected');
-      }, this);
-    }
-  }, this);
-
-  this._updateItemPath();
-  if (this.scrollToSelection) {
-    // Execute delayed because tree may be not layouted yet
-    setTimeout(this.revealSelection.bind(this));
-  }
-};
-
-scout.Tree.prototype._removeSelection = function() {
-  // Remove children class on root nodes if no nodes were selected
-  if (this.selectedNodes.length === 0) {
-    this.nodes.forEach(function(childNode) {
-      childNode.$node.removeClass('child-of-selected');
-    }, this);
-  }
-
-  this.selectedNodes.forEach(function(node) {
-    var $node = node.$node;
-    if ($node) { // TODO BSH Check if $node can be undefined
-      $node.select(false);
-
-      // remove ancestor and child classes
-      var parentNode = node.parentNode;
-      while (parentNode) {
-        parentNode.$node.removeClass('ancestor-of-selected');
-        parentNode = parentNode.parentNode;
-      }
-      if (node.expanded) {
-        node.childNodes.forEach(function(childNode) {
-          childNode.$node.removeClass('child-of-selected');
-        }, this);
-      }
-    }
-  }, this);
 };
 
 scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
@@ -730,22 +939,15 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
   }
 };
 
-scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
-  var parentNode, $parentNode;
-  // Append continuous node blocks
+scout.Tree.prototype._insertNodes = function(nodes, parentNode) {
+  var $parentNode, $predecessor;
 
-  if (parentNodeId >= 0) {
-    parentNode = this.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
-  }
+  // Append continuous node blocks
   nodes.sort(function(a, b) {
     return a.childNodeIndex - b.childNodeIndex;
   });
   this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
-  var $predecessor;
   // Update parent with new child nodes
   if (parentNode) {
     if (parentNode.childNodes && parentNode.childNodes.length > 0) {
@@ -814,7 +1016,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
+scout.Tree.prototype._updateNodes = function(nodes, parentNode) {
   // Update model
   var anyPropertiesChanged = false;
   for (var i = 0; i < nodes.length; i++) {
@@ -835,19 +1037,44 @@ scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
-  var parentNode, i, nodeId, node, deletedNodes = [];
-
-  if (parentNodeId >= 0) {
-    parentNode = this.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
+/**
+ * Called by _onNodesUpdated for every updated node. The function is expected to apply
+ * all updated properties from the updatedNode to the oldNode. May be overridden by
+ * subclasses so update their specific node properties.
+ *
+ * @param oldNode
+ *          The target node to be updated
+ * @param updatedNode
+ *          The new node with potentially updated properties. Default values are already applied!
+ * @returns
+ *          true if at least one property has changed, false otherwise. This value is used to
+ *          determine if the node has to be rendered again.
+ */
+scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode) {
+  // Note: We only update _some_ of the properties, because everything else will be handled
+  // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
+  var propertiesChanged = false;
+  if (oldNode.leaf !== updatedNode.leaf) {
+    oldNode.leaf = updatedNode.leaf;
+    propertiesChanged = true;
   }
+  if (oldNode.enabled !== updatedNode.enabled) {
+    oldNode.enabled = updatedNode.enabled;
+    propertiesChanged = true;
+  }
+  if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {
+    oldNode.lazyExpandingEnabled = updatedNode.lazyExpandingEnabled;
+    // Also make sure expandedLazy is resetted (same code as in AbstractTreeNode.setLazyExpandingEnabled)
+    oldNode.expandedLazy = updatedNode.lazyExpandingEnabled;
+    propertiesChanged = true;
+  }
+  return propertiesChanged;
+};
 
-  for (i = 0; i < nodeIds.length; i++) {
-    nodeId = nodeIds[i];
-    node = this.nodesMap[nodeId];
+scout.Tree.prototype._deleteNodes = function(nodes, parentNode) {
+  var deletedNodes = [];
+
+  nodes.forEach(function(node) {
     if (parentNode) {
       if (node.parentNode !== parentNode) {
         throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
@@ -862,7 +1089,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
 
     // remove children from node map
     this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
-  }
+  }, this);
 
   // remove node from html document
   if (this.rendered) {
@@ -870,15 +1097,8 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
-  var parentNode, nodes;
-
-  if (parentNodeId >= 0) {
-    parentNode = this.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
-  }
+scout.Tree.prototype._deleteAllChildNodes = function(parentNode) {
+  var nodes;
   if (parentNode) {
     nodes = parentNode.childNodes;
     parentNode.childNodes = [];
@@ -900,285 +1120,6 @@ scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
     this._destroyTreeNode(node, parentNode);
     this._updateMarkChildrenChecked(node, false, false);
   }
-};
-
-scout.Tree.prototype._onNodesSelected = function(nodeIds) {
-  var nodes = this._nodesByIds(nodeIds);
-  this.selectNodes(nodes, false);
-};
-
-scout.Tree.prototype._onNodeExpanded = function(nodeId, event) {
-  var node = this.nodesMap[nodeId],
-    expanded = event.expanded,
-    recursive = event.recursive,
-    lazy = event.expandedLazy;
-
-  this.setNodeExpanded(node, expanded, {
-    notifyServer: false,
-    lazy: lazy
-  });
-  if (recursive) {
-    this._visitNodes(node.childNodes, function(childNode) {
-      this.setNodeExpanded(childNode, expanded, {
-        notifyServer: false,
-        lazy: lazy
-      });
-    }.bind(this));
-  }
-};
-
-scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
-  var node = this.nodesMap[nodeId];
-
-  scout.defaultValues.applyTo(cell, 'TreeNode');
-  node.text = cell.text;
-  node.cssClass = cell.cssClass;
-  node.iconId = cell.iconId;
-  node.tooltipText = cell.tooltipText;
-  node.foregroundColor = cell.foregroundColor;
-  node.backgroundColor = cell.backgroundColor;
-  node.font = cell.font;
-
-  if (this.rendered) {
-    this._decorateNode(node);
-  }
-};
-
-scout.Tree.prototype._onNodesChecked = function(nodes) {
-  for (var i = 0; i < nodes.length; i++) {
-    this.checkNode(this.nodesMap[nodes[i].id], nodes[i].checked, true);
-  }
-};
-
-scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
-  var i,
-    parentNode = this.nodesMap[parentNodeId],
-    $lastChildNode = parentNode.childNodes[parentNode.childNodes.length - 1].$node;
-
-  // Sort model nodes
-  var newPositionsMap = {};
-  for (i = 0; i < childNodeIds.length; i++) {
-    newPositionsMap[childNodeIds[i]] = i;
-  }
-  parentNode.childNodes.sort(compare.bind(this));
-
-  // Render sorted nodes
-  if (this.rendered && $lastChildNode) {
-    // Find the last affected node DIV
-    $lastChildNode = scout.Tree.collectSubtree($lastChildNode).last();
-
-    // Insert a marker DIV
-    var $marker = $lastChildNode.afterDiv();
-    for (i = 0; i < parentNode.childNodes.length; i++) {
-      var node = parentNode.childNodes[i];
-      var $node = node.$node;
-      if ($node) {
-        // Move the element in DOM tree. Note: Inserting the element at the new position is sufficient
-        // in jQuery. There is no need to remove() it at the old position. Also, removing would break
-        // the application, because remove() detaches all listeners!
-        scout.Tree.collectSubtree($node).insertBefore($marker);
-      }
-    }
-    $marker.remove();
-  }
-
-  function compare(node1, node2) {
-    var pos1 = newPositionsMap[node1.id];
-    var pos2 = newPositionsMap[node2.id];
-    if (pos1 < pos2) {
-      return -1;
-    }
-    if (pos1 > pos2) {
-      return 1;
-    }
-    return 0;
-  }
-};
-
-/**
- * @param parentNode optional. If provided, this node's state will be updated (e.g. it will be collapsed)
- */
-scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
-  if (nodes.length === 0) {
-    return;
-  }
-
-  nodes.forEach(function(node) {
-    if (node.childNodes.length > 0) {
-      this._removeNodes(node.childNodes, node);
-    }
-    if (node.$node) {
-      node.$node.remove();
-      delete node.$node;
-    }
-  }, this);
-
-  //If every child node was deleted mark node as collapsed (independent of the model state)
-  //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
-  var $parentNode = (parentNode ? parentNode.$node : undefined);
-  if ($parentNode) {
-    if (!parentNode) {
-      parentNode = $parentNode.data('node');
-    }
-    var childNodesOfParent = parentNode.childNodes;
-    if (!childNodesOfParent || childNodesOfParent.length === 0) {
-      $parentNode.removeClass('expanded');
-      $parentNode.removeClass('lazy');
-    }
-  }
-
-  this.invalidateLayoutTree();
-};
-
-scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
-  if (!nodes || nodes.length === 0) {
-    return;
-  }
-
-  $predecessor = $predecessor || $parent;
-  var parentNode = ($parent ? $parent.data('node') : null);
-
-  for (var i = 0; i < nodes.length; i++) {
-    var node = nodes[i];
-    var $node = this._$buildNode(node, $parent);
-
-    // If parent node wants its children to be lazy added to the tree, hide the DOM element, except
-    // the node is expanded, in which case we never hide it. (The last check provides a cheap
-    // way to retain most of the state when the page is reloaded).
-    if (!node.expanded && parentNode && parentNode.expandedLazy) {
-      $node.addClass('hidden');
-    }
-    // append first node and successors
-    if ($predecessor) {
-      $node.insertAfter($predecessor);
-    } else {
-      $node.prependTo(this.$data);
-    }
-
-    // if model demands children, create them
-    if (node.expanded && node.childNodes.length > 0) {
-      $predecessor = this._addNodes(node.childNodes, $node);
-    } else {
-      $predecessor = $node;
-    }
-  }
-
-  this.invalidateLayoutTree();
-
-  //return the last created node
-  return $predecessor;
-};
-
-scout.Tree.prototype._$buildNode = function(node, $parent) {
-  var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
-
-  var $node = $.makeDiv(this.ownerDocument(), 'tree-node')
-    .data('node', node)
-    .attr('data-nodeid', node.id)
-    .attr('data-level', level)
-    .css('padding-left', this._computeTreeItemPaddingLeft(level));
-  node.$node = $node;
-
-  this._decorateNode(node);
-  this._renderTreeItemControl($node);
-
-  if (this.checkable) {
-    this._renderTreeItemCheckbox(node);
-  }
-
-  return $node;
-};
-
-scout.Tree.prototype._decorateNode = function(node) {
-  var formerClasses,
-    $node = node.$node;
-  if (!$node) {
-    // This node is not yet rendered, nothing to do
-    return;
-  }
-
-  formerClasses = 'tree-node';
-  if ($node.isSelected()) {
-    formerClasses += ' selected';
-  }
-  if ($node.hasClass('group')) {
-    formerClasses += ' group';
-  }
-  $node.removeClass();
-  $node.addClass(formerClasses);
-  $node.addClass(node.cssClass);
-  $node.toggleClass('leaf', !! node.leaf);
-  $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
-  $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
-  $node.setEnabled( !! node.enabled);
-  $node.children('.tree-node-checkbox')
-    .children('.check-box')
-    .toggleClass('disabled', !(this.enabled && node.enabled));
-
-  if (!node.parentNode && this.selectedNodes.length === 0) {
-    // Root nodes have class child-of-selected if no node is selected
-    $node.addClass('child-of-selected');
-  }
-  else if (node.parentNode && this.selectedNodes.indexOf(node.parentNode) > -1) {
-    $node.addClass('child-of-selected');
-  }
-
-  // Replace only the "text part" of the node, leave control and checkbox untouched
-  var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
-  $node.empty();
-  if (node.htmlEnabled) {
-    $node.html(node.text);
-  } else {
-    $node.textOrNbsp(node.text);
-  }
-  $node.prepend(preservedChildren);
-
-  scout.helpers.legacyStyle(node, $node);
-
-  if (scout.strings.hasText(node.tooltipText)) {
-    $node.attr('title', node.tooltipText);
-  }
-
-  // apply node filter
-  if (this._applyFiltersForNode(node)) {
-    var newInvisibleNodes = [];
-    if (!node.filterAccepted) {
-      newInvisibleNodes.push(node);
-    }
-    this._nodesFiltered(newInvisibleNodes);
-  }
-  this._renderNodeFilterAccepted(node);
-
-  this.dragAndDropHandler.install($node);
-  // TODO BSH More attributes...
-  // iconId
-  // tooltipText
-
-  // If parent node is marked as 'lazy', check if any hidden child nodes remain.
-  if (node.parentNode && node.parentNode.$node.hasClass('lazy')) {
-    var hasHiddenNodes = node.parentNode.childNodes.some(function(childNode) {
-      if (!childNode.$node || childNode.$node.hasClass('hidden')) {
-        return true;
-      }
-      return false;
-    });
-    if (!hasHiddenNodes) {
-      // Remove 'lazy' from parent
-      node.parentNode.$node.removeClass('lazy');
-    }
-  }
-};
-
-scout.Tree.prototype._renderNodeChecked = function(node) {
-  if (!node.$node) {
-    // if node is not rendered, do nothing
-    return;
-  }
-
-  var $checkbox = node.$node
-    .children('.tree-node-checkbox')
-    .children('.check-box')
-    .toggleClass('checked', node.checked);
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
@@ -1244,36 +1185,6 @@ scout.Tree.prototype._sendBreadCrumbEnabled = function() {
   });
 };
 
-scout.Tree.prototype._renderTreeItemControl = function($node) {
-  var $control = $node.prependDiv('tree-node-control');
-  if (this.checkable) {
-    $control.addClass('checkable');
-  }
-};
-
-scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
-  var $node = node.$node,
-    $controlItem = $node.prependDiv('tree-node-checkbox');
-  var $checkboxDiv = $controlItem
-    .appendDiv('check-box')
-    .toggleClass('checked', node.checked)
-    .toggleClass('disabled', !(this.enabled && node.enabled));
-
-  if (node.childrenChecked) {
-    $checkboxDiv.toggleClass('children-checked', true);
-  } else {
-    $checkboxDiv.toggleClass('children-checked', false);
-  }
-};
-
-scout.Tree.prototype._onContextMenu = function(event) {
-  if (this.$data.is(event.target)) {
-    this._showContextMenu(event, ['Tree.EmptySpace']);
-  } else {
-    this._showContextMenu(event, ['Tree.SingleSelection', 'Tree.MultiSelection']);
-  }
-};
-
 scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
   event.preventDefault();
   event.stopPropagation();
@@ -1333,70 +1244,6 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
 
 scout.Tree.prototype._isCheckboxClicked = function(event) {
   return $(event.target).is('.check-box');
-};
-
-scout.Tree.prototype._onNodeDoubleClick = function(event) {
-  var $node = $(event.currentTarget);
-  var node = $node.data('node');
-  var expanded = !$node.hasClass('expanded');
-
-  if (this.breadcrumbEnabled) {
-    return;
-  }
-
-  this._send('nodeAction', {
-    nodeId: node.id
-  });
-
-  this.setNodeExpanded(node, expanded, {
-    lazy: false // always show all nodes on node double click
-  });
-};
-
-scout.Tree.prototype._onNodeControlMouseDown = function(event) {
-  this._doubleClickSupport.mousedown(event);
-  if (this._doubleClickSupport.doubleClicked()) {
-    //don't execute on double click events
-    return false;
-  }
-
-  var $node = $(event.currentTarget).parent();
-  var node = $node.data('node');
-  var expanded = !$node.hasClass('expanded');
-  var expansionOpts = {
-    lazy: false // always show all nodes when the control gets clicked
-  };
-
-  // Click on "show all" control shows all nodes
-  if ($node.hasClass('lazy')) {
-    if (event.ctrlKey || event.shiftKey) {
-      // Collapse
-      expanded = false;
-      expansionOpts.collapseChildNodes = true;
-    } else {
-      // Show all nodes
-      this.expandNode(node, expansionOpts);
-      return false;
-    }
-  }
-
-  this.selectNodes(node);
-  this.setNodeExpanded(node, expanded, expansionOpts);
-
-  // prevent bubbling to _onNodeMouseDown()
-  $.suppressEvent(event);
-  // ...but return true, so Outline.js can override this method and check if selection has been changed or not
-  return true;
-};
-
-scout.Tree.prototype._onNodeControlMouseUp = function(event) {
-  // prevent bubbling to _onNodeMouseUp()
-  return false;
-};
-
-scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
-  // prevent bubbling to _onNodeDoubleClick()
-  return false;
 };
 
 scout.Tree.prototype._showAllNodes = function(parentNode) {
@@ -1602,14 +1449,6 @@ scout.Tree.prototype._applyFiltersForNode = function(node) {
   return false;
 };
 
-scout.Tree.prototype._renderNodeFilterAccepted = function(node) {
-  if (node.filterAccepted) {
-    this.showNode(node.$node);
-  } else {
-    this.hideNode(node.$node);
-  }
-};
-
 scout.Tree.prototype.showNode = function($node, useAnimation) {
   var that = this,
     node = $node.data('node');
@@ -1666,6 +1505,78 @@ scout.Tree.prototype._nodesByIds = function(ids) {
   }.bind(this));
 };
 
+scout.Tree.prototype._onNodeDoubleClick = function(event) {
+  var $node = $(event.currentTarget);
+  var node = $node.data('node');
+  var expanded = !$node.hasClass('expanded');
+
+  if (this.breadcrumbEnabled) {
+    return;
+  }
+
+  this._send('nodeAction', {
+    nodeId: node.id
+  });
+
+  this.setNodeExpanded(node, expanded, {
+    lazy: false // always show all nodes on node double click
+  });
+};
+
+scout.Tree.prototype._onNodeControlMouseDown = function(event) {
+  this._doubleClickSupport.mousedown(event);
+  if (this._doubleClickSupport.doubleClicked()) {
+    //don't execute on double click events
+    return false;
+  }
+
+  var $node = $(event.currentTarget).parent();
+  var node = $node.data('node');
+  var expanded = !$node.hasClass('expanded');
+  var expansionOpts = {
+    lazy: false // always show all nodes when the control gets clicked
+  };
+
+  // Click on "show all" control shows all nodes
+  if ($node.hasClass('lazy')) {
+    if (event.ctrlKey || event.shiftKey) {
+      // Collapse
+      expanded = false;
+      expansionOpts.collapseChildNodes = true;
+    } else {
+      // Show all nodes
+      this.expandNode(node, expansionOpts);
+      return false;
+    }
+  }
+
+  this.selectNodes(node);
+  this.setNodeExpanded(node, expanded, expansionOpts);
+
+  // prevent bubbling to _onNodeMouseDown()
+  $.suppressEvent(event);
+  // ...but return true, so Outline.js can override this method and check if selection has been changed or not
+  return true;
+};
+
+scout.Tree.prototype._onNodeControlMouseUp = function(event) {
+  // prevent bubbling to _onNodeMouseUp()
+  return false;
+};
+
+scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
+  // prevent bubbling to _onNodeDoubleClick()
+  return false;
+};
+
+scout.Tree.prototype._onContextMenu = function(event) {
+  if (this.$data.is(event.target)) {
+    this._showContextMenu(event, ['Tree.EmptySpace']);
+  } else {
+    this._showContextMenu(event, ['Tree.SingleSelection', 'Tree.MultiSelection']);
+  }
+};
+
 scout.Tree.prototype._onRequestFocus = function() {
   this.session.focusManager.requestFocus(this.$container);
 };
@@ -1674,45 +1585,148 @@ scout.Tree.prototype._onScrollToSelection = function() {
   this.revealSelection();
 };
 
-/**
- * Called by _onNodesUpdated for every updated node. The function is expected to apply
- * all updated properties from the updatedNode to the oldNode. May be overridden by
- * subclasses so update their specific node properties.
- *
- * @param oldNode
- *          The target node to be updated
- * @param updatedNode
- *          The new node with potentially updated properties. Default values are already applied!
- * @returns
- *          true if at least one property has changed, false otherwise. This value is used to
- *          determine if the node has to be rendered again.
- */
-scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode) {
-  // Note: We only update _some_ of the properties, because everything else will be handled
-  // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
-  var propertiesChanged = false;
-  if (oldNode.leaf !== updatedNode.leaf) {
-    oldNode.leaf = updatedNode.leaf;
-    propertiesChanged = true;
+scout.Tree.prototype.onResize = function() {
+  if (this.rendered) {
+    this.htmlComp.revalidateLayoutTree();
   }
-  if (oldNode.enabled !== updatedNode.enabled) {
-    oldNode.enabled = updatedNode.enabled;
-    propertiesChanged = true;
+};
+
+scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
+  var parentNode;
+  if (parentNodeId >= 0) {
+    parentNode = this.nodesMap[parentNodeId];
+    if (!parentNode) {
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+    }
   }
-  if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {
-    oldNode.lazyExpandingEnabled = updatedNode.lazyExpandingEnabled;
-    // Also make sure expandedLazy is resetted (same code as in AbstractTreeNode.setLazyExpandingEnabled)
-    oldNode.expandedLazy = updatedNode.lazyExpandingEnabled;
-    propertiesChanged = true;
+  this._insertNodes(nodes, parentNode);
+};
+
+scout.Tree.prototype._onNodesUpdated = function(nodes) {
+  this._updateNodes(nodes);
+};
+
+scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
+  var parentNode;
+  if (parentNodeId >= 0) {
+    parentNode = this.nodesMap[parentNodeId];
+    if (!parentNode) {
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+    }
   }
-  return propertiesChanged;
+  var nodes = this._nodesByIds(nodeIds);
+  this._deleteNodes(nodes, parentNode);
+};
+
+scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
+  var parentNode;
+  if (parentNodeId >= 0) {
+    parentNode = this.nodesMap[parentNodeId];
+    if (!parentNode) {
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+    }
+  }
+  this._deleteAllChildNodes(parentNode);
+};
+
+scout.Tree.prototype._onNodesSelected = function(nodeIds) {
+  var nodes = this._nodesByIds(nodeIds);
+  this.selectNodes(nodes, false);
+};
+
+scout.Tree.prototype._onNodeExpanded = function(nodeId, event) {
+  var node = this.nodesMap[nodeId],
+    expanded = event.expanded,
+    recursive = event.recursive,
+    lazy = event.expandedLazy;
+
+  this.setNodeExpanded(node, expanded, {
+    notifyServer: false,
+    lazy: lazy
+  });
+  if (recursive) {
+    this._visitNodes(node.childNodes, function(childNode) {
+      this.setNodeExpanded(childNode, expanded, {
+        notifyServer: false,
+        lazy: lazy
+      });
+    }.bind(this));
+  }
+};
+
+scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
+  var node = this.nodesMap[nodeId];
+
+  scout.defaultValues.applyTo(cell, 'TreeNode');
+  node.text = cell.text;
+  node.cssClass = cell.cssClass;
+  node.iconId = cell.iconId;
+  node.tooltipText = cell.tooltipText;
+  node.foregroundColor = cell.foregroundColor;
+  node.backgroundColor = cell.backgroundColor;
+  node.font = cell.font;
+
+  if (this.rendered) {
+    this._decorateNode(node);
+  }
+};
+
+scout.Tree.prototype._onNodesChecked = function(nodes) {
+  for (var i = 0; i < nodes.length; i++) {
+    this.checkNode(this.nodesMap[nodes[i].id], nodes[i].checked, true);
+  }
+};
+
+scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
+  var i,
+    parentNode = this.nodesMap[parentNodeId],
+    $lastChildNode = parentNode.childNodes[parentNode.childNodes.length - 1].$node;
+
+  // Sort model nodes
+  var newPositionsMap = {};
+  for (i = 0; i < childNodeIds.length; i++) {
+    newPositionsMap[childNodeIds[i]] = i;
+  }
+  parentNode.childNodes.sort(compare.bind(this));
+
+  // Render sorted nodes
+  if (this.rendered && $lastChildNode) {
+    // Find the last affected node DIV
+    $lastChildNode = scout.Tree.collectSubtree($lastChildNode).last();
+
+    // Insert a marker DIV
+    var $marker = $lastChildNode.afterDiv();
+    for (i = 0; i < parentNode.childNodes.length; i++) {
+      var node = parentNode.childNodes[i];
+      var $node = node.$node;
+      if ($node) {
+        // Move the element in DOM tree. Note: Inserting the element at the new position is sufficient
+        // in jQuery. There is no need to remove() it at the old position. Also, removing would break
+        // the application, because remove() detaches all listeners!
+        scout.Tree.collectSubtree($node).insertBefore($marker);
+      }
+    }
+    $marker.remove();
+  }
+
+  function compare(node1, node2) {
+    var pos1 = newPositionsMap[node1.id];
+    var pos2 = newPositionsMap[node2.id];
+    if (pos1 < pos2) {
+      return -1;
+    }
+    if (pos1 > pos2) {
+      return 1;
+    }
+    return 0;
+  }
 };
 
 scout.Tree.prototype.onModelAction = function(event) {
   if (event.type === 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
   } else if (event.type === 'nodesUpdated') {
-    this._onNodesUpdated(event.nodes, event.commonParentNodeId);
+    this._onNodesUpdated(event.nodes);
   } else if (event.type === 'nodesDeleted') {
     this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
   } else if (event.type === 'allChildNodesDeleted') {
