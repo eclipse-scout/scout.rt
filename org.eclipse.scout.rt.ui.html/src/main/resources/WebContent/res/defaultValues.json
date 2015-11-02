@@ -104,6 +104,9 @@
       "multilineText": false,
       "updateDisplayTextOnModify": false
     },
+    "TileContainerBox": {
+      "tiles": [] // TODO remove all tile definitions and move to separate json file
+    },
     "DateField": {
       "hasDate": true,
       "hasTime": false

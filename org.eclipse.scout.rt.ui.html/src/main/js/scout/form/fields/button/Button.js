@@ -105,12 +105,6 @@ scout.Button.prototype._render = function($parent) {
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 };
 
-scout.Button.prototype._onClick = function() {
-  if (this.enabled) {
-    this.doAction();
-  }
-};
-
 scout.Button.prototype._remove = function() {
   scout.Button.parent.prototype._remove.call(this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
@@ -166,6 +160,13 @@ scout.Button.prototype.setSelected = function(selected) {
   });
 };
 
+scout.Button.prototype.setIconId = function(iconId) {
+  this._setProperty('iconId', iconId);
+  if (this.rendered) {
+    this._renderIconId();
+  }
+};
+
 /**
  * @override
  */
@@ -195,6 +196,7 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function(label) {
+  label = scout.helpers.nvl(label, this.label);
   this._$label.textOrNbsp(scout.strings.removeAmpersand(label));
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
@@ -216,4 +218,10 @@ scout.Button.prototype._renderIconId = function() {
 scout.Button.prototype._syncKeyStroke = function(keyStroke) {
   this.keyStroke = keyStroke;
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
+};
+
+scout.Button.prototype._onClick = function() {
+  if (this.enabled) {
+    this.doAction();
+  }
 };

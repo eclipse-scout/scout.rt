@@ -997,6 +997,11 @@ scout.Tree.prototype._insertNodes = function(nodes, parentNode) {
     }
   }
 
+  this.trigger('nodesInserted', {
+    nodes: nodes,
+    parentNode: parentNode
+  });
+
   // ----- Helper functions -----
 
   function calcPredecessor(nodeBefore) {
@@ -1016,7 +1021,7 @@ scout.Tree.prototype._insertNodes = function(nodes, parentNode) {
   }
 };
 
-scout.Tree.prototype._updateNodes = function(nodes, parentNode) {
+scout.Tree.prototype._updateNodes = function(nodes) {
   // Update model
   var anyPropertiesChanged = false;
   for (var i = 0; i < nodes.length; i++) {
@@ -1035,6 +1040,10 @@ scout.Tree.prototype._updateNodes = function(nodes, parentNode) {
   if (this.rendered && anyPropertiesChanged) {
     this._updateItemPath();
   }
+
+  this.trigger('nodesUpdated', {
+    nodes: nodes
+  });
 };
 
 /**
@@ -1095,6 +1104,11 @@ scout.Tree.prototype._deleteNodes = function(nodes, parentNode) {
   if (this.rendered) {
     this._removeNodes(deletedNodes, parentNode);
   }
+
+  this.trigger('nodesDeleted', {
+    nodes: nodes,
+    parentNode: parentNode
+  });
 };
 
 scout.Tree.prototype._deleteAllChildNodes = function(parentNode) {
@@ -1112,6 +1126,10 @@ scout.Tree.prototype._deleteAllChildNodes = function(parentNode) {
   if (this.rendered) {
     this._removeNodes(nodes, parentNode);
   }
+
+  this.trigger('allChildNodesDeleted', {
+    parentNode: parentNode
+  });
 
   // --- Helper functions ---
 
@@ -1669,6 +1687,10 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
   if (this.rendered) {
     this._decorateNode(node);
   }
+
+  this.trigger('nodeChanged', {
+    node: node
+  });
 };
 
 scout.Tree.prototype._onNodesChecked = function(nodes) {
@@ -1708,6 +1730,9 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
     }
     $marker.remove();
   }
+  this.trigger('childNodeOrderChanged', {
+    parentNode: parentNode
+  });
 
   function compare(node1, node2) {
     var pos1 = newPositionsMap[node1.id];

@@ -90,13 +90,13 @@ scout.FormField.prototype._render = function($parent) {
 };
 
 scout.FormField.prototype._renderProperties = function() {
-  this._renderEnabled(this.enabled);
-  this._renderMandatory(this.mandatory);
-  this._renderVisible(this.visible);
+  this._renderEnabled();
+  this._renderMandatory();
+  this._renderVisible();
   this._renderTooltipText();
   this._renderErrorStatus();
   this._renderMenus();
-  this._renderLabel(this.label);
+  this._renderLabel();
   this._renderLabelVisible(this.labelVisible);
   this._renderStatusVisible(this.statusVisible);
   this._renderCssClass(this.cssClass);
@@ -149,6 +149,7 @@ scout.FormField.prototype._renderTooltipText = function() {
 };
 
 scout.FormField.prototype._renderVisible = function(visible) {
+  visible = scout.helpers.nvl(visible, this.visible);
   this.$container.setVisible(visible);
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
@@ -325,6 +326,13 @@ scout.FormField.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStroke
 
 scout.FormField.prototype._syncMenus = function(newMenus, oldMenus) {
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+};
+
+scout.FormField.prototype.setLabel = function(label) {
+  this._setProperty('label', label);
+  if (this.rendered) {
+    this._renderLabel();
+  }
 };
 
 scout.FormField.prototype.setTooltipText = function(tooltipText) {
