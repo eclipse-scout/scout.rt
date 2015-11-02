@@ -594,7 +594,6 @@
       left: to
     }, opts);
 
-    console.log(this.attr('id') + ' ' + from + ' ' + to );
     return this;
   };
 
