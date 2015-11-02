@@ -209,17 +209,18 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(5)
   protected IWizardContainerForm execCreateContainerForm() {
-    DefaultWizardContainerForm containerForm = new DefaultWizardContainerForm(this);
-    decorateWizardContainerForm(containerForm);
-    return containerForm;
+    return new DefaultWizardContainerForm(this);
   }
 
-  protected void decorateWizardContainerForm(IWizardContainerForm containerForm) {
-    containerForm.setDisplayHint(getDisplayHint());
-    containerForm.setDisplayViewId(getDisplayViewId());
-    containerForm.setModal(isModal());
-    containerForm.setTitle(getTitle());
-    containerForm.setSubTitle(getSubTitle());
+  protected void decorateWizardContainerForm() {
+    if (m_containerForm == null) {
+      return;
+    }
+    m_containerForm.setDisplayHint(getDisplayHint());
+    m_containerForm.setDisplayViewId(getDisplayViewId());
+    m_containerForm.setModal(isModal());
+    m_containerForm.setTitle(getTitle());
+    m_containerForm.setSubTitle(getSubTitle());
   }
 
   /**
@@ -1043,6 +1044,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
       @Override
       public void run() throws Exception {
+        decorateWizardContainerForm();
         interceptStart();
       }
     });
