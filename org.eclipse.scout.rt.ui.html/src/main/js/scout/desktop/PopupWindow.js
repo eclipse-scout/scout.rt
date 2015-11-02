@@ -14,6 +14,7 @@ scout.PopupWindow = function(myWindow, form) { // use 'myWindow' in place of 'wi
   // this is required when we want to check if a certain DOM element belongs
   // to a popup window
   myWindow.popupWindow = this;
+  myWindow.name = 'Scout popup-window ' + form.modelClass;
 };
 
 scout.PopupWindow.prototype._onUnload = function() {
