@@ -41,8 +41,11 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   }
 
   public AbstractCalendarField(boolean callInitializer) {
-    super(callInitializer);
+    super(false);
     m_valueSelectionMediator = new OptimisticLock();
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   /*
