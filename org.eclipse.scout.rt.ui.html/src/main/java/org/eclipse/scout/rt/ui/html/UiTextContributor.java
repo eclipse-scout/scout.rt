@@ -72,7 +72,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.backward",
         "ui.toEnd",
         "ui.ascending",
-        "ui.copy",
+        "ui.Copy",
         "ui.descending",
         "ui.ascendingAdditionally",
         "ui.descendingAdditionally",
