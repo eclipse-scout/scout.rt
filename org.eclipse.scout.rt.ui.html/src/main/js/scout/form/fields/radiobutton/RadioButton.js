@@ -51,12 +51,9 @@ scout.RadioButton.prototype._renderProperties = function() {
 /**
  * @override
  */
-scout.RadioButton.prototype._renderLabel = function(label) {
-  if (!label) {
-    label = '';
-  }
+scout.RadioButton.prototype._renderLabel = function() {
   if (this.$field) {
-    this.$field.text(label ? scout.strings.removeAmpersand(label) : '');
+    this.$field.textOrNbsp(scout.strings.removeAmpersand(this.label));
   }
 
 };

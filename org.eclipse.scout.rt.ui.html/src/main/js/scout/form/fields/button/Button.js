@@ -195,9 +195,8 @@ scout.Button.prototype._renderSelected = function() {
 /**
  * @override
  */
-scout.Button.prototype._renderLabel = function(label) {
-  label = scout.helpers.nvl(label, this.label);
-  this._$label.textOrNbsp(scout.strings.removeAmpersand(label));
+scout.Button.prototype._renderLabel = function() {
+  this._$label.textOrNbsp(scout.strings.removeAmpersand(this.label));
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
 };

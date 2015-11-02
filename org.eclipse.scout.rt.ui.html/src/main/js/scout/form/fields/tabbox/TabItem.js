@@ -39,7 +39,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
     .on('mousedown', this._onTabMouseDown.bind(this));
 
   this._renderTabActive();
-  this._renderLabel(this.label);
+  this._renderLabel();
   this._tabRendered = true;
   this._updateTab();
 };
@@ -121,8 +121,8 @@ scout.TabItem.prototype._syncLabel = function(label) {
   }
 };
 
-scout.TabItem.prototype._renderLabel = function(label) {
-  scout.TabItem.parent.prototype._renderLabel.call(this, label);
+scout.TabItem.prototype._renderLabel = function() {
+  scout.TabItem.parent.prototype._renderLabel.call(this);
   this._updateTab();
 };
 

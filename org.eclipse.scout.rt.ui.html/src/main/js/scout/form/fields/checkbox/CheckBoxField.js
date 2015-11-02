@@ -98,9 +98,9 @@ scout.CheckBoxField.prototype._renderValue = function(value) {
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderLabel = function(label) {
+scout.CheckBoxField.prototype._renderLabel = function() {
   if (this.$checkBoxLabel) {
-    this.$checkBoxLabel.text(label || '');
+    this.$checkBoxLabel.textOrNbsp(scout.strings.removeAmpersand(this.label), 'empty');
   }
 };
 
