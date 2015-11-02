@@ -392,19 +392,19 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
     .click(onRemoveColorClick);
 
   function onRedColorClick() {
-    table.colorData(column, 'red');
+    table.setColumnBackgroundEffect(column, 'colorGradient1');
   }
 
   function onGreenColorClick() {
-    table.colorData(column, 'green');
+    table.setColumnBackgroundEffect(column, 'colorGradient2');
   }
 
   function onBarColorClick() {
-    table.colorData(column, 'bar');
+    table.setColumnBackgroundEffect(column, 'barChart');
   }
 
   function onRemoveColorClick() {
-    table.colorData(column, 'remove');
+    table.setColumnBackgroundEffect(column, null);
   }
 };
 

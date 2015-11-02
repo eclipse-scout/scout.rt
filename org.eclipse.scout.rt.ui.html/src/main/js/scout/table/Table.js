@@ -1644,7 +1644,20 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
   }
 };
 
-scout.Table.prototype.colorData = function(column, mode) {
+scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {
+  this.sendColumnBackgroundEffect(column, effect);
+  this.renderColumnBackgroundEffect(column, effect);
+};
+
+scout.Table.prototype.sendColumnBackgroundEffect= function(column, effect) {
+  var data = {
+    columnId : column.id,
+    backgroundEffect : effect
+  };
+  this._send('columnBackgroundEffectChanged', data);
+};
+
+scout.Table.prototype.renderColumnBackgroundEffect = function(column, effect) {
   var minValue, maxValue, colorFunc, row, value, v, i, $cell,
     filteredRows = this.filteredRows();
 
@@ -1662,7 +1675,7 @@ scout.Table.prototype.colorData = function(column, mode) {
 
   // TODO CRU Don't use hardcoded colors (or make them customizable)
   // TODO CRU Handle case where model already has set specific cell background colors
-  if (mode === 'red') {
+  if (effect === 'colorGradient1') {
     colorFunc = function($cell, value) {
       var level = (value - minValue) / (maxValue - minValue);
 
@@ -1673,7 +1686,7 @@ scout.Table.prototype.colorData = function(column, mode) {
       $cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
       $cell.css('background-image', '');
     };
-  } else if (mode === 'green') {
+  } else if (effect === 'colorGradient2') {
     colorFunc = function($cell, value) {
       var level = (value - minValue) / (maxValue - minValue);
 
@@ -1684,14 +1697,17 @@ scout.Table.prototype.colorData = function(column, mode) {
       $cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
       $cell.css('background-image', '');
     };
-  } else if (mode === 'bar') {
+  } else if (effect === 'barChart') {
     colorFunc = function($cell, value) {
       var level = Math.ceil((value - minValue) / (maxValue - minValue) * 100) + '';
 
       $cell.css('background-color', 'transparent');
       $cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )');
     };
-  } else if (mode === 'remove') {
+  } else {
+    if (effect !== null) {
+      // FIXME ASA log warning
+    }
     colorFunc = function($cell, value) {
       $cell.css('background-image', '');
       $cell.css('background-color', 'transparent');
@@ -2978,6 +2994,16 @@ scout.Table.prototype._onScrollToSelection = function() {
   this.revealSelection();
 };
 
+scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
+  var columnId, effect;
+  event.eventParts.forEach(function(eventPart){
+    // FIXME ASA write backgroundEffect on UI-Object?
+    columnId = eventPart.columnId;
+    effect = eventPart.backgroundEffect;
+    this.renderColumnBackgroundEffect(this.columnById(columnId), effect);
+  }, this);
+};
+
 scout.Table.prototype._onAggregationFunctionChanged = function(event) {
   var columnId, column, func;
 
@@ -3036,6 +3062,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onScrollToSelection();
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onAggregationFunctionChanged(event);
+  } else if (event.type === 'columnBackgroundEffectChanged') {
+    this._onColumnBackgroundEffectChanged(event);
   } else {
     scout.Table.parent.prototype.onModelAction.call(this, event);
   }
