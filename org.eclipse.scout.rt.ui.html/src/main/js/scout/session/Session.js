@@ -63,8 +63,8 @@ scout.Session = function($entryPoint, options) {
   this._asyncEvents = [];
   this._asyncResponses = [];
   this._deferred;
-  this._startup;
-  this._unload;
+  this.ready = false; // true after desktop has been completely rendered
+  this.unloaded = false; // true after unload event has been received from the window
   this.desktop;
   this.url = 'json';
   this._adapterDataCache = {};
@@ -236,37 +236,42 @@ scout.Session.prototype.sendEvent = function(event, delay) {
   }.bind(this), delay);
 };
 
+scout.Session.prototype._sendStartupRequest = function() {
+  // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
+  var request = {
+    uiSessionId: this.uiSessionId,
+    startup: true
+  };
+  if (this.clientSessionId) {
+    request.clientSessionId = this.clientSessionId;
+  }
+  if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
+    request.userAgent = this.userAgent;
+  }
+  request.customParams = this._customParams;
+  // Send request
+  this._sendRequest(request);
+};
+
+scout.Session.prototype._sendUnloadRequest = function() {
+  var request = {
+    uiSessionId: this.uiSessionId,
+    unload: true
+  };
+  // Send request
+  this._sendRequest(request);
+};
+
 scout.Session.prototype._sendNow = function() {
-  if (this._asyncEvents.length === 0 && !this._startup && !this._unload) {
+  if (this._asyncEvents.length === 0) {
     // Nothing to send -> return
     return;
   }
-
   var request = {
-    uiSessionId: this.uiSessionId
+    uiSessionId: this.uiSessionId,
+    events: this._asyncEvents
   };
-
-  if (this._startup) {
-    this._startup = false;
-    // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
-    request.startup = true;
-    if (this.clientSessionId) {
-      request.clientSessionId = this.clientSessionId;
-    }
-    if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
-      request.userAgent = this.userAgent;
-    }
-    request.customParams = this._customParams;
-  }
-
-  if (this._unload) {
-    this._unload = false;
-    request.unload = true;
-  }
-
-  if (this._asyncEvents.length > 0) {
-    request.events = this._asyncEvents;
-  }
+  // Send request
   this._sendRequest(request);
   this._asyncEvents = [];
 };
@@ -727,7 +732,7 @@ scout.Session.prototype.goOffline = function() {
   // thus we wait some short period of time before displaying the message and starting the reconnector. If
   // we find that goOffline() was called because of request unloading, we skip the unnecessary part.
   setTimeout(function() {
-    if (this._unload) {
+    if (this.unloaded) {
       return;
     }
     this.rootAdapter.goOffline();
@@ -924,8 +929,7 @@ scout.Session.prototype.init = function() {
   this._setApplicationLoading(true);
 
   // Send startup request
-  this._startup = true;
-  this._sendNow();
+  this._sendStartupRequest();
 
   // Destroy UI session on server when page is closed or reloaded
   $(window).on('unload.' + this.id, this._onWindowUnload.bind(this));
@@ -972,16 +976,16 @@ scout.Session.prototype._onInitialized = function(event) {
   var clientSessionData = this._getAdapterData(event.clientSession);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
 
-  var d = scout.device;
-  $.log.info('Session initialized. Detected ' + scout.device);
-
   // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
-  if (scout.fonts.loadingComplete) {
+  var renderDesktopImpl = function() {
     this._renderDesktop();
+    this.ready = true;
+    $.log.info('Session initialized. Detected ' + scout.device);
+  }.bind(this);
+  if (scout.fonts.loadingComplete) {
+    renderDesktopImpl();
   } else {
-    scout.fonts.preloader().then(function() {
-      this._renderDesktop();
-    }.bind(this));
+    scout.fonts.preloader().then(renderDesktopImpl());
   }
 };
 
@@ -1017,13 +1021,15 @@ scout.Session.prototype._onDisposeAdapter = function(event) {
 
 scout.Session.prototype._onWindowUnload = function() {
   $.log.info('Session unloading...');
+  this.unloaded = true;
 
-  // Destroy UI session on server
-  this._unload = true;
-  this._sendNow();
+  // Close popup windows
   if (this.desktop) {
     this.desktop.formController.closePopupWindows();
   }
+
+  // Destroy UI session on server
+  this._sendUnloadRequest();
 };
 
 /**
