@@ -242,7 +242,35 @@ scout.Tree.prototype._renderAutoCheckChildren = function() {
 };
 
 scout.Tree.prototype._renderCheckable = function() {
-  // NOP
+  // Define helper functions
+  var isNodeRendered = function(node) {
+    return !!node.$node;
+  };
+  var updateCheckableStateRec = function (node) {
+    var $node = node.$node;
+    var $control = $node.children('.tree-node-control');
+    var $checkbox = $node.children('.tree-node-checkbox');
+
+    if (this.checkable) {
+      $control.addClass('checkable');
+      if ($checkbox.length === 0) {
+        this._renderTreeItemCheckbox(node);
+      }
+    } else {
+      $control.removeClass('checkable');
+      $checkbox.remove();
+    }
+
+    $node.css('padding-left', this._computeTreeItemPaddingLeft(parseFloat($node.attr('data-level'))));
+
+    // Recursion
+    if (node.childNodes) {
+      node.childNodes.filter(isNodeRendered).forEach(updateCheckableStateRec);
+    }
+  }.bind(this);
+
+  // Start recursion
+  this.nodes.filter(isNodeRendered).forEach(updateCheckableStateRec);
 };
 
 scout.Tree.prototype._renderMultiCheck = function() {
