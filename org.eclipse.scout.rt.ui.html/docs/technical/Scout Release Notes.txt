@@ -563,3 +563,31 @@ ClientUIPreferences.setTableCustomizerData(String customizerKey, Object customiz
 Replaced by:
 ClientUIPreferences.getTableCustomizerData(ITableCustomizer customizer, String configName)
 ClientUIPreferences.setTableCustomizerData(ITableCustomizer customizer, String configName)
+
+BSH 02.11.2015
+AbstractWizard.decorateWizardContainerForm() was changed:
+1. Argument 'containerForm' was removed. Use getContainerForm() instead.
+2. The method is no longer called when the form is created (during constructor of AbstractWizard). Instead is is called directly before the
+   container form is started, i.e. during the wizard's start() method.
+Migration:
+Old code (MyWizard extends AbstractWizard):
+  @Override
+  protected IWizardContainerForm execCreateContainerForm() {
+    MyWizardContainerForm containerForm = new MyWizardContainerForm(this);
+    decorateWizardContainerForm(containerForm);
+    // more custom modifications
+    return containerForm;
+  }
+New code:
+  @Override
+  protected IWizardContainerForm execCreateContainerForm() {
+    return new MyWizardContainerForm(this);
+  }
+
+  @Override
+  protected IWizardContainerForm decorateWizardContainerForm() {
+    super.decorateWizardContainerForm();
+    if (getContainerForm() != null) {
+      // more custom modifications
+    }
+  }
