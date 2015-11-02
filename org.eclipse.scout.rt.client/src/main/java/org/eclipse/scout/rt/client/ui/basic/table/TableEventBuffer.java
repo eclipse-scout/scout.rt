@@ -66,6 +66,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         remove(getRowRelatedEvents(), events.subList(0, i));
       }
       else if (type == TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED) {
+        // FIXME ASA what about TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED
         //ignore all previous aggregate function changes.
         List<Integer> typesToDelete = CollectionUtility.arrayList(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
         if (isIgnorePrevious(type)) {
@@ -433,6 +434,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected boolean isCoalesceConsecutivePrevious(int type) {
     switch (type) {
+      // FIXME ASA what about TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED
       case TableEvent.TYPE_ROWS_UPDATED:
       case TableEvent.TYPE_ROWS_INSERTED:
       case TableEvent.TYPE_ROWS_DELETED:

@@ -149,6 +149,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   public static final int TYPE_USER_FILTER_REMOVED = 910;
 
   public static final int TYPE_COLUMN_AGGREGATION_CHANGED = 950;
+  public static final int TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED = 960;
 
   private final int m_type;
   private List<? extends ITableRow> m_rows;

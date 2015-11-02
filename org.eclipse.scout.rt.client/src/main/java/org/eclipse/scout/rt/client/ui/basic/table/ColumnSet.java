@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
@@ -1417,10 +1418,15 @@ public class ColumnSet {
   }
 
   private void fireColumnAggregationChanged(IColumn<?> c) {
-    if (!(c instanceof INumberColumn)) {
-      return;
-    }
+    Assertions.assertInstance(c, INumberColumn.class, "ColumnAggregation is only supported on NumberColumns.");
     TableEvent e = new TableEvent(m_table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    e.setColumns(CollectionUtility.arrayList(c));
+    m_table.fireTableEventInternal(e);
+  }
+
+  private void fireColumnBackgroundEffectChanged(IColumn<?> c) {
+    Assertions.assertInstance(c, INumberColumn.class, "BackgroundEffect is only supported on NumberColumns.");
+    TableEvent e = new TableEvent(m_table, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
     e.setColumns(CollectionUtility.arrayList(c));
     m_table.fireTableEventInternal(e);
   }
@@ -1461,6 +1467,10 @@ public class ColumnSet {
       }
       if (INumberColumn.PROP_AGGREGATION_FUNCTION.equals(e.getPropertyName())) {
         fireColumnAggregationChanged(c);
+        return;
+      }
+      if (INumberColumn.PROP_BACKGROUND_EFFECT.equals(e.getPropertyName())) {
+        fireColumnBackgroundEffectChanged(c);
         return;
       }
       if (c.isGroupingActive() && IColumn.PROP_VISIBLE.equals(e.getPropertyName())) {

@@ -4371,17 +4371,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void fireAggregationFunctionChanged(IColumn<?> c, String function) {
+    public void fireAggregationFunctionChanged(INumberColumn<?> c, String function) {
 
       try {
         pushUIProcessor();
-        //
+        getColumnSet().setAggregationFunction(c, function);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
 
-        if (!(c instanceof INumberColumn)) {
-          LOG.warn("Aggregation can only be specified on numeric columns");
-          return;
-        }
-        getColumnSet().setAggregationFunction((INumberColumn) c, function);
+    @Override
+    public void setColumnBackgroundEffect(INumberColumn<?> column, String effect) {
+      try {
+        pushUIProcessor();
+        column.setBackgroundEffect(effect);
         ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
       }
       finally {

@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
@@ -1546,6 +1547,9 @@ public class OrganizeColumnsForm extends AbstractForm {
       col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
       col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
       col.setVisibleColumnIndexHint(prefs.getTableColumnViewIndex(col, col.getInitialSortIndex(), configName));
+      if (col instanceof INumberColumn) {
+        ((INumberColumn) col).setBackgroundEffect(prefs.getTableColumnBackgroundEffect(col, ((INumberColumn) col).getInitialBackgroundEffect(), configName));
+      }
     }
   }
 }

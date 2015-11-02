@@ -70,6 +70,7 @@ public class ClientUIPreferences {
   private static final String TABLE_COLUMN_SORT_INDEX = "table.column.sortIndex.";
   private static final String TABLE_COLUMN_GROUPED = "table.column.grouped.";
   private static final String TABLE_COLUMN_AGGR_FUNCTION = "table.column.aggr.function.";
+  private static final String TABLE_COLUMN_BACKGROUND_EFFECT = "table.column.background.effect.";
   private static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   private static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
   private static final String APPLICATION_WINDOW_MAXIMIZED = "application.window.maximized";
@@ -297,6 +298,10 @@ public class ClientUIPreferences {
     if (col instanceof INumberColumn) {
       aggregationFunction = ((INumberColumn) col).getAggregationFunction();
     }
+    String backgroundEffect = null;
+    if (col instanceof INumberColumn) {
+      backgroundEffect = ((INumberColumn) col).getBackgroundEffect();
+    }
 
     //
     if (viewIndex >= 0) {
@@ -350,12 +355,11 @@ public class ClientUIPreferences {
     }
     //
     key = createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION);
-    if (aggregationFunction != null) {
-      m_prefs.put(key, aggregationFunction);
-    }
-    else {
-      m_prefs.remove(key);
-    }
+    m_prefs.put(key, aggregationFunction);
+    //
+    key = createColumnConfigKey(col, configName, TABLE_COLUMN_BACKGROUND_EFFECT);
+    m_prefs.put(key, backgroundEffect);
+
     if (flush) {
       flush();
     }
@@ -596,6 +600,14 @@ public class ClientUIPreferences {
       }
     }
     return defaultWidth;
+  }
+
+  public String getTableColumnBackgroundEffect(IColumn col, String defaultValue, String configName) {
+    if (m_prefs == null) {
+      return defaultValue;
+    }
+    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_BACKGROUND_EFFECT);
+    return m_prefs.get(key, defaultValue);
   }
 
   public boolean getTableColumnVisible(IColumn col, boolean defaultValue) {

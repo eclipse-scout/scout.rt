@@ -14,15 +14,20 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
 public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, INumberValueContainer<NUMBER> {
 
-  public static final String AGGREGATION_FUNCTION_SUM = "sum";
-  public static final String AGGREGATION_FUNCTION_AVG = "avg";
-  public static final String AGGREGATION_FUNCTION_MIN = "min";
-  public static final String AGGREGATION_FUNCTION_MAX = "max";
+  String AGGREGATION_FUNCTION_SUM = "sum";
+  String AGGREGATION_FUNCTION_AVG = "avg";
+  String AGGREGATION_FUNCTION_MIN = "min";
+  String AGGREGATION_FUNCTION_MAX = "max";
+
+  String BACKGROUND_EFFECT_COLOR_GRADIENT_1 = "colorGradient1";
+  String BACKGROUND_EFFECT_COLOR_GRADIENT_2 = "colorGradient2";
+  String BACKGROUND_EFFECT_BAR_CHART = "barChart";
 
   /**
    * type String
    */
   String PROP_AGGREGATION_FUNCTION = "aggregationFunction";
+  String PROP_BACKGROUND_EFFECT = "backgroundEffect";
 
   void setValidateOnAnyKey(boolean b);
 
@@ -35,5 +40,25 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
   String getAggregationFunction();
 
   void setAggregationFunction(String f);
+
+  /**
+   * Set the background effect for this column. May be null.
+   * <p>
+   * Supported by the UI are {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_1},
+   * {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_2} and {@link INumberColumn#BACKGROUND_EFFECT_BAR_CHART}
+   *
+   * @param effect
+   * @since 5.2
+   */
+  void setBackgroundEffect(String effect);
+
+  /**
+   * @return The background effect of this column. May be null.
+   */
+  String getBackgroundEffect();
+
+  void setInitialBackgroundEffect(String effect);
+
+  String getInitialBackgroundEffect();
 
 }

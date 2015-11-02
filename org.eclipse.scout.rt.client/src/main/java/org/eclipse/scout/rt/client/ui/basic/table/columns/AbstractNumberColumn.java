@@ -15,11 +15,13 @@ import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
@@ -38,6 +40,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   private boolean m_validateOnAnyKey;
 
   private String m_initialAggregationFunction;
+  private String m_initialBackgroundEffect;
 
   public AbstractNumberColumn() {
     super();
@@ -117,6 +120,31 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     return AGGREGATION_FUNCTION_SUM;
   }
 
+  /**
+   * Set the background effect for this column. May be null.
+   * <p>
+   * Supported by the UI are {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_1},
+   * {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_2} and {@link INumberColumn#BACKGROUND_EFFECT_BAR_CHART}
+   *
+   * @param effect
+   * @since 5.2
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  protected String getConfiguredBackgroundEffect() {
+    return null;
+  }
+
+  @Override
+  public void initColumn() {
+    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+    setBackgroundEffect(prefs.getTableColumnBackgroundEffect(this, getBackgroundEffect(), null));
+    String prefsAggregationFunction = prefs.getTableColumnAggregationFunction(this, getAggregationFunction(), null);
+    if (!StringUtility.isNullOrEmpty(prefsAggregationFunction)) {
+      setAggregationFunction(prefsAggregationFunction);
+    }
+    super.initColumn();
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -128,6 +156,8 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     setMinValue(getConfiguredMinValue());
     setInitialAggregationFunction(getConfiguredAggregationFunction());
     setAggregationFunction(getConfiguredAggregationFunction());
+    setInitialBackgroundEffect(getConfiguredBackgroundEffect());
+    setBackgroundEffect(getConfiguredBackgroundEffect());
   }
 
   protected void initFormat() {
@@ -268,6 +298,26 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   @Override
   public void setAggregationFunction(String f) {
     propertySupport.setPropertyString(PROP_AGGREGATION_FUNCTION, f);
+  }
+
+  @Override
+  public String getBackgroundEffect() {
+    return propertySupport.getPropertyString(PROP_BACKGROUND_EFFECT);
+  }
+
+  @Override
+  public void setBackgroundEffect(String effect) {
+    propertySupport.setPropertyString(PROP_BACKGROUND_EFFECT, effect);
+  }
+
+  @Override
+  public void setInitialBackgroundEffect(String effect) {
+    m_initialBackgroundEffect = effect;
+  }
+
+  @Override
+  public String getInitialBackgroundEffect() {
+    return m_initialBackgroundEffect;
   }
 
   @Override

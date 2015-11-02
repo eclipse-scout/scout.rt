@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -64,7 +65,7 @@ public interface ITableUIFacade {
 
   void fireHeaderGroupFromUI(IColumn<?> c, boolean multiGroup, boolean ascending);
 
-  void fireAggregationFunctionChanged(IColumn<?> c, String function);
+  void fireAggregationFunctionChanged(INumberColumn<?> c, String function);
 
   void setSelectedRowsFromUI(List<? extends ITableRow> rows);
 
@@ -115,4 +116,6 @@ public interface ITableUIFacade {
   void setFilteredRowsFromUI(List<? extends ITableRow> rows);
 
   void removeFilteredRowsFromUI();
+
+  void setColumnBackgroundEffect(INumberColumn<?> column, String mode);
 }
