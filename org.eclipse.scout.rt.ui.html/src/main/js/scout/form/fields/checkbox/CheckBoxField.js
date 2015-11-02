@@ -35,7 +35,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
     .on('mousedown', this._onMouseDown.bind(this));
 
   this.$checkBoxLabel = this.$field
-    .appendDiv(this.ownerDocument(), 'label')
+    .appendDiv('label')
     .on('mousedown', this._onMouseDown.bind(this));
 
   scout.tooltips.install(this.$checkBoxLabel, {

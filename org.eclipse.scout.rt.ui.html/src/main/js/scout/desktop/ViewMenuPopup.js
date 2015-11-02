@@ -63,7 +63,7 @@ scout.ViewMenuPopup.prototype._renderHead = function() {
 
   this._copyCssClassToHead('view-button-tab');
   this._copyCssClassToHead('unfocusable');
-  this.$head.removeClass('popup-head'); // FIXME AWE: use CSS class?
+  this.$head.removeClass('popup-head');
   this.$head.css('background-color', 'white');
   this.$head.css('color', '#006c86');
 };
