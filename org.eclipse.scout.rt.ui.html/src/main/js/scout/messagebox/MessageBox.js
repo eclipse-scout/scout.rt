@@ -20,7 +20,6 @@ scout.MessageBox = function() {
   this.$cancelButton;
   this._$closeButton;
   this.focusListener;
-  this._addEventSupport();
   this.attached = false; // Indicates whether this message box is currently visible to the user.
 };
 scout.inherits(scout.MessageBox, scout.ModelAdapter);

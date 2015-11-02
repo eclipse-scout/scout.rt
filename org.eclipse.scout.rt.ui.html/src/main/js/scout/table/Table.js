@@ -38,7 +38,6 @@ scout.Table = function(model) {
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
-  this._addEventSupport();
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
