@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AbstractComposerNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
@@ -214,7 +215,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node, must not be null
    *         <p>
    *         Normally overrides call super. {@link #execCreateRootNode()}
@@ -227,7 +228,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
    *         Normally overrides call super. {@link #execCreateEntityNode(ITreeNode, IDataModelEntity, boolean, Object[],
@@ -246,7 +247,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
    *         Normally overrides call super. {@link #execCreateAttributeNode(ITreeNode, IDataModelAttribute, Integer,
@@ -269,7 +270,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
    *         Normally overrides call super.{@link #execCreateEitherNode(ITreeNode, boolean)}
@@ -285,7 +286,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
    *         Normally overrides call super.{@link #execCreateAdditionalOrNode(ITreeNode, boolean)}
@@ -760,6 +761,22 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     @Override
     protected boolean getConfiguredRootNodeVisible() {
       return true;
+    }
+
+    @Override
+    protected void execDisposeTree() throws ProcessingException {
+      super.execDisposeTree();
+
+      // dispose nodes (not necessary to remove them, dispose is sufficient)
+      visitTree(new ITreeVisitor() {
+        @Override
+        public boolean visit(ITreeNode node) {
+          if (node instanceof AbstractComposerNode) {
+            ((AbstractComposerNode) node).dispose();
+          }
+          return true;
+        }
+      });
     }
 
     @Override
