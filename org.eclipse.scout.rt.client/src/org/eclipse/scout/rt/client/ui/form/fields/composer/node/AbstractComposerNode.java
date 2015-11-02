@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * Control Structure node for NOT, OR, AND, etc.
  * <p>
  * Example of an extensive company search formula:
- * 
+ *
  * <pre>
  * EITHER
  *   name starts with "abb"
@@ -77,8 +77,13 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
   }
 
   @Override
-  public String toString() {
-    return getClass().getSimpleName() + "[" + getCell().getText() + "]";
+  public void nodeRemovedNotify() {
+    super.nodeRemovedNotify();
+    dispose();
+  }
+
+  public void dispose() {
+    disposeMenus();
   }
 
   protected void attachAddEntityMenus(Collection<IMenu> menus) {
@@ -102,6 +107,19 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
     for (IDataModelEntity e : childEntitites) {
       menus.add(new AddEntityMenu(getComposerField(), this, e));
     }
+  }
+
+  protected void disposeMenus() {
+    for (IMenu menu : getMenus()) {
+      if (menu instanceof AddEntityMenu) {
+        ((AddEntityMenu) menu).dispose();
+      }
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "[" + getCell().getText() + "]";
   }
 
 }

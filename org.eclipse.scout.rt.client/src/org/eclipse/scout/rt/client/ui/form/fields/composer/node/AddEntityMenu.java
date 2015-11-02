@@ -27,6 +27,7 @@ public class AddEntityMenu extends AbstractMenu {
   private final IComposerField m_field;
   private final ITreeNode m_parentNode;
   private final IDataModelEntity m_entity;
+  private PropertyChangeListener m_propertyChangeListener;
 
   public AddEntityMenu(IComposerField field, ITreeNode parentNode, IDataModelEntity e) {
     super(false);
@@ -40,17 +41,18 @@ public class AddEntityMenu extends AbstractMenu {
   protected void execInitAction() throws ProcessingException {
     setText(ScoutTexts.get("ExtendedSearchAddEntityPrefix") + " " + m_entity.getText());
     setIconId(m_entity.getIconId());
-    m_entity.addPropertyChangeListener(new PropertyChangeListener() {
-
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IDataModelEntity.PROP_VISIBLE.equals(evt.getPropertyName())) {
-          updateVisibility();
-        }
-      }
-
-    });
+    if (m_propertyChangeListener == null) {
+      m_propertyChangeListener = new P_PropertyChangeListener();
+      m_entity.addPropertyChangeListener(m_propertyChangeListener);
+    }
     updateVisibility();
+  }
+
+  public void dispose() {
+    if (m_propertyChangeListener != null) {
+      m_entity.removePropertyChangeListener(m_propertyChangeListener);
+      m_propertyChangeListener = null;
+    }
   }
 
   private void updateVisibility() {
@@ -62,4 +64,13 @@ public class AddEntityMenu extends AbstractMenu {
     m_field.addEntityNode(m_parentNode, m_entity, false, null, null);
   }
 
+  private class P_PropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IDataModelEntity.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        updateVisibility();
+      }
+    }
+  }
 }
