@@ -14,7 +14,8 @@ scout.menuNavigationKeyStrokes = {
     keyStrokeContext.registerKeyStroke([
       new scout.MenuNavigationUpKeyStroke(popup, menuItemClass),
       new scout.MenuNavigationDownKeyStroke(popup, menuItemClass),
-      new scout.MenuNavigationExecKeyStroke(popup, menuItemClass)
+      new scout.MenuNavigationExecKeyStroke(popup, menuItemClass),
+      new scout.MenuExecByNumberKeyStroke(popup, menuItemClass)
     ]);
   },
 
@@ -93,11 +94,51 @@ scout.MenuNavigationExecKeyStroke = function(popup, menuItemClass) {
 scout.inherits(scout.MenuNavigationExecKeyStroke, scout.KeyStroke);
 
 scout.MenuNavigationExecKeyStroke.prototype.handle = function(event) {
-  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+  this._simulateLeftClickOnItems(scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected);
+};
+
+scout.MenuNavigationExecKeyStroke.prototype._simulateLeftClickOnItems = function($menuItems) {
   ['mousedown', 'mouseup', 'click'].forEach(function(eventType) {
-    menuItems.$selected.trigger({
+    $menuItems.trigger({
       type: eventType,
       which: 1
     });
   }); // simulate left-mouse click (full click event sequence in order, see scout.Menu.prototype._onMouseEvent)
+};
+
+/**
+ * MenuExecByNumberKeyStroke
+ */
+scout.MenuExecByNumberKeyStroke = function(popup, menuItemClass) {
+  scout.MenuExecByNumberKeyStroke.parent.call(this, popup, menuItemClass);
+  this._menuItemClass = menuItemClass;
+  this.field = popup;
+  this.which = [scout.keys[1], scout.keys[2], scout.keys[3], scout.keys[4], scout.keys[5], scout.keys[6], scout.keys[7], scout.keys[8], scout.keys[9]];
+  this.renderingHints.render = true;
+  this.renderingHints.$drawingArea = function($drawingArea, event) {
+    return event._$element;
+  }.bind(this);
+};
+scout.inherits(scout.MenuExecByNumberKeyStroke, scout.MenuNavigationExecKeyStroke);
+
+scout.MenuExecByNumberKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.MenuExecByNumberKeyStroke.parent.prototype._accept.call(this, event);
+  if (!accepted) {
+    return false;
+  }
+
+  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+  var index = scout.codesToKeys[event.which];
+  event._$element = menuItems.$all.eq(index - 1);
+
+  if (event._$element) {
+    return true;
+  }
+  return false;
+};
+
+scout.MenuExecByNumberKeyStroke.prototype.handle = function(event) {
+  if (event._$element) {
+    this._simulateLeftClickOnItems(event._$element);
+  }
 };

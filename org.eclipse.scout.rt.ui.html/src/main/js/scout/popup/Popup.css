@@ -78,6 +78,10 @@
     border-bottom: 1px solid transparent; //@border-color;
   }
 
+  & > .menu-item > .key-box {
+    bottom: auto;
+  }
+
   &.down  {
     #scout.drop-shadow();
 
