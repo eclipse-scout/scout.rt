@@ -63,7 +63,7 @@ scout.PopupLayout.prototype._calcMaxSizes = function() {
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.getMargins(),
     anchorBounds = this.popup.getAnchorBounds(),
-    $window = $(window),
+    $window = $($.getWindow(this.popup.$container)),
     windowSize = new scout.Dimension($window.width(), $window.height());
 
   maxWidthRight = (windowSize.width - (anchorBounds.x + anchorBounds.width) - popupMargins.horizontal() - windowPaddingX);

@@ -84,6 +84,15 @@
     return $element && $element.length ? $element[0].ownerDocument : null;
   };
 
+
+  /**
+   * @return HTML window reference (defaultView) of the given element
+   */
+  $.getWindow = function($element) {
+    var document = $.getDocument($element);
+    return document ? document.defaultView : null;
+  };
+
   /**
    * @param theDocument HTML document reference. We use the name 'theDocument' everywhere, to prevent accidental usage of global document variable
    * @param element string. Example = &lt;input&gt;

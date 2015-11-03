@@ -257,10 +257,11 @@ scout.Popup.prototype.overlap = function($container, location) {
     height = $container.outerHeight(),
     width = $container.outerWidth(),
     left = location.x,
-    top = location.y;
+    top = location.y,
+    $window = $($.getWindow($container));
 
-  overlapX = left + width + this.windowPaddingX - $(window).width();
-  overlapY = top + height + this.windowPaddingY - $(window).height();
+  overlapX = left + width + this.windowPaddingX - $window.width();
+  overlapY = top + height + this.windowPaddingY - $window.height();
   return {
     x: overlapX,
     y: overlapY
