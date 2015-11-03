@@ -1,0 +1,341 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/* global section, narrow to .scout for usage as portlet */
+
+/* TODO AWE/CGU: (css) YUI compressor destroys calc(100% + x) expressions (only with plus operator)
+ * This bug will be fixed with YUI compressor 2.4.9 which is not released yet:
+ * https://github.com/yui/yuicompressor/commits/master
+ * We must update maven-yui-compressor-plugin (v >= 1.6.0, with YUI >= 2.4.9) or...
+ * Hack the old maven plugin wo work with a new YUI version or...
+ * Download YUI 2.4.9 and call as Java program from maven.
+ */
+body {
+  #scout.font-text-normal();
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  #scout.user-select(none);
+  -moz-user-select: -moz-none;
+  cursor: default;
+  color: @text-color;
+}
+
+/* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
+::-moz-selection {
+  #scout.text-selection();
+}
+::selection {
+  #scout.text-selection();
+}
+
+::-webkit-input-placeholder {
+  #scout.placeholder();
+}
+:-moz-placeholder { /* older versions of firefox */
+  #scout.placeholder();
+}
+::-moz-placeholder {
+  #scout.placeholder();
+}
+:-ms-input-placeholder {
+  #scout.placeholder();
+}
+
+/* Hide IE decorations for text input fields: */
+/* - Clear button ("X"): https://msdn.microsoft.com/en-us/library/windows/apps/hh465740.aspx */
+/* - Password reveal button: https://msdn.microsoft.com/en-us/library/windows/apps/hh465773.aspx */
+/* Note: Set width/height to 0 instead of "display: none", because of http://stackoverflow.com/a/17986002 */
+::-ms-clear {
+  width : 0;
+  height: 0;
+}
+::-ms-reveal {
+  width : 0;
+  height: 0;
+}
+
+.disabled {
+  color: @text-disabled-color;
+
+  &::-moz-selection {
+    #scout.text-selection-disabled();
+  }
+  &::selection {
+    #scout.text-selection-disabled();
+  }
+
+  &::-webkit-input-placeholder {
+    #scout.placeholder-disabled();
+  }
+  &:-moz-placeholder { /* older versions of firefox */
+    #scout.placeholder-disabled();
+  }
+  &::-moz-placeholder {
+    #scout.placeholder-disabled();
+  }
+  &:-ms-input-placeholder {
+    #scout.placeholder-disabled();
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+*, *::before, *::after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Workaround for firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=648624 */
+/* use -moz-none to allow child element to set -moz-user-select: text*/
+div {
+  -moz-user-select: -moz-none;
+}
+
+input, textarea, button {
+  #scout.font-text-normal();
+}
+
+input, .input-field, textarea, .clipboard-field & > .field {
+  background-color: @control-background-color;
+  color: @control-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+
+  &.disabled {
+    background-color: @control-disabled-background-color;
+    color: @control-disabled-color;
+  }
+
+  &:focus {
+    #scout.focus-border();
+  }
+
+  &.has-error {
+    border-color: @error-border-color;
+    background-color: @error-background-color;
+  }
+
+  &.has-error:focus {
+    #scout.glow(@error-glow-color);
+  }
+}
+
+input {
+  padding: 0 @text-field-padding-x;
+
+  /* remove platform specific styling, mainly used to remove shadow on ios safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* text inputs on safari have 2px top and bottom margin -> remove*/
+  margin: 0;
+}
+
+.input-field {
+  padding:  @text-field-padding-y @text-field-padding-x;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+button {
+  padding: @button-padding;
+  margin: 0; /* reset user agent style, e.g. on safari */
+}
+
+textarea {
+  /* these two properties are required for FF, otherwise the editable textarea is 2px too large, */
+  /* and the DOM inspector does not include these 2 pixels. */
+  margin: 0 auto;
+  padding: @text-field-padding-y @text-field-padding-x;
+  resize: none;
+  /* Override default overflow value 'scroll' in IE */
+  overflow: auto;
+}
+
+/* cursor handling */
+
+/* The following classes are added dynamically while dragging. !important is necessary to override */
+/* any cursor an underlying component defines while moving the mouse. */
+
+.col-resize,
+.col-resize * {
+  cursor: col-resize !important;
+}
+.row-resize,
+.row-resize * {
+  cursor: row-resize !important;
+}
+
+/* remove the dotted border in firefox */
+button::-moz-focus-inner {
+  border: 0;
+}
+
+/* hidden DIV used to measure string length in UI */
+#ScoutStringMeasurement {
+  position: absolute;
+  visibility: hidden;
+  height: auto;
+  width: auto;
+}
+
+.font-preloader {
+  position: absolute;
+  top: -999px;
+  left: -999px;
+  visibility: hidden;
+  display: block;
+  width: auto;
+  height: auto;
+  white-space: nowrap;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+  font-variant: normal;
+  font-size: 20em;
+}
+
+.drag-handle {
+  content: '';
+  width: 100%;
+  height: 20px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  margin-top: -5px;
+  cursor: move;
+}
+
+/* Used to display errors from server when desktop is not available */
+.fatal-error {
+  margin: 10px;
+  #scout.user-select(text)
+}
+
+.application-loading {
+  @application-loading-size: 50px;
+
+  /* Make it use the whole available size, to show the 'wait' mouse cursor */
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  &::before {
+    content: '';
+    border-radius: @application-loading-size;
+    border: 3px solid @palette-gray-4;
+    border-right-color: @palette-blue-6;
+    width: @application-loading-size;
+    height: @application-loading-size;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -(@application-loading-size / 2);
+    margin-top: -((@application-loading-size / 2) + 20px);
+    #scout.animation(rotation 1.0s infinite linear);
+  }
+}
+
+a,
+.link,
+.app-link {
+  color: @applink-color;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:focus {
+    outline-color: @applink-color;
+    text-decoration: none;
+  }
+}
+
+.font-icon {
+  #scout.font-icon();
+}
+
+.white-space-nowrap {
+  #scout.white-space-nowrap();
+}
+
+/* --- z-index --- */
+/* Rule: All child elements of .scout get the same z-index 0 assigned. This spawns a new stacking context for each */
+/* of these elements (iff they are "positioned"). To bring a new element to the top, add it to the end of the list. */
+/* https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context */
+.scout > .desktop-navigation,
+.scout > .desktop-taskbar,
+.scout > .desktop-bench,
+.scout > .splitter,
+.scout > .glasspane,
+.scout > .busyindicator,
+.scout > .dialog,
+.scout > .form,
+.scout > .messagebox,
+.scout > .tooltip,
+.scout > .popup,
+.scout > .form-tool-popup,
+.scout > .smart-field-popup,
+.scout > .date-picker-popup,
+.scout > .table-header-menu,
+.scout > .notifications {
+  z-index: 0;
+}
+
+/* Used for static pages like login, logout, unsupported-browser and noscript section.
+ * Background-image is not defined here, because logo is always project specific.
+ * You should define a CSS rule in your project-specific .css files.
+ */
+.box-with-logo {
+  border: 1px solid @palette-gray-4;
+  background-color: @background-color;
+  max-width: 420px;
+  margin: 150px auto;
+  padding: 40px 70px;
+  #scout.drop-shadow();
+
+  background-position: center 45px;
+  background-repeat: no-repeat;
+  padding-top: 140px;
+
+  & > .button {
+    padding-top: 32px;
+    text-align: center;
+  }
+
+  &.small {
+    background-size: 25%;
+    padding-top: 100px;
+  }
+
+  &.centered {
+    text-align: center;
+  }
+}
+
+noscript {
+  display: block;
+
+  & > h1 {
+    #scout.font-text-normal(bold);
+  }
+}

@@ -1,0 +1,198 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@planner-scale-height: 45px;
+@planner-resource-minheight: 30px;
+@planner-resource-title-width: 150px;
+@resource-padding-x: 5px;
+
+.planner-icon(@icon, @size) {
+  #scout.font-icon();
+  display: inline-block;
+  position: relative;
+  font-size: @size;
+  line-height: 29px;
+  width: 29px;
+  content: @icon;
+  color: @icon-color;
+  text-align: center;
+}
+
+.planner {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+
+  & > .menubar {
+    padding-left: @resource-padding-x;
+    padding-right: @resource-padding-x;
+  }
+
+  & > .menubar.bottom {
+    position: absolute;
+    bottom: 0;
+  }
+}
+
+.planner-scale {
+  position: absolute;
+  right: 0px;
+  height: @planner-scale-height;
+  border-bottom:  1px solid @palette-gray-4;
+  width: 100%;
+  /* for horizontal scrollbars */
+  overflow: hidden;
+  white-space: nowrap;
+
+  & .scale-item {
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+    padding: 0px 5px;
+
+    &.selected {
+      background-color: @item-selection-background-color;
+    }
+
+    &.invisible {
+      color: transparent;
+    }
+
+  }
+
+  & > .timeline {
+    display: inline-block;
+    width: calc(~'100%' - @planner-resource-title-width);
+
+    & > .timeline-large {
+      height: 50%;
+      background-color: @planner-timeline-background-color;
+      line-height: @planner-scale-height / 2;
+
+      & > .scale-item > .planner-large-scale-item-line {
+        height: @planner-scale-height;
+      }
+    }
+
+    & > .timeline-small {
+      height: 50%;
+      line-height: @planner-scale-height / 2;
+    }
+  }
+}
+
+.planner-scale-title {
+   height: 100%;
+   float: left;
+   #scout.overflow-ellipsis-nowrap();
+   padding: 0px @resource-padding-x;
+   font-size: 17px;
+   color: @palette-gray-6;
+   line-height: @planner-scale-height;
+   width: @planner-resource-title-width;
+ }
+
+.planner-grid {
+  position: absolute;
+  right: 0px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.planner-resource {
+  height: @planner-resource-minheight;
+  width: 100%;
+  border-bottom: 1px solid @palette-gray-4;
+
+  & > .resource-title {
+    line-height: @planner-resource-minheight;
+    height: 100%;
+    width: @planner-resource-title-width;
+    padding: 0px @resource-padding-x;
+    float: left;
+    #scout.overflow-ellipsis-nowrap();
+  }
+
+  &.selected > .resource-title {
+    background-color: @item-selection-background-color;
+  }
+
+  & > .resource-cells {
+    position: relative;
+    height: 100%;
+    width: calc(~'100%' - @planner-resource-title-width);
+    float: left;
+
+    & > .selector {
+      position: absolute;
+      border-top: 2px solid @item-selection-border-color;
+      border-bottom: 2px solid @item-selection-border-color;
+      z-index: 1; /* TODO CRU/BSH/CGU Instead of assigning a z-index, find a better insertion point for the selector */
+      top: 0;
+
+      & > .selector-resize-left {
+        background-color: @palette-white;
+        border-left: 2px solid @item-selection-border-color;
+        border-right: 2px solid @item-selection-border-color;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 6px;
+        height: 100%;
+        cursor: col-resize;
+      }
+
+      & > .selector-resize-right {
+        background-color: @palette-white;
+        border-left: 2px solid @item-selection-border-color;
+        border-right: 2px solid @item-selection-border-color;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 6px;
+        height: 100%;
+        cursor: col-resize;
+      }
+    }
+  }
+}
+
+.planner-activity {
+  position: absolute;
+  top: 1px;
+  width: 0px;
+  height: @planner-resource-minheight - 3px;
+  line-height: @planner-resource-minheight - 3px;
+  background-color: @palette-cyan-4;
+  text-align: center;
+  border: 1px solid @palette-gray-4;
+  overflow: hidden;
+
+  &.selected {
+    outline: 2px solid @item-selection-border-color;
+  }
+}
+
+.planner-small-scale-item-line {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  top: 0px;
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+.planner-large-scale-item-line {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  top: 0px;
+  background-color: rgba(0, 0, 0, 0.2);
+}

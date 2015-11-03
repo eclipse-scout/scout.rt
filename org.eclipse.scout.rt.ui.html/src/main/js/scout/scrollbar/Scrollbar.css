@@ -1,0 +1,73 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@scrollbar-size: 8px;
+@scrollbar-thumb-size: @scrollbar-size;
+@scrollbar-margin: 8px;
+@scrollbar-side-margin: 3px;
+
+.scrollbar {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+
+  &.y-axis {
+    height: calc(~'100%' - 2 * @scrollbar-margin);
+    width: @scrollbar-size;
+    margin: @scrollbar-margin @scrollbar-side-margin;
+
+    &.borderless {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  &.x-axis {
+    width: calc(~'100%' - 2 * @scrollbar-margin);
+    height: @scrollbar-size;
+    margin: @scrollbar-side-margin @scrollbar-margin;
+
+    &.borderless {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.scrollbar-thumb {
+  position: absolute;
+  z-index: 11;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: fade(@scrollbar-thumb-color, 30%);
+
+  &.y-axis {
+    width: @scrollbar-thumb-size;
+    top: 0px;
+  }
+
+  &.x-axis {
+    height: @scrollbar-thumb-size;
+    left: 0px;
+  }
+
+  &.inverted {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.scrollbar-thumb-move,
+.scrollbar-thumb:hover {
+    background-color: fade(@scrollbar-thumb-color, 60%);
+
+  &.inverted {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+}

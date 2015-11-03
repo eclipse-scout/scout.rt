@@ -1,0 +1,90 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.split-box {
+
+  & > .split-area {
+    @x-splitter-size: 40px - @mandatory-indicator-width;
+    @y-splitter-size: 15px;
+    @splitter-line-size: 3px;
+    @temp-splitter-line-size: 1px;
+
+    & > .splitter {
+      position: absolute;
+      background-color: @border-color;
+
+      &:hover {
+        background-color: @hover-color;
+      }
+
+      /* used when only one field is visible */
+      &.hidden {
+        display: none;
+      }
+
+      /* | */
+      &.x-axis {
+        height: 100%;
+        width: @x-splitter-size;
+        border-left: (ceil((@x-splitter-size - @mandatory-indicator-width - @splitter-line-size) / 2) + @mandatory-indicator-width) solid @background-color;
+        border-right: floor((@x-splitter-size - @mandatory-indicator-width - @splitter-line-size) / 2) solid @background-color;
+        cursor: col-resize;
+      }
+
+      /* -- */
+      &.y-axis {
+        margin-left: @mandatory-indicator-width;
+        width: calc(~'100%' - @mandatory-indicator-width);
+        height: @y-splitter-size;
+        border-top: ceil((@y-splitter-size - @splitter-line-size) / 2) solid @background-color;
+        border-bottom: floor((@y-splitter-size - @splitter-line-size) / 2) solid @background-color;
+        cursor: row-resize;
+      }
+
+      &.dragging {
+        background-color: @border-color;
+        opacity: 0.25;
+      }
+
+      &.disabled {
+        &:hover {
+          background-color: @border-color;
+        }
+
+        cursor: default;
+      }
+    }
+
+    /* used while dragging */
+    & > .temp-splitter {
+      position: absolute;
+      z-index: 2;
+
+      /* | */
+      &.x-axis {
+        height: 100%;
+        width: @temp-splitter-line-size;
+        border-left: @temp-splitter-line-size dashed @focus-border-color;
+        margin-left: ceil((@x-splitter-size - @mandatory-indicator-width - @temp-splitter-line-size) / 2) + @mandatory-indicator-width;
+        margin-right: floor((@x-splitter-size - @mandatory-indicator-width - @temp-splitter-line-size) / 2);
+      }
+
+      /* -- */
+      &.y-axis {
+        margin-left: @mandatory-indicator-width;
+        width: calc(~'100%' - @mandatory-indicator-width);
+        height: @temp-splitter-line-size;
+        border-top: @temp-splitter-line-size dashed @focus-border-color;
+        margin-top: ceil((@y-splitter-size - @temp-splitter-line-size) / 2);
+        margin-bottom: floor((@y-splitter-size - @temp-splitter-line-size) / 2);
+      }
+    }
+  }
+}

@@ -1,0 +1,354 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+describe("scout.strings", function() {
+
+  describe("nl2br", function() {
+
+    it("can convert newlines to br tags", function() {
+      expect(scout.strings.nl2br()).toBe(undefined);
+      expect(scout.strings.nl2br(null)).toBe(null);
+      expect(scout.strings.nl2br('')).toBe('');
+      expect(scout.strings.nl2br('Hello')).toBe('Hello');
+      expect(scout.strings.nl2br('Hello\nGoodbye')).toBe('Hello<br>Goodbye');
+      expect(scout.strings.nl2br('Hello\nGoodbye\n')).toBe('Hello<br>Goodbye<br>');
+      expect(scout.strings.nl2br('Hello\n\nGoodbye')).toBe('Hello<br><br>Goodbye');
+      expect(scout.strings.nl2br('Hello\n\r\nGoodbye')).toBe('Hello<br><br>Goodbye');
+      expect(scout.strings.nl2br(123)).toBe('123');
+    });
+
+    it("encodes html, if the parameter is set to true (default)", function() {
+      expect(scout.strings.nl2br('<b>Hello</b>\nGoodbye')).toBe('&lt;b&gt;Hello&lt;/b&gt;<br>Goodbye');
+      expect(scout.strings.nl2br('Hello\n<br>\nGoodbye')).toBe('Hello<br>&lt;br&gt;<br>Goodbye');
+    });
+
+  });
+
+  describe("removeAmpersand", function() {
+
+    it("can remove ampersands", function() {
+      expect(scout.strings.removeAmpersand()).toBe(undefined);
+      expect(scout.strings.removeAmpersand(null)).toBe(null);
+      expect(scout.strings.removeAmpersand('')).toBe('');
+      expect(scout.strings.removeAmpersand(' ')).toBe(' ');
+      expect(scout.strings.removeAmpersand('Hello')).toBe('Hello');
+      expect(scout.strings.removeAmpersand('Hello & Co')).toBe('Hello  Co');
+      expect(scout.strings.removeAmpersand('&Menu')).toBe('Menu');
+      expect(scout.strings.removeAmpersand('&')).toBe('');
+      expect(scout.strings.removeAmpersand('&One &Two &Three&')).toBe('One Two Three');
+      expect(scout.strings.removeAmpersand('You&&Me')).toBe('You&Me');
+      expect(scout.strings.removeAmpersand('You&&&Me')).toBe('You&Me');
+      expect(scout.strings.removeAmpersand('You&&&&Me')).toBe('You&&Me');
+      expect(scout.strings.removeAmpersand('You&&&&&Me')).toBe('You&&Me');
+      expect(scout.strings.removeAmpersand(123)).toBe('123');
+    });
+
+  });
+
+  describe("getMnemonic", function() {
+
+    it("can extract mnemonics", function() {
+      expect(scout.strings.getMnemonic()).toBe(undefined);
+      expect(scout.strings.getMnemonic(null)).toBe(null);
+      expect(scout.strings.getMnemonic('')).toBe(null);
+      expect(scout.strings.getMnemonic(' ')).toBe(null);
+      expect(scout.strings.getMnemonic('Hello')).toBe(null);
+      expect(scout.strings.getMnemonic('Hello & Co')).toBe(null);
+      expect(scout.strings.getMnemonic('&Menu')).toBe('M');
+      expect(scout.strings.getMnemonic('Ne&xt...')).toBe('x');
+      expect(scout.strings.getMnemonic('N&ächster Eintrag')).toBe(null); // ä is not defined in scout.keys
+      expect(scout.strings.getMnemonic('Next&...')).toBe(null);
+      expect(scout.strings.getMnemonic('&')).toBe(null);
+      expect(scout.strings.getMnemonic('&One &Two &Three&')).toBe('O');
+      expect(scout.strings.getMnemonic('You&&Me')).toBe(null);
+      expect(scout.strings.getMnemonic('You&&&Me')).toBe('M');
+      expect(scout.strings.getMnemonic('You&&&&Me')).toBe(null);
+      expect(scout.strings.getMnemonic('You&&&&&Me')).toBe('M');
+      expect(scout.strings.getMnemonic(123)).toBe(null);
+    });
+
+  });
+
+  describe("hasText", function() {
+
+    it("can check if string has text", function() {
+      expect(scout.strings.hasText()).toBe(false);
+      expect(scout.strings.hasText('')).toBe(false);
+      expect(scout.strings.hasText(' ')).toBe(false);
+      expect(scout.strings.hasText('Hello')).toBe(true);
+      expect(scout.strings.hasText('       .      ')).toBe(true);
+      expect(scout.strings.hasText('       \n      ')).toBe(false);
+      expect(scout.strings.hasText('       \n      \nn')).toBe(true);
+      expect(scout.strings.hasText(123)).toBe(true);
+      expect(scout.strings.hasText(0)).toBe(true);
+    });
+
+  });
+
+  describe("repeat", function() {
+
+    it("can repeat strings", function() {
+      expect(scout.strings.repeat()).toBe(undefined);
+      expect(scout.strings.repeat('')).toBe('');
+      expect(scout.strings.repeat('X')).toBe('');
+      expect(scout.strings.repeat('X', 1)).toBe('X');
+      expect(scout.strings.repeat('X', 7)).toBe('XXXXXXX');
+      expect(scout.strings.repeat('X', -7)).toBe('');
+      expect(scout.strings.repeat(4, 4)).toBe('4444');
+    });
+
+  });
+
+  describe("padZeroLeft", function() {
+
+    it("can pad strings with 0", function() {
+      expect(scout.strings.padZeroLeft()).toBe(undefined);
+      expect(scout.strings.padZeroLeft('')).toBe('');
+      expect(scout.strings.padZeroLeft('X')).toBe('X');
+      expect(scout.strings.padZeroLeft('X', 1)).toBe('X');
+      expect(scout.strings.padZeroLeft('X', 7)).toBe('000000X');
+      expect(scout.strings.padZeroLeft('X', -7)).toBe('X');
+      expect(scout.strings.padZeroLeft(123, 4)).toBe('0123');
+      expect(scout.strings.padZeroLeft(12345, 4)).toBe('12345');
+    });
+
+  });
+
+  describe("startsWith", function() {
+
+    it("can check if a string starts with another", function() {
+      expect(scout.strings.startsWith('abc', 'a')).toBe(true);
+      expect(scout.strings.startsWith('abc', 'b')).toBe(false);
+      expect(scout.strings.startsWith('äabc', 'ä')).toBe(true);
+      expect(scout.strings.startsWith('äabc', 'Ä')).toBe(false);
+      expect(scout.strings.startsWith('abc', '')).toBe(true);
+      expect(scout.strings.startsWith('', '')).toBe(true);
+      expect(scout.strings.startsWith()).toBe(false);
+      expect(scout.strings.startsWith(undefined, 'hello')).toBe(false);
+      expect(scout.strings.startsWith('Der Himmel ist blau!', 'Der')).toBe(true);
+      expect(scout.strings.startsWith('¿Vive usted en España?', 'Vive')).toBe(false);
+      expect(scout.strings.startsWith('¿Vive usted en España?', '¿Vive')).toBe(true);
+      expect(scout.strings.startsWith(456, 4)).toBe(true);
+      expect(scout.strings.startsWith(456, 5)).toBe(false);
+      expect(scout.strings.startsWith(456, '4')).toBe(true);
+      expect(scout.strings.startsWith('456', 4)).toBe(true);
+      expect(scout.strings.startsWith(true, 't')).toBe(true);
+    });
+
+  });
+
+  describe("endsWith", function() {
+
+    it("can check if a string ends with another", function() {
+      expect(scout.strings.endsWith('abc', 'c')).toBe(true);
+      expect(scout.strings.endsWith('abc', 'b')).toBe(false);
+      expect(scout.strings.endsWith('abcä', 'ä')).toBe(true);
+      expect(scout.strings.endsWith('abcä', 'Ä')).toBe(false);
+      expect(scout.strings.endsWith('abc', '')).toBe(true);
+      expect(scout.strings.endsWith('', '')).toBe(true);
+      expect(scout.strings.endsWith()).toBe(false);
+      expect(scout.strings.endsWith(undefined, 'hello')).toBe(false);
+      expect(scout.strings.endsWith('Der Himmel ist blau!', 'blau')).toBe(false);
+      expect(scout.strings.endsWith('Der Himmel ist blau!', 'blau!')).toBe(true);
+      expect(scout.strings.endsWith(1234, 4)).toBe(true);
+      expect(scout.strings.endsWith(1234, 5)).toBe(false);
+      expect(scout.strings.endsWith(1234, '4')).toBe(true);
+      expect(scout.strings.endsWith('1234', 4)).toBe(true);
+    });
+
+  });
+
+  describe("count", function() {
+
+    it("can count occurrences", function() {
+      expect(scout.strings.count()).toBe(0);
+      expect(scout.strings.count('hello')).toBe(0);
+      expect(scout.strings.count('hello', 'xxx')).toBe(0);
+      expect(scout.strings.count('hello', 'l')).toBe(2);
+      expect(scout.strings.count('hello', 'll')).toBe(1);
+      expect(scout.strings.count('hello', 'H')).toBe(0);
+      expect(scout.strings.count('hello', 'h')).toBe(1);
+      expect(scout.strings.count('hello! this a test. :-)', '  ')).toBe(0);
+      expect(scout.strings.count('hello! this a test. :-)', ' ')).toBe(4);
+      expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', 'ü')).toBe(1);
+      expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', '"')).toBe(6);
+      expect(scout.strings.count('the bird is the word', 'rd')).toBe(2);
+      expect(scout.strings.count(98138165, 1)).toBe(2);
+    });
+
+  });
+
+  describe("encode", function() {
+
+    it("encodes html", function() {
+      expect(scout.strings.encode()).toBeUndefined();
+      expect(scout.strings.encode('hello')).toBe('hello');
+      expect(scout.strings.encode('<b>hello</b>')).toBe('&lt;b&gt;hello&lt;/b&gt;');
+      expect(scout.strings.encode(123)).toBe('123');
+    });
+
+  });
+
+  describe("join", function() {
+
+    it("joins strings", function() {
+      expect(scout.strings.join()).toBe('');
+      expect(scout.strings.join('')).toBe('');
+      expect(scout.strings.join(' ')).toBe('');
+      expect(scout.strings.join('hello')).toBe('');
+      expect(scout.strings.join('hello', undefined)).toBe('');
+      expect(scout.strings.join('hello', 'world')).toBe('world');
+      expect(scout.strings.join('hello', 'world', '!')).toBe('worldhello!');
+      expect(scout.strings.join(' ', 'hello', 'world', '!')).toBe('hello world !');
+      expect(scout.strings.join(' ', 'hello', undefined, '!')).toBe('hello !');
+      expect(scout.strings.join(' ', 'hello', null, '!')).toBe('hello !');
+      expect(scout.strings.join(' ', 'hello', '', '!')).toBe('hello !');
+      expect(scout.strings.join('  ', ' ', '', ' ')).toBe('    ');
+      expect(scout.strings.join(undefined, 'one', 'two', 'three')).toBe('onetwothree');
+      expect(scout.strings.join('', 'one', 'two', 'three')).toBe('onetwothree');
+      expect(scout.strings.join(2, 0, 0, 0)).toBe('02020');
+    });
+
+  });
+
+  describe("box", function() {
+
+    it("boxes strings", function() {
+      expect(scout.strings.box()).toBe('');
+      expect(scout.strings.box('(')).toBe('');
+      expect(scout.strings.box('(', undefined)).toBe('');
+      expect(scout.strings.box('(', 'x')).toBe('(x');
+      expect(scout.strings.box(undefined, 'x')).toBe('x');
+      expect(scout.strings.box('(', 'x', ')')).toBe('(x)');
+      expect(scout.strings.box('   (', 'x ', ')')).toBe('   (x )');
+      expect(scout.strings.box(' (', 'x  ')).toBe(' (x  ');
+      expect(scout.strings.box('(', 'x', ')', 'y')).toBe('(x)');
+      expect(scout.strings.box('', 'x', '')).toBe('x');
+      expect(scout.strings.box('a', ' ', 'b')).toBe('');
+      expect(scout.strings.box(0, -3, 7)).toBe('0-37');
+    });
+
+  });
+
+  describe("lowercaseFirstLetter", function() {
+
+    it("converts first letter to lowercase", function() {
+      expect(scout.strings.lowercaseFirstLetter()).toBe(undefined);
+      expect(scout.strings.lowercaseFirstLetter(null)).toBe(null);
+      expect(scout.strings.lowercaseFirstLetter(0)).toBe('0');
+      expect(scout.strings.lowercaseFirstLetter('0')).toBe('0');
+      expect(scout.strings.lowercaseFirstLetter('hans müller')).toBe('hans müller');
+      expect(scout.strings.lowercaseFirstLetter('Hans Müller')).toBe('hans Müller');
+      expect(scout.strings.lowercaseFirstLetter('ÄÖÜ sind Umlaute')).toBe('äÖÜ sind Umlaute');
+    });
+
+  });
+
+  describe("quote", function() {
+
+    it("quotes special characters for regexp", function() {
+      expect(scout.strings.quote()).toBe(undefined);
+      expect(scout.strings.quote(null)).toBe(null);
+      expect(scout.strings.quote('bla')).toBe('bla');
+      expect(scout.strings.quote('foo. bar.')).toBe('foo\\. bar\\.');
+      expect(scout.strings.quote('ein * am Himmel')).toBe('ein \\* am Himmel');
+      expect(scout.strings.quote(123)).toBe('123');
+    });
+
+  });
+
+  describe("asString", function() {
+
+    it("converts input to string", function() {
+      expect(scout.strings.asString()).toBe(undefined);
+      expect(scout.strings.asString(null)).toBe(null);
+      expect(scout.strings.asString('bla')).toBe('bla');
+      expect(scout.strings.asString(false)).toBe('false');
+      expect(scout.strings.asString(-4747)).toBe('-4747');
+      expect(scout.strings.asString(0.123)).toBe('0.123');
+      expect(scout.strings.asString({})).toBe('[object Object]');
+    });
+
+  });
+
+  describe("plainText", function() {
+
+    it("converts html to plain text", function() {
+      var htmlText = '<b>hello</b>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello');
+
+      htmlText = '<b>hello</b> world! <span class="xyz">Some more html...</span>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello world! Some more html...');
+    });
+
+    it("considers upper and lower case tags", function() {
+      var htmlText = '<B>hello</B>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello');
+
+      htmlText = '<b>hello</b> world! <SPAN class="xyz">Some more html...</SPAN>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello world! Some more html...');
+    });
+
+    it("converts br, p, div into new lines", function() {
+      var htmlText = '<b>1. line</b><br><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+
+      htmlText = '<b>1. line</b><br/><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+
+      htmlText = '<p><b>1. line</b></p><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+
+      htmlText = '<div><b>1. line</b></div><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+    });
+
+    it("converts li, tr into new lines", function() {
+      var htmlText = '<ul><li><b>1. line</b></li><li><i>2. line</i></li></ul>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line\n');
+
+      htmlText = '<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line\n');
+    });
+
+    it("converts td into whitespaces", function() {
+      var htmlText = '<table><tr><td>1. cell</td><td>2. cell</td></tr></table>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. cell 2. cell\n');
+
+      htmlText =
+        '<table>' +
+        '  <tr><td>1. cell</td><td>2. cell</td></tr></table>' +
+        '  <tr><td>1. cell(r2)</td><td>2. cell(r2)</td></tr>' +
+        '</table>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. cell 2. cell\n1. cell(r2) 2. cell(r2)\n');
+    });
+
+    it("converts &nbsp;, &amp;, &gt;, &lt;", function() {
+      var htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first word next word');
+
+      htmlText = '<b>first&amp;word</b>&amp;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first&word&next word');
+
+      htmlText = '<b>first&gt;word</b>&lt;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first>word<next word');
+
+      htmlText = '<b>first&lt;word</b>&gt;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first<word>next word');
+    });
+
+    it("preserves tabs", function() {
+      var htmlText = '\t\t';
+      expect(scout.strings.plainText(htmlText)).toBe('\t\t');
+    });
+
+  });
+
+});

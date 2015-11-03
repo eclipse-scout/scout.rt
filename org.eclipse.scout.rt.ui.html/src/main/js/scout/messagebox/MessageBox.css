@@ -1,0 +1,57 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@color-messagebox-border: @palette-gray-4;
+@messagebox-label-padding: 20px;
+
+.messagebox {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  max-width: 330px;
+  #scout.drop-shadow-large();
+  border-top: 5px solid @active-color;
+  border-radius: @border-radius;
+
+  &.severity-error {
+    border-top-color: @error-border-color;
+  }
+
+  /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
+  &.calc-helper {
+    top: 0;
+    left: 0;
+  }
+
+  &.shown {
+    #scout.animation-name(fade-slidein-top);
+    #scout.animation-duration(0.5s);
+  }
+
+  &.modality-highlight {
+    #scout.animation-shake();
+  }
+}
+
+.messagebox-content {
+  border-left: 1px solid @color-messagebox-border;
+  border-right: 1px solid @color-messagebox-border;
+  background-color: @control-background-color;
+  padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
+}
+
+.messagebox-label {
+  padding-top: @messagebox-label-padding;
+  word-wrap: break-word;
+}
+
+.messagebox-header {
+  font-weight: bold;
+}

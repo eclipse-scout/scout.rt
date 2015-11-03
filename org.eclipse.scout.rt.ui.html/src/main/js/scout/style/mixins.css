@@ -1,0 +1,264 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+#scout {
+
+  .vendor(@property, @value) {
+    -webkit-@{property}: @value;
+    -moz-@{property}: @value;
+    -ms-@{property}: @value;
+    -o-@{property}: @value;
+    @{property}: @value;
+  }
+
+  .glow(@color, @radius: 5px) {
+    box-shadow: 0 0 @radius @color;
+  }
+
+  .inner-glow(@color, @radius: 4px) {
+    box-shadow: inset 0 0 @radius @color;
+  }
+
+  .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {
+    box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
+  }
+
+  .drop-shadow-large() {
+    #scout.drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: 0.5);
+  }
+
+  .focus-border(@bordersize: 1px) {
+    outline: none;
+    border: @bordersize solid @focus-border-color;
+    #scout.glow(@focus-glow-color);
+  }
+
+  .no-focus-border() {
+    outline: none;
+    border: 0;
+    box-shadow: 0 0 0 0;
+  }
+
+  .transform(@args) {
+    -webkit-transform: @args;
+    -ms-transform: @args;
+    transform: @args;
+  }
+
+  .transform-origin(@args) {
+    -webkit-transform-origin: @args;
+    -moz-transform-origin: @args;
+    -ms-transform-origin: @args;
+    transform-origin: @args;
+  }
+
+  .text-selection() {
+    background: @text-selection-background-color;
+    color: @text-selection-color;
+  }
+  .text-selection-disabled() {
+    background: @text-selection-disabled-background-color;
+    color: @text-selection-disabled-color;
+  }
+
+  .placeholder() {
+    opacity: @text-field-placeholder-opacity;
+  }
+  .placeholder-disabled() {
+    color: @disabled-color;
+  }
+
+  .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
+    position: absolute;
+    content: '';
+    left: @left;
+    top: @top;
+    width: calc(~'100% +' @diffW);
+    height: calc(~'100% +' @diffH);
+  }
+
+  /* Expects a sibling html element with class 'icon' **/
+  .text-field-with-icon(@icon; @className: ~'') {
+    padding-right: @text-field-padding-x + 15px;
+
+    & ~ .icon@{className} {
+      position: absolute;
+      margin-right: @text-field-padding-x;
+      cursor: text;
+    }
+
+    & ~ .icon@{className}::before {
+      #scout.font-icon();
+      font-size: 13px;
+      content: @icon;
+      /* TODO AWE: (smartfield) wieso braucht das icon eine line-height? */
+      /* wird doch sowieso absolut positioniert. */
+      line-height: @logical-grid-height;
+      color: @text-field-icon-color;
+    }
+
+    &:focus ~ .icon@{className}::before {
+      color: @text-field-icon-focus-color;
+    }
+
+    &.has-error ~ .icon@{className}::before {
+      color: @text-field-icon-error-color;
+    }
+
+    &.disabled {
+      padding-right: @text-field-padding-x;
+    }
+
+    &.disabled ~ .icon@{className} {
+      display: none;
+    }
+
+    /* When field is too small, hide the icon */
+    &.compact {
+      padding-right: @text-field-padding-x;
+
+      & ~ .icon {
+        display: none;
+      }
+    }
+  }
+
+  .user-select(@mode) {
+    -webkit-user-select: @mode;
+    -moz-user-select: @mode;
+    -ms-user-select: @mode;
+    user-select: @mode;
+  }
+
+  .checkbox-before() {
+    content: '';
+    display: inline-block;
+    width: @check-box-size;
+    height: @check-box-size;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .checkbox-before-focus() {
+    border-color: @focus-border-color;
+  }
+
+  .checkbox-before-checked() {
+    #scout.font-icon();
+    content: @icon-checked;
+    color: @palette-blue-6;
+    font-size: 11px;
+    text-align: center;
+    line-height: 15px;
+  }
+
+  .checkbox-before-border() {
+    border: 2px solid @border-color;
+    border-radius: 3px;
+  }
+
+  .checkbox-before-disabled-border() {
+    border: 2px solid @border-color;
+  }
+
+  .checkbox-before-disabled() {
+    color: @checkbox-disabled-color;
+    background-color: @control-disabled-background-color;
+  }
+
+  .checkbox-after-children-checked() {
+    content: '';
+    display: inline-block;
+    height: 8px;
+    width: 8px;
+    background-color: @palette-blue-6;
+    border-radius: 2px;
+    position: absolute;
+    top: -7px;
+    left: 5px;
+  }
+
+  .checkbox-after-children-checked-disabled() {
+    background-color: @checkbox-disabled-color;
+  }
+
+  .overflow-ellipsis() {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .overflow-ellipsis-nowrap() {
+    #scout.overflow-ellipsis();
+    white-space: nowrap;
+  }
+
+  .overflow-nowrap() {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .white-space-nowrap() {
+    white-space: nowrap;
+  }
+
+  .button-focus() {
+    #scout.overlay(-3px, -3px, 6px, 6px);
+    #scout.focus-border();
+    border-radius: @border-radius;
+  }
+
+  .triangle-top-left(@size, @color) {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: @size @size 0 0;
+    #scout.triangle-top-left-color(@color);
+  }
+
+  .triangle-top-left-color(@color) {
+    border-color: @color transparent transparent transparent;
+  }
+
+  /* Font Mixins */
+
+  .font-text-small(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-small;
+  }
+
+  .font-text-normal(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-normal;
+  }
+
+  .font-text-plus(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-plus;
+  }
+
+  .font-text-large(@font-weight: @font-weight-normal) {
+    font-family: @font-default-family;
+    font-weight: @font-weight;
+    font-size: @font-size-large;
+  }
+
+  .font-icon {
+    font-family: scoutIcons, @font-default-family;
+    font-weight: @font-weight-normal;
+    speak: none;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

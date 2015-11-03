@@ -1,0 +1,540 @@
+JsonAdapter / JavaScript Model [03.06.2014 cgu, awe]
+- Der Konstruktor aller JS ModelAdapter ist parameterlos. Grund: durch die JS-Vererbung via inheritsFrom, wird der super-Ctor
+  immer einmal ohne Argumente aufgerufen, man müsste darum im Ctor 'if (model && session)' verwenden um Exceptions zu vermeiden.
+  Darum wird neu anstatt dem Ctor eine init Methode mit den beiden Argumenten model, session verwendet.
+- Server-seitig schicken wir nur beim ersten Mal das komplette Model als JSON-string. Der Client erzeugt aus diesem JSON-string
+  eine ModelAdapter Instanz und speichert diese in der modelAdapterRegistry. Wird die gleiche Instanz ein zweites Mal benötigt, schickt
+  der Server nur noch die ID dieser Instanz im JSON-string, der Client liefert dann die bereits vorhandene Instanz aus der model-
+  AdapterRegistry zurück.
+- Wird eine (Scout-)Model Instanz abgeräumt (z.B. eine Form Instanz) muss die serverseitige JsonAdapter Implementierung dafür sorgen,
+  dass alle Kinder (z.B. FormFields) aus der modelAdapterRegistry entfernt werden. Der genau gleiche Clean-up muss auf Clientseite
+  erfolgen und alle ModelAdapter Instanzen bzw. DOM Objekte aus der modelAdapterRegistry gelöscht werden (ModelAdapter.destroy())
+  OFFEN: JsonAdapters erstellen child adapters nach bedarf in createChildAdatpers bzw PropertyChangeEvents. ChildAdapters werden jedoch IMMER disposed.
+  Auswirkung: Wenn ein Adapter geteilt wird (z.B. selbe Model-Menu-Instanz wird auf Table und Tree verwendet), löscht die eine Komponente die Adapter. Die andere muss dann die Adapter neu erstellen.
+  -> Das modelData wird erneut an den Client geschickt.
+  OFFEN2: Wann soll der client seitige Adapter aus der Registry entfernt werden. Entweder wird pro Server adapter ein dispose geschickt (viel Traffic, jedoch klar). Oder Adapter müssen verknüpft sein (parent child, jedoch basierend auf server adapters). Oder...?
+- PROBLEME:
+  - UseCase: Modell wird initial per Property Change geschickt (z.B. TableField.setTable(X)). Noch während der Server am drehen ist, wechselt die Table von X auf Y. Table X wird nun NIE geschickt, im Server ist sie aber in der Registry vorhanden.
+    Passiert in der Widgets App wenn man auf Page & Search Forms, Page with nodes und dann Page with table klickt (Exception auf Client bei Menus)
+  - UseCase2: Modell wird initial als Property geschickt (z.B: Form.RootGroupBox). Noch während der Server am drehen ist, gibt es Property-Change-Events auf die RootGroupBox. Diese PropertyChange Events müssten eigentlich nicht separat, sondern könnten als Teil des initialen Loads geschickt werden -> Spart Datenübertragung.
+    Problem ist, dass man nicht weiss, welche Properties solche initialen Loads beinhalten.
+    Passiert in der Widget APP z.B. in der ButtonsForm (Buttons werden erst nacht dem Laden dekoriert).
+  Lösung? Alle Create Events vorher schicken? Beispiel: Page schickt DetailForm. DetailForm ist neu, gibt ein CreateEvent. FormFields darauf sind auch neu -> Create events.
+  Auf dem Client müssten alle Create events zuerst behandelt werden, eigentlich auch in umgekehrter Reihenfolge. FormField zuerst erstellen, da Form sonst nicht initialisiert werden kann. Könnte aber trotzdem noch Abhängigkeitsprobleme geben.
+  Eventuell alle erstellen und danach alle initialisieren?
+  Parent/Child Abhängigkeit müsste bei der Initialisierung gesetzt werden.
+  -> LÖSUNG: Server merkt sich modelAdapter und macht nicht direkt toJson. Er ignoriert dann alle Property-Change-Events für Objekte, die noch nicht an den Client geschickt wurden.
+  JsonAdapter implementiert das Interface toJsonString, welches toJson().toString() macht.
+  Insert und DeleteRows könnten auch ignoriert werden. Dann müsste es aber auch ein coalesce für selection event geben. UseCase: insert 5. select 5. Delete 5 -> 5 wird nicht geschickt, exception.
+  Auf dem Client braucht es auch ein coalesce für Offline-Fall. Wenn auf einer Tabelle rumgeklickt wird, müssen nicht alle Selection-Events geschickt werden, sondern nur der letzte.
+  TODO: Prüfen ob Parent/Child-Abhängigkeit überhaupt "verhebt". Beispiel: Menus, einmal als ContextMenü und einmal als Action-Bar. 2 GUIS mit einem Model.
+
+ModelAdapter Property Changes
+- Bei einem property change event werden die Werte der Properties auf den ModelAdapter übertragen. Danach werden die setter aufgerufen (z.B. setEnabled()).
+- Im Setter wird der Status gerendert werden
+- Manchmal muss jedoch im Setter auch der Property-Wert gesetzt werden, da der Server nicht mit einem property change event antwortet, wenn der Wert dem Client bereits bekannt ist (siehe PropertyFilter).
+  Betrifft z.B. Checkbox.setSelected(). Oder auch StringField.setDisplayText.
+  An anderen Orten möchte man aber explizit den Model-State nicht verändern, sondern nur das GUI. Z.B. goOffline/goOnline, damit man später das GUI auf den alten State zurücksetzen kann.
+  Lösung? Eventuell die setter in render umbenennen und den Model-State strikt ausserhalb setzen (z.B. im Checkbox Klick-Listener.
+- Weiterer offener Punkt: Die Render-Methoden dürfen eigentlich nur aufgerufen werden, wenn der Adapter dargestellt ist (isRendered). Ansonsten knallt es.
+  Lösung? Gar nicht erst aufrufen, in der Methode auf isRendered prüfen. Oder sogar model von GUI trennen wie im Scout-Client?
+
+Aufteilung zwischen GUI-Elementen und Server / Model-Interaktion?
+- z.B. Table schickt Server Event im Selektions-Code. Alternative wäre ein Listener, welcher auf Selektion hört und dort den Event schickt.
+- Vorteil des Listeners: Saubere Trennung, Komponenten könnten einfacher ersetzt werden?
+- Nachteil: Eventuell unnötiger Zusatzaufwand
+
+Offline
+- 2 Use Cases: Tunnel und Aktenkoffer
+- Tunnel:
+  Applikation soll bedienbar bleiben, auch wenn temporär kein Netz da ist. Die Elemente werden readonly, ausser vielleicht Textfelder, damit der Benutzer weiter tippen kann.
+  Baum, Tabelle, TableControls sollen weiterhin bedienbar sein. PROBLEM: Page-DetailForms müssten auf dem GUI als solche erkannt werden, damit sie ein/ausgeblendet werden können.
+    -> Die DetailForms (und SearchForms) dürfen nicht auf den Desktop gelegt werden (mittels addForm) aus dem Model, das GUI soll sich darum kümmern. siehe auch FIXME in MiniCrmOutline
+  Benutzer sieht, dass zur Zeit keine Verbindung hergestellt ist. Die Seite versucht automatisch, die Verbindung wieder herzustellen.
+  Die Events werden aufgeonmmen und sobald der Server wieder erreichbar ist abgeschickt.
+  Mögliche Optimierung: Unnötige Events müssten nicht geschickt werden. Beispiel: Es ist nicht nötig, jede Selektion der TableRows zu schicken, die letzte würde genügen.
+- Aktenkoffer:
+  Der Benutzer kann Objekte auswählen, die Offline verfübar sein sollen.
+  Werden dann alle Childpages auch geladen? Inkl. Aller Forms? ev. mittels Benutzer-Auswahl?
+  Die Objekte werden in einer Offline-Sicht dargestellt.
+  Die Offline-Sicht ist ähnlich zur Such-Sicht.
+  Bearbeitung im Offline-Modus: 2-Varianten:
+  1. Normale Scout-Komponenten so bearbeitbar wie möglich machen, Validierungen würden erst "zu Hause" (Online) durchgeführt.
+     Viele Komponenten gingen gar nicht (z.B. Adressen, da die Selektions-Logik im Modell liegt).
+     Auch dynamische Properties (visible, enabled). Alle Buttons und Menus. Es müsste UseCase-Buttons geben (z.B. neuer Eintrag in Tabelle hinzufügen). Man wäre dann aber sehr schnell wieder an der Grenze des Machbaren angelangt.
+     Stammdaten für Smartfields könnte man cachen, Lookup-Call-Smartfields könnten aber bereits nicht mehr genutzt werden.
+     Um überhaupt einen Dialog im Bearbeitungs-Modus öffnen zu können, braucht es intelligente Menüs bzw. Readonly und Bearbeitungs-Modus eines 360°-Dialogs, da im Offline-Fall die Menus grundsätzlich nicht funktionieren können.
+     Dialog wäre gesperrt bei Mitnahme? Ansonsten würde es ja beim Zurücksynchronisieren einfach überschreiben.
+     Ok, Abbrechen-Button müssten enabled sein. Dialog wird einfach geschlossen? Sobald online, wird ein doOk gemacht? Wie weiss man, dass OK-Button enabled sein soll?
+     Alternative: Ok immer disabled, Dialog muss minimiert werden. Manuell Dialoge durchgehen und OK klicken sobald man zurück ist. Ansonsten müsste noch geklärt werden, wie Zurücksynchronisierung ablaufen soll.
+     Oder Ansicht aller Offline-Dialoge analog Taskbar. Beim Synchronisieren nacheinander öffnen und speichern.
+     Klick auf OK macht keine Mussfeldprüfung? Theoretisch eigentlich möglich, jedoch halt nicht für dynamische Dinge (eher selten). Eigentlich wäre es nicht schlecht, wenn es macht was es kann und den Rest am Schluss beim online gehen. Vielleicht sollte man einen Hinweis einblenden, dass beim Synchronisieren nochmals eine Überprüfung stattfindet.
+  2. Man erstellt die Dialoge spezifisch für Offline
+     Im Modell oder als Javascript-Komponenten? Falls im Modell, hätte man die selben Einschränkungen wie oben -> eher nicht.
+     Falls als JS-Komonenten: Die bestehenden Komponenten (Table, SmartField etc.) sollten wiederverwendbar sein.
+     Wie kann man auf Events reagieren oder Properties setzen? Die Komponenten sind nicht dafür ausgelegt.
+     Entweder man baut setter für Properties und Event-Handling ein, also trennt GUI-Komponenten von Scout-Komponennten (analog Swing, SWT etc., siehe auch Abschnitt oben).
+     Alternative könnte sein, man verwendet die Session-Events -> Für Offline-Komonenten eine Offline-Session injecten. Selection-Listener an Table würde in Wahrheit ein Listener an die Session anhängen.
+     Setter würde es benötigen (z.B.: setSelectedRows würde model.selectedRows setzen, session.send und anschliessend renderSelectedRows aufrufen). Für Properties könnte man eventuell setter auch zur Laufzeit erzeugen, da es sie aktuell nicht gibt
+
+
+Attach / Detach vs. new Scout.DesktopTable()
+- Attach geht lange bei grossen Objekten (z.B. table mit 800 Rows)
+
+Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
+- Beispiel: Server schickt nodes und pro node table gleich mit, table darf aber noch nicht gerendert werden (wäre spezifisch für desktoptree)
+  Aktuell wird einfach ein JsonDesktopTable erzeugt ohne gui, damit table events behandelt werden können.
+- Soll die Erzeugung vom Server getriggert werden mittels create events? Aktuell wird die table einfach mit den nodes mitgeschickt
+
+Datenübertragung
+- Wenn keine Elemente vorhanden, leere Liste oder das Element nicht schicken? Keine undef Prüfung mit JS vs. weniger Daten-Übertragung
+  -> [09.05.2014, awe, cgu]: Element nicht schicken
+- Dasselbe gilt für Properties, welche den "Default"-Wert haben. z.B: maximizedEnabled ist zu 99% auf false bei Dialogen, muss das übertragen werden?
+  Wir könnten initial auch eine Map mit Default-Props schicken und dann die einzelnen Props nur, falls sie nicht default sind. Ob man aber so viel spart dabei?
+- Wie soll der Wert eines Properties gelöscht werden?
+  -> [09.05.2014, awe, cgu]: Wir schicken einen Empty-String, auf dem Client kann dann mittels !value darauf geprüft werden.
+- Wenn das GUI mit einem Wert kommt (z.B. selected=true bei CheckBox), dann muss der Server nicht mit selected=true darauf antworten.
+  -> Der Property-Change Event vom Modell muss ignoriert werden -> PropertyChangeFilter bzw. Table oder TreeEventFilter
+- Wenn ein neues Objekt an den Client geschickt werden soll und an diesem Objekt während dem Server-Cycle noch Änderungen vorgenommen werden, dann sind eigentlich die ersten Informationen obsolet. Wie wollen wir damit umgehen?
+  Beispiel: Form wird dem Desktop hinzugefügt bewirkt ein toJson. Danach werden die Felder verändert.
+
+Naming
+- Events und Properties sollten wie im Modell benannt werden. Z.B: beim Menu: "text" statt "label", weil es IMenu.getText(); heisst
+  Offen: Naming im CSS nachziehen?
+
+Protokoll
+- Jetzt schicken Client und Server events, sollte man das eventuell unterscheiden? Client->actions, Server->events? Ist nur ein Naming-Ding
+
+RendererRegistry
+- Die Objekte werden bei Bedarf erstellt. Der Client erhält die Notifikation mittels create event, oder über die initialisierung des Parent (toJson)
+  - Offene Frage: Was passiert, wenn das Objekt im toJson bereits initialisiert wurde und erneut geschickt wird? Zur Zeit wird das Objekt auf dem Client neu erstellt. -> Leak?
+- Dies führt zu einer inkrementellen Erstellung des Modells auf dem Client.
+- Wann sollen die Objekte aufgeräumt werden? Bei From passiert es zur Zeit beim Close, jedoch nicht rekursiv -> Felder bleiben bestehen -> Leak
+
+JsHint
+- Wir verwenden kein unused, weil sonst alle ungenützten Parameter auch angezeigt würden, was man leider nicht abstellen kann.
+
+Javascript-Event-Handling
+- Event-Listener müssen zwingend wieder entfernt werden (aktuell ein Problem im Menu.js)
+- Sollten wir für globale Events (z.B. ('*') bei Menu.js) Namespaces verwenden, damit wir anderen nicht reinfunken (Portlets)?
+
+Scout/Model-Anpassungen
+- Feld-Validierungen
+  Ziel: Validierungen und Formatierungen möglichst mittels Javascript machen
+  - Pro Feld Pattern/Regex und Error-Meldung?
+  - Möglichkeit für custom Javascript Validator/Formatter?
+- Tabellen-Sortierung / Filterung soll ins JS
+  Paging-Unterstützung andenken
+- Unterstützung für Graph / Map / Chart auf Pages
+  Was soll alles im Modell konfiguriert werden können?
+- ViewButtons eigentlich nicht nötig, Modell ist auf dem Desktop vorhanden
+- Editierbare-Tabellen
+  Felder wären im JS bekannt, Tabelle hat aber execPrepare, execCompleteEdit etc.
+  Dynamische Cell-Editierbarkeit müsste umbedingt umgebaut werden. Zur Zeit im prepare isCellEditable (execIsEditable) aufgerufen, also zum Zeitpunkt der Darstellung.
+  Die Editierbarkeit darf nicht so berechnet werden, sondern muss über einen setter steuerbar sein, damit man 1. Veränderung der Editierbarkeit anzeigen kann und 2. vor dem Klicken schon weiss, ob man überhaupt ein Feld erzeugen muss
+  Dies würde auch der aktuellen Mobile-Lösung zu gute kommen, welche dynamische Editierbarkeit zur Zeit nicht unterstützt, weil prepareEdit null zurückliefert falls Spalte zwar editierbar, aber Feld nicht -> Es müsste jederzeit ein Feld erzeugt werden können, egal ob aktuell enabled oder nicht.
+- Filter bei Tree / Table (ITreeNodeFilter, ITableRowFilter) könnten auch vom JS übernommen werden
+- Tabellen-Organisation soll neu ein eigenes GUI-Element sein (kein Standard-Form)
+- Dynamische Outlines (Add/Remove)
+- IDateColumn / ITimeColumn und ev. Felder müssen das Pattern zurückgeben können, analog INumberValueContainer
+- Wie wollen wir mit den internen Tabellen bei NodePages umgehen? siehe auch FIXME in JsonDesktopTree -> vermutlich konfigurierbar machen auf nodepage
+- Handling / Caching der Detail-Forms bei Pages sollte von Scout unterstützt werden (Bei activate Öffnen des Forms falls noch nicht gemacht, bei Dispose schliessen). Das Pattern ist immer dasselbe.
+
+Scout-Pattern / Namespacing
+- Scout verwendet genau einen Namespace namens scout
+- Es gibt keine weitere Gruppierung mittels JS-Objekten (scout.abc.xy). Jede weitere Verschachtelung ist ein Objekt-Zugriff -> Performance-Impact
+- Scout-Namespace wird mittels IIF (Immediate Invocation Function) erzeugt
+- Die internen Objekte/Komponenten (Session, Menu, etc) werden innerhalb dieser IIF definiert
+- Vorteil des IIF:
+  - Die Scout-Komponenten müssen nicht mittels Scout.Komponente referenziert werden
+  - API gegen aussen muss explizit definiert werden (die Komponenten müssen explizit freigegeben werden): scout.Menu = Menu;
+- Scout ist ein Singleton, es gibt einmal window.scout
+- Das Pattern könnte sich noch ändern, abhängig von Portlets und Erweiterbarkeit (siehe unten)
+
+Session-Handling
+- Es gibt verschiedene Arten von Sessions:
+
+  HTTP session:        - Java Servlet Sessions auf dem GUI-Server. Wird vom Applikationsserver nach erfolgter
+                         Authentifizierung erstellt.
+                       - Wird identifiert durch ein Session-Cookie JSESSIONID, welches der HTTP-Client bei jedem
+                         Request mitschickt. Man kann auf dem App-Server einstellen, wie lange dieses Cookie
+                         leben soll (z.B. 4h wegen iPhone-Homescreen-Verhalten, oder ohne Zeitpunkt, dann ist es
+                         kaputt, wenn der Browser zugemacht wird). Genaue Eigenschaften des Cookies (z.B. Pfad
+                         oder HTTP-only Flag) werden vom App-Server definiert.
+                       - Es gibt keine Verbindung zwischen den verschiedenen HTTP-Sessions. Jeder User hat eine
+                         eigene HTTP-Session (und auch ein einzelner User kann mehrere HTTP-Sessions haben, z.B.
+                         wenn er ein Private-Browsing-Fenster öffnet).
+                       - Layer: Appserver/HTTP
+
+  JavaScript session:  - Wird vom Browser pro Scout-Kontext (DIV) erzeugt (main.js bzw. Session.js).
+                       - Als ID dient die UiSessionId. Diese wird immer vom Browser neu erzeugt aus dem aktuellen
+                         Timestamp und optional dem Wert des data-partid Attributs (für Portlet). Innerhalb
+                         einer HTTP-Session ist dieser Wert damit eindeutig.
+                       - Diese Session ist der Rootkontext des GUIs, alles läuft innerhalb dieser Session ab.
+                         Sie merkt sich auch alle Objekte und Mappings (Registry).
+                       - Die JavaScript session hat ein Pendant auf dem GUI-Server, die -> UiSession.
+                       - Layer: UI/Browser (JavaScript)
+
+  UI session:          - Unter dem Schlüssel "scout.htmlui.uisession.$UiSessionId" werden die verschiedenen
+                         UiSessions des Benutzers (1 pro Scout-"Fenster") in der HTTP-Session abgelegt.
+                       - Wenn noch keine UiSession existiert, wird dynamisch eine erzeugt (nur wenn im JSON-
+                         Request "startup=true" mitgeliefert wird, ansonsten ist der Zustand ungültig). Die damit
+                         zur verknüpfende ClientSession muss ebenfalls mitgeliefert werden.
+                       - Auch auf der Serverseite enthält die UiSession eine Registry für alle Adapter.
+                       - Die UI session und die JavaScript session enthalten den gleichen Zustand. Dieser
+                         Zustand beschreibt den Inhalt des betreffenden Scout-"Fensters".
+                       - Layer: scout.rt.ui.html (Java, auf dem GUI-Server)
+
+  Client session:      - Scout-Modell des Clients (unabhängig vom UI, wie früher).
+                       - Die ClientSession wird ebenfalls in der HTTP-Session abgelegt (Schlüssel "scout.htmlui.
+                         session.client.$ClientSessionId"). Dadurch können mehrere UiSessions die gleiche
+                         ClientSession verwenden (z.b. in einem Popup).
+                       - Die ClientSessionId ist eine beliebige Nummer und wird von Session.js berechnet. Danach
+                         wird sie im HTML5 "session storage" abgelegt, wodurch Sub-Fenster (Popups) den gleichen
+                         Wert erhalten, ein neues Tab jedoch einen anderen Wert. Damit ist es möglich, dass ein
+                         Benutzer mehrere "Clients" gleichzeitig im selben Browser offen haben kann. (Es ist aber
+                         nicht möglich, mehrere verschiedene Benutzer im gleichen Browser laufen zu lassen, da
+                         die HTTP-Session bzw. das Session-Cookie im ganzen Browser gilt. Falls man das möchte,
+                         müsste der Benutzername in die URL mitaufgenommen werden.)
+                       - Layer: scout.rt.client (Java, auf dem GUI-Server)
+
+  Server session       - Scout-Modell des Servers (unabhängig vom UI, wie früher).
+                       - Login des GUI-Servers auf den Backend-Server wie früher bei RAP (TODO: Wirklich???).
+                       - Layer: scout.rt.server (Java, auf dem Backend-Server)
+
+
+Portlets
+- Javascript und CSS müssen abgegrenzt werden
+- Die Elemente dürfen nicht über #Element im CSS referenziert werden, da es #Element pro scout-div geben kann
+  -> nur Klassen verwenden (.element)
+- Sobald es mehrere Divs auf der Seite gibt, darf das CSS die Objekte nur innerhalb eines divs selektieren, also anstatt .table muss es #divId.table heissen
+- Dieses Hinzufügen der divId kann vom Server übernommen werden. Client muss dem Server mitteilen, wieviele Divs es gibt.
+- Falls es nur ein Div hat, ist diese Prozessierung nicht nötig. Vorteil: Selektion ist schneller
+- Müssen / Wollen wir unterstützen, dass unterschiedliche Scout-Divs unterschiedliche Scout-Komponenten verwenden?
+  Falls ja, muss entweder JS bei der Erstellung der Komponenten divId berücksichtigen.
+  Oder pro (unterschiedlichem) scout div machen wir new Scout() anstatt ein Singleton (siehe scout-pattern.js)
+
+Mobile
+- Separates CSS und Javascript für mobile? Basierend auf scout.css?
+  - Vorteile:
+    - Man muss mobile Komponentent nicht mit eigenen CSS-Klassen bestücken (z.B. braucht es table-row-mobile nicht)
+    - man kann CSS / JS für nicht verwendete Komponenten weglassen
+    -> scout.js sowies scout-mobile.js sind so schlank wie möglich
+  Damit wir den Source-Code nicht duplizieren müssen, sollten wir versuchen, unsere Widgets möglichst flexibel zu machen, also dass einzelne Komponenten ausgetauscht oder komplett weggelassen werden können.
+  Z.B: Footer/Header bei der Tabelle oder Keystroke-Handling. Diese Komponenten können wir dann fürs scout-mobile.js einfach weglassen.
+- Eventuell css eigenschaften mittels @Override verändern, damit das mobile css nicht unnötig aufgeblasen wird?
+- Damit die mobilen CSS und JS-Dateien geladen werden, gibt es auch ein index-mobile.html. Dieses Html wird zurückgegeben, wenn es ein mobiler Browser ist und man auf / verbindet.
+  Man kann aber auch direkt auf die mobile Version wechseln, indem man direkt /index-mobile.html ansteuert.
+- Auf der Session.js gibt es ein UserAgent-Objekt (analog zur ClientSession auf dem Server), dort steht der deviceType drin.
+  Das index-mobile.html initialisiert den UserAgent mit dem DeviceType „Mobile“. Bei einem Tablet sollte an dieser Stelle mit Tablet initialisiert werden, es gibt KEIN index-tablet.html.
+  Wir erhoffen uns damit, dass wir dann live (responsive) zwischen mobile und tablet wechseln können.
+- Template-Mechanismus für Tables? Damit man pro Table das Layout selber vorgeben kann (z.B. Datumsspalte rechts oben)
+- User-Feedback:
+  Browser haben ein 300ms delay, siehe auch index-mobile.html
+  Touch-Feedback kann man mittels den Pseudeselektor :active steuern. MouseDown kommt nicht bei TouchStart, da man nicht weiss, ob TouchStart zu einem Tab oder Scroll führt
+
+Styling / Farben
+- Wie wollen wir mit Custom Styling umgehen? Soll es die Properties setBackgroundColor / setFont etc weiterhin geben?
+  Gedanken: Styling könnte komplett im CSS gemacht werden. Beispiele:
+    .text-field: background-color: blue;
+    .person-form > text-field: background-color: blue; -> Möglichkeit für eigene Klassen muss gegeben sein
+    .classId: background-color: blue -> scout classId als css class hinzufügen, eindeutig stylebar
+  Problem dabei: Dynamisches Anpassen des Styles ist nicht möglich. Beispiel: Zelle (3,4) in einer Tabelle soll rot werden, wenn Zelle (2,3) leer ist.
+  Könnte man lösen, indem jedes Scout-Objekt ein Property css-styles bekommt, oder weiterhin über setBackgroundColor.
+  Problem dabei: Die verwendeten Farben müssen zum aktuellen Scout-CSS passen.
+  -> Das CRM darf keine fixen Farben verwenden, weil wenn das Projekt ein eigenes CSS hat diese Farben nicht mehr passen.
+  Besser wäre es vermutlich, eine Farb-Palette zu definieren. Das CRM könnte dann Konstanten aus dieser Palette verwenden.
+
+Erweiterbarkeit
+- Es muss möglich sein, Komponenten austauschen zu könnnen
+- Dafür braucht eine Komponenten-Factory (analog FormFieldFactory)
+- Pattern muss Registrierung von eigenen Komponenten ermöglichen -> scout.registerComponent();
+- Wie gehen wir mit custom CSS um? Css erweiterbar machen mittels z.B. @extends? Build-Umgebung für Css / JS sollte den Projekten zur Verfügung gestellt werden
+  Custom css nötig für eigene Komponenten + für eigenes Styling (Corporate Design)
+- Wenn Projekt eine eigene JS-Library verwenden möchte, kann es die im Script-Tag einfügen -> Durch Namespacing grenzt sich Scout ab -> keine Konflikte
+- Wie kann das Projekte eine bestehende Komponente erweitern / patchen?
+  Komponente registrieren -> ok
+  Komponente erweitern (extends) -> unklar. Nur via Build-Prozess? Oder genügt es, alle Scout-Komponenten öffentlich zu machen (scout.Table = Table)? Dann könnte man "JS-Vererbung" verwenden
+
+Erweiterbarkeit, Dependencies und weitere js Resourcen in externen Bundles
+- Andere Bundles würden gerne etwas contributen (z.B. Office-Feld), Java, Javascript und CSS-Files inkl. Tests.
+- Contribution zur Build-Time eher unrealistisch, da es ein "Master" bräuchte, der die Abhängigkeiten kennt (z.B. Projekt-Bundle).
+  Zudem liegen die Bundles binär rum, die Sourcen sind also gar nicht im Workspace, man müsste Scout auschecken.
+- Laufzeitansatz:
+  Jedes Plugin würde Scripts contributen (Extension-Point)
+  Die Scripts werden zu einem scout.js zusammengestellt (unter Berücksichtigung der Plugin-Dependencies).
+  Die Scripts sind alle mit einer IIFE gewrapped.
+  Die einzelnen Scripts sind entweder bereits komplett oder beinhalten @includes
+  Alternative zu includes, siehe Beispiel unten. Nachteil: Man kann nicht feingranular einzelne Dateien nicht verwenden (z.B. für Mobile). Oder doch?
+  Sind die Scripts bereits minifiziert oder machen wir die Minifizierung auch zur Laufzeit?
+- Alternative:
+  Anstatt dass jedes Plugin ein script contributed, welches mit dem ScriptProcessor zusammengebaut wird, könnte jedes einzelne File contributed werden.
+  Es gäbe dann keine Includes mehr im Template.js (ev. ausser für jquery-scout). Nur noch //@include js-files oder ähnlich
+  Es gäbe nur ein template.js (oder noch eins für mobile), eventuell auch via extension point hinzugefügt -> austauschbar.
+  Die ObjectFactory.js müsste dann auch dynamisch erstellt werden.
+  Pro extension point könnte dann ein Feld.js, Feld.css und JsonFeld.java angegeben werden.
+  Für Files ohne Model halt nur ein Feld.js.
+  Man könnte dadurch jede JS-Klasse austauschen.
+  Reihenfolge müsste berücksichtigt werden, wie aktuell im template.js
+  Minifizierung müsste auch zwingend zur Laufzeit erfolgen (falls nicht debug=true).
+- Dynamisches Nachladen
+  Je nach Script möchte man es vielleicht eher erst bei Bedarf laden (z.B. Office).
+  Mögliche Lösung: Scout.js stellt eine ScriptRegistry zur Verfügung.
+  Office-Plugin kann sich das Script registrieren (mittels Javascript).
+  Beim Erzeugen der Objekte (ObjectFactory) könnte es prüfen, ob es das Object gibt if(scout.FormField). Falls nicht, in der Script-Registry nachschauen.
+  Das Script wird mittels $.getCachedScript (siehe jquery-scout) geladen.
+- CSS-Files analog
+- index.html referenzieren die erzeugten scout.js bzw. scout.css bzw. scout-mobile.js.
+- Auch andere Scripts werden registriert (Jquery)?
+- Ausführung der JS-Tests noch unklar. Varianten:
+  1. Weiter wie jetzt -> einzelne Files refernzieren.
+  2. Erzeugte Script-Files referenzieren (pro bundle). Vor der Testausführung müssten die Script-Files neu erzeugt werden (Build-Time)
+  3. Vor der Test-Ausführung Server hochfahren, welcher die Scripts bereitstellt. SpecRunnerMaven.html könnte dann die scout.js mittels localhost:xy referenzieren. Auch die jasmine-Libs müssten so nicht für jedes Plugin kopiert werden.
+- Alternativen:
+  http://blog.teamtreehouse.com/organize-your-code-with-requirejs
+  http://softwarebyjosh.com/2011/12/04/how-to-organize-large-javascript-projects.html
+  https://github.com/asual/lesscss-engine (nur CSS-Files)
+  Bundle-Grenzen-Problem können diese Tools nicht lösen. Wir müssen sowieso die Files selber zusammensammeln.
+  Eventuell könnten die Files von uns zur Laufzeit zusammengesucht und danach die Abhängigkeiten mit einem solchen Tool aufgelöst werden? Vorteile?
+
+Beispiel:
+<code>
+  ScoutTextField.js
+#package/namespace "Scout"
+#require ScoutFormField.js
+
+
+
+scout.js
+(function(scout, $, undefined) {
+  #include("Scout")
+}(window.scout = window.scout || {}, jQuery));
+
+
+gothaer.js
+#require scout.js
+(function(scout, $, undefined) {
+  #include("Gothaer")
+}(window.scout = window.scout || {}, jQuery));
+</code>
+
+14.08.2014 AWE, Html Rendering
+Wenn Adapter gerendert werden, sollen die DOM elemente möglichst unmittelbar zum parent appended werden.
+Andernfalls kann der Effekt von CSS definitionen auf das jeweilige Element nicht korrekt aufgelöst werden.
+Wenn das geschieht, können Fehler entstehen wie z.B. das JQuery#show() fälschlicherweise ein display Attribut
+setzt das der CSS Definition widerspricht.
+
+03.09.2014 AWE, Layout
+Layouting mit HTML/CSS für Forms funktioniert nicht gut genug. Fälle in denen das Layout programmatisch geändert
+wird (visibility ändert, text-länge ändert, komponente wird added/removed) können nicht gut genug CSS-only behandelt
+werden. Zudem ist das Layout hochgradig konfigurierbar durch den Scout-Entwickler. Schwierig umsetzebar sind v.a.
+die properties weightX/Y und useUiHeight/Width für die es in HTML nur wenig Support gibt, bzw. die schlecht ohne
+Programmlogik in CSS umgesetzt werden können. Fazit: wir müssen das LogicalGridLayout in JavaScript implementieren
+und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (invalidate, layout, etc.).
+
+18.09.2014 AWE, Layout Facts
+- Vorbild der Umsetzung: LayoutManager(2) von Swing, mit gewissen Vereinfachungen (nur Forms können layouted werden).
+- Definition "Insets" für Html UI: Padding, Margin, Border
+- Definition "width" und "height" (Dimension) für Html UI: Grösse einer Komponente exkl. Insets.
+  width/height in HTML/CSS sind _ohne_ Insets
+- getSize() liefert Dimensionen inkl. Insets zurück
+- getPreferredSize() liefert Dimension inkl. Insets zurück.
+
+
+09.10.2014 AWE, CGU: Scrollbar
+1. Native Scrollbar wenn möglich verwenden
+2. Wenn native Scrollbar hässlich, native Scrollbar stylen, wenn möglich
+3. Im Notfall JS-basierte Scrollbar verwenden
+
+Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie funktionieren auch auf verschiedenen
+  Gerätetypen mit unterschiedlichen Browsern / Maustreiber / etc. am problemlosesten. --> spart Aufwand
+Hauptproblem: Browser feuern kein resize-Event wenn ein DIV seine Grösse ändert. Als Ersatz muss immer explizit
+  ein "update" auf der JS-Scrollbar gemacht werden --> hässlicher Code. Ebenfalls funktioniert die JS-Scrollbar
+  nicht richtig, wenn der Parent position:static hat, sondern nur wenn der parent relative oder absolute ist.
+Kompromiss: JS-Scrollbar nur im Baum verwenden, weil dort der optische "Gewinn" am grössten ist. Überall sonst
+  native Scrollbars verwenden.
+
+
+23.10.2014 AWE, CGU, IMO - Word Integration
+1. für UGM präpariertes docx in /resources auf Webserver legen
+2. Menü "Word-Dokument öffnen" einfügen, auf Server ein (Desktop-)Event OPEN_URL an Browser schicken, URL
+   in Response zurückschicken. Browser öffnet dann die URL normal (mime-type)
+3. Client-Service anbieten mit Methoden die von Word-Plugin aufgerufen werden. Als Meta-Daten wird im docx
+   die Session-ID mitgeschickt, damit die Word-Integration in die richtige Session kommt. Es wird ein
+   eigener Service für die Word-Integration erstellt
+4. Noch offen ist, wie wir komplizierte Use-Cases (z.B. Variable Erstellen in der Template-Ansicht) lösen
+   wollen. Dialog in C# nachprogrammieren ist zu aufwändig, enge Integration von Word und Browser ist schwierig.
+   Evtl. brauchen wir dafür wirklich diese Detached-Dialoge
+
+
+29.20.2014 AWE, CGU, IMO - Detached Forms, Word Integration
+- Template-Dialoge nachprogrammieren zu aufwändig, wir wollen auch keine Code-Duplikation (Java, C#)
+- Einfachste Lösung ist folgende:
+  * Word erzeugt eine neue Scout-ClientSession mit einem eigenen Desktop (ohne Outlines)
+  * z.Z. ist der Desktop noch nicht besonders flexibel. Vermutlich müssen wir ein paar Änderungen machen
+    damit, der Desktop den Tree-Bereich nicht anzeigt, wenn es keine Outlines gibt.
+  * Muss das Word-Plugin die "Haupt-ClientSession" benachrichtigen, kann das via Jobs und der entsprechenden
+    Session ID gelöst werden.
+- Killerargument gegen gemeinsame ClientSession von Hauptfenster (Browser) und Word (embedded Browser):
+  * wenn der embedded Browser abstürzt und ein modaler Dialog offen ist (z.B. MessageBox) ist die
+    ClientSession blockiert. Das Hauptfenster hat keine Möglichkeit zu erkennen, dass der embedded
+    Browser abgestürzt ist (bis zum Session-Timeout). Möglicher Workaround für solche Situationen:
+    F5 im Hauptfenster --> GUI wird ab Model neu gebaut und zeigt auch detached Forms an. Nachteil:
+    die detached Forms werden dann natürlich auch angezeigt, wenn der embedded Browser noch läuft.
+
+
+12.11.2014 AWE, CGU - Überlegungen zu MenuBar
+Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dabei:
+- Existierende Konfiguration:
+  * System-Buttons in Form (Cancel, Ok, etc.) -> werden im Form rechts angezeigt
+  * Process-Buttons -> werden im Form links angezeigt
+  * Andere-Buttons -> werden im Layout-grid platziert
+- Braucht die GroupBox eine MenuBar oder reicht eine MenuBar pro Form? Beispiel: Marketing "Zielgruppen"
+- Wie gehen wir mit dem Default-Button um? Wie wird er konfiguriert? (Konzept gibt es heute in Scout nicht)
+- Wie werden die Menu-Contributions von Form, Page, Selection sinnvoll zusammengesetzt? Welche Möglichkeiten soll
+  es geben, diese per Konfiguration zu steuern? Brauchen wir frei konfigurierbare logische Gruppen wie in Eclipse
+  RCP? oder reicht ein horiz. Alignment wie heute?
+
+ 25.11.2014 AWE, CGU - Überlegungen zu Icons
+- Wir behalten getConfiguredIconId
+- Icons.java beinhaltet Konstanten zu den Icons (wie heute)
+- Icons können Font-Icons sein oder gewöhnliche Resourcen
+- Die Information ist codiert in der IconId. z.B. scoutIcons:\E002 für Font Icons mit der Font scoutIcons.
+- Für Ressource-Icons muss dem Client noch mitgeteilt werden, welche States es für die Icons gibt (hover, disabled, selected, etc).
+- Die State-Icons sind entweder als einzelne Resourcen verfügbar oder als Sprite (am besten ein Sprite mit allen States pro Icon)
+- Die State-Info sollte vorzugsweise gecached sein auf dem Client (IconRegistry). Der Json Layer könnte eine analoge Registry haben (JsonIconRegistrY),
+  damit der Server weiss, bei welchen Icons nur der Key oder die komplette State-Info mitgeschickt werden muss (ähnlich wie AdapterRegistry)
+
+03.12.2014 BSH, CGU - Disposal
+- attachChilds macht immer ein create, dispose macht immer ein dispose. könnte sein, dass für dasselbe model mehrere json adapter erstellt werden
+  -> get funktioniert nicht mehr
+  -> registry dürfte nicht global sondern muss pro component sein, bzw. es gibt keine registry mehr
+  -> AbstractJsonAdapter hat eine map von childAdapter
+  -> Property-Change manipuliert auch diese map
+- adapter property muss alten disposen und neuen erstellen
+- bei pageChange Event der Outline -> analog für form und table
+- bei ausgezeichnten orten auch ein dispose: PageRemoval, form close, messagebox close, desktop close
+- TODO CGU client seite überlegen. Weiterhin ein registry oder pro Komponente?
+- TODO cgu: context menü prüfen
+
+- TODO CGU alternative mit Dispose überlegen, wie heute, vielleicht Kombination möglich, nur Property-Change Problem lösen
+<<<<<<< Upstream, based on branch 'develop' of ssh://nbu@git.bsiag.com:29418/tools/eclipse.scout
+
+13.01.2015 UI Team, AHO - Menu
+- Thema: soll die Konfiguration im Bereich Forms (System/Process Buttons) geändert werden
+  damit das Model besser zum neuen UI passt? Sollen Buttons durch Actions ersetzt werden?
+  Fazit: der Aufwand dafür wäre zu gross (hoher Migrationsaufwand), der Gewinn wäre relativ
+  klein (bessere Verständlichkeit, mehr Bezug zum UI).
+- Wir werden die aktuelle Konfiguration interpretieren und in der MenuBar vom Html UI darstellen
+
+  System-Buttons interpretieren horizontalAlignment
+    links = -1
+    rechts =  1
+  Process Buttons interpretieren horizontalAlignment
+    links = -1
+    rechts =  1
+
+  Buttons mit gleichem hAlign werden nach ihrer Order sortiert
+
+  Menus im Form
+    links = implements IMenu (gibt es heute nicht)
+    rechts = implements IToolMenu (z.B. ShareMenu)
+  Menus in Table
+    ganz links = fix die navi buttons
+    links 1 = empty space
+    links 2 = single/multi selection
+    rechts = IToolMenu
+
+  Menus können nicht mit Buttons durchmischt werden
+
+  Bei den detailForms in der Outline sind IMMER die beiden navi buttons ganz links
+
+Order von Buttons muss in CRM geändert werden (Migration durch Script)
+MVI fragen ob uns die SDK bei der Migration unterstützen kann
+
+
+
+27.01.2015 AWE, CGU - Laden von Ressourcen, z.B. Bitmap-Grafiken, Font-Icons
+
+Die Logik für Fields mit einem Image oder einem Font-Icon ist wie folgt:
+
+ imageId vorhanden?
+ Ja  :
+   beginnt imageId mit "font:"?
+   Ja  :
+     Font-Icon. <div> Tag erzeugen mit class Attribut "font-icon". Das was
+     nach 'font:' kommt, als Content verwenden, Bsp: <div class="font-icon" data-icon="X" />
+     Evtl. müssen wir stattdessen den Content vom DIV setzen -> ausprobieren
+   Nein:
+     Statische Bitmap-Grafik. <img> Tag mit src Attribut "icons/[imageId]" erzeugen
+     Auf dem UI-Server alle Requests auf /icons/ behandeln, imageId parsen
+     und Icon als byte[] zurückgeben.
+ Nein:
+   image vorhanden?
+   Ja  :
+     Dynamische Bitmap-Grafik. <img> Tag mit src Attribut "images/[adapterId] erzeugen
+     Auf dem UI-Server alle Requests auf /images/ behandeln, adapterId parsen, Referenz
+     zu Adapter auflösen, getModel().getImage() aufrufen und Bitmap-Grafik als byte[]
+     zurückgeben.
+   Nein:
+     Kein Bild anzeigen
+
+
+Erweiterbarkeit von Font-Icons:
+
+Das Projekt soll eine eigene Image-Font erstellen können: myProject.ttf
+Will man ein font-icon der Basis font "überschreiben" muss man irgendwo definieren
+welche Icons überschrieben werden. Am besten macht das eine Klasse FontIconLocator.
+
+String fontName = fontIconLocator.getFontIcon("X")
+
+Per Default kommt hier scoutIcons.ttf zurück (=default).
+Der FontIconLocator kann im Projekt überschrieben/ausgetauscht werden, hat man z.B.
+das Icon 'X' ersetzt, gibt man neu in getFontIcon() "myProject.ttf" zurück.
+
+Der HTML Client lädt sich zu Beginn eine Font-Icon Map herunter
+Dort steht für jedes registrierte Font-Icon drin in welcher font-Datei das Icon zu
+finden ist. Wenn der Client eine imageId mit "font:" antrifft, macht er einen Lookup
+auf die Map. Ist die font = default ist das class Attribut einfach "font-icon",
+ist die font != default ist das class Attribut "font-icon myProject". Das Projekt muss
+dann eine zusätzliche CSS Definition definieren (Voraussetzung: CSS Erweiterbarkeit)
+In dieser kann für myProject eine andere font-family mit myProject.ttf referenziert
+werden.
+
+Alternative Idee: wir bauen ein Tool, das im Build Prozess eine grosse scoutIcons.ttf
+welche alle Icons von original scoutIcons.ttf + crmIcons.ttf + myProject.ttf drin hat.
+Es braucht ein Tool, welches im Build die Fonts mergen und analysieren kann.
+
+Security:
+Man kann heute Felder auf enabled / visible setzen per Javascript-Console. wie wollen wir damit umgehen? Erneute Prüfung auf enabled/visible im JSON-Layer einbauen?
+
+Erweiterbarkeit:
+Probleme mit aktuellem Ansatz:
+1. Man möchte colors und mixins verwenden -> benötigt weitere css files. Diese Files werden dann z.B. in bsiwidgets.css inkludiert, obwohl sie in scout.css schon dabei sind.
+   Vielleicht eine Anweisung im Include, dass man sie nur zur Compile-Zeit benötigt? Mit Kommentar start und Ende eines inkludierten Files markieren, dann kann man es einfacher rauslöschen.
+2. Es ist zur Zeit nötig, eine Versions-Nummer zu verwenden beim import von js oder css Dateien, die aber gar nichts bewirkt -> optional machen.
+3. Wir sollten überlegen, ob es Namespaces für Includes braucht. Oder genügt es über den Filenamen? z.B. colors.css, bsiwidgets-colors.css vs. scout/colors.css, bsiwidgets/colors.css
+
+Keystrokes:
+-Einzige Erweiterung im Model ist das Ein- und Ausschalten von automatischer KeyStrokezuteilung für Views.
+-Die von Chris vorgeschlagene Steuerung von TablePage und OutlineTree soll direkt im CRM implementiert werden und nicht im Scout.
+-Die von Chris vorgeschlagene Steuerung der ToolButtons, der Sichtwechsel und der Suche wird direkt im CRM implementiert.
+-ProcessButton KeyStrokes werden wie bis anhin über Mnemonics gewährleistet.
+-ProcessButtons Registrieren ihre KeyStrokes und Mnemonics immer auf dem darüberliegenden Form, dass heisst, diese werden ausgeführt wenn sich der Fokus irgendwo im Form befindet.
+-DefaultButton soll DefaultFormEnterKeyStroke ersetzen.
+-Mnemonics werden höher Priorisiert als konfigurierte Keystrokes.
+
+AppLink-Handling
+Damit keine Primary-Keys ins HTML geschrieben werden müssen, sollten die Links umgewandelt werden. Damit diese Umwandlung möglichst transparent erfolgt, soll es der JSON-Layer übernehmen.
+Jeder (App-Link fähige) JsonAdapter könnte das HTML parsen, IDS für die Links erzeugen und diese in einer lokalen Map abspeichern. Bei der Aktivierung des Links könnte er dann auf die Map den Lookup machen.
+Vielleicht könnte man auch gleich die Adapter-Registry dafür verwenden und einen Adapter pro Link erzeugen?
+Für die BeanFields/Columns: Dort muss kein HTML geparsed werden, dafür jedoch muss anhand des Properties erkannt werden, ob es sich um ein App-Link-Ref handelt. Falls ja -> Umwandeln. Diese Erkennung könnte anhand eines AppLink-Beans erfolgen.
+Also anstatt zwei Properties mit Ref und Name erstellt man ein AppLink-Property.
+
+JavaScript: Trennung zwischen Adapter und Widgets (Views)
+Im Falle der Menüs haben wir gesehen, dass es schön wäre, wenn es eine Trennung zwischen adpater und widgets gäbe.
+Aktuell ist die Beziehung Adpater/Widget 1:1 - bei den Menüs wäre es aber gut, wenn ein Adapter mehrere Widgets
+(im Sinne von MVC: Views) haben könnte. So wäre es möglich, dass das selbe Menü in der Menü-Bar gerendert wird
+aber auch in einem Popup-Menü (Rechtsklick). Aktuell ist es aber so gelöst, dass man einen Wegwerf-Clone vom
+Adapter/Widget erzeugt, wenn das Popup-Menü geöffnet wird, da die Impl. davon viel weniger aufwändig ist als eine
+generelle Konzeptänderung.

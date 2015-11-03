@@ -1,0 +1,125 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@view-buttons-height: 50px;
+
+/* main element */
+
+.desktop-navigation {
+  position: relative;
+  height: 100%;
+  width: @size-desktop-navigation;
+  background-color: @navigation-background-color;
+  color: @navigation-color;
+}
+
+.navigation-breadcrumb {
+  width: @size-desktop-navigation-breadcrumb;
+}
+
+.navigation-container {
+  position: relative;
+  width: 100%;
+  height: calc(~'100%' - @view-buttons-height);
+}
+
+.view-buttons {
+  width: 100%;
+  height: @view-buttons-height;
+  white-space: nowrap;
+  #scout.font-text-large();
+  overflow: hidden;
+}
+
+.view-button-tab {
+  display: inline-block;
+  height: @view-buttons-height;
+  padding: 10px;
+  background-color: @panel-background-color;
+  color: @view-button-tab-color;
+  border-right: solid 1px @border-color;
+  white-space: nowrap;
+  min-width: 60px;
+  position: relative;
+  vertical-align: top;
+  text-align: center;
+
+  & > .key-box {
+    bottom: 4px;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    &:not(.selected) > .font-icon {
+      color: @hover-color;
+    }
+  }
+
+  &.selected {
+    background-color: @view-button-tab-active-background-color;
+    color: @view-button-tab-active-color;
+
+    & > .view-button-tab-title {
+      display: inline-block;
+       /* subtract icon-width and gap */
+      width: calc(~'100%' - 20px);
+      margin-left: 8px;
+
+      &.has-menu {
+        /* subtract icon-width and gap and menu-button width and gap */
+        width: calc(~'100%' - 48px);
+      }
+    }
+
+    &.last {
+      border-right-color: transparent;
+    }
+  }
+
+
+  & > .icon {
+    display: inline-block;
+    font-size: 20px;
+    padding-top: 3px;
+  }
+}
+
+.view-button-tab-title {
+  display: none;
+  vertical-align: text-bottom;
+  #scout.font-text-large();
+  #scout.overflow-ellipsis-nowrap();
+}
+
+.view-menu-button {
+  display: inline-block;
+  margin-left: 8px;
+
+  &::before {
+    #scout.font-icon();
+    font-size: 17px;
+    content: @icon-angle-down;
+  }
+
+  &.menu-open::before {
+    content: @icon-angle-up;
+  }
+
+  &:hover {
+    color: @palette-orange-3;
+  }
+}
+
+.view-menu-popup-body {
+  background-color: @palette-white;
+  border-right: solid 1px @border-color;
+  border-top: solid 1px @border-color;
+}

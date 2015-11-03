@@ -1,0 +1,104 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@tooltip-arrow-size: 14px;
+@tooltip-border-size: 1px;
+@tooltip-border: @tooltip-border-size solid @tooltip-border-color;
+
+.tooltip {
+  position: absolute;
+  background-color: @tooltip-background-color;
+  border: @tooltip-border;
+  color: @tooltip-color;
+  #scout.drop-shadow();
+  max-width: 300px;
+  white-space: normal;
+}
+
+.tooltip-content {
+  background-color: @tooltip-background-color;
+  padding: 8px 12px;
+  position: relative;
+  min-width: 60px; /* Prevents tooltips with very short text from looking "strange" */
+
+  & span.bold {
+    font-weight: bold;
+  }
+
+  & span.small {
+    font-size: 11px;
+    color: @palette-gray-6;
+  }
+
+}
+
+.tooltip-arrow {
+  position: absolute;
+  width: @tooltip-arrow-size;
+  height: @tooltip-arrow-size;
+  background-color: @tooltip-background-color;
+  border: @tooltip-border;
+  #scout.transform(rotate(45deg));
+  #scout.drop-shadow();
+}
+
+.tooltip-arrow.arrow-bottom {
+  bottom: -(@tooltip-arrow-size / 2);
+  margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
+}
+
+.tooltip-arrow.arrow-top {
+  top: -(@tooltip-arrow-size / 2);
+  margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
+}
+
+.tooltip-error {
+  background-color: @error-background-color;
+  border-color: @error-color;
+
+  & .tooltip-arrow {
+    background-color: @error-background-color;
+    border-color: @error-color;
+  }
+
+  & .tooltip-content {
+    background-color: @error-background-color;
+  }
+}
+
+.tooltip-warning {
+  background-color: @tooltip-warning-background-color;
+  border-color: @tooltip-warning-border-color;
+  color: @tooltip-warning-color;
+
+  & .tooltip-arrow {
+    background-color: @tooltip-warning-background-color;
+    border-color: @tooltip-warning-border-color;
+  }
+
+  & .tooltip-content {
+    background-color: @tooltip-warning-background-color;
+  }
+}
+
+.tooltip-info {
+  background-color: @tooltip-info-background-color;
+  border-color: @tooltip-info-border-color;
+  color: @tooltip-info-color;
+
+  & .tooltip-arrow {
+    background-color: @tooltip-info-background-color;
+    border-color: @tooltip-info-border-color;
+  }
+
+  & .tooltip-content {
+    background-color: @tooltip-info-background-color;
+  }
+}

@@ -1,0 +1,64 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.search-outline.tree {
+  & > .outline-title {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}
+
+.search-outline-panel {
+  border-bottom: 1px solid @outline-title-border-color;
+  padding-bottom: 14px;
+  margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
+
+  & ~ .tree {
+    height: calc(~'100%' - 70px);
+  }
+}
+
+.search-outline-field {
+  border: 1px solid @navigation-background-color;
+  height: 35px;
+  border-radius: 5px;
+  background-color: @palette-gray-2;
+  width: 100%;
+
+  &:focus {
+    border-color: @navigation-background-color;
+    #scout.glow(@palette-white);
+  }
+}
+
+.search-outline-status {
+  #scout.overflow-ellipsis-nowrap();
+  padding-right: 8px;
+  text-align: right;
+  margin-top: 10px;
+  margin-bottom: -4px;
+  color: @palette-blue-2;
+}
+
+.outline.breadcrumb > .search-outline-panel {
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+
+  & > .search-outline-field {
+    margin-right: @outline-title-margin-right;
+    margin-left: @outline-title-margin-left;
+    width: calc(~'100%' - (@outline-title-margin-left + @outline-title-margin-right));
+  }
+
+  & > .search-outline-status {
+    text-align: center;
+  }
+}

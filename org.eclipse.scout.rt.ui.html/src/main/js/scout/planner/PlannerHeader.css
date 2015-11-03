@@ -1,0 +1,146 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@planner-header-height: 50px;
+@planner-header-buttons: 30px;
+
+.planner-icon(@icon, @size) {
+  #scout.font-icon();
+  display: inline-block;
+  position: relative;
+  font-size: @size;
+  line-height: 29px;
+  width: 29px;
+  content: @icon;
+  color: @icon-color;
+  text-align: center;
+}
+
+.planner-header {
+  padding-top: 8px;
+  padding-right: 3px;
+  height: @planner-header-height;
+  line-height: @planner-header-height;
+
+  min-width: 420px;
+  text-align: center;
+
+  & .busyindicator-label::before {
+    margin-top: -14px;
+  }
+
+  & .planner-range {
+    float: left;
+    padding-left: 8px;
+
+    & .planner-previous,
+    & .planner-today,
+    & .planner-next {
+      cursor: pointer;
+      float: left;
+      height: @planner-header-buttons;
+      color: @text-color;
+      background-color: @button-background-color;
+      border: 1px solid @border-color;
+      border-radius: @border-radius;
+      cursor: pointer;
+      white-space: nowrap;
+      margin-right: 5px;
+
+      line-height: @planner-header-buttons;
+
+      &:hover {
+        color: @hover-color;
+      }
+    }
+
+    & .planner-today {
+      width: 65px;
+    }
+
+
+    & .planner-select {
+      height: @planner-header-buttons;
+      line-height: @planner-header-buttons;
+      float: left;
+      font-size: 16px;
+      margin-left: 15px;
+    }
+
+    & .planner-previous:hover::before,
+    & .planner-next:hover::before {
+      color: @hover-color;
+    }
+
+    & .planner-previous::before {
+      .planner-icon(@icon-angle-left, 20px);
+    }
+
+    & .planner-next::before {
+      .planner-icon(@icon-angle-right, 20px);
+    }
+  }
+
+  & .planner-commands {
+    float: right;
+
+    & .planner-mode,
+    & .planner-toggle-year,
+    & .planner-toggle-list {
+      height: @planner-header-buttons;
+      line-height: @planner-header-buttons;
+      float: left;
+      cursor: pointer;
+    }
+
+    & .planner-mode {
+      width: 65px;
+      border-top: 1px solid @border-color;
+      border-bottom: 1px solid @border-color;
+      border-left: 1px solid @border-color;
+      #scout.overflow-ellipsis-nowrap();
+
+      &.first {
+        border-left: 1px solid @border-color;
+        border-top-left-radius: @border-radius;
+        border-bottom-left-radius: @border-radius;
+      }
+
+      &.last {
+        border-right: 1px solid @border-color;
+        border-top-right-radius: @border-radius;
+        border-bottom-right-radius: @border-radius;
+        margin-right: 5px;
+      }
+
+      &.selected{
+        background-color: @item-selection-background-color;
+      }
+    }
+
+    & .planner-toggle-year,
+    & .planner-toggle-list {
+      margin-left: 5px;
+    }
+
+    & .planner-toggle-year::before {
+      .planner-icon(@icon-calendar, 20px);
+     }
+
+    & .planner-toggle-list::before {
+      .planner-icon(@icon-th-list, 20px);
+     }
+
+    & *:hover::before, & *:hover,
+    & .selected::before, & .selected {
+      color: @planner-mode-active-text-color;
+    }
+  }
+}

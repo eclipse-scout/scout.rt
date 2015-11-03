@@ -1,0 +1,324 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.table-header-menu {
+  position: absolute;
+  width: 225px;
+  background-color: @table-header-menu-background-color;
+  padding-bottom: 5px;
+  border: 1px solid @border-color;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &.down {
+    #scout.drop-shadow;
+  }
+
+  &.up {
+    #scout.drop-shadow(@y: -3px);
+  }
+}
+
+.table-header-menu-whiter {
+  height: 1px;
+  position: absolute;
+  left: 0px;
+  background-color: @table-header-menu-background-color;
+
+  .table-header-menu.down & {
+    top: -1px;
+  }
+
+  .table-header-menu.up & {
+    bottom: -1px;
+  }
+}
+
+.table-header-menu-group {
+  padding: 10px 0px 35px 10px;
+}
+
+.table-header-menu-group-filter {
+  padding: 10px 0px 7px 10px;
+}
+
+.header-text {
+  #scout.font-text-normal(@font-weight-bold);
+  font-weight:bold;
+  color: @text-color;
+  line-height: 22px;
+  height: 22px;
+  #scout.overflow-ellipsis-nowrap();
+}
+
+.table-header-menu-command {
+  float: left;
+  width: 43px;
+  margin-right: 10px;
+  height: 29px;
+  #scout.font-icon();
+  font-size: 17px;
+  line-height: 29px;
+  color: @icon-color;
+  border: 1px solid @table-header-cmd-border-color;
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    color: @palette-blue-6;
+    border-color: @palette-blue-6;
+  }
+
+  &::after {
+    position: relative;
+    left: 3px;
+    top: -6px;
+    font-size: 10px;
+    line-height: 10px;
+  }
+
+  &.selected {
+    background-color: @table-header-cmd-active-background-color;
+    border: 1px solid @table-header-cmd-active-border-color;
+  }
+
+  &.selected::before,
+  &.selected::after {
+    color: @table-header-cmd-active-color;
+  }
+
+  &.move-top::before,
+  &.move-up::before,
+  &.move-down::before,
+  &.move-bottom::before {
+    font-size: 20px;
+    line-height: 20px;
+  }
+
+  &.move-top::before {
+    content: @icon-angle-double-left;
+  }
+  &.move-up::before {
+    content: @icon-angle-left;
+  }
+  &.move-down::before {
+   content: @icon-angle-right;
+  }
+  &.move-bottom::before {
+    content: @icon-angle-double-right;
+  }
+
+  &.sort-asc::before,
+  &.sort-asc-add::before {
+    content: @icon-long-arrow-up;
+  }
+
+  &.sort-desc::before,
+  &.sort-desc-add::before {
+    content: @icon-long-arrow-down;
+  }
+
+  &.sort-asc-add::after,
+  &.sort-desc-add::after {
+    content: attr(data-icon);
+  }
+
+  &.sort-asc::before,
+  &.sort-asc-add::before {
+    content: @icon-long-arrow-up;
+  }
+
+  &.sort-asc.selected:hover::before,
+  &.sort-asc-add.selected:hover::before,
+  &.sort-desc.selected:hover::before,
+  &.sort-desc-add.selected:hover::before,
+  &.group-all.selected:hover::before,
+  &.group-selection.selected:hover::before,
+  &.group-column.selected:hover::before,
+  &.group-column-additional.selected:hover::before {
+    top: -1px;
+    font-size: 17px;
+    line-height: 20px;
+    #scout.font-icon();
+    content: @icon-remove;
+  }
+
+  &.sort-asc.selected:hover::after,
+  &.sort-asc-add.selected:hover::after,
+  &.sort-desc.selected:hover::after,
+  &.sort-desc-add.selected:hover::after,
+  &.group-all.selected:hover::after,
+  &.group-selection.selected:hover::after,
+  &.group-sort.selected:hover::after,
+  &.group-column.selected:hover::after,
+  &.group-column-additional.selected:hover::after {
+    content: '';
+  }
+
+  &.group-all::before,
+  &.group-selection::before {
+    position: relative;
+    top: 0px;
+    font-size: 20px;
+    line-height: 20px;
+    content: @icon-sum;
+  }
+
+  &.group-column::before,
+  &.group-column-additional::before {
+    position: relative;
+    top: 0px;
+    font-size: 20px;
+    line-height: 20px;
+    content: @icon-group;
+  }
+
+  &.group-column::after,
+  &.group-column-additional::after {
+    content: attr(data-icon);
+  }
+
+   &.aggregation-function::before {
+    position: relative;
+    top: 0px;
+    font-size: 20px;
+    line-height: 20px;
+  }
+
+  &.sum.aggregation-function::before {
+    content: @icon-sum;
+  }
+
+  &.avg.aggregation-function::before {
+    content: @icon-avg;
+  }
+
+  &.max.aggregation-function::before {
+    content: @icon-max;
+  }
+
+  &.min.aggregation-function::before {
+    content: @icon-min;
+  }
+
+  &.sort-asc-add::after,
+  &.sort-desc-add::after {
+    content: attr(data-icon);
+  }
+
+  &.group-selection::after {
+    content: @icon-menu;
+  }
+
+  &.group-column-additional::after {
+    content: @icon-plus;
+  }
+
+  &.color-red::after {
+    content: @icon-nbsp;
+  }
+
+  &.color-red {
+    background-image: linear-gradient(to right, @palette-red-2, @palette-green-2);
+    border: 0;
+  }
+
+  &.color-green::after {
+    content: @icon-nbsp;
+  }
+  &.color-green {
+    background-image: linear-gradient(to right, @palette-green-2, @palette-red-2);
+    border: 0;
+  }
+
+  &.color-bar::after {
+    content: @icon-nbsp;
+  }
+  &.color-bar {
+    background-image: linear-gradient(to right, @table-header-cmd-active-border-color  0%, @table-header-cmd-active-border-color  65%, @palette-white 65%, @palette-white 100% );
+    border: 1px solid @table-header-cmd-active-border-color ;
+    width: 43px;
+    line-height: 29px;
+  }
+
+  &.color-remove::after {
+    content: @icon-nbsp;
+  }
+  &.color-remove {
+    background: @palette-white;
+    border: 1px solid @table-header-cmd-active-border-color;
+    width: 43px;
+    line-height: 29px;
+  }
+
+  &.column-add::before {
+    content: @icon-plus;
+  }
+
+  &.column-remove::before {
+    content: @icon-remove;
+  }
+}
+
+.table-header-menu-filter-container {
+  position: relative;
+  overflow:hidden;
+  max-height: 226px;
+  padding: 0;
+}
+
+.table-header-menu-filter-container > .scrollbar {
+  right: 14px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.table-header-menu-filter {
+  position:relative;
+  width: 200px;
+  float: left;
+  clear: both;
+  height: 30px;
+  line-height: 30px;
+  cursor: pointer;
+  padding: 0px 20px 0px 8px;
+  #scout.overflow-ellipsis-nowrap();
+  border-top: 1px solid @table-header-cmd-border-color;
+
+  &.last {
+    border-bottom: 1px solid @table-header-cmd-border-color;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &::after {
+    position: absolute;
+    right: 14px;
+    content: attr(data-value);
+  }
+
+  &.selected {
+    background-color: @table-header-cmd-active-background-color;
+    border-top-color: @table-header-cmd-active-border-color;
+    color: @table-header-cmd-active-color;
+  }
+
+  &.selected + .table-header-menu-filter {
+    border-top: 1px solid @table-header-menu-background-color;
+  }
+
+  &.selected:last-child {
+    border-bottom-color: @table-header-cmd-active-border-color;
+  }
+}

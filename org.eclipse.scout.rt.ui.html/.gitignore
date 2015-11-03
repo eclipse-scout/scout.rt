@@ -1,0 +1,3 @@
+node_modules
+/src/main/resources/WebContent/res/fastclickmod*.min.js
+/src/main/resources/WebContent/test-gen/*

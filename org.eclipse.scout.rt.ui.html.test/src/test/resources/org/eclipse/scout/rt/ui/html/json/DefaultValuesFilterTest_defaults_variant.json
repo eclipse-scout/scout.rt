@@ -1,0 +1,16 @@
+{
+  "defaults": {
+    "FormField": {
+      "enabled": true
+    },
+    "TableField.Custom": {
+      "enabled": false,
+      "borderDecoration": "auto"
+    }
+  },
+  "objectTypeHierarchy": {
+    "FormField": {
+      "TableField": null
+    }
+  }
+}

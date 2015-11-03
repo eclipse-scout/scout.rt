@@ -1,0 +1,99 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@tabbox-padding-x: 20px;
+@tabbox-focus-arrow-width: 15px;
+
+.tab-area {
+  margin-top: @group-margin-top;
+  margin-left: @mandatory-indicator-width;
+  white-space: nowrap;
+  position: relative;
+
+  & > .tab-item {
+    position: relative;
+    #scout.font-text-normal(@font-weight-bold);
+    color: @title-color;
+    border: none;
+    background-color: transparent;
+    padding: @group-title-padding-y @tabbox-padding-x;
+    border-bottom: solid 3px transparent;
+    cursor: pointer;
+
+    &.selected {
+      color: @active-color;
+      border-bottom-color: @active-color;
+    }
+
+    &.marked:not(.selected) {
+      border-bottom-color: @palette-gray-5;
+    }
+
+    &:hover {
+      color: @hover-color;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus::before {
+      #scout.font-icon();
+      content: @icon-angle-right;
+      color: @active-color;
+      position: absolute;
+      left: @tabbox-padding-x - @tabbox-focus-arrow-width;
+      width: @tabbox-focus-arrow-width;
+    }
+  }
+
+  &::after {
+    width: 100%;
+    height: 3px;
+    margin-top: -3px;
+    background-color: @palette-gray-4;
+    content: '';
+    display: block;
+  }
+
+  & > .overflow-tab-item {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    padding: 0px 0px;
+
+    &::before {
+      #scout.font-icon();
+      position: relative;
+      bottom: -2px;
+      font-size: 17px;
+      color: @icon-color;
+      content: @icon-ellipsis-v;
+    }
+  }
+
+  & > .menubar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-right: 0px;
+    padding-left: 12px;
+    width: auto;
+    border: none;
+    z-index: 1;
+    height: 100%;
+
+    & > .menu-item,
+    & > .menu-separator {
+      margin-right: 5px;
+    }
+  }
+}

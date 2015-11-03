@@ -1,0 +1,209 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/* This class is used for menu items styling */
+
+@menu-margin-x: @bench-margin-x;
+@menu-item-margin-right: 14px;
+@menu-item-height: 39px;
+
+/* Mixins */
+.menu-icon {
+  display: inline-block;
+  font-size: 18px;
+  color: @icon-color;
+  vertical-align: -3px;
+}
+
+.sub-menu-icon {
+  display: inline-block;
+  position: relative;
+  left: 0px;
+  top: 3px;
+  #scout.font-icon();
+  line-height: 18px;
+  font-size: 18px;
+  padding-left: 10px;
+  content: @icon-angle-down;
+}
+
+/* Styles */
+
+.menu-separator {
+  width: 1px;
+  height: 30px;
+  margin: 6px 19px 3px 19px - @menu-item-margin-right;
+  background-color: @border-color;
+}
+
+.menu-item {
+  height: @menu-item-height;
+  line-height: @menu-item-height;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+
+  & > .key-box {
+    bottom: -3px;
+  }
+
+  & > .font-icon {
+    .menu-icon;
+    font-size: 18px;
+    height: @logical-grid-height;
+    line-height: @logical-grid-height - 4px;
+    /* Prepare for focus border: */
+    border: 1px solid transparent;
+    margin-left: -2px;
+    margin-right: -2px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  &:not(.disabled):hover {
+    color: @hover-color;
+
+    &.menu-button.default-menu {
+      background-color: @default-button-hover-background-color;
+    }
+
+    &:not(.default-menu) > .font-icon {
+      color:@hover-color;
+    }
+  }
+
+  &.disabled {
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &:not(.last) {
+    margin-right: @menu-item-margin-right;
+  }
+
+  &:focus {
+    outline: none;
+    color: @hover-color;
+  }
+
+  /* Draw border for icon only items */
+  &:not(.menu-textandicon):focus::before {
+    #scout.focus-border();
+  }
+
+  &.menu-open {
+    color: @active-color;
+  }
+
+  &.has-submenu::after {
+   .sub-menu-icon;
+  }
+
+  &.selected:not(.menu-button) {
+    background-color: @item-selection-background-color;
+    border-color: @item-selection-border-color;
+  }
+
+  &.right-aligned {
+    float: right;
+  }
+}
+
+.menu-textandicon > .icon {
+  padding-right: 5px;
+}
+
+/* FIXME AWE: reduce copy/paste --> Button.css */
+.menu-button {
+  padding: 0 @button-padding;
+  text-align: center;
+  position: relative;
+  height: 30px;
+  color: @text-color;
+  background-color: @button-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  cursor: pointer;
+  height: @menubar-height;
+  line-height: @menubar-height;
+  min-width: 110px;
+
+  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
+  /* cut off. We should find a better solution for this. */
+  white-space: nowrap;
+
+  &:not(.disabled):active {
+    background-color: @palette-gray-3;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus::before {
+    #scout.button-focus();
+  }
+
+  &.default-menu:not(.disabled) {
+    #scout.font-text-normal(@font-weight-bold);
+    background-color: @default-button-background-color;
+    color: @default-button-color;
+    border-width: 0;
+
+    &:focus {
+      color: @default-button-color;
+    }
+
+    &:active {
+      background-color: @active-color;
+    }
+
+    & > .font-icon {
+      font-weight: normal;
+      color: @icon-inverted-color;
+    }
+  }
+
+  &.disabled {
+    background-color: @control-background-color;
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.selected {
+  border-style: inset;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
+  &.has-submenu::after {
+   .button-sub-menu-icon;
+  }
+
+  &:not(.last) {
+    margin-right: @menu-item-margin-right;
+  }
+
+  &.small-gap {
+    margin-right: 4px;
+  }
+
+  &.small {
+    min-width: 53px;
+
+    & > .font-icon {
+      font-size: 18px;
+      vertical-align: baseline;
+    }
+  }
+}

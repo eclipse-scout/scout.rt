@@ -1,0 +1,216 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@table-footer-height: 52px;
+@table-control-padding: 14px;
+@table-control-content-padding: 10px;
+
+.table-footer {
+  position: absolute;
+  bottom: 0px;
+  height: @table-footer-height;
+  width: 100%;
+  white-space: nowrap;
+  border-top: 1px solid @border-color;
+}
+
+.table-control-resize {
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  height: 16px;
+  cursor: row-resize;
+  z-index: 1;
+  border-top: 3px solid @group-box-title-border-color;
+}
+
+.table-control-container {
+  position: absolute;
+  overflow: hidden;
+  outline: none;
+  background-color: @background-color;
+  bottom: @table-footer-height;
+  width: 100%;
+  display: none;
+  z-index: 1;
+  /* Reset nowrap, forms may have fields which need wrapping (e.g. label field) */
+  white-space: normal;
+
+  &:not(.has-resizer) {
+    border-top: 1px solid @group-box-title-border-color;
+  }
+}
+
+.table-control-content {
+  height: 100%;
+  width: 100%;
+
+  & .tab-box.in-table-control > .tab-area {
+    margin-top: 0;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    &::after {
+      height: 0px;
+    }
+
+    & > button {
+      border-top: solid 3px transparent;
+      border-bottom: solid 1px transparent !important;
+
+      &.selected {
+        border-top-color: @active-color;
+      }
+
+      &.marked:not(.selected) {
+        border-top-color: @palette-gray-5;
+      }
+    }
+  }
+
+  & .tab-content {
+    position: absolute;
+    top: 31px;
+  }
+
+  & .tab-area > .tab-item {
+      z-index: 2;
+  }
+
+}
+
+.table-controls {
+  position: absolute;
+
+  .table-footer > & ~ & {
+    margin-left: -1px;
+  }
+}
+
+.table-info {
+  position: absolute;
+  right: 0;
+}
+
+.table-text-filter {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+  min-height: 26px;
+  font-size: 13px;
+  margin-top: (@table-footer-height - 26px) / 2;
+  margin-right: @table-control-padding;
+}
+
+.table-info-load,
+.table-info-status,
+.table-info-filter,
+.table-info-selection {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  padding-top: @table-control-padding / 2;
+  padding-bottom: 0;
+  display: inline-block;
+  height: @table-footer-height - 1px; /* subtract border-top of .table-footer */
+  color: @table-info-color;
+  cursor: pointer;
+  line-height: 19px;
+  #scout.overflow-nowrap();
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: @table-control-padding / 2  + 2px;
+    left: 0;
+    height: @table-footer-height - @table-control-padding - 4px;
+    border-right: 1px solid @border-color;
+  }
+
+  /* margins are used instead of paddings for a better animation */
+  & > span {
+    margin-left: @table-control-padding;
+    margin-right: @table-control-padding - 1px; /* because left padding includes the ::before border */
+  }
+
+  & > .table-info-button {
+    text-decoration: underline;
+
+    & > .key-box {
+      bottom: 2px;
+    }
+  }
+
+  &:hover > .table-info-button {
+    color: @hover-color;
+  }
+}
+
+.table-info-tooltip {
+  line-height: 30px;
+  /* move tooltip a little down, make sure it is on the same height as other table footer tooltips (table-control, table-status) */
+  margin-top: 6px;
+}
+
+.table-info-status {
+  padding-top: 0;
+  line-height: @table-footer-height;
+  color: @table-info-color;
+
+  &:hover {
+    color: @table-info-hover-color;
+  }
+
+  /* normal */
+
+  & > .font-icon {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+    padding-top: 8px; /* controls distance to tooltip */
+    padding-bottom: 11px; /* larger than padding-top, to move icon to optical middle */
+
+    &::before {
+      content: @icon-info;
+      #scout.font-icon();
+      font-size: 22px;
+    }
+  }
+
+  /* error */
+
+  &.has-error > .font-icon::before {
+    #scout.animation(attention 5s linear infinite);
+    content: @icon-error;
+  }
+
+  &.has-error.tooltip-active {
+    color: @table-info-error-color;
+  }
+
+  &.has-error.tooltip-active:hover {
+    color: @table-info-error-hover-color;
+  }
+
+  /* warning */
+
+  &.has-warning > .font-icon::before {
+    content: @icon-error;
+  }
+
+  &.has-warning.tooltip-active {
+    color: @table-info-warning-color;
+  }
+
+  &.has-warning.tooltip-active:hover {
+    color: @table-info-warning-hover-color;
+  }
+}

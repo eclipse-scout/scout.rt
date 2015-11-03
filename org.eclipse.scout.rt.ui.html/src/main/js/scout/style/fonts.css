@@ -1,0 +1,38 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/* Font face definition for custom icon font:
+
+See GIT history for font-face definitions. Some how it wasn't possible
+to produce a consistent look on all browsers with the font-face definition.
+Simply using font-family works better and is more reliable. However, we still
+could use 'Open Sans' in the font-family (when it's installed on the client
+system) and fall back to Arial otherwise, without downloading a WOFF file.
+
+Try these to switch between fonts:
+
+@defaultFont: 'Open Sans', OpenSans, Arial, sans-serif;
+@defaultFont: Arial, sans-serif;
+ */
+@font-default-family: Arial, sans-serif;
+@font-weight-normal: normal;
+@font-weight-bold: bold;
+
+@font-size-small: 11px;
+@font-size-normal: 13px;
+@font-size-plus: 14px;
+@font-size-large: 16px;
+@font-size-extra-large: 32px;
+
+@font-face {
+  font-family: scoutIcons;
+  font-weight: normal;
+  src: url('scoutIcons.woff') format('woff');
+}

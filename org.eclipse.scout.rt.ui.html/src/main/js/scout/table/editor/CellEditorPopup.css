@@ -1,0 +1,42 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.cell-editor-popup {
+  /* make sure it is behind the scrollbar */
+  z-index: 0;
+
+  .first& {
+    /* Hide the left border of the field */
+    margin-left: -1px;
+  }
+}
+
+.cell-editor-field {
+  /* -1px correction is necessary because the table-cell does not have a border but the fields have */
+  padding: @table-row-padding-y @table-cell-padding-right - 1px @table-row-padding-y @table-cell-padding-left - 1px;
+  border-radius: 0;
+
+  &.halign-right {
+    padding-right: @table-cell-padding-left - 1px;
+    padding-left: @table-cell-padding-right - 1px;
+  }
+  &.halign-center {
+    padding-right: @table-cell-padding-left - 1px;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  .first& {
+    /* correction for margin-left -1px */
+    padding-left: @table-cell-padding-left;
+  }
+}

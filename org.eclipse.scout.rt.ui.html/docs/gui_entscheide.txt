@@ -1,0 +1,148 @@
+Baum
+- Selektion des Nodes bei Klick auf den Kreis vor dem Element?
+  In Windows und aktuellen CRM ist es nicht so.
+  Neu habe wir aber einen markanten Kreis inkl. Hover Effekt.
+  Selektieren würde bedeuten, mann könnte nicht durch den Baum Browsen, ohne die Selektion zu ändern.
+  Eventuell selektieren, wenn expand/collapse nicht möglich ist?
+
+Tastatur-Navigation
+  Desktop soll ohne Tab/Fokus navigierbar sein.
+  - Idee: Navigation im Baum mit Ctrl, Tabelle ohne Modifier
+  - Problem: Ctrl-+ und Ctrl-- bereits belegt vom Browser (Zoom)
+  - Lösung?: Ctrl-Alt- verwenden stattdessen? Oder effektiv wechseln zwischen Baum und Tabelle / 360°-Sicht / Such-Form erlauben mittels Tab oder Tastenkombination.
+
+Sequence-Box
+  Wir möchten die UI-Impl. vereinfachen:
+  - Fehlerstatus für alle Felder "sammeln", d.h. eine Sequence-Box hat nur einen Fehlerstatus
+  - Infotext (Tooltip) für alle Felder sammeln, d.h. eine Sequence-Box hat nur einen Infotext
+  - Jedes Feld in der SB hat einen Mandatory-Stern, der Platz für den Stern wird immer reserviert
+    auch wenn das Feld nicht obligatrisch ist (einfacher zu layouten, keine Schlangenlinien).
+  - Die komplizierte Label-Logik entfällt. Wenn ein Feld in der SB dargestellt wird, wird
+    das Label automatisch im Feld als Placeholder-Text dargestellt.
+
+
+Arbeits-Hypothese für Margins bei Groupboxes, TabBoxes und Table innerhalb von Forms
+AWE, CGU 24.10.2014
+
+Groupbox:
+
+  Hat NIE left/right margin
+  Kann top/bottom margin haben (siehe Groupbox-Body)
+
+Groupbox-Title:
+
+  Hat NIE einen margin-bottom
+  Margin-Top ist derselbe wie bei GroupBox-body
+  Visible: Ja wenn text !empty, sonst Nein
+  TODO: man könnte auf  dem Model set/isTitleVisible() impl.
+    analog FormField-Label
+
+Groupbox-body:
+
+  Hat einen top/bottom margin, wenn borderVisible = Ja
+    Andernfalls kein margin
+    Default = Ja
+  margin-bottom > margin-top (z.B. 20px / 10px)
+  TODO: man könnte borderVisible in marginVisible umbenennen
+    heute steuert borderVisible auch die Sichtbarkeit vom
+    Title, das wäre neu nicht mehr so.
+
+Einfache-"Magie" mit Border-Decoration=AUTO:
+
+  Wenn GroupBox NUR ein TableField enthält, dann borderVisible
+  automatisch = Nein
+
+Spezialfälle:
+
+  RootGroupBox hat NIE einen margin
+
+  hat IMMER einen border-top (horiz. linie)
+
+Table:
+
+  Fokusrahmen um TableField fällt weg (weil wir die Table meistens
+  ohne Border darstellen). Dafür müssen wir den Fokus-Rahmen innerhalb
+  der Table-Cells visualisieren. Vorlage ist hier Windows. Wichtig:
+  Fokus ist nicht gleich Selektion!
+
+TableField:
+
+  Hat NIE einen Border (vorläufig)
+  Hat keinen Tablestatus (vorläufig)
+
+TabBox:
+
+  Hat kein margin-bottom
+  Tabarea hat denselben margin-top wie groupbox
+
+
+Überlegungen zu Tastatursteuerung / Fokus-Handling
+AWE, CGU 10.11.2014
+
+- Key-Shortcuts sind kein Ersatz für Fokus-Handling, sondern ein ergänzendes Konzept on-top
+- Es gibt nicht _eine_ richtige Art die Applikation zu bedienen, jeder Benutzer hat eine andere
+  Art mit der Bedienung, das soll durch Html UI nicht verhindert werden (Beispiel von Claudio
+  Usability / Screen-Reader)
+- Alle wichtigen Elemente der Applikation sollen durch Fokus/Tab-Order erreichbar sein und
+  entsprechend visualisiert werden (Baum, Tabelle, Forms, Menübars).
+- Tastatur-Shortcuts dürfen kein Standardverhalten überschreiben (Cursor, Home, End, Ctrl + Cursor,
+  etc.) weder vom Browser noch generell von Eingabe-Feldern, Buttons, Links, etc.
+- Wir müssen grundlegend definieren wie wir Tastatursteuerung umsetzen und Fokus visualisieren
+  wollen --> Aufwand in CRM-Aktivität verifizieren.
+- Wichtig ist auch der initiale Fokus: Wenn wir auf einen (Desktop-)Tab klicken muss das erste
+  Feld im Form fokussiert werden bzw. dort wo der Fokus zuletzt war. Das gleiche gilt auch für
+  Dialoge die auf- und wieder zugehen. Nach dem Schliessen muss der Fokus wieder da sein, wo
+  er vorher war.
+
+
+Suche / Table-Controls
+AWE, CGU 09.01.2015
+
+- Das Konzept vom UGM Prototyp für Suche, Erweiterte Suche und Kategorien passt nicht gut zu der
+  heutigen Funktionsweise der Suche in CRM.
+  Ist-Zustand: Es gibt _ein_ SearchForm, auf diesem hat es bis zu 4 Tabs:
+    * Einfache Suche
+    * Detaillierte Suche
+    * Erweiterte Suche
+    * Kategorien
+
+  Wenn der Anwender auf einem dieser Tabs etwas eingibt, schränkt dies die Suche weiter ein (Bsp:
+  Anwender wählt eine Kategorie und tippt noch etwas ins Feld der einfachen Suche). Klickt der
+  Anwender auf "Zurücksetzen" wird der Inhalt auf allen Tabs zurückgesetzt. Ist in einem Tab
+  etwas ausgefüllt, wird dies durch den "orangen Punkt" dargestellt.
+
+  Würden wir neu den Inhalt der 4 Tabs auf 3 Forms verteilen, hätten wir folgende Probleme:
+  - Es gibt (model-mässig) kein Verbindung zwischen den Forms, d.h. es wäre schwierig die Suche
+    einzuschränken, wenn die Eingaben über mehrere Forms verteilt sind
+  - Man müsste auf dem Table-Control Widget anzeigen können, dass etwas ausgefüllt ist.
+  - Zurücksetzen wäre ebenfalls schwierig
+  - Auch wenn die technischen Probleme lösbar sind (=Mehraufwand), für den Anwender ist das
+    Konzept trotzdem schwerer verständlich als das heutige.
+
+  Ideen:
+  1. So lassen wie heute: es gibt ein SearchForm mit 4 Tabs. Gibt auch am wenigsten Aufwand
+     bei der Migration
+  2. Tabs auf mehrere Forms aufteilen, Forms müssen miteinander synchronisiert werden,
+     TableControl Widget braucht ein "oranger Punkt" Feature
+  3. Model-mässig ein Form behalten, aber einzelne Tabs als Table-Control rendern
+     TableControl Widget braucht ein "oranger Punkt" Feature
+
+Reload
+BSH 2015-01-21
+
+- Browser-Relead-Button bzw. Ctrl+R lädt die ganze HTML-Seite neu. Applikation reagiert darauf nicht,
+  sondern rendert einfach das GUI neu. Im Model keine Events.
+- Vorschlag: F5-Hotkey verwenden, um Daten im Model neu zu laden.
+- Neuladen muss auf TablePage und NodePages möglich sein. NodePages brauchen darum auch den TableStatus.
+- Vorschlag CGU: Auch Detail-Forms / 360°-Sichten können neu geladen werden. Hier wäre der Button
+  allerdings oben. Ist das schlimm?
+
+Ideen:
+-Tabelle
+  NBU 2015-03-10
+  - Filter-Feld: über das Filter Feld sollte es möglich sein gewisse Werte über Formeln zu Filtern.
+             Bsp. Wenn Werte grösser als 100 gesucht werden sollen dann kann >100 eingegeben werden
+             und der Filter sucht sich dann alle Zellen die Zahlen grösser 100 drin haben.
+             Weiter sollte es möglich sein diese Formeln direkt auf eine Spalte anzuwenden.
+             Bsp. Es gibt eine Spalte Preis, in welcher man alle Werte zwischen 150'000 und 200'000
+             filtern möchte die Eingabe würde ins Filter-Feld könnte dann etwa so aussehen-> [Preis =>150000]&&[Preis<=200000]

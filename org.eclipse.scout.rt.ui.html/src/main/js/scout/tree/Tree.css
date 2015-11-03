@@ -1,0 +1,183 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.tree {
+  position: relative;
+  height: 100%;
+  width: 100%;
+
+  &:focus {
+
+    & .tree-node.selected {
+      background-color: @item-selection-background-color;
+      border-color: @item-selection-border-color;
+    }
+
+    /*first child is the scrollbar*/
+    .tree-node:nth-of-type(1).selected {
+      border-top-color: @item-selection-nonfocus-background-color;
+    }
+  }
+
+  & > .menubar {
+    padding: 0 8px;
+  }
+}
+
+.tree-data {
+  /* necessary for scrollbars */
+  position: relative;
+  overflow: hidden;
+  width: 100%; /* expand to outer container, needed for breadcrumb */
+}
+
+.navigation-breadcrumb .tree-data {
+  float: left;
+}
+
+.tree-node {
+  display: block;
+  position: relative;
+  #scout.overflow-ellipsis-nowrap();
+  border: 1px solid transparent;
+  border-left: 0px solid transparent;
+  border-right: 0px solid transparent;
+  padding: 6px;
+
+  &.selected {
+    background-color: @item-selection-nonfocus-background-color;
+    border-color: @item-selection-nonfocus-border-color;
+    border-left-color: transparent;
+    border-right-color: transparent;
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  &.disabled {
+    color: @disabled-color;
+  }
+
+  /*first child is the scrollbar*/
+  &:nth-of-type(1).selected {
+    border-top-color: @item-selection-nonfocus-background-color;
+  }
+}
+
+.tree-node-checkbox {
+  display: block;
+  position: absolute;
+  top: auto;
+  left: auto;
+  margin-top: -2px;
+  margin-left: -@tree-node-checkbox-size - 4px;
+  width: @tree-node-checkbox-size;
+  height: @tree-node-checkbox-size;
+
+  & .check-box {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: 13px;
+
+    &.disabled {
+      cursor: default;
+    }
+
+    &::before {
+      #scout.checkbox-before();
+      #scout.checkbox-before-border();
+      margin-top: -12px;
+    }
+
+    &.checked::before {
+      #scout.checkbox-before-checked();
+    }
+
+    &.disabled::before {
+      #scout.checkbox-before-disabled();
+    }
+
+    &.disabled:hover::before {
+      #scout.checkbox-before-disabled-border();
+    }
+
+    &:not(.checked).children-checked::after {
+      #scout.checkbox-after-children-checked();
+    }
+
+    &.disabled:not(.checked).children-checked::after {
+      #scout.checkbox-after-children-checked-disabled();
+    }
+  }
+}
+
+.tree-node-control {
+  display: block;
+  position: absolute;
+  top: auto;
+  left: auto;
+  transition: transform 0.3s;
+  cursor: pointer;
+
+  /* adjust control position */
+  margin-left: -@tree-node-control-size - 2px;
+  margin-top: -1px;
+
+  /* for good animation, ensure that the control is a square and the icon is centered */
+  width: @tree-node-control-size;
+  height: @tree-node-control-size;
+  line-height: @tree-node-control-size;
+  text-align: center;
+
+  &::before {
+    #scout.font-icon();
+    font-size: @tree-node-control-size;
+    content: @icon-angle-right;
+    color: @border-color;
+
+    .tree-node.leaf > & {
+      content: '';
+    }
+
+    .tree-node.lazy > & {
+      #scout.font-text-normal();
+      content: '+';
+      /* Move to left because '+' sign is not as wide as 'arrow-down' */
+      margin-left: -2px;
+    }
+
+    .tree-node-control:hover::before {
+      color: @hover-color;
+    }
+  }
+
+  .tree-node.expanded > & {
+    /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
+    /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
+    #scout.transform(rotate(89.99deg));
+  }
+
+  &.checkable {
+    margin-left: -@tree-node-control-checkbox-size - 8px;
+  }
+}
+
+/* key handling */
+
+.tree-node .key-box {
+  top: calc(~'50%' - 9px);
+}
+
+.tree > .tree-data > .key-box {
+  top: 6px;
+  left: 4px !important;
+}

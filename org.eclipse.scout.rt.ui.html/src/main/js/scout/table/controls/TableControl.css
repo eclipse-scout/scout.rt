@@ -1,0 +1,57 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.table-control {
+  position: relative;
+  display: inline-block;
+  padding: 0 @table-control-padding;
+  cursor: pointer;
+  height: @table-footer-height;
+  line-height: @table-footer-height;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  /* draw over border-top of .table-footer */
+  margin-top: -1px;
+  padding-top: 1px;
+
+  & > .font-icon {
+    font-size: 22px;
+    color: @icon-light-color;
+  }
+
+  &:hover > .font-icon {
+    color: @hover-color;
+  }
+
+  &.disabled:hover,
+  &.disabled > .font-icon {
+    cursor: default;
+    color: @icon-disabled-color;
+  }
+
+  &.selected > .font-icon {
+    color: @active-color;
+  }
+
+  &.selected {
+    border-left-color: @border-color;
+    border-right-color: @border-color;
+    background-color: @background-color;
+
+    &:first-child {
+      border-left-color: transparent;
+    }
+  }
+}
+
+.tooltip.table-control-tooltip {
+  /* move tooltip a little down, make sure it is on the same height as other table footer tooltips (table-info, table-status) */
+  margin-top: 7px;
+}

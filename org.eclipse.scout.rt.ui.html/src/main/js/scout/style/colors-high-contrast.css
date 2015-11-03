@@ -1,0 +1,168 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/* ---------------------------------------------------- */
+/* Color palette definition for BSI CRM (high contrast) */
+/* ---------------------------------------------------- */
+
+@palette-black: #000;
+@palette-white: #fff;
+
+@palette-red-0: #FEE0E0;
+@palette-red-1: #FECAC8;
+@palette-red-2: #FEB1AB;
+@palette-red-3: #FF6060;
+@palette-red-4: #DF2632;
+
+@palette-green-0: #DDF4EA;
+@palette-green-1: #B6ECD3;
+@palette-green-2: #86D9B2;
+@palette-green-3: #0DAF66;
+@palette-green-4: #1F7C5D;
+
+@palette-blue-0: #ECF3F7;
+@palette-blue-1: #C8E4F2;
+@palette-blue-2: #B0DAEE;
+@palette-blue-3: #389DB6;
+@palette-blue-4: #2B73B3;
+@palette-blue-5: #0082A1;
+@palette-blue-6: #006C86;
+@palette-blue-7: #005164;
+@palette-blue-8: #003D4B;
+
+@palette-gray-0: #FEFEFE;
+@palette-gray-1: #F6F6F6;
+@palette-gray-2: #EFEFEF;
+@palette-gray-2-5: #E2E2E2;
+@palette-gray-3: #DDDDDD;
+@palette-gray-4: #CCCCCC;
+@palette-gray-5: #999999;
+@palette-gray-5-5: #828282;
+@palette-gray-6: #666666;
+@palette-gray-7: #5C5C5C;
+@palette-gray-8: #4C4C4C;
+@palette-gray-9: #333333;
+
+@palette-cyan-0: #DDFFF9;
+@palette-cyan-1: #BAF3E8;
+@palette-cyan-2: #93EDDC;
+@palette-cyan-3: #3EE1C3;
+@palette-cyan-4: #24B499;
+
+@palette-orange-0: #FCF0E5;
+@palette-orange-1: #FEE6C0;
+@palette-orange-2: #FFDB9D;
+@palette-orange-3: #FDAD4F;
+@palette-orange-4: #FE9915;
+
+/* ------------- */
+/* Global colors */
+/* ------------- */
+
+@active-color: @palette-blue-6;
+@active-inverted-background-color: @palette-blue-6;
+@active-inverted-color: @palette-white;
+@background-color: @palette-gray-0;
+@border-color: @palette-gray-5;
+@control-background-color: @palette-white;
+@control-color: @text-color;
+@control-disabled-background-color: @palette-gray-2;
+@control-disabled-color: @text-disabled-color;
+@disabled-color: @palette-gray-6;
+@error-background-color: @palette-red-0;
+@error-border-color: @palette-red-3;
+@error-color: @palette-red-3;
+@error-glow-color: @palette-red-3;
+@focus-border-color: @palette-blue-6;
+@focus-color: @palette-blue-6;
+@focus-glow-color: fade(@focus-border-color, 50%);
+@highlight-color: @palette-orange-4;
+@hover-color: @palette-blue-6;
+@icon-color: @palette-gray-8;
+@icon-disabled-color: @palette-gray-4;
+@icon-inverted-color: @palette-white;
+@icon-light-color: @palette-gray-5-5;
+@item-selection-background-color: @palette-blue-1;
+@item-selection-border-color: @palette-blue-6;
+@item-selection-disabled-background-color: @palette-gray-3;
+@item-selection-disabled-border-color: @palette-gray-5;
+@item-selection-nonfocus-background-color: @palette-gray-1;
+@item-selection-nonfocus-border-color: @palette-gray-4;
+@text-color: @palette-black;
+@text-disabled-color: @palette-gray-7;
+@text-selection-background-color: @palette-blue-6;
+@text-selection-color: @palette-white;
+@text-selection-disabled-background-color: @palette-gray-6;
+@text-selection-disabled-color: @palette-gray-2;
+@title-color: @palette-gray-9;
+
+/* ------------------------- */
+/* Component specific colors */
+/* ------------------------- */
+
+@applink-color: @palette-blue-6;
+@button-background-color: @palette-gray-2-5;
+@calendar-day-color: @text-color;
+@calendar-mode-active-text-color: @text-color;
+@calendar-out-background-color: fade(@palette-gray-3, 40%);
+@calendar-out-color: @palette-gray-6;
+@calendar-week-axis-color: @palette-gray-6;
+@calendar-weekend-color: @palette-blue-6;
+@calendar-weekend-out-background-color: fade(@palette-gray-3, 40%);
+@calendar-weekend-out-color: @palette-gray-6;
+@checkbox-disabled-color: @palette-gray-5;
+@default-button-background-color: @palette-blue-6;
+@default-button-color: @palette-white;
+@default-button-hover-background-color: @palette-blue-3;
+@group-box-title-border-color: @palette-gray-4;
+@navigation-background-color: @palette-blue-8;
+@navigation-color: @palette-gray-2;
+@outline-control-button-background-color: @palette-blue-6;
+@outline-group-background-color: @palette-blue-7;
+@outline-in-background-selection-background-color: @palette-blue-4;
+@outline-selection-background-color: @background-color;
+@outline-selection-color: @text-color;
+@panel-background-color: @palette-gray-2;
+@planner-mode-active-text-color: @text-color;
+@planner-timeline-background-color: @palette-gray-3;
+@popup-border-color: @palette-blue-6;
+@scrollbar-thumb-color: @palette-gray-7;
+@scrollbar-thumb-inverted-color: @palette-gray-3;
+@table-aggregate-cell-selection-color: @palette-blue-5;
+@table-aggregate-row-background-color: @palette-gray-1;
+@table-header-background-color: @palette-gray-2-5;
+@table-header-cmd-active-background-color: @active-inverted-background-color;
+@table-header-cmd-active-border-color: @active-inverted-background-color;
+@table-header-cmd-active-color: @active-inverted-color;
+@table-header-cmd-border-color: @border-color;
+@table-header-menu-background-color: @control-background-color;
+@table-info-color: @palette-gray-9;
+@table-info-error-color: @error-color;
+@table-info-error-hover-color: @palette-red-4;
+@table-info-hover-color: @palette-gray-6;
+@table-info-warning-color: @palette-blue-4;
+@table-info-warning-hover-color: @palette-blue-6;
+@table-row-border-color: @palette-gray-4;
+@text-field-icon-color: @palette-gray-5;
+@text-field-icon-error-color: @error-border-color;
+@text-field-icon-focus-color: @focus-border-color;
+@text-field-placeholder-opacity: 0.75;
+@tooltip-background-color: @palette-gray-2;
+@tooltip-border-color: @palette-gray-5;
+@tooltip-color: @palette-gray-9;
+@tooltip-info-background-color: @tooltip-background-color;
+@tooltip-info-border-color: @tooltip-border-color;
+@tooltip-info-color: @tooltip-border-color;
+@tooltip-warning-background-color: @palette-blue-0;
+@tooltip-warning-border-color: @palette-blue-3;
+@tooltip-warning-color: @tooltip-color;
+@view-button-tab-active-background-color: @navigation-background-color;
+@view-button-tab-active-color: @active-inverted-color;
+@view-button-tab-color: @palette-gray-7;

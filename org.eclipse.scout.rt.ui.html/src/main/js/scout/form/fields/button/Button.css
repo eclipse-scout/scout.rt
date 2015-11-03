@@ -1,0 +1,110 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/* Mixins */
+
+.button-sub-menu-icon {
+  display: inline-block;
+  position: relative;
+  left: 0px;
+  top: 3px;
+  margin-top: -5px;
+  #scout.font-icon();
+  line-height: 18px;
+  font-size: 18px;
+  padding-left: 10px;
+  content: @icon-angle-down;
+}
+
+/* Styles */
+
+.button > button {
+  position: relative;
+  color: @text-color;
+  background-color: @button-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  cursor: pointer;
+  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
+  /* cut off. We should find a better solution for this. */
+  white-space: nowrap;
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus::before {
+    #scout.button-focus();
+  }
+
+  &:not(.disabled):active {
+    background-color: @palette-gray-3;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
+  &:disabled {
+    background-color: @palette-white;
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.selected {
+    border-style: inset;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
+  &.has-submenu::after {
+   .button-sub-menu-icon;
+  }
+}
+
+button > img {
+  vertical-align: middle;
+  margin-bottom: 1px;
+
+  &.with-label {
+    margin-right: 8px;
+  }
+}
+
+.form-field.button > .field,
+.form-field.link-button > .field {
+  margin-left: @mandatory-indicator-width;
+}
+
+.form-field.link-button > .menu-item {
+  line-height: normal; /* override line-height of .menu-item */
+  padding-top: @borderless-field-padding-y;
+  /* add a transparent border to align text with normal buttons which also have a border */
+  border-top: 1px solid transparent;
+
+  /* Link buttons in a form must have an underline, but link buttons in the menu-bar shouldn't */
+  text-decoration: underline;
+
+  &:focus :not(:disabled) {
+    color: @hover-color;
+  }
+}
+
+.table .button > .key-box {
+  top: 8px;
+}
+
+.button > .key-box {
+  position: absolute;
+  top: 8px;
+}

@@ -1,0 +1,205 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@table-header-padding-y: @table-row-padding-y;
+@table-header-padding-left: @table-cell-padding-left;
+@table-header-padding-right: @table-cell-padding-right;
+@table-header-sort-icon-size-1: 12px;
+@table-header-sort-icon-size-2: @table-header-sort-icon-size-1 + 12px; /* bigger space when multiple icons are displayed */
+
+.table-header {
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: @table-header-background-color;
+  border-bottom: 1px solid @border-color;
+}
+
+.table-header > .menubar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding-right: 0px;
+  padding-left: 6px;
+  background-color: @table-header-background-color;
+  width: auto;
+  border: none;
+  z-index: 1;
+  height: 100%;
+
+  & > .menu-item {
+    height: auto;
+    line-height: normal;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-right: 5px;
+
+    & > .font-icon {
+      height: auto;
+      line-height: normal;
+    }
+  }
+}
+
+.table-header-item {
+  position: relative;
+  display: inline-block;
+  #scout.font-text-normal(@font-weight-bold);
+  padding: @table-header-padding-y @table-header-padding-right @table-header-padding-y @table-header-padding-left;
+  #scout.overflow-ellipsis-nowrap();
+  /* Vertical align is necessary for 2 things:
+    1. Alignment in case of multiline headers.
+    2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */
+  vertical-align: bottom;
+  cursor: pointer;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+
+  &.disabled {
+    cursor: default;
+    /* Override default disabled text color, because "disabled" in the table header means something different */
+    color: @text-color;
+  }
+
+  &.empty {
+    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
+    text-overflow: clip;
+  }
+
+  &.halign-right {
+    text-align: right;
+    padding-right: @table-cell-padding-left;
+    padding-left: @table-cell-padding-right;
+  }
+  &.halign-center {
+    text-align: center;
+    padding-right: @table-cell-padding-left;
+  }
+
+  &.sorted,
+  &.grouped,
+  &.filtered {
+    /* make room for icon */
+    padding-right: @table-header-padding-right + @table-header-sort-icon-size-1;
+
+    &.halign-right,
+    &.halign-center {
+      padding-right: @table-cell-padding-left + @table-header-sort-icon-size-1;
+    }
+  }
+
+  &.sorted.grouped,
+  &.sorted.filtered {
+    /* make some more room */
+    padding-right: @table-header-padding-right + @table-header-sort-icon-size-2;
+
+    &.halign-right,
+    &.halign-center {
+      padding-right: @table-cell-padding-left + @table-header-sort-icon-size-2;
+    }
+  }
+
+  &.not(.disabled):hover,
+  &.header-move {
+    color: @hover-color;
+  }
+
+  &.header-move > .table-header-item-state {
+    display: none;
+  }
+
+  &.selected {
+    border-left: 1px solid @border-color;
+    border-right: 1px solid @border-color;
+    background-color: @control-background-color;
+    color: @active-color;
+    z-index: 1;
+  }
+
+  &.filler {
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+}
+
+.table-header-item-state {
+  position: absolute;
+  right: 3px;
+  top: 4px;
+  font-weight: normal;
+  font-size: 10px;
+  color: #666;
+  display: table-row;
+
+  & > .left {
+    display: table-cell;
+    padding-top: 5px;
+    padding-left: 3px;
+    text-align: center;
+  }
+
+  &.grouped.filtered > .left {
+    padding-top: 0;
+  }
+
+  & > .right {
+    display: table-cell;
+    color: @palette-gray-6;
+    font-size: 16px;
+    padding-left: 3px;
+    padding-right: 3px;
+    vertical-align: top;
+  }
+
+  &.sort-desc > .right::after {
+    content: @icon-arial-long-arrow-down;
+  }
+
+  &.sort-asc > .right::after {
+    content: @icon-arial-long-arrow-up;
+  }
+}
+
+.table-header-resize {
+  position: absolute;
+  display: inline-block;
+  top: 0px;
+  height: 100%;
+  width: 17px;
+  padding: 6px 8px;
+  margin-left: -8px;
+  background-color: @border-color;
+  background-clip: content-box;
+  z-index: 1;
+
+  &:not(.disabled) {
+    cursor: col-resize;
+  }
+
+  .header-move & {
+    /* Hide separators while moving, because their position will not be updated until the move-end event */
+    visibility: hidden;
+  }
+
+  .menu-open + &.table-header-resize {
+    background-color: @panel-background-color;
+  }
+}
+
+/* Temporary element inserted in header and data area during resizing of a column */
+.table-column-resize-helper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  height: 1px;
+  /* width is set dynamically by TableHeader.js */
+}

@@ -1,0 +1,331 @@
++---------------------------------+
+| BSI JavaScript Style Guide      |
++---------------------------------+
+
+Als Basis dient der Google JavaScript StyleGuide:
+https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+Bei einigen Punkten wurde auch der StyleGuide von jQuery zu Rate gezogen:
+http://contribute.jquery.org/style-guide/js/
+
+
+### Variablen
+
+Variablen gelten in JS (zumindest in ECMA 5) immer für die ganze Funktion und nicht für
+innere Blöcke wie if, while etc. Egal wo in der Funktion man die Variable mit 'var'
+definiert, zur Laufzeit existiert die Variable immer schon am Anfang der Funktion (mit
+Wert undefined). Das nennt sich "Variable Hoisting".
+
+Es ist zu einem gewissen Grad Geschmacksache, ob man alle verwendeten Variablen selber
+schon ganz am Anfang der Funktion deklariert. Vorteilhaft dabei ist, dass es die
+tatsächliche Situation zur Laufzeit abbildet, allerdings kann die Lesbarkeit darunter
+leiden. Darum sollte man mit Augenmass vorgehen:
+
+  - Variablen innerhalb ihres "logischen" Kontexts deklarieren, so dass ein Leser der
+    Funktion möglichst nicht verwirrt ist durch Sachen, die erst später relevant werden.
+
+    Wenn eine Variable von Anfang bis Ende der Funktion immer wieder benutzt wird, sollte
+    sie schon am Anfang deklariert werden. Wenn sie nur in einem einzigen if() Statement
+    vorkommt, dann eher erst dort. Auch Zählvariablen in for()-Loops können in der for-
+    Anweisung deklariert werden. Wenn die gleiche aber in mehreren Loops verwendet wird,
+    kann es Sinn machen, sie weiter oben zu deklarieren, damit die beiden for-Anweisungen
+    "ähnlich" aussehen.
+
+  - Pro 'var' Anweisung dürfen mehrere Variablen deklariert und auch initialisiert
+    werden. Komplexe Initialisierung soll aber auf einer separaten Zeile notiert werden.
+    Grundsätzlich ist eine kompakte Darstellung erwünscht, die Lesbarkeit soll
+    aber nicht darunter leiden.
+
+Beispiele:
+
+NOK:
+
+  var x = (y > 0 ? 1 : 2), y = $('h1').children('.myClass').first().text();
+
+OK:
+
+  var x, y = 3;
+
+  var x = 4,
+    y = x + 1,
+    value = $('h1').text();
+
+  for (var i = 0; i < array.length; i++) {
+    var temp = array[i];
+    temp.run();
+  }
+
+Links:
+- http://benalman.com/news/2012/05/multiple-var-statements-javascript/
+
+
+### Visibility
+
+Wir verwenden Underscore (_) als Prefix für private und protected Members einer Klasse.
+Solche Members dürfen von nur von der Klasse selber oder Sub-Klassen davon aufgerufen werden.
+Auch Friend-Klassen dürfen auf diese Eigenschaften zugreifen (z.B. darf die Klasse TableLayout
+auf Properties von Table zugreifen). Tests/Spec dürfen ebenfalls auf Underscore-Properties
+zugreifen.
+
+Andere Klassen dürfen nicht auf auf Properties zugreifen, die dieser Konvention folgen.
+Properties die bewusst public sind und auf die von "überall" zugegriffen werden darf haben
+keinen Underscore im Bezeichner.
+
+
+### Pruefen, ob eine Variable oder ein Property existiert
+
+Am einfachsten ist es, zu schauen, ob die Variable "truthy" ist:
+
+  if (value)
+  if (obj.prop)
+
+Es gibt aber Fälle, wo das nicht geht:
+
+  1) Die Variable ist zwar vorhanden, hat aber einen "falsy" Wert (z.B. 0).
+
+     Das ist der häufigsten Fall. Man prüft hier einfach auf undefined (mit ===):
+
+       if (value === undefined)
+       if (obj.prop === undefined)
+
+     Teilweise wird von dieser Variante abgeraten, da das globale Objekt 'undefined'
+     überschrieben worden sein könnte. Das wird in Scout aber durch eine IIFE verhindert.
+     Bei dieser Variante wird 'null' nicht geprüft, d.h. es braucht ggf. eine zweite
+     Bedingung. Und bei der Property-Variante ist natürlich wichtig, dass 'obj' ein
+     Objekt ist, sonst kommt es beim Zugriff auf obj.prop zu einer Exception.
+
+  2) Die Variable ist nicht deklariert (gibt Exception bei der Prüfung)
+
+     Dieser Fall kommt eher selten vor. Ein Beispiel ist die Prüfung, ob das globale
+     Objekt log4javascript vorhanden ist, d.h. schon log4javascript installiert ist.
+     Lösen kann man das über den typeof-Trick:
+
+       if (typeof neverdeclared === 'undefined')
+
+     Auch 1) könnte man damit erledigen, aber es gibt eher keinen Vorteil. Bei 1) hat
+     man den Vorteil, dass das Wort 'undefined' in Eclipse fett geschrieben wird. Manche
+     sagen, dass der String-Vergleich von 2) langsam ist, während andere sagen, dass
+     das nicht stimmt, da die Browser extra darauf optimieren.
+
+  3) Es ist wirklich relevant, ob x auf obj vorhanden ist (und nicht etwa auf einem
+     seiner Prototypen).
+
+     Da 'obj.prop' auch etwas zurückgibt, wenn prop auf einem der Prototypen des Objekts
+     definiert ist, kann manchmal auch folgende Notation nötig sein:
+
+       if (obj.hasOwnProperty('prop'))
+
+     Das scheint allerdings relativ langsam sein, darum nur verwenden, wenn wirklich nötig.
+
+Links:
+- http://stackoverflow.com/questions/4725603
+- http://stackoverflow.com/questions/17150396
+- http://jsperf.com/hasownproperty-vs-in/2
+
+
+### Gleichheit pruefen
+
+Empfehlung: Immer === verwenden, es sei denn, man moechte explizit Type Coercion
+verwenden bzw. unterstuetzen. Ansonsten ist es besser, dass der Code auch mit dem
+strikten Vergleich funktioniert (und nicht nur "zufaellig" wegen JS-Type-Magie).
+
+Performance scheint nur eine untergeordnete Rolle zu spielen:
+http://www.adequatelygood.com/Performance-of-vs-.html
+
+Falls doch einmal absichtlich == oder != verwendet werden soll, dies deutlich im
+Code so kennzeichnen, um unabsichtlich "Korrekturen" zu vermeiden. Beispiel:
+  ...
+  if (scout.sessions[i].partId == sessionIndex) { // <-- compare with '==' is intentional!
+  ...
+
+
+### Exceptions werfen
+
+Man kann in JS grundsaetzlich beliebige Objekte werfen. Es sollte aber immer ein Error-
+Objekt geworfen werden, nie nur ein String. Das Problem mit Strings ist, dass nicht
+alle "Faenger" damit umgehen konnen. Jasmine z.B. zeigt dann nur "undefined: undefined"
+als Meldung an, was ueberhaupt nicht hilfreich ist. IE hat angeblich auch Probleme damit.
+FireFox zeigt keine Line-Number-Info an ohne Error Object.
+
+NOK:                           OK:
+-------------------------------------------------------------------------
+throw 'This is an error';      throw new Error('This is an error');
+
+Links:
+http://www.nczonline.net/blog/2009/03/10/the-art-of-throwing-javascript-errors-part-2/
+http://stackoverflow.com/questions/11502052/throwing-strings-instead-of-errors
+
+
+### Strings
+
+In JavaScript fuer Strings immer einheitlich ' als Begrenzer verwenden.
+
+Ausnahme: Wenn innerhalb des Strings sehr viele Apostrophe vorkommen, kann man die
+Anfuehrungszeichen umkehren, damit man sich das Escapen sparen kann.
+
+Und: In einem JSON-Objekt _muessen_ fuer Strings " verwendet werden! Aber Achtung, wenn man
+ein JS-Objekt im Code von Hand erzeugt, dann ist noch lange kein JSON! Trotzdem kann man da,
+wenn man moechte, doppelte Anfuehrungszeichen verwenden.
+
+Es gibt keinen wirklich triftigen Grund, ausser dass es besser ist, wenn nicht im ganzen
+Code beide Arten von Anfuehrungszeichen durcheinander verwendet werden. Fuer das Erzeugen
+von HTML-Code mit Attributen ist es ausserdem praktisch, wenn die doppelten
+Anfuehrungszeichen nicht escaped werden muessen.
+
+Beispiele:
+var x = 'This is a string.';
+var y = '<div id="' + model.id + '" class="row selected">That\'s it!</div>';
+var z = "That's it!";
+var obj = {
+  "id": 123;
+  'name': 'simple object';
+};
+var jsonResponse = '{ "id": 123, "name": "simple object" }';
+
+
+### Kommentare
+
+Kommentare immer so:
+  // My comment
+
+So nicht:
+  //My comment
+  /* My comment */
+
+
+### Overloading
+
+JavaScript kennt kein Ueberladen von Methoden. Allerdings sind Funktionen auch nicht streng
+typisiert, somit kann eine dynamische Anzahl Argumente uebergeben werden, mit unterschiedlichen
+Typen. Ein Pattern um Overloading zu implementieren ist wie folgt. Agenommen die Methode 'setSize'
+soll mit 2 Numbers und mit einem Dimension Objekt aufgerufen werden koennen:
+
+  obj.setSize(6, 7);
+
+  obj.setSize(new Dimension(6, 7));
+
+Die Implementierung von setSize ist wie folgt:
+
+  setSize = function(vararg, height) {
+    if (vararg instanceof Dimension) {
+      this.width = vararg.width;
+      this.height = vararg.height;
+    } else {
+      this.width = vararg;
+      this.height = height;
+    }
+  };
+
+Bei Konstruktoren moechte man oft auch einen Default-Konstruktor, das Beispiel oben liesse sich
+dann wie folgt erweitern:
+
+  this.width = vararg || 0;
+  this.height = height || 0;
+
+Für Konstruktoren mit vielen Parametern bietet es sich an, ein einzelnes Objekt als Parameter zu
+verwenden. Wir nennen dieses Objekt "options". Dies macht die Erzeugung eines Objektes einiges
+übersichtlicher:
+
+  scout.MyObject = function(options) {
+    options = options || {};
+    var param1 = options.param1 || 'default';
+    var param2 = options.param2 !== undefined ? options.param2 : true
+  }
+
+  var obj = new scout.MyObject({
+    param1: 'abc',
+    param2: false
+  }
+
+Achtung: Falls '', 0 oder false als Werte erlaubt sind, kann || nicht verwendet werden.
+In diesen Faellen die ? Notation verwenden. Alternativ kann auch $.extend eingesetzt werden.
+
+
+### Properties
+
+Wir erzeugen keine Getter und Setter für einfache Properties (ohne Logik). Man soll direkt auf die
+Variable zugreifen. Hauptgrund: Code wird nicht unnötig aufgeblasen.
+Wenn der Getter/Setter Logik enthalten soll, dann erstellt man eine Methode aber ohne get/set.
+Es ist ein Setter, wenn es ein Argument hat.
+Beispiel:
+  $.fn.cssMarginLeft = function(value) {
+    if (value !== undefined) {
+      return this.css('margin-left', value + 'px');
+    }
+    return $.pxToNumber(this.css('margin-left'));
+  };
+
+### Methoden mit jQuery-Objekten als Return-Werte
+
+Wenn eine Methode ein jQuery-Objekt zurückgibt, soll dies im Namen ersichtlich sein.
+z.B. var $selectedRows =  table.$selectedRows();
+
+
+### Einzeilige if-Statements / Geschweifte Klammern
+
+Bei 'if' soll die Bedingung immer auf einer separaten Zeile. Die einzelnen Klauseln sollen immer
+in geschweifte Klammern eingefasst sein.
+
+NOK:
+  if (hasPrev && hasNext) $(this).addClass('select-middle');
+OK:
+  if (hasPrev && hasNext) {
+    $(this).addClass('select-middle');
+  }
+
+Begruendung:
+- Code wird robuster gegenueber unbeabsichtigt geaendertem Verhalten bei Refactorings.
+- Wir machen es im Java-Code auch so.
+
+
+### Method Chaining
+
+Wenn eine Anweisung mit durch '.' verbundenen Methodenaufrufen auf mehrere Zeilen verteilt
+werden soll, dann sollen die Punkte immer am Anfang der naechsten Zeile stehen.
+
+  OK:                                      NOK:
+  ----------------------------             -----------------------------
+  $("#p1").css("color", "red")             $("#p1").css("color", "red").
+    .slideUp(2000)                           slideUp(2000).
+    .slideDown(2000);                        slideDown(2000);
+
+Begruendung:
+- Die Style-Guides sind sich nicht einig. Google macht die Punkte hinten, jQuery hingegen vorne.
+  Da wir viele jQuery-Funktionen verwenden, halten wir uns an den jQuery-Styleguide.
+- Der JS-Formatter in Eclipse beherrscht aktuell nur die Punkte vorne. Deshalb verwenden wir
+  diesen Stil, obwohl er anders ist als im Java-Code.
+
+
+### Cast to boolean
+
+Um einen Wert in einen Boolean zu casten, folgende Kurznotation verwenden:
+
+  !!value
+
+Mit dem einen Ausrufezeichen wird geschaut, ob der Value "truthy" ist. Das ist dann
+immer garantiert true oder false, dummerweise noch verkehrt (true wenn 'value' falsy ist,
+false, wenn er truthy ist). Mit dem zweiten Ausrufezeichen wird das korrigiert.
+
+Zwischen !! und dem Wert kein Leerzeichen verwenden (macht man ja bei einem einzelnen ! auch nicht.)
+
+### Events
+Möchte man auf Events reagieren, so kann man $elem.on(type, func) verwenden. Bind() ist veraltet und soll nicht mehr verwendet werden.
+Um die Lesbarkeit zu erhöhen ist folgende Notation für den Funktions-Namen zu empfehlen:
+
+- this._onElementType.bind(this) z.B. this._onRowMousedown.bind(this) oder this._onButtonClick.bind(this)
+
+Durch das bind(this) zeigt this auf die Instanz der Klasse und nicht mehr auf das target. Wenn man auf das target zugreifen möchte, muss man dies über den event tun.
+
+  scout.Example.prototype._onRowMousedown = function(event) {
+    var $target = $(event.target);
+  }
+
+Naming: für den entsprechenden Event-Typ soll eine _on[EventTyp] Methode deklartiert werden:
+
+  scout.MyField.prototype._onClick = function(event) {
+    ...
+  };
+
+  $field.on('click', this._onClick.bind(this));
+
+Die _on-Konvention wird auch für Events verwendet, die vom UI-Server kommen, z.B. Table#_onRowsInserted(rows);
+

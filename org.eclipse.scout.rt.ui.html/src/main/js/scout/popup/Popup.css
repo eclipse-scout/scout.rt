@@ -1,0 +1,137 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.popup {
+  position: absolute;
+  top: 0px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.popup-head {
+  position: absolute;
+  line-height: @menu-item-height;
+  padding: 0 13px;
+  white-space: nowrap;
+  background-color: @palette-white;
+  border: 1px solid @border-color;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  color: @active-color;
+
+  .popup.down > & {
+    padding-top: 3px;
+    border-top-width: 1px;
+    #scout.drop-shadow();
+  }
+
+  .popup.up > & {
+    padding-bottom: 3px;
+    border-bottom-width: 1px;
+    #scout.drop-shadow(@y: -6px;);
+  }
+
+  &.has-submenu::after {
+    .sub-menu-icon;
+    #scout.transform(rotate(180deg));
+    padding-right: 10px;
+    padding-left: 0;
+    top: 5px;
+  }
+
+  & > .font-icon {
+    .menu-icon;
+    color: @active-color;
+  }
+
+  &.in-main-menubar > .font-icon {
+    font-size: 22px;
+    display: inline-block;
+  }
+}
+
+.popup-deco {
+  position: absolute;
+  height: 1px;
+  left: 1px;
+  background-color: @palette-white;
+}
+
+.popup-body {
+  position: relative;
+  border: 1px solid @border-color;
+  background-color: @palette-white;
+
+  & > .menu-item.context-menu-item-first {
+    border-top: 1px solid transparent; //@border-color;
+  }
+  & > .menu-item.context-menu-item-last {
+    border-bottom: 1px solid transparent; //@border-color;
+  }
+
+  & > .menu-item > .key-box {
+    bottom: auto;
+  }
+
+  &.down  {
+    #scout.drop-shadow();
+
+    .popup-head ~ & > .menu-item.context-menu-item-first {
+      border-top: 1px solid transparent;
+
+      &.selected {
+        border-color: @item-selection-border-color;
+      }
+    }
+  }
+
+  &.up {
+    #scout.drop-shadow(@y: -6px;);
+
+    .popup-head ~ & > .menu-item.context-menu-item-last {
+      border-bottom: 1px solid transparent;
+
+      &.selected {
+        border-color: @item-selection-border-color;
+      }
+    }
+  }
+
+  & > .menu-item {
+    border-top: solid 1px @border-color;
+    line-height: @menu-item-height - 1px; /* subtract border-top */
+    display: block;
+    width: 100%;
+    padding-left: 15px;
+
+    &.selected {
+      border-top: 1px solid @item-selection-border-color;
+      border-color: @item-selection-border-color;
+    }
+
+    &.selected + .menu-item{
+      border-top-color: @item-selection-border-color;
+    }
+
+    &.selected.context-menu-item-first {
+      border-top: 1px solid @item-selection-border-color;
+    }
+
+    &.selected.context-menu-item-last {
+      border-color: @item-selection-border-color;
+    }
+
+    &:focus {
+      text-decoration: none;
+    }
+  }
+}

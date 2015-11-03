@@ -1,0 +1,70 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.compact-tree {
+
+  .tree-field > & {
+    margin-left: @mandatory-indicator-width;
+  }
+
+  & > input {
+    width: 100%;
+    height: @logical-grid-height;
+  }
+
+  & > .nodes-wrapper {
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+
+    & > .nodes {
+      #scout.vendor(column-count, 2);
+      #scout.vendor(column-gap, 24px);
+
+      & > .section {
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        #scout.vendor(column-break-inside, avoid);
+        break-inside: avoid-column;
+        page-break-inside: avoid;
+
+        /* Hack for FF, because column-break-inside does not yet work for all elements, only for tables */
+        /* see: https://bugzilla.mozilla.org/show_bug.cgi?id=549114 */
+        display: table;
+
+        & > .title {
+          line-height: 18px;
+          font-weight: bold;
+        }
+
+        & > .process {
+          cursor: pointer;
+          line-height: 18px;
+          /* Hanging indents: */
+          padding-left: 10px;
+          text-indent: -10px;
+
+          &:hover {
+            color:@hover-color;
+          }
+
+          &.selected {
+            text-decoration:underline;
+            color:@active-color;
+          }
+        }
+      }
+    }
+  }
+}

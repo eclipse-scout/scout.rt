@@ -1,0 +1,531 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@desktop-table-header-padding-y: @table-header-padding-y + 6;
+@desktop-table-row-padding-y: @table-row-padding-y + 6;
+@taskbar-menu-textandicon-padding-right: 11px;
+
+/* desktop */
+
+.desktop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  &:focus {
+    outline: none;
+  }
+
+  &.has-navigation {
+    & > .desktop-bench,
+    & > .desktop-taskbar {
+      left: @size-desktop-navigation;
+    }
+  }
+}
+
+/* bench */
+
+.desktop-bench-drop-shadow() {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 3px;
+  width: 10px;
+  height: 100%;
+  box-shadow: -10px 0px 10px 0px rgba(0,0,0,0.4);
+}
+
+.desktop-bench {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: @background-color;
+
+  &.drop-shadow::before {
+    .desktop-bench-drop-shadow();
+  }
+
+  &.has-taskbar {
+    top: @desktop-taskbar-height;
+  }
+
+  & > .table {
+    & > .table-header {
+      & > .table-header-item {
+        padding-top: @desktop-table-header-padding-y;
+        padding-bottom: @desktop-table-header-padding-y;
+
+        & > .table-header-item-state {
+          top: 10px;
+        }
+      }
+
+      & > .menubar > .menu-item {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-right: 7px;
+      }
+
+      & > .menubar {
+        padding-right: 0px;
+      }
+    }
+
+    & > .table-header,
+    & > .table-data {
+      margin-left: @bench-margin-x;
+      margin-right: @bench-margin-x;
+    }
+
+    & .table-aggregate {
+      margin-left: @bench-margin-x;
+      margin-right: @bench-margin-x;
+
+      & > .table-cell {
+        padding-top: @desktop-table-row-padding-y;
+        padding-bottom: @desktop-table-row-padding-y;
+      }
+    }
+
+    & > .table-data {
+      & > .scrollbar.y-axis {
+        /* 2px looks slightly better than the default which is 3px */
+        margin-left: 2px;
+        margin-right: 2px;
+      }
+
+      & > .scrollbar.x-axis {
+        margin-top: 2px;
+        margin-bottom: 2px;
+      }
+
+      & > .table-row,
+      & > .table-aggregate-row {
+        /* Desktop table has a 2px border. Top and bottom border are added to the table cell. */
+        border-left-width: 2px;
+        border-right-width: 2px;
+
+        &.selected {
+          background-color: @item-selection-background-color;
+          border-color: @item-selection-border-color;
+        }
+
+        & > .table-cell {
+          /* Replace first and last pixel of specified row padding by a transparent border. This border will be */
+          /* set to the selection color when the row is selected, thus creating the illusion that the 2px selection */
+          /* border is drawn around the cell. See CSS rules below. */
+          padding-top: @desktop-table-row-padding-y - 1px;
+          padding-bottom: @desktop-table-row-padding-y - 1px;
+          border-top: 1px solid transparent;
+          border-bottom: 1px solid transparent;
+
+          &.checkable {
+            padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+            padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+          }
+        }
+
+        &.select-top > .table-cell {
+          border-top-color: @item-selection-border-color;
+        }
+
+        &.select-bottom > .table-cell {
+          border-bottom-color: @item-selection-border-color;
+        }
+
+        &.select-single > .table-cell {
+          border-top-color: @item-selection-border-color;
+          border-bottom-color: @item-selection-border-color;
+        }
+      }
+    }
+  }
+}
+
+/* taskbar */
+
+.desktop-taskbar {
+  position: absolute;
+  left: 0;
+  top: 0px;
+  right: 0px;
+  height: @desktop-taskbar-height;
+
+  /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
+  /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
+  &::before {
+    content: '';
+    background-color: @border-color;
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    top: @desktop-taskbar-height - 1px;
+    left: 0;
+  }
+}
+
+/* taskbar: view-tabs */
+
+.desktop-view-tabs {
+  position: absolute;
+  vertical-align: top;
+
+  & > .overflow-tab-item {
+    border-right: 1px solid @border-color;
+    display: inline-block;
+    height: 50px;
+    width: 30px;
+    padding-top: 17px;
+    text-align: center;
+    cursor: pointer;
+
+    &::before {
+      #scout.font-icon();
+      color: @icon-color;
+      content: @icon-chevron-right;
+    }
+
+    & .num-tabs {
+      color: @disabled-color;
+      font-size: 10px;
+      margin-top: -4px;
+    }
+  }
+}
+
+.desktop-view-tab {
+  position: relative;
+  vertical-align: top;
+  display: inline-block;
+  /* 1px smaller than the taskbar because of the bottom border */
+  height: @desktop-taskbar-height - 1px;
+  width: 220px;
+  padding: 6px 10px 0 20px;
+  cursor: pointer;
+  background-color: @panel-background-color;
+  color: @text-color;
+  border-right: 1px solid @border-color;
+
+  &.small {
+    width: 130px;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &.disabled {
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.selected {
+    cursor: default;
+    background-color: @background-color;
+    color: @active-color;
+    /* full size of taskbar to draw over the border-bottom */
+    height: @desktop-taskbar-height;
+
+    &::before {
+      .desktop-bench-drop-shadow();
+      top: 0px;
+      width: 20px;
+      height: 110%;
+    }
+
+    &:not(:first-child)::before {
+      box-shadow: -7px 0px 10px 0px rgba(0,0,0,0.4);
+    }
+  }
+
+  & > .icon {
+    float: right;
+    margin-left: 5px;
+    margin-right: -5px;
+  }
+
+  & > .title {
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-large();
+  }
+
+  & > .sub-title {
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-normal();
+  }
+
+  &.has-submenu::after {
+    display: inline-block;
+    position: relative;
+    left: 0px;
+    #scout.font-icon();
+    line-height: 17px;
+    font-size: 17px;
+    padding-left: 10px;
+    content: @icon-angle-down;
+  }
+}
+
+/* taskbar: tools */
+
+.taskbar-tools {
+  position: absolute;
+  vertical-align:top;
+  float: right;
+  white-space: nowrap;
+}
+
+.taskbar-tool-item.menu-item {
+  position: relative;
+  vertical-align: top;
+  height: @desktop-taskbar-height - 1px;
+  padding: 16px 20px 0 20px;
+  color: @text-color;
+  #scout.font-text-plus();
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  line-height: normal;
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &.disabled {
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.min-padding {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  &:not(.last) {
+    /* Reset  default styles from menu.css */
+    margin-right: 0;
+  }
+
+  & > .font-icon {
+    color: @icon-color;
+    font-size: 17px;
+
+    /* Reset  default styles from menu.css */
+    line-height: normal;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    vertical-align: 0;
+  }
+
+  &:hover > .font-icon {
+    color: @hover-color;
+  }
+
+  &.disabled > .font-icon {
+    color: @disabled-color;
+  }
+
+  &.has-submenu::after {
+    display: inline-block;
+    position: relative;
+    left: 0px;
+    #scout.font-icon();
+    line-height: 17px;
+    font-size: 17px;
+    padding-left: 10px;
+    content: @icon-angle-down;
+  }
+}
+
+.taskbar-tool-item.menu-textandicon > .font-icon {
+  padding-right: @taskbar-menu-textandicon-padding-right;
+}
+
+/* taskbar: tools popup */
+
+.taskbar-tool-item.popup-head {
+  border-left: 1px solid @border-color;
+  border-right: 1px solid @border-color;
+  background-color: @background-color;
+  cursor: pointer;
+  padding: 16px 20px 0 20px;
+  box-shadow: none;
+  border-top: none;
+  line-height: normal;
+  height: @desktop-taskbar-height - 1px;
+
+  .popup.down > & {
+    /* above selector is too less specific */
+    padding-top: 16px;
+  }
+
+  &.has-submenu {
+    background-color: @palette-white;
+  }
+
+  &.has-submenu::after {
+    font-size: 17px;
+    top: 0px;
+  }
+
+  &.selected > .font-icon {
+    font-size: 17px;
+    vertical-align: 0;
+  }
+}
+
+.popup.form-tool-popup {
+  & > .popup-body {
+    border-bottom: 1px solid @border-color;
+  }
+
+  & > .popup-deco {
+    background-color: @background-color;
+  }
+}
+
+/* taskbar: key boxes */
+
+.desktop-view-tab .key-box,
+.taskbar-tool-item.menu-item .key-box {
+  bottom: 4px;
+
+  &.disabled {
+    background-color: @disabled-color;
+  }
+}
+
+/* taskbar: logo */
+
+.taskbar-logo {
+  float: right;
+  margin-top: 8px;
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 33px;
+  height: 33px;
+  background: url('taskbar-logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* other elements of the desktop */
+
+.notifications {
+  position: fixed;
+  right: 10px;
+  top: 0;
+  height: 100%;
+  margin-top: 60px;
+  width: 0; /* Don't block access to the elements in the background */
+}
+
+.notification {
+  width: 250px;
+  float: right;
+  border-left: 3px solid @active-color;
+  background-color: @palette-white;
+  margin-bottom: 20px;
+  #scout.drop-shadow();
+
+  &.error {
+    border-left-color: @palette-red-3;
+  }
+
+  & > .notification-content {
+    border: 1px solid @border-color;
+    border-left-width: 0;
+    padding: 10px;
+
+    & > .close {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      color: @icon-light-color;
+
+      &:hover {
+        color: @icon-color;
+        cursor: pointer;
+      }
+      &::before {
+        #scout.font-icon();
+        content: @icon-remove;
+      }
+    }
+  }
+}
+
+.offline-message > .reconnect-animated::after {
+  #scout.animation(rotation 0.9s linear infinite);
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0);
+  border-top-color: @palette-gray-8;
+  border-left-color: @palette-gray-8;
+  width: 14px;
+  height: 14px;
+  margin-top: -3px;
+}
+
+.glasspane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  #scout.animation(fadeIn ease-in 1);
+  #scout.animation-duration(0.25s);
+  outline: none;
+  z-index: 100;
+
+  &.busy {
+    /* Make glasspane transparent and disable animation */
+    background-color: transparent;
+    #scout.animation(none);
+    cursor: wait;
+
+    &.dark {
+      background-color: rgba(0, 0, 0, 0.1);
+      #scout.animation(fadeIn ease-in 1);
+      #scout.animation-duration(0.25s);
+    }
+  }
+}
+
+/* "Open URI" related rules */
+
+.download-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  /* Do _not_ use 'display: none', because that seems to interrupt the download in Safari */
+}
+
+.popup-blocked-title {
+  margin-right: 15px; /* leave space for close icon */
+}
+
+a.popup-blocked-link {
+  display: block;
+  margin-top: 10px;
+  outline: none;
+}

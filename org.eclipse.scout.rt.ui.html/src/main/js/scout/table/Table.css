@@ -1,0 +1,236 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
+@table-cell-padding-right: 4px;  /* also used in scout.Column.prototype.buildCell */
+@table-row-padding-y: 7px;
+/* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline cells) */
+@checkable-cell-padding-adjustment: 2px;
+
+.table {
+  height: 100%;
+  width: 100%;
+  position: relative;
+
+  &:focus,
+  &.focused {
+    outline: none;
+
+    & .table-row.selected {
+      background-color: @item-selection-background-color;
+      border-color: @item-selection-border-color;
+    }
+  }
+
+  & > .menubar {
+    &:not(.main-menubar) {
+      padding-left: @table-cell-padding-left;
+      padding-right: @table-cell-padding-right;
+    }
+  }
+}
+
+.table-data {
+  position: relative;
+  overflow: hidden;
+
+  /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
+  /* - To make height calculation correct, this margin has to be subtracted again */
+  /*   from .table-data's height. See TableLayout.layout(). */
+  margin-top: -1px;
+  padding-top: 1px;
+}
+
+.table-row,
+.table-aggregate-row {
+  position:relative;
+  overflow: hidden;
+  border-left: 0px solid transparent;
+  border-right: 0px solid transparent;
+  border-bottom: 1px solid @table-row-border-color;
+
+  &.sum-selection {
+     color: @item-selection-border-color;
+   }
+
+  &.selected {
+    background-color: @item-selection-nonfocus-background-color;
+    border-color: @item-selection-nonfocus-border-color;
+    border-left-color: transparent;
+    border-right-color: transparent;
+
+    &.select-top,
+    &.select-middle {
+      /* Disable bottom-border. Instead, we add the border in the ::after pseudo element, because otherwise */
+      /* it would interfere with the 2px left border (missing control of 'border join behaviour' in CSS) */
+      border-bottom: 0;
+    }
+
+    &.select-top::after,
+    &.select-middle::after {
+      border-bottom: 1px solid @table-row-border-color;
+      content: '';
+      display: block;
+    }
+  }
+
+  &.select-single,
+  &.select-top {
+    border-top: 1px solid @item-selection-nonfocus-border-color;
+    /* Move the row 1px up to cover the bottom border of the previous row. */
+    margin-top: -1px;
+  }
+
+  &.disabled {
+    background-color: @control-disabled-background-color;
+  }
+}
+
+.table-cell {
+  color: @text-color;
+  display: table-cell;
+  padding: @table-row-padding-y @table-cell-padding-right @table-row-padding-y @table-cell-padding-left;
+  position: relative;
+  #scout.overflow-ellipsis();
+  vertical-align: top; /* for multiline text */
+
+  & > .width-fix {
+    /* Some browsers (e.g. IE9) need an additional <div> with display:inline-block below the table-cell */
+    display: inline-block;
+    #scout.overflow-ellipsis();
+    /* An additional max-width: must be added in browser. */
+  }
+
+  .disabled > .table-row > & {
+    color: @disabled-color;
+  }
+
+  &.empty {
+    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
+    text-overflow: clip;
+  }
+
+  .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    #scout.triangle-top-left(5px, @border-color);
+  }
+
+  .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.mandatory::before {
+    position: absolute;
+    content: '*';
+    top: 0;
+    left: 0;
+    border: none;
+    color: @border-color;
+  }
+
+  .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable.has-error::before {
+    #scout.triangle-top-left-color(@error-color);
+  }
+
+  .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.mandatory.has-error::before {
+    color: @error-color;
+  }
+
+  &.checkable {
+    /* same padding for left and right, it's by purpose */
+    padding: @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left;
+    cursor: pointer;
+  }
+
+  &.checkable.disabled,
+  .table.disabled > .table-data > .table-row > &.checkable {
+    cursor: default;
+  }
+
+  & > .check-box::before {
+    content: '';
+    display: inline-block;
+    width: @check-box-size;
+    height: @check-box-size;
+    #scout.checkbox-before-border();
+  }
+  & > .check-box.checked::before {
+    #scout.checkbox-before-checked();
+  }
+  & > .check-box.disabled::before,
+  .table.disabled > .table-data > .table-row > & > .check-box::before {
+    #scout.checkbox-before-disabled();
+  }
+
+  &.halign-right {
+    text-align: right;
+    padding-right: @table-cell-padding-left;
+    padding-left: @table-cell-padding-right;
+  }
+  &.halign-center {
+    text-align: center;
+    padding-right: @table-cell-padding-left;
+  }
+}
+
+.table-cell-icon {
+
+  .font-icon& {
+    color: @icon-color;
+
+    .disabled & {
+      color: @disabled-color;
+    }
+  }
+
+  .image-icon& {
+    /* vertical-align-bottom is necessary to remove the bottom margin of the image */
+    vertical-align: bottom;
+  }
+
+  .with-text& {
+    margin-right: 8px;
+  }
+}
+
+.table-aggregate {
+  overflow: hidden;
+}
+
+.table-aggregate-row {
+  background-color: @table-aggregate-row-background-color;
+}
+
+.table-aggregate-cell {
+  font-weight: bold;
+
+  & > .table-cell-icon {
+    color: @text-color;
+  }
+
+  /* if aggregation is based on selected rows */
+  &.selection,
+  &.selection > .table-cell-icon {
+    color: @table-aggregate-cell-selection-color;
+  }
+}
+
+/* key box */
+
+.table-row > .key-box {
+  top: calc(~'50%' - 17px/2);
+}
+
+.table-controls > .table-control > .key-box {
+  bottom: 4px;
+}
+
+.table .key-box.char {
+  top: calc(~'50%' - 17px/2);
+}

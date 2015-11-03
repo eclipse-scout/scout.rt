@@ -1,0 +1,122 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.file-chooser {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  width: 400px;
+  #scout.drop-shadow-large();
+  border-top: 5px solid @active-color;
+  border-radius: @border-radius;
+
+  & > .file-chooser-content {
+    border: 0 solid @palette-gray-4;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    background-color: @control-background-color;
+    padding: 10px 20px;
+
+    & > .file-chooser-title {
+      margin-right: 30px; /* Leave space for 'x' closable */
+      word-wrap: break-word;
+      #scout.font-text-large();
+      color: @active-color;
+    }
+
+    & > .file-chooser-label {
+      padding-top: @borderless-field-padding-y;
+      padding-bottom: @borderless-field-padding-y;
+    }
+
+    & > .file-chooser-files {
+      @file-list-indent: 20px;
+      position: relative;
+      min-height: 100px;
+      max-height: 100px;
+      border-top: 1px solid @border-color;
+      padding-top: 10px;
+      margin-top: 10px;
+      list-style-type: none;
+      padding-left: @file-list-indent;
+
+      & > .file {
+        text-indent: -@file-list-indent;
+        word-break: break-all;
+
+        &::before {
+          #scout.font-icon();
+          content: @icon-file;
+          float: left;
+          width: @file-list-indent;
+          margin-top: 1px;
+          padding-left: 2px;
+        }
+
+        & > .remove {
+          line-height: 20px; /* override line-height of .menu-item */
+          display: inline;
+          padding-left: @button-padding;
+
+          & > .remove-link {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  & > input[type=file], & > iframe {
+    display: none;
+  }
+
+  & > .closable {
+    position: absolute;
+    right: 5px;
+    margin: 8px;
+    #scout.font-icon();
+    font-size: 17px;
+    cursor: pointer;
+    color: @icon-light-color;
+
+    &::before {
+      content: @icon-remove;
+    }
+
+    &:hover {
+      color: @hover-color;
+    }
+  }
+
+  /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
+  &.calc-helper {
+    top: 0;
+    left: 0;
+  }
+
+  &.shown {
+    #scout.animation-name(fade-slidein-top);
+    #scout.animation-duration(0.5s);
+  }
+
+  &.modality-highlight {
+    #scout.animation-shake();
+  }
+}
+
+.legacy-upload-form {
+
+  & > .legacy-upload-file-input {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    height: @logical-grid-height;
+  }
+}

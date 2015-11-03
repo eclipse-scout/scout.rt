@@ -1,0 +1,53 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+#login-box {
+
+  & input,
+  & button {
+    width: 100%;
+    height: 45px;
+    margin: 15px 0;
+    font-size: 16px;
+  }
+}
+
+#login-button {
+  padding-top: 0;
+
+  & > button {
+    background-color: @default-button-background-color;
+    color: @default-button-color;
+    border-width: 0;
+
+    &.login-error {
+      background-color: @palette-red-4;
+
+      /* Also change color of focus glow */
+      &:focus::before {
+        border-color: @palette-red-4;
+        #scout.glow(@palette-red-4);
+      }
+    }
+  }
+}
+
+#login-button-loading {
+  #scout.animation(rotation 0.9s linear infinite);
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0);
+  border-top-color: @default-button-color;
+  border-left-color: @default-button-color;
+  border-right-color: @default-button-color;
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+}

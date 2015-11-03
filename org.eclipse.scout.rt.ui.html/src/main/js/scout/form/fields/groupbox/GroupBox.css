@@ -1,0 +1,135 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.root-group-box {
+  overflow: hidden;
+}
+
+@root-group-box-padding-left: @bench-margin-x - @mandatory-indicator-width;
+@root-group-box-padding-right: @bench-margin-x;
+
+.root-group-box > .group-box-body,
+.root-group-box > .group-box-title {
+  /* group-box-body may be scrollable. */
+  /* that's why the body has a padding instead of the root-group-box (to place the scrollbars inside the body) */
+  padding-left: @root-group-box-padding-left;
+  padding-right: @root-group-box-padding-right;
+}
+
+.root-group-box > .main-menubar {
+  border-bottom: 3px solid @group-box-title-border-color;
+}
+
+.root-group-box > .group-box-body {
+  & > .scrollbar.y-axis {
+    /* override margin reset from group-box-body (see below) */
+    margin-right: @scrollbar-side-margin;
+  }
+}
+
+.group-box {
+  & > .menubar {
+    margin-left: @mandatory-indicator-width;
+    margin-right: 0;
+  }
+
+  &.collapsed > .menubar {
+    display: none;
+  }
+}
+
+.group-box-title {
+  width: calc(~'100%' - @mandatory-indicator-width);
+  margin-top: @group-margin-top;
+  margin-left: @mandatory-indicator-width;
+  border-bottom: 3px solid @group-box-title-border-color;
+  padding: @group-title-padding-y 0;
+  #scout.overflow-ellipsis-nowrap();
+
+  .group-box.collapsed:not(.with-line) > & {
+    border-bottom-color: transparent;
+  }
+
+  & > .group-box-control {
+    display: inline-block;
+    transition: transform 0.3s;
+    cursor: pointer;
+    /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
+    /* because the control div is higher than the title span */
+    position: absolute;
+    top: @group-margin-top + @group-title-padding-y - 3px;
+    left: @mandatory-indicator-width;
+
+    /* for good animation, ensure that the control is a square and the icon is centered */
+    width: @group-box-control-size;
+    height: @group-box-control-size;
+    line-height: @group-box-control-size;
+    text-align: center;
+
+    &::before {
+      #scout.font-icon();
+      font-size: @group-box-control-size;
+      content: @icon-angle-down;
+
+      .disabled & {
+        color: @text-disabled-color;
+      }
+    }
+    &:hover::before {
+      color: @hover-color;
+
+     .disabled & {
+        color: @text-disabled-color;
+      }
+    }
+
+    .group-box.collapsed > & {
+      /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
+      /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
+      #scout.transform(rotate(-89.99deg));
+    }
+  }
+
+  & > span {
+    #scout.font-text-normal(@font-weight-bold);
+    color: @title-color;
+  }
+
+  &.expandable {
+    /* Expansion can also be performed on the title itself */
+    cursor: pointer;
+  }
+
+  /* Move title span to right when control is rendered */
+  & > .group-box-control ~ span {
+    padding-left: @group-box-control-size + 5px;
+  }
+}
+
+.group-box-body {
+  position: relative;
+  overflow: hidden;
+  padding: @group-margin-top 0 @group-margin-bottom 0;
+
+  &.y-padding-invisible {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .collapsed > & {
+    display: none;
+  }
+
+  /* position scrollbar as right as possible to prevent overlapping field parts. */
+  & > .scrollbar.y-axis {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

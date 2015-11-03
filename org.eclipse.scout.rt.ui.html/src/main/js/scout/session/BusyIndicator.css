@@ -1,0 +1,85 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@color-busyindicator-active: @palette-blue-6;
+@color-busyindicator-border: @palette-gray-4;
+@busyindicator-icon-size: 20px;
+
+.busyindicator {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  max-width: 300px;
+  #scout.drop-shadow-large();
+  border-top: 5px solid @color-busyindicator-active;
+  border-radius: @border-radius;
+
+  /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
+  &.calc-helper {
+    top: 0;
+    left: 0;
+  }
+
+  &.hidden {
+    visibility: hidden;
+  }
+
+  &.shown {
+    #scout.animation-name(fadeIn);
+    #scout.animation-duration(0.5s);
+  }
+
+  &.modality-highlight {
+    #scout.animation-shake();
+  }
+}
+
+.busyindicator-content {
+  border-left: 1px solid @color-busyindicator-border;
+  border-right: 1px solid @color-busyindicator-border;
+  background-color: @control-background-color;
+  padding: 26px;
+
+  &.no-buttons {
+    border-bottom: 1px solid @color-busyindicator-border;
+    border-bottom-left-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+  }
+}
+
+.busyindicator-label {
+  display: inline-block;
+  font-weight: bold;
+  margin-left: @busyindicator-icon-size + 10px;
+  text-indent: -(@busyindicator-icon-size + 10px);
+
+  &::before {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    width: @busyindicator-icon-size;
+    height: @busyindicator-icon-size;
+    margin-top: -3px;
+    margin-right: 15px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    border-top-color: @color-busyindicator-active;
+    border-left-color: @color-busyindicator-active;
+    border-right-color: @color-busyindicator-active;
+    #scout.animation(rotation 1.1s linear infinite);
+  }
+
+  &.cancelled::before {
+    border-top-color: transparent;
+    border-left-color: @color-busyindicator-active;
+    border-right-color: @color-busyindicator-active;
+    #scout.animation(rotation-reverse 2.0s linear infinite);
+  }
+}

@@ -1,0 +1,77 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@menubar-height: @logical-grid-height;
+
+.menubar {
+  position: relative;
+  width: 100%;
+  height: @menubar-height;
+  border-bottom: 1px solid @border-color;
+  white-space: nowrap;
+
+  &.bottom {
+    border-top: 1px solid @border-color;
+    border-bottom: 0;
+  }
+
+  & > .menu-item, .menu-separator {
+    /* reset a possible different value (e.g. set by .form-field)
+       which might cause 'display: inline-block' to be ignored for
+       the computed style */
+    position: relative;
+    display: inline-block;
+    height: @menubar-height;
+    line-height: @menubar-height;
+    vertical-align: middle;
+  }
+
+  & > .menu-item {
+
+    &:focus:not(.disabled):not(.menu-button) {
+      text-decoration: underline;
+      color: @focus-color;
+
+      &::before {
+        color: @focus-color;
+      }
+    }
+  }
+
+  & > .menu-separator {
+    margin-top: 4px;
+    height: @logical-grid-height - 12px;
+  }
+}
+
+.main-menubar {
+  margin-left: @bench-margin-x;
+  margin-right: @bench-margin-x;
+  height: 55px;
+  padding-top: 11px;
+
+  & > .menu-item {
+    &.small > .font-icon {
+      font-size: 18px;
+      vertical-align: baseline;
+    }
+    & > .font-icon {
+      font-size: 22px;
+    }
+  }
+
+  & > .menu-item.last {
+    margin-right: 0;
+
+    &.right-aligned {
+      margin-right: 5px;
+    }
+  }
+}
