@@ -549,8 +549,8 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
           .css('height', 0)
           .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
       }
-      $node.addClass('expanded');
     }
+    $node.addClass('expanded');
   } else {
     $node.removeClass('expanded');
 
