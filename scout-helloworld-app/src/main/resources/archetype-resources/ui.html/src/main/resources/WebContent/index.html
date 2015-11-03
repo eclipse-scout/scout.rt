@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>${displayName}</title>
+	<meta name="google" content="notranslate" />
+    <scout:include template="favicon.html" />
+	<scout:stylesheet src="res/scout-module.css" />
+    <scout:script src="res/jquery-all-macro.js" />
+    <scout:script src="res/scout-module.js" />
+    <script>
+      $(document).ready(function() {
+        scout.init({
+          bootstrap: {
+            fonts: ['scoutIcons']
+          },
+          session: {
+            uiUseTaskbarLogo: true
+          }
+        })
+      });
+    </script>
+  </head>
+  <body>
+    <scout:include template="no-script.html" />
+    <div class="scout" data-partid="1"></div>
+  </body>
+</html>

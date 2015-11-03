@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="org.eclipse.scout.hello.world"
+    xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <requiredProperties>
+    <requiredProperty key="javaVersion">
+      <defaultValue>1.8</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="displayName">
+      <defaultValue>My Application</defaultValue>
+    </requiredProperty>
+	<requiredProperty key="scoutAuthPublicKey">
+      <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
+    </requiredProperty>
+	<requiredProperty key="scoutAuthPrivateKey">
+      <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
+    </requiredProperty>
+	<requiredProperty key="scoutAuthPublicKeyDev">
+      <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
+    </requiredProperty>
+	<requiredProperty key="scoutAuthPrivateKeyDev">
+      <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
+    </requiredProperty>
+	<requiredProperty key="userName">
+      <defaultValue>Scout Robot</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+  <modules>
+    <module id="parent" dir="parent" name="parent">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="shared" dir="shared" name="shared">
+      <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+		<fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/test/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/generated/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>**/*.nls</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="server" dir="server" name="server">
+      <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/test/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/test/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="client" dir="client" name="client">
+      <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet packaged="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.gif</include>
+            <include>**/*.png</include>
+          </includes>
+        </fileSet>
+		<fileSet encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/test/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/test/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="server.app.war" dir="server.app.war" name="server.app.war">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/webapp</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+	<module id="server.app.dev" dir="server.app.dev" name="server.app.dev">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+		<fileSet filtered="true" encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>**/*.launch</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/webapp</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="ui.html" dir="ui.html" name="ui.html">
+      <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.css</include>
+            <include>**/*.xml</include>
+            <include>**/*.js</include>
+            <include>**/*.json</include>
+            <include>**/*.html</include>
+          </includes>
+        </fileSet>
+		<fileSet encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.ico</include>
+            <include>**/*.png</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="ui.html.app.war" dir="ui.html.app.war" name="ui.html.app.war">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/webapp</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+	<module id="ui.html.app.dev" dir="ui.html.app.dev" name="ui.html.app.dev">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+		<fileSet filtered="true" encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>**/*.launch</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/webapp</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+  </modules>
+</archetype-descriptor>

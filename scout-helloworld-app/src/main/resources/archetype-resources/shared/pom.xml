@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${groupId}.parent</artifactId>
+    <version>${version}</version>
+	<relativePath>../parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>${groupId}.shared</artifactId>
+  
+  <name>${displayName} Shared</name>
+
+  <dependencies>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.shared</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
+	  <scope>test</scope>
+    </dependency>
+	<dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+	  <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+	  <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+</project>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>maven_rt_plugin_config-master</artifactId>
+    <version>1.5</version>
+	<relativePath></relativePath>
+  </parent>
+
+  <groupId>${groupId}</groupId>
+  <artifactId>${groupId}.parent</artifactId>
+  <version>${version}</version>
+  <packaging>pom</packaging>
+  
+  <name>${displayName} Parent Module</name>
+
+  <properties>
+    <${groupId}.version>${project.version}</${groupId}.version>
+  	<jdk.source.version>${javaVersion}</jdk.source.version>
+  	<scout.version>5.2.0.B001</scout.version>
+  </properties>
+  
+  <modules>
+    <module>../shared</module>
+    <module>../server</module>
+    <module>../client</module>
+    <module>../server.app.war</module>
+    <module>../ui.html</module>
+    <module>../ui.html.app.war</module>
+  </modules>
+
+  <dependencyManagement>
+  	<dependencies>
+	  <!-- Scout Dependencies -->
+	  <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt</artifactId>
+        <version>${scout.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+	  <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
+        <version>${scout.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+	  
+	  <!-- Application Dependencies -->
+	  <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>${groupId}.client</artifactId>
+        <version>${${groupId}.version}</version>
+      </dependency>
+	  <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>${groupId}.shared</artifactId>
+        <version>${${groupId}.version}</version>
+      </dependency>
+	  <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>${groupId}.server</artifactId>
+        <version>${${groupId}.version}</version>
+      </dependency>
+	  <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>${groupId}.ui.html</artifactId>
+        <version>${${groupId}.version}</version>
+      </dependency>
+  	</dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sources>
+                <source>src/main/webapp</source>
+				<source>src/generated/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>

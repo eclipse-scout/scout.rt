@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${groupId}.parent</artifactId>
+    <version>${version}</version>
+	<relativePath>../parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>${groupId}.server</artifactId>
+  
+  <name>${displayName} Server</name>
+
+  <dependencies>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.server</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+    </dependency>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${groupId}.shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server.test</artifactId>
+	  <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+  </dependencies>
+</project>
