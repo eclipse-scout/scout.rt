@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.job.IRunContextProvider;
-import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 
 /**
  * There are 2 variants to use lookup values <br>
@@ -61,7 +60,6 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   private static final long serialVersionUID = 0L;
 
   private KEY_TYPE m_key;
-  @MaxLength(2000)
   private String m_text;
   private String m_all;
   private KEY_TYPE m_rec;
