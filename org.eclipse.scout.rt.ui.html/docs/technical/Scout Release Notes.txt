@@ -286,6 +286,14 @@ ILabelField, IHtmlField and IStringField are now IHtmlCapable
 AWE 01.05.2015
 Removed get/setColor() from ICalenderItem, replaced with get/setCssClass().
 
+CGU 28.05.2015
+Added ITable#rowIconVisible to control whether the row icon is visible or not.
+If set to true the gui creates a column which contains the row icons. The column has a fixed width, is not moveable
+and always the first column (resp. the second if the table is checkable). The column is not available in the model.
+If you need other settings or if you need the icon at another column position, you cannot use the row icons.
+Instead you have to create a column and use {@link Cell#setIconId(String)} to set the icons on it's cells.
+Migration: If you used ITableRow#setIconId or AbstractTable#getConfiguredDefaultIconId and still want the icons to be visible, you have to set getConfiguredRowIconVisible to true
+
 AWE 02.06.2015
 Moved get/setExternalKey() from ICalendarAppointment to base class ICalenderItem.
 Removed decorateCell/-Internal method from AbstractCalendarItemProvider
