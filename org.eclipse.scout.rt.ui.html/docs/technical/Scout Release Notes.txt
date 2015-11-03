@@ -531,6 +531,11 @@ The ui sends the filtered rows to the ui server to update its table state so tha
 This rowsFiltered event leads to a creation of UserTableRowFilter which contains the filtered rows. This is the only active filter on a table.
 The filters managed by TableUserFilterManager are actually only filter states and are not added to the table.
 
+CGU 21.09.2015
+Tree: Nodes may now be expanded in a lazy way. This means only those child nodes are visible which are expanded as well and the parent gets a '+' symbol.
+If the user clicks on this symbol all child nodes gets visible
+Migration: none
+
 ASA 24.09.2015
 Removed IToolButton from Form. Therefore IToolButtons can not be added anymore as an extension to Forms.
 --> Instead IToolButton can be defined inside the MainBox of a Form. (IToolButton now is a IMenu and adding Menus to a GroupBoxes as
@@ -549,6 +554,18 @@ Replacement: if return value was false, override computeTableEmptySpaceMenus and
 SME 14.10.2015
 Removed getConfiguredShowTableRowMenus
 Replacement: none (no functionality was provided)
+
+CGU 27.10.2015
+Renamed package imagebox to imagefield due to consistency reason
+Migration: Fix the imports (e.g. by using ctrl-shift-o)
+
+CGU 27.10.2015
+Removed html editor support on html field.
+Migration: If you used a html editor you can create a custom field an include an existing html editor.
+
+CGU 27.10.2015
+Removed chart box because it has not been used and there is no ui implementation.
+Migration: none
 
 ASA 20.10.2015
 Behavior change of Table in AbstractTableField:
@@ -591,3 +608,11 @@ New code:
       // more custom modifications
     }
   }
+
+CGU/MOT 03.11.2015
+Added IColumn#uiSortPossible
+Sorting of table data is done by the ui whenever possible.
+This has the advantage, that it is faster, that less data is transferred and that it works in offline mode.
+The drawback is that it is not possible in every case. Example: If an invisible column has alwaysSortAtBegin set to true, the sorting is delegated to the model.
+Furthermore smartcolumns can not be sorted by the ui because the value is not known.
+Migration: If you implemented custom sorting (e.g. by overriding AbstractColumn#compareTableRows), you have to set getConfiguredUiSortPossible to false
