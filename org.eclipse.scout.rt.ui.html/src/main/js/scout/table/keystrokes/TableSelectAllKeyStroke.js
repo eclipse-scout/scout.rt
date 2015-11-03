@@ -22,9 +22,13 @@ scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);
 
 scout.TableSelectAllKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TableSelectAllKeyStroke.parent.prototype._accept.call(this, event);
-  return accepted && this.field.rows.length !== this.field.selectedRows.length;
+  return accepted ;
 };
 
 scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
-  this.field.selectAll();
+  if(this.field.filteredRows().length===this.field.selectedRows.length){
+    this.field.clearSelection();
+  }else{
+    this.field.selectAll();
+  }
 };
