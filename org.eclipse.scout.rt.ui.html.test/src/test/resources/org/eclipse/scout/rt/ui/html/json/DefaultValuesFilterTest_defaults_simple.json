@@ -23,6 +23,17 @@
     "Cell": {
       "horizontalAlignment": -1,
       "editable": false
+    },
+    "Chart": {
+      "chartData": {},
+      "axisData": {
+        "xAxis": {
+          "label": ""
+        },
+        "yAxis": {
+          "label": ""
+        }
+      }
     }
   },
   "objectTypeHierarchy": {

@@ -60,6 +60,17 @@ describe("scout.defaultValues", function() {
           },
           "NumberField": {
             "alignment": 1
+          },
+          "Chart": {
+            "chartData": {},
+            "axisData": {
+              "xAxis": {
+                "label": ""
+              },
+              "yAxis": {
+                "label": ""
+              }
+            }
           }
         },
         "objectTypeHierarchy": {
@@ -97,6 +108,45 @@ describe("scout.defaultValues", function() {
         "gridData": {
           y: 5
         }
+      }, { // [6]
+        "id": "7",
+        "objectType": "Chart",
+        "enabled": false,
+        "chartData": {
+          "value": 2
+        }
+      }, { // [7]
+        "id": "8",
+        "objectType": "Chart",
+        "enabled": true
+      }, { // [8]
+        "id": "9",
+        "objectType": "Chart",
+        "enabled": true,
+        "chartData": "none"
+      }, { // [9]
+        "id": "10",
+        "objectType": "Chart",
+        "axisData": {
+          "yAxis": {
+            "label": "non-default"
+          }
+        }
+      }, { // [10]
+        "id": "11",
+        "objectType": "Chart",
+        "axisData": [{
+          "yAxis": {
+            "label": "non-default"
+          }
+        }, {}, {}]
+      }, { // [11]
+        "id": "12",
+        "objectType": "Chart",
+        "axisData": []
+      }, { // [12]
+        "id": "13",
+        "objectType": "Chart"
       }];
       scout.defaultValues.applyTo(testObjects);
 
@@ -110,6 +160,21 @@ describe("scout.defaultValues", function() {
       expect(testObjects[4].gridData).toBe('77');
       expect(testObjects[5].gridData.x).toBe(0);
       expect(testObjects[5].gridData.y).toBe(5);
+      expect(testObjects[6].chartData.value).toBe(2);
+      expect(testObjects[7].chartData).toEqual({});
+      expect(testObjects[8].chartData).toBe("none");
+      expect(testObjects[9].axisData.xAxis.label).toBe("");
+      expect(testObjects[9].axisData.yAxis.label).toBe("non-default");
+      expect(testObjects[10].axisData.length).toBe(3);
+      expect(testObjects[10].axisData[0].xAxis.label).toBe("");
+      expect(testObjects[10].axisData[0].yAxis.label).toBe("non-default");
+      expect(testObjects[10].axisData[1].xAxis.label).toBe("");
+      expect(testObjects[10].axisData[1].yAxis.label).toBe("");
+      expect(testObjects[10].axisData[2].xAxis.label).toBe("");
+      expect(testObjects[10].axisData[2].yAxis.label).toBe("");
+      expect(testObjects[11].axisData.length).toBe(0);
+      expect(testObjects[12].axisData.xAxis.label).toBe("");
+      expect(testObjects[12].axisData.yAxis.label).toBe("");
     });
 
     it("can apply default values to JSON considering the model variant", function() {

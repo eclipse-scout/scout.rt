@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,17 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.service.IService;
-import org.json.JSONObject;
+import java.net.URL;
 
-public interface IDefaultValuesFilterService extends IService {
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.ui.html.ResourceBase;
 
-  void filter(JSONObject json);
+/**
+ * @since 5.2
+ */
+@Order(-500) // TODO ABR Adjust to new order ranges
+public class DefaultValuesConfigurationContributor implements IDefaultValuesConfigurationContributor {
 
-  void filter(JSONObject json, String objectType);
-
-  String getCombinedDefaultValuesConfiguration();
-
-  BinaryResource getCombinedDefaultValuesConfigurationFile(String targetFilename);
+  @Override
+  public URL contributeDefaultValuesConfigurationUrl() {
+    return ResourceBase.class.getResource("json/defaultValues.json");
+  }
 }

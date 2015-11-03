@@ -22,12 +22,16 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.rt.platform.Bean;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+@Bean
 public class DefaultValuesFilter {
 
-  private final long m_lastModified;
+  public static final String PROP_DEFAULTS = "defaults";
+  public static final String PROP_OBJECT_TYPE_HIERARCHY = "objectTypeHierarchy";
+
   /**
    * Map holding the defaults object for a given object type from the configuration file.
    * <p>
@@ -43,17 +47,23 @@ public class DefaultValuesFilter {
    */
   private final Map<String, List<String>> m_objectTypeHierarchyFlat = new HashMap<>();
 
-  public DefaultValuesFilter(long lastModified, JSONObject jsonDefaults, JSONObject jsonObjectTypeHierarchy) {
-    m_lastModified = lastModified;
-    loadDefaults(jsonDefaults);
-    loadObjectTypeHierarchy(jsonObjectTypeHierarchy);
+  /**
+   * @param defaultValuesConfiguration
+   *          a {@link JSONObject} with two properties: {@value #PROP_DEFAULTS} and {@value #PROP_OBJECT_TYPE_HIERARCHY}
+   */
+  public void importConfiguration(JSONObject defaultValuesConfiguration) {
+    if (defaultValuesConfiguration == null) {
+      return;
+    }
+    importConfiguration(defaultValuesConfiguration.optJSONObject(PROP_DEFAULTS), defaultValuesConfiguration.optJSONObject(PROP_OBJECT_TYPE_HIERARCHY));
   }
 
-  public long lastModified() {
-    return m_lastModified;
+  public void importConfiguration(JSONObject jsonDefaults, JSONObject jsonObjectTypeHierarchy) {
+    importDefaults(jsonDefaults);
+    importObjectTypeHierarchy(jsonObjectTypeHierarchy);
   }
 
-  protected void loadDefaults(JSONObject jsonDefaults) {
+  protected void importDefaults(JSONObject jsonDefaults) {
     if (jsonDefaults == null) {
       return;
     }
@@ -69,12 +79,20 @@ public class DefaultValuesFilter {
           propMap = new HashMap<>();
           m_defaults.put(type, propMap);
         }
-        propMap.put(prop, value);
+        Object oldValue = propMap.get(prop);
+        if (value instanceof JSONObject && oldValue instanceof JSONObject) {
+          // Combine
+          JsonObjectUtility.mergeProperties((JSONObject) oldValue, (JSONObject) value);
+        }
+        else {
+          // Override (cannot be combined)
+          propMap.put(prop, value);
+        }
       }
     }
   }
 
-  protected void loadObjectTypeHierarchy(JSONObject jsonObjectTypeHierarchy) {
+  protected void importObjectTypeHierarchy(JSONObject jsonObjectTypeHierarchy) {
     // Generate hierarchy from configuration file
     generateObjectTypeHierarchyRec(jsonObjectTypeHierarchy, null, m_objectTypeHierarchyFlat);
 
@@ -109,8 +127,9 @@ public class DefaultValuesFilter {
       }
 
       // Store current result
-      if (targetMap.containsKey(objectType)) {
-        throw new IllegalStateException("Object type '" + objectType + "' has ambiguous parent object types.");
+      List<String> existingParentObjectTypes = targetMap.get(objectType);
+      if (existingParentObjectTypes != null) {
+        throw new IllegalStateException("Object type '" + objectType + "' has ambiguous parent object types: [" + CollectionUtility.format(existingParentObjectTypes) + "] vs. [" + CollectionUtility.format(newParentObjectTypes) + "]");
       }
       targetMap.put(objectType, newParentObjectTypes);
     }
@@ -161,8 +180,7 @@ public class DefaultValuesFilter {
     // Try to find a default value until one is found or there are no more parent types to check
     Map<String, Object> properties = m_defaults.get(objectType);
     Object defaultValue = (properties == null ? null : properties.get(propertyName));
-
-    return (isValueEqualToDefaultValue(propertyValue, defaultValue));
+    return isValueEqualToDefaultValue(propertyValue, defaultValue);
   }
 
   protected boolean isValueEqualToDefaultValue(Object value, Object defaultValue) {
@@ -175,8 +193,16 @@ public class DefaultValuesFilter {
     }
     if (defaultValue instanceof JSONObject) {
       if (value instanceof JSONObject) {
+        JSONObject jsonValue = (JSONObject) value;
+        JSONObject jsonDefaultValue = (JSONObject) defaultValue;
         // Special case: The property cannot be removed, but maybe  we can remove some of the objects attributes
-        filterDefaultObject((JSONObject) value, (JSONObject) defaultValue);
+        return filterDefaultObject(jsonValue, jsonDefaultValue);
+      }
+      if (value instanceof JSONArray) {
+        JSONArray jsonValue = (JSONArray) value;
+        JSONObject jsonDefaultValue = (JSONObject) defaultValue;
+        // Special case: Apply default value object to each element in the array
+        filterDefaultObject(jsonValue, jsonDefaultValue);
       }
       return false;
     }
@@ -204,7 +230,15 @@ public class DefaultValuesFilter {
     return CompareUtility.equals(value, defaultValue);
   }
 
-  protected void filterDefaultObject(JSONObject valueObject, JSONObject defaultValueObject) {
+  /**
+   * Removes all properties from "valueObject" where the value matches the corresponding value in "defaultValueObject".
+   *
+   * @return <code>true</code> of the two objects are completely equal and no properties remain in "valueObject". This
+   *         means that the valueObject itself MAY be removed. Return value <code>false</code> means that not all
+   *         properties are equal (but nevertheless, some properties may have been removed from valueObject).
+   */
+  protected boolean filterDefaultObject(JSONObject valueObject, JSONObject defaultValueObject) {
+    boolean sameKeys = CollectionUtility.equalsCollection(valueObject.keySet(), defaultValueObject.keySet());
     for (Iterator it = valueObject.keys(); it.hasNext();) {
       String prop = (String) it.next();
       Object subValue = valueObject.opt(prop);
@@ -212,6 +246,35 @@ public class DefaultValuesFilter {
       if (isValueEqualToDefaultValue(subValue, subDefaultValue)) {
         // Property value value is equal to the static default value -> remove the property
         it.remove();
+      }
+    }
+    // Even more special case: If valueObject is now empty and it used to have the same keys as
+    // the defaultValueObject, it is considered equal to the default value and MAY be removed.
+    if (valueObject.length() == 0 && sameKeys) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Filters the given default values from all {@link JSONObject}s in the "valueArray". If the array contains more
+   * arrays, the method is called recursively on those arrays. Otherwise, nothing is filtered. If an element is
+   * completely equal to the defaultValueObject it is <b>not</b> removed, i.e. an empty object remains at this position
+   * in the array. Otherwise, we could not restore the object later.
+   */
+  protected void filterDefaultObject(JSONArray valueArray, JSONObject defaultValueObject) {
+    for (int i = 0; i < valueArray.length(); i++) {
+      Object value = valueArray.opt(i);
+      // Can only filter
+      if (value instanceof JSONObject) {
+        JSONObject jsonValue = (JSONObject) value;
+        // Filter, but ignore return value. Element in the array must never be removed,
+        // otherwise we could not restore it later.
+        filterDefaultObject(jsonValue, defaultValueObject);
+      }
+      else if (value instanceof JSONArray) {
+        JSONArray jsonArray = (JSONArray) value;
+        filterDefaultObject(jsonArray, defaultValueObject);
       }
     }
   }

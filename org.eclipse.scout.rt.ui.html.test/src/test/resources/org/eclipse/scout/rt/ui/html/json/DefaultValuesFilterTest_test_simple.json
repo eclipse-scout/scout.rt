@@ -56,6 +56,66 @@
         "x": -1,
         "y": 2
       }
+    },
+    {
+      "id": "7",
+      "objectType": "Chart",
+      "enabled": false,
+      "chartData": {
+        "value": 2
+      }
+    },
+    {
+      "id": "8",
+      "objectType": "Chart",
+      "enabled": true,
+      "chartData": {
+      }
+    },
+    {
+      "id": "9",
+      "objectType": "Chart",
+      "enabled": true,
+      "chartData": "none"
+    },
+    {
+      "id": "10",
+      "objectType": "Chart",
+      "axisData": {
+        "xAxis": {
+          "label": ""
+        },
+        "yAxis": {
+          "label": "non-default"
+        }
+      }
+    },
+    {
+      "id": "11",
+      "objectType": "Chart",
+      "axisData": [
+        {
+          "xAxis": {
+            "label": ""
+          },
+          "yAxis": {
+            "label": "non-default"
+          }
+        },
+        {
+          "xAxis": {
+            "label": ""
+          }
+        },
+        {
+          "xAxis": {
+            "label": ""
+          },
+          "yAxis": {
+            "label": ""
+          }
+        }
+      ]
     }
   ]
 }

@@ -12,15 +12,18 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DefaultValuesFilterService implements IDefaultValuesFilterService {
@@ -29,7 +32,9 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
   private static final long FILE_UPDATE_CHECK_INTERVAL = 1234; // in milliseconds (only used in dev mode)
 
   private DefaultValuesFilter m_filter;
-  private long m_lastCheckForFileUpdate; // timestamp in milliseconds (only used in dev mode)
+  private long m_lastModified = -1;
+  private long m_lastCheckForFileUpdate = -1; // timestamp in milliseconds (only used in dev mode)
+  private String m_combinedDefaultValuesConfiguration = null;
 
   public DefaultValuesFilterService() {
   }
@@ -64,12 +69,15 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
     }
   }
 
-  protected URL getDefaultValuesJsonUrl() {
-    return BEANS.get(IWebContentService.class).getWebContentResource("res/defaultValues.json");
-  }
-
-  protected DefaultValuesFilter createDefaultValuesFilter(long lastModified, JSONObject defaultValuesConfig) throws JSONException {
-    return new DefaultValuesFilter(lastModified, defaultValuesConfig.getJSONObject("defaults"), defaultValuesConfig.getJSONObject("objectTypeHierarchy"));
+  protected List<URL> getDefaultValuesConfigurationUrls() {
+    List<URL> urls = new ArrayList<>();
+    for (IDefaultValuesConfigurationContributor contributor : BEANS.all(IDefaultValuesConfigurationContributor.class)) {
+      URL url = contributor.contributeDefaultValuesConfigurationUrl();
+      if (url != null) {
+        urls.add(url);
+      }
+    }
+    return urls;
   }
 
   protected void ensureLoaded() {
@@ -78,17 +86,20 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
       long time = System.currentTimeMillis();
       if (time - m_lastCheckForFileUpdate > FILE_UPDATE_CHECK_INTERVAL) {
         m_lastCheckForFileUpdate = time;
-        URL url = getDefaultValuesJsonUrl();
-        try {
-          URLConnection conn = url.openConnection();
-          long lastModified = conn.getLastModified();
-          if (lastModified != filter.lastModified()) {
-            LOG.info("Detected modification in " + url);
-            loadFilter();
+        List<URL> urls = getDefaultValuesConfigurationUrls();
+        for (URL url : urls) {
+          try {
+            URLConnection conn = url.openConnection();
+            long lastModified = conn.getLastModified();
+            if (lastModified > m_lastModified) {
+              LOG.info("Detected modification in " + url);
+              loadFilter();
+              break;
+            }
           }
-        }
-        catch (Exception e) {
-          LOG.warn("Error while checking for file modification of " + url, e);
+          catch (Exception e) {
+            LOG.warn("Error while checking for file modification of " + url, e);
+          }
         }
       }
     }
@@ -100,16 +111,53 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
 
   protected synchronized void loadFilter() {
     try {
-      URL url = getDefaultValuesJsonUrl();
-      URLConnection conn = url.openConnection();
-      long lastModified = conn.getLastModified();
-      String jsonData = IOUtility.getContentUtf8(conn.getInputStream());
-      jsonData = JsonUtility.stripCommentsFromJson(jsonData);
-      JSONObject json = new JSONObject(jsonData);
-      m_filter = createDefaultValuesFilter(lastModified, json);
+      // Build a list of default values configs
+      List<URL> urls = getDefaultValuesConfigurationUrls();
+      long newestModified = 0;
+      List<JSONObject> defaultValuesConfigurations = new ArrayList<JSONObject>();
+      for (URL url : urls) {
+        URLConnection conn = url.openConnection();
+        long lastModified = conn.getLastModified();
+        if (lastModified > newestModified) {
+          newestModified = lastModified;
+        }
+        String jsonData = IOUtility.getContentUtf8(conn.getInputStream());
+        jsonData = JsonUtility.stripCommentsFromJson(jsonData);
+        JSONObject json = new JSONObject(jsonData);
+        defaultValuesConfigurations.add(json);
+      }
+      m_lastModified = newestModified;
+
+      // Combine configs into "defaults" and "objectTypeHierarchy"
+      JSONObject combinedDefaultValuesConfiguration = new JSONObject();
+      for (JSONObject defaultValuesConfiguration : defaultValuesConfigurations) {
+        JsonObjectUtility.mergeProperties(combinedDefaultValuesConfiguration, defaultValuesConfiguration);
+      }
+
+      // Build combined string (suitable to send to UI)
+      m_combinedDefaultValuesConfiguration = JsonObjectUtility.toString(combinedDefaultValuesConfiguration);
+
+      // Build filter
+      DefaultValuesFilter filter = BEANS.get(DefaultValuesFilter.class);
+      filter.importConfiguration(combinedDefaultValuesConfiguration);
+      m_filter = filter;
     }
     catch (Exception e) {
       throw new ProcessingException("Unexpected error while initializing default values filter", e);
     }
+  }
+
+  @Override
+  public synchronized String getCombinedDefaultValuesConfiguration() {
+    ensureLoaded();
+    return m_combinedDefaultValuesConfiguration;
+  }
+
+  @Override
+  public synchronized BinaryResource getCombinedDefaultValuesConfigurationFile(String targetFilename) {
+    ensureLoaded();
+    byte[] content = (m_combinedDefaultValuesConfiguration == null ? null : m_combinedDefaultValuesConfiguration.getBytes(StandardCharsets.UTF_8));
+    BinaryResource res = new BinaryResource(targetFilename, FileUtility.getContentTypeForExtension("json"), content, m_lastModified);
+    return res;
   }
 }

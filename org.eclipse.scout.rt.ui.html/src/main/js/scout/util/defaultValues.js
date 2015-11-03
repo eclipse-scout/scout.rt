@@ -29,7 +29,7 @@ scout.defaultValues = {
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8',
       cache: true,
-      url: 'res/defaultValues.json',
+      url: 'defaultValues',
       data: ''
     }).done(function(data) {
       that._loadDefaultsConfiguration(data);
@@ -128,8 +128,18 @@ scout.defaultValues = {
       }
       // Special case: "default objects". If the property value is an object and default
       // value is also an object, extend the property value instead of replacing it.
-      else if (scout.objects.isPlainObject(object) && scout.objects.isPlainObject(defaults[prop])) {
+      else if (scout.objects.isPlainObject(object[prop]) && scout.objects.isPlainObject(defaults[prop])) {
         this._extendWithDefaults(object[prop], defaults[prop]);
+      }
+      // Special case: "array of default objects": If the property value is an array of objects and
+      // the default value is an object, extend each object in the array with the default value.
+      else if (Array.isArray(object[prop]) && scout.objects.isPlainObject(defaults[prop])) {
+        var objectArray = object[prop];
+        for (var i = 0; i < objectArray.length; i++) {
+          if (scout.objects.isPlainObject(objectArray[i])) {
+            this._extendWithDefaults(objectArray[i], defaults[prop]);
+          }
+        }
       }
     }
   }

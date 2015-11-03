@@ -29,7 +29,7 @@ public class DefaultValuesFilterTest {
 
   @Test
   public void testDefaultValueFilter_nullSafe() {
-    DefaultValuesFilter filter = new DefaultValuesFilter(0L, null, null);
+    DefaultValuesFilter filter = new DefaultValuesFilter();
     filter.filter(null);
   }
 
@@ -37,9 +37,8 @@ public class DefaultValuesFilterTest {
   public void testDefaultValueFilter_simple() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_simple.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
-    DefaultValuesFilter filter = new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
+    DefaultValuesFilter filter = new DefaultValuesFilter();
+    filter.importConfiguration(jsonDefaultValueConfiguration);
 
     // Load test data and apply filter
     JSONObject jsonToFilter = readJsonFile("json/DefaultValuesFilterTest_test_simple.json");
@@ -81,15 +80,39 @@ public class DefaultValuesFilterTest {
 
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(5)).opt("multiline"));
     assertEquals(Boolean.FALSE, ((JSONObject) adapterData.get(5)).opt("enabled"));
+
+    assertEquals(Boolean.FALSE, ((JSONObject) adapterData.get(6)).opt("enabled"));
+    JSONObject chartData = ((JSONObject) adapterData.get(6)).optJSONObject("chartData");
+    assertEquals(2, chartData.opt("value"));
+
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(7)).opt("enabled"));
+    assertEquals(null, ((JSONObject) adapterData.get(7)).opt("chartData"));
+
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(8)).opt("enabled"));
+    assertEquals("none", ((JSONObject) adapterData.get(8)).opt("chartData"));
+
+    assertEquals(null, ((JSONObject) adapterData.get(9)).opt("enabled"));
+    assertEquals(null, ((JSONObject) adapterData.get(9)).opt("chartData"));
+    JSONObject axisData = ((JSONObject) adapterData.get(9)).optJSONObject("axisData");
+    assertEquals(null, axisData.opt("xAxis"));
+    JSONObject yAxis = axisData.optJSONObject("yAxis");
+    assertEquals("non-default", yAxis.opt("label"));
+
+    JSONArray axisDataArray = ((JSONObject) adapterData.get(10)).optJSONArray("axisData");
+    assertEquals(3, axisDataArray.length());
+    assertEquals(null, axisDataArray.getJSONObject(0).opt("xAxis"));
+    yAxis = axisDataArray.getJSONObject(0).optJSONObject("yAxis");
+    assertEquals("non-default", yAxis.opt("label"));
+    assertEquals(0, axisDataArray.getJSONObject(1).length());
+    assertEquals(0, axisDataArray.getJSONObject(2).length());
   }
 
   @Test
   public void testDefaultValueFilter_variant() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_variant.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
-    DefaultValuesFilter filter = new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
+    DefaultValuesFilter filter = new DefaultValuesFilter();
+    filter.importConfiguration(jsonDefaultValueConfiguration);
 
     // Load test data and apply filter
     JSONObject jsonToFilter = readJsonFile("json/DefaultValuesFilterTest_test_variant.json");
@@ -120,9 +143,8 @@ public class DefaultValuesFilterTest {
   public void testDefaultValueFilter_lists() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_lists.json");
-    JSONObject jsonDefaults = jsonDefaultValueConfiguration.optJSONObject("defaults");
-    JSONObject jsonObjectTypeHierarchy = jsonDefaultValueConfiguration.optJSONObject("objectTypeHierarchy");
-    DefaultValuesFilter filter = new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
+    DefaultValuesFilter filter = new DefaultValuesFilter();
+    filter.importConfiguration(jsonDefaultValueConfiguration);
 
     // Load test data and apply filter
     JSONObject jsonToFilter = readJsonFile("json/DefaultValuesFilterTest_test_lists.json");
@@ -154,17 +176,15 @@ public class DefaultValuesFilterTest {
   public void testDefaultValueFilter_illegalHierarchy() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_illegalHierarchy.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
-    new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
+    DefaultValuesFilter filter = new DefaultValuesFilter();
+    filter.importConfiguration(jsonDefaultValueConfiguration);
   }
 
   @Test(expected = IllegalStateException.class)
   public void testDefaultValueFilter_loopHierarchy() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_loopHierarchy.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
-    new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
+    DefaultValuesFilter filter = new DefaultValuesFilter();
+    filter.importConfiguration(jsonDefaultValueConfiguration);
   }
 }

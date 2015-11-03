@@ -16,6 +16,7 @@
       "keyStrokes": [],
       "labelVisible": true,
       "labelPosition": 0,
+      "loading": false,
       "mandatory": false,
       "statusVisible": true,
       "menus": [],
@@ -64,7 +65,8 @@
       "processButton": true,
       "selected": false,
       "displayStyle": 0,
-      "KeyStroke": null
+      "keyStroke": null,
+      "statusVisible": false
     },
     "GroupBox": {
       "borderDecoration": "auto",
@@ -103,9 +105,6 @@
       "inputMasked": false,
       "multilineText": false,
       "updateDisplayTextOnModify": false
-    },
-    "TileContainerBox": {
-      "tiles": [] // TODO remove all tile definitions and move to separate json file
     },
     "DateField": {
       "hasDate": true,
@@ -224,35 +223,26 @@
       },
       "BrowserField": null,
       "GroupBox": {
-        "TabItem": null,
-        "TileContainerBox": null
+        "TabItem": null
       },
       "ImageField": null,
       "ListBox": null,
-      "OfficeOnlineField": null,
       "PlaceholderField": null,
       "PlannerField": null,
       "SequenceBox": null,
       "SplitBox": null,
       "TabBox": null,
       "TableField": null,
-      "TagCloudField": null,
       "TreeField": null,
       "TreeBox": null,
-      "TilePlaceholder": null,
-      "TileButton": {
-        "PageTileButton": null
-      },
       "ValueField": {
         "CheckBoxField": null,
         "CalendarField": null,
         "DateField": null,
         "FileChooserField": null,
-        "GraphField": null,
         "HtmlField": null,
         "LabelField": null,
         "NumberField": null,
-        "RichTextField": null,
         "SmartField": {
           "SmartFieldMultiline": null
         },
@@ -269,12 +259,7 @@
         "TableOrganizeMenu": null
       },
       "OutlineViewButton": null,
-      "TableControl": {
-        "AnalysisTableControl": null,
-        "ChartTableControl": null,
-        "GraphTableControl": null,
-        "MapTableControl": null
-      }
+      "TableControl": null
     },
     "Tree": {
       "Outline": {

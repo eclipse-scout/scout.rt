@@ -45,6 +45,9 @@ public class DefaultResourceLoaderFactory implements IResourceLoaderFactory {
     if (resourcePath.endsWith(".html")) {
       return new HtmlFileLoader(req, getScriptProcessor());
     }
+    if (resourcePath.matches("^/defaultValues$")) {
+      return new DefaultValuesLoader(req);
+    }
     if (resourcePath.endsWith(".json")) {
       return new JsonFileLoader(req);
     }

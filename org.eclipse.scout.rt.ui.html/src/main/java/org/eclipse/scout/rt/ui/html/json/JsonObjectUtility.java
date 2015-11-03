@@ -22,19 +22,26 @@ import java.util.NoSuchElementException;
 
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class JsonObjectUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonObjectUtility.class);
 
   private JsonObjectUtility() {
     // static access only
   }
 
+  /**
+   * @return never <code>null</code>
+   */
   public static String[] getNames(JSONObject source) {
     if (source == null || source.length() == 0) {
-      return null;
+      return new String[0];
     }
     String[] names = new String[source.length()];
     int i = 0;
@@ -46,29 +53,71 @@ public final class JsonObjectUtility {
   }
 
   /**
-   * Puts every property from source to json.
+   * Puts every property from source to target.
    *
-   * @param json
+   * @param target
    *          target object
    * @param source
    *          source object
    */
-  public static void putProperties(JSONObject json, JSONObject source) {
-    if (json == null || source == null) {
+  public static void putProperties(JSONObject target, JSONObject source) {
+    if (target == null || source == null) {
       return;
     }
-    String[] names = getNames(source);
-    if (names == null) {
+    for (String prop : getNames(source)) {
+      target.put(prop, source.opt(prop));
+    }
+  }
+
+  /**
+   * Puts every property from source to target. If a property exists in both objects and both values are of type
+   * {@link JSONObject}, the method is called recursively on those two objects.
+   *
+   * @param target
+   *          target object
+   * @param source
+   *          source object
+   */
+  public static void mergeProperties(JSONObject target, JSONObject source) {
+    if (target == null || source == null) {
       return;
     }
-    for (String name : names) {
-      json.put(name, source.opt(name));
+    for (String prop : getNames(source)) {
+      Object newValue = source.opt(prop);
+      Object oldValue = target.opt(prop);
+      if (newValue instanceof JSONObject && oldValue instanceof JSONObject) {
+        // Merge recusively
+        mergeProperties((JSONObject) oldValue, (JSONObject) newValue);
+      }
+      else {
+        // Override (values are incompatible, cannot be merged)
+        target.put(prop, newValue);
+      }
     }
   }
 
   // TODO BSH Remove this method
   public static JSONObject newOrderedJSONObject() {
     return new JSONObject();
+  }
+
+  /**
+   * Returns the given JSON object as formatted string with indent 2. <code>null</code> is returned as
+   * <code>"null"</code>.
+   */
+  public static String toString(JSONObject json) {
+    if (json == null) {
+      return "null";
+    }
+    try {
+      return json.toString(2);
+    }
+    catch (JSONException e) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Unexpected error while converting JSON to string", e);
+      }
+      return json.toString();
+    }
   }
 
   public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
