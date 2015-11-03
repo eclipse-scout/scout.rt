@@ -212,13 +212,13 @@ scout.graphics = {
 
   debugOutput: function($comp) {
     if (!$comp) {
-      return 'undefined';
+      return '$comp is undefined';
     }
     if (!($comp instanceof jQuery)) {
       $comp = $($comp);
     }
     if ($comp.length === 0) {
-      return '$()';
+      return '$comp doesn\t match any elements';
     }
     var attrs = '';
     if ($comp.attr('id')) {

@@ -39,10 +39,6 @@ scout.PopupWindow.prototype._onReady = function() {
 
   this.$container.height(600);
 
-  // in case window has been reloaded
-  if (this.form.rendered) {
-    this.form.remove();
-  }
   this.form.render(this.$container);
   this.form.htmlComp.validateLayout();
 };
