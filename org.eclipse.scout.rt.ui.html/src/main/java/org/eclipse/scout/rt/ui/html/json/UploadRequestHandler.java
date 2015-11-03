@@ -51,7 +51,7 @@ import org.json.JSONObject;
 /**
  * This handler contributes to the {@link UiServlet} as the POST handler for /upload
  */
-@Order(30)
+@Order(5030)
 public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestHandler.class);
 

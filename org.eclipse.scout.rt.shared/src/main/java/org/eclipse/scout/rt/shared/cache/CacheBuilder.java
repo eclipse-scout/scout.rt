@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 /**
  * @since 5.2
  */
-@Order(100)
+@Order(5100)
 public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   // list containing created cache instances

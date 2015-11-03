@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.shared.cache.ICache;
 /**
  * @since 5.2
  */
-@Order(2)
+@Order(5050)
 public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
 
   @Override

@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
  *
  * @since 4.3.0 (Mars-M5)
  */
-@Order(2)
+@Order(5100)
 public class CodeService implements ICodeService {
 
   public static final String CODE_SERVICE_CACHE_ID = CodeService.class.getName();

@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.mock;
 
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 
 /**
  * Creates {@link BeanMetaData} for a class using {@link MockBeanInstanceProducer}.
  */
+@Order(5100)
 public class MockBeanMetaDataProducer implements IBeanAnnotationMetaDataProducer {
   public static final int MOCK_BEAN_ORDER = -10000;
 

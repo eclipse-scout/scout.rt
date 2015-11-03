@@ -104,7 +104,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * This implementation can by used by an application by subclassing this class and adding the {@link Replace}
  * annotation.
  */
-@Order(1000.0D)
+@Order(5100)
 public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelContentHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SoapServiceTunnelContentHandler.class);
   private static final Pattern BEGIN_DATA_TAG = Pattern.compile("[<]([a-zA-Z0-9]+:)?data\\s*>");

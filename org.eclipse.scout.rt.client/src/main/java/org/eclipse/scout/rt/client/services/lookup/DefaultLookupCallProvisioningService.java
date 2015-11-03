@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  * @since 3.8.1
  */
 @Client
-@Order(1)
+@Order(5100)
 public class DefaultLookupCallProvisioningService implements ILookupCallProvisioningService {
 
   @SuppressWarnings("unchecked")

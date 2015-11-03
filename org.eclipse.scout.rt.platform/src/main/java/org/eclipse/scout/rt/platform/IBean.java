@@ -14,6 +14,8 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 
 /**
  * This is the registration for one bean in the {@link IBeanManager}.
@@ -21,6 +23,11 @@ import org.eclipse.scout.commons.annotations.Internal;
  * @since 5.1
  */
 public interface IBean<T> {
+
+  /**
+   * Default order of a bean that is neither annotated with {@link Order} nor with {@link Replace}.
+   */
+  double DEFAULT_BEAN_ORDER = 5000;
 
   /**
    * Gets a {@link Map} holding all {@link Annotation}s of this {@link IBean}.
@@ -66,7 +73,7 @@ public interface IBean<T> {
 
   /**
    * Gets the {@link IBeanInstanceProducer} associated with this {@link IBean}.
-   * 
+   *
    * @return The {@link IBeanInstanceProducer} of this {@link IBean}.
    */
   IBeanInstanceProducer<T> getBeanInstanceProducer();

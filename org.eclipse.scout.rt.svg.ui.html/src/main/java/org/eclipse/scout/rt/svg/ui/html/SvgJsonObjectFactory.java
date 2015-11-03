@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 @Bean
-@Order(1000)
+@Order(5200)
 public class SvgJsonObjectFactory extends AbstractJsonObjectFactory {
 
   @Override

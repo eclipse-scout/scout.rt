@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
  * Service state is per {@link IClientSession} type and stored in global map
  */
 @Client
-@Order(-2)
+@Order(4900)
 public class PermissionServiceClientProxy implements IPermissionService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionServiceClientProxy.class);
 

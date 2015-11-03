@@ -148,7 +148,7 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilte
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
 @Bean
-@Order(1000)
+@Order(5050)
 public class JsonObjectFactory extends AbstractJsonObjectFactory {
 
   @SuppressWarnings("unchecked")

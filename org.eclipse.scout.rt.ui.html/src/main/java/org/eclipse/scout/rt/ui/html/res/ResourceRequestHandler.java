@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
  * <p>
  * /dynamic/*, /icon/*, *.js, *.css, *.html, *.png, *.gif, *.jpg, *.woff, *.json
  */
-@Order(20)
+@Order(5020)
 public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestHandler.class);
 

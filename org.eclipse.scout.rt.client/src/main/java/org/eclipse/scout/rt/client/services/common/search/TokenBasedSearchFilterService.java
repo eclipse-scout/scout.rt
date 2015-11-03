@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.services.common.search;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -23,8 +22,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.AndNodeToken;
 
-@Client
-@Order(10)
+@Order(5200)
 public class TokenBasedSearchFilterService extends DefaultSearchFilterService {
 
   @Override

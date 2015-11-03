@@ -328,7 +328,6 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultiTemplateUsageFormMoveTopStringFieldInFirstTemplateBoxUsingClassIdentifier() throws Exception {
-    // XXX abr overload method
     BEANS.get(IExtensionRegistry.class).registerMove(new ClassIdentifier(FirstTemplateBox.class, TopStringField.class), 30d);
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 

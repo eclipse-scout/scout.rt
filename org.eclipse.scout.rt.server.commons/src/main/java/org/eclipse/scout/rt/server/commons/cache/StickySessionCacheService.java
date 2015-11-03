@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.annotations.Order;
  *
  * @since 4.0.0
  */
-@Order(1)
+@Order(5100)
 public class StickySessionCacheService extends AbstractHttpSessionCacheService {
 
   @Override

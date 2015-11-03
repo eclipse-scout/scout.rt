@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.testing.platform.mock.IBeanAnnotationMetaDataProducer;
 import org.eclipse.scout.rt.testing.platform.mock.MockBeanInstanceProducer;
 
-@Order(-100.0)
+@Order(550)
 public class ClientMockBeanDataProducer implements IBeanAnnotationMetaDataProducer {
   public static final int MOCK_BEAN_ORDER = -10000;
 

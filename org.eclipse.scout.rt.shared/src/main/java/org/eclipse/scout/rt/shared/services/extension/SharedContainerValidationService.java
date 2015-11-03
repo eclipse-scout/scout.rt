@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
-@Order(-200)
+@Order(5200)
 public class SharedContainerValidationService extends AbstractContainerValidationService {
 
   @PostConstruct

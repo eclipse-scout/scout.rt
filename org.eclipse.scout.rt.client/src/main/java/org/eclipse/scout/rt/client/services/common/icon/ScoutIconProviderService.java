@@ -14,7 +14,7 @@ import java.net.URL;
 
 import org.eclipse.scout.commons.annotations.Order;
 
-@Order(500)
+@Order(5500)
 public class ScoutIconProviderService extends AbstractIconProviderService {
 
   @Override

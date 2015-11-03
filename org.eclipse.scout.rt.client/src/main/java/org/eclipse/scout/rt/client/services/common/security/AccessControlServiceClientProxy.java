@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
  * Service state is per {@link IClientSession} instance and stored as {@link IClientSession#getData(String)}
  */
 @Client
-@Order(10)
+@Order(5010)
 @CreateImmediately
 public class AccessControlServiceClientProxy implements IAccessControlService, INotificationHandler<IAccessControlNotification> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);

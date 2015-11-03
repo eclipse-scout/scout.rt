@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Method;
 import java.security.Permissions;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.ServiceOperationInvoker;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
@@ -77,7 +77,7 @@ public class RemoteServiceAccessTest {
     fail("should fail");
   }
 
-  @Order(-10)
+  @IgnoreBean
   static class ServiceOperationInvokerMock extends ServiceOperationInvoker {
     private final Permissions m_permissionCollection;
 

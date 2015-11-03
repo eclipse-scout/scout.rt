@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
 /**
  * Text provider service for texts used by org.eclipse.scout.rt.shared.test plugin.
  */
-@Order(400)
+@Order(5400)
 public class TestTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
   protected String getDynamicNlsBaseName() {

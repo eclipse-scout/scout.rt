@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.annotations.Order;
  *
  * @since 4.3.0 (Mars-M5)
  */
-@Order(10)
+@Order(5100)
 public class BatchLookupService implements IBatchLookupService {
 
   @Override

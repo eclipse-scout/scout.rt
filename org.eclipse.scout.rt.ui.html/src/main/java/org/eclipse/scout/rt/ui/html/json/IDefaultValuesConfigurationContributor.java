@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.net.URL;
 
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * @since 5.2
  */
-@Bean
+@ApplicationScoped
 public interface IDefaultValuesConfigurationContributor {
 
   URL contributeDefaultValuesConfigurationUrl();

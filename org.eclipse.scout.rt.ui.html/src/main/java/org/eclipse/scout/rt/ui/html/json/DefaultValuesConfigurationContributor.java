@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.ui.html.ResourceBase;
 /**
  * @since 5.2
  */
-@Order(-500) // TODO ABR Adjust to new order ranges
+@Order(5500)
 public class DefaultValuesConfigurationContributor implements IDefaultValuesConfigurationContributor {
 
   @Override

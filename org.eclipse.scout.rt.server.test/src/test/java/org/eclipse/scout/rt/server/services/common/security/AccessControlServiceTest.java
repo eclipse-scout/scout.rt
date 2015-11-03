@@ -23,6 +23,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationBlockingTimeOut;
@@ -177,6 +178,7 @@ public class AccessControlServiceTest {
   /**
    * An access control service with {@link TestPermission1} for testing
    */
+  @IgnoreBean
   private static class TestAccessControlService extends AbstractAccessControlService {
     /**
      * Loads a test permission

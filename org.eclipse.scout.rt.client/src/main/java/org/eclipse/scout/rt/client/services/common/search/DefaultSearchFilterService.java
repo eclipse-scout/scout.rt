@@ -32,8 +32,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-@Order(1)
 @Client
+@Order(5100)
 public class DefaultSearchFilterService implements ISearchFilterService {
 
   @Override

@@ -16,11 +16,9 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.testing.client.ClientSessionProviderWithCache;
 
 public class LoginTestClientSessionProvider extends ClientSessionProviderWithCache {
@@ -58,8 +56,6 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
     return s_afterStartRunAs;
   }
 
-  @Bean
-  @Order(-10)
   public static class LoginTestClientSession extends TestEnvironmentClientSession {
 
     @Override

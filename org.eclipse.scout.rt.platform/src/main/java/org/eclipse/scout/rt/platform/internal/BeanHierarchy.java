@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
  * This class is not thread safe
  */
 public class BeanHierarchy<T> {
+
   private final Class<T> m_clazz;
   private final Set<IBean<T>> m_beans;
   private final Map<Object, List<IBean<T>>> m_singleQueryByScope;
@@ -240,7 +241,6 @@ public class BeanHierarchy<T> {
     if (orderAnnotation != null) {
       return orderAnnotation.value();
     }
-    return 0;
+    return IBean.DEFAULT_BEAN_ORDER;
   }
-
 }

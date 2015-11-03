@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 /**
  * @since 5.2
  */
-@Order(3)
+@Order(5050)
 public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
 
   @Override

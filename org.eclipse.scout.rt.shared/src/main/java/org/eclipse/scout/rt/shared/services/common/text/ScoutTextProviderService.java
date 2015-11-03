@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.text;
 
 import org.eclipse.scout.commons.annotations.Order;
 
-@Order(50)
+@Order(5050)
 public class ScoutTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
   protected String getDynamicNlsBaseName() {

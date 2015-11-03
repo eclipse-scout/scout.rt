@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -152,6 +153,7 @@ public class SharedAccessControlServiceTest {
     assertSame(p5, p6);
   }
 
+  @IgnoreBean
   private static class P_SharedAccessControlService extends AbstractSharedAccessControlService {
 
     @Override

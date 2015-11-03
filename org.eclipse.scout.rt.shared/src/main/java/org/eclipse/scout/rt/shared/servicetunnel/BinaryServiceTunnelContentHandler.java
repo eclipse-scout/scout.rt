@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 /**
  * "No frills" implementation for client-server communication with optional compression.
  */
-@Order(1.0D)
+@Order(5010)
 public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelContentHandler {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryServiceTunnelContentHandler.class);

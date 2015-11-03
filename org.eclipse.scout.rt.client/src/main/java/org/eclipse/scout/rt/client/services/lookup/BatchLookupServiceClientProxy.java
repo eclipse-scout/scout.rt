@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 
 @Client
-@Order(3)
+@Order(4900)
 public class BatchLookupServiceClientProxy implements IBatchLookupService {
 
   public BatchLookupServiceClientProxy() {
