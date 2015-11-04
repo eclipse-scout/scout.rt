@@ -10,7 +10,6 @@
  ******************************************************************************/
 /* This class is used for menu items styling */
 
-@menu-margin-x: @bench-margin-x;
 @menu-item-margin-right: 14px;
 @menu-item-height: 39px;
 

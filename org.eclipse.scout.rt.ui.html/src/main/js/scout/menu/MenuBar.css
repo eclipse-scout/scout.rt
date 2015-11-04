@@ -52,8 +52,8 @@
 }
 
 .main-menubar {
-  margin-left: @bench-margin-x;
-  margin-right: @bench-margin-x;
+  padding-left: @bench-padding-x;
+  padding-right: @bench-padding-x - @desktop-table-header-menubar-padding-right;
   height: 55px;
   padding-top: 11px;
 

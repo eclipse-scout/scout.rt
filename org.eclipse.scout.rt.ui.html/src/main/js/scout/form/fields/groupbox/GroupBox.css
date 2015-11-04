@@ -12,8 +12,8 @@
   overflow: hidden;
 }
 
-@root-group-box-padding-left: @bench-margin-x - @mandatory-indicator-width;
-@root-group-box-padding-right: @bench-margin-x;
+@root-group-box-padding-left: @bench-padding-x - @mandatory-indicator-width;
+@root-group-box-padding-right: @bench-padding-x;
 
 .root-group-box > .group-box-body,
 .root-group-box > .group-box-title {
@@ -21,10 +21,6 @@
   /* that's why the body has a padding instead of the root-group-box (to place the scrollbars inside the body) */
   padding-left: @root-group-box-padding-left;
   padding-right: @root-group-box-padding-right;
-}
-
-.root-group-box > .main-menubar {
-  border-bottom: 3px solid @group-box-title-border-color;
 }
 
 .root-group-box > .group-box-body {
