@@ -33,7 +33,7 @@ scout.logout = {
       .on('click', loginAgain)
       .appendTo($buttonBar);
 
-    $('noscript').remove(); // cleanup DOM
+    scout.helpers.prepareDOM();
 
     // ----- Helper functions -----
 

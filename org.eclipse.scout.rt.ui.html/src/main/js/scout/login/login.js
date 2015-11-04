@@ -57,7 +57,7 @@ scout.login = {
 
     this.$user.focus();
 
-    $('noscript').remove(); // cleanup DOM
+    scout.helpers.prepareDOM();
 
     // ----- Helper functions -----
 

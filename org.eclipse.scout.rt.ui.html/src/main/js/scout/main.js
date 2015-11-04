@@ -11,9 +11,13 @@
 // TODO AWE/CGU: think about refactoring this code to a Scout.js class and use an
 // instance of that new class in scout-module.js for the last line of code:
 // }(window.scout = window.scout || {}, jQuery));
+
 scout.sessions = [];
+scout.uniqueIdSeqNo = 0; // use createUniqueId() to generate a new ID
 
 /**
+ * @memberOf scout
+ *
  * Main initialization function.<p>
  *
  * Calls scout._bootstrap and scout._init.<p>
@@ -33,14 +37,15 @@ scout.init = function(options) {
  * The individual bootstrap functions may return null or undefined, a single deferred or multiple deferreds as an array.
  */
 scout._bootstrap = function(options) {
-  var deferreds = [],
-    deferredValues = [
-      scout.logging.bootstrap(),
-      scout.device.bootstrap(),
-      scout.defaultValues.bootstrap(),
-      scout.fonts.bootstrap(options.fonts)
-    ];
+  options = options || {};
+  var deferredValues = [
+    scout.logging.bootstrap(),
+    scout.device.bootstrap(),
+    scout.defaultValues.bootstrap(),
+    scout.fonts.bootstrap(options.fonts)
+  ];
 
+  var deferreds = [];
   deferredValues.forEach(function(value) {
     if (Array.isArray(value)) {
       deferreds.concat(value);
@@ -48,7 +53,6 @@ scout._bootstrap = function(options) {
       deferreds.push(value);
     }
   });
-
   return deferreds;
 };
 
@@ -60,8 +64,8 @@ scout._init = function(options) {
   if (!this._checkBrowserCompability(options)) {
     return;
   }
-  $('noscript').remove(); // cleanup DOM
 
+  scout.helpers.prepareDOM();
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor();
 
@@ -76,15 +80,13 @@ scout._init = function(options) {
   });
 };
 
-scout._uniqueIdSeqNo = 0;
-
 /**
  * Returns a new unique ID to be used for Widgets/Adapters created by the UI
  * without a model delivered by the server-side client.
  *
  */
 scout.createUniqueId = function() {
-  return 'ui' + (++scout._uniqueIdSeqNo).toString();
+  return 'ui' + (++scout.uniqueIdSeqNo).toString();
 };
 
 /**
@@ -110,6 +112,7 @@ scout.inherits = function(childCtor, parentCtor) {
  *   Used mainly for widgets but may actually be used for any objects which have a init method with one parameter.
  */
 scout.create = function(vararg, options) {
+  options = options || {};
   if (typeof vararg === 'string') {
     options.objectType = vararg;
     return scout._createLocalObject(options);
@@ -155,7 +158,6 @@ scout._checkBrowserCompability = function(options) {
     return true;
   }
 
-  var session = this;
   $('.scout').each(function() {
     var $entryPoint = $(this),
       $box = $entryPoint.appendDiv('box-with-logo small'),
@@ -165,7 +167,7 @@ scout._checkBrowserCompability = function(options) {
     $box.load('unsupported-browser.html', function() {
       $box.find('button').on('click', function() {
         $box.remove();
-        session.init(newOptions);
+        scout._init(newOptions);
       });
     });
   });
