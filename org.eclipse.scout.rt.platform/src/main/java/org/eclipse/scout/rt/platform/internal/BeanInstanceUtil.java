@@ -37,14 +37,11 @@ public final class BeanInstanceUtil {
       instance = initializeInstance(instance);
     }
     catch (Throwable t) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info(String.format("Cannot create new instance of '%s'.", beanClazz), t);
+      if (LOG.isWarnEnabled()) {
+        LOG.warn(String.format("Cannot create new instance of '%s'.", beanClazz), t);
       }
       if (t instanceof Error) {
         throw (Error) t;
-      }
-      else if (t instanceof RuntimeException) {
-        throw (RuntimeException) t;
       }
       else {
         throw new BeanCreationException(beanClazz == null ? null : beanClazz.getName(), t);
