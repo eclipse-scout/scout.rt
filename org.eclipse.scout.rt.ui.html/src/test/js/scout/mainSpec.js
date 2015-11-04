@@ -59,13 +59,13 @@ describe('main', function() {
     describe('creates local object if first parameter is the objectType', function() {
 
       it('sets property \'id\' correctly when no ID is provided', function() {
-        var expectedSeqNo = scout._uniqueIdSeqNo + 1,
+        var expectedSeqNo = scout.uniqueIdSeqNo + 1,
           menu = scout.create('Menu', {
             parent: new scout.NullWidget(),
             session: session
           });
         expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-        expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
+        expect(scout.uniqueIdSeqNo).toBe(expectedSeqNo);
       });
 
       it('session must be set, but adapter should not be registered', function() {
@@ -82,14 +82,14 @@ describe('main', function() {
     });
 
     it('creates local object if first parameter of type object and contains objectType property', function() {
-      var expectedSeqNo = scout._uniqueIdSeqNo + 1,
+      var expectedSeqNo = scout.uniqueIdSeqNo + 1,
         menu = scout.create({
           parent: new scout.NullWidget(),
           session: session,
           objectType: 'Menu'
         });
       expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-      expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
+      expect(scout.uniqueIdSeqNo).toBe(expectedSeqNo);
     });
 
   });
