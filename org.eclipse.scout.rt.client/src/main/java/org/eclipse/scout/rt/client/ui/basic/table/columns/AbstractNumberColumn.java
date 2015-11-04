@@ -115,17 +115,20 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     return true;
   }
 
+  /**
+   * Configure the aggregation function for this column
+   *
+   * @returns one of the constant values in {@link INumberColumn#AggregationFunction}
+   * @since 5.2
+   */
   protected String getConfiguredAggregationFunction() {
-    return AGGREGATION_FUNCTION_SUM;
+    return INumberColumn.AggregationFunction.SUM;
   }
 
   /**
-   * Set the background effect for this column. May be null.
-   * <p>
-   * Supported by the UI are {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_1},
-   * {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_2} and {@link INumberColumn#BACKGROUND_EFFECT_BAR_CHART}
+   * Configure the background effect for this column
    *
-   * @param effect
+   * @returns one of the constant values in {@link INumberColumn#BackgroundEffect} or null
    * @since 5.2
    */
   @ConfigProperty(ConfigProperty.STRING)

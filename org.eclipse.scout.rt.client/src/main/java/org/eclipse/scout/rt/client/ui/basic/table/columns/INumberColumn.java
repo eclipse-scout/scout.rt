@@ -14,14 +14,32 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
 public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, INumberValueContainer<NUMBER> {
 
-  String AGGREGATION_FUNCTION_SUM = "sum";
-  String AGGREGATION_FUNCTION_AVG = "avg";
-  String AGGREGATION_FUNCTION_MIN = "min";
-  String AGGREGATION_FUNCTION_MAX = "max";
+  /**
+   * supported values for {@link INumberColumn#setAggregationFunction(String))} and
+   * {@link AbstractNumberColumn#getConfiguredAggregationFunction()}
+   *
+   * @since 5.2
+   */
+  interface AggregationFunction {
 
-  String BACKGROUND_EFFECT_COLOR_GRADIENT_1 = "colorGradient1";
-  String BACKGROUND_EFFECT_COLOR_GRADIENT_2 = "colorGradient2";
-  String BACKGROUND_EFFECT_BAR_CHART = "barChart";
+    String SUM = "sum";
+    String AVG = "avg";
+    String MIN = "min";
+    String MAX = "max";
+
+  }
+
+  /**
+   * supported values for {@link INumberColumn#setBackgroundEffect(String)} and
+   * {@link AbstractNumberColumn#getConfiguredBackgroundEffect()}
+   *
+   * @since 5.2
+   */
+  interface BackgroundEffect {
+    String COLOR_GRADIENT_1 = "colorGradient1";
+    String COLOR_GRADIENT_2 = "colorGradient2";
+    String BAR_CHART = "barChart";
+  }
 
   /**
    * type String
@@ -39,21 +57,26 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
 
   String getAggregationFunction();
 
+  /**
+   * Set the aggregation function for this column
+   *
+   * @param effect
+   *          one of the constant values in {@link AggregationFunction}
+   * @since 5.2
+   */
   void setAggregationFunction(String f);
 
   /**
-   * Set the background effect for this column. May be null.
-   * <p>
-   * Supported by the UI are {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_1},
-   * {@link INumberColumn#BACKGROUND_EFFECT_COLOR_GRADIENT_2} and {@link INumberColumn#BACKGROUND_EFFECT_BAR_CHART}
+   * Set the background effect for this column
    *
    * @param effect
+   *          one of the constant values in {@link BackgroundEffect} or <code>null</code>
    * @since 5.2
    */
   void setBackgroundEffect(String effect);
 
   /**
-   * @return The background effect of this column. May be null.
+   * @return The background effect of this column. May be <code>null</code>.
    */
   String getBackgroundEffect();
 
