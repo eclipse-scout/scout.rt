@@ -27,6 +27,7 @@ scout.DateField = function() {
   // has to be set again. Therefore, we have to store it in a private variable.
   this._modelErrorStatus = null;
 
+  this._popup;
   this._datePickerDateSelectedHandler;
   this._popupCloseHandler;
 };
@@ -96,6 +97,9 @@ scout.DateField.prototype._remove = function() {
   this.$timeFieldIcon = null;
   this._$predictDateField = null;
   this._$predictTimeField = null;
+  if (this._popup) {
+    this._popup = null;
+  }
 };
 
 scout.DateField.prototype._renderHasDate = function() {

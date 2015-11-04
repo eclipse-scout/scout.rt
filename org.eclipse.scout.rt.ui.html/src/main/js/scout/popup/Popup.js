@@ -223,10 +223,9 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   openingDirectionY = openingDirectionY || this.openingDirectionY;
   $container.removeClass('up down left right');
   $container.addClass(openingDirectionY + ' ' + openingDirectionX);
-  height = $container.outerHeight(true),
+  height = $container.outerHeight(true);
 
-    anchorBounds = this.getAnchorBounds();
-
+  anchorBounds = this.getAnchorBounds();
   x = anchorBounds.x;
   y = anchorBounds.y;
   if (openingDirectionY === 'up') {

@@ -96,6 +96,13 @@ scout.SmartField.prototype._render = function($parent) {
   this.addPopup();
 };
 
+scout.SmartField.prototype._remove = function() {
+  scout.SmartField.parent.prototype._remove.call(this);
+  if (this._popup) {
+    this._popup = null;
+  }
+};
+
 /**
  * Method invoked if being rendered within a cell-editor (mode='scout.FormField.MODE_CELLEDITOR'), and once the editor finished its rendering.
  */
