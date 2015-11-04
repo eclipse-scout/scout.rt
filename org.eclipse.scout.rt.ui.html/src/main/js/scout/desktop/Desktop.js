@@ -78,23 +78,27 @@ scout.Desktop.prototype._render = function($parent) {
   this._installKeyStrokeContextForDesktopViewButtonBar();
 
   this._renderTaskBar($parent);
+  this._renderToolMenus();
   this._renderBench();
   this._createSplitter($parent);
+  this._setSplitterPosition();
+  // TODO AWE/BSH Maybe remove this? Addon functionality may be provided by using an own desktop.
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
   });
-
-  this._renderToolMenus();
   this.navigation.onOutlineChanged(this.outline, true);
-  this._setSplitterPosition();
 
   $(window).on('resize', this.onResize.bind(this));
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
   this._setupDragAndDrop();
 
+  this._disableContextMenu($parent);
+};
+
+scout.Desktop.prototype._disableContextMenu = function($parent) {
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
-  $parent.bind('contextmenu', function(event) {
+  $parent.on('contextmenu', function(event) {
     if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
       event.preventDefault();
     }
