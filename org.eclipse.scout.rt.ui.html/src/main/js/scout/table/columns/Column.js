@@ -33,6 +33,7 @@ scout.Column.prototype.init = function(model) {
   if (this.aggregationFunction) {
     this.setAggregationFunction(this.aggregationFunction);
   }
+
 };
 
 /**

@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -138,10 +137,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   public void initColumn() {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     setBackgroundEffect(prefs.getTableColumnBackgroundEffect(this, getBackgroundEffect(), null));
-    String prefsAggregationFunction = prefs.getTableColumnAggregationFunction(this, getAggregationFunction(), null);
-    if (!StringUtility.isNullOrEmpty(prefsAggregationFunction)) {
-      setAggregationFunction(prefsAggregationFunction);
-    }
     super.initColumn();
   }
 

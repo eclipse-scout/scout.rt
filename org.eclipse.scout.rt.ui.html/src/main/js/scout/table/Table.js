@@ -978,6 +978,12 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       this._applyFilters($rows);
     }
 
+    this.columns.forEach(function(column) {
+      if (column.backgroundEffect) {
+        column.table.renderColumnBackgroundEffect(column);
+      }
+    });
+
     this._installRows($rows);
 
     // notify
@@ -1645,21 +1651,23 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
 };
 
 scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {
-  this.sendColumnBackgroundEffect(column, effect);
-  this.renderColumnBackgroundEffect(column, effect);
+  column.backgroundEffect = effect;
+  this.sendColumnBackgroundEffect(column);
+  this.renderColumnBackgroundEffect(column);
 };
 
-scout.Table.prototype.sendColumnBackgroundEffect= function(column, effect) {
+scout.Table.prototype.sendColumnBackgroundEffect = function(column) {
   var data = {
     columnId : column.id,
-    backgroundEffect : effect
+    backgroundEffect : column.backgroundEffect
   };
   this._send('columnBackgroundEffectChanged', data);
 };
 
-scout.Table.prototype.renderColumnBackgroundEffect = function(column, effect) {
+scout.Table.prototype.renderColumnBackgroundEffect = function(column) {
   var minValue, maxValue, colorFunc, row, value, v, i, $cell,
-    filteredRows = this.filteredRows();
+      effect = column.backgroundEffect,
+      filteredRows = this.filteredRows();
 
   for (i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
@@ -2995,12 +3003,12 @@ scout.Table.prototype._onScrollToSelection = function() {
 };
 
 scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
-  var columnId, effect;
+  var columnId, column, effect;
   event.eventParts.forEach(function(eventPart){
-    // FIXME ASA write backgroundEffect on UI-Object?
     columnId = eventPart.columnId;
-    effect = eventPart.backgroundEffect;
-    this.renderColumnBackgroundEffect(this.columnById(columnId), effect);
+    column = this.columnById(columnId);
+    column.backgroundEffect = eventPart.backgroundEffect;
+    this.renderColumnBackgroundEffect(column);
   }, this);
 };
 

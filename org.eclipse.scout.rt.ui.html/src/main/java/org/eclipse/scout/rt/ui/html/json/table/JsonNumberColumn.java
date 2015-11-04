@@ -25,6 +25,7 @@ public class JsonNumberColumn<NUMBER_COLUMN extends INumberColumn<?>> extends Js
     JSONObject json = super.toJson();
     json.put("format", ((INumberColumn) getColumn()).getFormat().toPattern());
     json.put("aggregationFunction", ((INumberColumn) getColumn()).getAggregationFunction());
+    json.put("backgroundEffect", ((INumberColumn) getColumn()).getBackgroundEffect());
     return json;
   }
 
