@@ -12,7 +12,13 @@
   height: 100%;
   width: 100%;
   position: relative;
-  background-color: @background-color;
+  background-color: @form-background-color;
+}
+
+.view {
+  & > .root-group-box > .main-menubar {
+    #scout.main-menubar-light;
+  }
 }
 
 .dialog {

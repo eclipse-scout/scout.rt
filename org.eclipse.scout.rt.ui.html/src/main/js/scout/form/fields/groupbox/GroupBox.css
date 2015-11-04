@@ -34,6 +34,8 @@
   & > .menubar {
     margin-left: @mandatory-indicator-width;
     margin-right: 0;
+    background-color: inherit;
+    #scout.menubar-background-color-inherit;
   }
 
   &.collapsed > .menubar {

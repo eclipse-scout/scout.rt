@@ -20,6 +20,7 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var titleMarginX, menuBarSize, gbBodySize,
+    pseudoStatusWidth = 0,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
@@ -28,8 +29,17 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
+  if ($pseudoStatus.isVisible()) {
+    $pseudoStatus.cssWidth(this._statusWidth);
+    pseudoStatusWidth = $pseudoStatus.outerWidth(true);
+  }
+
   if (htmlMenuBar) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+    if (!this._groupBox.mainBox) {
+      // adjust size of menubar as well if it is in a regular group box
+      menuBarSize.width -= pseudoStatusWidth;
+    }
     htmlMenuBar.setSize(menuBarSize);
   } else {
     menuBarSize = new scout.Dimension(0, 0);
@@ -39,9 +49,8 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   gbBodySize.height -= this._titleHeight();
   gbBodySize.height -= menuBarSize.height;
 
-  if ($pseudoStatus.isVisible()) {
-    $pseudoStatus.cssWidth(this._statusWidth);
-    titleMarginX = $groupBoxTitle.cssMarginX() + $pseudoStatus.outerWidth(true);
+  if (pseudoStatusWidth > 0) {
+    titleMarginX = $groupBoxTitle.cssMarginX() + pseudoStatusWidth;
     $groupBoxTitle.css('width', 'calc(100% - ' + titleMarginX + 'px');
   }
 

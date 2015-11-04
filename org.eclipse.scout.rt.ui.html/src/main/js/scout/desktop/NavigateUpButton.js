@@ -16,7 +16,12 @@ scout.NavigateUpButton = function(options) {
   this.iconId = this._defaultIconId;
   this.keyStroke = 'backspace';
 };
-scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);
+scout.inherits(scout.NavigateUpButton, scout.AbstractNavigateButton);
+
+scout.NavigateUpButton.prototype._render = function($parent) {
+  scout.NavigateUpButton.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('up');
+};
 
 scout.NavigateUpButton.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form _is_ hidden.

@@ -19,6 +19,7 @@
   width: 100%;
   white-space: nowrap;
   border-top: 1px solid @border-color;
+  background-color: @table-footer-background-color;
 }
 
 .table-control-resize {
@@ -35,7 +36,7 @@
   position: absolute;
   overflow: hidden;
   outline: none;
-  background-color: @background-color;
+  background-color: @table-control-container-background-color;
   bottom: @table-footer-height;
   width: 100%;
   display: none;
@@ -44,13 +45,21 @@
   white-space: normal;
 
   &:not(.has-resizer) {
-    border-top: 1px solid @group-box-title-border-color;
+    border-top: 3px solid @group-box-title-border-color;
   }
 }
 
 .table-control-content {
   height: 100%;
   width: 100%;
+
+  & > .form {
+    background-color: @table-control-form-background-color;
+
+    & > .root-group-box > .main-menubar {
+      #scout.main-menubar-light;
+    }
+  }
 
   & .tab-box.in-table-control > .tab-area {
     margin-top: 0;

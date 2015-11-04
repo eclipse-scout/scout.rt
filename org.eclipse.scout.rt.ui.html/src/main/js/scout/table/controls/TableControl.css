@@ -23,27 +23,27 @@
 
   & > .font-icon {
     font-size: 22px;
-    color: @icon-light-color;
+    color: @table-control-color;
   }
 
   &:hover > .font-icon {
-    color: @hover-color;
+    color: @table-control-hover-color;
   }
 
   &.disabled:hover,
   &.disabled > .font-icon {
     cursor: default;
-    color: @icon-disabled-color;
+    color: @table-control-disabled-color;
   }
 
   &.selected > .font-icon {
-    color: @active-color;
+    color: @table-control-active-color;
   }
 
   &.selected {
     border-left-color: @border-color;
     border-right-color: @border-color;
-    background-color: @background-color;
+    background-color: @table-control-active-background-color;
 
     &:first-child {
       border-left-color: transparent;

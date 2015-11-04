@@ -120,15 +120,16 @@
 }
 
 /* FIXME AWE: reduce copy/paste --> Button.css */
-.menu-button {
+/* FIXME CGU move to menubar.css */
+.menubar-item.menu-button {
   padding: 0 @button-padding;
   text-align: center;
   position: relative;
   height: 30px;
-  color: @text-color;
-  background-color: @button-background-color;
-  border: 1px solid @border-color;
+  color: @menubar-button-color;
+  background-color: @menubar-button-background-color;
   border-radius: @border-radius;
+  border: 1px solid @menubar-button-border-color;
   cursor: pointer;
   height: @menubar-height;
   line-height: @menubar-height;
@@ -140,9 +141,7 @@
   white-space: nowrap;
 
   &:not(.disabled):active {
-    background-color: @palette-gray-3;
-    border-right-color: @border-color;
-    border-bottom-color: @border-color;
+    background-color: @menubar-button-active-color;
   }
 
   &:focus {
@@ -151,6 +150,10 @@
 
   &:focus::before {
     #scout.button-focus();
+  }
+
+  & > .font-icon {
+    color: @menubar-button-font-icon-color;
   }
 
   &.default-menu:not(.disabled) {
@@ -164,7 +167,7 @@
     }
 
     &:active {
-      background-color: @active-color;
+      background-color: @default-button-active-background-color;
     }
 
     & > .font-icon {
@@ -174,19 +177,24 @@
   }
 
   &.disabled {
-    background-color: @control-background-color;
-    color: @disabled-color;
+    background-color: @menubar-button-disabled-background-color;
+    border-color: @menubar-button-disabled-border-color;
+    color: @menubar-button-disabled-color;
     cursor: default;
+
+    & > .font-icon {
+      color: @menubar-button-font-icon-disabled-color;
+    }
   }
 
   &.selected {
-  border-style: inset;
+    border-style: inset;
     border-right-color: @border-color;
     border-bottom-color: @border-color;
   }
 
   &.has-submenu::after {
-   .button-sub-menu-icon;
+    .button-sub-menu-icon;
   }
 
   &:not(.last) {
@@ -194,7 +202,7 @@
   }
 
   &.small-gap {
-    margin-right: 4px;
+    margin-right: 6px;
   }
 
   &.small {

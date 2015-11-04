@@ -1,0 +1,3 @@
+.form-tool-popup > .popup-body > .form > .root-group-box > .main-menubar {
+  background-color: @form-tool-popup-main-menubar-background-color;
+}

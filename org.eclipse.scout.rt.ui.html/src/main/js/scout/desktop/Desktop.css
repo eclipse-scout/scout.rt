@@ -66,6 +66,9 @@
 
   & > .table {
     & > .table-header {
+      padding-left: @desktop-table-header-padding-x;
+      padding-right: @desktop-table-header-padding-x;
+
       & > .table-header-item {
         padding-top: @desktop-table-header-padding-y;
         padding-bottom: @desktop-table-header-padding-y;
@@ -85,11 +88,6 @@
         }
       }
 
-    }
-
-    & > .table-header {
-      padding-left: @desktop-table-header-padding-x;
-      padding-right: @desktop-table-header-padding-x;
     }
 
     & > .table-data {
@@ -170,6 +168,7 @@
   top: 0px;
   right: 0px;
   height: @desktop-taskbar-height;
+  background-color: @desktop-taskbar-background-color;
 
   /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
   /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
@@ -222,7 +221,7 @@
   width: 220px;
   padding: 6px 10px 0 20px;
   cursor: pointer;
-  background-color: @panel-background-color;
+  background-color: @view-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
 
@@ -241,8 +240,8 @@
 
   &.selected {
     cursor: default;
-    background-color: @background-color;
-    color: @active-color;
+    background-color: @view-tab-active-background-color;
+    color: @view-tab-active-color;
     /* full size of taskbar to draw over the border-bottom */
     height: @desktop-taskbar-height;
 

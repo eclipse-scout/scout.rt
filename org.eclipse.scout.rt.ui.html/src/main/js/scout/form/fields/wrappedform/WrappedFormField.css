@@ -25,9 +25,10 @@
     }
   }
 
-  /* Reset margin set in MenuBar.css */
+  /* Reset values set in MenuBar.css */
   & > .root-group-box > .menubar {
     margin-left: @mandatory-indicator-width;
     margin-right: 0;
+    #scout.menubar-background-color-inherit;
   }
 }

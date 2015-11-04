@@ -79,6 +79,7 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
     throw new Error('view already rendered');
   }
   this._view.render(this._$bench);
+  this._view.$container.addClass('view');
   this._view.htmlComp.validateLayout();
   this._view.htmlComp.validateRoot = true;
   this._view.rendered = true;

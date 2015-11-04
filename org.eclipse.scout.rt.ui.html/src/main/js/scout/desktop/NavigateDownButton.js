@@ -16,7 +16,12 @@ scout.NavigateDownButton = function(outline, node) {
   this.iconId = this._defaultIconId;
   this.keyStroke = 'enter';
 };
-scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
+scout.inherits(scout.NavigateDownButton, scout.AbstractNavigateButton);
+
+scout.NavigateDownButton.prototype._render = function($parent) {
+  scout.NavigateDownButton.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('down');
+};
 
 scout.NavigateDownButton.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.

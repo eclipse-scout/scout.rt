@@ -293,7 +293,7 @@ __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
 // More misc. elements
 __include("scout/desktop/DesktopFormController.js");
-__include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
+__include("scout/desktop/AbstractNavigateButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");
 __include("scout/desktop/NavigateUpButton.js");
 }(window.scout = window.scout || {}, jQuery));

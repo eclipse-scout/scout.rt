@@ -11,14 +11,14 @@
 .box-buttons {
 
   &.empty {
-    border-bottom: 1px solid @color-messagebox-border;
+    border-bottom: 1px solid @boxbutton-border-color;
   }
 
   & > .button {
     position: relative;
     padding: 12px;
-    background-color: @palette-gray-2;
-    border: 1px solid @color-messagebox-border;
+    background-color: @boxbutton-background-color;
+    border: 1px solid @boxbutton-border-color;
     cursor: pointer;
     text-align: center;
     #scout.overflow-ellipsis-nowrap();
@@ -32,7 +32,7 @@
   }
 
   & > .button:not(.disabled):active {
-    background-color: @palette-gray-3;
+    background-color: @boxbutton-active-background-color;
   }
 
   & > .button:first-child {

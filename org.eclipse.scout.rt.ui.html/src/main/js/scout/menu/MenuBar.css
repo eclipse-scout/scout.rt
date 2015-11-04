@@ -10,11 +10,32 @@
  ******************************************************************************/
 @menubar-height: @logical-grid-height;
 
+#scout {
+  .menubar-background-color-inherit {
+    background-color: inherit;
+
+    & > .menu-button.disabled {
+      /* use regular button color since menubar has no color */
+      background-color: @button-disabled-background-color;
+    }
+  }
+
+  /* a transparent main-menubar with a smaller bottom border */
+  .main-menubar-light {
+    #scout.menubar-background-color-inherit();
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: @bench-padding-x;
+    margin-right: @bench-padding-x;
+  }
+}
+
 .menubar {
   position: relative;
   width: 100%;
   height: @menubar-height;
   border-bottom: 1px solid @border-color;
+  background-color: @menubar-background-color;
   white-space: nowrap;
 
   &.bottom {
@@ -51,11 +72,20 @@
   }
 }
 
+.menubar-item {
+  color: @menubar-item-color;
+
+  & > .font-icon {
+    color: @menubar-item-color;
+  }
+}
+
 .main-menubar {
   padding-left: @bench-padding-x;
   padding-right: @bench-padding-x - @desktop-table-header-menubar-padding-right;
   height: 55px;
   padding-top: 11px;
+  background-color: @main-menubar-background-color;
 
   & > .menu-item {
     &.small > .font-icon {

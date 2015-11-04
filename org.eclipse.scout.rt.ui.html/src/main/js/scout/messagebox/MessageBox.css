@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@color-messagebox-border: @palette-gray-4;
 @messagebox-label-padding: 20px;
 
 .messagebox {
@@ -41,8 +40,8 @@
 }
 
 .messagebox-content {
-  border-left: 1px solid @color-messagebox-border;
-  border-right: 1px solid @color-messagebox-border;
+  border-left: 1px solid @boxbutton-border-color;
+  border-right: 1px solid @boxbutton-border-color;
   background-color: @control-background-color;
   padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
 }

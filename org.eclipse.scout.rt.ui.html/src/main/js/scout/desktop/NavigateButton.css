@@ -1,0 +1,8 @@
+.navigate-button.up {
+  color: @navigate-up-button-color;
+  border-color: @navigate-up-button-border-color;
+
+  & > .font-icon {
+    color: @navigate-up-button-color;
+  }
+}

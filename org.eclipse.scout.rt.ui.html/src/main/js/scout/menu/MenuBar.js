@@ -292,6 +292,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     }
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
+    item.$container.addClass('menubar-item');
     if (right) {
       // Mark as right-aligned
       item.rightAligned = true;
