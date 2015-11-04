@@ -20,87 +20,91 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
  */
 public interface IChart extends IPropertyObserver, ITypeWithClassId {
 
-	int DEFAULT_MAX_SEGMENTS_PIE = 5;
+  String PROP_CONTAINER = "container";
+  String PROP_AUTO_COLOR = "autoColor";
+  String PROP_CHART_TYPE = "chartType";
+  String PROP_CHART_DATA = "chartData";
+  String PROP_ENABLED = "enabled";
+  String PROP_VISIBLE = "visible";
+  String PROP_MAX_SEGMENTS = "maxSegments";
+  String PROP_CLICKABLE = "clickable";
+  String PROP_MODEL_HANDLES_CLICK = "modelHandlesClick";
+  String PROP_ANIMATED = "animated";
+  String PROP_LEGEND_VISIBLE = "legendVisible";
+  String PROP_LEGEND_POSITION = "legendPosition";
 
-	String PROP_CONTAINER = "container";
-	String PROP_AUTO_COLOR = "autoColor";
-	String PROP_CHART_TYPE = "chartType";
-	String PROP_CHART_DATA = "chartData";
-	String PROP_ENABLED = "enabled";
-	String PROP_VISIBLE = "visible";
-	String PROP_MAX_SEGMENTS = "maxSegments";
-	String PROP_CLICKABLE = "clickable";
-	String PROP_MODEL_HANDLES_CLICK = "modelHandlesClick";
-	String PROP_ANIMATED = "animated";
-	String PROP_LEGEND_VISIBLE = "legendVisible";
-	String PROP_LEGEND_POSITION = "legendPosition";
+  int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
-	int LEGEND_POSITION_BOTTOM = 0;
-	int LEGEND_POSITION_BOTTOM_SINGLE = 1;
-	int LEGEND_POSITION_TOP = 2;
-	int LEGEND_POSITION_TOP_SINGLE = 3;
-	int LEGEND_POSITION_RIGHT = 4;
-	int LEGEND_POSITION_LEFT = 5;
+  int LEGEND_POSITION_BOTTOM = 0;
+  int LEGEND_POSITION_BOTTOM_SINGLE = 1;
+  int LEGEND_POSITION_TOP = 2;
+  int LEGEND_POSITION_TOP_SINGLE = 3;
+  int LEGEND_POSITION_RIGHT = 4;
+  int LEGEND_POSITION_LEFT = 5;
 
-	IChartUIFacade getUIFacade();
+  IChartUIFacade getUIFacade();
 
-	void setContainerInternal(ITypeWithClassId container);
+  void setContainerInternal(ITypeWithClassId container);
 
-	ITypeWithClassId getContainer();
+  ITypeWithClassId getContainer();
 
-	void addChartListener(ChartListener listener);
+  void addChartListener(ChartListener listener);
 
-	void removeChartListener(ChartListener listener);
+  void removeChartListener(ChartListener listener);
 
-	void setChartType(int chartType);
+  /**
+   * Triggers a property change event for {@link #PROP_CHART_DATA}. Useful when the contents of the chart data bean has
+   * been changed but not the bean itself (property support does not fire events when the same object is set again).
+   */
+  void fireChartDataChanged();
 
-	int getChartType();
+  void setChartType(int chartType);
 
-	void setAutoColor(boolean autoColor);
+  int getChartType();
 
-	boolean isAutoColor();
+  void setAutoColor(boolean autoColor);
 
-	void setChartData(IChartBean chartData);
+  boolean isAutoColor();
 
-	IChartBean getChartData();
+  void setChartData(IChartBean chartData);
 
-	void setEnabled(boolean enabled);
+  IChartBean getChartData();
 
-	boolean isEnabled();
+  void setEnabled(boolean enabled);
 
-	void setVisible(boolean visible);
+  boolean isEnabled();
 
-	boolean isVisible();
+  void setVisible(boolean visible);
 
-	/**
-	 * used for pie charts to limit segments-> if set, smallest segments are
-	 * collapsed
-	 */
-	int getMaxSegments();
+  boolean isVisible();
 
-	/**
-	 * used for pie charts to limit segments-> if set, smallest segments are
-	 * collapsed
-	 */
-	void setMaxSegments(int maxSegments);
+  /**
+   * used for pie charts to limit segments-> if set, smallest segments are collapsed
+   */
+  int getMaxSegments();
 
-	void setClickable(boolean clickable);
+  /**
+   * used for pie charts to limit segments-> if set, smallest segments are collapsed
+   */
+  void setMaxSegments(int maxSegments);
 
-	boolean isClickable();
+  void setClickable(boolean clickable);
 
-	void setModelHandlesClick(boolean modelHandlesClick);
+  boolean isClickable();
 
-	boolean isModelHandlesClick();
+  void setModelHandlesClick(boolean modelHandlesClick);
 
-	boolean isAnimated();
+  boolean isModelHandlesClick();
 
-	void setAnimated(boolean animated);
+  boolean isAnimated();
 
-	void setLegendPosition(int position);
+  void setAnimated(boolean animated);
 
-	int getLegendPosition();
+  void setLegendPosition(int position);
 
-	boolean isLegendVisible();
+  int getLegendPosition();
 
-	void setLegendVisible(boolean visible);
+  boolean isLegendVisible();
+
+  void setLegendVisible(boolean visible);
 }
