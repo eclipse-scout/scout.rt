@@ -423,6 +423,15 @@
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </repository>
+    <!-- Bintray Repository for com.asual.lesscss:lesscss-engine dependency -->
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>bintray-bsi-business-systems-integration-ag-scout-eclipse-org</id>
+      <name>bintray</name>
+      <url>http://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
