@@ -403,7 +403,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   this.$controlContainer.stop(true).show().delay(1).animate({
     height: control.height
   }, {
-    duration: this.rendered ? 500 : 0,
+    duration: this.rendered ? control.animateDuration : 0,
     progress: this._revalidateTableLayout.bind(this),
     complete: function() {
       control.onControlContainerOpened();
@@ -416,7 +416,7 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
   this.$controlContainer.stop(true).show().animate({
     height: 0
   }, {
-    duration: 500,
+    duration: control.animateDuration,
     progress: this._revalidateTableLayout.bind(this)
   });
 

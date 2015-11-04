@@ -15,11 +15,13 @@ scout.TableControl = function() {
   this._addAdapterProperties('form');
   this.contentRendered = false;
   this.height = scout.TableControl.CONTAINER_SIZE;
+  this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
   this.resizerVisible = true;
 };
 scout.inherits(scout.TableControl, scout.Action);
 
 scout.TableControl.CONTAINER_SIZE = 345;
+scout.TableControl.CONTAINER_ANIMATE_DURATION = 350;
 
 scout.TableControl.prototype._init = function(model) {
   scout.TableControl.parent.prototype._init.call(this, model);
