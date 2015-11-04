@@ -250,8 +250,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       getTable().discardAllRows();
       for (ITreeNode childNode : childNodes) {
         ITableRow row = new TableRow(getTable().getColumnSet());
-        ICell cell = treeToTableCell(childNode.getCellForUpdate());
-        row.setCell(0, cell);
+        updateCellFromPageCell(row.getCellForUpdate(0), childNode.getCell());
         ITableRow insertedRow = getTable().addRow(row);
         linkTableRowWithPage(insertedRow, (IPage) childNode);
       }
@@ -261,11 +260,15 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
   }
 
-  protected ICell treeToTableCell(Cell treeCell) {
-    Cell tableCell = new Cell(treeCell);
+  /**
+   * Called when the table gets rebuilt.
+   * <p>
+   * Updates the cell belonging to the newly created table row with the content of the page cell. row.
+   */
+  protected void updateCellFromPageCell(Cell tableRowCell, ICell pageCell) {
+    tableRowCell.updateFrom(pageCell);
     // ensure a value is set
-    tableCell.setValue(treeCell.getText());
-    return tableCell;
+    tableRowCell.setValue(pageCell.getText());
   }
 
   private List<? extends IMenu> m_pageMenusOfSelection;

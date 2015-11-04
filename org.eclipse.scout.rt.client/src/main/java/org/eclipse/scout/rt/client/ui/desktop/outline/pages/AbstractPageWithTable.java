@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -887,6 +888,16 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
+   * Called when a row gets inserted.
+   * <p>
+   * Updates the cell belonging to the newly created page with the content of the summary cell of the inserted table
+   * row.
+   */
+  protected void updateCellFromTableCell(Cell pageCell, ICell summaryCell) {
+    pageCell.updateFrom(summaryCell);
+  }
+
+  /**
    * Table listener and tree controller<br>
    * the table is reflected in tree children only if the tree/page node is not marked as being a leaf
    */
@@ -926,7 +937,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                 IPage<?> childPage = interceptCreateVirtualChildPage(element);
                 if (childPage != null) {
                   ICell tableCell = getTable().getSummaryCell(element);
-                  childPage.getCellForUpdate().updateFrom(tableCell);
+                  updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
                   linkTableRowWithPage(element, childPage);
                   childPageList.add(childPage);
                 }
