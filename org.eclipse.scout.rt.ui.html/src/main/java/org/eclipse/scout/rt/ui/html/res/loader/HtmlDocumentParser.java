@@ -13,12 +13,15 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -32,8 +35,9 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 public class HtmlDocumentParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlDocumentParser.class);
 
+  private static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\"\\s]+)=\"([^\"]*)\"");
   private static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message key=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout\\:stylesheet src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout\\:script src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
@@ -153,26 +157,39 @@ public class HtmlDocumentParser {
     Matcher m = PATTERN_MESSAGE_TAG.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
-      String keyAttr = m.group(1);
-      String otherAttrs = m.group(2);
-      String text;
-      if (otherAttrs.contains("style=\"javascript\"")) {
-        // JavaScript style replacement
-        StringBuilder js = new StringBuilder("{");
-        String[] keys = keyAttr.split(" ");
-        for (String key : keys) {
-          js.append("'" + key + "': ");
-          js.append(toJavaScriptString(TEXTS.get(key)));
-          js.append(", ");
+      Matcher m2 = PATTERN_KEY_VALUE.matcher(m.group(1));
+      String style = "";
+      List<String> keys = new ArrayList<>();
+      while (m2.find()) {
+        String key = m2.group(1);
+        String value = m2.group(2);
+        if (StringUtility.equalsIgnoreCase(key, "style")) {
+          style = value;
         }
-        int length = js.length();
-        js.delete(length - 2, length);
-        js.append("}");
-        text = js.toString();
+        else if (StringUtility.equalsIgnoreCase(key, "key")) {
+          keys.add(value);
+        }
       }
-      else {
-        // Plain normal replacement
-        text = TEXTS.get(keyAttr);
+      // Generate output
+      String text = "";
+      if (!keys.isEmpty()) {
+        if (StringUtility.equalsIgnoreCase(style, "javascript")) {
+          // JavaScript style replacement
+          StringBuilder js = new StringBuilder("{");
+          for (String key : keys) {
+            js.append("'").append(key).append("': ");
+            js.append(toJavaScriptString(TEXTS.get(key)));
+            js.append(", ");
+          }
+          int length = js.length();
+          js.delete(length - 2, length);
+          js.append("}");
+          text = js.toString();
+        }
+        else {
+          // Plain normal replacement
+          text = TEXTS.get(keys.get(0));
+        }
       }
       m.appendReplacement(sb, Matcher.quoteReplacement(text));
     }
@@ -187,5 +204,4 @@ public class HtmlDocumentParser {
     text = text.replaceAll("\r\n", "\\\\n");
     return "'" + text + "'";
   }
-
 }
