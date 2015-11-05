@@ -185,7 +185,7 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
     activeContext._validateAndSetFocus(element, filter);
   }
 
-  return (document.activeElement === element);
+  return scout.focusUtils.isActiveElement(element);
 };
 
 /**

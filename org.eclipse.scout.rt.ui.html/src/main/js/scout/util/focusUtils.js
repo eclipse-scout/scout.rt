@@ -57,11 +57,13 @@ scout.focusUtils = {
     return (text.length > 0);
   },
 
+
   /**
-   * @return true when the given element is the document.activeElement, otherwise false.
+   * Returns true if the given HTML element is the active element in its own document, false otherwise
+   * @param element
    */
   isActiveElement: function(element) {
-    return $(document.activeElement).is(element);
+    return element && element.ownerDocument.activeElement === element;
   }
 
 };

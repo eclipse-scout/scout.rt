@@ -137,7 +137,7 @@ scout.strings = {
     if (string === undefined || string === null) {
       return string;
     }
-    var div = document.createElement('div');
+    var div = document.createElement('div'); // FIXME AWE: fragment here?
     div.textContent = string;
     return div.innerHTML;
   },

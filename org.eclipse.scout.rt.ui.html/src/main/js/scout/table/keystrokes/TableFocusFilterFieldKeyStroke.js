@@ -43,9 +43,9 @@ scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var activeElement = document.activeElement;
-  var activeElementType = activeElement.tagName.toLowerCase();
-  var focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
+  var activeElement = this.field.$container.getActiveElement(),
+    activeElementType = activeElement.tagName.toLowerCase(),
+    focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
   if (activeElement.className === 'table-text-filter' || !focusOnInputField) {
     event._$filterInput = $filterInput;
     this._isKeyStrokeInRange(event);

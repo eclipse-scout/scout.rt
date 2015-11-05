@@ -156,7 +156,7 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
 
     // Before handling the keystroke, accept the input of a potential active value field.
     if (!keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField)) {
-      scout.ValueField.invokeValueFieldAcceptInput();
+      scout.ValueField.invokeValueFieldAcceptInput(event.target);
     }
 
     // Handle the keystroke.

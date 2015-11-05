@@ -668,7 +668,7 @@ scout.Planner.prototype._onCellMousedown = function(event) {
   }
 
   if (this.selectionMode === SELECTION_MODE.ACTIVITY) {
-    $activity = $(document.elementFromPoint(event.pageX, event.pageY));
+    $activity = this._$elementFromPoint(event.pageX, event.pageY);
 
     if ($activity.hasClass('planner-activity')) {
       $('.selected', this.$grid).removeClass('selected');
@@ -805,7 +805,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
 
 scout.Planner.prototype._findRow = function(y) {
   var x = this.$grid.offset().left + 10,
-    $row = $(document.elementFromPoint(x, y)).parent();
+    $row = this._$elementFromPoint(x, y).parent();
 
   if ($row.hasClass('planner-resource')) {
     return $row.data('resource');
@@ -816,7 +816,7 @@ scout.Planner.prototype._findRow = function(y) {
 
 scout.Planner.prototype._findScale = function(x) {
   var y = this.$scale.offset().top + this.$scale.height() * 0.75,
-    $scale = $(document.elementFromPoint(x, y));
+    $scale = this._$elementFromPoint(x, y);
 
   if ($scale.data('date-from') !== undefined) {
     return {
@@ -829,6 +829,10 @@ scout.Planner.prototype._findScale = function(x) {
 };
 
 /* -- helper ---------------------------------------------------- */
+
+scout.Planner.prototype._$elementFromPoint = function(x, y) {
+  return $(this.$container.getDocument().elementFromPoint(x, y));
+};
 
 scout.Planner.prototype._dateFormat = function(date, pattern) {
   var d = new Date(date.valueOf()),

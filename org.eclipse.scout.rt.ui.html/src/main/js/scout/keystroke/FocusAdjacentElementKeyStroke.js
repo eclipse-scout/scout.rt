@@ -20,7 +20,7 @@ scout.FocusAdjacentElementKeyStroke = function(session, field) {
 scout.inherits(scout.FocusAdjacentElementKeyStroke, scout.KeyStroke);
 
 scout.FocusAdjacentElementKeyStroke.prototype.handle = function(event) {
-  var activeElement = document.activeElement,
+  var activeElement = this.field.$container.getActiveElement(),
     $focusableElements = this.field.$container.find(':focusable');
 
   switch (event.which) {

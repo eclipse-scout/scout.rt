@@ -25,7 +25,7 @@ scout.BaseDesktop.prototype._renderTitle = function(title) {
   }
   var $scoutDivs = $('div.scout');
   if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
-    document.title = title;
+    $scoutDivs.getDocument().title = title;
   }
 };
 

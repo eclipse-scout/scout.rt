@@ -27,7 +27,7 @@ scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
  */
 scout.ButtonKeyStroke.prototype._accept = function(event) {
   var accepted = scout.ButtonKeyStroke.parent.prototype._accept.call(this, event);
-  return accepted && jQuery.contains(document.documentElement, this.field.$field[0]);
+  return accepted && this.field.$field.isAttached();
 };
 
 /**

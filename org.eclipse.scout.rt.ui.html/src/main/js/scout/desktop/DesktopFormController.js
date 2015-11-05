@@ -19,8 +19,8 @@ scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
     windowSpecs = 'left=' + bounds.x + ',top=' + bounds.y + ',width=' + bounds.width + ',height=' + bounds.height;
   } else {
     // FIXME AWE: (2nd screen) use prefSize from dialog here
-    var $document = $(document),
-      documentSize = new scout.Dimension($document.width(), $document.height());
+    var $mainDocument = $(document),
+      documentSize = new scout.Dimension($mainDocument.width(), $mainDocument.height());
     windowSpecs = 'left=0,top=0,width=' + documentSize.width + ',height=' + documentSize.height;
   }
 

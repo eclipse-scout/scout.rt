@@ -411,7 +411,7 @@
    * @return true if the element is attached (= is in the dom tree), false if not
    */
   $.fn.isAttached = function() {
-    return $.contains(document.documentElement, this[0]);
+    return $.contains(this.getDocument().documentElement, this[0]);
   };
 
   /**
@@ -886,7 +886,7 @@
 
   $.fn.backupSelection = function() {
     var field = this[0];
-    if (field && field === document.activeElement) {
+    if (field && field === this.getActiveElement()) {
       return {
         selectionStart: field.selectionStart,
         selectionEnd: field.selectionEnd,
@@ -898,7 +898,7 @@
 
   $.fn.restoreSelection = function(selection) {
     var field = this[0];
-    if (field && field === document.activeElement && selection) {
+    if (field && field === this.getActiveElement() && selection) {
       field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
     }
   };
@@ -998,13 +998,20 @@
     return this.length ? this[0].ownerDocument : null;
   };
 
-
   /**
    * @return HTML window reference (defaultView) of the HTML element
    */
   $.fn.getWindow = function() {
     var document = this.getDocument();
     return document ? document.defaultView : null;
+  };
+
+  /**
+   * @return HTML document reference (ownerDocument) of the HTML element.
+   */
+  $.fn.getActiveElement = function() {
+    var document = this.getDocument();
+    return document ? document.activeElement : null;
   };
 
   /**

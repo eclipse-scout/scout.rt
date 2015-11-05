@@ -26,7 +26,7 @@ scout.ClickActiveElementKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  event._$activeElement = $(document.activeElement);
+  event._$activeElement = $(this.field.$container.getActiveElement());
   return true;
 };
 

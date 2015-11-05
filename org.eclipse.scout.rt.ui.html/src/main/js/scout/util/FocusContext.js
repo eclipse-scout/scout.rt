@@ -46,7 +46,7 @@ scout.FocusContext.prototype._dispose = function() {
  */
 scout.FocusContext.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
-    var activeElement = document.activeElement,
+    var activeElement = this.$container.getActiveElement(),
       $focusableElements = this.$container.find(':tabbable'),
       firstFocusableElement = $focusableElements.first()[0],
       lastFocusableElement = $focusableElements.last()[0];
@@ -171,7 +171,7 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   elementToFocus = elementToFocus || this.focusManager.$entryPoint[0];
 
   // Only focus element if different to current focused element
-  if (document.activeElement === elementToFocus) {
+  if (scout.focusUtils.isActiveElement(elementToFocus)) {
     return;
   }
 

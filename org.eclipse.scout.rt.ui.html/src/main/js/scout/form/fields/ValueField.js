@@ -97,8 +97,9 @@ scout.ValueField.prototype.addField = function($field) {
 
 scout.ValueField.prototype._onStatusMousedown = function(event) {
   if (this.menus && this.menus.length > 0) {
-    if (($(document.activeElement).data('valuefield') === this ||
-        $(document.activeElement).parent().data('valuefield') === this)) {
+    var $activeElement = $(this.$container.getActiveElement());
+    if ($activeElement.data('valuefield') === this ||
+        $activeElement.parent().data('valuefield') === this) {
       this.acceptInput();
     }
   }
@@ -113,7 +114,7 @@ scout.ValueField.prototype._onStatusMousedown = function(event) {
  * This method has no effect if another element is the focus owner.
  */
 scout.ValueField.invokeValueFieldAboutToBlurByMouseDown = function(target) {
-  var activeValueField = this._getActiveValueField();
+  var activeValueField = this._getActiveValueField(target);
   if (activeValueField) {
     activeValueField.aboutToBlurByMouseDown(target);
   }
@@ -123,8 +124,8 @@ scout.ValueField.invokeValueFieldAboutToBlurByMouseDown = function(target) {
  * Invokes 'ValueField.acceptInput' on the currently active value field.
  * This method has no effect if another element is the focus owner.
  */
-scout.ValueField.invokeValueFieldAcceptInput = function() {
-  var activeValueField = this._getActiveValueField();
+scout.ValueField.invokeValueFieldAcceptInput = function(target) {
+  var activeValueField = this._getActiveValueField(target);
   if (activeValueField) {
     activeValueField.acceptInput();
   }
@@ -135,7 +136,8 @@ scout.ValueField.invokeValueFieldAcceptInput = function() {
  * Also, if no value field currently owns the focus, its parent is checked to be a value field and is returned accordingly.
  * That is used in DateField.js with multiple input elements.
  */
-scout.ValueField._getActiveValueField = function() {
-  var valueField = $(document.activeElement).data('valuefield') || $(document.activeElement).parent().data('valuefield');
+scout.ValueField._getActiveValueField = function(target) {
+  var $activeElement = $(target.ownerDocument),
+    valueField = $activeElement.data('valuefield') || $activeElement.parent().data('valuefield');
   return valueField && !(valueField.$field && valueField.$field.hasClass('disabled')) ? valueField : null;
 };

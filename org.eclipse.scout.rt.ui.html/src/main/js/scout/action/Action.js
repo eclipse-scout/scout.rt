@@ -221,10 +221,11 @@ scout.Action.prototype.prepareDoAction = function(event) {
   // triggered, which means the acceptInput() is never executed so
   // the executed action works with a wrong value for the active field.
   // --> Same check in Button.doAction()
-  var activeValueField = $(document.activeElement).data('valuefield');
+  var $activeElement = $(document.activeElement), // FIXME AWE: (2nd screen) how to get Document here when $container is null?
+    activeValueField = $activeElement.data('valuefield');
   if (activeValueField === undefined) {
     // try parent, some times the value field is the parent of the input field (e.g. DateField.js)
-    activeValueField = $(document.activeElement).parent().data('valuefield');
+    activeValueField = $activeElement.parent().data('valuefield');
   }
   if (activeValueField) {
     activeValueField.acceptInput();

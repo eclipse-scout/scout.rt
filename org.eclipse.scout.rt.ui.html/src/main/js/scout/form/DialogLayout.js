@@ -21,7 +21,7 @@ scout.DialogLayout.prototype.layout = function($container) {
   }
 
   var htmlComp = this._form.htmlComp,
-    $document = $(document),
+    $document = $(this._form.$container.getDocument()),
     dialogMargins = htmlComp.getMargins(),
     documentSize = new scout.Dimension($document.width(), $document.height()),
     dialogSize = new scout.Dimension(),

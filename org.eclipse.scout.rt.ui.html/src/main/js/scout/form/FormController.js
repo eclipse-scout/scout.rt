@@ -208,7 +208,7 @@ scout.FormController.prototype.detachDialogs = function() {
 
 scout.FormController.prototype._layoutDialog = function(dialog) {
   var left, top, opticalMiddleOffset, dialogSize,
-    $document = $(document),
+    $document = $(dialog.$container.getDocument()),
     documentSize = new scout.Dimension($document.width(), $document.height());
 
   dialog.htmlComp.pixelBasedSizing = true;
