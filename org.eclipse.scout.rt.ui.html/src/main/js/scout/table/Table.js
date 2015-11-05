@@ -1713,7 +1713,7 @@ scout.Table.prototype.renderColumnBackgroundEffect = function(column) {
     };
   } else {
     if (effect !== null) {
-      // FIXME ASA log warning
+      $.log.warn('Unsupported backgroundEffect: ' + effect);
     }
     colorFunc = function($cell, value) {
       $cell.css('background-image', '');

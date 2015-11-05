@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddCustomColumnEmptySpaceMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
@@ -748,13 +750,14 @@ public class OrganizeColumnsForm extends AbstractForm {
             protected void execRowsSelected(List<? extends ITableRow> rows) {
               enableDisableMenus();
               refreshMenus();
-
             }
 
             @Override
             protected void execInitTable() {
               getMenuByClass(AddCustomColumnMenu.class).setVisiblePermission(new CreateCustomColumnPermission());
               getMenuByClass(AddCustomColumnMenu.class).setVisible(m_table.getTableCustomizer() != null);
+              getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisiblePermission(new CreateCustomColumnPermission());
+              getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisible(m_table.getTableCustomizer() != null);
               getMenuByClass(ModifyCustomColumnMenu.class).setVisiblePermission(new UpdateCustomColumnPermission());
               getMenuByClass(ModifyCustomColumnMenu.class).setVisible(m_table.getTableCustomizer() != null);
             }
@@ -762,6 +765,9 @@ public class OrganizeColumnsForm extends AbstractForm {
             private void refreshMenus() {
               ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
               IColumn selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow);
+              if (selectedCol == null) {
+                return;
+              }
               // sort
               if (selectedCol.isSortActive() && selectedCol.isSortAscending()) {
                 getMenuByClass(SortAscAdditionalMenu.class).setText("x");
@@ -1167,6 +1173,25 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
 
             @Order(70.0)
+            public class AddCustomColumnEmptySpaceMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.Plus;
+              }
+
+              @Override
+              protected void execAction() {
+                addColumnWithCustomizer();
+              }
+            }
+
+            @Order(70.0)
             public class AddCustomColumnMenu extends AbstractMenu {
 
               @Override
@@ -1181,51 +1206,55 @@ public class OrganizeColumnsForm extends AbstractForm {
 
               @Override
               protected void execAction() {
-                if (m_table != null) {
-                  if (m_table.getTableCustomizer() != null) {
-                    ArrayList<String> existingColumns = new ArrayList<String>();
-                    for (IColumn c : m_table.getColumns()) {
-                      existingColumns.add(c.getColumnId());
-                    }
-                    m_table.getTableCustomizer().addColumn();
+                addColumnWithCustomizer();
+              }
 
-                    // find target row (selected row or first row)
-                    ITableRow targetOrderRow = getColumnsTableField().getTable().getSelectedRow();
-                    if (targetOrderRow == null && getColumnsTableField().getTable().getRowCount() > 0) {
-                      targetOrderRow = getColumnsTableField().getTable().getRow(0);
-                    }
-                    if (targetOrderRow == null) {
-                      return;
-                    }
+            }
 
-                    // find new row
-                    getColumnsTableField().reloadTableData();
-                    for (ITableRow newColumnRow : getColumnsTableField().getTable().getRows()) {
-                      if (!existingColumns.contains(getColumnsTableField().getTable().getKeyColumn().getValue(newColumnRow).getColumnId())) {
-                        // move new column
-                        try {
-                          getColumnsTableField().getTable().setTableChanging(true);
-                          if (newColumnRow.getRowIndex() < targetOrderRow.getRowIndex()) {
-                            moveDown(newColumnRow, targetOrderRow.getRowIndex());
-                          }
-                          else {
-                            moveUp(newColumnRow, targetOrderRow.getRowIndex());
-                          }
-                          updateColumnVisibilityAndOrder();
+            protected void addColumnWithCustomizer() {
+              if (m_table != null) {
+                if (m_table.getTableCustomizer() != null) {
+                  ArrayList<String> existingColumns = new ArrayList<String>();
+                  for (IColumn c : m_table.getColumns()) {
+                    existingColumns.add(c.getColumnId());
+                  }
+                  m_table.getTableCustomizer().addColumn();
 
-                          // select new row
-                          getColumnsTableField().getTable().selectRow(newColumnRow);
+                  // find target row (selected row or first row)
+                  ITableRow targetOrderRow = getColumnsTableField().getTable().getSelectedRow();
+                  if (targetOrderRow == null && getColumnsTableField().getTable().getRowCount() > 0) {
+                    targetOrderRow = getColumnsTableField().getTable().getRow(0);
+                  }
+                  if (targetOrderRow == null) {
+                    return;
+                  }
+
+                  // find new row
+                  getColumnsTableField().reloadTableData();
+                  for (ITableRow newColumnRow : getColumnsTableField().getTable().getRows()) {
+                    if (!existingColumns.contains(getColumnsTableField().getTable().getKeyColumn().getValue(newColumnRow).getColumnId())) {
+                      // move new column
+                      try {
+                        getColumnsTableField().getTable().setTableChanging(true);
+                        if (newColumnRow.getRowIndex() < targetOrderRow.getRowIndex()) {
+                          moveDown(newColumnRow, targetOrderRow.getRowIndex());
                         }
-                        finally {
-                          getColumnsTableField().getTable().setTableChanging(false);
+                        else {
+                          moveUp(newColumnRow, targetOrderRow.getRowIndex());
                         }
-                        break;
+                        updateColumnVisibilityAndOrder();
+
+                        // select new row
+                        getColumnsTableField().getTable().selectRow(newColumnRow);
                       }
+                      finally {
+                        getColumnsTableField().getTable().setTableChanging(false);
+                      }
+                      break;
                     }
                   }
                 }
               }
-
             }
 
             @Order(80.0)
@@ -1428,22 +1457,23 @@ public class OrganizeColumnsForm extends AbstractForm {
   private void enableDisableMenus() {
     boolean isCustomColumnSelected = false;
     boolean isFilterActive = false;
-    List<ITableRow> selectedRows = getColumnsTableField().getTable().getSelectedRows();
+    Table tableFieldTable = getColumnsTableField().getTable();
+    List<ITableRow> selectedRows = tableFieldTable.getSelectedRows();
     for (ITableRow row : selectedRows) {
-      if (getColumnsTableField().getTable().getKeyColumn().getValue(row).isColumnFilterActive()) {
+      if (tableFieldTable.getKeyColumn().getValue(row).isColumnFilterActive()) {
         isFilterActive = true;
       }
-      if (getColumnsTableField().getTable().getKeyColumn().getValue(row) instanceof ICustomColumn<?>) {
+      if (tableFieldTable.getKeyColumn().getValue(row) instanceof ICustomColumn<?>) {
         isCustomColumnSelected = true;
       }
     }
 
-    getColumnsTableField().getTable().getMenuByClass(ModifyCustomColumnMenu.class).setEnabled(isCustomColumnSelected);
-    getColumnsTableField().getTable().getMenuByClass(ModifyCustomColumnMenu.class).setVisible(isCustomColumnSelected);
-    getColumnsTableField().getTable().getMenuByClass(RemoveMenu.class).setEnabled(isCustomColumnSelected);
-    getColumnsTableField().getTable().getMenuByClass(RemoveMenu.class).setVisible(isCustomColumnSelected);
-
-    getColumnsTableField().getTable().getMenuByClass(RemoveFilterMenu.class).setVisible(isFilterActive);
+    tableFieldTable.getMenuByClass(ModifyCustomColumnMenu.class).setEnabled(isCustomColumnSelected);
+    tableFieldTable.getMenuByClass(ModifyCustomColumnMenu.class).setVisible(isCustomColumnSelected);
+    tableFieldTable.getMenuByClass(RemoveMenu.class).setEnabled(isCustomColumnSelected);
+    tableFieldTable.getMenuByClass(RemoveMenu.class).setVisible(isCustomColumnSelected);
+    tableFieldTable.getMenuByClass(RemoveFilterMenu.class).setVisible(isFilterActive);
+    tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisible(m_table.getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
 
   }
 

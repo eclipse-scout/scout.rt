@@ -476,6 +476,39 @@ public class TableEventBufferTest {
     assertEquals(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, events.get(3).getType());
   }
 
+  @Test
+  public void testCoalesceAndRemoveObsoleteColumnBackgroundEffectEvents() {
+    ITable table = mock(ITable.class);
+    final IColumn<?> c1 = mockColumn(0);
+    final IColumn<?> c2 = mockColumn(1);
+    final IColumn<?> c3 = mockColumn(2);
+
+    final TableEvent event0 = new TableEvent(table, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
+    event0.setColumns(CollectionUtility.arrayList(c3));
+    final TableEvent event1 = new TableEvent(table, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
+    event1.setColumns(CollectionUtility.arrayList(c1));
+    final TableEvent event2 = new TableEvent(table, TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
+    event2.setColumns(CollectionUtility.arrayList(c2));
+    final TableEvent event3 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    event3.setColumns(CollectionUtility.arrayList(c1));
+
+    m_testBuffer.add(event0);
+    m_testBuffer.add(new TableEvent(table, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED));
+    m_testBuffer.add(event1);
+    m_testBuffer.add(event2);
+    m_testBuffer.add(event3);
+
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(events.size(), 3);
+    assertEquals(TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED, events.get(0).getType());
+    assertEquals(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED, events.get(1).getType());
+    assertEquals(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED, events.get(2).getType());
+    TableEvent bgEffectEvent = events.get(1);
+    assertEquals(2, bgEffectEvent.getColumns().size());
+    assertTrue(bgEffectEvent.getColumns().containsAll(CollectionUtility.arrayList(c1, c2)));
+
+  }
+
   private TableEvent createTestUpdateEvent() {
     return new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1));
   }
