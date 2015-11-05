@@ -28,12 +28,8 @@ public final class ClientConfigProperties {
 
     @Override
     protected String parse(String value) {
-      String p = super.parse(value);
-      if (p == null) {
-        return p;
-      }
-      if (CompareUtility.isOneOf(p, "small", "medium", "large")) {
-        return p;
+      if (CompareUtility.isOneOf(value, "small", "medium", "large")) {
+        return value;
       }
       throw new PlatformException("Invalid value for property '" + getKey() + "': '" + value + "'. Valid values are small, medium or large");
     }
@@ -41,6 +37,11 @@ public final class ClientConfigProperties {
     @Override
     public String getKey() {
       return "org.eclipse.scout.memory";
+    }
+
+    @Override
+    protected String getDefaultValue() {
+      return "large";
     }
   }
 

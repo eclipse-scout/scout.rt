@@ -260,32 +260,47 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   /*
    * Properties
    */
-
   protected void initConfig() {
     m_virtualDesktop = new VirtualDesktop();
-    String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
-    setMemoryPolicy(memPolicyValue);
+    m_browserUri = resolveBrowserUri();
 
-    if (PropertyMap.CURRENT.get() != null) {
-      String urlText = PropertyMap.CURRENT.get().get("url");
-      try {
-        m_browserUri = urlText != null ? new URI(urlText) : null;
-      }
-      catch (URISyntaxException e) {
-        LOG.warn("Cannot read browser url: " + urlText, e);
-      }
+    setMemoryPolicy(resolveMemoryPolicy());
+  }
+
+  /**
+   * Resolves the browser URI, or <code>null</code> if could not be resolved.
+   * <p>
+   * The default implementation looks in the current calling context for the URL. Typically, that URL is set only during
+   * session initialization.
+   *
+   * @see UiSession.createAndStartClientSession()
+   */
+  protected URI resolveBrowserUri() {
+    String url = PropertyMap.CURRENT.get().get("url");
+    if (url == null) {
+      return null;
+    }
+
+    try {
+      return new URI(url);
+    }
+    catch (URISyntaxException e) {
+      LOG.warn("Cannot read browser url: " + url, e);
+      return null;
     }
   }
 
-  private void setMemoryPolicy(String policy) {
-    if ("small".equals(policy)) {
-      setMemoryPolicy(new SmallMemoryPolicy());
-    }
-    else if ("medium".equals(policy)) {
-      setMemoryPolicy(new MediumMemoryPolicy());
-    }
-    else {
-      setMemoryPolicy(new LargeMemoryPolicy());
+  /**
+   * Returns the memory policy to be used.
+   */
+  protected IMemoryPolicy resolveMemoryPolicy() {
+    switch (CONFIG.getPropertyValue(MemoryPolicyProperty.class)) {
+      case "small":
+        return new SmallMemoryPolicy();
+      case "medium":
+        return new MediumMemoryPolicy();
+      default:
+        return new LargeMemoryPolicy();
     }
   }
 
@@ -388,14 +403,14 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setDesktop(IDesktop a) {
-    if (a == null) {
+  public void setDesktop(IDesktop desktop) {
+    if (desktop == null) {
       throw new IllegalArgumentException("argument must not be null");
     }
     if (m_desktop != null) {
       throw new IllegalStateException("desktop is active");
     }
-    m_desktop = a;
+    m_desktop = desktop;
     if (m_desktop != null) {
       if (m_virtualDesktop != null) {
         for (DesktopListener listener : m_virtualDesktop.getDesktopListeners()) {
@@ -551,11 +566,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setMemoryPolicy(IMemoryPolicy p) {
+  public void setMemoryPolicy(IMemoryPolicy memoryPolicy) {
     if (m_memoryPolicy != null) {
       m_memoryPolicy.removeNotify();
     }
-    m_memoryPolicy = p;
+    m_memoryPolicy = memoryPolicy;
     if (m_memoryPolicy != null) {
       m_memoryPolicy.addNotify();
     }

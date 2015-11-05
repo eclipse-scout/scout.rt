@@ -118,9 +118,9 @@ public interface IClientSession extends ISession, IPropertyObserver {
   IDesktop getDesktop();
 
   /**
-   * set the desktop model assiciated with this client session
+   * Sets the desktop model associated with this client session.
    */
-  void setDesktop(IDesktop a);
+  void setDesktop(IDesktop desktop);
 
   /**
    * see {@link IMemoryPolicy}
@@ -130,7 +130,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
   /**
    * see {@link IMemoryPolicy}
    */
-  void setMemoryPolicy(IMemoryPolicy p);
+  void setMemoryPolicy(IMemoryPolicy memoryPolicy);
 
   /**
    * @return Subject used for offline operations
