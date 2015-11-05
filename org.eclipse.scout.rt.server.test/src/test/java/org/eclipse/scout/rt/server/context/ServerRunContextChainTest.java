@@ -20,7 +20,7 @@ import java.util.Iterator;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.chain.IChainable;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.context.PropertyMap;

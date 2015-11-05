@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;

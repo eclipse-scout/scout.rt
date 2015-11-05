@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.status.IStatus;
 /**
  * This interface can be used via {@link ScoutLogManager#getLogger(Class)}.
  * <p>
- * ScoutLogManager creates a transparent wrapper of a java.util.logging.Logger or Eclipse Logger.
+ * ScoutLogManager creates a transparent wrapper of an {@link org.slf4j.Logger}.
  * <p>
  * Therefore using this interface or {@link Logger#getLogger(String)} is the absolute same thing.
  * <p>
@@ -380,7 +380,7 @@ public interface IScoutLogger {
 
   /**
    * Log the given {@link IStatus} in the level of the severity of the status ({@link IStatus#getSeverity()}).
-   * 
+   *
    * @param status
    *          The status to log. Must not be null.
    */
@@ -389,7 +389,7 @@ public interface IScoutLogger {
   /**
    * Log the given {@link IProcessingStatus} in the level of the severity of the status (
    * {@link IProcessingStatus#getSeverity()}).
-   * 
+   *
    * @param status
    *          The {@link IProcessingStatus} to log. must not be null.
    */

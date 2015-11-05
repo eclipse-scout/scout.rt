@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.logger.internal.slf4j;
+package org.eclipse.scout.commons.logger;
 
 import java.util.concurrent.Callable;
 

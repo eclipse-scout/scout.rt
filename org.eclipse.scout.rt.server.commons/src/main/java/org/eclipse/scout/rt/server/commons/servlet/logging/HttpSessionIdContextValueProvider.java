@@ -2,8 +2,8 @@ package org.eclipse.scout.rt.server.commons.servlet.logging;
 
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.slf4j.MDC;

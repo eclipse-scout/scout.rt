@@ -15,8 +15,8 @@ import java.security.Principal;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.slf4j.MDC;
 

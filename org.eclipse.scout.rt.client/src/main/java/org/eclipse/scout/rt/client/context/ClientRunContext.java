@@ -18,7 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;

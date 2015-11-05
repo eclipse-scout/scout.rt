@@ -19,8 +19,6 @@ import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
@@ -39,7 +37,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 public class GeneralView extends DefaultView {
 
   private static final long serialVersionUID = -5324529296371616980L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GeneralView.class);
 
   public GeneralView(AdminSession as) {
     super(as);
@@ -54,7 +51,6 @@ public class GeneralView extends DefaultView {
   public void produceBody(HtmlComponent p) {
     // menu
     String monitoringStatusMessage = createMonitoringQuickLink(p);
-    String loggingStatusMessage = createLoggingQuickLink(p);
 
     // infos
     String title = CONFIG.getPropertyValue(ApplicationNameProperty.class);
@@ -128,9 +124,6 @@ public class GeneralView extends DefaultView {
     if (monitoringStatusMessage != null) {
       p.raw(monitoringStatusMessage);
     }
-    if (loggingStatusMessage != null) {
-      p.raw(loggingStatusMessage);
-    }
   }
 
   private String createMonitoringQuickLink(HtmlComponent p) {
@@ -190,68 +183,6 @@ public class GeneralView extends DefaultView {
     return null;
   }
 
-  private String createLoggingQuickLink(HtmlComponent p) {
-    if (!ACCESS.check(new UpdateServiceConfigurationPermission())) {
-      return null;
-    }
-
-    Integer globalLogLevel;
-    try {
-      // check whether global log level is supported by installed log manager
-      globalLogLevel = ScoutLogManager.getGlobalLogLevel();
-    }
-    catch (UnsupportedOperationException e) {
-      LOG.info("Use of global log level is not supported", e);
-      return null;
-    }
-
-    if (globalLogLevel != null) {
-      p.print("Global logging is active [ ");
-      p.linkAction("deactivate", new P_ToggleGlobalLoggingAction(false));
-      p.print(" ]");
-
-      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_ERROR, "ERROR");
-      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_WARN, "WARNING");
-      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_INFO, "INFO");
-      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_DEBUG, "DEBUG");
-      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_TRACE, "TRACE");
-      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_OFF, "OFF");
-    }
-    else {
-      p.print("Global logging is inactive [");
-      p.linkAction("activate", new P_ToggleGlobalLoggingAction(true));
-      p.print(" ]");
-    }
-    p.p();
-
-    if (globalLogLevel != null && globalLogLevel > IScoutLogger.LEVEL_WARN) {
-      return "<p><b>Note: Global logging is active with a level finer than WARNING; this might affect performance due to increased log output.</b><p>";
-    }
-    return null;
-  }
-
-  private void addLogLevelRadioEntry(HtmlComponent p, final int logLevel, String logLevelText) {
-    Integer globalLogLevel = ScoutLogManager.getGlobalLogLevel();
-    if (globalLogLevel == null) {
-      globalLogLevel = -1;
-    }
-
-    AbstractHtmlAction action = new AbstractHtmlAction("level=" + logLevel) {
-      private static final long serialVersionUID = -6006327487856760793L;
-
-      @Override
-      public void run() {
-        if (logLevel >= 0 && logLevel <= 5) {
-          ScoutLogManager.setGlobalLogLevel(logLevel);
-        }
-        else {
-          ScoutLogManager.setGlobalLogLevel(null);
-        }
-      }
-    };
-    p.radioBoxOption("globalLogLevel", logLevelText, action, logLevel == globalLogLevel);
-  }
-
   private class P_EnableAction extends AbstractHtmlAction {
     private static final long serialVersionUID = 3594131240310244266L;
     private boolean m_enabled;
@@ -281,26 +212,4 @@ public class GeneralView extends DefaultView {
       ProcessInspector.instance().setTimeout(m_minutes * 60000L);
     }
   }
-
-  private final class P_ToggleGlobalLoggingAction extends AbstractHtmlAction {
-
-    private static final long serialVersionUID = -4106119434491057505L;
-    private boolean m_activate;
-
-    public P_ToggleGlobalLoggingAction(boolean activate) {
-      super(P_ToggleGlobalLoggingAction.class.getName() + "." + (activate ? "global" : "default"));
-      m_activate = activate;
-    }
-
-    @Override
-    public void run() {
-      if (m_activate) {
-        ScoutLogManager.setGlobalLogLevel(IScoutLogger.LEVEL_ERROR);
-      }
-      else {
-        ScoutLogManager.setGlobalLogLevel(null);
-      }
-    }
-  }
-
 }

@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
+import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.BEANS;
