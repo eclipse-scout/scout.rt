@@ -721,6 +721,10 @@ public class OrganizeColumnsForm extends AbstractForm {
               return getColumnSet().getColumnByClass(WidthColumn.class);
             }
 
+            public BehindScrollbarColumn getBehindScrollbarColumn() {
+              return getColumnSet().getColumnByClass(BehindScrollbarColumn.class);
+            }
+
             public TitleColumn getTitleColumn() {
               return getColumnSet().getColumnByClass(TitleColumn.class);
             }
@@ -910,6 +914,22 @@ public class OrganizeColumnsForm extends AbstractForm {
               protected void execCompleteEdit(ITableRow row, IFormField editingField) {
                 super.execCompleteEdit(row, editingField);
                 getKeyColumn().getValue(row).setWidth(getWidthColumn().getValue(row));
+              }
+
+            }
+
+            // prevents the scrollbar from overlapping the WidthColumn
+            @Order(80.0)
+            public class BehindScrollbarColumn extends AbstractStringColumn {
+
+              @Override
+              protected boolean getConfiguredFixedWidth() {
+                return true;
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 10;
               }
 
             }
