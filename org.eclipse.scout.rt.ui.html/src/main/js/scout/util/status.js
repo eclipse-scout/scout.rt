@@ -18,11 +18,10 @@ scout.status = {
   },
 
   animateStatusMessage: function($status, message) {
-    var document = $.getDocument($status);
     if (scout.strings.endsWith(message, '...')) {
-      var $elipsis = $.makeSpan(document, 'elipsis');
+      var $elipsis = $status.makeSpan('elipsis');
       for (var i = 0; i < 3; i++) {
-        $elipsis.append($.makeSpan(document, 'animate-dot delay-' + i, '.'));
+        $elipsis.append($status.makeSpan('animate-dot delay-' + i, '.'));
       }
       message = message.substring(0, message.length - 3);
       $status.empty().text(message).append($elipsis);

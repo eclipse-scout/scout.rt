@@ -77,74 +77,6 @@
 
   // === $ extensions ===
 
-  /**
-   * @return HTML document reference (ownerDocument) of the given element
-   */
-  $.getDocument = function($element) {
-    return $element && $element.length ? $element[0].ownerDocument : null;
-  };
-
-
-  /**
-   * @return HTML window reference (defaultView) of the given element
-   */
-  $.getWindow = function($element) {
-    var document = $.getDocument($element);
-    return document ? document.defaultView : null;
-  };
-
-  /**
-   * @param theDocument HTML document reference. We use the name 'theDocument' everywhere, to prevent accidental usage of global document variable
-   * @param element string. Example = &lt;input&gt;
-   * @param cssClass (optional) class attribute
-   * @param text (optional) adds a child text-node with given text (no HTML content)
-   */
-  $.makeElement = function(theDocument, element, cssClass, text) {
-    if (theDocument === undefined || element === undefined) {
-      return new Error('missing arguments: document, element');
-    }
-    var $element = $(element, theDocument);
-    if (cssClass) {
-      $element.addClass(cssClass);
-    }
-    if (text) {
-      $element.text(text);
-    }
-    return $element;
-  };
-
-  $.makeDiv = function(theDocument, cssClass, htmlContent, id) {
-    var $div = $.makeElement(theDocument, '<div>', cssClass);
-    if (id !== undefined) {
-      $div.attr('id', id);
-    }
-    if (htmlContent) {
-      $div.html(htmlContent);
-    }
-    if (scout.device.unselectableAttribute) {
-      $div.attr('unselectable', 'on'); // FIXME AWE: unselectable / IE9 - make this correct
-    }
-    return $div;
-  };
-
-  $.makeSpan = function(theDocument, cssClass, text) {
-    return $.makeElement(theDocument, '<span>', cssClass, text);
-  };
-
-  $.makeSVG = function(theDocument, type, cssClass, htmlContent, id) {
-    var $svg = $(theDocument.createElementNS('http://www.w3.org/2000/svg', type));
-    if (cssClass) {
-      $svg.attrSVG('class', cssClass);
-    }
-    if (htmlContent) {
-      $svg.html(htmlContent);
-    }
-    if (id !== undefined) {
-      $svg.attrSVG('id', id);
-    }
-    return $svg;
-  };
-
   // used by some animate functions
   $.removeThis = function() {
     $(this).remove();
@@ -240,45 +172,6 @@
     return jQuery.ajax(options);
   };
 
-  // === $.prototype extensions ===
-
-  // prepend - and return new div for chaining
-  $.fn.prependDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).prependTo(this);
-  };
-
-  // append - and return new div for chaining
-  $.fn.appendDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).appendTo(this);
-  };
-
-  $.fn.appendElement = function(element, cssClass, text) {
-    return $.makeElement($.getDocument(this), element, cssClass, text).appendTo(this);
-  };
-
-  // insert after - and return new div for chaining
-  $.fn.afterDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).insertAfter(this);
-  };
-
-  // insert before - and return new div for chaining
-  $.fn.beforeDiv = function(cssClass, htmlContent, id) {
-    return $.makeDiv($.getDocument(this), cssClass, htmlContent, id).insertBefore(this);
-  };
-
-  $.fn.appendSpan = function(cssClass, text) {
-    return $.makeSpan($.getDocument(this), cssClass, text).appendTo(this);
-  };
-
-  $.fn.appendBr = function(cssClass) {
-    return $.makeElement($.getDocument(this), '<br>', cssClass).appendTo(this);
-  };
-
-  // append svg
-  $.fn.appendSVG = function(type, cssClass, htmlContent, id) {
-    return $.makeSVG($.getDocument(this), type, cssClass, htmlContent, id).appendTo(this);
-  };
-
   $.pxToNumber = function(pixel) {
     if (!pixel) {
       // parseFloat would return NaN if pixel is '' or undefined
@@ -286,6 +179,49 @@
     }
     // parseFloat ignores 'px' and just extracts the number
     return parseFloat(pixel, 10);
+  };
+
+  // === $.prototype extensions ===
+
+  // prepend - and return new div for chaining
+  $.fn.prependDiv = function(cssClass, htmlContent, id) {
+    return this.makeDiv(cssClass, htmlContent, id).prependTo(this);
+  };
+
+  // append - and return new div for chaining
+  $.fn.appendDiv = function(cssClass, htmlContent, id) {
+    return this.makeDiv(cssClass, htmlContent, id).appendTo(this);
+  };
+
+  $.fn.appendElement = function(element, cssClass, text) {
+    return this.makeElement(element, cssClass, text).appendTo(this);
+  };
+
+  // insert after - and return new div for chaining
+  $.fn.afterDiv = function(cssClass, htmlContent, id) {
+    return this.makeDiv(cssClass, htmlContent, id).insertAfter(this);
+  };
+
+  // insert before - and return new div for chaining
+  $.fn.beforeDiv = function(cssClass, htmlContent, id) {
+    return this.makeDiv(cssClass, htmlContent, id).insertBefore(this);
+  };
+
+  $.fn.appendSpan = function(cssClass, text) {
+    return this.makeSpan(cssClass, text).appendTo(this);
+  };
+
+  $.fn.appendBr = function(cssClass) {
+    return this.makeElement('<br>', cssClass).appendTo(this);
+  };
+
+  $.fn.appendTextNode = function(text) {
+    return this.getDocument().createTextNode(text).appendTo(this);
+  };
+
+  // append SVG
+  $.fn.appendSVG = function(type, cssClass, htmlContent, id) {
+    return this.makeSVG(type, cssClass, htmlContent, id).appendTo(this);
   };
 
   // attr and class handling for svg
@@ -998,21 +934,100 @@
   };
 
   /**
+   * @param element string. Example = &lt;input&gt;
+   * @param cssClass (optional) class attribute
+   * @param text (optional) adds a child text-node with given text (no HTML content)
+   */
+  $.fn.makeElement = function(element, cssClass, text) {
+    var myDocument = this.getDocument();
+    if (myDocument === undefined || element === undefined) {
+      return new Error('missing arguments: document, element');
+    }
+    var $element = $(element, myDocument);
+    if (cssClass) {
+      $element.addClass(cssClass);
+    }
+    if (text) {
+      $element.text(text);
+    }
+    return $element;
+  };
+
+  $.fn.makeDiv = function(cssClass, htmlContent, id) {
+    var unselectable = scout.device.unselectableAttribute,
+      $div = this.makeElement('<div>', cssClass);
+
+    if (id !== undefined) {
+      $div.attr('id', id);
+    }
+    if (htmlContent) {
+      $div.html(htmlContent);
+    }
+    if (unselectable.key) {
+      $div.attr(unselectable.key, unselectable.value);
+    }
+    return $div;
+  };
+
+  $.fn.makeSpan = function(cssClass, text) {
+    return this.makeElement('<span>', cssClass, text);
+  };
+
+  $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
+    var myDocument = this.getDocument();
+    if (myDocument === undefined || type === undefined) {
+      return new Error('missing arguments: document, type');
+    }
+    var $svg = $(myDocument.createElementNS('http://www.w3.org/2000/svg', type));
+    if (cssClass) {
+      $svg.attrSVG('class', cssClass);
+    }
+    if (htmlContent) {
+      $svg.html(htmlContent);
+    }
+    if (id !== undefined) {
+      $svg.attrSVG('id', id);
+    }
+    return $svg;
+  };
+
+  /**
+   * @return HTML document reference (ownerDocument) of the HTML element.
+   */
+  $.fn.getDocument = function() {
+    return this.length ? this[0].ownerDocument : null;
+  };
+
+
+  /**
+   * @return HTML window reference (defaultView) of the HTML element
+   */
+  $.fn.getWindow = function() {
+    var document = this.getDocument();
+    return document ? document.defaultView : null;
+  };
+
+  /**
    * Select all text within an element, e.g. within a content editable div element.
    */
   $.fn.selectAllText = function() {
     var range,
-      doc = document,
+      myDocument = this.getDocument(),
+      myWindow = this.getWindow(),
       element = this[0];
-    if (doc.body.createTextRange) {
-      range = document.body.createTextRange();
+
+    if (myDocument.body.createTextRange) {
+      range = myDocument.body.createTextRange();
       range.moveToElementText(element);
       range.select();
-    } else if (window.getSelection) {
-      range = document.createRange();
+      return;
+    }
+
+    if (myWindow.getSelection) {
+      range = myDocument.createRange();
       range.selectNodeContents(element);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
+      myWindow.getSelection().removeAllRanges();
+      myWindow.getSelection().addRange(range);
     }
   };
 

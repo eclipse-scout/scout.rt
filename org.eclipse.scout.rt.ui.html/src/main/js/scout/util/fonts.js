@@ -109,11 +109,10 @@ scout.fonts = {
       // Create DIV with default font
       // (Hide explicitly with inline style to prevent visible text when, for some reason, the CSS file cannot be loaded)
       var $body = $('body'),
-        $div = $.makeDiv($.getDocument($body), 'font-preloader')
+        $div = $body.appendDiv('font-preloader')
           .text('ABC abc 123 .,_')
           .css('visibility', 'hidden')
-          .css('font-family', testFonts)
-          .appendTo($body);
+          .css('font-family', testFonts);
 
       // Remember size, set new font, and then measure again
       var originalWidth = $div.outerWidth();

@@ -276,7 +276,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
 scout.Tree.prototype._$buildNode = function(node, $parent) {
   var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
-  var $node = $.makeDiv(this.ownerDocument(), 'tree-node')
+  var $node = this.$container.makeDiv('tree-node')
     .data('node', node)
     .attr('data-nodeid', node.id)
     .attr('data-level', level)

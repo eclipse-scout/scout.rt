@@ -39,12 +39,13 @@ scout.PopupWithHead.prototype.rerenderHead = function() {
  * Copies html from this.$headBlueprint, if set.
  */
 scout.PopupWithHead.prototype._renderHead = function() {
-  this.$deco = $.makeDiv(this.ownerDocument(), 'popup-deco');
-  this.$head = $.makeDiv(this.ownerDocument(), 'popup-head');
+  this.$deco = this.$container.makeDiv('popup-deco');
+  this.$head = this.$container
+    .makeDiv('popup-head')
+    .on('mousedown', '', this._onHeadMouseDown.bind(this));
   this.$container
     .prepend(this.$head)
     .append(this.$deco);
-  this.$head.on('mousedown', '', this._onHeadMouseDown.bind(this));
   if (this.$headBlueprint) {
     this.$head.html(this.$headBlueprint.html());
     this._modifyHeadChildren();

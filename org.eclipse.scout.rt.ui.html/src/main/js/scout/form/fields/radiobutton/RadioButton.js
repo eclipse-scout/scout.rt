@@ -15,8 +15,7 @@ scout.inherits(scout.RadioButton, scout.Button);
 
 scout.RadioButton.prototype._render = function($parent) {
   this.addContainer($parent, 'radio-button', new scout.ButtonLayout(this));
-
-  this.addField($.makeDiv(this.ownerDocument())
+  this.addField($parent.makeDiv()
     .attr('value', this.radioValue)
     .on('mousedown', this._mouseDown.bind(this)));
   this.addStatus();

@@ -16,8 +16,7 @@ scout.inherits(scout.ColorField, scout.ValueField);
 scout.ColorField.prototype._render = function($parent) {
   this.addContainer($parent, 'color-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument(), 'not-implemented')
-    .text('not implemented yet'));
+  this.addField($parent.makeDiv('not-implemented').text('not implemented yet'));
   this.addMandatoryIndicator();
   this.addStatus();
 };

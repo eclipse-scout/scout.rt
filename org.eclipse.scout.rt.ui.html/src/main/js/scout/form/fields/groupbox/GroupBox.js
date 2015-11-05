@@ -56,7 +56,7 @@ scout.GroupBox.prototype._render = function($parent) {
     this.htmlComp.layoutData = null;
   }
 
-  this.$label = $.makeSpan(this.ownerDocument()).html(this.label);
+  this.$label = $parent.makeSpan().html(this.label);
   this._$groupBoxTitle = this.$container
     .appendDiv('group-box-title')
     .append(this.$label);
@@ -204,7 +204,7 @@ scout.GroupBox.prototype._renderExpandable = function(expandable) {
   if (expandable) {
     if ($control.length === 0) {
       // Create control if necessary
-      $control = $.makeDiv(this.ownerDocument(), 'group-box-control')
+      $control = this.$container.makeDiv('group-box-control')
         .on('click', this._onGroupBoxControlClick.bind(this))
         .prependTo(this._$groupBoxTitle);
     }

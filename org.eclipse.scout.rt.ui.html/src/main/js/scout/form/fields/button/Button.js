@@ -71,13 +71,12 @@ scout.Button.prototype._render = function($parent) {
      * Probably it would be more reasonable to change the configuration (which would lead to additional
      * effort required to change an existing application).
      */
-    $button = $.makeDiv(this.ownerDocument($parent));
+    $button = $parent.makeDiv('menu-item');
     $button.setTabbable(this.enabled);
-    $button.addClass('menu-item');
     cssClass = 'link-button';
   } else {
     // render as button
-    $button = $.makeElement(this.ownerDocument($parent), '<button>');
+    $button = $parent.makeElement('<button>');
     cssClass = 'button';
   }
   this._$label = $button.appendSpan('button-label');

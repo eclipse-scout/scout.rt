@@ -66,7 +66,7 @@ scout.DateField.prototype._syncErrorStatus = function(errorStatus) {
 scout.DateField.prototype._render = function($parent) {
   this.addContainer($parent, 'date-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument(), 'date-time-composite'));
+  this.addField($parent.makeDiv('date-time-composite'));
   this.addStatus(this.$field);
   if (!this.embedded) {
     this.addMandatoryIndicator();

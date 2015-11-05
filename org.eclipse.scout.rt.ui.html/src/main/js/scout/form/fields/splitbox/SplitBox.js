@@ -23,7 +23,7 @@ scout.SplitBox.prototype._render = function($parent) {
   // This widget does not support label, mandatoryIndicator and status
 
   // Create split area
-  this._$splitArea = $.makeDiv(this.ownerDocument(), 'split-area');
+  this._$splitArea = $parent.makeDiv('split-area');
   this.addField(this._$splitArea);
   this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));

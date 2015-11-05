@@ -54,8 +54,7 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$info = this.$container.appendDiv('table-info');
 
   // text filter
-  this._$textFilter = scout.fields.makeTextField(this.ownerDocument())
-    .addClass('table-text-filter')
+  this._$textFilter = scout.fields.makeTextField($parent, 'table-text-filter')
     .appendTo(this._$info)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));

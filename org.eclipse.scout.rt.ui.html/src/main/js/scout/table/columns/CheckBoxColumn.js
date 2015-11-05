@@ -48,7 +48,7 @@ scout.CheckBoxColumn.prototype.buildCell = function(cell, row) {
   }
   content = '<div class="' + checkBoxCssClass + '"/>';
 
-  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + content + '</div>';
+  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute.string + '>' + content + '</div>';
 };
 
 scout.CheckBoxColumn.prototype.$checkBox = function($row) {

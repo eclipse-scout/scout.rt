@@ -20,7 +20,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
 
   this.addContainer($parent, 'smart-field', new scout.SmartFieldLayout(this));
   this.addLabel();
-  this.addFieldContainer($.makeDiv(this.ownerDocument()));
+  this.addFieldContainer($parent.makeDiv());
   htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 

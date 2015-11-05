@@ -19,7 +19,7 @@ scout.inherits(scout.BeanField, scout.ValueField);
 scout.BeanField.prototype._render = function($parent) {
   this.addContainer($parent, 'bean-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument()));
+  this.addField($parent.makeDiv());
   this.addStatus();
 };
 

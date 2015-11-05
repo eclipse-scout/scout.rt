@@ -26,12 +26,11 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
   if (this.field.loading && !this._$loadingIndicator) {
     // --- 1. not loading -> loading ---
 
-    var document = $.getDocument(this.field.$container);
     var renderLoading = function() {
       // Hide field content
       this.field.$container.addClass('loading');
       // Create loading indicator
-      this._$loadingIndicator = $.makeDiv(document, 'loading-indicator').appendTo(this.field.$container);
+      this._$loadingIndicator = this.field.$container.appendDiv('loading-indicator');
     }.bind(this);
 
     if (this.loadingIndicatorDelay) {

@@ -612,7 +612,7 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
 
   if (!popup) {
     // Popup blocker detected
-    var $notification = $.makeDiv(this.ownerDocument(), 'notification');
+    var $notification = this.$container.makeDiv('notification');
     var $notificationContent = $notification
       .appendDiv('notification-content notification-closable');
     $notificationContent.appendDiv('close')

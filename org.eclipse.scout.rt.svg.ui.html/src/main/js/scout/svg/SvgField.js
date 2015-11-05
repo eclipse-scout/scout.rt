@@ -16,7 +16,7 @@ scout.inherits(scout.SvgField, scout.ValueField);
 scout.SvgField.prototype._render = function($parent) {
   this.addContainer($parent, 'svg-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument()));
+  this.addField($parent.makeDiv());
   this.addMandatoryIndicator();
   this.addStatus();
   this.loadingSupport = new scout.DefaultFieldLoadingSupport(this);

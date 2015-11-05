@@ -18,7 +18,7 @@ scout.inherits(scout.BrowserField, scout.ValueField);
 scout.BrowserField.prototype._render = function($parent) {
   this.addContainer($parent, 'browser-field');
   this.addLabel();
-  this.addField($.makeElement(this.ownerDocument(), '<iframe>'));
+  this.addField($parent.makeElement('<iframe>'));
   this.addStatus();
 
   this._postMessageListener = this._onPostMessage.bind(this);

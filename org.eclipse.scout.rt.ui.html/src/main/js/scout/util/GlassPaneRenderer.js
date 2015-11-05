@@ -20,15 +20,15 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
-  this.findGlassPaneTargets().forEach(function($glassPaneTarget) {
+  this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
     // Render glasspanes onto glasspane targets.
-    this._$glassPanes.push($.makeDiv($.getDocument($glassPaneTarget), 'glasspane')
-      .on('mousedown', this._onMousedown.bind(this))
-      .appendTo($glassPaneTarget));
-    this._$glassPaneTargets.push($glassPaneTarget);
+    this._$glassPanes.push($(glassPaneTarget)
+      .appendDiv('glasspane')
+      .on('mousedown', this._onMousedown.bind(this)));
+    this._$glassPaneTargets.push(glassPaneTarget);
 
     // Register 'glassPaneTarget' in focus manager.
-    this.session.focusManager.registerGlassPaneTarget($glassPaneTarget);
+    this.session.focusManager.registerGlassPaneTarget(glassPaneTarget);
 
   }, this);
 };

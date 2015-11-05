@@ -64,7 +64,7 @@ scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
  */
 scout.MenuBar.prototype._render = function($parent) {
   // Visibility may change when updateItems() function is called, see updateVisibility().
-  this.$container = $.makeDiv(this.ownerDocument($parent), 'menubar')
+  this.$container = $parent.makeDiv('menubar')
     .attr('id', 'MenuBar-' + scout.createUniqueId())
     .toggleClass('main-menubar', this.size === 'large')
     .setVisible(this.menuItems.length > 0);

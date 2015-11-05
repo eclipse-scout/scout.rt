@@ -25,7 +25,7 @@ scout.ClipboardField.prototype._createKeyStrokeContext = function() {
 scout.ClipboardField.prototype._render = function($parent) {
   this.addContainer($parent, 'clipboard-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument()));
+  this.addField($parent.makeDiv());
   this.addStatus();
 
   // add drag and drop support

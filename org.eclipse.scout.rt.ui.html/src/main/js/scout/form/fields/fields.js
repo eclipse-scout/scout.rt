@@ -11,11 +11,11 @@
 scout.fields = {
 
   /**
-   * @param theDocument HTML document reference used to create the INPUT element
+   * @param $parent used to determine which HTML document is used to create the new HTML element
    * @returns an INPUT element as used in Scout forms.
    */
-  makeTextField: function(theDocument) {
-    return $.makeElement(theDocument, '<input>')
+  makeTextField: function($parent, cssClass) {
+    return $parent.makeElement('<input>', cssClass)
       .attr('type', 'text')
       .attr('autocomplete', 'false') /* use false instead of off, off is currently ignored in chrome, false should work with all major browsers*/
       .disableSpellcheck();
@@ -57,16 +57,11 @@ scout.fields = {
    * Creates a DIV element for touch-devices and an INPUT element for all other devices.
    */
   makeInputOrDiv: function(field, cssClass) {
-    var $element;
     if (field.touch) {
-      $element = $.makeDiv(field.ownerDocument(), 'input-field');
+      return field.$container.makeDiv(scout.strings.join(' ', 'input-field', cssClass));
     } else {
-      $element = scout.fields.makeTextField(field.ownerDocument());
+      return scout.fields.makeTextField(field.$container, cssClass);
     }
-    if (cssClass) {
-      $element.addClass(cssClass);
-    }
-    return $element;
   },
 
   // note: the INPUT element does not process the click event when the field is disabled

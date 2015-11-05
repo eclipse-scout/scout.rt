@@ -59,7 +59,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$title = this.$content.appendDiv('file-chooser-title')
     .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'));
 
-  this.$fileInputField = $.makeElement(this.ownerDocument(), '<input>')
+  this.$fileInputField = $parent.makeElement('<input>')
     .attr('type', 'file')
     .prop('multiple', this.multiSelect)
     .attr('accept', this.contentTypes)
@@ -223,16 +223,15 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this._files = [file];
       this.$files.empty();
     }
-    var $file = this.$files.appendElement('<li>', 'file')
-      .text(file.name);
-    var $remove = $file.appendSpan('remove menu-item')
+    var $file = this.$files.appendElement('<li>', 'file', file.name);
+    var $remove = $file
+      .appendSpan('remove menu-item')
       .on('click', this.removeFile.bind(this, file, $file));
-    var $removeLink = $.makeElement(this.ownerDocument(), '<a>', 'remove-link')
-      .text(this.session.text('Remove'));
+    var $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
     $remove
-      .append(document.createTextNode('('))
+      .appendTextNode('(')
       .append($removeLink)
-      .append(document.createTextNode(')'));
+      .appendTextNode(')');
   }
   this.$uploadButton.setEnabled(this._files.length > 0);
   scout.scrollbars.update(this.$files);

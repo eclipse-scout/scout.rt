@@ -899,7 +899,7 @@ scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelec
   if (!row.enabled) {
     rowClass += ' disabled';
   }
-  var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
+  var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCellForRow(row);
   }
@@ -1561,8 +1561,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    $aggregateRow = $.makeDiv(this.ownerDocument(), 'table-aggregate-row');
-
+    $aggregateRow = this.$container.makeDiv('table-aggregate-row');
     row = aggregateRow.row;
     contents = aggregateRow.contents;
 
@@ -2777,9 +2776,7 @@ scout.Table.prototype._removeTableHeader = function() {
 scout.Table.prototype._renderEmptyData = function(width) {
   if (this.header && this.rows.length === 0) {
     if (!this.$emptyData) {
-      this.$emptyData = $.makeDiv(this.ownerDocument())
-        .html('&nbsp;')
-        .appendTo(this.$data);
+      this.$emptyData = this.$data.appendDiv().html('&nbsp;');
     }
     var headerWidth = scout.helpers.nvl(width, this.header.$container[0].scrollWidth);
     this.$emptyData

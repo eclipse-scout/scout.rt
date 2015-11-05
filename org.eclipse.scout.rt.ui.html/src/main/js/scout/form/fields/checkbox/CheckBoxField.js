@@ -28,7 +28,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addContainer($parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addField($.makeDiv(this.ownerDocument()));
+  this.addField($parent.makeDiv());
 
   this.$checkBox = this.$field
     .appendDiv('check-box')

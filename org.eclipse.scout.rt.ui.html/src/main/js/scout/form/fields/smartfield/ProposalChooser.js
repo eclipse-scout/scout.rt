@@ -74,7 +74,7 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
 };
 
 scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {
-  var $radio = $.makeElement(this.ownerDocument(), '<input>')
+  var $radio = $parent.makeElement('<input>')
     .attr('type', 'radio')
     .attr('name', 'activeState')
     .attr('value', value)
@@ -84,7 +84,7 @@ scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {
   }
   $parent
     .append($radio)
-    .append($.makeElement(this.ownerDocument(), '<label>').text(text));
+    .appendElement('<label>').text(text);
 };
 
 scout.ProposalChooser.prototype._onActiveFilterChanged = function(event) {

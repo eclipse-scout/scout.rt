@@ -212,8 +212,8 @@ scout.DatePicker.prototype._build$DateBox = function() {
   var weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
   var start = new Date(this.viewDate);
 
-  var $box = $
-    .makeDiv(this.ownerDocument(), 'date-picker-month')
+  var $box = this.$container
+    .makeDiv('date-picker-month')
     .data('viewDate', this.viewDate);
 
   // Create weekday header

@@ -16,8 +16,7 @@ scout.inherits(scout.MailField, scout.ValueField);
 scout.MailField.prototype._render = function($parent) {
   this.addContainer($parent, 'mail-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument(), 'not-implemented')
-    .text('not implemented yet'));
+  this.addField($parent.makeDiv('not-implemented').text('not implemented yet'));
   this.addMandatoryIndicator();
   this.addStatus();
 };

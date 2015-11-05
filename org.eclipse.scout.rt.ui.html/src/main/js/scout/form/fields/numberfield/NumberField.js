@@ -25,7 +25,7 @@ scout.NumberField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
   this.addField(
-    scout.fields.makeTextField(this.ownerDocument())
+    scout.fields.makeTextField($parent)
     .blur(this._parse.bind(this))
     .blur(this._onFieldBlur.bind(this)));
   this.addStatus();

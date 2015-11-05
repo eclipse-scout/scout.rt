@@ -24,7 +24,9 @@ scout.Device = function(userAgent) {
 
   // --- device specific configuration
   // initialize with empty string so that it can be used without calling initUnselectableAttribute()
-  this.unselectableAttribute = '';
+  // this property is used with regular JQuery attr(key, value) Syntax and in cases where we create
+  // DOM elements by creating a string.
+  this.unselectableAttribute = scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
   this.tableAdditionalDivRequired = false;
   this.focusManagerActive = true;
 
@@ -33,6 +35,12 @@ scout.Device = function(userAgent) {
     this._parseBrowser(userAgent);
     this._parseBrowserVersion(userAgent);
   }
+};
+
+scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE = {
+  key: null,
+  value: null,
+  string: ''
 };
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
@@ -263,10 +271,14 @@ scout.Device.prototype.supportsCssProperty = function(property) {
 scout.Device.prototype.getUnselectableAttribute = function() {
   return this.supportsFeature('_unselectableAttribute', function(property) {
     if (this.supportsCssUserSelect()) {
-      return '';
+      return scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
     }
-    // workaround for IE 9
-    return ' unselectable="on"';
+    // required for IE 9
+    return {
+      key: 'unselectable',
+      value: 'on',
+      string: ' unselectable="on"'
+    };
   }.bind(this));
 };
 

@@ -65,7 +65,7 @@ scout.BaseDesktop.prototype._goOffline = function() {
   }
   this.offline = true;
 
-  this.$offlineNotification = $.makeDiv(this.ownerDocument(), 'notification error');
+  this.$offlineNotification = this.$container.makeDiv('notification error');
   this._$offlineMessage = this.$offlineNotification.appendDiv('notification-content offline-message');
   this._$offlineMessage
     .appendDiv('offline-message-text')

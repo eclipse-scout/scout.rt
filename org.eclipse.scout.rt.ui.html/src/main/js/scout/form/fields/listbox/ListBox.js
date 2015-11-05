@@ -16,10 +16,9 @@ scout.inherits(scout.ListBox, scout.ValueField);
 
 scout.ListBox.prototype._render = function($parent) {
   this.addContainer($parent, 'list-box');
-
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addFieldContainer($.makeDiv(this.ownerDocument()));
+  this.addFieldContainer($parent.makeDiv());
 
   var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));

@@ -76,7 +76,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       continue;
     }
 
-    var $div = $.makeDiv(this.ownerDocument(), 'select-axis', column1.text)
+    var $div = this.$contentContainer.makeDiv('select-axis', column1.text)
       .data('column', column1);
 
     if (column1.type === 'date') {

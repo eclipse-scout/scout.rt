@@ -16,7 +16,7 @@ scout.inherits(scout.LabelField, scout.ValueField);
 scout.LabelField.prototype._render = function($parent) {
   this.addContainer($parent, 'label-field');
   this.addLabel();
-  this.addField($.makeDiv(this.ownerDocument()));
+  this.addField($parent.makeDiv());
   this.addStatus();
 };
 
