@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -26,18 +30,21 @@ import org.json.JSONObject;
  * sessionStorage.getItem('scout:clientSessionId'), current timestamp</li>
  * <li>{@link JsonStartupRequest#PROP_USER_AGENT} - first one defined: argument to scout.init(), default
  * scout.UserAgent.DEVICE_TYPE_DESKTOP</li>
- * <li>{@link JsonStartupRequest#PROP_CUSTOM_PARAMS} - contains custom parameters to scout.init() as well as all
- * location url parameters and the url itself with key 'url'</li>
+ * <li>{@link JsonStartupRequest#PROP_SESSION_STARTUP_PARAMS} - contains session startup parameters to scout.init() as
+ * well as all location url parameters and the url itself with key 'url'</li>
  * </ul>
  */
 public class JsonStartupRequest extends JsonRequest {
 
   public static final String PROP_CLIENT_SESSION_ID = "clientSessionId";
   public static final String PROP_USER_AGENT = "userAgent";
-  public static final String PROP_CUSTOM_PARAMS = "customParams";
+  public static final String PROP_SESSION_STARTUP_PARAMS = "sessionStartupParams";
+
+  private final Map<String, String> m_sessionStartupParams;
 
   public JsonStartupRequest(JsonRequest request) {
     super(request.getRequestObject());
+    m_sessionStartupParams = parseSessionStartupParams(request.getRequestObject());
   }
 
   /**
@@ -55,11 +62,24 @@ public class JsonStartupRequest extends JsonRequest {
   }
 
   /**
-   * These properties are available at {@link PropertyMap#CURRENT} when the {@link IClientSession} starts
-   *
-   * @return customParams or <code>null</code> (optional attribute)
+   * @return session startup parameters, or an empty {@link Map} if not provided (optional attribute)
    */
-  public JSONObject getCustomParams() {
-    return getRequestObject().optJSONObject(PROP_CUSTOM_PARAMS);
+  public Map<String, String> getSessionStartupParams() {
+    return m_sessionStartupParams;
+  }
+
+  private Map<String, String> parseSessionStartupParams(JSONObject object) {
+    JSONObject params = getRequestObject().optJSONObject(PROP_SESSION_STARTUP_PARAMS);
+    if (params == null) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, String> map = new HashMap<>(params.length());
+    JSONArray names = params.names();
+    for (int i = 0; i < names.length(); i++) {
+      String name = names.getString(i);
+      map.put(name, params.getString(name));
+    }
+    return Collections.unmodifiableMap(map);
   }
 }

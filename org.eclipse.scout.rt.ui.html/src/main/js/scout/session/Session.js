@@ -71,7 +71,7 @@ scout.Session = function($entryPoint, options) {
   this.objectFactory = new scout.ObjectFactory(this);
   this._initObjectFactory(options.objectFactories);
   this._texts = new scout.Texts();
-  this._customParams;
+  this._sessionStartupParams;
   this._requestsPendingCounter = 0;
   this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
@@ -90,7 +90,8 @@ scout.Session = function($entryPoint, options) {
     objectType: 'GlobalAdapter'
   });
 
-  this._initCustomParams();
+  // Initializes session startup parameters with information from the URL.
+  this._initSessionStartupParams();
 
   // Install focus management for this session.
   this.focusManager = new scout.FocusManager(this, options);
@@ -98,17 +99,17 @@ scout.Session = function($entryPoint, options) {
 };
 
 /**
- * Extracts custom parameters from URL: query string parameters and the url itself with key 'url'
+ * Extracts session startup parameters from URL: query string parameters and the URL itself with key 'url'
  */
-scout.Session.prototype._initCustomParams = function() {
-  this._customParams = this._customParams || {};
+scout.Session.prototype._initSessionStartupParams = function() {
+  this._sessionStartupParams = this._sessionStartupParams || {};
 
   var scoutUrl = new scout.URL();
-  this._customParams.url = scoutUrl._baseUrlRaw;
+  this._sessionStartupParams.url = scoutUrl._baseUrlRaw;
 
-  var customParamMap = scoutUrl.parameterMap;
-  for (var prop in customParamMap) {
-    this._customParams[prop] = customParamMap[prop];
+  var urlParameterMap = scoutUrl.parameterMap;
+  for (var prop in urlParameterMap) {
+    this._sessionStartupParams[prop] = urlParameterMap[prop];
   }
 };
 
@@ -248,7 +249,7 @@ scout.Session.prototype._sendStartupRequest = function() {
   if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
     request.userAgent = this.userAgent;
   }
-  request.customParams = this._customParams;
+  request.sessionStartupParams = this._sessionStartupParams;
   // Send request
   this._sendRequest(request);
 };

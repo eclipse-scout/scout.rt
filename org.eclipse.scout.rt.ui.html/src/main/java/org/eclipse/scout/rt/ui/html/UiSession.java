@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.security.AccessController;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -67,7 +66,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class UiSession implements IUiSession, HttpSessionBindingListener {
@@ -296,7 +294,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     else {
       // No client session for the requested ID was found, so create one
-      clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
+      clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), jsonStartupReq.getSessionStartupParams());
       LOG.info("Created new client session [clientSessionId=" + clientSession.getId() + ", userAgent=" + clientSession.getUserAgent() + "]");
       // Ensure session is active
       if (!clientSession.isActive()) {
@@ -346,31 +344,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
   }
 
-  protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
-    try {
-      return BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.copyCurrent()
-          .withLocale(locale)
-          .withUserAgent(userAgent)
-          .withProperties(sessionInitParams)); // Associate all session-init-params with the initialization RunContext. That is all parameter provided as part of the URL.
-    }
-    catch (RuntimeException e) {
-      throw new UiException("Error while creating new client session", e);
-    }
-  }
-
-  /**
-   * extract the params used to create a new {@link IClientSession}
-   */
-  protected Map<String, String> extractSessionInitParams(JSONObject customParams) {
-    Map<String, String> customParamsMap = new HashMap<String, String>();
-    if (customParams != null) {
-      JSONArray names = customParams.names();
-      for (int i = 0; i < names.length(); i++) {
-        String name = names.getString(i);
-        customParamsMap.put(name, customParams.getString(name));
-      }
-    }
-    return customParamsMap;
+  protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionStartupParams) {
+    return BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.copyCurrent()
+        .withLocale(locale)
+        .withUserAgent(userAgent)
+        .withProperties(sessionStartupParams)); // Make startup parameters available at {@link PropertyMap#CURRENT} during client session is starting.
   }
 
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
