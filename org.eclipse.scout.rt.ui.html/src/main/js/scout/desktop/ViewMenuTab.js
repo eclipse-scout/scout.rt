@@ -146,7 +146,7 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
       return false; // menu won't open if we didn't abort the mousedown-event
     }
   } else {
-    this.outlineViewButton.doAction();
+    this.outlineViewButton.doAction(event);
   }
 };
 
