@@ -130,7 +130,7 @@ public class PlatformImplementor implements IPlatform {
       }
       catch (Exception ex) {
         errorCount++;
-        LOG.error("Failed reading config property '{0}'", prop.getKey(), ex);
+        LOG.error("Failed reading config property '{}'", prop.getKey(), ex);
       }
     }
     if (errorCount > 0) {

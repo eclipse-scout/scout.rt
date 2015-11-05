@@ -521,7 +521,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       Jobs.getJobManager().cancel(Jobs.newFutureFilter().andMatchAnyFuture(runningJobs), true);
 
       LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
-          + "[session={0}, user={1}, jobs=(see next line)]\n{2}",
+          + "[session={}, user={}, jobs=(see next line)]\n{}",
           new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
     }
   }

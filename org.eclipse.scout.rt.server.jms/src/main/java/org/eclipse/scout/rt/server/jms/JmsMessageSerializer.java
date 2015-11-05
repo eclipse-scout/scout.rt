@@ -52,7 +52,7 @@ public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
   @Override
   public Message createMessage(T message, Session session) {
     if (LOG.isTraceEnabled()) {
-      LOG.trace("creating JMS message: msgContent={0}", message);
+      LOG.trace("creating JMS message: msgContent={}", message);
     }
     try {
       BytesMessage jmsMessage = session.createBytesMessage();
@@ -71,7 +71,7 @@ public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
   public T extractMessage(Message jmsMessage) {
     if (LOG.isTraceEnabled()) {
       try {
-        LOG.trace("extracting JMS message: jmsMessageId={0}, messageContent={1}", jmsMessage.getJMSMessageID(), jmsMessage.getStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT));
+        LOG.trace("extracting JMS message: jmsMessageId={}, messageContent={}", jmsMessage.getJMSMessageID(), jmsMessage.getStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT));
       }
       catch (JMSException e) {
         LOG.trace("extracting JMS message: jmsMessageId=?, messageContent=?", e);

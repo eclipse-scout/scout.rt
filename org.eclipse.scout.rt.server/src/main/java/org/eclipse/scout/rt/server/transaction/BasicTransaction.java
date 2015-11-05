@@ -40,13 +40,13 @@ public class BasicTransaction implements ITransaction {
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
       if (LOG.isDebugEnabled()) {
-        LOG.debug("register transaction member {0}", memberId);
+        LOG.debug("register transaction member {}", memberId);
       }
       // release existing
       ITransactionMember old = (ITransactionMember) m_memberMap.get(memberId);
       if (old != null) {
         if (LOG.isWarnEnabled()) {
-          LOG.warn("releasing overwritten transaction member {0} / {1}.", memberId, old.getMemberId());
+          LOG.warn("releasing overwritten transaction member {} / {}.", memberId, old.getMemberId());
         }
         old.release();
       }
@@ -63,7 +63,7 @@ public class BasicTransaction implements ITransaction {
     synchronized (m_memberMapLock) {
       ITransactionMember res = (ITransactionMember) m_memberMap.get(memberId);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("get transaction member '{0}' -> '{1}'.", memberId, res);
+        LOG.debug("get transaction member '{}' -> '{}'.", memberId, res);
       }
       return res;
     }
@@ -93,7 +93,7 @@ public class BasicTransaction implements ITransaction {
     synchronized (m_memberMapLock) {
       m_memberMap.remove(memberId);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("unregister transaction member '{0}'.", memberId);
+        LOG.debug("unregister transaction member '{}'.", memberId);
       }
     }
   }
@@ -111,7 +111,7 @@ public class BasicTransaction implements ITransaction {
       try {
         if (mem.needsCommit()) {
           if (LOG.isDebugEnabled()) {
-            LOG.debug("commit phase 1 of transaction member '{0}'.", mem.getMemberId());
+            LOG.debug("commit phase 1 of transaction member '{}'.", mem.getMemberId());
           }
           boolean b = mem.commitPhase1();
           allSuccessful = allSuccessful && b;

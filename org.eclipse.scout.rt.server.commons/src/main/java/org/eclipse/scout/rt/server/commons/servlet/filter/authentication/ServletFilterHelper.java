@@ -166,12 +166,12 @@ public class ServletFilterHelper {
         return;
       }
       else {
-        LOG.warn("The request for '{0}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{1}' will most likely fail. (Trying nevertheless.)", req.getPathInfo(), targetLocation);
+        LOG.warn("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. (Trying nevertheless.)", req.getPathInfo(), targetLocation);
       }
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug((redirect ? "Redirecting" : "Forwarding") + " '{0}' to '{1}'", req.getPathInfo(), targetLocation);
+      LOG.debug((redirect ? "Redirecting" : "Forwarding") + " '{}' to '{}'", req.getPathInfo(), targetLocation);
     }
     if (redirect) {
       resp.sendRedirect(targetLocation);

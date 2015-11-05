@@ -55,7 +55,7 @@ public class BeanFilter {
    */
   private void collectWithSubClasses(IClassInventory classInventory, IClassInfo ci, Set<Class> collector) {
     if (ci.isEnum() || ci.isAnnotation() || ci.isSynthetic() || !ci.isPublic()) {
-      LOG.debug("Skipping bean candidate '{0}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
+      LOG.debug("Skipping bean candidate '{}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
       return;
     }
 
@@ -77,19 +77,19 @@ public class BeanFilter {
   private void collect(IClassInfo ci, Set<Class> collector) {
     if (ci.hasAnnotation(IgnoreBean.class)) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{0}' because it is annotated with '{1}'.", ci.name(), IgnoreBean.class.getSimpleName());
+        LOG.debug("Skipping bean candidate '{}' because it is annotated with '{}'.", ci.name(), IgnoreBean.class.getSimpleName());
       }
       return;
     }
     if (!ci.isInstanciable()) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());
+        LOG.debug("Skipping bean candidate '{}' because it is not instanciable.", ci.name());
       }
       return;
     }
     if (!ci.hasNoArgsConstructor()) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{0}' because it has no empty constructor().", ci.name());
+        LOG.debug("Skipping bean candidate '{}' because it has no empty constructor().", ci.name());
       }
       return;
     }
