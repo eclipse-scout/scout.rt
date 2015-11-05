@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job;
+package org.eclipse.scout.rt.platform.context;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.scout.commons.Assertions;
 
 /**
- * Map to store custom properties on the current context.
+ * Map to associate properties with the current context.
  *
  * @since 3.8.2
  */

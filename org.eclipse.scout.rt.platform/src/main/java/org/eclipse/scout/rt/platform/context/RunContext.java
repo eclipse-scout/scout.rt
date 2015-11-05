@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.logging.PrinicpalContextValueProvider;
 
 /**

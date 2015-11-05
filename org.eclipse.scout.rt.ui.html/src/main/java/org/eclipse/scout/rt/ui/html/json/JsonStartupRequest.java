@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 

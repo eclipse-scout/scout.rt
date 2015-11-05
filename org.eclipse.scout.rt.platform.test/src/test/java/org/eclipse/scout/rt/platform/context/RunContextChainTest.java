@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.logger.internal.slf4j.DiagnosticContextValueProcessor;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SubjectProcessor;
-import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
