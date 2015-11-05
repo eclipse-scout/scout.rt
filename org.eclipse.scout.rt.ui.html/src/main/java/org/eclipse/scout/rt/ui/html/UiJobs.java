@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 public class UiJobs {
 
   protected static final long AWAIT_TIMEOUT = TimeUnit.HOURS.toMillis(1);
-  protected static final String POLLING_REQUEST_HINT = "pollingRequest";
+  protected static final String POLLING_REQUEST_HINT = UiJobs.class.getName() + ".pollingRequest";
 
   /**
    * Blocks until all model jobs for the given session are done. Blocked jobs (e.g. waitFor) are ignored. If the calling
@@ -69,8 +69,7 @@ public class UiJobs {
    * Returns whether the given {@link RunContext} represents a polling request.
    */
   public boolean isPollingRequest(RunContext runContext) {
-    Object pollingRequestHint = runContext.getProperty(POLLING_REQUEST_HINT);
-    return pollingRequestHint instanceof Boolean && ((Boolean) pollingRequestHint).booleanValue();
+    return runContext.containsProperty(POLLING_REQUEST_HINT);
   }
 
   /**

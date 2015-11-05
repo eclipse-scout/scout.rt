@@ -44,12 +44,13 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
   }
 
   /**
-   * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
+   * Returns the value to which the specified key is mapped, or <code>null</code> if this map contains no mapping for
+   * the key.
    */
   @SuppressWarnings("unchecked")
-  public <RESULT> RESULT get(final Object key) {
+  public <VALUE> VALUE get(final Object key) {
     Assertions.assertNotNull(key, "Key must not be null");
-    return (RESULT) m_properties.get(key);
+    return (VALUE) m_properties.get(key);
   }
 
   /**
@@ -57,16 +58,20 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
    * the key.
    */
   @SuppressWarnings("unchecked")
-  public <RESULT> RESULT getOrDefault(final Object key, final RESULT defaultValue) {
+  public <VALUE> VALUE getOrDefault(final Object key, final VALUE defaultValue) {
     Assertions.assertNotNull(key, "Key must not be null");
     if (m_properties.containsKey(key)) {
-      return (RESULT) m_properties.get(key);
+      return (VALUE) m_properties.get(key);
     }
     else {
       return defaultValue;
     }
   }
 
+  /**
+   * Puts the given key-value association to this {@link PropertyMap}, or removes it if a <code>null</code>-value is
+   * provided.
+   */
   public void put(final Object key, final Object value) {
     Assertions.assertNotNull(key, "Key must not be null");
     if (value == null) {
@@ -75,6 +80,14 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
     else {
       m_properties.put(key, value);
     }
+  }
+
+  /**
+   * Returns <code>true</code> if the property is contained in this map.
+   */
+  public boolean contains(final Object key) {
+    Assertions.assertNotNull(key, "Key must not be null");
+    return m_properties.containsKey(key);
   }
 
   public void clear() {

@@ -348,8 +348,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
-      final ClientRunContext ctx = ClientRunContexts.copyCurrent().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
-      return BEANS.get(ClientSessionProvider.class).provide(ctx);
+      return BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.copyCurrent()
+          .withLocale(locale)
+          .withUserAgent(userAgent)
+          .withProperties(sessionInitParams)); // Associate all session-init-params with the initialization RunContext. That is all parameter provided as part of the URL.
     }
     catch (RuntimeException e) {
       throw new UiException("Error while creating new client session", e);

@@ -21,17 +21,16 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
-import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -87,11 +86,8 @@ public class GeneralView extends DefaultView {
       p.print("There is no Session found");
     }
 
-    String sessionId = (String) BEANS.get(ServerRunContext.class).getProperty(ServiceTunnelServlet.SESSION_ID);
-
-//    String sessionID = BEANS.get(IClientIdentificationService.class).getClientId(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get(), IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     p.br();
-    p.print("Session ID (IClientIdentificationService): " + sessionId);
+    p.print("Session ID: " + PropertyMap.CURRENT.get().get(ServiceTunnelServlet.SESSION_ID));
     p.p();
     p.print("JAAS Context");
     p.br();

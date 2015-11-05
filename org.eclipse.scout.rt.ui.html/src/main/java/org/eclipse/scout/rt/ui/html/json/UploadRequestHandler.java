@@ -39,7 +39,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -67,8 +66,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     if (!matcher.matches()) {
       return false;
     }
-    String uiSessionId = matcher.group(1);
-    String targetAdapterId = matcher.group(2);
+    
+    final String uiSessionId = matcher.group(1);
+    final String targetAdapterId = matcher.group(2);
 
     // Check if is really a file upload
     if (!ServletFileUpload.isMultipartContent(req)) {
@@ -80,16 +80,13 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       IUiSession uiSession = resolveUiSession(req, uiSessionId);
 
       // Associate subsequent processing with the uiSession.
-      UiRunContexts.copyCurrent()
-          .withSession(uiSession)
-          .withProperty("targetAdapterId", targetAdapterId)
-          .run(new IRunnable() {
+      UiRunContexts.copyCurrent().withSession(uiSession).run(new IRunnable() {
 
-            @Override
-            public void run() throws Exception {
-              handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp);
-            }
-          }, BEANS.get(ExceptionTranslator.class));
+        @Override
+        public void run() throws Exception {
+          handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp, targetAdapterId);
+        }
+      }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
@@ -101,13 +98,12 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   /**
    * Method invoked to handle a file upload request from UI.
    */
-  protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, FileUploadException {
+  protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String targetAdapterId) throws IOException, FileUploadException {
     long start = System.nanoTime();
     if (LOG.isDebugEnabled()) {
       LOG.debug("Fileupload started");
     }
 
-    String targetAdapterId = (String) PropertyMap.CURRENT.get().get("targetAdapterId");
     IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
 
     // Read uploaded data

@@ -226,22 +226,48 @@ public class RunContext {
   }
 
   /**
-   * @see #withProperties(Map)
+   * Returns the {@link PropertyMap} associated with this context.
+   *
+   * @see #withProperty(Object, Object)
    */
   public PropertyMap getPropertyMap() {
     return m_propertyMap;
   }
 
   /**
+   * Returns the property value to which the specified key is mapped, or <code>null</code> if not associated with this
+   * context.
+   *
    * @see #withProperty(Object, Object)
    */
-  public Object getProperty(final Object key) {
+  public <VALUE> VALUE getProperty(final Object key) {
     return m_propertyMap.get(key);
+  }
+
+  /**
+   * Returns the property value to which the specified key is mapped, or {@code defaultValue} if not associated with
+   * this context.
+   *
+   * @see #withProperty(Object, Object)
+   */
+  public <VALUE> VALUE getPropertyOrDefault(final Object key, final VALUE defaultValue) {
+    return m_propertyMap.getOrDefault(key, defaultValue);
+  }
+
+  /**
+   * Returns whether the given property is associated with this context.
+   *
+   * @see #withProperty(Object, Object)
+   */
+  public boolean containsProperty(final Object key) {
+    return m_propertyMap.contains(key);
   }
 
   /**
    * Associates this context with the given 'key-value' property, meaning that any code running on behalf of this
    * context has that property set in {@link PropertyMap#CURRENT} thread-local.
+   * <p>
+   * To remove a property, use <code>null</code> as its value.
    */
   public RunContext withProperty(final Object key, final Object value) {
     m_propertyMap.put(key, value);

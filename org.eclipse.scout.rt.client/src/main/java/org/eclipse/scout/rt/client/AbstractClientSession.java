@@ -267,7 +267,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     setMemoryPolicy(memPolicyValue);
 
     if (PropertyMap.CURRENT.get() != null) {
-      String urlText = (String) PropertyMap.CURRENT.get().get("url");
+      String urlText = PropertyMap.CURRENT.get().get("url");
       try {
         m_browserUri = urlText != null ? new URI(urlText) : null;
       }
