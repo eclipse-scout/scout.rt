@@ -115,13 +115,3 @@ scout.ViewButtonActionKeyStroke = function(action) {
   scout.ViewButtonActionKeyStroke.parent.call(this, action);
 };
 scout.inherits(scout.ViewButtonActionKeyStroke, scout.ActionKeyStroke);
-
-scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
-  if (this.field.iconId) {
-    var wIcon = $drawingArea.width();
-    var wKeybox = $drawingArea.find('.key-box').outerWidth();
-    var containerPadding = Number($drawingArea.css('padding-left').replace('px', ''));
-    var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
-    $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
-  }
-};
