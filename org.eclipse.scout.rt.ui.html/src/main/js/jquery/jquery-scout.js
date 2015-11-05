@@ -903,6 +903,17 @@
     }
   };
 
+  /**
+   * If the given value is "truthy", it is set as attribute on the target. Otherwise, the attribute is removed.
+   */
+  $.fn.attrOrRemove = function(attributeName, value) {
+    if (value) {
+      $(this).attr(attributeName, value);
+    } else {
+      $(this).removeAttr(attributeName);
+    }
+  };
+
   // ===== helpers for projects, may not necessarily be used by scout itself =====
 
   $.fn.appendAppLink = function(appLinkBean, func) {
