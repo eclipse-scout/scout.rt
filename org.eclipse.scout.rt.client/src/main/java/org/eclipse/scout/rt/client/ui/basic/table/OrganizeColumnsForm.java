@@ -138,6 +138,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           return TEXTS.get("Profiles");
         }
 
+        @Override
+        protected boolean getConfiguredStatusVisible() {
+          return false;
+        }
+
         @Order(10.0)
         public class ProfilesTableField extends AbstractTableField<ProfilesTableField.Table> {
 
@@ -164,6 +169,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           @Override
           protected String getConfiguredLabel() {
             return TEXTS.get("Configurations");
+          }
+
+          @Override
+          protected boolean getConfiguredStatusVisible() {
+            return false;
           }
 
           @Override
@@ -206,7 +216,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             try {
               m_table.setTableChanging(true);
               //
-              m_table.resetDisplayableColumns();
+              m_table.resetColumns();
               TableUserFilterManager m = m_table.getUserFilterManager();
               if (m != null) {
                 m.reset();
@@ -536,6 +546,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           return 1;
         }
 
+        @Override
+        protected boolean getConfiguredStatusVisible() {
+          return false;
+        }
+
         @Order(10.0)
         public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
 
@@ -556,6 +571,11 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected boolean getConfiguredLabelVisible() {
+            return false;
+          }
+
+          @Override
+          protected boolean getConfiguredStatusVisible() {
             return false;
           }
 

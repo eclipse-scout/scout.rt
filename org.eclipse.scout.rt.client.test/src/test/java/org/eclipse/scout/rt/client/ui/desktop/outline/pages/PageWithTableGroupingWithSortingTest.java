@@ -52,7 +52,7 @@ public class PageWithTableGroupingWithSortingTest {
   @Test
   public void testGroupingWithSorting() throws Exception {
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //initially, no column should be grouped or sorted,
     //since the configured grouping column is invalid.
@@ -82,7 +82,7 @@ public class PageWithTableGroupingWithSortingTest {
   public void testGrouping() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //add some grouping / sorting cols:
     table.getUIFacade().fireHeaderGroupFromUI(b2, false, true);

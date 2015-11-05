@@ -49,7 +49,7 @@ public class PageWithTable3Test {
     desktop.activateFirstPage();
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     //
     //load table with configured sort columns
     assertTrue(CollectionUtility.equalsCollection(CollectionUtility.arrayList(7, 6, 5, 4, 3, 2, 1, 0), table.getValueColumn().getValues()));

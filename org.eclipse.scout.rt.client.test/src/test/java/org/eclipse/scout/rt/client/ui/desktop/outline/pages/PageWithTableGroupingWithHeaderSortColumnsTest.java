@@ -52,7 +52,7 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
   public void testGroupingWithHeaderSortColumn() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //initially, no column should be grouped,
     //since the configured grouping column is invalid.
@@ -76,7 +76,7 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
   public void testGroupingInvisibleHeaderSortColumn() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //group by all columns
     table.getUIFacade().fireHeaderGroupFromUI(b3, false, true);
@@ -96,7 +96,7 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
   public void testGroupingInvisibleFirstHeaderSortColumn() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //group by all columns
     table.getUIFacade().fireHeaderGroupFromUI(b3, false, true);

@@ -905,16 +905,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void resetColumnOrder();
 
   /**
-   * initialize all columns: visible/invisible, order, sorting, width
-   * <p>
-   * same as calling <code>resetColumns(true, true, true, true)</code>
+   * reset all columns properties to initial state: <br>
+   * visible/invisible, order, sorting, grouping, width, backgroundEffects
    */
-  void resetDisplayableColumns();
-
-  /**
-   * initialize columns
-   */
-  void resetColumns(boolean visibility, boolean order, boolean sorting, boolean widths);
+  void resetColumns();
 
   void decorateRow(ITableRow row);
 

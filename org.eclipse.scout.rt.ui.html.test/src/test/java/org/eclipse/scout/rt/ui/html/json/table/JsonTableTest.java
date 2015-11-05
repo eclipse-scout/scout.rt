@@ -228,7 +228,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     IColumn<?> column0 = table.getColumns().get(0);
     IColumn<?> column1 = table.getColumns().get(1);
@@ -256,7 +256,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     IColumn<?> column0 = table.getColumns().get(0);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
@@ -288,7 +288,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     IColumn<?> column = table.getColumns().get(0);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
@@ -312,7 +312,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     table.getColumnSet().getColumn(0).setDisplayable(false);
 
     IColumn<?> column0 = table.getColumns().get(0);
@@ -345,7 +345,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     table.getColumnSet().getColumn(0).setVisible(false);
 
     IJsonAdapter<? super TableWith3Cols> jsonTable = m_uiSession.newJsonAdapter(table, null);
@@ -372,7 +372,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     IColumn column0 = table.getColumnSet().getColumn(0);
     IColumn column1 = table.getColumnSet().getColumn(1);
     IColumn column2 = table.getColumnSet().getColumn(2);
@@ -906,7 +906,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
 
     // Response should contain no events
@@ -937,7 +937,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
 
     // Response should contain no events
@@ -969,7 +969,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
 
     // Response should contain no events
@@ -998,7 +998,7 @@ public class JsonTableTest {
   public void testTableEventCoalesceInUi_InsertAndRowOrderChanged() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.initTable();
-    table.resetDisplayableColumns();
+    table.resetColumns();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
 
     table.fill(2, false);
@@ -1020,7 +1020,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.initTable();
     table.fill(1, false);
-    table.resetDisplayableColumns();
+    table.resetColumns();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
     m_uiSession.currentJsonResponse().addAdapter(jsonTable);
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
@@ -1048,7 +1048,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.initTable();
     table.fill(1, false);
-    table.resetDisplayableColumns();
+    table.resetColumns();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
     m_uiSession.currentJsonResponse().addAdapter(jsonTable);
     JSONObject response = m_uiSession.currentJsonResponse().toJson();

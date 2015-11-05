@@ -3478,25 +3478,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public void resetDisplayableColumns() {
+  public void resetColumns() {
     resetColumns(true, true, true, true);
+    for (IColumn<?> col : getColumns()) {
+      if (col instanceof INumberColumn) {
+        ((INumberColumn) col).setBackgroundEffect(((INumberColumn) col).getInitialBackgroundEffect());
+      }
+    }
   }
 
-  @Override
-  public void resetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) {
+  protected void resetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) {
     try {
       setTableChanging(true);
-      //
-      try {
-        if (sorting) {
-          m_sortValid = false;
-        }
-        resetColumnsInternal(visibility, order, sorting, widths);
-        interceptResetColumns(visibility, order, sorting, widths);
+      if (sorting) {
+        m_sortValid = false;
       }
-      catch (Exception e) {
-        LOG.error("reset columns " + visibility + "," + order + "," + sorting + "," + widths, e);
-      }
+      resetColumnsInternal(visibility, order, sorting, widths);
+      interceptResetColumns(visibility, order, sorting, widths);
     }
     finally {
       setTableChanging(false);
@@ -3520,7 +3518,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(list);
     }
-    //
     //Order
     if (order) {
       TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
@@ -3533,12 +3530,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(orderMap.values());
     }
-    //
     //Sorting & Grouping
     if (sorting) {
-
       getColumnSet().resetSortingAndGrouping();
-
     }
     //Widths
     if (widths) {
@@ -4578,7 +4572,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public void fireTableResetFromUI() {
       try {
         setTableChanging(true);
-        resetDisplayableColumns();
+        resetColumns();
         TableUserFilterManager m = getUserFilterManager();
         if (m != null) {
           m.reset();

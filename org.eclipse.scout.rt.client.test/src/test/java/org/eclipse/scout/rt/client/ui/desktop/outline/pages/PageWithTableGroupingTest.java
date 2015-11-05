@@ -54,7 +54,7 @@ public class PageWithTableGroupingTest {
   public void testGroupingBasic() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //initially, only the configured columns are grouped.
     assertGroupingState(table, CollectionUtility.arrayList(b3), CollectionUtility.arrayList(b2, b1));
@@ -78,7 +78,7 @@ public class PageWithTableGroupingTest {
   public void testGroupingVisibility() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //additional grouping
     table.getUIFacade().fireHeaderGroupFromUI(b2, true, true);
@@ -97,7 +97,7 @@ public class PageWithTableGroupingTest {
   public void testGroupingPreferences() throws Exception {
 
     //reset columns
-    table.resetDisplayableColumns();
+    table.resetColumns();
 
     //additional grouping
     table.getUIFacade().fireHeaderGroupFromUI(b2, true, true);
