@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
@@ -14,7 +14,7 @@
   <artifactId>${groupId}.parent</artifactId>
   <version>${version}</version>
   <packaging>pom</packaging>
-  
+
   <name>${displayName} Parent Module</name>
 
   <properties>
@@ -22,14 +22,14 @@
   	<jdk.source.version>${javaVersion}</jdk.source.version>
   	<scout.version>5.2.0.B001</scout.version>
   </properties>
-  
+
   <modules>
-    <module>../shared</module>
-    <module>../server</module>
-    <module>../client</module>
-    <module>../server.app.war</module>
-    <module>../ui.html</module>
-    <module>../ui.html.app.war</module>
+    <module>../${groupId}.shared</module>
+    <module>../${groupId}.server</module>
+    <module>../${groupId}.client</module>
+    <module>../${groupId}.server.app.war</module>
+    <module>../${groupId}.ui.html</module>
+    <module>../${groupId}.ui.html.app.war</module>
   </modules>
 
   <dependencyManagement>
@@ -49,7 +49,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-	  
+
 	  <!-- Application Dependencies -->
 	  <dependency>
         <groupId>${groupId}</groupId>
@@ -97,5 +97,5 @@
       </plugin>
     </plugins>
   </build>
-  
+
 </project>

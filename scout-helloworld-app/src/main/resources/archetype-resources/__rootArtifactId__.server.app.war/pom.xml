@@ -7,18 +7,18 @@
     <groupId>${groupId}</groupId>
     <artifactId>${groupId}.parent</artifactId>
     <version>${version}</version>
-	<relativePath>../parent/pom.xml</relativePath>
+	<relativePath>../${groupId}.parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>${groupId}.ui.html.app.war</artifactId>
+  <artifactId>${groupId}.server.app.war</artifactId>
   <packaging>war</packaging>
-  
-  <name>${displayName} HTML UI WAR</name>
+
+  <name>${displayName} Server WAR</name>
 
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${groupId}.ui.html</artifactId>
+      <artifactId>${groupId}.server</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -7,16 +7,16 @@
     <groupId>${groupId}</groupId>
     <artifactId>${groupId}.parent</artifactId>
     <version>${version}</version>
-	<relativePath>../parent/pom.xml</relativePath>
+	<relativePath>../${groupId}.parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>${groupId}.client</artifactId>
-  
-  <name>${displayName} Client</name>
+  <artifactId>${groupId}.server</artifactId>
+
+  <name>${displayName} Server</name>
 
   <dependencies>
     <dependency>
-      <artifactId>org.eclipse.scout.rt.client</artifactId>
+      <artifactId>org.eclipse.scout.rt.server</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
     </dependency>
     <dependency>
@@ -25,8 +25,12 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.client.test</artifactId>
+      <artifactId>org.eclipse.scout.rt.server.test</artifactId>
 	  <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>${groupId}</groupId>
-  <artifactId>${artifactId}</artifactId>
+  <artifactId>${rootArtifactId}</artifactId>
   <version>${version}</version>
   <packaging>pom</packaging>
-  
+
   <name>${displayName} ROOT Module</name>
 
   <prerequisites>
@@ -36,4 +36,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

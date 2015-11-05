@@ -26,7 +26,7 @@
     </requiredProperty>
   </requiredProperties>
   <modules>
-    <module id="parent" dir="parent" name="parent">
+    <module id="parent" dir="__rootArtifactId__.parent" name="parent">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
@@ -36,7 +36,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="shared" dir="shared" name="shared">
+    <module id="shared" dir="__rootArtifactId__.shared" name="shared">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
@@ -76,7 +76,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="server" dir="server" name="server">
+    <module id="server" dir="__rootArtifactId__.server" name="server">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
@@ -104,7 +104,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="client" dir="client" name="client">
+    <module id="client" dir="__rootArtifactId__.client" name="client">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
@@ -139,7 +139,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="server.app.war" dir="server.app.war" name="server.app.war">
+    <module id="server.app.war" dir="__rootArtifactId__.server.app.war" name="server.app.war">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -156,7 +156,7 @@
         </fileSet>
       </fileSets>
     </module>
-	<module id="server.app.dev" dir="server.app.dev" name="server.app.dev">
+	<module id="server.app.dev" dir="__rootArtifactId__.server.app.dev" name="server.app.dev">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -179,7 +179,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="ui.html" dir="ui.html" name="ui.html">
+    <module id="ui.html" dir="__rootArtifactId__.ui.html" name="ui.html">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
@@ -206,7 +206,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="ui.html.app.war" dir="ui.html.app.war" name="ui.html.app.war">
+    <module id="ui.html.app.war" dir="__rootArtifactId__.ui.html.app.war" name="ui.html.app.war">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -223,7 +223,7 @@
         </fileSet>
       </fileSets>
     </module>
-	<module id="ui.html.app.dev" dir="ui.html.app.dev" name="ui.html.app.dev">
+	<module id="ui.html.app.dev" dir="__rootArtifactId__.ui.html.app.dev" name="ui.html.app.dev">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>

@@ -7,11 +7,11 @@
     <groupId>${groupId}</groupId>
     <artifactId>${groupId}.parent</artifactId>
     <version>${version}</version>
-	<relativePath>../parent/pom.xml</relativePath>
+	<relativePath>../${groupId}.parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>${groupId}.ui.html</artifactId>
-  
+
   <name>${displayName} HTML UI</name>
 
   <dependencies>
