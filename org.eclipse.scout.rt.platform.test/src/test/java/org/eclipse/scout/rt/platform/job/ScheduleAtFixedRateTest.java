@@ -54,7 +54,6 @@ public class ScheduleAtFixedRateTest {
     long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
     long periodNano = TimeUnit.MILLISECONDS.toNanos(500);
     long tStartNano = System.nanoTime();
-    long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = m_jobManager.scheduleAtFixedRate(new IRunnable() {
@@ -77,10 +76,9 @@ public class ScheduleAtFixedRateTest {
       Long actualExecutionTime = protocol.get(i);
       long expectedExecutionTime = tStartNano + initialDelayNano + i * periodNano;
       long expectedExecutionTimeMin = expectedExecutionTime;
-      long expectedExecutionTimeMax = expectedExecutionTime + assertToleranceNano;
 
-      if (actualExecutionTime < expectedExecutionTimeMin || actualExecutionTime > expectedExecutionTimeMax) {
-        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=[%s;%s]", i, actualExecutionTime, expectedExecutionTimeMin, expectedExecutionTimeMax));
+      if (actualExecutionTime < expectedExecutionTimeMin) {
+        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
   }
@@ -94,7 +92,6 @@ public class ScheduleAtFixedRateTest {
     final int nRuns = 3;
     long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
     long periodNano = TimeUnit.MILLISECONDS.toNanos(500);
-    long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
@@ -118,10 +115,9 @@ public class ScheduleAtFixedRateTest {
       Long actualExecutionTime = protocol.get(i);
       long expectedExecutionTime = tStartNano + initialDelayNano + i * periodNano;
       long expectedExecutionTimeMin = expectedExecutionTime;
-      long expectedExecutionTimeMax = expectedExecutionTime + assertToleranceNano;
 
-      if (actualExecutionTime < expectedExecutionTimeMin || actualExecutionTime > expectedExecutionTimeMax) {
-        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=[%s;%s]", i, actualExecutionTime, expectedExecutionTimeMin, expectedExecutionTimeMax));
+      if (actualExecutionTime < expectedExecutionTimeMin) {
+        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
   }
@@ -136,7 +132,6 @@ public class ScheduleAtFixedRateTest {
     final long sleepTimeNano = TimeUnit.MILLISECONDS.toNanos(300);
     long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
     long periodNano = TimeUnit.MILLISECONDS.toNanos(500);
-    long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
@@ -161,10 +156,9 @@ public class ScheduleAtFixedRateTest {
       Long actualExecutionTime = protocol.get(i);
       long expectedExecutionTime = tStartNano + initialDelayNano + i * periodNano;
       long expectedExecutionTimeMin = expectedExecutionTime;
-      long expectedExecutionTimeMax = expectedExecutionTime + assertToleranceNano;
 
-      if (actualExecutionTime < expectedExecutionTimeMin || actualExecutionTime > expectedExecutionTimeMax) {
-        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=[%s;%s]", i, actualExecutionTime, expectedExecutionTimeMin, expectedExecutionTimeMax));
+      if (actualExecutionTime < expectedExecutionTimeMin) {
+        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
   }
@@ -179,7 +173,6 @@ public class ScheduleAtFixedRateTest {
     final long sleepTimeNano = TimeUnit.MILLISECONDS.toNanos(1500);
     long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
     long periodNano = TimeUnit.MILLISECONDS.toNanos(500);
-    long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
@@ -204,10 +197,9 @@ public class ScheduleAtFixedRateTest {
       Long actualExecutionTime = protocol.get(i);
       long expectedExecutionTime = tStartNano + initialDelayNano + i * sleepTimeNano;
       long expectedExecutionTimeMin = expectedExecutionTime;
-      long expectedExecutionTimeMax = expectedExecutionTime + assertToleranceNano;
 
-      if (actualExecutionTime < expectedExecutionTimeMin || actualExecutionTime > expectedExecutionTimeMax) {
-        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=[%s;%s]", i, actualExecutionTime, expectedExecutionTimeMin, expectedExecutionTimeMax));
+      if (actualExecutionTime < expectedExecutionTimeMin) {
+        fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
   }
