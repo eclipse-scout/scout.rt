@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -105,10 +105,10 @@ public class ServerRunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(UserAgent.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 10. ThreadLocalProcessor for ClientNotificationNodeId.CURRENT
+    // 10. ThreadLocalProcessor for ClientNodeId.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(ClientNotificationNodeId.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+    assertSame(IClientNodeId.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     // 11. ThreadLocalProcessor for TransactionalClientNotificationCollector.CURRENT
     c = chainIterator.next();

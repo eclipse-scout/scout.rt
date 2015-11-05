@@ -31,7 +31,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
@@ -174,7 +174,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
-        if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread() && ClientNotificationNodeId.CURRENT.get() != null) {
+        if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread() && IClientNodeId.CURRENT.get() != null) {
           String sessionId = getId();
           if (sessionId != null) {
             SharedContextChangedNotification notification = new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap));

@@ -20,9 +20,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
-import org.eclipse.scout.rt.client.clientnotification.IClientSessionRegistry;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
@@ -71,15 +71,15 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
 
   @Override
   protected void beforeTunnel(ServiceTunnelRequest serviceRequest) {
-    ISession session = IClientSession.CURRENT.get();
+    ISession session = ISession.CURRENT.get();
     if (session != null) {
       serviceRequest.setSessionId(session.getId());
     }
     else {
-      // user notification node id as identifier for created back end session
-      serviceRequest.setSessionId(IClientSessionRegistry.NOTIFICATION_NODE_ID);
+      // use this client's node-id for session less communication
+      serviceRequest.setSessionId(IClientNode.ID);
     }
-    serviceRequest.setClientNotificationNodeId(IClientSessionRegistry.NOTIFICATION_NODE_ID);
+    serviceRequest.setClientNodeId(IClientNode.ID);
   }
 
   @Override

@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -61,7 +61,7 @@ public class ServerRunContext extends RunContext {
 
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
-  protected String m_notificationNodeId;
+  protected String m_clientNodeId;
   protected TransactionalClientNotificationCollector m_transactionalClientNotificationCollector;
   protected TransactionScope m_transactionScope;
   protected ITransaction m_transaction;
@@ -76,7 +76,7 @@ public class ServerRunContext extends RunContext {
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
-        .add(new ThreadLocalProcessor<>(ClientNotificationNodeId.CURRENT, m_notificationNodeId))
+        .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
         .add(new ThreadLocalProcessor<>(TransactionalClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
         .add(new TransactionProcessor<>(getTransaction(), m_transactionScope));
@@ -145,15 +145,15 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * @see #withNotificationNodeId(String)
+   * @see #withClientNodeId(String)
    */
-  public String getNotificationNodeId() {
-    return m_notificationNodeId;
+  public String getClientNodeId() {
+    return m_clientNodeId;
   }
 
   /**
-   * Associates this context with the given 'notification ID', meaning that any code running on behalf of this context
-   * has that id set in {@link ClientNotificationNodeId#CURRENT} thread-local.
+   * Associates this context with the given 'client node ID', meaning that any code running on behalf of this context
+   * has that id set in {@link IClientNodeId#CURRENT} thread-local.
    * <p>
    * Every client node (that is every UI server node) has its unique 'node ID' which is included with every
    * 'client-server' request, and is mainly used to publish client notifications. If transactional client notifications
@@ -164,8 +164,8 @@ public class ServerRunContext extends RunContext {
    * <p>
    * Typically, this node ID is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
-  public ServerRunContext withNotificationNodeId(final String notificationNodeId) {
-    m_notificationNodeId = notificationNodeId;
+  public ServerRunContext withClientNodeId(final String clientNodeId) {
+    m_clientNodeId = clientNodeId;
     return this;
   }
 
@@ -183,8 +183,8 @@ public class ServerRunContext extends RunContext {
    * <p>
    * That collector is used to collect all transactional client notifications, which are to be published upon successful
    * commit of the associated transaction, and which are addressed to the client node which triggered processing (see
-   * {@link #withNotificationNodeId(String)}). That way, transactional client notifications are not published
-   * immediately upon successful commit, but included in the client's response instead (piggyback).
+   * {@link #withClientNodeId(String)}). That way, transactional client notifications are not published immediately upon
+   * successful commit, but included in the client's response instead (piggyback).
    * <p>
    * Typically, that collector is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
@@ -252,7 +252,7 @@ public class ServerRunContext extends RunContext {
     builder.attr("locale", getLocale());
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
-    builder.attr("notificationNodeId", getNotificationNodeId());
+    builder.attr("clientNodeId", getClientNodeId());
     builder.ref("transactionalClientNotificationCollector", getTransactionalClientNotificationCollector());
     builder.ref("transaction", getTransaction());
     builder.attr("transactionScope", getTransactionScope());
@@ -270,7 +270,7 @@ public class ServerRunContext extends RunContext {
     m_session = originRunContext.m_session;
     m_userAgent = originRunContext.m_userAgent;
     m_transactionalClientNotificationCollector = originRunContext.m_transactionalClientNotificationCollector;
-    m_notificationNodeId = originRunContext.m_notificationNodeId;
+    m_clientNodeId = originRunContext.m_clientNodeId;
     m_transactionScope = originRunContext.m_transactionScope;
     m_transaction = originRunContext.m_transaction;
     m_offline = originRunContext.m_offline;
@@ -281,7 +281,7 @@ public class ServerRunContext extends RunContext {
     super.fillCurrentValues();
     m_userAgent = UserAgent.CURRENT.get();
     m_transactionalClientNotificationCollector = TransactionalClientNotificationCollector.CURRENT.get();
-    m_notificationNodeId = ClientNotificationNodeId.CURRENT.get();
+    m_clientNodeId = IClientNodeId.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
     m_offline = BooleanUtility.nvl(OfflineState.CURRENT.get(), false);
@@ -293,7 +293,7 @@ public class ServerRunContext extends RunContext {
     super.fillEmptyValues();
     m_userAgent = null;
     m_transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
-    m_notificationNodeId = null;
+    m_clientNodeId = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;
     m_offline = false;

@@ -132,7 +132,7 @@ public class ServiceTunnelServlet extends HttpServlet {
                 .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
                 .withRunMonitor(runMonitor)
                 .withTransactionalClientNotificationCollector(transactionalClientNotificationCollector)
-                .withNotificationNodeId(serviceRequest.getClientNotificationNodeId())
+                .withClientNodeId(serviceRequest.getClientNodeId())
                 .withProperty(SESSION_ID, serviceRequest.getSessionId());
             serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 

@@ -203,7 +203,7 @@ public class ClientNotificationRegistryTest {
       final String currentNode = TEST_NODE;
       final String otherNode = "Node2";
 
-      ServerRunContexts.copyCurrent().withNotificationNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
+      ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -239,7 +239,7 @@ public class ClientNotificationRegistryTest {
     final String currentNode = TEST_NODE;
     final String otherNode = "Node2";
 
-    ServerRunContexts.copyCurrent().withNotificationNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
+    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {

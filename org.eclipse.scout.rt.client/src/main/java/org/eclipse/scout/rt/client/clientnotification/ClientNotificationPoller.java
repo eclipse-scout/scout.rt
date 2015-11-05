@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -79,8 +80,7 @@ public class ClientNotificationPoller {
     public void run() throws InterruptedException {
       while (!RunMonitor.CURRENT.get().isCancelled()) {
         try {
-          IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
-          handleMessagesReceived(svc.getNotifications(IClientSessionRegistry.NOTIFICATION_NODE_ID));
+          handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(IClientNode.ID));
         }
         catch (UndeclaredThrowableException e) {
           if (e.getCause() instanceof ProcessingException) {

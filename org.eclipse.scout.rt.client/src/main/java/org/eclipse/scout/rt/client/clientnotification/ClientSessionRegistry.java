@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -72,12 +73,12 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     final String userId = session.getUserId();
     LOG.debug(String.format("Unregister client session [sessionid=%s, userId=%s].", sessionId, userId));
 
-    // unregister user remote
+    // unregister from remote notifications
     try {
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).unregisterSession(NOTIFICATION_NODE_ID, sessionId, userId);
+          BEANS.get(IClientNotificationService.class).unregisterSession(IClientNode.ID, sessionId, userId);
         }
       });
     }
@@ -127,7 +128,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).registerSession(NOTIFICATION_NODE_ID, session.getId(), session.getUserId());
+          BEANS.get(IClientNotificationService.class).registerSession(IClientNode.ID, session.getId(), session.getUserId());
         }
       });
     }

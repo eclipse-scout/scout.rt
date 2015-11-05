@@ -36,7 +36,7 @@ public class ServiceTunnelRequest implements Serializable {
   private final Object[] m_args;
   private final Locale m_locale;
   private String m_userAgent;
-  private String m_notificationNodeId;
+  private String m_clientNodeId;
 
   public ServiceTunnelRequest(String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
     m_serviceInterfaceClassName = serviceInterfaceName;
@@ -106,12 +106,18 @@ public class ServiceTunnelRequest implements Serializable {
     m_userAgent = userAgent;
   }
 
-  public String getClientNotificationNodeId() {
-    return m_notificationNodeId;
+  /**
+   * Returns the unique ID of the client node which triggered this service request.
+   */
+  public String getClientNodeId() {
+    return m_clientNodeId;
   }
 
-  public void setClientNotificationNodeId(String notificationNodeId) {
-    m_notificationNodeId = notificationNodeId;
+  /**
+   * Sets the unique ID of the client node which triggered this service request.
+   */
+  public void setClientNodeId(String notificationNodeId) {
+    m_clientNodeId = notificationNodeId;
   }
 
   @Override

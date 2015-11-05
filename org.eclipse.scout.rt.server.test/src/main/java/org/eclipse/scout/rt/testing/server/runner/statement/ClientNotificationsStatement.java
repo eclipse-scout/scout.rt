@@ -22,7 +22,7 @@ import org.junit.runners.model.Statement;
 public class ClientNotificationsStatement extends Statement {
 
   private final Statement m_next;
-  private final String m_nodeId;
+  private final String m_clientNodeId;
   private final TransactionalClientNotificationCollector m_collector;
 
   /**
@@ -36,7 +36,7 @@ public class ClientNotificationsStatement extends Statement {
    */
   public ClientNotificationsStatement(final Statement next, final RunWithClientNotifications annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_nodeId = (annotation != null ? annotation.nodeId() : null);
+    m_clientNodeId = (annotation != null ? annotation.clientNodeId() : null);
     m_collector = new TransactionalClientNotificationCollector();
   }
 
@@ -44,7 +44,7 @@ public class ClientNotificationsStatement extends Statement {
   public void evaluate() throws Throwable {
     ServerRunContexts.copyCurrent()
         .withTransactionalClientNotificationCollector(m_collector)
-        .withNotificationNodeId(m_nodeId)
+        .withClientNodeId(m_clientNodeId)
         .run(new IRunnable() {
 
           @Override

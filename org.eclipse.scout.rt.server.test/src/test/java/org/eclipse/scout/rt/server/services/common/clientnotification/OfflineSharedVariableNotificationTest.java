@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationService;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -68,7 +68,7 @@ public class OfflineSharedVariableNotificationTest {
     OfflineState.setOfflineDefault(false);
     OfflineState.CURRENT.remove();
     m_serverSession = null;
-    ClientNotificationNodeId.CURRENT.remove();
+    IClientNodeId.CURRENT.remove();
   }
 
   /**
@@ -250,7 +250,7 @@ public class OfflineSharedVariableNotificationTest {
   private void runWithNotificationContainer(IRunnable runnable) {
     ServerRunContexts.copyCurrent()
         .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
-        .withNotificationNodeId("test").run(runnable);
+        .withClientNodeId("test").run(runnable);
   }
 
   private List<ClientNotificationMessage> getNotifications() {
