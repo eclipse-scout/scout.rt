@@ -530,10 +530,18 @@
   };
 
   // SVG animate, array contains attr, endValue + startValue
-  $.fn.animateSVG = function(attr, endValue, duration, complete) {
+  $.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) {
     return this.each(function() {
       var startValue = parseFloat($(this).attr(attr));
-
+      if(withoutTabIndex){
+        var oldComplete = complete;
+        complete = function (){
+          if(oldComplete){
+            oldComplete.call(this);
+          }
+          $(this).removeAttr('tabindex');
+        };
+      }
       $(this).animate({
         tabIndex: 0
       }, {
