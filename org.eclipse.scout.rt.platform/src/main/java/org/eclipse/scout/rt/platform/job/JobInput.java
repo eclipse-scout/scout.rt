@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -138,19 +137,6 @@ public class JobInput {
    */
   public JobInput withThreadName(final String threadName) {
     m_threadName = threadName;
-    return this;
-  }
-
-  public PropertyMap getPropertyMap() {
-    return getRunContext().getPropertyMap();
-  }
-
-  public Object getProperty(final Object key) {
-    return getRunContext().getProperty(key);
-  }
-
-  public JobInput withProperty(final Object key, final Object value) {
-    getRunContext().withProperty(key, value);
     return this;
   }
 

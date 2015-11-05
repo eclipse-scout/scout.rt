@@ -200,25 +200,18 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void addTimer(IFuture<?> future) {
     P_TimerJob runnable = new P_TimerJob(future);
-    future.getJobInput().withProperty(TIMER_PROPERTY, runnable);
+    future.getJobInput().getRunContext().withProperty(TIMER_PROPERTY, runnable);
     Jobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS);
   }
 
   private void removeTimer(IFuture<?> future) {
-    P_TimerJob t = (P_TimerJob) future.getJobInput().getProperty(TIMER_PROPERTY);
-    if (t != null) {
-      future.getJobInput().withProperty(TIMER_PROPERTY, null);
-    }
-  }
-
-  private P_TimerJob getTimer(IFuture<?> future) {
-    return (P_TimerJob) future.getJobInput().getProperty(TIMER_PROPERTY);
+    future.getJobInput().getRunContext().withProperty(TIMER_PROPERTY, null);
   }
 
   private void addBusyOperation(IFuture<?> future) {
     int oldSize, newSize;
     synchronized (getStateLock()) {
-      future.getJobInput().withProperty(BUSY_OPERATION_PROPERTY, "true");
+      future.getJobInput().getRunContext().withProperty(BUSY_OPERATION_PROPERTY, Boolean.TRUE);
       oldSize = m_list.size();
       m_list.add(future);
       newSize = m_list.size();
@@ -231,14 +224,14 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void removeBusyOperation(IFuture<?> future) {
     synchronized (getStateLock()) {
-      future.getJobInput().withProperty(BUSY_OPERATION_PROPERTY, null);
+      future.getJobInput().getRunContext().withProperty(BUSY_OPERATION_PROPERTY, null);
       m_list.remove(future);
       getStateLock().notifyAll();
     }
   }
 
   private boolean isBusyOperationNoLock(IFuture<?> future) {
-    return "true".equals(future.getJobInput().getProperty(BUSY_OPERATION_PROPERTY));
+    return future.getJobInput().getRunContext().containsProperty(BUSY_OPERATION_PROPERTY);
   }
 
   private static boolean isJobActive(IFuture<?> future) {
@@ -254,7 +247,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
     @Override
     public void run() throws Exception {
-      if (P_TimerJob.this != getTimer(m_future)) {
+      if (P_TimerJob.this != m_future.getJobInput().getRunContext().getProperty(TIMER_PROPERTY)) {
         return;
       }
       removeTimer(m_future);
