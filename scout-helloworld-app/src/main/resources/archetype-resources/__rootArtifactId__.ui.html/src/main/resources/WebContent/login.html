@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8">
     <title>${displayName}</title>
-	<meta name="google" content="notranslate" />
     <scout:include template="favicon.html" />
 	<scout:stylesheet src="res/scout-login-module.css" />
     <style type="text/css">
@@ -15,7 +14,7 @@
     <scout:script src="res/scout-login-module.js" />
     <script>
       $(document).ready(function() {
-        scout.login.init({texts: <scout:message key="ui.Login ui.LoginFailed ui.User ui.Password" style="javascript" /> });
+        scout.login.init({texts: <scout:message style="javascript" key="ui.Login" key="ui.LoginFailed" key="ui.User" key="ui.Password" /> });
       });
     </script>
   </head>

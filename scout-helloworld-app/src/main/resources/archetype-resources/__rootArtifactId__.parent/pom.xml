@@ -36,19 +36,12 @@
     <dependencies>
     <!-- Scout Dependencies -->
     <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt</artifactId>
-        <version>${scout.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
-        <version>${scout.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt</artifactId>
+      <version>${scout.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
 
     <!-- Application Dependencies -->
     <dependency>
@@ -73,29 +66,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sources>
-                <source>src/main/webapp</source>
-        <source>src/generated/java</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
