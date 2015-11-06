@@ -61,7 +61,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
       }
       m_wizard.addPropertyChangeListener(m_propertyChangeListener);
     }
-    updateTitleFromWizard();
+    updateTitleFromWizard(false);
   }
 
   @Override
@@ -115,10 +115,21 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
     }
   }
 
-  protected void updateTitleFromWizard() {
+  /**
+   * @param force
+   *          If <code>true</code>, title properties are always copied from the wizard. Otherwise, they are only copied
+   *          if their value is not <code>null</code>.
+   */
+  protected void updateTitleFromWizard(boolean force) {
     if (getWizard() != null) {
-      setTitle(getWizard().getTitle());
-      setSubTitle(getWizard().getSubTitle());
+      String title = getWizard().getTitle();
+      String subTitle = getWizard().getSubTitle();
+      if (title != null || force) {
+        setTitle(title);
+      }
+      if (subTitle != null || force) {
+        setSubTitle(subTitle);
+      }
     }
   }
 
@@ -135,10 +146,10 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
         setInnerWizardForm(getWizard().getWizardForm());
       }
       else if (IWizard.PROP_TITLE.equals(propertyName)) {
-        updateTitleFromWizard();
+        updateTitleFromWizard(true);
       }
       else if (IWizard.PROP_SUB_TITLE.equals(propertyName)) {
-        updateTitleFromWizard();
+        updateTitleFromWizard(true);
       }
     }
     catch (Exception e) {

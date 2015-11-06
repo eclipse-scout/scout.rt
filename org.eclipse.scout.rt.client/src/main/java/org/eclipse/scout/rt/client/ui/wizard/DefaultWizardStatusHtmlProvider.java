@@ -63,8 +63,8 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     String bottomPart = "";
     StringBuilder listPart = new StringBuilder();
     if (w != null) {
-      if (w.getTooltipText() != null) {
-        topPart = "<div class=\"infoBox\">" + StringUtility.nvl(w.getTitleHtml(), w.getTooltipText()) + "</div>";
+      if (w.getSubTitle() != null) {
+        topPart = "<div class=\"infoBox\">" + w.getSubTitle() + "</div>";
       }
       if (w.getActiveStep() != null) {
         if (w.getActiveStep().getTooltipText() != null || w.getActiveStep().getSubTitle() != null) {

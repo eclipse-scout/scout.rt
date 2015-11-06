@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.net.URL;
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -52,11 +53,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   }
 
   String PROP_TITLE = "title";
-  String PROP_TITLE_HTML = "titleHtml";
   String PROP_SUB_TITLE = "subTitle";
-  String PROP_TOOLTIP_TEXT = "tooltipText";
-  String PROP_ICON_ID = "iconId";
-  String PROP_WIZARD_NO = "wizardNo";
   /**
    * {@link IForm}
    */
@@ -73,6 +70,14 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void addWizardListener(WizardListener listener);
 
   void removeWizardListener(WizardListener listener);
+  
+  String getTitle();
+
+  void setTitle(String title);
+
+  String getSubTitle();
+
+  void setSubTitle(String subTitle);
 
   /**
    * when the wizard is changed (for example the state) all these changes are accumulated and then fired in single
@@ -83,73 +88,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void setChanging(boolean b);
 
   boolean isChanging();
-
-  /**
-   * Hint for wizard container form
-   */
-  int getDisplayHint();
-
-  /**
-   * Hint for wizard container form
-   */
-  void setDisplayHint(int displayHint);
-
-  /**
-   * Hint for wizard container form
-   */
-  String getDisplayViewId();
-
-  /**
-   * Hint for wizard container form
-   */
-  void setDisplayViewId(String viewId);
-
-  /**
-   * Hint for wizard container form
-   */
-  boolean isModal();
-
-  /**
-   * Hint for wizard container form
-   */
-  void setModal(boolean modal);
-
-  /**
-   * Hint for wizard container form
-   */
-  String getTitle();
-
-  /**
-   * Hint for wizard container form
-   */
-  void setTitle(String title);
-
-  /**
-   * Hint for wizard container form
-   */
-  String getSubTitle();
-
-  /**
-   * Hint for wizard container form
-   */
-  void setSubTitle(String subTitle);
-
-  String getTitleHtml();
-
-  void setTitleHtml(String subTitleHtml);
-
-  String getTooltipText();
-
-  void setTooltipText(String tooltipText);
-
-  String getIconId();
-
-  void setIconId(String iconId);
-
-  String getWizardNo();
-
-  void setWizardNo(String wizardNo);
-
+  
   /**
    * No more operations are possible on a closed wizard.
    */
@@ -352,11 +291,18 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void doWizardStepAction(IWizardStep<? extends IForm> wizardStep);
 
   /**
-   * The container form is created when it does not exist already. By default the container form is created upon start
-   * of the wizard.
+   * The container form is created during initialization of the wizard. The container form cannot be changed later. The
+   * default wizard container form is {@link DefaultWizardContainerForm}.
+   *
+   * @throws AssertionException
+   *           when the return value is <code>null</code>.
    */
   IWizardContainerForm createContainerForm();
 
+  /**
+   * @return the wizard's container form (created in {@link #createContainerForm()} - thus, the result should never be
+   *         <code>null</code>).
+   */
   IWizardContainerForm getContainerForm();
 
   /**

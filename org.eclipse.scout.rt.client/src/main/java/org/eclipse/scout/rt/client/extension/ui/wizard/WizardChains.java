@@ -124,6 +124,24 @@ public final class WizardChains {
     }
   }
 
+  public static class WizardDecorateContainerFormChain extends AbstractWizardChain {
+
+    public WizardDecorateContainerFormChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
+      super(extensions);
+    }
+
+    public IWizardContainerForm execDecorateContainerForm() {
+      MethodInvocation<IWizardContainerForm> methodInvocation = new MethodInvocation<IWizardContainerForm>() {
+        @Override
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
+          next.execDecorateContainerForm(WizardDecorateContainerFormChain.this);
+        }
+      };
+      callChain(methodInvocation);
+      return methodInvocation.getReturnValue();
+    }
+  }
+
   public static class WizardAnyFieldChangedChain extends AbstractWizardChain {
 
     public WizardAnyFieldChangedChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {

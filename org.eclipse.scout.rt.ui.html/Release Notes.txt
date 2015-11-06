@@ -592,8 +592,14 @@ ClientUIPreferences.setTableCustomizerData(ITableCustomizer customizer, String c
 BSH 02.11.2015
 AbstractWizard.decorateWizardContainerForm() was changed:
 1. Argument 'containerForm' was removed. Use getContainerForm() instead.
-2. The method is no longer called when the form is created (during constructor of AbstractWizard). Instead is is called directly before the
-   container form is started, i.e. during the wizard's start() method.
+2. Method was renamed to "execDecorateContainerForm" (analog to execCreateContainerForm).
+
+Some properties were removed from IWizard:
+- "displayHint", "displayViewId", "modal" --> no replacement. Set them on the wizard container form. If the wizard container
+    form does not provide the correct value, the wizard may change them in execDecorateContainerForm().
+- "iconId", "tooltipText", "wizardNo" --> no replacement (legacy properties, never used).
+- "titleHtml" --> use "subTitle" instead (but should not really be necessary)
+
 Migration:
 Old code (MyWizard extends AbstractWizard):
   @Override
@@ -610,11 +616,9 @@ New code:
   }
 
   @Override
-  protected IWizardContainerForm decorateWizardContainerForm() {
-    super.decorateWizardContainerForm();
-    if (getContainerForm() != null) {
-      // more custom modifications
-    }
+  protected void execDecorateContainerForm() {
+    getContainerForm().setXyz(...);
+    // more custom modifications
   }
 
 CGU/MOT 03.11.2015

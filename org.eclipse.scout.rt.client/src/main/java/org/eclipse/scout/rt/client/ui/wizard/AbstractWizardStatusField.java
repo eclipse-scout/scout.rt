@@ -167,8 +167,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
     @Override
     public void propertyChange(final PropertyChangeEvent e) {
       if (IWizard.PROP_TITLE.equals(e.getPropertyName())
-          || IWizard.PROP_TITLE_HTML.equals(e.getPropertyName())
-          || IWizard.PROP_TOOLTIP_TEXT.equals(e.getPropertyName())) {
+          || IWizard.PROP_SUB_TITLE.equals(e.getPropertyName())) {
         markDirty();
       }
     }
