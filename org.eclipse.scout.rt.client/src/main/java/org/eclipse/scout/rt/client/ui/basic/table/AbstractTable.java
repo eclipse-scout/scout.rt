@@ -960,7 +960,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             break;
           }
           case TableEvent.TYPE_ROW_DROP_ACTION: {
-            if (e.getDropObject() != null) {
+            if (e.getDropObject() != null && isEnabled()) {
               try {
                 interceptDrop(e.getFirstRow(), e.getDropObject());
               }
