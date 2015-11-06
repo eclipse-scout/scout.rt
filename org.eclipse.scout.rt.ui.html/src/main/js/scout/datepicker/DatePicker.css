@@ -61,7 +61,7 @@
   }
 
   &.date-picker-out {
-    color: @palette-gray-4;
+    color: @palette-gray-5;
   }
 
   &.date-picker-weekend {

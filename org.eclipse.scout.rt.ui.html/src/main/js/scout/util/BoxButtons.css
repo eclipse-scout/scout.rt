@@ -28,7 +28,7 @@
 
   & > .button.disabled {
     cursor: default;
-    color: @palette-gray-5;
+    color: @palette-gray-6;
   }
 
   & > .button:not(.disabled):active {

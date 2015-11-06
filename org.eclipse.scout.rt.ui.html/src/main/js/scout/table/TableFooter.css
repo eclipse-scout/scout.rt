@@ -80,7 +80,7 @@
       }
 
       &.marked:not(.selected) {
-        border-top-color: @palette-gray-5;
+        border-top-color: @palette-gray-6;
       }
     }
   }

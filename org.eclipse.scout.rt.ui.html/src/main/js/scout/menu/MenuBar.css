@@ -83,8 +83,8 @@
 .main-menubar {
   padding-left: @bench-padding-x;
   padding-right: @bench-padding-x - @desktop-table-header-menubar-padding-right;
-  height: 55px;
-  padding-top: 11px;
+  height: 52px;
+  padding-top: 10px;
   background-color: @main-menubar-background-color;
 
   & > .menu-item {

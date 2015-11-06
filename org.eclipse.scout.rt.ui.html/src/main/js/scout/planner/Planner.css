@@ -46,7 +46,7 @@
   position: absolute;
   right: 0px;
   height: @planner-scale-height;
-  border-bottom:  1px solid @palette-gray-4;
+  border-bottom:  1px solid @palette-gray-5;
   width: 100%;
   /* for horizontal scrollbars */
   overflow: hidden;
@@ -95,7 +95,7 @@
    #scout.overflow-ellipsis-nowrap();
    padding: 0px @resource-padding-x;
    font-size: 17px;
-   color: @palette-gray-6;
+   color: @palette-gray-7;
    line-height: @planner-scale-height;
    width: @planner-resource-title-width;
  }
@@ -110,7 +110,7 @@
 .planner-resource {
   height: @planner-resource-minheight;
   width: 100%;
-  border-bottom: 1px solid @palette-gray-4;
+  border-bottom: 1px solid @palette-gray-5;
 
   & > .resource-title {
     line-height: @planner-resource-minheight;
@@ -173,7 +173,7 @@
   line-height: @planner-resource-minheight - 3px;
   background-color: @palette-cyan-4;
   text-align: center;
-  border: 1px solid @palette-gray-4;
+  border: 1px solid @palette-gray-5;
   overflow: hidden;
 
   &.selected {

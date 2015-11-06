@@ -14,9 +14,9 @@
 @wizard-progress-separator-width: 10px;
 @wizard-progress-separator-line-width: 2px;
 
-@wizard-progress-step-background-color: @palette-gray-2;
+@wizard-progress-step-background-color: @palette-gray-3;
 @wizard-progress-step-foreground-color: @text-color;
-@wizard-progress-step-separator-color: @palette-gray-4;
+@wizard-progress-step-separator-color: @palette-gray-5;
 @wizard-progress-active-step-background-color: @item-selection-background-color;
 @wizard-progress-active-step-foreground-color: @wizard-progress-step-foreground-color;
 @wizard-progress-active-step-separator-color: @wizard-progress-step-separator-color;

@@ -244,7 +244,7 @@ button::-moz-focus-inner {
   &::before {
     content: '';
     border-radius: @application-loading-size;
-    border: 3px solid @palette-gray-4;
+    border: 3px solid @palette-gray-5;
     border-right-color: @palette-blue-6;
     width: @application-loading-size;
     height: @application-loading-size;
@@ -306,7 +306,7 @@ a,
  * You should define a CSS rule in your project-specific .css files.
  */
 .box-with-logo {
-  border: 1px solid @palette-gray-4;
+  border: 1px solid @palette-gray-5;
   background-color: @background-color;
   max-width: 420px;
   margin: 150px auto;

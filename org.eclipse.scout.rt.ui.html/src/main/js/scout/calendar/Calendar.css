@@ -176,7 +176,7 @@
 
   & span.small {
     font-size: 11px;
-    color: @palette-gray-6;
+    color: @palette-gray-7;
   }
 
   /* Default colors used when component has no specific class */
@@ -255,7 +255,7 @@
         left: 0px;
         bottom: -1px;
         content: '';
-        background-color: @palette-gray-4;
+        background-color: @palette-gray-5;
       }
     }
 
@@ -327,7 +327,7 @@
     left: 0px;
     top: 0px;
     content: '';
-    background-color: @palette-gray-4;
+    background-color: @palette-gray-5;
   }
 
   & .calendar-week::after{
@@ -337,7 +337,7 @@
     left: 0px;
     top: 0px;
     content: '';
-    background-color: @palette-gray-4;
+    background-color: @palette-gray-5;
   }
 
   & .calendar-day-name::before   {
@@ -422,7 +422,7 @@
     height: 1px;
     width: 100%;
     content: '';
-    background-color: @palette-gray-2;
+    background-color: @palette-gray-3;
   }
 
   & .calendar-week-axis::before {
@@ -445,7 +445,7 @@
     height: 1px;
     width: 100%;
     content: '';
-    background-color: @palette-gray-4;
+    background-color: @palette-gray-5;
   }
 
   & .calendar-week-task::before {

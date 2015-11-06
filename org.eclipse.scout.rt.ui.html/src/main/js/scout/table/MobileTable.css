@@ -23,7 +23,7 @@ height: ~'calc(100% - 95px)'; /*85px is table footer/control*/
 .table-row {
   position:relative;
   padding: 4px 8px 4px 12px;
-  border-bottom: 1px solid @palette-gray-4;
+  border-bottom: 1px solid @palette-gray-5;
 }
 
 .table-row-single {
@@ -33,11 +33,11 @@ height: ~'calc(100% - 95px)'; /*85px is table footer/control*/
 
 .table-row:active {
   /* touch feedback */
-  background-color: @palette-gray-4;
+  background-color: @palette-gray-5;
 }
 
 .table-row.selected {
-  background-color: @palette-gray-4;
+  background-color: @palette-gray-5;
 }
 
 .table-row > h3 {
@@ -53,7 +53,7 @@ height: ~'calc(100% - 95px)'; /*85px is table footer/control*/
 .table-row > p::after {
   #scout.font-icon();
   content: @icon-chevron-right;
-  color: @palette-gray-4;
+  color: @palette-gray-5;
   position: absolute;
   display: block;
   width: 22px;
