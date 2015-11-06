@@ -242,7 +242,7 @@ scout.Desktop.prototype._renderBench = function() {
   if (!this._hasBench()) {
     return;
   }
-  this.$bench = this.$container.appendDiv('desktop-bench');
+  this.$bench = this.$container.makeDiv('desktop-bench').insertAfter(this._$taskBar);
   this.$bench.toggleClass('has-taskbar', this._hasTaskBar());
   new scout.HtmlComponent(this.$bench, this.session);
 
