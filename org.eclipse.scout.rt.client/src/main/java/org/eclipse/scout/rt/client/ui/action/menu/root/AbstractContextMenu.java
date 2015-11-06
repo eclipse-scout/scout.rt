@@ -19,8 +19,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.root.IContextMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -31,12 +29,10 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
 public abstract class AbstractContextMenu extends AbstractMenu implements IContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContextMenu.class);
 
   private final EventListenerList m_listeners = new EventListenerList();
   private final IPropertyObserver m_owner;
-
-  private PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
+  private final PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
 
   public AbstractContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList) {
     this(owner, initialChildList, true);
@@ -84,12 +80,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
 
   protected void fireContextMenuEvent(ContextMenuEvent event) {
     for (ContextMenuListener l : m_listeners.getListeners(ContextMenuListener.class)) {
-      try {
-        l.contextMenuChanged(event);
-      }
-      catch (Exception e) {
-        LOG.error("Error during listener notification '" + l + "'.", e);
-      }
+      l.contextMenuChanged(event);
     }
   }
 

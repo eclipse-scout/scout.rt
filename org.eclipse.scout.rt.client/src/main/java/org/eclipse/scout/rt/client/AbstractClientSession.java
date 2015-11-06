@@ -682,12 +682,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners
     listeners.addAll(BEANS.all(IGlobalSessionListener.class)); // global listeners
     for (final ISessionListener listener : listeners) {
-      try {
-        listener.sessionChanged(event);
-      }
-      catch (final Exception e) {
-        LOG.error("Failed to notify listener about session state change", e);
-      }
+      listener.sessionChanged(event);
     }
   }
 

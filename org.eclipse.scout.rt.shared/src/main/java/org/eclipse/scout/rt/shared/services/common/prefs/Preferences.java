@@ -341,12 +341,7 @@ public class Preferences implements IPreferences {
 
   protected void fireEvent(PreferenceChangeEvent event) {
     for (IPreferenceChangeListener listener : m_eventListeners.getListeners(IPreferenceChangeListener.class)) {
-      try {
-        listener.preferenceChange(event);
-      }
-      catch (Exception e) {
-        LOG.error("Error on event listener notification for listener '" + listener.getClass().getName() + "'.", e);
-      }
+      listener.preferenceChange(event);
     }
   }
 

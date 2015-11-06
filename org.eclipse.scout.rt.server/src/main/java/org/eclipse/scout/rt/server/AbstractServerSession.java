@@ -31,8 +31,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -286,12 +286,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners
     listeners.addAll(BEANS.all(IGlobalSessionListener.class)); // global listeners
     for (final ISessionListener listener : listeners) {
-      try {
-        listener.sessionChanged(event);
-      }
-      catch (final Exception e) {
-        LOG.error("Failed to notify listener about session state change", e);
-      }
+      listener.sessionChanged(event);
     }
   }
 

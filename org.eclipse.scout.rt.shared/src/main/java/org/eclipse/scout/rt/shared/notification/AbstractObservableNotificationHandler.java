@@ -80,13 +80,9 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
         return;
       }
     }
+
     for (INotificationListener<T> l : listeners) {
-      try {
-        l.handleNotification(notification);
-      }
-      catch (Exception e) {
-        LOG.error(String.format("Error during notification of listener '%s'.", l), e);
-      }
+      l.handleNotification(notification);
     }
   }
 

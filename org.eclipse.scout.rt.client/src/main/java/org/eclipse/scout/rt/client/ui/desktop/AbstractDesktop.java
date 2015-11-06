@@ -1682,12 +1682,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       for (Map.Entry<DataChangeListener, Set<Object>> e : map.entrySet()) {
         DataChangeListener listener = e.getKey();
         Set<Object> typeSet = e.getValue();
-        try {
-          listener.dataChanged(typeSet.toArray());
-        }
-        catch (Exception t) {
-          LOG.error(null, t);
-        }
+        listener.dataChanged(typeSet.toArray());
       }
     }
   }
@@ -1816,12 +1811,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     DesktopListener[] listeners = m_listenerList.getListeners(DesktopListener.class);
     if (listeners != null && listeners.length > 0) {
       for (DesktopListener listener : listeners) {
-        try {
-          listener.desktopChanged(event);
-        }
-        catch (Exception ex) {
-          LOG.error(null, ex);
-        }
+        listener.desktopChanged(event);
       }
     }
   }

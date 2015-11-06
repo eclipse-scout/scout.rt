@@ -895,12 +895,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
     menus.addAllOrdered(contributedMenus);
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
+    injectMenusInternal(menus);
 
     addHeaderMenus(menus);
     //set container on menus
@@ -1059,12 +1054,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     // dynamically injected columns
-    try {
-      injectColumnsInternal(columns);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contribute columns.", e);
-    }
+    injectColumnsInternal(columns);
 
     // move columns
     ExtensionUtility.moveModelObjects(columns);
@@ -4017,12 +4007,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     else {
       TableListener[] listeners = m_listenerList.getListeners(TableListener.class);
       for (TableListener l : listeners) {
-        try {
-          l.tableChanged(e);
-        }
-        catch (Exception t) {
-          LOG.error("fire " + e, t);
-        }
+        l.tableChanged(e);
       }
     }
   }
