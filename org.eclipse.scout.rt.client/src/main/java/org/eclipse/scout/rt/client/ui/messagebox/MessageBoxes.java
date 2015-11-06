@@ -74,6 +74,7 @@ public final class MessageBoxes {
    *
    * @param items
    *          one item or array of multiple items
+   * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    */
   public static boolean showDeleteConfirmationMessage(Object items) {
     return showDeleteConfirmationMessage(null, items);
@@ -84,6 +85,7 @@ public final class MessageBoxes {
    *
    * @param items
    *          a list of multiple items
+   * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    * @since Scout 4.0.1
    */
   public static boolean showDeleteConfirmationMessage(Collection<?> items) {
@@ -97,6 +99,7 @@ public final class MessageBoxes {
    *          display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
    *          one item or array of multiple items
+   * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    */
   public static boolean showDeleteConfirmationMessage(String itemType, Object items) {
     if (items == null) {
@@ -120,6 +123,7 @@ public final class MessageBoxes {
    *          display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
    *          a list of multiple items
+   * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    * @since Scout 4.0.1
    */
   public static boolean showDeleteConfirmationMessage(String itemType, Collection<?> items) {
