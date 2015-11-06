@@ -78,8 +78,10 @@ scout.Desktop.prototype._render = function($parent) {
   this._installKeyStrokeContextForDesktopViewButtonBar();
 
   this._renderTaskBar($parent);
-  this._renderToolMenus();
   this._renderBench();
+  // render ToolMenus after bench because menus are a part of the taskbar and main structure with all elements
+  //on desktop should be rendered before fill them. Otherwise there are problems with Popups.
+  this._renderToolMenus();
   this._createSplitter($parent);
   this._setSplitterPosition();
   // TODO AWE/BSH Maybe remove this? Addon functionality may be provided by using an own desktop.
@@ -242,7 +244,7 @@ scout.Desktop.prototype._renderBench = function() {
   if (!this._hasBench()) {
     return;
   }
-  this.$bench = this.$container.makeDiv('desktop-bench').insertAfter(this._$taskBar);
+  this.$bench = this.$container.appendDiv('desktop-bench');
   this.$bench.toggleClass('has-taskbar', this._hasTaskBar());
   new scout.HtmlComponent(this.$bench, this.session);
 
