@@ -16,7 +16,10 @@ import static org.junit.Assert.fail;
 import java.awt.Color;
 import java.io.InputStream;
 
+import javax.swing.text.html.HTMLDocument;
+
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -922,5 +925,78 @@ public class HTMLUtilityTest {
     input = null;
     expected = null;
     assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
+  }
+
+  @Test
+  public void testCleanupCss() {
+    String sample = "<html>\n" +
+        "<head>\n" +
+        "\n" +
+        "</head>\n" +
+        "<body>\n" +
+        "<p><font size=\"2\" face=\"sans-serif\"><br>\n" +
+        "</font><font size=\"2\" face=\"Arial\">Bla, bla</font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">Bla blubb</font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">aa: </font><font size=\"2\" face=\"Arial\"><b>&nbsp; &nbsp; &nbsp; 168549681</b></font><br>\n" +
+        "<font size=\"2\" face=\"Arial\"><b></b></font><br>\n" +
+        "<font size=\"2\" face=\"Arial\">Dat: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;23.09.2015 </font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">aaaa : &nbsp; Main Station</font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">bbb : &nbsp; </font><font size=\"2\" face=\"Arial\"><b>City\n" +
+        "</b></font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">___________________________________________________________________________________________________</font><br>\n" +
+        "<br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">Bla</font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">No: </font><font size=\"2\" face=\"Arial\"><b>&nbsp; &nbsp; &nbsp; 123412341234</b></font><br>\n" +
+        "<font size=\"2\" face=\"Arial\"><b></b></font><br>\n" +
+        "<font size=\"2\" face=\"Arial\">Date : &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;01.10.2015 </font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">a : &nbsp; asdf</font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">b: &nbsp; </font><font size=\"2\" face=\"Arial\"><b>asdfasdf</b></font><br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">___________________________________________________________________________________________________</font><br>\n" +
+        "<br>\n" +
+        "<br>\n" +
+        "<font size=\"2\" face=\"Arial\">fff</font><br>\n" +
+        "<br>\n" +
+        "</font>\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
+        "<tbody>\n" +
+        "<tr valign=\"top\">\n" +
+        "<td width=\"95\" valign=\"middle\"><img src=\"cid:1__=aa@example.com\" width=\"58\" height=\"100\" align=\"bottom\"></td>\n" +
+        "<td width=\"755\" valign=\"middle\"><font size=\"1\" face=\"Arial\"><b>Peter Example</b></font><font size=\"1\" face=\"Arial\"><br>\n" +
+        "aaa<br>\n" +
+        "bbb<br>\n" +
+        "ccc<br>\n" +
+        "dd 1<br>\n" +
+        "TÃ©l: &#43;1234 - Fax: &#43;1234</font><font size=\"1\" color=\"#0000FF\" face=\"Arial\"><u><br>\n" +
+        "</u></font><a href=\"mailto:aa@example.com\"><font size=\"1\" color=\"#0000FF\" face=\"Arial\"><u>aa@example.com</u></font></a><font size=\"1\" color=\"#000080\" face=\"Arial\">&nbsp;-\n" +
+        "</font><a href=\"http://www.test.com\"><font size=\"1\" color=\"#0000FF\" face=\"Arial\"><u>http://www.test.com</u></font></a><font size=\"1\" color=\"#000080\" face=\"Arial\">&nbsp;</font></td>\n" +
+        "</tr>\n" +
+        "<tr valign=\"top\">\n" +
+        "<td width=\"95\" valign=\"middle\"><img width=\"1\" height=\"1\" src=\"cid:2__=aa@example.com\" border=\"0\" alt=\"\"></td>\n" +
+        "<td width=\"755\" valign=\"middle\"><font size=\"1\" face=\"Arial\">aa\n" +
+        "</font><font size=\"1\" face=\"Arial\"><i>d</i></font><font size=\"1\" face=\"Arial\">&nbsp;et asdf\n" +
+        "<br>\n" +
+        "asdf </font></td>\n" +
+        "</tr>\n" +
+        "</tbody>\n" +
+        "</table>\n" +
+        "<br>\n" +
+        "</p>\n" +
+        "</body>\n" +
+        "</html>\n";
+
+    HTMLDocument htmlDoc = HTMLUtility.toHtmlDocument(sample);
+    HTMLDocument result = HTMLUtility.cleanupCss(htmlDoc, null);
+    String out = HTMLUtility.toHtmlText(result);
+    Assert.assertTrue(out.indexOf("size=\"") < 0); // ensure all font size attributes are removed
   }
 }

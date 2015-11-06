@@ -389,38 +389,39 @@ public final class HTMLUtility {
       }
     }
     // clean font tags if any styles are present
-    final Map<MutableAttributeSet, List<Object>> attributesToRemove = new HashMap<MutableAttributeSet, List<Object>>();
     doc.writeLockEx();
-    visitDocument(doc, new IDocumentVisitor() {
-      @Override
-      public void visitElement(Element elem) {
-        // nop
-      }
+    try {
+      final Map<Object /* attribute */, List<MutableAttributeSet> /*list of elements holding the attribute*/> attributesToRemove = new HashMap<Object, List<MutableAttributeSet>>(4);
+      visitDocument(doc, new IDocumentVisitor() {
+        @Override
+        public void visitElement(Element elem) {
+          // nop
+        }
 
-      @Override
-      public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
-        if (nm == HTML.Attribute.FACE || nm == HTML.Attribute.SIZE || nm == CSS.Attribute.FONT_FAMILY || nm == CSS.Attribute.FONT_SIZE) {
-          if (atts instanceof MutableAttributeSet) {
-            MutableAttributeSet mutableAttributeSet = (MutableAttributeSet) atts;
-            List<Object> attributes = attributesToRemove.get(mutableAttributeSet);
-            if (attributes == null) {
-              attributes = new ArrayList<Object>();
-              attributesToRemove.put(mutableAttributeSet, attributes);
+        @Override
+        public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
+          if (nm == HTML.Attribute.FACE || nm == HTML.Attribute.SIZE || nm == CSS.Attribute.FONT_FAMILY || nm == CSS.Attribute.FONT_SIZE) {
+            if (atts instanceof MutableAttributeSet) {
+              List<MutableAttributeSet> elements = attributesToRemove.get(nm);
+              if (elements == null) {
+                elements = new ArrayList<MutableAttributeSet>();
+                attributesToRemove.put(nm, elements);
+              }
+              elements.add((MutableAttributeSet) atts);
             }
-            attributes.add(nm);
           }
         }
-      }
-    });
+      });
 
-    for (Entry<MutableAttributeSet, List<Object>> entry : attributesToRemove.entrySet()) {
-      MutableAttributeSet mutableAttributeSet = entry.getKey();
-      for (Object nm : entry.getValue()) {
-        mutableAttributeSet.removeAttribute(nm);
+      for (Entry<Object, List<MutableAttributeSet>> a : attributesToRemove.entrySet()) {
+        for (MutableAttributeSet element : a.getValue()) {
+          element.removeAttribute(a.getKey());
+        }
       }
     }
-
-    doc.writeUnlockEx();
+    finally {
+      doc.writeUnlockEx();
+    }
     return htmlDoc;
   }
 
