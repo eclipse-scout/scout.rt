@@ -19,8 +19,6 @@ import java.util.ListIterator;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -34,6 +32,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A limited navigation history for storing the navigation history and navigating in that history.
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
  */
 public class UserNavigationHistory {
   private static final int MAX_HISTORY_SIZE = 25;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UserNavigationHistory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UserNavigationHistory.class);
 
   private final EventListenerList m_listenerList;
   private final LinkedList<Bookmark> m_bookmarks;

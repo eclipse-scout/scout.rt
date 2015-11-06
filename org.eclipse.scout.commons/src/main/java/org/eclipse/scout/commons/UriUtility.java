@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for creating, parsing and converting {@link URI}s and {@link URL}s.
@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public final class UriUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UriUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UriUtility.class);
   public static final String ISO_8859_1 = "ISO-8859-1";
 
   private UriUtility() {

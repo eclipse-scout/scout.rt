@@ -20,8 +20,8 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * "No frills" implementation for client-server communication with optional compression.
@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 @Order(5010)
 public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelContentHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryServiceTunnelContentHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BinaryServiceTunnelContentHandler.class);
   private static final String CONTENT_TYPE = "application/octet-stream";
 
   private Boolean m_receivedCompressed;

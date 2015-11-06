@@ -34,8 +34,8 @@ import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates SOAP envelopes for {@link IServiceTunnelRequest} and {@link IServiceTunnelResponse} objects.<br>
@@ -106,7 +106,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 @Order(5100)
 public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelContentHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SoapServiceTunnelContentHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SoapServiceTunnelContentHandler.class);
   private static final Pattern BEGIN_DATA_TAG = Pattern.compile("[<]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern END_DATA_TAG = Pattern.compile("[<][/]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern COMPRESSED_ATTRIBUTE = Pattern.compile("compressed\\s*=\\s*\"(true|false)\"");

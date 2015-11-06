@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -32,6 +30,8 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchroni
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link ClientNotificationRegistry} is the registry for all notifications. It keeps a
@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
  */
 @ApplicationScoped
 public class ClientNotificationRegistry {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationRegistry.class);
   private final Map<String /*notificationNodeId*/, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
 
   /**

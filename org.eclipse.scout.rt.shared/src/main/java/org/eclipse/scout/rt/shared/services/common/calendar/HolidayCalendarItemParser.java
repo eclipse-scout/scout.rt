@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 /**
@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
  * </pre>
  */
 public class HolidayCalendarItemParser {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarItemParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HolidayCalendarItemParser.class);
 
   private static final String HOLIDAY = "holiday";
   private static final String DATE = "date";

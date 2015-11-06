@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
@@ -47,12 +45,14 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractServerSession implements IServerSession, Serializable, IExtensibleObject {
 
   private static final long serialVersionUID = 1L;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractServerSession.class);
 
   transient private final EventListenerList m_eventListeners;
 

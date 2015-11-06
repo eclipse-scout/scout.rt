@@ -31,11 +31,11 @@ import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.SecurityUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h4>DataSourceSecurityFilter</h4> The following properties can be set in the <code>web.xml</code> file:
@@ -62,7 +62,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  */
 public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataSourceSecurityFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataSourceSecurityFilter.class);
   public static final String PROP_BASIC_ATTEMPT = "DataSourceSecurityFilter.basicAttempt";
 
   /**

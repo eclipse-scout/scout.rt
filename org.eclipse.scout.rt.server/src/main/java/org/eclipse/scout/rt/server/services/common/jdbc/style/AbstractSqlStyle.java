@@ -34,13 +34,13 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSqlStyle implements ISqlStyle {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlStyle.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlStyle.class);
 
   @Override
   public String getConcatOp() {

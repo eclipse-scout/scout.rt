@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.services.common.pwd;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm;
@@ -23,12 +21,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runs the password verification process
  */
 public class PasswordPolicyVerifier {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PasswordPolicyVerifier.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PasswordPolicyVerifier.class);
 
   /**
    * Calls {@link IPasswordManagementService#getPasswordExpirationDate(String)} to check whether the password has

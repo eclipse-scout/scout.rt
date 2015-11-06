@@ -18,8 +18,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper to retrieve information about the HTTP client by parsing the user agent string.
@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * This class was originally copied from org.eclipse.scout.rt.ui.rap.
  */
 public class BrowserInfo {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserInfo.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BrowserInfo.class);
 
   public static enum EngineType {
     ANDROID, CHROME, SAFARI, FIREFOX, IE, OPERA, KONQUEROR, UNKNOWN

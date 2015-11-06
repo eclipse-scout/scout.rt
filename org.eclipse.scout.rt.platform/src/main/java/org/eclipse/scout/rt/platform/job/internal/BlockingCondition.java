@@ -23,20 +23,20 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link IBlockingCondition}.
  */
 public class BlockingCondition implements IBlockingCondition {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BlockingCondition.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BlockingCondition.class);
 
   private volatile boolean m_blocking;
   private final String m_name;

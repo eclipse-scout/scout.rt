@@ -15,17 +15,17 @@ import java.io.IOException;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This service stores the bookmark data's 3 root folders as individial data records
  */
 public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmarkStorageService implements IBookmarkStorageService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlBookmarkStorageService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlBookmarkStorageService.class);
 
   /**
    * @return sql data with the following columns

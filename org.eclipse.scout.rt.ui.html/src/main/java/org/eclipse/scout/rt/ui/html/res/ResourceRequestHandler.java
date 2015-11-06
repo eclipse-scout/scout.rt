@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -32,6 +30,8 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This handler contributes to the {@link UiServlet} as the default GET handler for
@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
  */
 @Order(5020)
 public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceRequestHandler.class);
 
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";

@@ -16,13 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UiThemeUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiThemeUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UiThemeUtility.class);
   private static final String THEME_SESSION_ATTRIBUTE = UiThemeUtility.class.getName() + "#theme";
 
   /**

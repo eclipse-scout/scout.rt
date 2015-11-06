@@ -25,8 +25,6 @@ import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -35,6 +33,8 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ITableRowDataMapper}.
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
  * @since 3.8.2
  */
 public class TableRowDataMapper implements ITableRowDataMapper {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRowDataMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TableRowDataMapper.class);
 
   private final Map<IColumn, FastPropertyDescriptor> m_propertyDescriptorByColumn;
   private final ColumnSet m_columnSet;

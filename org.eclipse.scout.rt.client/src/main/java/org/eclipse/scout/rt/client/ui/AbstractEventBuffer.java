@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A buffer for events ({@link IModelEvent}) with coalesce functionality:
@@ -32,7 +32,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  *          event type
  */
 public abstract class AbstractEventBuffer<T extends IModelEvent> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractEventBuffer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractEventBuffer.class);
 
   private List<T> m_buffer = new LinkedList<>();
   private T m_lastAddedEvent = null;

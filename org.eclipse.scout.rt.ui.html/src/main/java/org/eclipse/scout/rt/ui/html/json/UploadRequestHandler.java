@@ -35,8 +35,6 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
@@ -46,13 +44,15 @@ import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This handler contributes to the {@link UiServlet} as the POST handler for /upload
  */
 @Order(5030)
 public class UploadRequestHandler extends AbstractUiServletRequestHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UploadRequestHandler.class);
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 

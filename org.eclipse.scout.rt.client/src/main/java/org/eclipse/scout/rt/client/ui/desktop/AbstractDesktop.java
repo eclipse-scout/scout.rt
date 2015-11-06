@@ -41,8 +41,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
@@ -105,6 +103,8 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The desktop model (may) consist of
@@ -124,7 +124,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  */
 public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop, IContributionOwner, IExtensibleObject {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDesktop.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktop.class);
 
   private final IDesktopExtension m_localDesktopExtension;
   private List<IDesktopExtension> m_desktopExtensions;

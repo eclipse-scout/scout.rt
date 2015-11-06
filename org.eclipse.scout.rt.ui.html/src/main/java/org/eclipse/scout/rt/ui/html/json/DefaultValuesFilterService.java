@@ -19,15 +19,15 @@ import java.util.List;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultValuesFilterService implements IDefaultValuesFilterService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultValuesFilterService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultValuesFilterService.class);
 
   private static final long FILE_UPDATE_CHECK_INTERVAL = 1234; // in milliseconds (only used in dev mode)
 

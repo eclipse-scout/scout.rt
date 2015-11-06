@@ -21,8 +21,6 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
@@ -37,6 +35,8 @@ import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>SOAPHandler</code> used to authenticate webservice requests based on the configured <i>Authentication
@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  */
 public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AuthenticationHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AuthenticationHandler.class);
   protected static final Subject AUTHENTICATOR_SUBJECT = CONFIG.getPropertyValue(JaxWsAuthenticatorSubjectProperty.class);
 
   protected final IAuthenticationMethod m_authenticationMethod;

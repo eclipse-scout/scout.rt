@@ -16,10 +16,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Notification is sent from server to client to notify that the code type has changed and the client should clear its
@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 public class CodeTypeChangedNotification implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeTypeChangedNotification.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CodeTypeChangedNotification.class);
 
   private Set<Class<? extends ICodeType<?, ?>>> m_codeTypes;
 

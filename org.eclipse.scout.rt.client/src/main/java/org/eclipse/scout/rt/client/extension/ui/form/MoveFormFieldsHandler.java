@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
@@ -26,10 +24,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.MoveDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MoveFormFieldsHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MoveFormFieldsHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MoveFormFieldsHandler.class);
 
   private final IForm m_form;
   private final IInternalExtensionRegistry m_extensionRegistry;

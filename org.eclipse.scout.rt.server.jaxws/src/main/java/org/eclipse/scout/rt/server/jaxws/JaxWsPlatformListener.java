@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.server.jaxws;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
@@ -24,6 +22,8 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience listener to activate configured {@link JaxWsImplementorSpecifics} by adding a {@link Replace} annotation
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
  */
 public class JaxWsPlatformListener implements IPlatformListener {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JaxWsPlatformListener.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsPlatformListener.class);
 
   @Override
   public void stateChanged(final PlatformEvent event) throws PlatformException {

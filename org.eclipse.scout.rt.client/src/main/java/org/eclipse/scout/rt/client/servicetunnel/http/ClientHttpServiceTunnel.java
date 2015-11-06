@@ -18,8 +18,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
@@ -40,6 +38,8 @@ import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherSer
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class since the
@@ -47,7 +47,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
  */
 public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implements IClientServiceTunnel {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientHttpServiceTunnel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientHttpServiceTunnel.class);
 
   private boolean m_analyzeNetworkLatency = true;
 

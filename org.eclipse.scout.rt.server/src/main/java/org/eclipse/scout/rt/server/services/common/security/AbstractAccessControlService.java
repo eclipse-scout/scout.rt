@@ -14,8 +14,6 @@ import java.io.Serializable;
 import java.security.Permissions;
 import java.util.Collection;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -25,12 +23,14 @@ import org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccess
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementations should override {@link #execLoadPermissions()}
  */
 public abstract class AbstractAccessControlService extends AbstractSharedAccessControlService implements INotificationHandler<AccessControlClusterNotification> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractAccessControlService.class);
 
   @Override
   protected void notifySetPermisions(Permissions p) {

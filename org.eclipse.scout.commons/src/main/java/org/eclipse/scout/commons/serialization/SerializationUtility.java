@@ -12,8 +12,8 @@ package org.eclipse.scout.commons.serialization;
 
 import java.lang.reflect.Modifier;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility for serializing and deserializing java objects. The utility works in a standard java environment as well as
@@ -33,12 +33,12 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * @since 3.8.2
  */
 public final class SerializationUtility {
-  private static final IScoutLogger LOG;
+  private static final Logger LOG;
 
   private static final IObjectSerializerFactory FACTORY;
 
   static {
-    LOG = ScoutLogManager.getLogger(SerializationUtility.class);
+    LOG = LoggerFactory.getLogger(SerializationUtility.class);
     FACTORY = createObjectSerializerFactory();
   }
 

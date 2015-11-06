@@ -20,14 +20,14 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BasicHierarchyPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicHierarchyPermission.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BasicHierarchyPermission.class);
 
   public static final int LEVEL_UNDEFINED = -1;
   public static final int LEVEL_NONE = 0;

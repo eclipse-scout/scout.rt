@@ -27,8 +27,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.StringHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
@@ -62,9 +60,11 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSqlService implements ISqlService, IServiceInventory {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlService.class);
   public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1024 * 1024; // = 1MB default
 
   private SqlConnectionPool m_pool;

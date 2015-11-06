@@ -11,18 +11,18 @@
 package org.eclipse.scout.rt.platform.inventory;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
 import org.jboss.jandex.IndexView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Singleton with all the classes that were scanned in maven modules that contain /src/main/resources/META-INF/scout.xml
  */
 public final class ClassInventory {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClassInventory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClassInventory.class);
   private static IClassInventory INSTANCE;
 
   public static IClassInventory get() {

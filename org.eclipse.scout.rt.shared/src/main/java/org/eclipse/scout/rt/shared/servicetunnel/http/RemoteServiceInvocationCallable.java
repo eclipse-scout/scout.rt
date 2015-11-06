@@ -19,8 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.ICancellable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -31,6 +29,8 @@ import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelServ
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a {@link Callable} to invoke the service operation as described by {@link IServiceTunnelRequest}
@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  */
 public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelResponse>, ICancellable {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RemoteServiceInvocationCallable.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceInvocationCallable.class);
 
   private final AbstractHttpServiceTunnel m_tunnel;
   private final ServiceTunnelRequest m_serviceRequest;

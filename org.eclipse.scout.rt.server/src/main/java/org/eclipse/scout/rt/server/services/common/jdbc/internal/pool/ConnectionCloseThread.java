@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.server.services.common.jdbc.internal.pool;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class ConnectionCloseThread extends Thread {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ConnectionCloseThread.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConnectionCloseThread.class);
 
   private Connection m_conn;
 

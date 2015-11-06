@@ -25,8 +25,6 @@ import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -42,13 +40,15 @@ import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandl
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
  */
 public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpServiceTunnel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractHttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 

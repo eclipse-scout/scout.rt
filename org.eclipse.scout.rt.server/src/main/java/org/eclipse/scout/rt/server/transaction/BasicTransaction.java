@@ -17,14 +17,14 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Bean
 public class BasicTransaction implements ITransaction {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicTransaction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BasicTransaction.class);
 
   private final Object m_memberMapLock = new Object();
   private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<String, ITransactionMember>();

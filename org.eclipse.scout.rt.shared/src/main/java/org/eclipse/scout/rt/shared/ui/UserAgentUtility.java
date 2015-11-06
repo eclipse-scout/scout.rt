@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.ui;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.8.0
  */
 public final class UserAgentUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UserAgentUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UserAgentUtility.class);
 
   private UserAgentUtility() {
   }

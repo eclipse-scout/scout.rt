@@ -16,8 +16,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract icon provider service. By default {@link #getFolderName()} links to
@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * provider service is called <code>org.eclipse.scout.sample.SampleIconProviderService</code>).
  */
 public abstract class AbstractIconProviderService implements IIconProviderService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractIconProviderService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractIconProviderService.class);
   private static final String[] DEFAULT_ICON_EXTENSIONS = new String[]{"png", "gif", "jpg"};
 
   private final ReentrantReadWriteLock m_cacheLock = new ReentrantReadWriteLock();

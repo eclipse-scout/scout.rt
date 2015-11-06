@@ -12,8 +12,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -60,10 +58,12 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OrganizeColumnsForm extends AbstractForm {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(OrganizeColumnsForm.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OrganizeColumnsForm.class);
 
   protected enum ConfigType {
     DEFAULT, CUSTOM

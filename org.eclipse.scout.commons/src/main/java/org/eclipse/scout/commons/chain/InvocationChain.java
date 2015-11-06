@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.chain.IInvocationDecorator.IUndecorator;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Invocation chain according to the design pattern 'Chain-of-responsibility'.
@@ -36,7 +36,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class InvocationChain<RESULT> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InvocationChain.class);
+  private static final Logger LOG = LoggerFactory.getLogger(InvocationChain.class);
 
   private final LinkedList<IChainable> m_chainables = new LinkedList<>();
 

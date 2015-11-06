@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSchedulerJob implements ISchedulerJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSchedulerJob.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSchedulerJob.class);
 
   private final String m_groupId;
   private final String m_jobId;

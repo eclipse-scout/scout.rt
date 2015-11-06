@@ -16,15 +16,15 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("6936b8b8-6612-4efa-bf29-80a26f80b9da")
 public abstract class AbstractWizardStatusField extends AbstractHtmlField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWizardStatusField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractWizardStatusField.class);
   private IWizard m_wizard;
   private IWizardStatusHtmlProvider m_htmlProvider;
   private P_WizardListener m_scoutWizardListener;

@@ -15,13 +15,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.AbstractSqlStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MySqlSqlStyle extends AbstractSqlStyle {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MySqlSqlStyle.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MySqlSqlStyle.class);
 
   private static final String DATE_SQL_METHOD = "DATE(";
   private static final String UPPERCASE_SQL_METHOD = "upper(";

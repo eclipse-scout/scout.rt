@@ -43,11 +43,11 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class IOUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(IOUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IOUtility.class);
 
   private IOUtility() {
   }

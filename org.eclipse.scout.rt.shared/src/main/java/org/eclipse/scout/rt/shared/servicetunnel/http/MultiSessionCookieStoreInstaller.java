@@ -15,14 +15,14 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Install and uninstall {@link MultiSessionCookieStore}
  */
 public class MultiSessionCookieStoreInstaller {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiSessionCookieStoreInstaller.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MultiSessionCookieStoreInstaller.class);
 
   private CookieHandler m_oldCookieHandler;
   private CookieHandler m_newCookieHandler;

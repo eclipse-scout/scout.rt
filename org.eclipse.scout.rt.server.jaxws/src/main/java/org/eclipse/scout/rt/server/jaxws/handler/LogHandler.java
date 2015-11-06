@@ -18,12 +18,12 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsLogHandlerDebugProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handler to log SOAP messages.
@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 @ApplicationScoped
 public class LogHandler implements SOAPHandler<SOAPMessageContext> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LogHandler.class);
 
   private boolean m_logDebug;
 

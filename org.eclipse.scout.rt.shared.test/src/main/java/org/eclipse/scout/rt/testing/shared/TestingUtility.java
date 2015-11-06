@@ -21,8 +21,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -31,10 +29,12 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TestingUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TestingUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TestingUtility.class);
 
   /**
    * Order to make sure testing beans are preferred over regular beans

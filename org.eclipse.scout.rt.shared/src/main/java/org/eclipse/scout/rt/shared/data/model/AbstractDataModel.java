@@ -18,15 +18,15 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModel implements IDataModel, Serializable, IContributionOwner {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModel.class);
 
   private boolean m_calledInitializer;
   private List<IDataModelAttribute> m_attributes;

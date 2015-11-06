@@ -15,15 +15,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JandexClassInfo implements IClassInfo {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexClassInfo.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;
   private volatile boolean m_hasNoArgsConstructor;
   private volatile Class<?> m_class;

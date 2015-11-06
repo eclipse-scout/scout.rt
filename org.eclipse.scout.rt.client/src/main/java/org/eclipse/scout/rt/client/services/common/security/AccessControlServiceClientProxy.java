@@ -21,8 +21,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -35,6 +33,8 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlNotifi
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Access control permissions received from backend (JAAS permissions), cached for convenience and performance.
@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 @Order(5010)
 @CreateImmediately
 public class AccessControlServiceClientProxy implements IAccessControlService, INotificationHandler<IAccessControlNotification> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AccessControlServiceClientProxy.class);
   private static final String SESSION_DATA_KEY = "accessControlServiceState";
 
   private ServiceState getServiceState() {

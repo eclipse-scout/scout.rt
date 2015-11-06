@@ -18,10 +18,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread factory for named threads and to handle uncaught exceptions.
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
  */
 public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandler {
 
-  protected static final IScoutLogger LOG = ScoutLogManager.getLogger(NamedThreadFactory.class);
+  protected static final Logger LOG = LoggerFactory.getLogger(NamedThreadFactory.class);
 
   private final AtomicLong m_sequence;
   private final String m_threadName;

@@ -17,8 +17,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
@@ -38,13 +36,15 @@ import org.eclipse.scout.rt.shared.security.CreateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maintain a menu per bookmark and its key stroke on the desktop
  */
 @Order(1f)
 public abstract class AbstractBookmarkMenu extends AbstractMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBookmarkMenu.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractBookmarkMenu.class);
 
   public AbstractBookmarkMenu() {
   }

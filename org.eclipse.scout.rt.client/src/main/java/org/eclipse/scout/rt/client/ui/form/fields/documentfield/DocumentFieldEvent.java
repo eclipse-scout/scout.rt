@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 import java.util.EventObject;
 
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DocumentFieldEvent extends EventObject implements IModelEvent {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DocumentFieldEvent.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DocumentFieldEvent.class);
 
   private static final long serialVersionUID = 1L;
 

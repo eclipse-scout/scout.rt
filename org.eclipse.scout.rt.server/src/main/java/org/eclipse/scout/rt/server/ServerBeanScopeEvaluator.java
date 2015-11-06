@@ -13,15 +13,15 @@ package org.eclipse.scout.rt.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerBeanScopeEvaluator implements IBeanScopeEvaluator {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerBeanScopeEvaluator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServerBeanScopeEvaluator.class);
 
   @Override
   public Object getCurrentScope() {

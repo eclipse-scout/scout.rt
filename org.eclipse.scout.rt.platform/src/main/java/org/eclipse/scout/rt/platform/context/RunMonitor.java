@@ -17,10 +17,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.ICancellable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A <code>RunMonitor</code> provides cancellation support for operations typically running on behalf of a
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 @Bean
 public class RunMonitor implements ICancellable {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunMonitor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RunMonitor.class);
 
   /**
    * The monitor which is currently associated with the current thread; is never <code>null</code> if running within a

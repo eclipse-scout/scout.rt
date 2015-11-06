@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet facade to provide remote files in web context<br>
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 public class RemoteFileServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RemoteFileServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteFileServlet.class);
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$

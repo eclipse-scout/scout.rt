@@ -17,13 +17,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.UiHints;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultHttpCacheControl implements IHttpCacheControl {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultHttpCacheControl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultHttpCacheControl.class);
 
   /**
    * This cache is servlet-wide (all sessions)

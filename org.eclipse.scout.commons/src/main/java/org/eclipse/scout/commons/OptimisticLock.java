@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Optimistic locking with one accepted writer in critical section usage for writers with access check is as follows:
@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * if(lock.isReleased()){ ... }
  */
 public class OptimisticLock {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(OptimisticLock.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OptimisticLock.class);
   private volatile int m_lockCount = 0;
 
   /**

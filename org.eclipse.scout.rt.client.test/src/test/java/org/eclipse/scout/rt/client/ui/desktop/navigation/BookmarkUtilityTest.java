@@ -7,18 +7,18 @@ import java.io.Serializable;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for {@link org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility#makeSerializableKey
  * BookmarkUtility#makeSerializableKey}
  */
 public class BookmarkUtilityTest {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkUtilityTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BookmarkUtilityTest.class);
 
   /**
    * Tests that Bookmark[] is converted to String[] when legacySupport is true

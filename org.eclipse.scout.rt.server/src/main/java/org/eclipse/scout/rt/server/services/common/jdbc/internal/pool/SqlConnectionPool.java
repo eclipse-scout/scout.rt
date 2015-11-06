@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * System-wide connection pool for pooling connections There is one pool for every ISqlService sub class type If
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
  * thread-safe
  */
 public final class SqlConnectionPool {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SqlConnectionPool.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SqlConnectionPool.class);
 
   /*
    * Pool factory per service type (top-level class)

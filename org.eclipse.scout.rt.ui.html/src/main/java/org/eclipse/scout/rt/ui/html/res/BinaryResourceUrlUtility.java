@@ -15,16 +15,16 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BinaryResourceUrlUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryResourceUrlUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BinaryResourceUrlUtility.class);
 
   /**
    * Regular expression pattern to find icons, e.g. to find &lt;img src="iconid:some_icon"&gt;.

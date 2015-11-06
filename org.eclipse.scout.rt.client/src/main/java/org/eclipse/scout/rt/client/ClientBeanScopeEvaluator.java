@@ -13,16 +13,16 @@ package org.eclipse.scout.rt.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientBeanScopeEvaluator implements IBeanScopeEvaluator {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientBeanScopeEvaluator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientBeanScopeEvaluator.class);
 
   @Override
   public Object getCurrentScope() {

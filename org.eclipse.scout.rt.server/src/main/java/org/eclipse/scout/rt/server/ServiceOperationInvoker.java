@@ -18,8 +18,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -38,6 +36,8 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides functionality to invoke service operations as described by {@link ServiceTunnelRequest} and to return the
@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  */
 @ApplicationScoped
 public class ServiceOperationInvoker {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceOperationInvoker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceOperationInvoker.class);
 
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");

@@ -31,8 +31,6 @@ import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -48,9 +46,11 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClusterSynchronizationService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClusterSynchronizationService.class);
 
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
 

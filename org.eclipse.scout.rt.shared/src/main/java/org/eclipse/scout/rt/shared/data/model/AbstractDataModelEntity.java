@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -39,10 +37,12 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
 import org.eclipse.scout.rt.shared.extension.data.model.IDataModelEntityExtension;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelEntity.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelEntity.class);
 
   private double m_order;
   private Permission m_visiblePermission;

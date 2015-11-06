@@ -19,13 +19,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementCache;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreparedStatementCache extends AbstractTransactionMember implements IStatementCache {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PreparedStatementCache.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PreparedStatementCache.class);
 
   public static final String TRANSACTION_MEMBER_ID = "PreparedStatementCache";
 

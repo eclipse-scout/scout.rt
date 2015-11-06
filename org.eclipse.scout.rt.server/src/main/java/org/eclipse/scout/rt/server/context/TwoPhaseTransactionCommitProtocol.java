@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.server.context;
 
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the atomic commitment protocol <code>2-phase-commit-protocol (2PC)</code> according to the XA
@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  */
 public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProtocol {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionCommitProtocol.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TwoPhaseTransactionCommitProtocol.class);
 
   @Override
   public void commitOrRollback(final ITransaction tx) {

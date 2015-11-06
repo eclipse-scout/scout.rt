@@ -15,8 +15,6 @@ import java.text.ParsePosition;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.scheduler.internal.node.ArgRef;
 import org.eclipse.scout.rt.server.scheduler.internal.node.BooleanAtom;
 import org.eclipse.scout.rt.server.scheduler.internal.node.FormulaRoot;
@@ -28,6 +26,8 @@ import org.eclipse.scout.rt.server.scheduler.internal.node.Op;
 import org.eclipse.scout.rt.server.scheduler.internal.node.SignalRef;
 import org.eclipse.scout.rt.server.scheduler.internal.node.StringAtom;
 import org.eclipse.scout.rt.server.scheduler.internal.node.WrappedToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parser for dynamic formulas Syntax (EBNF): token=token0 = token1 (S? op1 S? token1)* . token1 = token2 (S? op2 S?
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.server.scheduler.internal.node.WrappedToken;
  */
 
 public class FormulaParser {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormulaParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FormulaParser.class);
   private static final String S_MAP = " \n\t\r";
 
   private String str;

@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
@@ -41,10 +39,12 @@ import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonPropertyObserver<CALENDAR> implements IJsonContextMenuOwner {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonCalendar.class);
 
   // from model
   public static final String EVENT_CALENDAR_CHANGED = "calendarChanged";

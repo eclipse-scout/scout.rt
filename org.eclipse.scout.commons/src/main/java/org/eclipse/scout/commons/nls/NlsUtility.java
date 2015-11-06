@@ -18,14 +18,14 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Warning: Avoid osgi imports in this class, so it can be used in J2EE
  */
 public final class NlsUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NlsUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NlsUtility.class);
 
   private NlsUtility() {
   }

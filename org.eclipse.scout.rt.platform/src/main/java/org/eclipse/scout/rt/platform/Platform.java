@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.ServiceLoader;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.internal.PlatformStarter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the main scout platform, automatically started on first access to this class.
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.internal.PlatformStarter;
  * Tests use a PlatformTestRunner.
  */
 public final class Platform {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Platform.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Platform.class);
 
   private static IPlatform platform;
 

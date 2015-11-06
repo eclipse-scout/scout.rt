@@ -36,12 +36,12 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory to create a global {@link TrustManager}. If a certificate is not trusted by the manager, the request is
@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  */
 @ApplicationScoped
 public class GlobalTrustManager {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GlobalTrustManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GlobalTrustManager.class);
 
   private static final String PATH_CERTS = "/certificates";
 

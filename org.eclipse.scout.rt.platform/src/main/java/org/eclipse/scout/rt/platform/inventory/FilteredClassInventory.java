@@ -15,14 +15,14 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class Inventory with filter for a specific type.
  */
 public class FilteredClassInventory<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FilteredClassInventory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FilteredClassInventory.class);
 
   private final IFilter<IClassInfo> m_filter;
   private final Class<?> m_inventoryType;

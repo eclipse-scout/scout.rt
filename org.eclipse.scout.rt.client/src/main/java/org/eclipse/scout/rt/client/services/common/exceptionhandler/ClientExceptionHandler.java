@@ -16,8 +16,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -25,6 +23,8 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code ClientExceptionHandler} is the central point for handling client-side exceptions. For processing exceptions,
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 @Replace
 public class ClientExceptionHandler extends ExceptionHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientExceptionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientExceptionHandler.class);
   private static final String SESSION_DATA_KEY = "ClientExceptionHandler#loopDetectionSemaphore";
 
   @Override

@@ -31,8 +31,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.IListBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.ListBoxChains.ListBoxFilterLookupResultChain;
@@ -73,10 +71,12 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("3dc8747d-19eb-4c0a-b5fc-c3dc2ad0783d")
 public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> implements IListBox<KEY> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractListBox.class);
 
   private ITable m_table;
   private ILookupCall<KEY> m_lookupCall;

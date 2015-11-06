@@ -20,9 +20,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a thread-safe implementation of a non-blocking 1-permit-per-mutex semaphore backed with a fair queue. For
@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class MutexSemaphores {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MutexSemaphores.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MutexSemaphores.class);
 
   private static final boolean POSITION_TAIL = true;
   private static final boolean POSITION_HEAD = false;

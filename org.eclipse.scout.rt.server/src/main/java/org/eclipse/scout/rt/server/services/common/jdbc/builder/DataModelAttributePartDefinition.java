@@ -14,19 +14,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.AttributeStrategy;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Definition of a attribute-to-sql mapping for {@link IDataModelAttribute}
  */
 public class DataModelAttributePartDefinition implements DataModelConstants {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelAttributePartDefinition.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataModelAttributePartDefinition.class);
 
   private final String m_whereClause;
   private final String m_selectClause;

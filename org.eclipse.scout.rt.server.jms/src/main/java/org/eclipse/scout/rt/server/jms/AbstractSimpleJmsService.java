@@ -24,8 +24,6 @@ import javax.jms.Session;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -37,6 +35,8 @@ import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for a JMS scout service that receives messages asynchronously. Use this class if you do not need any
@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * {@link #stopMessageConsumer()}.
  */
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSimpleJmsService.class);
+  private static Logger LOG = LoggerFactory.getLogger(AbstractSimpleJmsService.class);
 
   private final long m_receiveTimeout;
   private volatile IFuture<Void> m_messageConsumerFuture;

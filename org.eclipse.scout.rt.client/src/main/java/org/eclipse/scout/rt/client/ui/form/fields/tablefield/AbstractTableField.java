@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.ITableFieldExtension;
@@ -48,12 +46,14 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 @ClassId("76887bde-6815-4f7d-9cbd-60409b49488d")
 @FormData(value = AbstractTableFieldBeanData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTableField<T extends ITable> extends AbstractFormField implements ITableField<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTableField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTableField.class);
 
   private T m_table;
   private boolean m_tableExternallyManaged;

@@ -17,13 +17,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Converts the system and custom process buttons of the main box to actions.
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  * {@link #getRelevantSystemTypesForRightHeader()})
  */
 public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormHeaderActionFetcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FormHeaderActionFetcher.class);
 
   public FormHeaderActionFetcher(IForm form) {
     super(form);

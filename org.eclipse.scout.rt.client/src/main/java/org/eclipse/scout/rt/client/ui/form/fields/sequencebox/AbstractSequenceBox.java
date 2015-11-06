@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
@@ -42,6 +40,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal.SequenceBoxGrid;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link IFormField} that contains an ordered sequence of {@link IFormField}s.<br>
@@ -54,7 +54,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  */
 @ClassId("e71e8b93-1168-4f5e-8781-4774f01eee26")
 public abstract class AbstractSequenceBox extends AbstractCompositeField implements ISequenceBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSequenceBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSequenceBox.class);
 
   private boolean m_autoCheckFromTo;
   private OptimisticLock m_labelCompositionLock;

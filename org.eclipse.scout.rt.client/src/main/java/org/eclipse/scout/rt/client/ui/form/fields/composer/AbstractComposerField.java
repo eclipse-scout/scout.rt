@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -74,13 +72,15 @@ import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @ClassId("8e7f7eb8-be18-48e5-9efe-8a5b3459e247")
 @FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractComposerField extends AbstractFormField implements IComposerField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractComposerField.class);
 
   private IComposerFieldUIFacade m_uiFacade;
   private ITree m_tree;

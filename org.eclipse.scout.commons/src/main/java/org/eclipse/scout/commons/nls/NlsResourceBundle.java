@@ -19,8 +19,8 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h4>NlsResourceBundle</h4> Other than {@link ResourceBundle} this bundle loads bundles by their intuitive names.
@@ -32,7 +32,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public final class NlsResourceBundle extends PropertyResourceBundle {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NlsResourceBundle.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NlsResourceBundle.class);
   public static final String TEXT_RESOURCE_EXTENSION = "properties";
 
   public NlsResourceBundle(InputStream stream) throws IOException {

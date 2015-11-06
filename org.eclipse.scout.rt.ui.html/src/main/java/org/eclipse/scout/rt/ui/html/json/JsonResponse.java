@@ -22,13 +22,13 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonResponse {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonResponse.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonResponse.class);
 
   public static final int ERR_STARTUP_FAILED = 5;
   public static final int ERR_SESSION_TIMEOUT = 10;

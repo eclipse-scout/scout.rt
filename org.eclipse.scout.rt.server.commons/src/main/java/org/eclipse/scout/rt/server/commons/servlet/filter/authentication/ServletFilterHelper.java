@@ -21,16 +21,16 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.Encoding;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 5.0
  */
 @ApplicationScoped
 public class ServletFilterHelper {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServletFilterHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServletFilterHelper.class);
 
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = Principal.class.getName();
 

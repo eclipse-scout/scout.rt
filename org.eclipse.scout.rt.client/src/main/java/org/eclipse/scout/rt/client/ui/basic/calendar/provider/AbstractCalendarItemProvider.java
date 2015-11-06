@@ -25,8 +25,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -51,9 +49,11 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractCalendarItemProvider extends AbstractPropertyObserver implements ICalendarItemProvider, IContributionOwner, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarItemProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendarItemProvider.class);
 
   private IFuture<Void> m_reloadJob;
   private boolean m_initialized;

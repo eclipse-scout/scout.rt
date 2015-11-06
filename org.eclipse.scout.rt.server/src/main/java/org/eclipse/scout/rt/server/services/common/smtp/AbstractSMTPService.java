@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDebugReceiverEmailProperty;
@@ -36,9 +34,11 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpSubjectPrefixPrope
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseAuthenticationProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseSmtpsProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUsernameProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSMTPService implements ISMTPService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSMTPService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSMTPService.class);
 
   private final String m_host;
   private final int m_port;

@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeaderCell implements IHeaderCell, IStyleable {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HeaderCell.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HeaderCell.class);
 
   private int m_columnIndex = -1;
   private boolean m_sortAscending;

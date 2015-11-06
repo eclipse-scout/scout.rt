@@ -19,8 +19,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
@@ -38,12 +36,14 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDev
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 5.1
  */
 public class PlatformImplementor implements IPlatform {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
   private AtomicReference<State> m_state; // may be read at any time by any thread

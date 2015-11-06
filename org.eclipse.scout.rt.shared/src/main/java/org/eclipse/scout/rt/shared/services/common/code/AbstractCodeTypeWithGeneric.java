@@ -29,8 +29,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IntegerHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -43,9 +41,11 @@ import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGe
 import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGenericChains.CodeTypeWithGenericOverwriteCodeChain;
 import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeTypeExtension;
 import org.eclipse.scout.rt.shared.extension.services.common.code.MoveCodesHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID>, IContributionOwner, IExtensibleObject, Serializable {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCodeTypeWithGeneric.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractCodeTypeWithGeneric.class);
   private static final long serialVersionUID = 1L;
 
   private boolean m_initialized;

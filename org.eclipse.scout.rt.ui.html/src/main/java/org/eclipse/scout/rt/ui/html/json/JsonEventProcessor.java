@@ -11,18 +11,18 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Processes JSON events from the UI in a Scout model job and waits for all model jobs of that session to complete.
  */
 public class JsonEventProcessor {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonEventProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonEventProcessor.class);
 
   private final IUiSession m_uiSession;
 

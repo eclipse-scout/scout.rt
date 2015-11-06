@@ -25,8 +25,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -64,9 +62,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPage.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
   private T m_table;
   private IForm m_detailForm;

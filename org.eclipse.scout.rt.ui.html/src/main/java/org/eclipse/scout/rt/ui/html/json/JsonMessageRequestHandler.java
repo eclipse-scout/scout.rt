@@ -23,8 +23,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
@@ -35,6 +33,8 @@ import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
@@ -44,7 +44,7 @@ import org.slf4j.MDC;
  */
 @Order(5010)
 public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonMessageRequestHandler.class);
 
   private static final int BACKGROUND_POLLING_INTERVAL_SECONDS = 60;
 

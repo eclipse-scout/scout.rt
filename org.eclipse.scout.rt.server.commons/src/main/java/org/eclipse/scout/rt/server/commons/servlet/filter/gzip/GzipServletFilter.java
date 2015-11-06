@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Supports the following servlet init-params:
@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.platform.Platform;
  * </ul>
  */
 public class GzipServletFilter implements Filter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GzipServletFilter.class);
 
   public static final String ACCEPT_ENCODING = "Accept-Encoding";
   public static final String CONTENT_ENCODING = "Content-Encoding";

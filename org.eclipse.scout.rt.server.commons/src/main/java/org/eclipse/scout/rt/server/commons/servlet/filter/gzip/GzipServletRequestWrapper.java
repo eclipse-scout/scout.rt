@@ -22,12 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.BufferedServletInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletRequestWrapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GzipServletRequestWrapper.class);
 
   private BufferedServletInputStream m_buf;
   private int m_compressedLength = -1;

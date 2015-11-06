@@ -17,8 +17,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -31,6 +29,8 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Client side service for bookmark support
@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
  */
 @Client
 public class BookmarkService implements IBookmarkService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BookmarkService.class);
   private static final String SESSION_DATA_KEY = "bookmarkServiceState";
 
   public BookmarkService() {

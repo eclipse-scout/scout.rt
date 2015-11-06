@@ -22,15 +22,15 @@ import java.util.NoSuchElementException;
 
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JsonObjectUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonObjectUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonObjectUtility.class);
 
   private JsonObjectUtility() {
     // static access only

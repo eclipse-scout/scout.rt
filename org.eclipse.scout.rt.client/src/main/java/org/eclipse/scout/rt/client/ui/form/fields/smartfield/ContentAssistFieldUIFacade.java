@@ -11,13 +11,13 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFacade {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ContentAssistFieldUIFacade.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ContentAssistFieldUIFacade.class);
 
   private final AbstractContentAssistField<?, LOOKUP_KEY> m_field;
 

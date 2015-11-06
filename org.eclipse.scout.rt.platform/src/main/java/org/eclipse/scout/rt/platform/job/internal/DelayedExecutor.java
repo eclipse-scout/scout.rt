@@ -19,10 +19,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides functionality to execute Runnables some time in the future on behalf of a
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
  */
 class DelayedExecutor {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DelayedExecutor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DelayedExecutor.class);
 
   private final ExecutorService m_executor;
   private final String m_threadName;

@@ -16,9 +16,9 @@ import java.util.concurrent.Semaphore;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a 1-based semaphore for tasks to gain exclusive access to a mutual exclusive object (mutex). In contrast
@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.Bean;
 @Internal
 public class MutexSemaphore {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MutexSemaphore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MutexSemaphore.class);
 
   private volatile Object m_mutexObject;
   private final Deque<IMutexTask<?>> m_pendingQueue;

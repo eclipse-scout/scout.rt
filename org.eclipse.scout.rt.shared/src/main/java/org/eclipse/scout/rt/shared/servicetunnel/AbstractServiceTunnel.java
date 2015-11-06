@@ -15,19 +15,19 @@ import java.util.Arrays;
 
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service tunnel is Thread-Safe.
  */
 public abstract class AbstractServiceTunnel implements IServiceTunnel {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServiceTunnel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractServiceTunnel.class);
 
   public AbstractServiceTunnel() {
   }

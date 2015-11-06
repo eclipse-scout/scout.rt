@@ -19,19 +19,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience authentication filter for development mode using the system property user.name
  */
 @Bean
 public class DevelopmentAuthenticator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DevelopmentAuthenticator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DevelopmentAuthenticator.class);
 
   private boolean m_showWarning = true;
   private boolean m_active;

@@ -37,8 +37,6 @@ import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.holders.TableBeanHolderFilter;
 import org.eclipse.scout.commons.holders.TableHolderFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.IntoModel;
@@ -65,9 +63,11 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatementProcessor implements IStatementProcessor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatementProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StatementProcessor.class);
 
   static {
     if (LOG.isDebugEnabled()) {

@@ -32,8 +32,6 @@ import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -80,9 +78,11 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTree extends AbstractPropertyObserver implements ITree, IContributionOwner, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTree.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTree.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private ITreeUIFacade m_uiFacade;

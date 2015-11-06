@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.security.Permissions;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper for {@link Permissions} that is serialize safe. This is useful to transfer permission collections that may
@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class LenientPermissionWrapper implements Serializable {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LenientPermissionWrapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LenientPermissionWrapper.class);
 
   /*
    * do NOT change this field name, it is used as text in readObject and writeObject

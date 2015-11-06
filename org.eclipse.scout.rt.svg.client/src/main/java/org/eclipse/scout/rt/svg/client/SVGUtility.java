@@ -33,8 +33,8 @@ import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,7 +57,7 @@ public final class SVGUtility {
   public static final String SVG_NS = SVGDOMImplementation.SVG_NAMESPACE_URI;
   public static final String XLINK_NS = XMLConstants.XLINK_NAMESPACE_URI;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SVGUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SVGUtility.class);
 
   /**
    * Conversion of points/mm/inch and more see http://www.endmemo.com/convert/topography.php

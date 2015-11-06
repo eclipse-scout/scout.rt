@@ -13,9 +13,9 @@ package org.eclipse.scout.commons.parsers;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parser for into variables in arbitrary sql text Syntax (EBNF):
@@ -39,7 +39,7 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
  * </pre>
  */
 public class IntoParser {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(IntoParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IntoParser.class);
 
   private static final String S_MAP;
   private static final String NAME_MAP;

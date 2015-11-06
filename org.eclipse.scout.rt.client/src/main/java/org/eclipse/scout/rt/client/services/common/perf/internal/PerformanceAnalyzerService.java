@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.services.common.perf.internal;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PerformanceAnalyzerService implements IPerformanceAnalyzerService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PerformanceAnalyzerService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PerformanceAnalyzerService.class);
 
   private final PerformanceSampleSet m_networkLatency;
   private final PerformanceSampleSet m_serverExecutionTime;

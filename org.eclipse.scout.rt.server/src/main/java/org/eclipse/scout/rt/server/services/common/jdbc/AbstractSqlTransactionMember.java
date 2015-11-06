@@ -4,12 +4,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSqlTransactionMember extends AbstractTransactionMember {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlTransactionMember.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlTransactionMember.class);
 
   private final Object m_activeStatementsLock = new Object();
   private final HashSet<Statement> m_activeStatements = new HashSet<Statement>();

@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Transform entities and attributes from and to shared data objects and external ids (using folder and meta syntax:
@@ -37,7 +37,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * {@link IDataModel#getMetaDataOfAttributeData(AbstractDataModelAttributeData, Object[])}
  */
 public final class DataModelUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataModelUtility.class);
 
   private DataModelUtility() {
   }

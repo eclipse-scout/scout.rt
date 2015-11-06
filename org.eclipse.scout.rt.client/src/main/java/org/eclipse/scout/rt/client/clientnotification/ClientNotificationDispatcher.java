@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
@@ -34,13 +32,15 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches notifications on the client side
  */
 @ApplicationScoped
 public class ClientNotificationDispatcher {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationDispatcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationDispatcher.class);
 
   private final Set<IFuture<Void>> m_notificationFutures = new HashSet<>();
 

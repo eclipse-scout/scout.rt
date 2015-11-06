@@ -20,8 +20,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -31,12 +29,14 @@ import org.eclipse.scout.rt.svg.client.SVGUtility;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.ISvgFieldExtension;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
 @ClassId("20ed1036-9314-4bd8-bad6-c66e778f281f")
 public abstract class AbstractSvgField extends AbstractFormField implements ISvgField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSvgField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSvgField.class);
 
   private ISvgFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();

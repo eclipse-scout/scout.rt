@@ -13,15 +13,15 @@ package org.eclipse.scout.rt.server.services.common.jdbc.fixture;
 import java.sql.Connection;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.sql.SqlFormatter;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlServiceMock extends AbstractSqlService {
-  private static IScoutLogger logger = ScoutLogManager.getLogger(SqlServiceMock.class);
+  private static Logger logger = LoggerFactory.getLogger(SqlServiceMock.class);
 
   private final StringBuffer m_protocol;
   private Object[][] m_resultData;

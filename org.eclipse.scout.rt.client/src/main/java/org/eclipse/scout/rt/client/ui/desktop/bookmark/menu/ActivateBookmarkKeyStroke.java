@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark.menu;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ActivateBookmarkKeyStroke extends KeyStroke {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActivateBookmarkKeyStroke.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkKeyStroke.class);
 
   private final Bookmark m_bookmark;
 

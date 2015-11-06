@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
@@ -52,6 +50,8 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link IJobManager}.
@@ -66,7 +66,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 @ApplicationScoped
 public class JobManager implements IJobManager, IPlatformListener {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
 
   protected final ExecutorService m_executor;
   protected final MutexSemaphores m_mutexSemaphores;

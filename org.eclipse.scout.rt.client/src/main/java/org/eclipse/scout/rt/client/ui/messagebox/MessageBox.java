@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.html.IHtmlContent;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.job.ClientJobs;
@@ -40,6 +38,8 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of message box.<br/>
@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 @Bean
 public class MessageBox extends AbstractPropertyObserver implements IMessageBox {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MessageBox.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private final IMessageBoxUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.cache;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default handler for {@link InvalidateCacheNotification}. It invalidates cache entries but does not propagate the
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.shared.notification.INotificationHandler;
  * @since 5.2
  */
 public class CacheNotificationHandler implements INotificationHandler<InvalidateCacheNotification> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CacheNotificationHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CacheNotificationHandler.class);
 
   @Override
   public void handleNotification(InvalidateCacheNotification notification) {

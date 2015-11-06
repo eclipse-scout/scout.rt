@@ -2,8 +2,6 @@ package org.eclipse.scout.rt.client;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
@@ -18,12 +16,14 @@ import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CreateTunnelToServerBeansProperty;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default client-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanManager()}
  */
 public class RegisterTunnelToServerPlatformListener implements IPlatformListener {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RegisterTunnelToServerPlatformListener.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RegisterTunnelToServerPlatformListener.class);
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {

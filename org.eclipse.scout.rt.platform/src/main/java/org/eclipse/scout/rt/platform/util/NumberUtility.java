@@ -20,13 +20,13 @@ import java.util.Random;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class NumberUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NumberUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NumberUtility.class);
   private static final Random RANDOMIZER = new Random();
 
   private NumberUtility() {

@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.html.script;
 import java.net.URL;
 import java.util.regex.Matcher;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScriptFileLocator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ScriptFileLocator.class);
 
   private IWebContentService m_resourceLocator;
 

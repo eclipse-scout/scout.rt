@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.form;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -28,9 +26,11 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<FORM> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonForm.class);
 
   public static final String PROP_FORM_ID = "formId";
   public static final String PROP_TITLE = IForm.PROP_TITLE;

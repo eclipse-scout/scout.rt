@@ -19,19 +19,19 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.8.0
  */
 public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FindFieldByXmlIdsVisitor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FindFieldByXmlIdsVisitor.class);
 
   private final String[] m_xmlFieldIds;
 

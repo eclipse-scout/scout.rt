@@ -22,8 +22,6 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
@@ -33,11 +31,13 @@ import org.eclipse.scout.rt.server.admin.inspector.ReflectServiceInventory;
 import org.eclipse.scout.rt.server.admin.inspector.ServiceInspector;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServicesView extends DefaultView {
   private static final long serialVersionUID = -3977567784149624349L;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServicesView.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServicesView.class);
 
   private ServiceInspector[] m_serviceInspectors;
   private ServiceInspector m_selectedService;

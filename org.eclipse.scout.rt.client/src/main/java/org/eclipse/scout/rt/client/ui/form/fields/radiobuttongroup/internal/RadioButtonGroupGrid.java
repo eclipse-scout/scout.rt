@@ -12,18 +12,18 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Grid (model) layout of radio button group only visible process-buttons are used
  */
 public class RadioButtonGroupGrid {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RadioButtonGroupGrid.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RadioButtonGroupGrid.class);
 
   private ICompositeField m_group = null;
   private IFormField[] m_fields;

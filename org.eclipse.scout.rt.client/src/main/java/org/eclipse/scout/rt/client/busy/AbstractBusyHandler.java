@@ -16,12 +16,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
  * @since 3.8
  */
 public abstract class AbstractBusyHandler implements IBusyHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBusyHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractBusyHandler.class);
   private static final String TIMER_PROPERTY = AbstractBusyHandler.class.getName() + ".timer";
   private static final String BUSY_OPERATION_PROPERTY = AbstractBusyHandler.class.getName() + ".busy";
 

@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Internal
 class JobListenerWithFilter implements IJobListener {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobListenerWithFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JobListenerWithFilter.class);
 
   private final IJobListener m_listener;
   private final IFilter<JobEvent> m_filter;

@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class FormUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FormUtility.class);
 
   private FormUtility() {
   }

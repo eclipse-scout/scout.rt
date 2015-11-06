@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayCalendarItemParser;
@@ -25,12 +23,14 @@ import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * For details see {@link HolidayCalendarItemParser}
  */
 public class HolidayCalendarService implements IHolidayCalendarService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HolidayCalendarService.class);
 
   private ConcurrentExpiringMap<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new ConcurrentExpiringMap<String, HolidayCalendarItemParser>(5, TimeUnit.MINUTES);
 

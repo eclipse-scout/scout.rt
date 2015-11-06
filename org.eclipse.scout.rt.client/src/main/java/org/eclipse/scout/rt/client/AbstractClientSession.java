@@ -36,8 +36,6 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
@@ -72,10 +70,12 @@ import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractClientSession extends AbstractPropertyObserver implements IClientSession, IExtensibleObject {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractClientSession.class);
 
   private final EventListenerList m_eventListeners;
 

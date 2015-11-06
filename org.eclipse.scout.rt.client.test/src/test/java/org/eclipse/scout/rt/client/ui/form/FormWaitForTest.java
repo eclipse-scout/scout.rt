@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form;
 import java.util.ArrayList;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -30,6 +28,8 @@ import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bugzilla 352472 - Possible Deadlock at IForm#waitFor
@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormWaitForTest {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormWaitForTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FormWaitForTest.class);
 
   @Test
   public void testStartAndWait_Dialog() throws Exception {

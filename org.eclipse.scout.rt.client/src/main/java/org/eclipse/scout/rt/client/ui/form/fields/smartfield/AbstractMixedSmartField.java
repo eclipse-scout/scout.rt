@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -45,6 +43,8 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A smart field with a key type different from the value type. The default implementation of
@@ -57,7 +57,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 @ScoutSdkIgnore
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMixedSmartField.class);
 
   private AtomicReference<IFuture<List<ILookupRow<LOOKUP_KEY>>>> m_backgroundJobFuture;
   private IContentAssistFieldUIFacade m_uiFacade;

@@ -18,8 +18,6 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -30,9 +28,11 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageServ
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageService implements IBookmarkStorageService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileSystemBookmarkStorageService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileSystemBookmarkStorageService.class);
 
   public static final String GLOBAL_FILE_NAME = "all_users";
 

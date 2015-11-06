@@ -23,10 +23,10 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation that inserts new fields and that replaces existing fields using the {@link Replace}
@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * @since 3.8.2
  */
 public class DefaultFormFieldInjection implements IFormFieldInjection {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultFormFieldInjection.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultFormFieldInjection.class);
 
   private final Map<IFormField, Set<Class<? extends IFormField>>> m_replacingFormFieldsByContainer;
   private final Map<Class<?>, Class<? extends IFormField>> m_replacementMapping;

@@ -32,12 +32,12 @@ import javax.mail.Store;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImapAdapter implements IImapAdapter {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ImapAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ImapAdapter.class);
 
   public static final String TRASH_FOLDER_NAME = "Trash";
   public static final int DEFAULT_IMAP_PORT = 143;

@@ -14,10 +14,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code ExceptionHandler} to not silently swallow exceptions during JUnit test execution. In
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExcept
  */
 public class JUnitExceptionHandler extends ExceptionHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JUnitExceptionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JUnitExceptionHandler.class);
 
   private final AtomicReference<Throwable> m_error = new AtomicReference<>(null);
 

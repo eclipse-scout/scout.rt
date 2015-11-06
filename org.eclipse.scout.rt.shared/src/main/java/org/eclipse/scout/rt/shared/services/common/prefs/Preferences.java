@@ -23,10 +23,10 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ISession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation for the preferences using a simple hash map and {@link String} key-value pairs.
@@ -58,7 +58,7 @@ public class Preferences implements IPreferences {
    */
   public static final int EVENT_KIND_REMOVE = 1 << 3;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Preferences.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Preferences.class);
   private static final long serialVersionUID = 1L;
 
   private final String m_name;

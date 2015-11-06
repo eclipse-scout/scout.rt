@@ -17,14 +17,14 @@ import java.util.List;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvider {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultWizardStatusHtmlProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultWizardStatusHtmlProvider.class);
 
   private String m_htmlTemplate;
 

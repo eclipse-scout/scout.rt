@@ -23,12 +23,12 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlConnectionBuilder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SqlConnectionBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SqlConnectionBuilder.class);
 
   public Connection createJdbcConnection(AbstractSqlService sqlService) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
     String user = sqlService.getUsername();

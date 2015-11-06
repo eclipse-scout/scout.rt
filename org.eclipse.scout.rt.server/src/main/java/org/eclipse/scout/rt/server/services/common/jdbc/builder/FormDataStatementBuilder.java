@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.token.IToken;
@@ -46,6 +44,8 @@ import org.eclipse.scout.rt.shared.data.model.EntityPath;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <pre>
@@ -116,7 +116,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * @author Ivan Motsch
  */
 public class FormDataStatementBuilder implements DataModelConstants {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FormDataStatementBuilder.class);
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
 
   /**

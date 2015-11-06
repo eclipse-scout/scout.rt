@@ -17,8 +17,8 @@ import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Description: Allows to store multiple time ranges. There are no overlapping on the stored ranges.
@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * @version 1.0
  */
 class MultiTimeRange implements Cloneable {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiTimeRange.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MultiTimeRange.class);
 
   private TreeMap<Date/* fromDate */, TimeRange> m_multipleTimeRangeMap = new TreeMap<Date, TimeRange>();
 

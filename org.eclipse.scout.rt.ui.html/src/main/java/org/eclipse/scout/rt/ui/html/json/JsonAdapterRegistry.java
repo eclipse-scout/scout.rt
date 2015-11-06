@@ -17,15 +17,15 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.AbstractSingleValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a per session registry for {@link IJsonAdapter} instances.
  */
 public class JsonAdapterRegistry {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonAdapterRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonAdapterRegistry.class);
 
   private final IndexedStore<IJsonAdapter<?>> m_store;
 

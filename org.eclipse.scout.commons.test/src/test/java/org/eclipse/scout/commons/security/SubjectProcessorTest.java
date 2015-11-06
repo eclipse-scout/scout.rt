@@ -22,7 +22,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.junit.Test;
 
 public class SubjectProcessorTest {

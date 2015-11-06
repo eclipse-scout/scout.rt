@@ -15,13 +15,13 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.chain.IInvocationDecorator;
 import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Depending on the {@link TransactionScope} and the existence of a caller transaction, this processor starts a new
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  */
 public class TransactionProcessor<RESULT> implements IInvocationDecorator<RESULT> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TransactionProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransactionProcessor.class);
 
   protected final TransactionScope m_transactionScope;
   protected final ITransaction m_callerTransaction;

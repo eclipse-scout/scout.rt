@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.ActiveOutlineObserver;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -35,9 +33,11 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PageFormManager {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageFormManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PageFormManager.class);
 
   private PageFormMap m_pageFormMap;
   private ActiveOutlineObserver m_activeOutlineObserver;

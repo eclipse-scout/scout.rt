@@ -21,14 +21,14 @@ import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Process JS and CSS script templates such as <code>scout-module.js</code>
@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UiHints}
  */
 public class ScriptFileBuilder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ScriptFileBuilder.class);
 
   private static final Pattern INCLUDE_PAT = Pattern.compile("(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)[;]*");
 

@@ -29,11 +29,11 @@ import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.eventlistprofiler.EventListenerProfiler;
 import org.eclipse.scout.commons.eventlistprofiler.IEventListenerSnapshot;
 import org.eclipse.scout.commons.eventlistprofiler.IEventListenerSource;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BasicPropertySupport implements IEventListenerSource {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicPropertySupport.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BasicPropertySupport.class);
 
   public static final int DEFAULT_INT_VALUE = 0;
   public static final int DEFAULT_DOUBLE_VALUE = 0;

@@ -18,8 +18,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -31,10 +29,12 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
 public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
 

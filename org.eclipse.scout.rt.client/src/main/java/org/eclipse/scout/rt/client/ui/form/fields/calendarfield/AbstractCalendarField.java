@@ -21,17 +21,17 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalendarFieldExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("0b1ac83b-6fa4-4e12-88d0-680ed168e914")
 public abstract class AbstractCalendarField<T extends ICalendar> extends AbstractValueField<Date> implements ICalendarField<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendarField.class);
 
   private T m_calendar;
   private final OptimisticLock m_valueSelectionMediator;

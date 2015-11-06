@@ -32,8 +32,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
@@ -73,10 +71,12 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("ebe15e4d-017b-4ac0-9a5a-2c9e07c8ad6f")
 public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver implements IColumn<VALUE>, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractColumn.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
 
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()

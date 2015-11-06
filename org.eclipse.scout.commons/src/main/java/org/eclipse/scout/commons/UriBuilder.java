@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builder for {@link URI} and {@link URL} instances.
@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class UriBuilder {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UriBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UriBuilder.class);
 
   private final Map<String, String> m_parameters = new HashMap<String, String>();
   private String m_scheme;

@@ -27,14 +27,14 @@ import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration-related utilities.
  */
 public final class ConfigurationUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ConfigurationUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigurationUtility.class);
 
   private ConfigurationUtility() {
   }

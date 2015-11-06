@@ -31,8 +31,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -53,6 +51,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Use this Servlet to dispatch scout UI service requests using {@link IServiceTunnelRequest},
@@ -65,7 +65,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
 
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
   private boolean m_debug;

@@ -16,9 +16,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code ExceptionHandler} is the central point for handling exceptions.
@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 @ApplicationScoped
 public class ExceptionHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExceptionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandler.class);
 
   /**
    * Method invoked to handle the given {@code Throwable}. This method must not throw an exception.

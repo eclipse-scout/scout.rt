@@ -19,12 +19,12 @@ import java.util.zip.CRC32;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Bookmark implements Serializable, Cloneable, IOrdered {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Bookmark.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Bookmark.class);
   private static final long serialVersionUID = 1L;
 
   /*

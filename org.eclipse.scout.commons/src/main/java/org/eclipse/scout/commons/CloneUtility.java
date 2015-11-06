@@ -21,14 +21,14 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class CloneUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CloneUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CloneUtility.class);
 
   private CloneUtility() {
   }

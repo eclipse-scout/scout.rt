@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.menu;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ActivateBookmarkMenu extends AbstractMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActivateBookmarkMenu.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkMenu.class);
 
   private final Bookmark m_bookmark;
 

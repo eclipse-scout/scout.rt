@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TreeEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(TreeEvent.class);
+  private static Logger LOG = LoggerFactory.getLogger(TreeEvent.class);
 
   /**
    * valid attributes are parentNode,childNodes

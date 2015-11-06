@@ -45,8 +45,6 @@ import javax.xml.ws.http.HTTPException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.apt.internal.HandlerArtifactProcessor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor.HandlerDescriptor;
@@ -216,7 +214,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     AptUtil.addJavaDoc(portTypeProxy, createJavaDocForPortTypeProxy(descriptor));
 
     // Create the logger field.
-    final JFieldVar logger = portTypeProxy.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, IScoutLogger.class, LOGGER_FIELD_NAME, model.ref(ScoutLogManager.class).staticInvoke("getLogger").arg(portTypeProxy.dotclass()));
+    final JFieldVar logger = portTypeProxy.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, org.slf4j.Logger.class, LOGGER_FIELD_NAME, model.ref(org.slf4j.LoggerFactory.class).staticInvoke("getLogger").arg(portTypeProxy.dotclass()));
     // Inject WebServiceContext
     final JFieldVar webServiceContext = portTypeProxy.field(JMod.PROTECTED, WebServiceContext.class, WEBSERVICE_CONTEXT_FIELD_NAME);
     webServiceContext.annotate(Resource.class);

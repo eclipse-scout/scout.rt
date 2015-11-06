@@ -30,8 +30,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.ITreeBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterLookupResultChain;
@@ -63,10 +61,12 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("5648579d-1968-47be-a0c9-a8c846d2caf4")
 public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> implements ITreeBox<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTreeBox.class);
 
   private ITree m_tree;
   private ILookupCall<T> m_lookupCall;

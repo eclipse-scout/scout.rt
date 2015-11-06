@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience lookup call to present {@link IDataModelAttribute#getAggregationTypes()}
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelAggregationLookupCall.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataModelAggregationLookupCall.class);
 
   private IDataModelAttribute m_attribute;
   private List<ILookupRow<Integer>> m_lookupRows;

@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationUtility;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
@@ -44,9 +42,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PageForm extends AbstractMobileForm implements IPageForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageForm.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PageForm.class);
   private List<IButton> m_mainboxButtons;
   private IPage<?> m_page;
   private P_PageTableListener m_pageTableListener;

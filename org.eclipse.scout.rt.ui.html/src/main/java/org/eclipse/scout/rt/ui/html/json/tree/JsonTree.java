@@ -20,8 +20,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -56,10 +54,12 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonTree.class);
 
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_NODES_UPDATED = "nodesUpdated";

@@ -23,8 +23,6 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPException;
 
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -38,6 +36,8 @@ import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.InitParam;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class proxies a JAX-WS handler to be installed on provider side, and adds the following functionality:
@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  */
 public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CONTEXT> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HandlerProxy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HandlerProxy.class);
 
   private static final Subject HANDLER_SUBJECT = CONFIG.getPropertyValue(JaxWsHandlerSubjectProperty.class);
 

@@ -26,11 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h4>LDAPSecurityFilter</h4> The following properties can be set in the <code>config.properties</code> file:
@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  * @since 1.0.0 02.07.2008 TODO imo remove in 6.0, convert to LDAPAuthenticator
  */
 public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LDAPSecurityFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LDAPSecurityFilter.class);
   public static final String PROP_BASIC_ATTEMPT = "LDAPSecurityFilter.basicAttempt";
 
   private String m_serverUrl;

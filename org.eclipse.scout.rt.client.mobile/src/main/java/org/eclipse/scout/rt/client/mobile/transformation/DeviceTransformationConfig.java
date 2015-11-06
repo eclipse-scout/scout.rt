@@ -15,16 +15,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.9.0
  */
 public class DeviceTransformationConfig {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DeviceTransformationConfig.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceTransformationConfig.class);
 
   private Set<IDeviceTransformation> m_enabledTransformations = new HashSet<IDeviceTransformation>();
   private Map<IForm, ExclusionInfo> m_excludedForms = new WeakHashMap<IForm, ExclusionInfo>();

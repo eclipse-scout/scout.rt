@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -41,11 +39,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal.TabBoxGrid;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("14555c41-2d65-414a-94b1-d4328cbd818c")
 public abstract class AbstractTabBox extends AbstractCompositeField implements ITabBox {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTabBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTabBox.class);
 
   private ITabBoxUIFacade m_uiFacade;
   private TabBoxGrid m_grid;

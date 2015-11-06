@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRebuildProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.jboss.jandex.CompositeIndex;
@@ -24,10 +22,12 @@ import org.jboss.jandex.IndexView;
 import org.jboss.jandex.IndexWriter;
 import org.jboss.jandex.Indexer;
 import org.jboss.jandex.JarIndexer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JandexInventoryBuilder {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexInventoryBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JandexInventoryBuilder.class);
 
   private static final String SCOUT_XML_PATH = "META-INF/scout.xml";
   private static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";

@@ -32,8 +32,6 @@ import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -67,10 +65,12 @@ import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UiSession implements IUiSession, HttpSessionBindingListener {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiSession.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UiSession.class);
 
   /**
    * Prefix for name of HTTP session attribute that is used to store the associated {@link IClientSession}s.

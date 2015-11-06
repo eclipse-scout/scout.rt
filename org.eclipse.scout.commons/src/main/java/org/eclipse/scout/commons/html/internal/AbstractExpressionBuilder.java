@@ -20,15 +20,15 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.html.HtmlBinds;
 import org.eclipse.scout.commons.html.IHtmlContent;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Buffer for expressions</br>
  * (not thread safe)
  */
 public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlContent {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractExpressionBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractExpressionBuilder.class);
   private StringBuilder m_buf;
   private HtmlBinds m_binds = new HtmlBinds();
 

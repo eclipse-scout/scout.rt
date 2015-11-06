@@ -52,8 +52,8 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.RFCWrapperPart;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.slf4j.LoggerFactory;
 
 public class MailUtility {
 
@@ -621,7 +621,7 @@ public class MailUtility {
       handlerList.add(0, className);
     }
     catch (Throwable t) {
-      ScoutLogManager.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
+      LoggerFactory.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
     }
   }
 

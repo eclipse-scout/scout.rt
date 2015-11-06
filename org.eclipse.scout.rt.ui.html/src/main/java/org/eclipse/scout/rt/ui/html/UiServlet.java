@@ -23,13 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Instances of this class must be registered global handler for "/*".
@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
 public class UiServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UiServlet.class);
 
   private final P_AbstractRequestHandler m_requestHandlerGet;
   private final P_AbstractRequestHandler m_requestHandlerPost;

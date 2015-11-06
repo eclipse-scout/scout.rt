@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.TierProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Indicates whether the application is running in back-end, front-end or undetermined
@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.TierProperty;
  * @see IService
  */
 public final class TierState {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TierState.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TierState.class);
   private static final Tier VALUE;
 
   static {

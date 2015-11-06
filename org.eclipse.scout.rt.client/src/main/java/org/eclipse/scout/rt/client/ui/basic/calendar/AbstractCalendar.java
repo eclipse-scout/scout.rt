@@ -36,8 +36,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -62,12 +60,14 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ICalendarItemProducer} are defined as inner classes<br>
  */
 public abstract class AbstractCalendar extends AbstractPropertyObserver implements ICalendar, IContributionOwner, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendar.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendar.class);
 
   private boolean m_initialized;
   private List<ICalendarItemProvider> m_providers;

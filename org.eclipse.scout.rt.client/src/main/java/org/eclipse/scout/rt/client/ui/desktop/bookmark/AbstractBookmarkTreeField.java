@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -59,9 +57,11 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBookmarkTreeField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractBookmarkTreeField.class);
 
   private BookmarkFolder m_bookmarkRootFolder;
   private IPublishBookmarkCommand m_publishBookmarkCommand;

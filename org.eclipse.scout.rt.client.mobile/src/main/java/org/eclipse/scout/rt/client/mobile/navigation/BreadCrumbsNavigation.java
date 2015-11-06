@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -27,12 +25,14 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.9.0
  */
 public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BreadCrumbsNavigation.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BreadCrumbsNavigation.class);
 
   private final EventListenerList m_listenerList;
   private Stack<IBreadCrumb> m_breadCrumbs;

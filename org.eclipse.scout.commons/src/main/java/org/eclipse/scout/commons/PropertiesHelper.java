@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to extract properties stored in properties files.
@@ -49,7 +49,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class PropertiesHelper {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PropertiesHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PropertiesHelper.class);
   private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
   private final Map<String, String> m_configProperties;

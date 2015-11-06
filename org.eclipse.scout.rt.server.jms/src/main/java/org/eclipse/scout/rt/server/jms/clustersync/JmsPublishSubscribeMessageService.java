@@ -22,8 +22,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -36,6 +34,8 @@ import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessagePro
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribeMessageListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribeMessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This publish subscribe message service uses a JMS topic to deliver messages.
@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribe
 @Bean
 @ApplicationScoped
 public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<IClusterNotificationMessage> implements IPublishSubscribeMessageService {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(JmsPublishSubscribeMessageService.class);
+  private static Logger LOG = LoggerFactory.getLogger(JmsPublishSubscribeMessageService.class);
 
   private volatile IPublishSubscribeMessageListener m_listener;
   private ConnectionFactory m_connectionFactory;

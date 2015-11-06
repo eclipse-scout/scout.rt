@@ -13,14 +13,14 @@ package org.eclipse.scout.commons.parsers;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.token.DatabaseSpecificToken;
 import org.eclipse.scout.commons.parsers.token.FunctionInputToken;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.TextToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parser for bind variables in arbitrary sql staments The bind is (possibly) parsed together with its left operator
@@ -66,7 +66,7 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
  * functionality (which will be removed in future releases) and false throws an exception when using &...& binds.
  */
 public class BindParser {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BindParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BindParser.class);
 
   private static final String S_MAP;
   private static final String NAME_MAP;

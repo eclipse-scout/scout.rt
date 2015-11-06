@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigIntegerColumn;
@@ -40,6 +38,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.9.0
@@ -47,7 +47,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 public class ColumnFieldBuilder {
 
   private static final String PROP_PROPERTY_DELEGATOR = "propertyDelegator";
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColumnFieldBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ColumnFieldBuilder.class);
 
   public Map<IColumn<?>, IFormField> build(List<IColumn<?>> columns, ITableRow row) {
     Map<IColumn<?>, IFormField> fields = new HashMap<IColumn<?>, IFormField>();

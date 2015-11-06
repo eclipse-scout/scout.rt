@@ -18,16 +18,16 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility for building statements with {@link EntityContribution}
  */
 public final class EntityContributionUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(EntityContributionUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EntityContributionUtility.class);
 
   public static EntityContribution constraintTextToContribution(String wherePart) {
     EntityContribution contrib = new EntityContribution();

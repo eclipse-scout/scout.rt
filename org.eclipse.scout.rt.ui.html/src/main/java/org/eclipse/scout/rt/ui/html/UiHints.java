@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.html;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper to manage url param hints for the {@link UiServlet}.
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter
  * All values are <code>true</code> by default, unless the application is run in development mode.
  */
 public final class UiHints {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiHints.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UiHints.class);
 
   /**
    * Enables/disables cache, compress, minify. Also decides if scoutClass attribute is added to the DOM for form-fields.

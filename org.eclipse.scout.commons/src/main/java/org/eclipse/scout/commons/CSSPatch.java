@@ -18,14 +18,14 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.html.CSS;
 import javax.swing.text.html.CSS.Attribute;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Patch for CSS class. The patch is applied as soon as this class is accessed.
  */
 public final class CSSPatch {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CSSPatch.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CSSPatch.class);
 
   private CSSPatch() {
   }

@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
@@ -35,9 +33,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMenu.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMenu.class);
 
   private Object m_ownerValue;
 

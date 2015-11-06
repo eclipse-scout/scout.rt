@@ -18,13 +18,13 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(JmsMessageSerializer.class);
+  private static Logger LOG = LoggerFactory.getLogger(JmsMessageSerializer.class);
   // Property name to save the message content on a JMS message - only used for logging/debug reasons.
   private static final String JMS_PROPERTY_TRACE_MESSAGE_CONTENT = "traceMessageContent";
 

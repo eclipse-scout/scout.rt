@@ -19,11 +19,11 @@ import javax.servlet.ServletResponse;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to create JSON (JavaScript Object Notation) response objects and to read a JSON object from
@@ -32,7 +32,7 @@ import org.json.JSONObject;
 @ApplicationScoped
 public class JsonRequestHelper {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonRequestHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonRequestHelper.class);
 
   /**
    * @return {@link JSONObject} to indicate that an unrecoverable failure occurred.

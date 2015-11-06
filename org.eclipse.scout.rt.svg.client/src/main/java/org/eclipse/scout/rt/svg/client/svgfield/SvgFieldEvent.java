@@ -16,12 +16,12 @@ import java.net.URL;
 import java.util.EventObject;
 
 import org.apache.batik.dom.svg.SVGOMPoint;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.svg.SVGPoint;
 
 public class SvgFieldEvent extends EventObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SvgFieldEvent.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SvgFieldEvent.class);
   private static final long serialVersionUID = 1L;
 
   private final int m_type;

@@ -18,21 +18,19 @@ import java.security.Permission;
 import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JUnit test for {@link LenientPermissionWrapper}
  */
 public class LenientPermissionWrapperTest {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LenientPermissionWrapperTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LenientPermissionWrapperTest.class);
 
   private static String data =
       "rO0ABXNyAENvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbnNXcmFwcGVyAAAAAAAAAAEDAAFMAA1tX3Blcm1pc3Npb25zdAAbTGphdmEvc2VjdXJpdHkvUGVybWlzc2lvbnM7eHBzcgATamF2YS51dGlsLkFycmF5TGlzdHiB0h2Zx2GdAwABSQAEc2l6ZXhwAAAAA3cEAAAACnNyAEJvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXIAAAAAAAAAAQMAAkwAC21fY2xhc3NOYW1ldAASTGphdmEvbGFuZy9TdHJpbmc7TAAMbV9wZXJtaXNzaW9udAAaTGphdmEvc2VjdXJpdHkvUGVybWlzc2lvbjt4cHQASG9yZy5lY2xpcHNlLnNjb3V0LnJ0LnNoYXJlZC5zZXJ2aWNldHVubmVsLkxlbmllbnRQZXJtaXNzaW9uV3JhcHBlclRlc3QkQXVyAAJbQqzzF/gGCFTgAgAAeHAAAADQrO0ABXNyAEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEEAAAAAAAAAAQIAAHhyAB1qYXZhLnNlY3VyaXR5LkJhc2ljUGVybWlzc2lvblclC9zPTqZ6AgAAeHIAGGphdmEuc2VjdXJpdHkuUGVybWlzc2lvbrHG4T8oV1F+AgABTAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAABQXhzcQB+AAV0AEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEN1cQB+AAoAAADQrO0ABXNyAEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEMAAAAAAAAAAQIAAHhyAB1qYXZhLnNlY3VyaXR5LkJhc2ljUGVybWlzc2lvblclC9zPTqZ6AgAAeHIAGGphdmEuc2VjdXJpdHkuUGVybWlzc2lvbrHG4T8oV1F+AgABTAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAABQ3hzcQB+AAV0AEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEJ1cQB+AAoAAADQrO0ABXNyAEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEIAAAAAAAAAAQIAAHhyAB1qYXZhLnNlY3VyaXR5LkJhc2ljUGVybWlzc2lvblclC9zPTqZ6AgAAeHIAGGphdmEuc2VjdXJpdHkuUGVybWlzc2lvbrHG4T8oV1F+AgABTAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAABQnh4eA==";
@@ -59,20 +57,21 @@ public class LenientPermissionWrapperTest {
 
   @Test
   public void read() throws Exception {
-    Logger logger2 = Logger.getLogger(LenientPermissionWrapper.class.getName());
-    Level oldLevel2 = logger2.getLevel();
-    try {
-      logger2.setLevel(Level.OFF);
-      //
-      Permissions actual = getObjectSerializer().deserialize(new ByteArrayInputStream(Base64Utility.decode(data)), Permissions.class);
-      Permissions expected = new Permissions();
-      expected.add(new A());
-      expected.add(new C());
-      assertPermissionsEqual(expected, actual);
-    }
-    finally {
-      logger2.setLevel(oldLevel2);
-    }
+    // FIXME abr: switch logging off and on again
+//    Logger logger2 = Logger.getLogger(LenientPermissionWrapper.class.getName());
+//    Level oldLevel2 = logger2.getLevel();
+//    try {
+//      logger2.setLevel(Level.OFF);
+    //
+    Permissions actual = getObjectSerializer().deserialize(new ByteArrayInputStream(Base64Utility.decode(data)), Permissions.class);
+    Permissions expected = new Permissions();
+    expected.add(new A());
+    expected.add(new C());
+    assertPermissionsEqual(expected, actual);
+//    }
+//    finally {
+//      logger2.setLevel(oldLevel2);
+//    }
   }
 
   public static void assertPermissionsEqual(Permissions expected, Permissions actual) {

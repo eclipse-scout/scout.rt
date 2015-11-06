@@ -19,8 +19,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.legacy.LegacyStatementBuilder;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
@@ -33,6 +31,8 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.O
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.TreeNodeToken;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.ValueToken;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.WildcardStringToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds sql based on static defined token fragments.
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.W
  * subclass to add token mappings and handle complex tokens in {@link #buildToken(int, Object[])}
  */
 public class TokenBasedStatementBuilder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TokenBasedStatementBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TokenBasedStatementBuilder.class);
 
   private final ISqlStyle m_sqlStyle;
   private final HashMap<Integer, String> m_tokenMappings = new HashMap<Integer, String>();

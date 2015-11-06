@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
@@ -21,10 +19,12 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends IContentAssistField<VALUE, LOOKUP_KEY>> extends JsonValueField<CONTENT_ASSIST_FIELD> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonSmartField.class);
   private static final String PROP_PROPOSAL = "proposal";
 
   private boolean m_proposal;

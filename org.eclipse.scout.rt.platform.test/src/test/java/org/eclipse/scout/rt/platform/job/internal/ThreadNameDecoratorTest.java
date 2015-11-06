@@ -33,8 +33,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;

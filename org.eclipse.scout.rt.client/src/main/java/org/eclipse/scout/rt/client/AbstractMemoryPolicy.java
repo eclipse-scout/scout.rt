@@ -16,8 +16,6 @@ import java.util.zip.CRC32;
 
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -30,9 +28,11 @@ import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMemoryPolicy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMemoryPolicy.class);
 
   public static class SearchFormState {
     final String formContentXml;

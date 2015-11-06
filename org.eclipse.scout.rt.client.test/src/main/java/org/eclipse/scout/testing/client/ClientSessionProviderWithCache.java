@@ -20,8 +20,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -33,12 +31,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.testing.client.TestingClientConfigProperties.ClientSessionCacheExpirationProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provider for client sessions. A client session is only created if not contained in the session cache.
  */
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionProviderWithCache.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientSessionProviderWithCache.class);
   private final LRUCache<CompositeObject, IClientSession> m_cache;
 
   public ClientSessionProviderWithCache() {

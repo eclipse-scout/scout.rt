@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerValueBoxChains.ComposerValueBoxChangedValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerValueBoxExtension;
@@ -55,6 +53,8 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Template box containing all composer values.
@@ -62,7 +62,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
  */
 @ClassId("2d8065cf-eeb3-4d64-8753-adb36cf852b8")
 public abstract class AbstractComposerValueBox extends AbstractGroupBox implements IComposerValueBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerValueBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractComposerValueBox.class);
 
   private Map<Integer/*operator*/, Map<Integer/*dataType*/, IComposerValueField>> m_opTypeToFieldMap;
   //selection context

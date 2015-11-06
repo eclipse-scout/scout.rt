@@ -22,18 +22,18 @@ import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
  */
 public class HtmlDocumentParser {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlDocumentParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HtmlDocumentParser.class);
 
   private static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\"\\s]+)=\"([^\"]*)\"");
   private static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);

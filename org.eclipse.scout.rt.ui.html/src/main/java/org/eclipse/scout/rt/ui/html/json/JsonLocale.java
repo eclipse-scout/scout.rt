@@ -19,16 +19,16 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonLocale implements IJsonObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonLocale.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonLocale.class);
 
   private final Locale m_locale;
 

@@ -17,8 +17,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -26,6 +24,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Proposal chooser with a table to choose proposals. You can provide your own table implementation when your
@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  */
 public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IContentAssistFieldTable<LOOKUP_KEY>, LOOKUP_KEY> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableProposalChooser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TableProposalChooser.class);
 
   private LOOKUP_KEY m_lastSelectedKey;
 

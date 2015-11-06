@@ -22,16 +22,16 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TableEvent extends java.util.EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(TableEvent.class);
+  private static Logger LOG = LoggerFactory.getLogger(TableEvent.class);
   /**
    * Column visibility and/or order and/or width changed
    */

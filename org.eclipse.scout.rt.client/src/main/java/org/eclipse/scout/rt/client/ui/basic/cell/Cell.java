@@ -17,8 +17,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
@@ -27,6 +25,8 @@ import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.form.fields.DefaultFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Cell represents model properties of a tree node or table cell.
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  */
 public class Cell implements ICell, IStyleable, IHtmlCapable {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Cell.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Cell.class);
 
   private static final Map<CellStyle, CellStyle> SHARED_STYLE_STORE;
   private static final Object SHARED_STYLE_STORE_LOCK = new Object();

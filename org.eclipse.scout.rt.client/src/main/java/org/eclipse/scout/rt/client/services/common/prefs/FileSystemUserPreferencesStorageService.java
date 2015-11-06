@@ -26,20 +26,20 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientConfigProperties.UserAreaProperty;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.shared.services.common.prefs.AbstractUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation for storing preferences on the local file system in user area.
  */
 public class FileSystemUserPreferencesStorageService extends AbstractUserPreferencesStorageService {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileSystemUserPreferencesStorageService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileSystemUserPreferencesStorageService.class);
 
   public static final String PROP_USER_HOME = "user.home";
 

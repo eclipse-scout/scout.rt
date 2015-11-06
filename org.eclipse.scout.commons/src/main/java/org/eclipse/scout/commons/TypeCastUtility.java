@@ -31,12 +31,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TypeCastUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TypeCastUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TypeCastUtility.class);
 
   // singleton
   private static TypeCastUtility instance = new TypeCastUtility();

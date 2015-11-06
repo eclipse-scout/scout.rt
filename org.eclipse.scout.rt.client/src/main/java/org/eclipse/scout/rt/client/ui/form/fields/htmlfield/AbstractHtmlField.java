@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -37,10 +35,12 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlField
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractHtmlField.class);
 
   private IHtmlFieldUIFacade m_uiFacade;
   private boolean m_scrollBarEnabled;

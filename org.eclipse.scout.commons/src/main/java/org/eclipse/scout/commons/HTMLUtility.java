@@ -42,8 +42,8 @@ import javax.swing.text.html.parser.DocumentParser;
 import javax.swing.text.html.parser.ParserDelegator;
 
 import org.eclipse.scout.commons.holders.IntegerHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to manipulate HTML documents regardless of ui.
@@ -51,7 +51,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public final class HTMLUtility {
   private static final Pattern HTML_PARAGRAPH_TAGS = Pattern.compile("<br>|<br/>|</p>|<p/>|</tr>|</table>", Pattern.CASE_INSENSITIVE);
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HTMLUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HTMLUtility.class);
 
   private static HashMap<String, CSS.Attribute> cssMap;
 

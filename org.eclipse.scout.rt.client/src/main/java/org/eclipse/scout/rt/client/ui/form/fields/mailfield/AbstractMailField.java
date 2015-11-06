@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -33,13 +31,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @version 3.x
  */
 @ClassId("35e1fd57-3c86-4c99-92ca-188c3c2dedde")
 public abstract class AbstractMailField extends AbstractValueField<MimeMessage> implements IMailField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMailField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMailField.class);
   private IMailFieldUIFacade m_uiFacade;
   private boolean m_mailEditor;
   private boolean m_scrollBarEnabled;

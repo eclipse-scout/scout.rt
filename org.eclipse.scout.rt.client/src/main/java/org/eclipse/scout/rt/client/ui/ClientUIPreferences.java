@@ -19,8 +19,6 @@ import java.util.StringTokenizer;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -37,12 +35,14 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * UI model customization wrapping a {@link IPreferences} object.
  */
 public class ClientUIPreferences {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientUIPreferences.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientUIPreferences.class);
 
   /**
    * @return a new instance of the {@link ClientUIPreferences}

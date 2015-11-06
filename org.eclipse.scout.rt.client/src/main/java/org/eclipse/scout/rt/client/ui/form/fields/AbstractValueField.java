@@ -33,8 +33,6 @@ import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -54,13 +52,15 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 @ScoutSdkIgnore
 @ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
 public abstract class AbstractValueField<VALUE> extends AbstractFormField implements IValueField<VALUE> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractValueField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractValueField.class);
 
   private int m_valueChanging;
   private int m_valueParsing;

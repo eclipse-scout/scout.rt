@@ -16,14 +16,14 @@ import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements INotificationHandler<T>, IGlobalSessionListener {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractObservableNotificationHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractObservableNotificationHandler.class);
 
   private final Map<ISession, EventListenerList> m_listeners = new WeakHashMap<>();
 

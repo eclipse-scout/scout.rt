@@ -14,11 +14,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Base64Utility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Base64Utility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Base64Utility.class);
 
   private Base64Utility() {
   }

@@ -16,11 +16,11 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthCredentialsProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Authenticator to validate webservice requests against configured users in <code>config.properties</code> file.
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthCredenti
  */
 public class ConfigFileAuthenticator implements IAuthenticator {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ConfigFileAuthenticator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigFileAuthenticator.class);
 
   private final Map<String, String> m_users;
 

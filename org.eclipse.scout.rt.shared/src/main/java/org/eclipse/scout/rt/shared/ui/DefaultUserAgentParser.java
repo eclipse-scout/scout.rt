@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.shared.ui;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This default parser is able to create a string representation (identifier) of {@link UserAgent} in the form of
@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * @since 3.8.0
  */
 public class DefaultUserAgentParser implements IUserAgentParser {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultUserAgentParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultUserAgentParser.class);
 
   public static String DELIMITER = "|";
 

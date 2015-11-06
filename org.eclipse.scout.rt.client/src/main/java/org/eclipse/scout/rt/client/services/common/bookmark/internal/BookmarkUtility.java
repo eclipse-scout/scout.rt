@@ -29,8 +29,6 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.services.common.bookmark.DefaultBookmarkAdapter;
@@ -59,10 +57,12 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class BookmarkUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BookmarkUtility.class);
 
   private BookmarkUtility() {
   }

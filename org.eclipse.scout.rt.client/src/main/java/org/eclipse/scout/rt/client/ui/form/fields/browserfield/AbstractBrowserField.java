@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -40,11 +38,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("6402e68c-abd1-42b8-8da2-b4a12f910c98")
 @FormData(value = AbstractBrowserFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE)
 public abstract class AbstractBrowserField extends AbstractFormField implements IBrowserField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBrowserField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractBrowserField.class);
 
   private IBrowserFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();

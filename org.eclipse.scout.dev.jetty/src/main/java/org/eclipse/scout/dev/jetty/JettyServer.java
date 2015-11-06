@@ -27,12 +27,12 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JettyServer {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JettyServer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
   public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.server.services.common.clustersync.ClusterSynchronizationService.createNodeId()

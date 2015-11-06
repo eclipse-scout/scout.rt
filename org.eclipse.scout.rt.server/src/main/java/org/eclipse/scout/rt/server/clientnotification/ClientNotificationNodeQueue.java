@@ -29,19 +29,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.FinalValue;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A queue for a client node, that keeps track of notifications for that node.
  */
 @Bean
 public class ClientNotificationNodeQueue {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationNodeQueue.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationNodeQueue.class);
 
   private final FinalValue<String> m_nodeId = new FinalValue<>();
 

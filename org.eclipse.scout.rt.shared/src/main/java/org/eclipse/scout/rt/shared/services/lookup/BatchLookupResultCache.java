@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Cache used to optimize performance on {@link BatchLookupCall}s with {@link IBatchLookupService}.
@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 @SuppressWarnings("unchecked")
 public class BatchLookupResultCache {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BatchLookupResultCache.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BatchLookupResultCache.class);
   private static final Object globalCacheableLock = new Object();
   private static final HashMap<Class<? extends ILookupCall>, Boolean> globalCacheable = new HashMap<Class<? extends ILookupCall>, Boolean>();
 

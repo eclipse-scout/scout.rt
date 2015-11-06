@@ -19,11 +19,11 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.jms.IJmsMessageSerializer;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Scout {@link ITransactionMember} to use the JMS API transaction features. If one needs transactional behavior on JMS
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  *          the type of message that should be sent and received
  */
 public class JmsTransactionMember<T> extends AbstractTransactionMember {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsTransactionMember.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JmsTransactionMember.class);
 
   private final Connection m_connection;
   private final Session m_session;

@@ -15,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
@@ -28,13 +26,15 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Cache only last 5 table page search form contents, last 5 table filter settings, releaseUnusedPages after every page
  * reload.
  */
 public class MediumMemoryPolicy extends AbstractMemoryPolicy {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediumMemoryPolicy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MediumMemoryPolicy.class);
 
   private boolean m_release = false;
   //cache last 5 search form contents and table filters

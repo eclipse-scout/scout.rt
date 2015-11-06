@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
@@ -57,9 +55,11 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractOutline.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractOutline.class);
 
   // visible is defined as: visibleGranted && visibleProperty
   private boolean m_visibleGranted;

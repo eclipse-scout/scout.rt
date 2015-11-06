@@ -13,19 +13,19 @@ package org.eclipse.scout.commons.exception;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link ProcessingStatus}
  */
 public class ProcessingStatusTest {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ProcessingStatusTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessingStatusTest.class);
 
   private IProcessingStatus m_infoStatus;
   private IProcessingStatus m_warningStatus;

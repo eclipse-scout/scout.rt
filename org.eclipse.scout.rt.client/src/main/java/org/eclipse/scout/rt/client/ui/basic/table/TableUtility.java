@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
@@ -37,9 +35,11 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TableUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TableUtility.class);
 
   private TableUtility() {
   }

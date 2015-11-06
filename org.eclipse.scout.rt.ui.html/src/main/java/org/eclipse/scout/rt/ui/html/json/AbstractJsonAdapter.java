@@ -16,13 +16,13 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractJsonAdapter.class);
 
   private final IUiSession m_uiSession;
   private final T m_model;

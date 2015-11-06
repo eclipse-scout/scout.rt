@@ -22,14 +22,14 @@ import javax.jms.Session;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configure jndi by simply placing the jndi.properties on the classpath, i.e. place it in WEB-INF/classes or in
@@ -52,7 +52,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchroni
  *          the type of message that should be sent and received
  */
 public abstract class AbstractJmsService<T> implements IService {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJmsService.class);
+  private static Logger LOG = LoggerFactory.getLogger(AbstractJmsService.class);
 
   private Connection m_connection;
 

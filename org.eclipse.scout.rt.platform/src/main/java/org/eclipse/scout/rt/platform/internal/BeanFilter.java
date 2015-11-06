@@ -3,18 +3,18 @@ package org.eclipse.scout.rt.platform.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * extract {@link Bean} annotated classes
  */
 public class BeanFilter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BeanFilter.class);
 
   /**
    * @return all {@link Bean} annotated classes

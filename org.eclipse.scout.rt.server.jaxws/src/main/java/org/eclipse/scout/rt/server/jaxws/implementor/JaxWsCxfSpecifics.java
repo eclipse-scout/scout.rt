@@ -17,9 +17,9 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.MessageContext;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JAX-WS implementor specifics of 'JAX-WS CXF implementation'.
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  */
 public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JaxWsCxfSpecifics.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsCxfSpecifics.class);
 
   @Override
   @PostConstruct

@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Row representing a result of a lookup.
@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
  */
 public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookupRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LookupRow.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LookupRow.class);
 
   public static final LookupRow<?>[] EMPTY_ARRAY = new LookupRow[0];
 

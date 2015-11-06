@@ -16,12 +16,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default permission service: Uses jandex class inventory to find classes.
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
  */
 public class PermissionService implements IPermissionService {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PermissionService.class);
 
   private final Object m_permissionClassesLock = new Object();
   private Set<Class<? extends Permission>> m_permissionClasses;

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.junit.Test;

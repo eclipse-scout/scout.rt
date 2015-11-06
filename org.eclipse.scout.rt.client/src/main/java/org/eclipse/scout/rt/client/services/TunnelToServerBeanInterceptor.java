@@ -13,20 +13,20 @@ package org.eclipse.scout.rt.client.services;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link IBeanInterceptor} that uses the {@link IServiceTunnel} available in the current {@link IClientSession}.
  */
 public class TunnelToServerBeanInterceptor<T> implements IBeanInterceptor<T> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TunnelToServerBeanInterceptor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TunnelToServerBeanInterceptor.class);
 
   private final Class<?> m_serviceInterfaceClass;
 

@@ -15,15 +15,15 @@ import java.nio.charset.StandardCharsets;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PagingTableRow extends TableRow {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PagingTableRow.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PagingTableRow.class);
   private static String s_htmlCellTemplate;
 
   static {

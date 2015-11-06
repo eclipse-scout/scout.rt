@@ -5,17 +5,17 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Registry for {@link INotificationHandler}s.
  */
 @ApplicationScoped
 public class NotificationHandlerRegistry {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NotificationHandlerRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NotificationHandlerRegistry.class);
   private final TypeParameterBeanRegistry<INotificationHandler> m_registry = new TypeParameterBeanRegistry<>();
 
   @PostConstruct

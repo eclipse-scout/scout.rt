@@ -16,8 +16,6 @@ import java.util.Calendar;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -30,6 +28,8 @@ import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests for IScheduler
@@ -79,7 +79,7 @@ public class SchedulerTest {
 }
 
 class JobAcceptTick extends AbstractSchedulerJob {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(JobAcceptTick.class);
+  private static Logger LOG = LoggerFactory.getLogger(JobAcceptTick.class);
 
   public JobAcceptTick(String groupId, String jobId) {
     super(groupId, jobId);

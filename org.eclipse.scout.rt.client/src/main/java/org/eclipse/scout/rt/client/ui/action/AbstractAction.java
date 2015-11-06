@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionActionChain;
@@ -41,9 +39,11 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
 
   private boolean m_initialized;
   private final IActionUIFacade m_uiFacade;

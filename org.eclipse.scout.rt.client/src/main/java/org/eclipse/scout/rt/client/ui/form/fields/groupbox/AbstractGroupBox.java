@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -42,10 +40,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProc
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractGroupBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractGroupBox.class);
 
   private IGroupBoxUIFacade m_uiFacade;
   private boolean m_mainBoxFlag = false;

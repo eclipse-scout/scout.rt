@@ -16,13 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> extends AbstractJsonAdapter<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserver.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractJsonPropertyObserver.class);
 
   private PropertyChangeListener m_propertyChangeListener;
   private PropertyEventFilter m_propertyEventFilter;

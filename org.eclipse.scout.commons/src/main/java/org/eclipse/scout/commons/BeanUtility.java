@@ -27,11 +27,11 @@ import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class BeanUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanUtility.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BeanUtility.class);
 
   private static final Object BEAN_INFO_CACHE_LOCK;
   private static final Map<CompositeObject/*Class,Class*/, FastBeanInfo> BEAN_INFO_CACHE;

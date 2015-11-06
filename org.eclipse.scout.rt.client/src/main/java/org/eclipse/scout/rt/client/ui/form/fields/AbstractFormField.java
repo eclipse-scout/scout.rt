@@ -33,8 +33,6 @@ import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
@@ -75,13 +73,15 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @ClassId("cb3204c4-71bf-4dc6-88a4-3a8f81a7ca10")
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField, IContributionOwner, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractFormField.class);
 
   private IForm m_form;
   private boolean m_initialized;

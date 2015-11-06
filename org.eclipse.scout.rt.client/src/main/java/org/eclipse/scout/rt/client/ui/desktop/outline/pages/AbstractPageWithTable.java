@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.PageData;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
@@ -70,13 +68,15 @@ import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A page containing a list of "menu" entries<br>
  * child pages are explicitly added
  */
 public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractPageWithTable.class);
 
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;

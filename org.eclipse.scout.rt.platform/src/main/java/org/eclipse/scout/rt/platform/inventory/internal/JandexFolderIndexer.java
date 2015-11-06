@@ -15,13 +15,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JandexFolderIndexer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexFolderIndexer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JandexFolderIndexer.class);
   private static final String CLASS_EXT = ".class";
 
   private JandexFolderIndexer() {

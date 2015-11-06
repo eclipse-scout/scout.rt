@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -38,9 +36,11 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSessionListener {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientSessionRegistry.class);
 
   /**
    * Subject for server calls for client notification related updates.

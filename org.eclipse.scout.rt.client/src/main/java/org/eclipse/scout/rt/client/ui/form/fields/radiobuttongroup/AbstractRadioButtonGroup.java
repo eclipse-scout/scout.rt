@@ -29,8 +29,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.IRadioButtonGroupExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.RadioButtonGroupChains.RadioButtonGroupFilterLookupResultChain;
@@ -54,6 +52,8 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AbstractRadioButtonGroup contains a set of {@link IRadioButton} and can also contain other {@link IFormField}s at the
@@ -61,7 +61,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  */
 @ClassId("20dd4412-e677-4996-afcc-13c43b9dcae8")
 public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T>, ICompositeField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRadioButtonGroup.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractRadioButtonGroup.class);
 
   private boolean m_valueAndSelectionMediatorActive;
   private ILookupCall<T> m_lookupCall;

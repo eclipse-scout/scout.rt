@@ -19,18 +19,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 5.1 replaces ITableColumnFilterManager
  */
 public class TableUserFilterManager {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableUserFilterManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TableUserFilterManager.class);
 
   private Map<Object, IUserFilterState> m_filterMap = new HashMap<Object, IUserFilterState>();
   private AbstractTable m_table;

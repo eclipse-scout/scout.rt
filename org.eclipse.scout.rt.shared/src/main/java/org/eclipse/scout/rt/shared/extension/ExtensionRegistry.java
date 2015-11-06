@@ -31,13 +31,13 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExtensionRegistry implements IInternalExtensionRegistry {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensionRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExtensionRegistry.class);
 
   private final Map<ClassIdentifier, List<ExtensionRegistryItem>> m_extensionItemMap;
   private final Map<ClassIdentifier, List<ExtensionRegistryItem>> m_contributionItemMap;

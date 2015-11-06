@@ -8,8 +8,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -20,6 +18,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.SaveAsData;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The document field is an editor field that presents a document for editing.
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  */
 @ClassId("4c022ea1-a522-43a5-b603-954d9cb8705c")
 public abstract class AbstractDocumentField extends AbstractValueField<RemoteFile> implements IDocumentField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDocumentField.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDocumentField.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private IDocumentFieldUIFacade m_uiFacade;

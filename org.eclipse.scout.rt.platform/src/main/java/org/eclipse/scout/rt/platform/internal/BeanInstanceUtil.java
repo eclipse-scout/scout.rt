@@ -19,12 +19,12 @@ import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BeanCreationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class BeanInstanceUtil {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanInstanceUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BeanInstanceUtil.class);
 
   private BeanInstanceUtil() {
 

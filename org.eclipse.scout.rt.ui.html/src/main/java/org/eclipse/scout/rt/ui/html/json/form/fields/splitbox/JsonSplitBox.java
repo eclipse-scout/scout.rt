@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.splitbox;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -22,9 +20,11 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPLIT_BOX> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSplitBox.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonSplitBox.class);
 
   public static final String EVENT_SET_SPLITTER_POSITION = "setSplitterPosition";
 

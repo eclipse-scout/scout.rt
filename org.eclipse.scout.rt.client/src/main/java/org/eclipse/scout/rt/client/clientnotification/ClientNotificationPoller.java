@@ -19,8 +19,6 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -34,11 +32,13 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @CreateImmediately
 public class ClientNotificationPoller {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationPoller.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationPoller.class);
   private IFuture<Void> m_pollerFuture;
 
   @PostConstruct

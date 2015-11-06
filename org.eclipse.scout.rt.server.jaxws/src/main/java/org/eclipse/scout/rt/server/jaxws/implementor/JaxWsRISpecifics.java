@@ -15,9 +15,9 @@ import java.lang.reflect.Proxy;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JAX-WS implementor specifics of 'JAX-WS Reference Implementation' as contained in JDK.
@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  */
 public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JaxWsRISpecifics.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsRISpecifics.class);
 
   @Override
   @PostConstruct

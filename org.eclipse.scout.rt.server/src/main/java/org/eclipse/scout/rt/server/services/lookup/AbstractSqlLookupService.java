@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
@@ -32,6 +30,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sql SELECT statement for getting {@link LookupRow}s.<br>
@@ -57,7 +57,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
 
   private static final Pattern REFUSING_ALL_TAGS_REGEX = Pattern.compile("<all>\\s*and\\s*([0-9]+)\\s*=\\s*([0-9]+)\\s*</all>", Pattern.DOTALL);
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlLookupService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlLookupService.class);
 
   /**
    * Sql SELECT statement

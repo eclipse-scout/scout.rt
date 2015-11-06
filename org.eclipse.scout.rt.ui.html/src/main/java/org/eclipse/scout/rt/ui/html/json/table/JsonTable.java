@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
@@ -75,9 +73,11 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserver<TABLE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";

@@ -14,16 +14,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Java proxy handler through a service tunnel.
  */
 public class ServiceTunnelInvocationHandler implements InvocationHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelInvocationHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelInvocationHandler.class);
 
   private final Class<?> m_serviceInterfaceClass;
 

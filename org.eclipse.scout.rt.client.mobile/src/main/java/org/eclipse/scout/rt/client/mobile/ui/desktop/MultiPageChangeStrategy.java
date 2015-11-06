@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.DefaultPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -19,12 +17,14 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.9.0
  */
 public class MultiPageChangeStrategy implements IPageChangeStrategy {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiPageChangeStrategy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MultiPageChangeStrategy.class);
 
   private IOutline m_outline;
   private IPage<?> m_mainPage;

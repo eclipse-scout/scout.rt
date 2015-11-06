@@ -15,8 +15,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -43,10 +41,12 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyObserver<DESKTOP> implements IBinaryResourceProvider {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonDesktop.class);
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";

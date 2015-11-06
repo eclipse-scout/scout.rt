@@ -25,17 +25,17 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.SortSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ColumnSet {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColumnSet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ColumnSet.class);
 
   private final AbstractTable m_table;
   private final List<IColumn<?>> m_columns;

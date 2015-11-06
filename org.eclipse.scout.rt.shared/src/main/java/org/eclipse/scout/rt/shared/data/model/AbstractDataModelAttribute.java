@@ -28,8 +28,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -48,9 +46,11 @@ import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelAttribute.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelAttribute.class);
   private static final long serialVersionUID = 1L;
 
   private String m_text;
