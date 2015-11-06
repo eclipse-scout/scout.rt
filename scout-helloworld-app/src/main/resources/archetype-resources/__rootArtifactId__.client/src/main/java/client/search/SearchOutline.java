@@ -4,9 +4,9 @@
 package ${groupId}.client.search;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractSearchOutline;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ${groupId}.shared.Icons;
 
@@ -18,7 +18,7 @@ import ${groupId}.shared.Icons;
 @Order(2000)
 public class SearchOutline extends AbstractSearchOutline {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SearchOutline.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SearchOutline.class);
 
   @Override
   protected void execSearch(final String query) {
