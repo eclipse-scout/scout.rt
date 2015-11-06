@@ -235,6 +235,7 @@ scout.TableControl.prototype.onResize = function() {
 };
 
 scout.TableControl.prototype._onMouseDown = function() {
+  this._removeTooltip();
   this.toggle();
 };
 
