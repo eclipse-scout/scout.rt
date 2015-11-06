@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
     <relativePath></relativePath>
   </parent>
 
@@ -345,14 +345,14 @@
   </dependencyManagement>
 
   <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-scm-plugin</artifactId>
-          <configuration>
-            <basedir>${project.basedir}/..</basedir>
-          </configuration>
-        </plugin>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <configuration>
+          <basedir>${project.basedir}/..</basedir>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>

@@ -10,6 +10,8 @@
 *.ear
 *.zip
 
+*.log
+
 # Eclipse #
 bin/
 classes
