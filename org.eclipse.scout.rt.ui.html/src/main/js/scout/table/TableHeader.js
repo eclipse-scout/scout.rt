@@ -508,7 +508,7 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
   }
 
   function dragEnd(event) {
-    this._$window.off('mousemove.tableheader');
+    that._$window.off('mousemove.tableheader');
 
     // in case of no movement: return
     if (!that.dragging) {
@@ -592,8 +592,8 @@ scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
     that.$dataColumnResizeHelper.remove();
     that.$dataColumnResizeHelper = null;
 
-    this._$window.off('mousemove.tableheader');
-    this._$body.removeClass('col-resize');
+    that._$window.off('mousemove.tableheader');
+    that._$body.removeClass('col-resize');
 
     that.table.resizeColumn(column, column.width);
   }
