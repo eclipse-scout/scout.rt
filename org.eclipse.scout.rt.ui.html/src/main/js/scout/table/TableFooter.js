@@ -398,8 +398,6 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
 
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
-  //FIXME CGU ask bsh what is this for? this prevents shrinking
-  this.$controlContainer.outerHeight(0); // start animation at zero
 
   // open container, stop existing (close) animations before
   // use delay to make sure form is rendered and layouted with new size
