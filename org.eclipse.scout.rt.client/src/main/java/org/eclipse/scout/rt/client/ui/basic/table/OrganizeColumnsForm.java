@@ -437,7 +437,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               @Override
               protected void execAction() {
                 getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
-                // FIXME ASA open and focus cell for edit, once it is supported.
+                getTable().requestFocusInCell(getConfigNameColumn(), getSelectedRow());
               }
 
             }
@@ -1467,14 +1467,14 @@ public class OrganizeColumnsForm extends AbstractForm {
         isCustomColumnSelected = true;
       }
     }
-
     tableFieldTable.getMenuByClass(ModifyCustomColumnMenu.class).setEnabled(isCustomColumnSelected);
     tableFieldTable.getMenuByClass(ModifyCustomColumnMenu.class).setVisible(isCustomColumnSelected);
     tableFieldTable.getMenuByClass(RemoveMenu.class).setEnabled(isCustomColumnSelected);
     tableFieldTable.getMenuByClass(RemoveMenu.class).setVisible(isCustomColumnSelected);
+    tableFieldTable.getMenuByClass(RemoveFilterMenu.class).setEnabled(isFilterActive);
     tableFieldTable.getMenuByClass(RemoveFilterMenu.class).setVisible(isFilterActive);
+    tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setEnabled(m_table.getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
     tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisible(m_table.getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
-
   }
 
   @Override

@@ -3009,6 +3009,15 @@ scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
   }, this);
 };
 
+scout.Table.prototype._onRequestFocusInCell = function(event) {
+  var row = this.rowById(event.rowId),
+      column = this.columnById(event.columnId),
+      cell = this.cell(column, row);
+  if (this.enabled && row.enabled && cell.editable) {
+    this.prepareCellEdit(event.rowId, event.columnId, true);
+  }
+};
+
 scout.Table.prototype._onAggregationFunctionChanged = function(event) {
   var columnId, column, func;
 
@@ -3069,6 +3078,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onAggregationFunctionChanged(event);
   } else if (event.type === 'columnBackgroundEffectChanged') {
     this._onColumnBackgroundEffectChanged(event);
+  } else if (event.type === 'requestFocusInCell') {
+    this._onRequestFocusInCell(event);
   } else {
     scout.Table.parent.prototype.onModelAction.call(this, event);
   }

@@ -722,12 +722,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Called when one or more rows are selected.
+   * Called whenever the selection changes.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
    * @param rows
-   *          an unmodifiable list of the selected rows.
+   *          an unmodifiable list of the selected rows, may be empty but not null.
    */
   @ConfigOperation
   @Order(100)

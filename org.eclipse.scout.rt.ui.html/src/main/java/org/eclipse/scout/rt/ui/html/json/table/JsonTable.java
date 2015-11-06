@@ -100,6 +100,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String EVENT_COLUMN_STRUCTURE_CHANGED = "columnStructureChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED = "columnBackgroundEffectChanged";
+  public static final String EVENT_REQUEST_FOCUS_IN_CELL = "requestFocusInCell";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
   public static final String EVENT_END_CELL_EDIT = "endCellEdit";
   public static final String EVENT_PREPARE_CELL_EDIT = "prepareCellEdit";
@@ -1061,6 +1062,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         handleModelColumnAggregationChanged(event);
       case TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED:
         handleModelColumnBackgroundEffectChanged(event);
+      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
+        handleModelRequestFocusInCell(event);
       default:
         // NOP
     }
@@ -1284,6 +1287,13 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
     putProperty(jsonEvent, "eventParts", eventParts);
     addActionEvent(EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED, jsonEvent);
+  }
+
+  protected void handleModelRequestFocusInCell(TableEvent event) {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROW_ID, getOrCreatedRowId(event.getRows().iterator().next()));
+    putProperty(jsonEvent, PROP_COLUMN_ID, getColumnId(event.getColumns().iterator().next()));
+    addActionEvent(EVENT_REQUEST_FOCUS_IN_CELL, jsonEvent);
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
