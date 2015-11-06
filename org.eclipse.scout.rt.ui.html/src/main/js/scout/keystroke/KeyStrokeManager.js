@@ -17,7 +17,7 @@ scout.KeyStrokeManager = function(session) {
   // Prevent browser to interpret F1 (help).
   this.$entryPoint.keydown(swallowHelpKeyStroke.bind(this));
   this.$entryPoint.keyup(swallowHelpKeyStroke.bind(this));
-  if ('onhelp' in window) {
+  if ('onhelp' in window) { // FIXME AWE: (2nd screen) check if F1 / KeystrokeManager works in popup-window (check all window references in this file)
     window.onhelp = scout.filters.returnFalse;
   }
 

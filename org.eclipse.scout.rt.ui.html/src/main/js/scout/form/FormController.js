@@ -139,13 +139,10 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return;
   }
 
-  // FIXME AWE: mit DWI besprechen: sollen wir popupwindows als dialog behandeln oder als "eigene" property
-  // also analog desktop.dialogs - desktop.popupWindows?
   if (dialog.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
     this._renderPopupWindow(dialog);
   } else {
     dialog.render(this.session.desktop.$container);
-
     this._layoutDialog(dialog);
 
     // Only display the dialog if its 'displayParent' is visible to the user.

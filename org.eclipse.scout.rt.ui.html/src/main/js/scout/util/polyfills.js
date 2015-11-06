@@ -21,6 +21,7 @@
  * http://stackoverflow.com/a/5976031
  *
  */
+// FIXME AWE: (2nd screen) check if we must also apply the polyfills to popup-windows
 (function(window) {
   if (window.FormData) {
     // Nothing to do

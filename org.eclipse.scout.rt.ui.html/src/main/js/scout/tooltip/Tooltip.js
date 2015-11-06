@@ -156,7 +156,7 @@ scout.Tooltip.prototype.position = function() {
 
   top = y - tooltipHeight - arrowSize;
   left = x - arrowPosition;
-  overlapX = left + tooltipWidth + this.windowPaddingX - $(window).width();
+  overlapX = left + tooltipWidth + this.windowPaddingX - this.$anchor.getWindow(true).width();
   overlapY = top - this.windowPaddingY;
 
   // Move tooltip to the left until it gets fully visible

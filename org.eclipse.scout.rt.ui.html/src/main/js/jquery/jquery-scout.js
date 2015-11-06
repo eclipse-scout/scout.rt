@@ -29,9 +29,9 @@
       return false;
     }
     // Must use correct window for element / computedStyle
-    var theWindow = elem.ownerDocument.defaultView;
+    var myWindow = elem.ownerDocument.defaultView;
     // Check if element itself is hidden by external style-sheet
-    if (isHidden(theWindow.getComputedStyle(elem))) {
+    if (isHidden(myWindow.getComputedStyle(elem))) {
       return false;
     }
     // Else visible
@@ -216,7 +216,7 @@
   };
 
   $.fn.appendTextNode = function(text) {
-    return this.getDocument().createTextNode(text).appendTo(this);
+    return $(this.getDocument().createTextNode(text)).appendTo(this);
   };
 
   // append SVG
@@ -745,7 +745,7 @@
           left = Math.max(100 - $handle.width(), left);
           left = Math.min($('body').width() - 100, left);
           top = Math.max(0, top); // must not be dragged outside of top, otherwise dragging back is impossible
-          top = Math.min($(window).height() - 100, top);
+          top = Math.min($handle.getWindow(true).height() - 100, top);
           $draggable.offset({
             top: top,
             left: left
@@ -994,24 +994,34 @@
   /**
    * @return HTML document reference (ownerDocument) of the HTML element.
    */
-  $.fn.getDocument = function() {
-    return this.length ? this[0].ownerDocument : null;
+  $.fn.getDocument = function(asJquery) {
+    var myDocument = this.length ? this[0].ownerDocument : null;
+    return asJquery ? $(myDocument) : myDocument;
   };
 
   /**
    * @return HTML window reference (defaultView) of the HTML element
    */
-  $.fn.getWindow = function() {
-    var document = this.getDocument();
-    return document ? document.defaultView : null;
+  $.fn.getWindow = function(asJquery) {
+    var myDocument = this.getDocument(),
+      myWindow = myDocument ? myDocument.defaultView : null;
+    return asJquery ? $(myWindow) : myWindow;
   };
 
   /**
    * @return HTML document reference (ownerDocument) of the HTML element.
    */
-  $.fn.getActiveElement = function() {
-    var document = this.getDocument();
-    return document ? document.activeElement : null;
+  $.fn.getActiveElement = function(asJquery) {
+    var myDocument = this.getDocument(),
+      activeElement = myDocument ? myDocument.activeElement : null;
+    return asJquery ? $(activeElement) : activeElement;
+  };
+
+  /**
+   * @return the BODY element of the HTML document in which the current HTML element is placed.
+   */
+  $.fn.getBody = function() {
+    return $('body', this.getDocument());
   };
 
   /**

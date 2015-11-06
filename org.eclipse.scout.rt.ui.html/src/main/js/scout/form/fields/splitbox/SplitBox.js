@@ -27,6 +27,8 @@ scout.SplitBox.prototype._render = function($parent) {
   this.addField(this._$splitArea);
   this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
+  this._$window = $parent.getWindow(true);
+  this._$body = $parent.getBody();
 
   // Add fields and splitter
   if (this.firstField) {
@@ -63,11 +65,11 @@ scout.SplitBox.prototype._render = function($parent) {
       };
 
       // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
-      $(window)
+      this._$window
         .on('mousemove.splitbox', resizeMove.bind(this))
         .on('mouseup.splitbox', resizeEnd.bind(this));
       // Ensure the correct cursor is always shown while moving
-      $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+      this._$body.addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
 
       // Get initial area and splitter bounds
       var splitAreaPosition = this._$splitArea.offset();
@@ -146,11 +148,11 @@ scout.SplitBox.prototype._render = function($parent) {
         return; // only handle left mouse button
       }
       // Remove listeners and reset cursor
-      $(window)
+      this._$window
         .off('mousemove.splitbox')
         .off('mouseup.splitbox');
       if ($tempSplitter) { // instead of check for this.splitterEnabled, if splitter is currently moving it must be finished correctly
-        $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
+        this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
 
         // Remove temporary splitter
         $tempSplitter.remove();

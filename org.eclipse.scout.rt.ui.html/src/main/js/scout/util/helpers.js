@@ -29,8 +29,8 @@ scout.helpers = {
    *
    * @memberOf scout.helpers
    */
-  // FIXME AWE/BSH: unsued after detach-window feature has been removed, check at end of release
-  // if it's still unused and delete it in that case-
+  // FIXME AWE/BSH: (2nd screen) unsued after detach-window feature has been removed, check at end of release
+  // if it's still unused and delete it in that case - also fix usage of 'window' variable here
   openWindow: function(url, windowId, popupWidth, popupHeight) {
     var windowSpec = '';
     if (popupWidth && popupHeight) {

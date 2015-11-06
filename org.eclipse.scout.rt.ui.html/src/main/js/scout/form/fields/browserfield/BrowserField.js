@@ -20,9 +20,10 @@ scout.BrowserField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($parent.makeElement('<iframe>'));
   this.addStatus();
+  this._$window = $parent.getWindow();
 
   this._postMessageListener = this._onPostMessage.bind(this);
-  window.addEventListener('message', this._postMessageListener);
+  this._$window.addEventListener('message', this._postMessageListener);
 };
 
 /**
@@ -83,6 +84,6 @@ scout.BrowserField.prototype._onPostMessage = function(event) {
  */
 scout.BrowserField.prototype._remove = function() {
   scout.BrowserField.parent.prototype._remove.call(this);
-  window.removeEventListener('message', this._postMessageListener);
+  this._$window.removeEventListener('message', this._postMessageListener);
   this._postMessageListener = null;
 };

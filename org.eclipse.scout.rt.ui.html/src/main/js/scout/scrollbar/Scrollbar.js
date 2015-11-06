@@ -85,7 +85,7 @@ scout.Scrollbar.prototype._onScrollWheel = function(event) {
     // only scroll if shift modifier matches
     return true;
   }
-  event = event.originalEvent || window.event.originalEvent;
+  event = event.originalEvent || this.$container.getWindow().event.originalEvent;
   w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
   d = this._scrollSize / this._offsetSize;
 

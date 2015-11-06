@@ -44,6 +44,9 @@ scout.TableHeader.prototype._render = function($parent) {
   }
   this.menuBar.render(this.$container);
   this._$menuBar = this.menuBar.$container;
+  this._$window = this.$container.getWindow(true);
+  this._$body = this.$container.getBody();
+
   this.updateMenuBar();
 
   this._renderColumns();
@@ -448,7 +451,7 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
   this.columnMoved = false;
 
   // start drag & drop events
-  $(window)
+  this._$window
     .on('mousemove.tableheader', '', dragMove)
     .one('mouseup', '', dragEnd);
 
@@ -505,7 +508,7 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
   }
 
   function dragEnd(event) {
-    $(window).off('mousemove.tableheader');
+    this._$window.off('mousemove.tableheader');
 
     // in case of no movement: return
     if (!that.dragging) {
@@ -562,10 +565,10 @@ scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
     .appendDiv('table-column-resize-helper')
     .css('width', this.table.rowWidth);
 
-  $(window)
+  this._$window
     .on('mousemove.tableheader', resizeMove)
     .one('mouseup', resizeEnd);
-  $('body').addClass('col-resize');
+  this._$body.addClass('col-resize');
 
   // Prevent text selection in a form, don't stop propagation to allow others (e.g. cell editor) to react
   event.preventDefault();
@@ -589,8 +592,8 @@ scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
     that.$dataColumnResizeHelper.remove();
     that.$dataColumnResizeHelper = null;
 
-    $(window).off('mousemove.tableheader');
-    $('body').removeClass('col-resize');
+    this._$window.off('mousemove.tableheader');
+    this._$body.removeClass('col-resize');
 
     that.table.resizeColumn(column, column.width);
   }

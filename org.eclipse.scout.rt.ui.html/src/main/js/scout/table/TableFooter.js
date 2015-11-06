@@ -40,6 +40,9 @@ scout.TableFooter.prototype._render = function($parent) {
   $parent = $parent || this.table.$container;
 
   this.$container = $parent.appendDiv('table-footer');
+  this._$window = $parent.getWindow(true);
+  this._$body = $parent.getBody();
+
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableFooterLayout(this));
 
@@ -135,12 +138,12 @@ scout.TableFooter.prototype._renderResizer = function() {
 
   function resize(event) {
     // Remember current height and start position
-    var startHeight = this.$controlContainer.height();
-    var startX = Math.floor(event.pageY);
-    $(window)
+    var startHeight = this.$controlContainer.height(),
+      startX = Math.floor(event.pageY);
+    this._$window
       .on('mousemove.tablefooter', resizeMove.bind(this))
       .one('mouseup', resizeEnd.bind(this));
-    $('body').addClass('row-resize');
+    this._$body.addClass('row-resize');
 
     function resizeMove(event) {
       // Calculate position delta
@@ -161,8 +164,8 @@ scout.TableFooter.prototype._renderResizer = function() {
         this.selectedControl.setSelected(false);
       }
 
-      $(window).off('mousemove.tablefooter');
-      $('body').removeClass('row-resize');
+      this._$window.off('mousemove.tablefooter');
+      this._$body.removeClass('row-resize');
     }
 
     return false;

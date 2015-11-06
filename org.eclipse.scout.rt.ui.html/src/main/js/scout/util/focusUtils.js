@@ -63,7 +63,17 @@ scout.focusUtils = {
    * @param element
    */
   isActiveElement: function(element) {
-    return element && element.ownerDocument.activeElement === element;
+    if (!element) {
+      return false;
+    }
+    var activeElement;
+    if (element instanceof jQuery) {
+      activeElement = element.getActiveElement();
+      element = element[0];
+    } else {
+      activeElement = element.ownerDocument.activeElement;
+    }
+    return activeElement === element;
   }
 
 };

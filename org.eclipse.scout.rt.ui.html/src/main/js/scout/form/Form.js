@@ -80,10 +80,11 @@ scout.Form.prototype._renderForm = function($parent) {
         .appendDiv('closable')
         .on('click', this.close.bind(this));
     }
+    var $myWindow = this.$container.getWindow(true);
     this.$container.resizable({
       start: function(event, ui) {
-        this.$container.resizable('option', 'maxHeight', $(window).height() - event.target.offsetTop);
-        this.$container.resizable('option', 'maxWidth', $(window).width() - event.target.offsetLeft);
+        this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
+        this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
       }.bind(this),
 
       resize: function(event, ui) {

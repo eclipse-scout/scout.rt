@@ -34,6 +34,8 @@ scout.Splitter.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
     .on('mousedown', this._onMouseDown.bind(this));
+  this._$window = $parent.getWindow(true);
+  this._$body = $parent.getBody();
 };
 
 /**
@@ -66,11 +68,11 @@ scout.Splitter.prototype.updatePosition = function(newPosition) {
 
 scout.Splitter.prototype._onMouseDown = function(event) {
   // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
-  $(window)
+  this._$window
     .on('mousemove.splitter', this._onMouseMove.bind(this))
     .one('mouseup', this._onMouseUp.bind(this));
   // Ensure the correct cursor is always shown while moving
-  $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+  this._$body.addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
   this.trigger('resizestart', event);
   // Prevent text selection in a form
   event.preventDefault();
@@ -111,8 +113,8 @@ scout.Splitter.prototype._onMouseMove = function(event) {
 
 scout.Splitter.prototype._onMouseUp = function(event) {
   // Remove listeners and reset cursor
-  $(window).off('mousemove.splitter');
-  $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
+  this._$window.off('mousemove.splitter');
+  this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
   this.trigger('resizeend', {
     data: this.position
   });

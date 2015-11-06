@@ -174,6 +174,7 @@ scout._checkBrowserCompability = function(options) {
   return false;
 };
 
+// FIXME AWE: (2nd screen) check if we must apply the global error handler to popups too
 scout._installGlobalJavascriptErrorHandler = function() {
   window.onerror = function(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {

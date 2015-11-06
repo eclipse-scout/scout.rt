@@ -88,7 +88,7 @@ scout.Desktop.prototype._render = function($parent) {
   });
   this.navigation.onOutlineChanged(this.outline, true);
 
-  $(window).on('resize', this.onResize.bind(this));
+  $parent.getWindow(true).on('resize', this.onResize.bind(this));
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
   this._setupDragAndDrop();

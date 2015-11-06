@@ -70,11 +70,11 @@ scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
 };
 
 scout.ClipboardField.prototype._onCopy = function(event) {
-  var dataTransfer;
+  var dataTransfer, myWindow = this.$container.getWindow();
   if (event.originalEvent.clipboardData) {
     dataTransfer = event.originalEvent.clipboardData;
-  } else if (window.clipboardData) {
-    dataTransfer = window.clipboardData;
+  } else if (myWindow.clipboardData) {
+    dataTransfer = myWindow.clipboardData;
   } else {
     // unable to obtain data transfer object
     throw new Error('Unable to access clipboard data.');
@@ -102,11 +102,11 @@ scout.ClipboardField.prototype._onCopy = function(event) {
 };
 
 scout.ClipboardField.prototype._onPaste = function(event) {
-  var dataTransfer;
+  var dataTransfer, myWindow = this.$container.getWindow();
   if (event.originalEvent.clipboardData) {
     dataTransfer = event.originalEvent.clipboardData;
-  } else if (window.clipboardData) {
-    dataTransfer = window.clipboardData;
+  } else if (myWindow.clipboardData) {
+    dataTransfer = myWindow.clipboardData;
   } else {
     // unable to obtain data transfer object
     throw new Error('Unable to access clipboard data.');
