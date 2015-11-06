@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -69,7 +70,7 @@ public class UiJobs {
    * Returns whether the given {@link RunContext} represents a polling request.
    */
   public boolean isPollingRequest(RunContext runContext) {
-    return runContext.containsProperty(POLLING_REQUEST_HINT);
+    return BooleanUtility.nvl(runContext.<Boolean>getProperty(POLLING_REQUEST_HINT), false);
   }
 
   /**
@@ -153,7 +154,7 @@ public class UiJobs {
   public JobInput newModelJobInput(final String jobName, final IClientSession clientSession, final boolean pollingRequest) {
     ClientRunContext runContext = ClientRunContexts.copyCurrent()
         .withSession(clientSession, true)
-        .withProperty(POLLING_REQUEST_HINT, pollingRequest);
+        .withProperty(POLLING_REQUEST_HINT, Boolean.valueOf(pollingRequest));
     return ModelJobs.newInput(runContext).withName(jobName);
   }
 }
