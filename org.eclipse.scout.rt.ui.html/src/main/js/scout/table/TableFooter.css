@@ -45,7 +45,7 @@
   white-space: normal;
 
   &:not(.has-resizer) {
-    border-top: 3px solid @group-box-title-border-color;
+    border-top: 2px solid @group-box-title-border-color;
   }
 }
 
