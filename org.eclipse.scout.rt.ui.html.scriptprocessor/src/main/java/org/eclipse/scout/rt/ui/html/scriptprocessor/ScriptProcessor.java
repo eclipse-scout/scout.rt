@@ -36,8 +36,8 @@ public class ScriptProcessor implements AutoCloseable {
         .addJarContaining(ScriptProcessor.class)
         .build(null);
     m_lessLoader = new SandboxClassLoaderBuilder()
-        .addLocalJar("private-libs/commons-cli.jar")
-        .addLocalJar("private-libs/commons-logging.jar")
+        .addLocalJar("private-libs/slf4j-api.jar")
+        .addLocalJar("private-libs/jcl-over-slf4j.jar")
         .addLocalJar("private-libs/rhino.jar")
         .addLocalJar("private-libs/lesscss-engine.jar")
         .addJarContaining(ScriptProcessor.class)
