@@ -61,7 +61,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrganizeColumnsForm extends AbstractForm {
+public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumnsForm {
 
   private static final Logger LOG = LoggerFactory.getLogger(OrganizeColumnsForm.class);
 
@@ -69,7 +69,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     DEFAULT, CUSTOM
   }
 
-  private final ITable m_table;
+  protected final ITable m_table;
 
   protected boolean m_loading;
 
@@ -762,7 +762,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               getMenuByClass(ModifyCustomColumnMenu.class).setVisible(m_table.getTableCustomizer() != null);
             }
 
-            private void refreshMenus() {
+            protected void refreshMenus() {
               ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
               IColumn selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow);
               if (selectedCol == null) {
@@ -1418,23 +1418,23 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   }
 
-  private void updateColumnVisibilityAndOrder() {
+  protected void updateColumnVisibilityAndOrder() {
     List<IColumn<?>> visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getCheckedRows());
     m_table.getColumnSet().setVisibleColumns(visibleColumns);
     ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
   }
 
-  private void setColumnVisible(ITableRow row, Boolean visible) {
+  protected void setColumnVisible(ITableRow row, Boolean visible) {
     getColumnsTableField().getTable().checkRow(row, visible);
 
     updateColumnVisibilityAndOrder();
   }
 
-  private void moveUp(ITableRow row) {
+  protected void moveUp(ITableRow row) {
     moveUp(row, row.getRowIndex() - 1);
   }
 
-  private void moveUp(ITableRow row, int targetIndex) {
+  protected void moveUp(ITableRow row, int targetIndex) {
     if (row != null && targetIndex >= 0) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
@@ -1442,11 +1442,11 @@ public class OrganizeColumnsForm extends AbstractForm {
     updateColumnVisibilityAndOrder();
   }
 
-  private void moveDown(ITableRow row) {
+  protected void moveDown(ITableRow row) {
     moveDown(row, row.getRowIndex() + 1);
   }
 
-  private void moveDown(ITableRow row, int targetIndex) {
+  protected void moveDown(ITableRow row, int targetIndex) {
     if (row != null && targetIndex < getColumnsTableField().getTable().getRowCount()) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
@@ -1454,7 +1454,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     updateColumnVisibilityAndOrder();
   }
 
-  private void enableDisableMenus() {
+  protected void enableDisableMenus() {
     boolean isCustomColumnSelected = false;
     boolean isFilterActive = false;
     Table tableFieldTable = getColumnsTableField().getTable();
@@ -1529,6 +1529,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   }
 
+  @Override
   public void reload() {
     m_loading = true;
     try {

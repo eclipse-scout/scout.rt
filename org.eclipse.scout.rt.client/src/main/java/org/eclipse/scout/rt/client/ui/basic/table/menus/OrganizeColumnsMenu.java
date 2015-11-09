@@ -15,14 +15,16 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.basic.table.IOrganizeColumnsForm;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsFormProvider;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsForm> {
+public class OrganizeColumnsMenu extends AbstractFormToolButton<IOrganizeColumnsForm> {
   private final ITable m_table;
 
   public OrganizeColumnsMenu(ITable table) {
@@ -52,8 +54,8 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<OrganizeColumnsF
   }
 
   @Override
-  protected OrganizeColumnsForm createForm() {
-    return new OrganizeColumnsForm(m_table);
+  protected IOrganizeColumnsForm createForm() {
+    return BEANS.get(OrganizeColumnsFormProvider.class).createOrganizeColumnsForm(m_table);
   }
 
   @Override

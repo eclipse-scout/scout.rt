@@ -1733,6 +1733,9 @@ scout.Table.prototype.renderColumnBackgroundEffect = function(column) {
 };
 
 scout.Table.prototype._renderRowChecked = function(row) {
+  if (!this.checkable) {
+    return;
+  }
   if (!this.checkableColumn) {
     throw new Error('checkableColumn not set');
   }
