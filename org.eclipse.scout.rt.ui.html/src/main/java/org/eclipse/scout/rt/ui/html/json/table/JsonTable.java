@@ -650,7 +650,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
 
     IJsonAdapter<?> jsonField = attachAdapter(field);
-    LOG.debug("Created new field adapter for cell editing. Adapter: " + jsonField);
+    LOG.debug("Created new field adapter for cell editing. Adapter: {}", jsonField);
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "columnId", event.getData().getString(PROP_COLUMN_ID));
     putProperty(json, "rowId", event.getData().getString(PROP_ROW_ID));
@@ -944,7 +944,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         jsonFilters.put(jsonFilter.toJson());
       }
       else {
-        LOG.info("Filter is not valid, maybe column is invisible. " + jsonFilter);
+        LOG.info("Filter is not valid, maybe column is invisible. {}", jsonFilter);
       }
     }
     return jsonFilters;

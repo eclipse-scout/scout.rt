@@ -379,7 +379,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
             }
           }
           catch (RuntimeException e) {
-            LOG.warn(null, e);
+            LOG.warn("Exception while selecting first page in outline [{}]", getClass().getName(), e);
           }
         }
       }

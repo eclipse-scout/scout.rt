@@ -135,7 +135,7 @@ public class UiServlet extends HttpServlet {
           }
         }
         // No handler was able to handle the request
-        LOG.info("404_NOT_FOUND_POST: " + req.getPathInfo());
+        LOG.info("404_NOT_FOUND_POST: {}", req.getPathInfo());
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
       catch (Exception t) {
@@ -144,7 +144,7 @@ public class UiServlet extends HttpServlet {
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("request completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
         }
       }
     }

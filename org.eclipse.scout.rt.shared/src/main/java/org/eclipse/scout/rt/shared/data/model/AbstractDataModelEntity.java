@@ -252,14 +252,14 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       interceptInitEntity();
     }
     catch (RuntimeException ex) {
-      LOG.error("entity " + this, ex);
+      LOG.error("entity {}", this, ex);
     }
     for (IDataModelAttribute a : getAttributes()) {
       try {
         a.initAttribute();
       }
       catch (RuntimeException ex) {
-        LOG.error("attribute " + this + "/" + a, ex);
+        LOG.error("attribute {}/{}", this, a, ex);
       }
     }
     m_initialized = true;
@@ -268,7 +268,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
         e.initEntity();
       }
       catch (RuntimeException ex) {
-        LOG.error("entity " + this + "/" + e, ex);
+        LOG.error("entity {}/{}", this, e, ex);
       }
     }
   }

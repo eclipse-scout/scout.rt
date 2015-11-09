@@ -44,7 +44,7 @@ public class PasswordPolicyVerifier {
   public boolean verify(String userId, int warnInAdvanceDays) {
     IPasswordManagementService service = BEANS.get(IPasswordManagementService.class);
     if (service == null) {
-      LOG.error("missing client service proxy for " + IPasswordManagementService.class.getName() + "; check plugin extensions");
+      LOG.error("missing client service proxy for {}. Check registered beans.", IPasswordManagementService.class.getName());
       return false;
     }
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();

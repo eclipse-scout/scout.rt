@@ -31,22 +31,22 @@ public class MultiSessionCookieStoreInstaller {
     CookieHandler cookieHandler = CookieHandler.getDefault();
     // Install MultiSessionCookieStore
     if (cookieHandler != null) {
-      LOG.warn("Overriding pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
+      LOG.warn("Overriding pre-installed cookie handler: {}", cookieHandlerToString(cookieHandler));
     }
     m_oldCookieHandler = cookieHandler;
     m_newCookieHandler = new CookieManager(new MultiSessionCookieStore(), CookiePolicy.ACCEPT_ALL);
     CookieHandler.setDefault(m_newCookieHandler);
-    LOG.info("Successfully installed " + cookieHandlerToString(m_newCookieHandler));
+    LOG.info("Successfully installed {}", cookieHandlerToString(m_newCookieHandler));
   }
 
   public void uninstall() {
     if (m_newCookieHandler != null) {
       if (CookieHandler.getDefault() == m_newCookieHandler) {
         CookieHandler.setDefault(m_oldCookieHandler);
-        LOG.info("Successfully uninstalled " + cookieHandlerToString(m_newCookieHandler));
+        LOG.info("Successfully uninstalled {}", cookieHandlerToString(m_newCookieHandler));
       }
       else {
-        LOG.warn("Could not uninstall " + cookieHandlerToString(m_newCookieHandler) + ", because it was apparently replaced with " + cookieHandlerToString(CookieHandler.getDefault()));
+        LOG.warn("Could not uninstall {}, because it was apparently replaced with {}", cookieHandlerToString(m_newCookieHandler), cookieHandlerToString(CookieHandler.getDefault()));
       }
       m_newCookieHandler = null;
     }

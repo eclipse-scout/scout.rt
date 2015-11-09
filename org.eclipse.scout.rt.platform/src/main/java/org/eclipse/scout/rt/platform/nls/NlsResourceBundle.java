@@ -69,7 +69,7 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
           child = parent;
         }
         catch (IOException e) {
-          LOG.warn("Error loading nls resource URL '" + res.toExternalForm() + "'.", e);
+          LOG.warn("Error loading nls resource URL '{}'.", res.toExternalForm(), e);
         }
       }
     }

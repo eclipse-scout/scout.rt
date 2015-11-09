@@ -90,10 +90,10 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
     final QName operation = (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
 
     if (m_logDebug) {
-      LOG.debug("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", new Object[]{service, port, operation, direction, soapMessage});
+      LOG.debug("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", service, port, operation, direction, soapMessage);
     }
     else {
-      LOG.info("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", new Object[]{service, port, operation, direction, soapMessage});
+      LOG.info("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", service, port, operation, direction, soapMessage);
     }
   }
 

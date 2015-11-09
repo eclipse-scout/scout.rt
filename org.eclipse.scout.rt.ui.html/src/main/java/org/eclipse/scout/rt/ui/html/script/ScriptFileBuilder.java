@@ -109,7 +109,7 @@ public class ScriptFileBuilder {
       return m_scriptLocator.locateFile(requestPath, mat, isMinifyEnabled());
     }
     else {
-      LOG.warn("locate " + requestPath + ": does not match SCRIPT_URL_PATTERN " + SCRIPT_URL_PATTERN.pattern());
+      LOG.warn("locate {}: does not match SCRIPT_URL_PATTERN {}", requestPath, SCRIPT_URL_PATTERN.pattern());
       return null;
     }
   }
@@ -127,7 +127,7 @@ public class ScriptFileBuilder {
 
     URL url = m_resourceLocator.getScriptSource(fragmentPath);
     if (url == null) {
-      LOG.warn("locate fragment " + fragmentPath + ": does not exist");
+      LOG.warn("locate fragment {}: does not exist", fragmentPath);
       return null;
     }
     return new ScriptSource(fragmentPath, url, ScriptSource.NodeType.SRC_FRAGMENT);
@@ -174,7 +174,7 @@ public class ScriptFileBuilder {
             break;
           }
           default: {
-            LOG.warn("Unexpected " + NodeType.class.getSimpleName() + " " + includeScript.getNodeType() + " for " + includePath);
+            LOG.warn("Unexpected {} {} for {}", NodeType.class.getSimpleName(), includeScript.getNodeType(), includePath);
             break;
           }
         }
@@ -238,7 +238,7 @@ public class ScriptFileBuilder {
             break;
           }
           default: {
-            LOG.warn("Unexpected " + NodeType.class.getSimpleName() + " " + includeFragment.getNodeType() + " for " + includePath);
+            LOG.warn("Unexpected {} {} for {}", NodeType.class.getSimpleName(), includeFragment.getNodeType(), includePath);
             break;
           }
         }

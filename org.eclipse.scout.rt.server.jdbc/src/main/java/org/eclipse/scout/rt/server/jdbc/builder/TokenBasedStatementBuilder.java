@@ -241,7 +241,7 @@ public class TokenBasedStatementBuilder {
     //default
     String s = getTokenMapping(key);
     if (s == null && !hasTokenMapping(key)) {
-      LOG.warn("null FieldMapping for key " + key);
+      LOG.warn("null FieldMapping for key {}", key);
     }
     if (s != null && s.length() > 0 && !"1=1".equals(s)) {
       Object sValue = (args != null && args.length > 0 ? args[0] : null);
@@ -326,7 +326,7 @@ public class TokenBasedStatementBuilder {
   protected String buildEntityNode(EntityNodeToken eNode) {
     String stm = getTokenMapping(eNode.getTokenId());
     if (stm == null) {
-      LOG.warn("no token defined for entity " + eNode.getTokenId());
+      LOG.warn("no token defined for entity {}", eNode.getTokenId());
       return null;
     }
     // add children
@@ -358,7 +358,7 @@ public class TokenBasedStatementBuilder {
   protected String buildAttributeNode(final AttributeNodeToken aNode) {
     String baseStatement = getTokenMapping(aNode.getTokenId());
     if (baseStatement == null) {
-      LOG.warn("no token defined for attribute " + aNode.getTokenId());
+      LOG.warn("no token defined for attribute {}", aNode.getTokenId());
       return null;
     }
     final Object sValue = CollectionUtility.firstElement(aNode.getValues());

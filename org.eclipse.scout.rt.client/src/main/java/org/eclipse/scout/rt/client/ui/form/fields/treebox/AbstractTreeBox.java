@@ -340,7 +340,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
     }
     else {
-      LOG.warn("there is no inner class of type ITree in " + getClass().getName());
+      LOG.warn("there is no inner class of type ITree in {}", getClass().getName());
     }
     getTree().setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
 
@@ -565,7 +565,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       data = call.getDataByAll();
       data = filterLookupResult(call, data);
       if (data != null && data.size() > 1000) {
-        LOG.warn("TreeBox " + getClass().getSimpleName() + " has loadIncremental=false but produced more than 1000 rows; check if this is intended.");
+        LOG.warn("TreeBox {} has loadIncremental=false but produced more than 1000 rows; check if this is intended.", getClass().getSimpleName());
       }
       List<ITreeNode> subTree = getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);
       filterNewNodesRec(subTree, 0);
@@ -586,7 +586,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         resultIt.remove();
       }
       else if (row.getKey() == null) {
-        LOG.warn("The key of a lookup row may not be null. Row has been removed for tree box '" + getClass().getName() + "'.");
+        LOG.warn("The key of a lookup row may not be null. Row has been removed for tree box '{}'.", getClass().getName());
         resultIt.remove();
       }
     }
@@ -647,7 +647,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       if ((tree.isCheckable() && !tree.isMultiCheck()) || (!tree.isCheckable() && !tree.isMultiSelect())) {
         //only single value
         if (rawValue.size() > 1) {
-          LOG.warn(getClass().getName() + " only accepts a single value. Got " + rawValue.toString() + ". Using only first value.");
+          LOG.warn("{} only accepts a single value. Got {}. Using only first value.", getClass().getName(), rawValue);
           return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
         }
       }

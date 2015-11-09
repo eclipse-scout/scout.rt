@@ -156,7 +156,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
             interceptChangedValue();
           }
           catch (Exception ex) {
-            LOG.error("fire value change on " + e.getSource(), ex);
+            LOG.error("fire value change on {}", e.getSource(), ex);
           }
         }
       }
@@ -284,7 +284,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           loadListBoxData();
         }
         catch (Exception e) {
-          LOG.warn(null, e);
+          LOG.warn("Exception while loading list box data [{}]", getClass().getName(), e);
           // nop
         }
       }
@@ -374,7 +374,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           getTree().setNodeExpanded(getTree().getRootNode(), true);
         }
         catch (Exception e) {
-          LOG.warn(null, e);
+          LOG.warn("Exception while loading and expanding root node [{}]", getClass().getName(), e);
           // nop
         }
       }

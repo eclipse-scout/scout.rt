@@ -571,7 +571,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       execReleaseConnection(conn);
     }
     catch (Throwable e) {
-      LOG.error(null, e);
+      LOG.error("Could not release connection", e);
     }
   }
 
@@ -754,7 +754,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
             }
           }
           catch (ClassNotFoundException t) {
-            LOG.warn("Could not load class with lenient name '" + name + "'.");
+            LOG.warn("Could not load class with lenient name '{}'", name);
           }
         }
       }
@@ -771,7 +771,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         suffix = seg + suffix;
       }
     }
-    LOG.warn("Could not find class with lenient name '" + name + "'");
+    LOG.warn("Could not find class with lenient name '{}'", name);
     return null;
   }
 

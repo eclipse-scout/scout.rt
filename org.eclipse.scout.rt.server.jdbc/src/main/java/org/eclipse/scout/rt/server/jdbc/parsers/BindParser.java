@@ -87,7 +87,7 @@ public class BindParser {
     parseStatement();
     addTextTokenUntil(m_str.length());
     if (m_pos.getIndex() < m_str.length()) {
-      LOG.warn("statement not fully parsed (index " + m_pos.getIndex() + "): " + m_str);
+      LOG.warn("statement not fully parsed (index {}): {}", m_pos.getIndex(), m_str);
     }
     return new BindModel(m_tokenList.toArray(new IToken[m_tokenList.size()]));
   }
@@ -169,7 +169,7 @@ public class BindParser {
       while (parseTextChar()) {
       }
       if (!matches("'")) {
-        LOG.warn("expected ' at position " + m_pos.getIndex() + " of " + m_str);
+        LOG.warn("expected ' at position {} of {}", m_pos.getIndex(), m_str);
       }
       String text = m_str.substring(index + 1, m_pos.getIndex()).replaceAll("''", "'");
       return text;
@@ -522,7 +522,7 @@ public class BindParser {
     int len = m_str.length();
     int i0 = Math.min(m_pos.getIndex(), len - 1);
     int i1 = Math.min(i0 + 32, len);
-    LOG.trace("# " + s + " at:" + m_str.substring(i0, i1));
+    LOG.trace("# {} at:{}", s, m_str.substring(i0, i1));
   }
 
   private void addTextTokenUntil(int endIndex) {

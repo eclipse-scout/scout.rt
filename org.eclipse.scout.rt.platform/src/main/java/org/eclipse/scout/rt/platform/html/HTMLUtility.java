@@ -119,7 +119,7 @@ public final class HTMLUtility {
       kit.read(new StringReader(htmlText), doc, 0);
     }
     catch (Exception e) {
-      LOG.warn(null, e);
+      LOG.warn("Could not parse given html text", e);
       return null;
     }
     return doc;
@@ -530,9 +530,10 @@ public final class HTMLUtility {
             }
           }
           catch (MalformedURLException e) {
+            // NOP
           }
           catch (Exception e) {
-            LOG.warn(null, e);
+            LOG.warn("Unexpected exception", e);
           }
         }
       }

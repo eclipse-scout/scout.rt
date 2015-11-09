@@ -345,7 +345,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         resultIt.remove();
       }
       else if (row.getKey() == null) {
-        LOG.warn("The key of a lookup row may not be null. Row has been removed for radio button group '" + getClass().getName() + "'.");
+        LOG.warn("The key of a lookup row may not be null. Row has been removed for radio button group '{}'.", getClass().getName());
         resultIt.remove();
       }
     }

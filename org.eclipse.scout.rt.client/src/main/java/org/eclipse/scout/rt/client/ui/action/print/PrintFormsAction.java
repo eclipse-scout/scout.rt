@@ -122,7 +122,7 @@ public class PrintFormsAction extends AbstractAction {
       }
       catch (Exception t) {
         m_errorCount++;
-        LOG.error(c.getName(), t);
+        LOG.error("Could not print form '{}'", c.getName(), t);
       }
     }
   }

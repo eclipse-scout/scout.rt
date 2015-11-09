@@ -176,7 +176,7 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
 
     }
     catch (NamingException ne) {
-      LOG.error("Exception in getting user DN from LDAP: " + ne);
+      LOG.error("Exception in getting user DN from LDAP: ", ne);
       throw new SecurityException(ne.getMessage(), ne);
     }
     return userDN;

@@ -504,7 +504,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
         if (parentId != null) {
           parentCode = idToCodeMap.get(parentId);
           if (parentCode == null) {
-            LOG.warn("parent code for " + code + " not found: id=" + parentId);
+            LOG.warn("parent code for {} not found: id={}", code, parentId);
           }
         }
         codeToParentCodeMap.put(code, parentCode);

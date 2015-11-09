@@ -128,7 +128,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
       getSession().commit();
     }
     catch (JMSException ex) {
-      LOG.error("commit: " + getSession(), ex);
+      LOG.error("commit: {}", getSession(), ex);
     }
   }
 
@@ -138,7 +138,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
       getSession().rollback();
     }
     catch (JMSException ex) {
-      LOG.error("rollback: " + getSession(), ex);
+      LOG.error("rollback: {}", getSession(), ex);
     }
   }
 

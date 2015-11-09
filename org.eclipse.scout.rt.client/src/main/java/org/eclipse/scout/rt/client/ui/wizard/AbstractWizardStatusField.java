@@ -119,7 +119,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
             refreshStatus();
           }
           catch (RuntimeException e) {
-            LOG.warn(null, e);
+            LOG.warn("Could not refresh status", e);
           }
         }
       }
@@ -128,24 +128,19 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
 
   public void refreshStatus() {
     m_dirty = false;
-    try {
-      if (m_htmlProvider == null) {
-        m_htmlProvider = new DefaultWizardStatusHtmlProvider();
-        m_htmlProvider.initialize(this);
-      }
-      setValue(m_htmlProvider.createHtml(m_wizard));
-      // now scroll to the active step
-      int index = 1;
-      for (IWizardStep<?> step : m_wizard.getSteps()) {
-        if (step == m_wizard.getActiveStep()) {
-          setScrollToAnchor(STEP_ANCHOR_IDENTIFIER + index);
-          break;
-        }
-        index++;
-      }
+    if (m_htmlProvider == null) {
+      m_htmlProvider = new DefaultWizardStatusHtmlProvider();
+      m_htmlProvider.initialize(this);
     }
-    catch (Exception e) {
-      LOG.warn(null, e);
+    setValue(m_htmlProvider.createHtml(m_wizard));
+    // now scroll to the active step
+    int index = 1;
+    for (IWizardStep<?> step : m_wizard.getSteps()) {
+      if (step == m_wizard.getActiveStep()) {
+        setScrollToAnchor(STEP_ANCHOR_IDENTIFIER + index);
+        break;
+      }
+      index++;
     }
   }
 

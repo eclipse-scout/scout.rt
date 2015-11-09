@@ -67,9 +67,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    * Add a new event to the buffer
    */
   public void add(T event) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Adding '%1$s'", event));
-    }
+    LOG.debug("Adding '{}'", event);
     // Optimization: If the new event is completely identical to the last
     // inserted one, don't add it. This helps preventing large lists
     // of buffered events which are expensive to coalesce.
@@ -87,9 +85,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    */
   public List<T> consumeAndCoalesceEvents() {
     List<T> result = coalesce(consume());
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Consumed events from buffer '%1$s'", result));
-    }
+    LOG.debug("Consumed events from buffer '{}'", result);
     return result;
   }
 

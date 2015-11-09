@@ -335,7 +335,7 @@ public final class EntityContributionUtility {
     else {
       //check for remaining dirt
       if (entityPart.length() > 0) {
-        LOG.warn("entityPart " + entityPartWithTags + " contains content that is not wrapped in a tag: " + entityPart);
+        LOG.warn("entityPart {} contains content that is not wrapped in a tag: {}", entityPartWithTags, entityPart);
       }
     }
     return parentContrib;

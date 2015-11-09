@@ -140,7 +140,7 @@ public class PageFormManager {
       return;
     }
 
-    LOG.debug("Hiding page: " + page);
+    LOG.debug("Hiding page: {}", page);
     IPageForm pageForm = m_pageFormMap.get(page);
     if (pageForm != null) {
       getDesktop().hideForm(pageForm);
@@ -152,7 +152,7 @@ public class PageFormManager {
     if (pageForm != null) {
       return pageForm;
     }
-    LOG.debug("Showing page: " + page);
+    LOG.debug("Showing page: {}", page);
 
     String displayViewId = getLeftPageSlotViewId();
 
@@ -346,7 +346,7 @@ public class PageFormManager {
   }
 
   private void handleTreeNodeSelected(final ITreeNode deselctedNode, final ITreeNode selectedNode) {
-    LOG.debug("Tree node selected: " + selectedNode);
+    LOG.debug("Tree node selected: {}", selectedNode);
     if (selectedNode == null) {
       hidePageForms();
       return;

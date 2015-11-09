@@ -105,7 +105,7 @@ public final class BeanUtility {
       }
       catch (Exception e) {
         if (lenient) {
-          LOG.warn("property " + name + " with value " + value, e);
+          LOG.warn("Could not set property property '{}' to value '{}'", name, value, e);
         }
         else {
           throw new ProcessingException("property " + name + " with value " + value, e);
@@ -215,10 +215,7 @@ public final class BeanUtility {
         return ctor.newInstance(parameters);
       }
       catch (Throwable t) {
-        if (LOG.isInfoEnabled()) {
-          LOG.info("Exception while instantiating new object [class=" + c + ", parameterTypes=" + Arrays.toString(parameterTypes)
-              + ", parameters=" + Arrays.toString(parameters) + "]", t);
-        }
+        LOG.info("Exception while instantiating new object [class={}, parameterTypes={}, parameters={}]", c, parameterTypes, parameters, t);
         throw new ProcessingException("Exception while instantiating new object", t);
       }
     }

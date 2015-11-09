@@ -62,7 +62,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
           handlePageFormEvent(e, id);
         }
         catch (Exception t) {
-          LOG.warn("page form event " + e, t);
+          LOG.warn("could not handle page form event{}", e, t);
         }
       }
     }
@@ -81,7 +81,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
           handleTableFilterEvent(e, id);
         }
         catch (Exception t) {
-          LOG.warn("table filter event " + e, t);
+          LOG.warn("could not handle table filter event {}", e, t);
         }
       }
     }
@@ -203,7 +203,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
           b.append(prop.getReadMethod().invoke(page, new Object[0]));
         }
         catch (Exception e) {
-          LOG.error("Error reading property " + prop, e);
+          LOG.error("Error reading property {}", prop, e);
           // nop - ignore this property
         }
       }

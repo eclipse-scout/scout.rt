@@ -74,7 +74,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Order(230)
   @Deprecated
   protected void execHyperlinkAction(URL url, String path, boolean local) {
-    LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
+    LOG.info("execHyperlinkAction {} (in {})", url, getClass().getName());
   }
 
   /**
@@ -94,7 +94,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
         local = "local".equals(url.getHost());
       }
       catch (MalformedURLException e) {
-        LOG.error("", e);
+        LOG.error("Malformed URL '{}'", ref, e);
       }
     }
     execHyperlinkAction(url, ref, local);

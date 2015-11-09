@@ -211,7 +211,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         result.add((IGroupBox) field);
       }
       else {
-        LOG.warn("Tabboxes only allow instance of IGroupBox as inner fields. '" + field.getClass().getName() + "' is not instance of IGroupBox!");
+        LOG.warn("Tabboxes only allow instance of IGroupBox as inner fields. '{}' is not instance of IGroupBox!", field.getClass().getName());
       }
     }
     return result;

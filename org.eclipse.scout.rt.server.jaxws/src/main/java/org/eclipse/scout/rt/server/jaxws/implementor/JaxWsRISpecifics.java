@@ -59,7 +59,7 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
       ((Closeable) Proxy.getInvocationHandler(port)).close();
     }
     catch (final Throwable e) {
-      LOG.error(String.format("Failed to close Socket for: %s", operation), e);
+      LOG.error("Failed to close Socket for: {}", operation, e);
     }
   }
 }

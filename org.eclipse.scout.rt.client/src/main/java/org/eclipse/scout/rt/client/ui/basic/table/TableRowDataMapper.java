@@ -72,7 +72,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
         m_propertyDescriptorByColumn.put(column, rowDataPropertyDesc);
       }
       else {
-        LOG.warn("No column found for property [" + rowDataPropertyDesc.getBeanClass().getName() + "#" + rowDataPropertyDesc.getName() + "]");
+        LOG.warn("No column found for property [{}#{}]", rowDataPropertyDesc.getBeanClass().getName(), rowDataPropertyDesc.getName());
       }
     }
     // compute ignored columns
@@ -159,7 +159,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
         value = propertyDesc.getReadMethod().invoke(dto);
       }
       catch (Exception e) {
-        LOG.warn("Error reading row data property for column [" + column.getClass().getName() + "]", e);
+        LOG.warn("Error reading row data property for column [{}]", column.getClass().getName(), e);
       }
     }
     else {
@@ -182,7 +182,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
           propertyDesc.getWriteMethod().invoke(dto, value);
         }
         catch (Exception t) {
-          LOG.warn("Error writing row data property for column [" + column.getClass().getName() + "]", t);
+          LOG.warn("Error writing row data property for column [{}]", column.getClass().getName(), t);
         }
       }
       else {

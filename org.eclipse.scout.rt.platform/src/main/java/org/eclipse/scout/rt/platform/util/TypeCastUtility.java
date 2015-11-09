@@ -1901,7 +1901,7 @@ public final class TypeCastUtility {
     //
     final boolean debugEnabled = LOG.isDebugEnabled();
     if (debugEnabled) {
-      LOG.debug("queryClass=" + queryClass + ", genericsOwnerClass=" + genericsOwnerClass + ", genericsParameterIndex=" + genericsParameterIndex);
+      LOG.debug("queryClass={}, genericsOwnerClass={}, genericsParameterIndex={}", queryClass, genericsOwnerClass, genericsParameterIndex);
     }
     TypeDesc desc = new TypeDesc();
     HashSet<Type> loopDetector = new HashSet<Type>();
@@ -1934,7 +1934,7 @@ public final class TypeCastUtility {
         //stop class, set generics index
         desc.parameterizedTypeIndex = stopTypeGenericsParameterIndex;
         if (debugEnabled) {
-          LOG.debug("foundStopClass " + c + ", using generics index " + desc.parameterizedTypeIndex);
+          LOG.debug("foundStopClass {}, using generics index {}", c, desc.parameterizedTypeIndex);
         }
         return true;
       }
@@ -1968,7 +1968,7 @@ public final class TypeCastUtility {
       }
       if (foundStopClass) {
         if (debugEnabled) {
-          LOG.debug("visit " + VerboseUtility.dumpGenerics(c));
+          LOG.debug("visit {}", VerboseUtility.dumpGenerics(c));
         }
         if (desc.resolvedClazz == null) {
           //find the index of the typeParameter
@@ -1977,7 +1977,7 @@ public final class TypeCastUtility {
           for (int i = 0; i < vars.length; i++) {
             if (vars[i] == desc.typeVariable) {
               if (debugEnabled) {
-                LOG.debug(desc.typeVariable + " has index " + i);
+                LOG.debug("{} has index {}", desc.typeVariable, i);
               }
               desc.parameterizedTypeIndex = i;
               break;
@@ -2004,13 +2004,13 @@ public final class TypeCastUtility {
       }
       //found path to stopClass
       if (debugEnabled) {
-        LOG.debug("visit " + VerboseUtility.dumpGenerics(pt));
+        LOG.debug("visit {}", VerboseUtility.dumpGenerics(pt));
       }
       if (desc.resolvedClazz == null) {
         //find next type variable
         Type actualArg = pt.getActualTypeArguments()[desc.parameterizedTypeIndex];
         if (debugEnabled) {
-          LOG.debug("index " + desc.parameterizedTypeIndex + " matches to " + actualArg);
+          LOG.debug("index {} matches to {}", desc.parameterizedTypeIndex, actualArg);
         }
         while (actualArg instanceof GenericArrayType) {
           //it is something like <T[]>
@@ -2029,7 +2029,7 @@ public final class TypeCastUtility {
         }
         else {
           if (debugEnabled) {
-            LOG.debug("failed with " + actualArg);
+            LOG.debug("failed with {}", actualArg);
           }
           throw new IllegalArgumentException("expected ParameterizedType with actual argument of type Class or TypeVariable when encountered " + VerboseUtility.dumpGenerics(type));
         }

@@ -73,7 +73,7 @@ public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelCont
       getObjectSerializer().serialize(out, msg);
     }
     catch (NotSerializableException e) {
-      LOG.error("Error serializing data " + msg);
+      LOG.error("Error serializing data '{}'", msg);
       throw e;
     }
     finally {

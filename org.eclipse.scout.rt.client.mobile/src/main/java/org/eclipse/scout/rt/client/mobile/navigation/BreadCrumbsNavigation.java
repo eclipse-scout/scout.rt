@@ -93,8 +93,8 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     m_currentBreadCrumb = breadCrumbs.pop();
     m_currentBreadCrumb.activate();
 
-    LOG.debug("Stepped back to: " + m_currentBreadCrumb);
-    LOG.debug("Current bread crumbs way: " + toString());
+    LOG.debug("Stepped back to: {}", m_currentBreadCrumb);
+    LOG.debug("Current bread crumbs way: {}", toString());
 
     fireBreadCrumbsChanged();
   }
@@ -129,8 +129,8 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     while (m_currentBreadCrumb != breadCrumb);
 
     m_currentBreadCrumb.activate();
-    LOG.debug("Activated bread crumb: " + m_currentBreadCrumb);
-    LOG.debug("Current bread crumbs way: " + toString());
+    LOG.debug("Activated bread crumb: {}", m_currentBreadCrumb);
+    LOG.debug("Current bread crumbs way: {}", toString());
 
     fireBreadCrumbsChanged();
   }
@@ -194,7 +194,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     }
 
     if (m_currentBreadCrumb.belongsTo(form)) {
-      LOG.debug("Removing existing bread crumb: " + m_currentBreadCrumb);
+      LOG.debug("Removing existing bread crumb: {}", m_currentBreadCrumb);
 
       if (getBreadCrumbs().size() > 0) {
         m_currentBreadCrumb = getBreadCrumbs().pop();
@@ -203,7 +203,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
         m_currentBreadCrumb = null;
       }
 
-      LOG.debug("Current bread crumbs way: " + toString());
+      LOG.debug("Current bread crumbs way: {}", toString());
       fireBreadCrumbsChanged();
     }
     else {
@@ -211,12 +211,12 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       int pos = 0;
       for (IBreadCrumb breadCrumb : breadCrumbs) {
         if (breadCrumb.belongsTo(form)) {
-          LOG.debug("Removing existing bread crumb: " + breadCrumb);
+          LOG.debug("Removing existing bread crumb: {}", breadCrumb);
 
           getBreadCrumbs().remove(breadCrumb);
           mergeDuplicates(pos);
 
-          LOG.debug("Current bread crumbs way: " + toString());
+          LOG.debug("Current bread crumbs way: {}", toString());
           fireBreadCrumbsChanged();
           return;
         }
@@ -240,7 +240,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     IBreadCrumb successor = getBreadCrumbs().get(pos);
     if (predecessor.getForm() == successor.getForm()) {
       getBreadCrumbs().remove(successor);
-      LOG.debug("Removing duplicate bread crumb: " + successor);
+      LOG.debug("Removing duplicate bread crumb: {}", successor);
     }
   }
 
@@ -252,7 +252,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       }
 
       getBreadCrumbs().add(m_currentBreadCrumb);
-      LOG.debug("Added new bread crumb: " + m_currentBreadCrumb);
+      LOG.debug("Added new bread crumb: {}", m_currentBreadCrumb);
     }
 
     if (form instanceof IOutlineChooserForm) {
@@ -261,7 +261,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     else {
       m_currentBreadCrumb = new BreadCrumb(this, form);
     }
-    LOG.debug("Current bread crumbs way: " + toString());
+    LOG.debug("Current bread crumbs way: {}", toString());
     fireBreadCrumbsChanged();
   }
 

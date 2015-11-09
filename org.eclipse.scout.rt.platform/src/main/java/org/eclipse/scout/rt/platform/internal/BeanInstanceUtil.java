@@ -37,9 +37,7 @@ public final class BeanInstanceUtil {
       instance = initializeInstance(instance);
     }
     catch (Throwable t) {
-      if (LOG.isWarnEnabled()) {
-        LOG.warn(String.format("Cannot create new instance of '%s'.", beanClazz), t);
-      }
+      LOG.warn("Cannot create new instance of [{}].", beanClazz, t);
       if (t instanceof Error) {
         throw (Error) t;
       }
@@ -84,7 +82,7 @@ public final class BeanInstanceUtil {
         }
       }
       catch (Exception e) {
-        LOG.error(String.format("Could not call initialize method '%s' on '%s'.", method.getName(), instance.getClass()), e);
+        LOG.error("Could not call initialize method '{}' on '{}'.", method.getName(), instance.getClass(), e);
       }
     }
   }

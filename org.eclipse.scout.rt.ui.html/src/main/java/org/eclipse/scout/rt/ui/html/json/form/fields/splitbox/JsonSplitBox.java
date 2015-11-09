@@ -41,7 +41,7 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
       if (fields.size() > 1) {
         secondField = fields.get(1);
         if (fields.size() > 2) {
-          LOG.warn("Split box only supports two fields. " + (fields.size() - 2) + " surplus fields are ignored in " + model + ".");
+          LOG.warn("Split box only supports two fields. {} surplus fields are ignored in {}.", (fields.size() - 2), model);
         }
       }
     }

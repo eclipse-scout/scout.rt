@@ -103,7 +103,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
       syncCalendarToCalendarField();
     }
     else {
-      LOG.warn("there is no inner class of type ICalendar in " + getClass().getName());
+      LOG.warn("there is no inner class of type ICalendar in {}", getClass().getName());
     }
   }
 

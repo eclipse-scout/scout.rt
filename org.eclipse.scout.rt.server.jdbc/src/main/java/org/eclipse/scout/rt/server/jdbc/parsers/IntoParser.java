@@ -65,7 +65,7 @@ public class IntoParser {
     parseStatement();
     addTextUntil(m_str.length());
     if (m_pos.getIndex() < m_str.length()) {
-      LOG.warn("statement not fully parsed (index " + m_pos.getIndex() + "): " + m_str);
+      LOG.warn("statement not fully parsed (index {}): {}", m_pos.getIndex(), m_str);
     }
     return new IntoModel(m_filteredText.toString(), m_intoList.toArray(new ValueOutputToken[0]));
   }
@@ -122,7 +122,7 @@ public class IntoParser {
       while (parseTextChar()) {
       }
       if (!matches("'")) {
-        LOG.warn("expected ' at position " + m_pos.getIndex() + " of " + m_str);
+        LOG.warn("expected ' at position {} of {}", m_pos.getIndex(), m_str);
       }
       return true;
     }
@@ -314,7 +314,7 @@ public class IntoParser {
     int len = m_str.length();
     int i0 = Math.min(m_pos.getIndex(), len - 1);
     int i1 = Math.min(i0 + 32, len);
-    LOG.trace("# " + s + " at:" + m_str.substring(i0, i1));
+    LOG.trace("# {} at:{}", s, m_str.substring(i0, i1));
   }
 
   private void addTextUntil(int endIndex) {

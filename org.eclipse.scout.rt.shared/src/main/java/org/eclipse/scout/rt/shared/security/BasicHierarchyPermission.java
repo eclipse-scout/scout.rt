@@ -166,7 +166,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
             return true;
           }
           case LEVEL_UNDEFINED: {
-            LOG.warn("The level of a " + this.getClass().getSimpleName() + " in the permission collection should not have the level LEVEL_UNDEFINED");
+            LOG.warn("The level of a {} in the permission collection should not have the level LEVEL_UNDEFINED", getClass().getName());
             return false;
           }
           case LEVEL_NONE: {

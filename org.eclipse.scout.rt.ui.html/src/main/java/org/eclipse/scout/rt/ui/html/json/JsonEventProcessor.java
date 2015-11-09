@@ -41,7 +41,7 @@ public class JsonEventProcessor {
     final IJsonAdapter jsonAdapter = m_uiSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
       // FIXME AWE: (json-layer) schauen ob wir eine warning ans UI zurückgeben sollen
-      LOG.warn("No adapter found for ID " + event.getTarget());
+      LOG.warn("No adapter found for ID {}", event.getTarget());
       return;
     }
     try {
@@ -52,7 +52,7 @@ public class JsonEventProcessor {
       jsonAdapter.cleanUpEventFilters();
     }
     catch (RuntimeException e) {
-      LOG.error("Error while handling event '" + event.getType() + "' for adapter " + jsonAdapter, e);
+      LOG.error("Error while handling event '{}' for adapter {}", event.getType(), jsonAdapter, e);
       throw e;
     }
   }

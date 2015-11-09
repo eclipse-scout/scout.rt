@@ -121,7 +121,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
       try {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         SVGUtility.writeSVGDocument(doc, out, StandardCharsets.UTF_8.name());
-        LOG.trace(getClass().getName() + ".setSvgDocument\n" + new String(out.toByteArray(), StandardCharsets.UTF_8));
+        LOG.trace("{}.setSvgDocument\n{}", getClass().getName(), new String(out.toByteArray(), StandardCharsets.UTF_8));
       }
       catch (RuntimeException e) {
         //nop

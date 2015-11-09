@@ -275,7 +275,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       return new URI(url);
     }
     catch (URISyntaxException e) {
-      LOG.warn("Cannot read browser url: " + url, e);
+      LOG.warn("Cannot read browser url: {}", url, e);
       return null;
     }
   }
@@ -529,8 +529,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
           .toFilter(), true);
 
       LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
-          + "[session={}, user={}, jobs=(see next line)]\n{}",
-          new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
+          + "[session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningJobs);
     }
   }
 

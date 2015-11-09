@@ -37,7 +37,7 @@ public class DefaultUserAgentParser implements IUserAgentParser {
   public UserAgent parseIdentifier(String userAgent) {
     String[] tokens = StringUtility.tokenize(userAgent, DELIMITER.charAt(0));
     if (tokens.length != 3) {
-      LOG.warn("UserAgentIdentifier could not be parsed. Invalid number of tokens. UserAgent: " + userAgent);
+      LOG.warn("UserAgentIdentifier could not be parsed. Invalid number of tokens. UserAgent: {}", userAgent);
       return UserAgent.createDefault();
     }
 
@@ -49,7 +49,7 @@ public class DefaultUserAgentParser implements IUserAgentParser {
       return UserAgent.create(uiLayer, uiDeviceType, uiDeviceId);
     }
     catch (Exception t) {
-      LOG.warn("UserAgentIdentifier could not be parsed. Exception occured while parsing. UserAgent: " + userAgent, t);
+      LOG.warn("UserAgentIdentifier could not be parsed. Exception occured while parsing. UserAgent: {}", userAgent, t);
       return UserAgent.createDefault();
     }
   }
@@ -60,7 +60,7 @@ public class DefaultUserAgentParser implements IUserAgentParser {
     if (uiDeviceId.contains(DELIMITER)) {
       uiDeviceId = uiDeviceId.replaceAll(DELIMITER, "_");
 
-      LOG.warn("Character which is used as delimiter has been found in uiDeviceId. Replaced with '_'. Old uiDeviceId: " + userAgent.getUiDeviceId() + ". New uiDeviceId: " + uiDeviceId);
+      LOG.warn("Character which is used as delimiter has been found in uiDeviceId. Replaced with '_'. Old uiDeviceId: {}. New uiDeviceId: {}", userAgent.getUiDeviceId(), uiDeviceId);
       userAgent.setUiDeviceId(uiDeviceId);
     }
     return StringUtility.concatenateTokens(userAgent.getUiLayer().getIdentifier(), DELIMITER + "", userAgent.getUiDeviceType().getIdentifier(), DELIMITER + "", uiDeviceId);

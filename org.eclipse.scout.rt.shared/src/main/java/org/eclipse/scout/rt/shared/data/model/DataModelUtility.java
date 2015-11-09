@@ -70,10 +70,10 @@ public final class DataModelUtility {
     if (LOG.isInfoEnabled()) {
       EntityPath verify = externalIdToEntityPath(f, externalId);
       if (verify == null) {
-        LOG.info("entity externalId " + externalId + " resolves to null");
+        LOG.info("entity externalId {} resolves to null", externalId);
       }
       else if (!verify.equals(entityPath)) {
-        LOG.info("entity externalId " + externalId + " is not valid for " + entityPath);
+        LOG.info("entity externalId {} is not valid for {}", externalId, entityPath);
       }
     }
     return externalId;
@@ -81,7 +81,7 @@ public final class DataModelUtility {
 
   /**
    * Computes the given attribute's external id along the given path of entities.
-   * 
+   *
    * @return the external id (foo/bar/foo) for an attribute using {@link Class#getSimpleName()} and
    *         {@link IDataModelEntity#getMetaDataOfEntity()}, {@link IDataModelAttribute#getMetaDataOfAttribute()}
    * @since 3.8.0
@@ -102,10 +102,10 @@ public final class DataModelUtility {
     if (LOG.isInfoEnabled()) {
       AttributePath verify = externalIdToAttributePath(f, externalId);
       if (verify == null) {
-        LOG.info("attribute externalId " + externalId + " resolves to null");
+        LOG.info("attribute externalId {} resolves to null", externalId);
       }
       else if (!verify.equals(attributePath)) {
-        LOG.info("attribute externalId " + externalId + " is not valid for " + attributePath);
+        LOG.info("attribute externalId {} is not valid for {}", externalId, attributePath);
       }
     }
     return externalId;
@@ -113,7 +113,7 @@ public final class DataModelUtility {
 
   /**
    * Returns the path of entities starting by the root, which is described by the external ID.
-   * 
+   *
    * @param f
    *          the data model
    * @param externalId
@@ -142,7 +142,7 @@ public final class DataModelUtility {
 
   /**
    * Recursively resolves the path of entities described by the given external Id.
-   * 
+   *
    * @return the list of all entities starting from the root entity.
    * @param parentEntity
    *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
@@ -175,9 +175,7 @@ public final class DataModelUtility {
       e = findEntity(f.getEntities(), elemName, meta);
     }
     if (e == null) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info("entity externalId " + externalId + " resolves to null");
-      }
+      LOG.info("entity externalId {} resolves to null", externalId);
       return null;
     }
     return resolvedPath.addToEnd(e);
@@ -210,9 +208,7 @@ public final class DataModelUtility {
       a = findAttribute(f.getAttributes(), elemName, meta);
     }
     if (a == null) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info("attribute externalId " + externalId + " resolves to null");
-      }
+      LOG.info("attribute externalId {} resolves to null", externalId);
       return null;
     }
     return entityPath.addToEnd(a);
@@ -298,7 +294,7 @@ public final class DataModelUtility {
 
   /**
    * Sorts the given array of data model entities by their display names.
-   * 
+   *
    * @param array
    * @return Returns the the sorted array of entities.
    * @since 3.8.0
@@ -329,7 +325,7 @@ public final class DataModelUtility {
   /**
    * Sorts the given array of data model attributes by their display name. Those having
    * {@link IDataModelAttribute#getType()} == {@link DataModelConstants#TYPE_AGGREGATE_COUNT} are moved to the head.
-   * 
+   *
    * @param array
    * @return Returns the sorted array of attributes.
    * @since 3.8.0

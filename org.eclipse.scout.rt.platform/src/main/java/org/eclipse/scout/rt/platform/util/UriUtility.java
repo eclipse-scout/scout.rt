@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for creating, parsing and converting {@link URI}s and {@link URL}s.
- * 
+ *
  * @since 3.8.1
  */
 public final class UriUtility {
@@ -38,7 +38,7 @@ public final class UriUtility {
 
   /**
    * Parses the given URL's query string using encoding ISO-8859-1 and extracts the query parameter.
-   * 
+   *
    * @param uri
    * @return map with parsed query parameters. Never <code>null</code>.
    */
@@ -48,7 +48,7 @@ public final class UriUtility {
 
   /**
    * Parses the given URL's query string using the given encoding and extracts the query parameter.
-   * 
+   *
    * @param uri
    * @param encoding
    *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
@@ -63,7 +63,7 @@ public final class UriUtility {
 
   /**
    * Parses the given URI's query string using encoding ISO-8859-1 and extracts the query parameter.
-   * 
+   *
    * @param uri
    * @return map with parsed query parameters. Never <code>null</code>.
    */
@@ -73,7 +73,7 @@ public final class UriUtility {
 
   /**
    * Parses the given URI's query string using the given encoding and extracts the query parameter.
-   * 
+   *
    * @param uri
    * @param encoding
    *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
@@ -98,7 +98,7 @@ public final class UriUtility {
         String value = URLDecoder.decode(parts[1], encoding);
         String existingMapping = result.put(key, value);
         if (existingMapping != null) {
-          LOG.warn("parameter key is used multiple times [key='" + key + "', oldValue='" + existingMapping + "', newValue='" + value + "'");
+          LOG.warn("parameter key is used multiple times [key='{}', oldValue='{}', newValue='{}'", key, existingMapping, value);
         }
       }
       catch (UnsupportedEncodingException e) {
@@ -110,7 +110,7 @@ public final class UriUtility {
 
   /**
    * Splits the path of the given {@link URI} in its elements.
-   * 
+   *
    * @param uri
    * @return the path elements or an empty string array if the uri or its path is <code>null</code>.
    */
@@ -127,7 +127,7 @@ public final class UriUtility {
 
   /**
    * Converts the given URL into an URI.
-   * 
+   *
    * @param url
    * @return <code>null</code> if the given url is <code>null</code>.
    */
@@ -145,7 +145,7 @@ public final class UriUtility {
 
   /**
    * Converts the given URI into an URL.
-   * 
+   *
    * @param uri
    * @return <code>null</code> if the given uri is <code>null</code>.
    */
@@ -163,7 +163,7 @@ public final class UriUtility {
 
   /**
    * Parses the given string into an {@link URI}.
-   * 
+   *
    * @param uri
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URI} instance.
    */
@@ -181,7 +181,7 @@ public final class UriUtility {
 
   /**
    * Parses the given string into an {@link URL}.
-   * 
+   *
    * @param url
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URL} instance.
    */

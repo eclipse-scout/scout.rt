@@ -175,7 +175,7 @@ public final class FormUtility {
         field.disposeField();
       }
       catch (Exception t) {
-        LOG.warn("dispose on " + field, t);
+        LOG.warn("Could not dispose field '{}'", field, t);
         // nop
       }
       return true;

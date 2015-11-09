@@ -197,7 +197,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     for (Resource<?> resource : resources) {
       // Can't use NewResourceId Provider because properties come before toJson and already create an id
       Object jsonResource = resourceToJson(resource, new P_GetOrCreateResourceIdProvider(), new P_GetOrCreateCellIdProvider());
-      LOG.debug("Id: " + getId() + ". Resources: " + jsonResource.toString());
+      LOG.debug("Id: {}. Resources: {}", getId(), jsonResource);
       jsonResources.put(jsonResource);
     }
     json.put("resources", jsonResources);
@@ -432,7 +432,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
     addPropertyEventFilterCondition(IPlanner.PROP_SELECTION_RANGE, selectionRange);
     getModel().getUIFacade().setSelectionFromUI(resources, selectionRange);
-    LOG.debug("selectionRange=" + selectionRange);
+    LOG.debug("selectionRange={}", selectionRange);
   }
 
   private Range<Date> extractSelectionRange(JSONObject data) {

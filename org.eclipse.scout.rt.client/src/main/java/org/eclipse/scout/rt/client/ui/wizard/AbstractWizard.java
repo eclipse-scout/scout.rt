@@ -300,7 +300,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Order(230)
   @Deprecated
   protected void execHyperlinkAction(URL url, String path, boolean local) {
-    LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
+    LOG.info("execHyperlinkAction {} (in {})", url, getClass().getName());
   }
 
   /**
@@ -320,7 +320,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         local = "local".equals(url.getHost());
       }
       catch (MalformedURLException e) {
-        LOG.error("", e);
+        LOG.error("Malformed URL '{}'", ref, e);
       }
     }
     execHyperlinkAction(url, ref, local);
@@ -388,7 +388,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
               interceptAnyFieldChanged((IFormField) e.getSource());
             }
             catch (RuntimeException t) {
-              LOG.error("" + e.getSource() + " " + e.getPropertyName() + "=" + e.getNewValue(), t);
+              LOG.error("{} {}={}", e.getSource(), e.getPropertyName(), e.getNewValue(), t);
             }
           }
         };
@@ -930,7 +930,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       }
       catch (RuntimeException e) {
         // TODO ABR Check if logging is the correct here
-        LOG.error("Unexpected error while closing form: " + m_containerForm, e);
+        LOG.error("Unexpected error while closing form: {}", m_containerForm, e);
       }
       // dispose all steps
       HashSet<IWizardStep<? extends IForm>> set = new HashSet<IWizardStep<? extends IForm>>();
@@ -942,7 +942,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
         catch (RuntimeException t) {
           // TODO ABR Check if logging is the correct here
-          LOG.error("Unexpected error while disposing step: " + step, t);
+          LOG.error("Unexpected error while disposing step: {}", step, t);
         }
       }
       if (getCloseType() == CloseType.Unknown) {

@@ -51,7 +51,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
   protected void registerTunnelToServerProxies(final IBeanManager beanManager, final IClassInventory classInventory) {
     for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(TunnelToServer.class)) {
       if (!ci.isInterface() || !ci.isPublic()) {
-        LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on public interfaces, not on " + ci.name());
+        LOG.error("The annotation @{} can only be used on public interfaces, not on {}", TunnelToServer.class.getSimpleName(), ci.name());
         continue;
       }
 
@@ -60,7 +60,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
         registerTunnelToServerProxy(beanManager, c);
       }
       catch (Exception e) {
-        LOG.warn("loading class", e);
+        LOG.warn("could not load class [{}]", ci.name(), e);
       }
     }
   }

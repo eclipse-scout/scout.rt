@@ -54,7 +54,7 @@ public class ActivateBookmarkMenu extends AbstractMenu {
         ClientSessionProvider.currentSession().getDesktop().activateBookmark(m_bookmark);
       }
       catch (Exception t) {
-        LOG.error(null, t);
+        LOG.error("Could not activate bookmark {}", m_bookmark, t);
       }
     }
   }

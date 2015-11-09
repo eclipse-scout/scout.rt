@@ -77,7 +77,7 @@ public class BinaryResourceUrlUtility {
     if (iconSpec != null) {
       return "icon/" + iconSpec.getName(); // includes file extension
     }
-    LOG.warn("iconId '" + iconId + "' could not be resolved");
+    LOG.warn("iconId '{}' could not be resolved", iconId);
     return null; // may happen, when no icon is available for the requested iconName
   }
 
@@ -108,7 +108,7 @@ public class BinaryResourceUrlUtility {
       return null;
     }
     if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
-      LOG.warn("adapter " + jsonAdapter + " is not implementing " + IBinaryResourceProvider.class);
+      LOG.warn("adapter {} is not implementing {}", jsonAdapter, IBinaryResourceProvider.class.getName());
       return null;
     }
     if (filename == null) {

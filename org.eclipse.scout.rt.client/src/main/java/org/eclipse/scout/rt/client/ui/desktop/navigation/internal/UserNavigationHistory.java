@@ -114,7 +114,7 @@ public class UserNavigationHistory {
     if (bm != null) {
       bookmarkTitle = bm.getText();
     }
-    LOG.warn("Exception occured while adding step to navigation history for bookmark: " + bookmarkTitle, t);
+    LOG.warn("Exception occured while adding step to navigation history for bookmark: {}", bookmarkTitle, t);
     return null;
   }
 
@@ -405,7 +405,7 @@ public class UserNavigationHistory {
         newList.add(m);
       }
       catch (RuntimeException e) {
-        LOG.error("could not initialize menu for bookmark '" + b + "'.", e);
+        LOG.error("could not initialize menu for bookmark '{}'.", b, e);
       }
     }
     return newList;

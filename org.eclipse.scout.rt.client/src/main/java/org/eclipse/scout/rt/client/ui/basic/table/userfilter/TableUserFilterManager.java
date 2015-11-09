@@ -42,7 +42,7 @@ public class TableUserFilterManager {
   public void addFilter(IUserFilterState filter) {
     m_filterMap.put(filter.createKey(), filter);
     fireFilterAdded(filter);
-    LOG.info("Filter added " + filter);
+    LOG.info("Filter added {}", filter);
   }
 
   public void removeFilter(IUserFilterState filter) {
@@ -52,7 +52,7 @@ public class TableUserFilterManager {
   public void removeFilterByKey(Object key) {
     IUserFilterState filter = m_filterMap.remove(key);
     fireFilterRemoved(filter);
-    LOG.info("Filter removed " + filter);
+    LOG.info("Filter removed {}", filter);
   }
 
   public void reset() {

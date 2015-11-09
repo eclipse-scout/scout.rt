@@ -478,7 +478,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       interceptDecorateCell(m_cell);
     }
     catch (Exception t) {
-      LOG.error("node " + getClass() + " " + getCell().getText(), t);
+      LOG.error("node {} {}", getClass(), getCell().getText(), t);
     }
   }
 
@@ -983,7 +983,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
         node.nodeAddedNotify();
       }
       catch (Exception t) {
-        LOG.error("", t);
+        LOG.error("Could not notify node added {}", node, t);
       }
       // access control after adding the page. The add triggers the
       // page.initPage() which eventually
@@ -1005,7 +1005,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
           postProcessAddRec(ch, includeSubtree);
         }
         else {
-          LOG.warn("The node " + node + " is child of itself!");
+          LOG.warn("The node {} is child of itself!", node);
         }
       }
     }

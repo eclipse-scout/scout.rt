@@ -277,7 +277,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
 
     getModel().getUIFacade().setSelectionFromUI(selectedDate, selectedComponent);
-    LOG.debug("date=" + selectedDate + " componentId=" + componentId);
+    LOG.debug("date={} componentId={}", selectedDate, componentId);
   }
 
   protected void handleUiModelChanged(JsonEvent event) {
@@ -296,7 +296,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
     uiFacade.setSelectedDateFromUI(selectedDate);
 
-    LOG.debug("displayMode=" + displayMode + " viewRange=" + viewRange + " selectedDate=" + selectedDate);
+    LOG.debug("displayMode={} viewRange={} selectedDate=", displayMode, viewRange, selectedDate);
   }
 
   /**
@@ -306,7 +306,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     Range<Date> viewRange = extractViewRange(event.getData());
     addPropertyEventFilterCondition(ICalendar.PROP_VIEW_RANGE, viewRange);
     getModel().getUIFacade().setViewRangeFromUI(viewRange);
-    LOG.debug("viewRange=" + viewRange);
+    LOG.debug("viewRange={}", viewRange);
   }
 
   private Range<Date> extractViewRange(JSONObject data) {

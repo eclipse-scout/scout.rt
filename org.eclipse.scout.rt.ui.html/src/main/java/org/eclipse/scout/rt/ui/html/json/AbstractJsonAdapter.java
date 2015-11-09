@@ -307,11 +307,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   protected final void addActionEvent(String eventName, IJsonAdapter referenceAdapter, JSONObject eventData) {
     if (referenceAdapter == null) {
       getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
-      LOG.debug("Added action event '" + eventName + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
+      LOG.debug("Added action event '{}' for {} with id {}. Model: {}", eventName, getObjectType(), getId(), getModel());
     }
     else {
       getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, referenceAdapter.getId(), eventData);
-      LOG.debug("Added action event '" + eventName + "' for " + getObjectType() + " with id " + getId() + " and reference " + referenceAdapter.getId() + ". Model: " + getModel());
+      LOG.debug("Added action event '{}' for {} with id {} and reference {}. Model: {}", eventName, getObjectType(), getId(), referenceAdapter.getId(), getModel());
     }
   }
 

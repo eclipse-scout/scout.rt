@@ -93,7 +93,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
     finally {
       if (LOG.isDebugEnabled()) {
         final long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tStart);
-        LOG.debug("TIME {}.{} {}ms {} bytes", new Object[]{m_serviceRequest.getServiceInterfaceClassName(), m_serviceRequest.getOperation(), elapsedMillis, nBytes});
+        LOG.debug("TIME {}.{} {}ms {} bytes", m_serviceRequest.getServiceInterfaceClassName(), m_serviceRequest.getOperation(), elapsedMillis, nBytes);
       }
     }
   }
@@ -123,7 +123,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       return true;
     }
     catch (final Exception e) {
-      LOG.warn(String.format("Failed to cancel server processing [requestSequence=%s]", requestSequence), e);
+      LOG.warn("Failed to cancel server processing [requestSequence={}]", requestSequence, e);
       return false;
     }
   }

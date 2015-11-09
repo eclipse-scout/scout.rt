@@ -66,7 +66,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     if (!matcher.matches()) {
       return false;
     }
-    
+
     final String uiSessionId = matcher.group(1);
     final String targetAdapterId = matcher.group(2);
 
@@ -132,7 +132,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       uiSession.uiSessionLock().unlock();
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+      LOG.debug("completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
     }
   }
 

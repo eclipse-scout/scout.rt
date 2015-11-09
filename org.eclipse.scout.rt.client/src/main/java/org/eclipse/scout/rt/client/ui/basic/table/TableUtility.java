@@ -98,7 +98,7 @@ public final class TableUtility {
         if (fields != null && fields.length > 0) {
           for (int i = 0; i < fields.length; i++) {
             if ((fields[i].getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
-              LOG.warn("" + clazz + " subclasses LocalLookupCall with additional member " + fields[i].getName() + " and should therefore override the 'equals' and 'hashCode' methods");
+              LOG.warn("{} subclasses LocalLookupCall with additional member {} and should therefore override the 'equals' and 'hashCode' methods", clazz, fields[i].getName());
               return false;
             }
           }
@@ -118,7 +118,7 @@ public final class TableUtility {
         if (fields != null && fields.length > 0) {
           for (int i = 0; i < fields.length; i++) {
             if ((fields[i].getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
-              LOG.warn("" + clazz + " subclasses LookupCall with additional member " + fields[i].getName() + " and should therefore override the 'equals' and 'hashCode' methods");
+              LOG.warn("{} subclasses LookupCall with additional member {} and should therefore override the 'equals' and 'hashCode' methods", clazz, fields[i].getName());
               return false;
             }
           }

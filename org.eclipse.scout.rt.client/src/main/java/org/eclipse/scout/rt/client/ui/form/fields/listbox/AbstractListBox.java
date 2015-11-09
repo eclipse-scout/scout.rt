@@ -321,7 +321,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       m_table.setEnabled(isEnabled());
     }
     else {
-      LOG.warn("there is no inner class of type ITable in " + getClass().getName());
+      LOG.warn("there is no inner class of type ITable in {}", getClass().getName());
     }
 
     // lookup call
@@ -539,7 +539,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         resultIt.remove();
       }
       else if (row.getKey() == null) {
-        LOG.warn("The key of a lookup row may not be null. Row has been removed for list box '" + getClass().getName() + "'.");
+        LOG.warn("The key of a lookup row may not be null. Row has been removed for list box '{}'.", getClass().getName());
         resultIt.remove();
       }
     }
@@ -625,7 +625,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       if ((table.isCheckable() && !table.isMultiCheck()) || (!table.isCheckable() && !table.isMultiSelect())) {
         //only single value
         if (rawValue.size() > 1) {
-          LOG.warn(getClass().getName() + " only accepts a single value. Got " + CollectionUtility.format(rawValue) + ". Using only first value.");
+          LOG.warn("{} only accepts a single value. Got {}. Using only first value.", getClass().getName(), rawValue);
           return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
         }
       }

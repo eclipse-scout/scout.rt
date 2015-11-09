@@ -370,7 +370,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         table = (T) ConfigurationUtility.newInnerInstance(this, tableClass);
       }
       else {
-        LOG.warn("there is no inner class of type ITable in " + getClass().getName());
+        LOG.warn("there is no inner class of type ITable in {}", getClass().getName());
       }
     }
     if (table != null) {
@@ -559,7 +559,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
     }
     catch (RuntimeException t) {
-      LOG.error("pageCreated " + getClass().getSimpleName(), t);
+      LOG.error("pageCreated {}", getClass().getName(), t);
     }
   }
 

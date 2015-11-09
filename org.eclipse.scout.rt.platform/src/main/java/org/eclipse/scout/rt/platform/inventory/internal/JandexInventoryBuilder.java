@@ -78,15 +78,11 @@ public class JandexInventoryBuilder {
       try (InputStream in = new BufferedInputStream(indexUri.toURL().openStream())) {
         Index index = new IndexReader(in).read();
         m_indexList.add(index);
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("found pre-built " + indexUri);
-        }
+        LOG.debug("found pre-built {}", indexUri);
         return;
       }
       catch (FileNotFoundException e) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("No pre-built index found: " + indexUri, e);
-        }
+        LOG.debug("No pre-built index found: {}", indexUri, e);
       }
       catch (Exception ex) {
         throw new PlatformException("error reading index: " + indexUri, ex);
@@ -95,10 +91,10 @@ public class JandexInventoryBuilder {
 
     //scan location
     if (m_forceRebuildFolderIndexes) {
-      LOG.info("forcing rebuild of index " + indexUri + "; scanning location...");
+      LOG.info("forcing rebuild of index '{}'. scanning location...", indexUri);
     }
     else {
-      LOG.info("found no pre-built " + indexUri + "; scanning location...");
+      LOG.info("found no pre-built '{}'. scanning location...", indexUri);
     }
     try {
       if (urlText.startsWith("jar:file:")) {
@@ -127,13 +123,11 @@ public class JandexInventoryBuilder {
 
   protected void saveIndexFile(File file, Index index) {
     try (FileOutputStream out = new FileOutputStream(file)) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("writing jandex index file: " + file);
-      }
+      LOG.debug("writing jandex index file: {}", file);
       new IndexWriter(out).write(index);
     }
     catch (Exception ex) {
-      LOG.warn("Cannot write jandex index file: " + file, ex);
+      LOG.warn("Cannot write jandex index file: {}", file, ex);
     }
   }
 

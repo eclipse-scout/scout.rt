@@ -81,7 +81,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
             job.setInterrupted(true);
           }
           catch (RuntimeException t) {
-            LOG.error("Could not stop scheduler" + job, t);
+            LOG.error("Could not stop scheduler {}", job, t);
           }
         }
       }
@@ -282,10 +282,8 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
     try {
       if (m_runningJobs.contains(job)) {
         // still running
-        if (LOG.isInfoEnabled()) {
-          if (job.acceptTick(tick)) {
-            LOG.info("job " + job + " is still running at " + tick);
-          }
+        if (LOG.isInfoEnabled() && job.acceptTick(tick)) {
+          LOG.info("job {} is still running at {}", job, tick);
         }
       }
       else {
@@ -295,9 +293,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
         }
         else if (job.acceptTick(tick)) {
           m_runningJobs.add(job);
-          if (LOG.isInfoEnabled()) {
-            LOG.info("job " + job + " triggered at " + tick);
-          }
+          LOG.info("job {} triggered at {}", job, tick);
           P_JobRunner runner = new P_JobRunner(job, tick);
           Thread t = new Thread(runner, "Scheduler.JobLauncher." + job.getGroupId() + "." + job.getJobId());
           t.setDaemon(true);
@@ -306,7 +302,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
       }
     }
     catch (RuntimeException t) {
-      LOG.error("" + job, t);
+      LOG.error("Unexpected exception while visiting job {}", job, t);
     }
   }
 
@@ -360,21 +356,15 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
 
     @Override
     public void run() {
-      if (LOG.isInfoEnabled()) {
-        LOG.info("scheduler started");
-      }
+      LOG.info("scheduler started");
       TickSignal signal = m_ticker.waitForNextTick();
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("tick " + signal);
-      }
+      LOG.debug("tick {}", signal);
       while (!isStopSignal()) {
         try {
           if (isActive()) {
             visitAllJobs(signal);
             signal = m_ticker.waitForNextTick();
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("tick " + signal);
-            }
+            LOG.debug("tick {}", signal);
           }
           else {
             if (LOG.isDebugEnabled()) {

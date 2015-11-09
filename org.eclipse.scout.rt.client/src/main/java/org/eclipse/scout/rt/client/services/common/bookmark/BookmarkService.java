@@ -164,7 +164,7 @@ public class BookmarkService implements IBookmarkService {
         ClientSessionProvider.currentSession().getDesktop().activateBookmark(b);
       }
       catch (Exception t) {
-        LOG.error(null, t);
+        LOG.error("Could not activate bookmark", t);
       }
     }
   }

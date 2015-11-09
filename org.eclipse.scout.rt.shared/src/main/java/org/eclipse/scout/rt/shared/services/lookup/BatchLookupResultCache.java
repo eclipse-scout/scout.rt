@@ -164,7 +164,8 @@ public class BatchLookupResultCache {
         }
         catch (Exception ex) {
           //not found
-          LOG.warn("" + clazz + " subclasses LookupCall with an additional member field '" + t.getSimpleName() + "." + f.getName() + "' and should therefore override the 'boolean equals(Object obj)' and 'int hashCode()' methods");
+          LOG.warn("{} subclasses LookupCall with an additional member field '{}.{}' and should therefore override the 'boolean equals(Object obj)' and 'int hashCode()' methods",
+              clazz, t.getSimpleName(), f.getName());
           return false;
         }
       }

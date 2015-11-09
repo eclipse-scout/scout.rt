@@ -1460,7 +1460,7 @@ public class StatementProcessor implements IStatementProcessor {
       t.setReplaceToken(sqlStyle.getNvlToken());
     }
     else {
-      LOG.warn("used unknown database specific token " + t.getParsedToken());
+      LOG.warn("used unknown database specific token {}", t.getParsedToken());
       t.setReplaceToken(name);
     }
   }

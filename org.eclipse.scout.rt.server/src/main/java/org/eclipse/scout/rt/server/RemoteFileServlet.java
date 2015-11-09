@@ -126,7 +126,7 @@ public class RemoteFileServlet extends HttpServlet {
         // ignore it
       }
       else {
-        LOG.warn("Failed to get remotefile " + pathInfo + ".", ex);
+        LOG.warn("Failed to get remotefile {}.", pathInfo, ex);
         // cannot sendError(..) here, since OutputStream maybe is already
         // committed.
         res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

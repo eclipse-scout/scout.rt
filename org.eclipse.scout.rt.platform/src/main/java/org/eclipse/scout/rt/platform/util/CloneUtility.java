@@ -53,7 +53,7 @@ public final class CloneUtility {
     catch (ClassNotFoundException e) {
       // 2. use fall back implementation if the object to be copied references classes that are not visible to the optimized class loader
       if (LOG.isDebugEnabled()) {
-        LOG.debug(ClassNotFoundException.class.getSimpleName() + " occurred while creating a deep copy using " + SerializationUtility.class.getSimpleName() + ". Using fallback strategy.", e);
+        LOG.debug("{} occurred while creating a deep copy using {}. Using fallback strategy.", ClassNotFoundException.class.getSimpleName(), SerializationUtility.class.getSimpleName(), e);
       }
       return fallBackCreateDeepCopyBySerializing(obj);
     }

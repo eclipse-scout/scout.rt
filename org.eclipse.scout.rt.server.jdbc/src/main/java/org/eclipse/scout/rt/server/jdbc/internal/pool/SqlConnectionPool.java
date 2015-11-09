@@ -99,9 +99,7 @@ public final class SqlConnectionPool {
             // create new connection
             PoolEntry test = new PoolEntry();
             test.conn = new SqlConnectionBuilder().createJdbcConnection(service);
-            if (LOG.isInfoEnabled()) {
-              LOG.info("created jdbc connection " + test.conn);
-            }
+            LOG.info("created jdbc connection {}", test.conn);
             service.callbackAfterConnectionCreated(test.conn);
             test.createTime = System.currentTimeMillis();
             m_idleEntries.add(test);
@@ -125,7 +123,7 @@ public final class SqlConnectionPool {
           catch (Throwable t) {
             // remove candidate from idle pool and close it
             m_idleEntries.remove(candidate);
-            LOG.warn("closing dirty connection: " + candidate.conn);
+            LOG.warn("closing dirty connection: {}", candidate.conn);
             try {
               candidate.conn.close();
             }
@@ -140,17 +138,13 @@ public final class SqlConnectionPool {
       candidate.leaseBegin = System.currentTimeMillis();
       candidate.leaseCount++;
       m_busyEntries.add(candidate);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("lease   " + candidate.conn);
-      }
+      LOG.debug("lease   {}", candidate.conn);
       return candidate.conn;
     }
   }
 
   public void releaseConnection(Connection conn) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("release " + conn);
-    }
+    LOG.debug("release {}", conn);
     synchronized (m_poolLock) {
       PoolEntry candidate = null;
       for (Iterator it = m_busyEntries.iterator(); it.hasNext();) {
@@ -199,7 +193,7 @@ public final class SqlConnectionPool {
         m_idleEntries.add(candidate);
       }
       else {
-        LOG.warn("closing dirty connection: " + conn);
+        LOG.warn("closing dirty connection: {}", conn);
         try {
           conn.close();
         }
@@ -263,7 +257,7 @@ public final class SqlConnectionPool {
       }
     }
     catch (Throwable t) {
-      LOG.warn(null, t);
+      LOG.warn("Unexpected Problem while managing SQL connection pool", t);
     }
   }
 }

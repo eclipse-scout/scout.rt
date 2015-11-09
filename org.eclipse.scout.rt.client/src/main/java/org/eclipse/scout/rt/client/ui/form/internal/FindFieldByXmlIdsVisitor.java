@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -130,8 +129,8 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
     }
     Entry<CompositeObject, IFormField> candidate = m_prioMap.lastEntry();
     if (m_ambiguousFieldKeys.contains(candidate.getKey())) {
-      if (Platform.get().inDevelopmentMode() && LOG.isWarnEnabled()) {
-        LOG.warn("ambiguous fieldId: " + Arrays.toString(m_xmlFieldIds) + " returning first candidate [" + candidate.getValue() + "]");
+      if (Platform.get().inDevelopmentMode()) {
+        LOG.warn("ambiguous fieldId: {} returning first candidate [{}]", m_xmlFieldIds, candidate.getValue());
       }
     }
     return candidate.getValue();

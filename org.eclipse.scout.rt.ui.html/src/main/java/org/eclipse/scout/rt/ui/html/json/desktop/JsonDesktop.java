@@ -116,7 +116,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     IJsonAdapter<?> jsonAdapter = getUiSession().getJsonAdapter(formId);
     if (jsonAdapter == null) {
       //should not occure, but if it occures its not fatal because on next dialog/view/outline opening this is repaired
-      LOG.info("handleUIFormActivated is looking for form which exists no more. ID: " + formId);
+      LOG.info("handleUIFormActivated is looking for form which exists no more. ID: {}", formId);
       return;
     }
     IForm form = (IForm) jsonAdapter.getModel();

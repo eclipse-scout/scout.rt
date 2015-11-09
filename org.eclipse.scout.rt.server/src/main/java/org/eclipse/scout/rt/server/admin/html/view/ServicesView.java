@@ -130,7 +130,7 @@ public class ServicesView extends DefaultView {
           list.add(inspector);
         }
         catch (RuntimeException e) {
-          LOG.warn("Failed inspecting service " + inspector.getService().getClass(), e);
+          LOG.warn("Failed inspecting service {}", inspector.getService().getClass(), e);
         }
       }
     }
@@ -290,7 +290,7 @@ public class ServicesView extends DefaultView {
                     service.changeProperty(finalDesc, propText);
                   }
                   catch (Exception e) {
-                    LOG.error("setting " + finalDesc.getName() + "=" + propText, e);
+                    LOG.error("setting {}={}", finalDesc.getName(), propText, e);
                   }
                 }
               });

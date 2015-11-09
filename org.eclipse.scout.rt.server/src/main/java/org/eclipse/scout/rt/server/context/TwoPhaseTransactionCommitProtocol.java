@@ -57,7 +57,7 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
       return tx.commitPhase1();
     }
     catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to commit XA transaction [2PC-phase='voting', tx=%s]", tx), e);
+      LOG.error("Failed to commit XA transaction [2PC-phase='voting', tx={}]", tx, e);
       return false;
     }
   }
@@ -73,7 +73,7 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
       return true;
     }
     catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to commit XA transaction [2PC-phase='commit', tx=%s]", tx), e);
+      LOG.error("Failed to commit XA transaction [2PC-phase='commit', tx={}]", tx, e);
       return false;
     }
   }
@@ -89,7 +89,7 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
       return true;
     }
     catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to rollback XA transaction [tx=%s]", tx), e);
+      LOG.error("Failed to rollback XA transaction [tx={}]", tx, e);
       return false;
     }
   }
@@ -105,7 +105,7 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
       return true;
     }
     catch (final RuntimeException e) {
-      LOG.error(String.format("Failed to release XA transaction members [tx=%s]", tx), e);
+      LOG.error("Failed to release XA transaction members [tx={}]", tx, e);
       return false;
     }
   }

@@ -29,14 +29,12 @@ class ConnectionCloseThread extends Thread {
 
   @Override
   public void run() {
-    if (LOG.isInfoEnabled()) {
-      LOG.info("close connection " + m_conn);
-    }
+    LOG.info("close connection {}", m_conn);
     try {
       m_conn.close();
     }
     catch (SQLException e) {
-      LOG.error("connection: " + m_conn, e);
+      LOG.error("connection: {}", m_conn, e);
     }
   }
 }

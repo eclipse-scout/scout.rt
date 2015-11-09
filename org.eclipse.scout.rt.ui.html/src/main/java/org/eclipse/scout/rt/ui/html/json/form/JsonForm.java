@@ -151,7 +151,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
         if (e.getType() == FormEvent.TYPE_REQUEST_FOCUS) {
           IJsonAdapter<?> formFieldAdapter = JsonAdapterUtility.findChildAdapter(this, e.getFormField());
           if (formFieldAdapter == null) {
-            LOG.error("Cannot handle requestFocus event, because adapter for " + e.getFormField() + " could not be resolved in " + toString());
+            LOG.error("Cannot handle requestFocus event, because adapter for {} could not be resolved in {}", e.getFormField(), this);
             return;
           }
 
@@ -219,7 +219,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   protected void handleModelRequestFocus(IFormField formField) {
     IJsonAdapter<?> formFieldAdapter = JsonAdapterUtility.findChildAdapter(this, formField);
     if (formFieldAdapter == null) {
-      LOG.error("Cannot handle requestFocus event, because adapter for " + formField + " could not be resolved in " + toString());
+      LOG.error("Cannot handle requestFocus event, because adapter for {} could not be resolved in {}", formField, this);
       return;
     }
 

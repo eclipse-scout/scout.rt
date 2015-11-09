@@ -556,7 +556,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setBorderDecoration(String s) {
     if (BORDER_DECORATION_SECTION.equals(s)) {
-      LOG.warn("Border decoration SECTION is not supported anymore, falling back to LINE [" + getClass().getName() + "]");
+      LOG.warn("Border decoration SECTION is not supported anymore, falling back to LINE [{}]", getClass().getName());
       s = BORDER_DECORATION_LINE;
     }
     propertySupport.setPropertyString(PROP_BORDER_DECORATION, s);

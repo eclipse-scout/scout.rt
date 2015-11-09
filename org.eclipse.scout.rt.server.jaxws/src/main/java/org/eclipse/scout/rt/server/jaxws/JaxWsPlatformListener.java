@@ -70,6 +70,6 @@ public class JaxWsPlatformListener implements IPlatformListener {
   }
 
   protected void logImplementorInfo(final IBeanManager beanManager) {
-    LOG.info("JAX-WS implementor: " + BEANS.get(JaxWsImplementorSpecifics.class).getVersionInfo());
+    LOG.info("JAX-WS implementor: {}", BEANS.get(JaxWsImplementorSpecifics.class).getVersionInfo());
   }
 }

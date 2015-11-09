@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -38,9 +37,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       if (callerArgs == null) {
         callerArgs = new Object[0];
       }
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("" + serviceInterfaceClass + "." + operation + "(" + Arrays.asList(callerArgs) + ")");
-      }
+      LOG.debug("{}.{}({})", serviceInterfaceClass, operation, callerArgs);
 
       ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
       Object[] serializableArgs = serviceUtility.filterHolderArguments(callerArgs);

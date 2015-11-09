@@ -354,7 +354,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         p.disposeProvider();
       }
       catch (Exception e) {
-        LOG.warn(p.getClass().getName(), e);
+        LOG.warn("Exception while disposing calendar item provider [{}]", p.getClass().getName(), e);
       }
     }
   }
@@ -366,7 +366,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       interceptDisposeCalendar();
     }
     catch (Exception e) {
-      LOG.warn(getClass().getName(), e);
+      LOG.warn("Exception while disposing calendar", e);
     }
   }
 

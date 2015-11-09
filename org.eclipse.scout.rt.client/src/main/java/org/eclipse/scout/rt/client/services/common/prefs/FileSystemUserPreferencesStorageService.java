@@ -54,7 +54,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     }
 
     File prefsLocation = getPrefsLocation(getUserScope(prefs.userScope()), prefs.name());
-    LOG.debug("flusing preferences to file '" + prefsLocation.getAbsolutePath() + "'.");
+    LOG.debug("flusing preferences to file '{}'.", prefsLocation.getAbsolutePath());
     Properties propsToFlush = new Properties();
     convertToProperties(prefs, propsToFlush);
     if (propsToFlush.isEmpty()) {
@@ -62,7 +62,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
         // no properties but the file exists -> remove
         boolean deleted = prefsLocation.delete();
         if (!deleted) {
-          LOG.warn("Could not delete preference file '" + prefsLocation.getAbsolutePath() + "'.");
+          LOG.warn("Could not delete preference file '{}'.", prefsLocation.getAbsolutePath());
         }
       }
     }
@@ -78,7 +78,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
       // fallback: try legacy location
       File legacyPrefsLocation = getLegacyPrefsLocation(nodeId);
       if (legacyPrefsLocation.exists()) {
-        LOG.warn("Legacy preference found: '" + legacyPrefsLocation.getAbsolutePath() + "'. Will be stored in the new location ('" + prefsLocation.getAbsolutePath() + "') the next time.");
+        LOG.warn("Legacy preference found: '{}'. Will be stored in the new location ('{}') the next time.", legacyPrefsLocation.getAbsolutePath(), prefsLocation.getAbsolutePath());
       }
       prefsLocation = legacyPrefsLocation;
     }
@@ -130,7 +130,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   }
 
   protected Properties loadFromDisk(File prefsLocation) {
-    LOG.debug("loading preferences from file '" + prefsLocation.getAbsolutePath() + "'.");
+    LOG.debug("loading preferences from file '{}'.", prefsLocation.getAbsolutePath());
     Properties result = new Properties();
     try (InputStream input = new BufferedInputStream(new FileInputStream(prefsLocation))) {
       result.load(input);
@@ -170,10 +170,10 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
       location = ConfigUtility.getProperty(legacyUserArea);
       if (location == null) {
         location = new File(ConfigUtility.getProperty(PROP_USER_HOME), "user").getAbsolutePath();
-        LOG.warn("No user area property found. Using '" + location + "' as fallback. Consider specifying a user area using property '" + userAreaProperty.getKey() + "'.");
+        LOG.warn("No user area property found. Using '{}' as fallback. Consider specifying a user area using property '{}'.", location, userAreaProperty.getKey());
       }
       else {
-        LOG.warn("Legacy user area property found: '" + legacyUserArea + "'. Consider migrating to the new one: '" + userAreaProperty.getKey() + "'.");
+        LOG.warn("Legacy user area property found: '{}'. Consider migrating to the new one: '{}'.", legacyUserArea, userAreaProperty.getKey());
       }
     }
     location = location.trim();
@@ -183,7 +183,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
         location = new File(new URI(location)).getAbsolutePath();
       }
       catch (URISyntaxException e) {
-        LOG.warn("invalid URI syntax: '" + location + "'.", e);
+        LOG.warn("invalid URI syntax: '{}'.", location, e);
       }
     }
     return location;

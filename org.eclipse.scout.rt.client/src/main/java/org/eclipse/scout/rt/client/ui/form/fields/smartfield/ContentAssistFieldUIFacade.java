@@ -34,7 +34,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     if (!m_field.isVisible() || !m_field.isEnabled()) {
       return;
     }
-    LOG.debug("proposalTypedFromUI text=" + text);
+    LOG.debug("proposalTypedFromUI text={}", text);
     m_field.clearProposal();
     m_field.setDisplayText(text);
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {

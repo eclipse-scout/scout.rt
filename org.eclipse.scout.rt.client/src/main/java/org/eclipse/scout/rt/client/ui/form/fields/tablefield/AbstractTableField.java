@@ -351,7 +351,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         for (int c = 0; c < dataMatrix[r].length; c++) {
           Object o = dataMatrix[r][c];
           if (o != null && !(o instanceof Serializable)) {
-            LOG.warn("ignoring not serializable value at row=" + r + ", col=" + c + ": " + o + "[" + o.getClass() + "]");
+            LOG.warn("ignoring not serializable value at row={}, col={}: {}[{}]", r, c, o, o.getClass());
             dataMatrix[r][c] = null;
           }
         }

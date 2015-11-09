@@ -99,12 +99,12 @@ public class GlobalTrustManager {
     try {
       RemoteFile[] certRemoteFiles = BEANS.get(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
       if (certRemoteFiles.length == 0) {
-        LOG.warn("No certificates to trust in folder '" + PATH_CERTS + "' could be found.");
+        LOG.warn("No certificates to trust in folder '{}' could be found.", PATH_CERTS);
       }
       trustedCerts = installTrustedCertificates(certRemoteFiles);
     }
     catch (RuntimeException e) {
-      LOG.error("Could not access folder '" + PATH_CERTS + "' to import trusted certificates.", e);
+      LOG.error("Could not access folder '{}' to import trusted certificates.", PATH_CERTS, e);
     }
 
     return trustedCerts == null ? new X509Certificate[]{} : trustedCerts.toArray(new X509Certificate[trustedCerts.size()]);
@@ -114,15 +114,15 @@ public class GlobalTrustManager {
     List<X509Certificate> trustedCerts = new LinkedList<X509Certificate>();
     for (RemoteFile certRemoteFile : certRemoteFiles) {
       try {
-        LOG.info("Trusted certificate '" + certRemoteFile.getName() + "' found.");
+        LOG.info("Trusted certificate '{}' found.", certRemoteFile.getName());
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         certRemoteFile.writeData(os);
         X509Certificate cert = readX509Cert(new ByteArrayInputStream(os.toByteArray()));
         trustedCerts.add(cert);
-        LOG.info("Trusted certificate '" + certRemoteFile.getName() + "' successfully installed.");
+        LOG.info("Trusted certificate '{}' successfully installed.", certRemoteFile.getName());
       }
       catch (Exception e) {
-        LOG.info("Failed to install trusted certificate '" + certRemoteFile.getName() + "'.");
+        LOG.info("Failed to install trusted certificate '{}'.", certRemoteFile.getName());
       }
     }
     return trustedCerts;

@@ -73,7 +73,7 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
     m_defaultPageChangeStrategy.pageChanged(m_outline, deselectedPage, selectedPage);
     m_mainPage = selectedPage;
 
-    LOG.debug("Main page activated: " + selectedPage);
+    LOG.debug("Main page activated: {}", selectedPage);
   }
 
   private void activateSubPage(IPage<?> selectedPage) {
@@ -93,7 +93,7 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
 
-      LOG.debug("Sub page activated: " + selectedPage);
+      LOG.debug("Sub page activated: {}", selectedPage);
     }
   }
 

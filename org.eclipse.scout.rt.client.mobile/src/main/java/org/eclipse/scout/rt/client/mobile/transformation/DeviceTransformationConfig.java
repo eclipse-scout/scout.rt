@@ -77,7 +77,7 @@ public class DeviceTransformationConfig {
 
     exclusionInfo.setExcludeAllTransformations(true);
 
-    LOG.debug("Excluding form " + form);
+    LOG.debug("Excluding form {}", form);
   }
 
   public void excludeFormTransformation(IForm form, IDeviceTransformation transformation) {
@@ -89,7 +89,7 @@ public class DeviceTransformationConfig {
 
     exclusionInfo.getExcludedTransformations().add(transformation);
 
-    LOG.debug("Excluding form transformation " + transformation + " for form " + form);
+    LOG.debug("Excluding form transformation {} for form {}", transformation, form);
   }
 
   public boolean isFormExcluded(IForm form) {
@@ -127,7 +127,7 @@ public class DeviceTransformationConfig {
 
     exclusionInfo.setExcludeAllTransformations(true);
 
-    LOG.debug("Excluding field " + formField);
+    LOG.debug("Excluding field {}", formField);
   }
 
   public void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation) {
@@ -139,7 +139,7 @@ public class DeviceTransformationConfig {
 
     exclusionInfo.getExcludedTransformations().add(transformation);
 
-    LOG.debug("Excluding field transformation " + transformation + " for field " + formField);
+    LOG.debug("Excluding field transformation {} for field {}", transformation, formField);
   }
 
   public boolean isFieldExcluded(IFormField formField) {

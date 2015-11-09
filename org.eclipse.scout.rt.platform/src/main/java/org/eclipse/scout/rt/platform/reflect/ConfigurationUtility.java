@@ -62,7 +62,7 @@ public final class ConfigurationUtility {
         }
         else {
           if (!candidate.isAnnotationPresent(Replace.class)) {
-            LOG.error("missing @Order annotation: " + candidate.getName());
+            LOG.error("missing @Order annotation: {}", candidate.getName());
           }
           orderedClassesMap.put(new CompositeObject(Double.MAX_VALUE, i), (Class<T>) candidate);
         }
@@ -217,7 +217,7 @@ public final class ConfigurationUtility {
       declaredMethod = declaringType.getDeclaredMethod(methodName, parameterTypes);
     }
     catch (NoSuchMethodException | SecurityException e) {
-      LOG.error("cannot find declared method " + declaringType.getName() + "." + methodName, e);
+      LOG.error("cannot find declared method {}.{}", declaringType.getName(), methodName, e);
       return false;
     }
     Class<?> c = implementationType;

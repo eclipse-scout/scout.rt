@@ -36,7 +36,7 @@ public class MainJsonObjectFactory implements IJsonObjectFactory {
       if (m_factories == null) {
         throw new IllegalStateException("No json object factories found.");
       }
-      LOG.info("Using following object factories: " + m_factories);
+      LOG.info("Using following object factories: {}", m_factories);
     }
     return m_factories;
   }

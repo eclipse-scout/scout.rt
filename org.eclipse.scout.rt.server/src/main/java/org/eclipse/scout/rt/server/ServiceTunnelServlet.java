@@ -160,7 +160,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         LOG.debug("Connection Error: ", e);
       }
       else {
-        LOG.error(String.format("Client=%s@%s/%s", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost()), e);
+        LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
         servletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
     }

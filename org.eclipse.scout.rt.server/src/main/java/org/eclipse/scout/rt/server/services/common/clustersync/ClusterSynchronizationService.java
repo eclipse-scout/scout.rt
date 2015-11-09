@@ -204,7 +204,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       setMessageService(messageService);
     }
     catch (Exception e) {
-      LOG.error(e.getMessage(), e);
+      LOG.error("Could not subscribe message listener", e);
       return false;
     }
     setEnabled(true);
@@ -223,7 +223,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
         messageService.unsubsribe();
       }
       catch (Exception e) {
-        LOG.error(e.getMessage(), e);
+        LOG.error("Could not unsubscribe message listener", e);
         return false;
       }
     }

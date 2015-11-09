@@ -782,7 +782,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     try {
       m_eventBufferLoopDetection++;
       if (m_eventBufferLoopDetection > 100) {
-        LOG.error("LOOP DETECTION in " + getClass() + ". see stack trace for more details.", new Exception("LOOP DETECTION"));
+        LOG.error("LOOP DETECTION in {}. see stack trace for more details.", getClass(), new Exception("LOOP DETECTION"));
         return;
       }
       //
@@ -960,7 +960,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setViewRange(Range<Date> viewRange) {
-    LOG.debug("Setting view range to " + viewRange);
+    LOG.debug("Setting view range to {}", viewRange);
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
   }
 
@@ -971,7 +971,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setSelectionRange(Range<Date> selectionRange) {
-    LOG.debug("Seting selection range to " + selectionRange);
+    LOG.debug("Seting selection range to {}", selectionRange);
     propertySupport.setProperty(PROP_SELECTION_RANGE, selectionRange);
   }
 

@@ -534,7 +534,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         ext.contributeOutlines(outlines);
       }
       catch (Exception t) {
-        LOG.error("contributing outlines by " + ext, t);
+        LOG.error("contributing outlines by {}", ext, t);
       }
     }
     List<IOutline> contributedOutlines = m_contributionHolder.getContributionsByClass(IOutline.class);
@@ -551,7 +551,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         ext.contributeActions(actionList);
       }
       catch (Exception t) {
-        LOG.error("contributing actions by " + ext, t);
+        LOG.error("contributing actions by {}", ext, t);
       }
     }
 
@@ -588,7 +588,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         ks.initAction();
       }
       catch (RuntimeException e) {
-        LOG.error("could not initialize key stroke '" + ks + "'.", e);
+        LOG.error("could not initialize key stroke '{}'.", ks, e);
       }
     }
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
@@ -599,7 +599,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         o.initTree();
       }
       catch (Exception e) {
-        LOG.error(null, e);
+        LOG.error("Could not init outline {}", o, e);
       }
     }
   }
@@ -650,7 +650,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (Exception t) {
-          LOG.error("extension " + ext + " failed", t);
+          LOG.error("extension {} failed", ext, t);
         }
       }
       // init actions
@@ -1044,7 +1044,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           activateBookmark(bookmark);
         }
         catch (RuntimeException e) {
-          LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
+          LOG.warn("Could not activate bookmark '{}' for restoring state of outline '{}'.", bookmark.getText(), m_outline, e);
         }
       }
     }
@@ -1100,7 +1100,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           popupWindow.doClose();
         }
         catch (Exception e) {
-          LOG.error("Failed to close popup window: " + popupWindow, e);
+          LOG.error("Failed to close popup window: {}", popupWindow, e);
         }
       }
     }
@@ -1332,7 +1332,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (Exception e) {
-          LOG.error("extension " + ext, e);
+          LOG.error("extension {}", ext, e);
         }
       }
     }
@@ -1361,7 +1361,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (Exception t) {
-          LOG.error("extension " + ext, t);
+          LOG.error("extension {}", ext, t);
         }
       }
     }
@@ -1386,7 +1386,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (Exception x) {
-          LOG.error("extension " + ext, x);
+          LOG.error("extension {}", ext, x);
         }
       }
     }
@@ -1827,7 +1827,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (Exception ex) {
-          LOG.error("extension " + ext, ex);
+          LOG.error("extension {}", ext, ex);
         }
       }
       for (IMenu m : list) {
@@ -1893,7 +1893,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
       catch (Exception t) {
-        LOG.error("extension " + ext, t);
+        LOG.error("extension {}", ext, t);
       }
     }
   }
@@ -1918,7 +1918,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
       catch (RuntimeException t) {
-        LOG.error("extension " + ext, t);
+        LOG.error("extension {}", ext, t);
       }
     }
 

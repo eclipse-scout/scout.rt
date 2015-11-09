@@ -257,7 +257,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
           dateFormatPattern = format;
           timeFormatPattern = null;
           if (isHasTime()) {
-            LOG.warn("Could not extract time part from pattern '" + format + "', using default pattern.");
+            LOG.warn("Could not extract time part from pattern '{}', using default pattern.", format);
           }
         }
         else {
@@ -335,7 +335,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
   protected void preventUpdateDisplaytextOnModifiyOnDateTimeField() {
     if (isUpdateDisplayTextOnModify() && isHasDate() && isHasTime()) {
-      LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field " + getClass().getName());
+      LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field {}", getClass().getName());
       setUpdateDisplayTextOnModify(false);
     }
   }
@@ -451,7 +451,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
           return new SimpleDateFormat(pat.substring(0, h).trim(), NlsLocale.get());
         }
         catch (Exception e) {
-          LOG.error("could not isolate date pattern from '" + pat + "'", e);
+          LOG.error("could not isolate date pattern from '{}'", pat, e);
         }
       }
     }
@@ -469,7 +469,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
           return new SimpleDateFormat(pat.substring(h).trim(), NlsLocale.get());
         }
         catch (Exception e) {
-          LOG.error("could not isolate time pattern from '" + pat + "'", e);
+          LOG.error("could not isolate time pattern from '{}'", pat, e);
         }
       }
     }

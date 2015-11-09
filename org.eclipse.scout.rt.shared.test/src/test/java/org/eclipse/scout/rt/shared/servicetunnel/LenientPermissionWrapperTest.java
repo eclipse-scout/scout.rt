@@ -23,14 +23,11 @@ import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * JUnit test for {@link LenientPermissionWrapper}
  */
 public class LenientPermissionWrapperTest {
-  private static final Logger LOG = LoggerFactory.getLogger(LenientPermissionWrapperTest.class);
 
   private static String data =
       "rO0ABXNyAENvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbnNXcmFwcGVyAAAAAAAAAAEDAAFMAA1tX3Blcm1pc3Npb25zdAAbTGphdmEvc2VjdXJpdHkvUGVybWlzc2lvbnM7eHBzcgATamF2YS51dGlsLkFycmF5TGlzdHiB0h2Zx2GdAwABSQAEc2l6ZXhwAAAAA3cEAAAACnNyAEJvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXIAAAAAAAAAAQMAAkwAC21fY2xhc3NOYW1ldAASTGphdmEvbGFuZy9TdHJpbmc7TAAMbV9wZXJtaXNzaW9udAAaTGphdmEvc2VjdXJpdHkvUGVybWlzc2lvbjt4cHQASG9yZy5lY2xpcHNlLnNjb3V0LnJ0LnNoYXJlZC5zZXJ2aWNldHVubmVsLkxlbmllbnRQZXJtaXNzaW9uV3JhcHBlclRlc3QkQXVyAAJbQqzzF/gGCFTgAgAAeHAAAADQrO0ABXNyAEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEEAAAAAAAAAAQIAAHhyAB1qYXZhLnNlY3VyaXR5LkJhc2ljUGVybWlzc2lvblclC9zPTqZ6AgAAeHIAGGphdmEuc2VjdXJpdHkuUGVybWlzc2lvbrHG4T8oV1F+AgABTAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAABQXhzcQB+AAV0AEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEN1cQB+AAoAAADQrO0ABXNyAEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEMAAAAAAAAAAQIAAHhyAB1qYXZhLnNlY3VyaXR5LkJhc2ljUGVybWlzc2lvblclC9zPTqZ6AgAAeHIAGGphdmEuc2VjdXJpdHkuUGVybWlzc2lvbrHG4T8oV1F+AgABTAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAABQ3hzcQB+AAV0AEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEJ1cQB+AAoAAADQrO0ABXNyAEhvcmcuZWNsaXBzZS5zY291dC5ydC5zaGFyZWQuc2VydmljZXR1bm5lbC5MZW5pZW50UGVybWlzc2lvbldyYXBwZXJUZXN0JEIAAAAAAAAAAQIAAHhyAB1qYXZhLnNlY3VyaXR5LkJhc2ljUGVybWlzc2lvblclC9zPTqZ6AgAAeHIAGGphdmEuc2VjdXJpdHkuUGVybWlzc2lvbrHG4T8oV1F+AgABTAAEbmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwdAABQnh4eA==";
@@ -48,7 +45,7 @@ public class LenientPermissionWrapperTest {
     p.add(new B_XXX());//rename to B to re-create the test input data string
     p.add(new C());
     byte[] b = getObjectSerializer().serialize(p);
-    LOG.debug("private static String data=\"" + Base64Utility.encode(b) + "\";");
+    System.out.println("private static String data=\"" + Base64Utility.encode(b) + "\";"); // sysout is desired here
   }
 
   private IObjectSerializer getObjectSerializer() {

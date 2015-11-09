@@ -92,13 +92,13 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
             URLConnection conn = url.openConnection();
             long lastModified = conn.getLastModified();
             if (lastModified > m_lastModified) {
-              LOG.info("Detected modification in " + url);
+              LOG.info("Detected modification in {}", url);
               loadFilter();
               break;
             }
           }
           catch (Exception e) {
-            LOG.warn("Error while checking for file modification of " + url, e);
+            LOG.warn("Error while checking for file modification of {}", url, e);
           }
         }
       }

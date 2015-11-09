@@ -72,7 +72,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     checkSession(session);
     final String sessionId = session.getId();
     final String userId = session.getUserId();
-    LOG.debug(String.format("Unregister client session [sessionid=%s, userId=%s].", sessionId, userId));
+    LOG.debug("Unregister client session [sessionid={}, userId={}].", sessionId, userId);
 
     // unregister from remote notifications
     try {
@@ -84,7 +84,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       });
     }
     catch (RuntimeException e) {
-      LOG.warn(String.format("Could not unregister session[%s] for remote notifications.", session), e);
+      LOG.warn("Could not unregister session[{}] for remote notifications.", session, e);
     }
     // client session household
     synchronized (m_cacheLock) {
@@ -114,7 +114,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   public void sessionStarted(final IClientSession session) {
     ensureUserIdAvailable(session);
     checkSession(session);
-    LOG.debug(String.format("Register client session [sessionid=%s, userId=%s].", session.getId(), session.getUserId()));
+    LOG.debug("Register client session [sessionid={}, userId={}].", session.getId(), session.getUserId());
     registerOnClient(session);
     registerOnServer(session);
   }
@@ -134,7 +134,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       });
     }
     catch (RuntimeException e) {
-      LOG.warn(String.format("Could not register session[%s] for remote notifications.", session), e);
+      LOG.warn("Could not register session[{}] for remote notifications.", session, e);
     }
   }
 
@@ -202,7 +202,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
           return CollectionUtility.arrayList((IClientSession) IClientSession.CURRENT.get());
         }
         else {
-          LOG.error("No session found for user " + userId);
+          LOG.error("No session found for user {}", userId);
           return CollectionUtility.emptyArrayList();
         }
       }

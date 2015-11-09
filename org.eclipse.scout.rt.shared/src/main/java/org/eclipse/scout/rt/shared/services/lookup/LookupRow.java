@@ -160,7 +160,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     if (cells != null) {
 
       if (maxColumnIndex > cells.length - 1) {
-        LOG.warn(String.format("Max column index (%d) greater than provided data (%d).", maxColumnIndex, cells.length - 1));
+        LOG.warn("Max column index ({}) greater than provided data ({}).", maxColumnIndex, cells.length - 1);
         maxColumnIndex = cells.length - 1;
       }
 
@@ -197,7 +197,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
           withEnabled(Boolean.valueOf(((Number) cells[enabledIndex]).intValue() != 0));
         }
         else {
-          LOG.error(String.format("Ignoring invalid Boolean value", cells[enabledIndex]));
+          LOG.error("Ignoring invalid Boolean value '{}'", cells[enabledIndex]);
         }
       }
       if (parentKeyIndex <= maxColumnIndex && cells[parentKeyIndex] != null) {
@@ -213,7 +213,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
           withActive(Boolean.valueOf(((Number) cells[activeIndex]).intValue() != 0));
         }
         else {
-          LOG.error(String.format("Ignoring invalid Boolean value", cells[activeIndex]));
+          LOG.error("Ignoring invalid Boolean value '{}'", cells[activeIndex]);
         }
       }
     }

@@ -200,7 +200,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
       // Check if extension owner is compatible with extension generic
       if (!ownerClass.equals(extensionGeneric)) {
         if (extensionGeneric == null) {
-          LOG.warn("Could not parse owner generic of extension [" + extensionClass.getName() + "].");
+          LOG.warn("Could not parse owner generic of extension [{}].", extensionClass.getName());
         }
         else if (!extensionGeneric.isAssignableFrom(ownerClass)) {
           throw new IllegalExtensionException("Owner [" + ownerClass.getName() + "] is not compatible with the generic [" + extensionGeneric.getName() + "] of extension [" + extensionClass.getName() + "].");
@@ -222,7 +222,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
     // Warn if there is an order information for a non ordered object.
     boolean isOrdered = IOrdered.class.isAssignableFrom(extensionClass);
     if (!isOrdered && (modelOrder != null || isOrderAnnotationPresentInSuperClasses(extensionClass))) {
-      LOG.warn("Order information not valid for extension [" + extensionClass.getName() + "]. This extension is not an [" + IOrdered.class.getName() + "] object.");
+      LOG.warn("Order information not valid for extension [{}]. This extension is not an [{}] object.", extensionClass.getName(), IOrdered.class.getName());
     }
   }
 

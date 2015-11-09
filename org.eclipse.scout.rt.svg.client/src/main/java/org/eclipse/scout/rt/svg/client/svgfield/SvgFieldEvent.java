@@ -81,7 +81,7 @@ public class SvgFieldEvent extends EventObject {
         return new URL(ref);
       }
       catch (MalformedURLException e) {
-        LOG.error("", e);
+        LOG.error("Malformed URL '{}'", ref, e);
       }
     }
     return null;

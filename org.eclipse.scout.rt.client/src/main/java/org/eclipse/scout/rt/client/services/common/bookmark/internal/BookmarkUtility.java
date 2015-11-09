@@ -153,7 +153,7 @@ public final class BookmarkUtility {
       // check ambiguity
       CompositeObject nextKey = sortMap.firstKey();
       if (CompareUtility.equals(bestMatchingKey.getComponent(0), nextKey.getComponent(0)) && CompareUtility.equals(bestMatchingKey.getComponent(1), nextKey.getComponent(1))) {
-        LOG.warn("More than one pages found for page class [" + className + "] and bookmark Identifier [" + bookmarkIdentifier + "]");
+        LOG.warn("More than one pages found for page class [{}] and bookmark Identifier [{}]", className, bookmarkIdentifier);
       }
     }
     return bestMatchingPage;
@@ -219,10 +219,10 @@ public final class BookmarkUtility {
       // check if key object overrides toString()
       if (!useLegacySupport && !(o instanceof String)) {
         if (ConfigurationUtility.isMethodOverwrite(Object.class, "toString", new Class[0], o.getClass())) {
-          LOG.warn("Bookmark key is not serializable. Falling back to toString(). Note: keys may not be stable [class=" + o.getClass() + ", string representation: " + o.toString() + "]");
+          LOG.warn("Bookmark key is not serializable. Falling back to toString(). Note: keys may not be stable [class={}, string representation:{}]", o.getClass(), o);
         }
         else {
-          LOG.error("Bookmark key is not serializable. Falling back to toString() which is not overriden by the given class [" + o.getClass() + "]");
+          LOG.error("Bookmark key is not serializable. Falling back to toString() which is not overriden by the given class [{}]", o.getClass());
         }
       }
       return o.toString();

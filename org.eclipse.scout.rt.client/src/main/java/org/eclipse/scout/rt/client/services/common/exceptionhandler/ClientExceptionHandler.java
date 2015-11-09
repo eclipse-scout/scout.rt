@@ -88,7 +88,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
       }
     }
     else {
-      LOG.error(String.format("Loop detection in %s when handling '%s'. StackTrace: ", getClass().getSimpleName(), pe), new Exception());
+      LOG.error("Loop detection in {} when handling '{}'. StackTrace: ", getClass().getName(), pe, new Exception());
     }
   }
 

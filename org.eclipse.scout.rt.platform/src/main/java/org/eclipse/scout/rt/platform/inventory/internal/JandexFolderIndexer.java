@@ -50,7 +50,7 @@ public final class JandexFolderIndexer {
             }
           }
           catch (IOException ex) {
-            LOG.error("indexing class: " + f, ex);
+            LOG.error("indexing class: {}", f, ex);
           }
         }
       }

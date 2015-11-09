@@ -136,7 +136,7 @@ public class RunMonitor implements ICancellable {
       return false; // same behavior like Java Future.
     }
     catch (final RuntimeException e) {
-      LOG.error(String.format("Cancellation failed [cancellable=%s]", cancellable), e);
+      LOG.error("Cancellation failed [cancellable={}]", cancellable, e);
       return false;
     }
   }

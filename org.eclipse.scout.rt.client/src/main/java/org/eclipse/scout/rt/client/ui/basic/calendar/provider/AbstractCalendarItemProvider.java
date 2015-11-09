@@ -408,7 +408,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         }
         catch (ProcessingException e) {
           if (!e.isInterruption()) {
-            LOG.error(null, e);
+            LOG.error("Could not reload calendar items", e);
           }
         }
 

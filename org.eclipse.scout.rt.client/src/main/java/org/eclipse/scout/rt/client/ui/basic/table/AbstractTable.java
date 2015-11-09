@@ -793,7 +793,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         local = "local".equals(url.getHost());
       }
       catch (MalformedURLException e) {
-        LOG.error("", e);
+        LOG.error("Malformed URL", e);
       }
     }
     execHyperlinkAction(url, ref, local);
@@ -1140,7 +1140,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         initTable();
       }
       catch (RuntimeException e) {
-        LOG.error("Failed re-initializing table " + getClass().getName(), e);
+        LOG.error("Failed re-initializing table {}", getClass().getName(), e);
       }
     }
   }
@@ -1184,7 +1184,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       interceptDisposeTable();
     }
     catch (Exception e) {
-      LOG.error(getClass().getName(), e);
+      LOG.error("Could not dispose table [{}]", getClass().getName(), e);
     }
   }
 
@@ -3657,7 +3657,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       m_eventBufferLoopDetection++;
       if (m_eventBufferLoopDetection > 100) {
-        LOG.error("LOOP DETECTION in " + getClass() + ". see stack trace for more details.", new Exception("LOOP DETECTION"));
+        LOG.error("LOOP DETECTION in {}. see stack trace for more details.", getClass(), new Exception("LOOP DETECTION"));
         return;
       }
       //
@@ -3738,7 +3738,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         resolvedRows.add(row);
       }
       else {
-        LOG.warn("could not resolve row " + row);
+        LOG.warn("could not resolve row {}", row);
       }
     }
     return resolvedRows;
@@ -3851,9 +3851,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("fire rows updated " + rows);
-    }
+    LOG.debug("fire rows updated {}", rows);
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROWS_UPDATED, rows);
     // For each row, add information about updated columns to the event. (A row may also be updated if
     // not specific column was changed, e.g. when a row's enabled state changes.)
@@ -4097,7 +4095,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         String pattern = StringUtility.toRegExPattern(prefix.toLowerCase());
         pattern = pattern + ".*";
         if (LOG.isInfoEnabled()) {
-          LOG.info("finding regex:" + pattern + " in column " + getColumnSet().getColumn(colIndex).getHeaderCell().getText());
+          LOG.info("finding regex: '{}' in column '{}'", pattern, getColumnSet().getColumn(colIndex).getHeaderCell().getText());
         }
         // loop over values and find matching one
         int rowCount = getRowCount();

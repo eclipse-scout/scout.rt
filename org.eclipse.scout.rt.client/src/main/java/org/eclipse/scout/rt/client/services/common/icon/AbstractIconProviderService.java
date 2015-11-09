@@ -118,7 +118,7 @@ public abstract class AbstractIconProviderService implements IIconProviderServic
             return iconSpec;
           }
           catch (Exception e) {
-            LOG.error("could not read input stream from url '" + url + "'.", e);
+            LOG.error("could not read input stream from url '{}'.", url, e);
           }
         }
       }

@@ -99,7 +99,7 @@ public class JandexClassInfo implements IClassInfo {
       }
     }
     catch (Exception ex) {
-      LOG.warn("loading class", ex);
+      LOG.warn("Could not resolve class [{}]", name(), ex);
       return false;
     }
     return true;

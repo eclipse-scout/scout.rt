@@ -116,9 +116,7 @@ public class PlatformImplementor implements IPlatform {
 
   protected void validateConfiguration() {
     if (!ConfigUtility.isInitialized()) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info(": No " + ConfigUtility.CONFIG_FILE_NAME + " found. Running with empty configuration.");
-      }
+      LOG.info("No {} found. Running with empty configuration.", ConfigUtility.CONFIG_FILE_NAME);
     }
 
     int errorCount = 0;
@@ -154,7 +152,7 @@ public class PlatformImplementor implements IPlatform {
       m_beanContext.setBeanDecorationFactory(bean.getInstance());
       return;
     }
-    LOG.warn("Using " + SimpleBeanDecorationFactory.class.getName() + ". Please verify that this application really has no client or server side " + IBeanDecorationFactory.class.getSimpleName());
+    LOG.warn("Using {}. Please verify that this application really has no client or server side {}", SimpleBeanDecorationFactory.class.getName(), IBeanDecorationFactory.class.getSimpleName());
     m_beanContext.setBeanDecorationFactory(new SimpleBeanDecorationFactory());
   }
 

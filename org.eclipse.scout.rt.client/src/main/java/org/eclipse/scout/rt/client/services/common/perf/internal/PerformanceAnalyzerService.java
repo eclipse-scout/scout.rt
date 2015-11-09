@@ -39,7 +39,7 @@ public class PerformanceAnalyzerService implements IPerformanceAnalyzerService {
       m_propertySupport.firePropertyChange(PROP_NETWORK_LATENCY, oldValue, newValue);
     }
     catch (Exception t) {
-      LOG.warn(null, t);
+      LOG.warn("Unexpected exception", t);
     }
   }
 
@@ -57,7 +57,7 @@ public class PerformanceAnalyzerService implements IPerformanceAnalyzerService {
       m_propertySupport.firePropertyChange(PROP_SERVER_EXECUTION_TIME, oldValue, newValue);
     }
     catch (Exception t) {
-      LOG.warn(null, t);
+      LOG.warn("Unexpected Exception", t);
     }
   }
 

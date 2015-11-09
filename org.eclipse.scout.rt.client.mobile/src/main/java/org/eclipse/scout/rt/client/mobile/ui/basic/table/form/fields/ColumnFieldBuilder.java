@@ -61,7 +61,7 @@ public class ColumnFieldBuilder {
         fields.put(column, field);
       }
       else {
-        LOG.warn("No field mapping found for column " + column.getClass());
+        LOG.warn("No field mapping found for column [{}]", column.getClass().getName());
       }
     }
 

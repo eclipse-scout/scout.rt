@@ -37,7 +37,7 @@ class JobListenerWithFilter implements IJobListener {
         m_listener.changed(event);
       }
       catch (final RuntimeException e) {
-        LOG.error(String.format("Listener or filter threw exception while accepting or handling job lifecycle event [listener=%s, filter=%s, event=%s]", m_listener.getClass().getName(), m_filter.getClass().getName(), event), e);
+        LOG.error("Listener or filter threw exception while accepting or handling job lifecycle event [listener={}, filter={}, event={}]", m_listener.getClass().getName(), m_filter.getClass().getName(), event, e);
       }
     }
   }

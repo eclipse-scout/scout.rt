@@ -200,7 +200,7 @@ public final class CSSPatch {
         StyleContext.registerStaticAttributeKey(key);
       }
       catch (Throwable t) {
-        LOG.error("Failed registering CSS.Attribute '" + key + "' on StyleContext", t);
+        LOG.error("Failed registering CSS.Attribute '{}' on StyleContext", key, t);
       }
     }
   }
@@ -212,7 +212,7 @@ public final class CSSPatch {
       return c.newInstance(s1, s2, b);
     }
     catch (Throwable t) {
-      LOG.error("Failed patching CSS by adding key '" + s1 + "'", t);
+      LOG.error("Failed patching CSS by adding key '{}'", s1, t);
     }
     return null;
   }

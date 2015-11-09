@@ -64,7 +64,7 @@ public class ServiceOperationInvoker {
 
     long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("TIME {}.{} {}ms", new Object[]{serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), elapsedMillis});
+      LOG.debug("TIME {}.{} {}ms", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), elapsedMillis);
     }
     response.setProcessingDuration(elapsedMillis);
     return response;
@@ -77,7 +77,7 @@ public class ServiceOperationInvoker {
     IServerSession serverSession = ServerSessionProvider.currentSession();
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
-      LOG.debug("started " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " by " + authenticatedUser + " at " + new Date());
+      LOG.debug("started {}.{} by {} at {}", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), authenticatedUser, new Date());
     }
     CallInspector callInspector = getCallInspector(serviceReq, serverSession);
     ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
@@ -101,19 +101,19 @@ public class ServiceOperationInvoker {
           callInspector.update();
         }
         catch (Throwable t) {
-          LOG.warn(null, t);
+          LOG.warn("Could not update call inspector", t);
         }
         try {
           callInspector.close(serviceRes);
         }
         catch (Throwable t) {
-          LOG.warn(null, t);
+          LOG.warn("Could not close service invocation on call inspector", t);
         }
         try {
           callInspector.getSessionInspector().update();
         }
         catch (Throwable t) {
-          LOG.warn(null, t);
+          LOG.warn("Could not update session inspector", t);
         }
       }
     }
@@ -239,7 +239,7 @@ public class ServiceOperationInvoker {
       BEANS.get(ExceptionHandler.class).handle(pe);
     }
     else {
-      LOG.error(String.format("Unexpected error while invoking service operation [%s]", serviceOperation), t);
+      LOG.error("Unexpected error while invoking service operation [{}]", serviceOperation, t);
     }
   }
 

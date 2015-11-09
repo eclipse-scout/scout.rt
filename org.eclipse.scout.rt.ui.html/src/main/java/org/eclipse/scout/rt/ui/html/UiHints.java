@@ -72,7 +72,7 @@ public final class UiHints {
     }
     HttpSession session = req.getSession();
     for (String attName : sessionAttributeNameToStoreTo) {
-      LOG.info("Set UiHint: " + attName + "=" + value);
+      LOG.info("Set UiHint: {}={}", attName, value);
       session.setAttribute(attName, value);
     }
   }

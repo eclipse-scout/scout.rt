@@ -118,9 +118,7 @@ public class BasicPropertySupport implements IEventListenerSource {
         return CollectionUtility.copyMap(m_props);
       }
       catch (ConcurrentModificationException cme) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(null, cme);
-        }
+        LOG.debug("Could not create copy of properties map", cme);
       }
     }
     return CollectionUtility.copyMap(m_props);

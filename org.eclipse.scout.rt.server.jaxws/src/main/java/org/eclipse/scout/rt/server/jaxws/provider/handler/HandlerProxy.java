@@ -123,7 +123,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
       }
     }
     catch (final Exception e) {
-      LOG.error(String.format("Failed to handle message [handler=%s, method=%s, inbound=%s]", m_handler.getClass().getName(), method, MessageContexts.isInboundMessage(messageContext)), e);
+      LOG.error("Failed to handle message [handler={}, method={}, inbound={}]", m_handler.getClass().getName(), method, MessageContexts.isInboundMessage(messageContext), e);
       throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // do not send cause to the client
     }
   }

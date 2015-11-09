@@ -139,7 +139,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     Set<String> textKeys = new TreeSet<String>();
     for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
       contributor.contributeUiTextKeys(textKeys);
-      LOG.debug("Gathered ui text keys from contributor " + contributor);
+      LOG.debug("Gathered ui text keys from contributor {}", contributor);
     }
 
     // Resolve texts with the given locale
@@ -150,7 +150,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         map.put(textKey, text);
       }
       else {
-        LOG.warn("Could not find text for contributed UI text key '" + textKey + "'");
+        LOG.warn("Could not find text for contributed UI text key '{}'", textKey);
       }
     }
     return map;
@@ -261,7 +261,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         sendInitializationEvent(jsonClientSessionAdapter.getId());
       }
 
-      LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
+      LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
     finally {
       m_currentHttpContext.clear();
@@ -282,9 +282,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     String currentTheme = UiThemeUtility.defaultIfNull(UiThemeUtility.getTheme(req));
     boolean reloadPage = !modelTheme.equals(currentTheme);
     UiThemeUtility.storeTheme(resp, httpSession, modelTheme);
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("UI theme model=" + modelTheme + " current=" + currentTheme + " reloadPage=" + reloadPage);
-    }
+    LOG.debug("UI theme model={} current={} reloadPage={}", modelTheme, currentTheme, reloadPage);
     return reloadPage;
   }
 
@@ -317,12 +315,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     if (clientSession != null) {
       // Found existing client session
-      LOG.info("Using cached client session [clientSessionId=" + clientSession.getId() + "]");
+      LOG.info("Using cached client session [clientSessionId={}]", clientSession.getId());
     }
     else {
       // No client session for the requested ID was found, so create one
       clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), jsonStartupReq.getSessionStartupParams());
-      LOG.info("Created new client session [clientSessionId=" + clientSession.getId() + ", userAgent=" + clientSession.getUserAgent() + "]");
+      LOG.info("Created new client session [clientSessionId={}, userAgent={}]", clientSession.getId(), clientSession.getUserAgent());
       // Ensure session is active
       if (!clientSession.isActive()) {
         throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + clientSession.getId() + "]");
@@ -719,7 +717,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   public void waitForBackgroundJobs(int pollWaitSeconds) {
     boolean wait = true;
     while (wait) {
-      LOG.trace("Wait for max. " + pollWaitSeconds + " seconds until background job terminates or wait timeout occurs...");
+      LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
       try {
         long t0 = System.currentTimeMillis();
         // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
@@ -781,7 +779,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   public void updateTheme(String theme) {
     UiThemeUtility.storeTheme(m_currentHttpContext.getResponse(), m_currentHttpSession, theme);
     sendReloadPageEvent();
-    LOG.info("UI theme changed to: " + theme);
+    LOG.info("UI theme changed to: {}", theme);
   }
 
   /**
@@ -802,7 +800,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void logout() {
-    LOG.info("Logging out from UI session with ID " + m_uiSessionId + " [clientSessionId=" + getClientSessionId() + "]");
+    LOG.info("Logging out from UI session with ID {} [clientSessionId={}]", m_uiSessionId, getClientSessionId());
     HttpSession httpSession = currentHttpSession();
     if (httpSession != null) {
       // This will cause P_ClientSessionCleanupHandler.valueUnbound() to be executed
@@ -821,7 +819,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     if (jsonResponse != null) {
       jsonResponse.addActionEvent(getUiSessionId(), getLogoutRedirectUrl(), createLogoutEventData());
     }
-    LOG.info("Logged out successfully from UI session with ID " + m_uiSessionId);
+    LOG.info("Logged out successfully from UI session with ID {}", m_uiSessionId);
   }
 
   protected JSONObject createLogoutEventData() {
@@ -865,13 +863,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() {
-          LOG.info("Shutting down client session with ID " + m_clientSession.getId() + " due to invalidation of HTTP session");
+          LOG.info("Shutting down client session with ID {} due to invalidation of HTTP session", m_clientSession.getId());
           // Dispose model (if session was not already stopped earlier by itself).
           // Session inactivation is executed delayed (see AbstractClientSession#getMaxShutdownWaitTime(), that's why desktop may already be null
           if (m_clientSession.isActive() && m_clientSession.getDesktop() != null) {
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
-          LOG.info("Client session with ID " + m_clientSession.getId() + " terminated.");
+          LOG.info("Client session with ID {} terminated.", m_clientSession.getId());
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_clientSession, true))
           .withName("Closing desktop due to HTTP session invalidation"));
@@ -900,7 +898,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   public void valueUnbound(HttpSessionBindingEvent event) {
     if (ModelJobs.isModelThread()) {
       dispose(); // already in model job
-      LOG.info("UI session with ID " + m_uiSessionId + " unbound from HTTP session.");
+      LOG.info("UI session with ID {} unbound from HTTP session.", m_uiSessionId);
       return;
     }
     try {
@@ -909,7 +907,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         @Override
         public void run() throws Exception {
           dispose();
-          LOG.info("UI session with ID " + m_uiSessionId + " unbound from HTTP session.");
+          LOG.info("UI session with ID {} unbound from HTTP session.", m_uiSessionId);
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getClientSession(), true))).awaitDone();
     }

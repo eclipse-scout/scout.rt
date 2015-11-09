@@ -77,7 +77,7 @@ public class FormulaParser {
         throw ce;
       }
       catch (Exception other) {
-        LOG.error(null, other);
+        LOG.error("Could not parse formula", other);
         throw new ParseException("unexpected exception: " + other, pos.getIndex());
       }
     }

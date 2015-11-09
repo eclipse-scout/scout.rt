@@ -39,7 +39,7 @@ public class ServiceTunnelInvocationHandler implements InvocationHandler {
     // only proxy methods that are on the IService interface
     if (Object.class.isAssignableFrom(method.getDeclaringClass())) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Soap call to " + m_serviceInterfaceClass.getName() + "." + method.getName() + "(" + VerboseUtility.dumpObjects(args) + ")");
+        LOG.debug("Soap call to {}.{}({})", m_serviceInterfaceClass.getName(), method.getName(), VerboseUtility.dumpObjects(args));
       }
       return BEANS.get(IServiceTunnel.class).invokeService(m_serviceInterfaceClass, method, args);
     }

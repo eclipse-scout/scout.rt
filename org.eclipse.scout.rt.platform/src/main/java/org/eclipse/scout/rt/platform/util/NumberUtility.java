@@ -96,7 +96,7 @@ public final class NumberUtility {
       retVal = new BigDecimal(number.toString());
     }
     catch (NumberFormatException e) {
-      LOG.warn("converting to BigDecimal failed for Number: " + number.toString());
+      LOG.warn("converting to BigDecimal failed for Number: '{}'", number);
     }
     return retVal;
   }

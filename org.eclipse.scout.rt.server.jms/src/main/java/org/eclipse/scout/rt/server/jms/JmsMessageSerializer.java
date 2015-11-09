@@ -89,7 +89,7 @@ public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
         LOG.warn("received empty BytesMessage");
       }
       else if (bodyLength > Integer.MAX_VALUE) {
-        LOG.warn("received BytesMessage is too large (length = " + bodyLength + ")");
+        LOG.warn("received BytesMessage is too large (length={})", bodyLength);
       }
       else {
         byte[] buffer = new byte[(int) bodyLength];

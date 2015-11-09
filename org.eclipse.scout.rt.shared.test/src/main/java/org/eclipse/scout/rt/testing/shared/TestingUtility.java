@@ -110,7 +110,7 @@ public final class TestingUtility {
       beanData.withOrder(TESTING_BEAN_ORDER);
     }
     if (Mockito.mockingDetails(beanData.getInitialInstance()).isMock() && beanData.getBeanAnnotation(TunnelToServer.class) != null) {
-      LOG.info("removing TunnelToServer annotation on mocked bean: " + beanData.getBeanClazz());
+      LOG.info("removing TunnelToServer annotation on mocked bean: {}", beanData.getBeanClazz());
       beanData.withoutAnnotation(TunnelToServer.class);
     }
     return Platform.get().getBeanManager().registerBean(beanData);

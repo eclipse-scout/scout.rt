@@ -62,7 +62,7 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
       ((Closeable) port).close();
     }
     catch (final Throwable e) {
-      LOG.error(String.format("Failed to close Socket for: %s", operation), e);
+      LOG.error("Failed to close Socket for: {}", operation, e);
     }
   }
 }

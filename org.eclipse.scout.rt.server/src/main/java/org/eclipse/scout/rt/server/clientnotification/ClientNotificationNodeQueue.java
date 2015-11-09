@@ -144,7 +144,7 @@ public class ClientNotificationNodeQueue {
       }
     }
     if (dropCount > 0) {
-      LOG.warn(String.format("Notification queue capacity reached. Remove oldest %s notification messages.", dropCount));
+      LOG.warn("Notification queue capacity reached. Remove oldest {} notification messages.", dropCount);
     }
   }
 
@@ -159,9 +159,7 @@ public class ClientNotificationNodeQueue {
     m_lastConsumeAccess.set(System.currentTimeMillis());
 
     List<ClientNotificationMessage> result = getNotifications(maxAmount, maxWaitTime, unit);
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("consumed %s notifications.", result.size()));
-    }
+    LOG.debug("consumed {} notifications.", result.size());
     return result;
   }
 

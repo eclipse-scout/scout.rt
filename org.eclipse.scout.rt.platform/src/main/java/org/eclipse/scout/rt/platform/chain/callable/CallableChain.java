@@ -205,7 +205,7 @@ public class CallableChain<RESULT> {
         undecorator.undecorate(callableResult, callableException);
       }
       catch (final RuntimeException e) {
-        LOG.error(String.format("Unexpected error during the undecoration of a command's execution. [undecorator=%s, command=%s]", undecorator.getClass().getSimpleName(), m_command), e);
+        LOG.error("Unexpected error during the undecoration of a command's execution. [undecorator={}, command={}]", undecorator.getClass().getName(), m_command, e);
       }
     }
   }

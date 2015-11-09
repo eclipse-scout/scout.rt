@@ -852,7 +852,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     String nodeId = event.getData().getString(PROP_NODE_ID);
     ITreeNode node = optTreeNodeForNodeId(nodeId);
     if (node == null) {
-      LOG.warn("Requested tree-node with ID " + nodeId + " doesn't exist. Skip nodeClicked event");
+      LOG.warn("Requested tree-node with ID {} doesn't exist. Skip nodeClicked event", nodeId);
       return;
     }
     getModel().getUIFacade().fireNodeClickFromUI(node, MouseButton.Left);
@@ -862,7 +862,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     String nodeId = event.getData().getString(PROP_NODE_ID);
     ITreeNode node = optTreeNodeForNodeId(nodeId);
     if (node == null) {
-      LOG.warn("Requested tree-node with ID " + nodeId + " doesn't exist. Skip nodeAction event");
+      LOG.warn("Requested tree-node with ID {} doesn't exist. Skip nodeAction event", nodeId);
       return;
     }
     getModel().getUIFacade().fireNodeActionFromUI(node);
@@ -878,7 +878,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     String nodeId = event.getData().getString(PROP_NODE_ID);
     ITreeNode node = optTreeNodeForNodeId(nodeId);
     if (node == null) {
-      LOG.warn("Requested tree-node with ID " + nodeId + " doesn't exist. Skip nodeExpanded event");
+      LOG.warn("Requested tree-node with ID {} doesn't exist. Skip nodeExpanded event", nodeId);
       return;
     }
     boolean expanded = event.getData().getBoolean(PROP_EXPANDED);

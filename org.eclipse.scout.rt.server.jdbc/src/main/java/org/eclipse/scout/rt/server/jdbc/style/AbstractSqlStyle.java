@@ -80,7 +80,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       String s = (String) value;
       if (s.length() > MAX_SQL_STRING_LENGTH) {
         s = s.substring(0, MAX_SQL_STRING_LENGTH);
-        LOG.warn("toPlainText of a String with more than " + MAX_SQL_STRING_LENGTH + " characters failed; truncated to '" + s + "'");
+        LOG.warn("toPlainText of a String with more than {} characters failed; truncated to '{}'", MAX_SQL_STRING_LENGTH, s);
         return "'" + s.replaceAll("'", "''") + "'";
       }
       return "'" + s.replaceAll("'", "''") + "'";
@@ -88,7 +88,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     else if (value instanceof char[]) {
       if (((char[]) value).length > MAX_SQL_STRING_LENGTH) {
         String s = new String((char[]) value, 0, MAX_SQL_STRING_LENGTH);
-        LOG.warn("toPlainText of a CLOB with more than " + MAX_SQL_STRING_LENGTH + " characters failed; truncated to '" + s + "'");
+        LOG.warn("toPlainText of a CLOB with more than {} characters failed; truncated to '{}'", MAX_SQL_STRING_LENGTH, s);
         return "'" + s.replaceAll("'", "''") + "'";
       }
       String s = new String((char[]) value);

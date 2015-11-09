@@ -138,7 +138,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
         e.initEntity();
       }
       catch (RuntimeException ex) {
-        LOG.error("entity " + e, ex);
+        LOG.error("entity {}", e, ex);
       }
     }
     for (IDataModelAttribute a : getAttributes()) {
@@ -146,7 +146,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
         a.initAttribute();
       }
       catch (RuntimeException ex) {
-        LOG.error("attribute " + a, ex);
+        LOG.error("attribute {}", a, ex);
       }
     }
   }

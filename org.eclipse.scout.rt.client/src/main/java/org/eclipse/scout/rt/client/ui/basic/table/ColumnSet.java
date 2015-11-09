@@ -158,7 +158,7 @@ public class ColumnSet {
         c.initColumn();
       }
       catch (Exception t) {
-        LOG.error("column " + c, t);
+        LOG.error("Could not init column {}", c, t);
       }
     }
     initialize();
@@ -175,7 +175,7 @@ public class ColumnSet {
         c.removePropertyChangeListener(m_columnListener);
       }
       catch (Exception t) {
-        LOG.error("column " + c, t);
+        LOG.error("Could not dispose column {}", c, t);
       }
     }
   }
@@ -255,13 +255,13 @@ public class ColumnSet {
       if (col.isInitialAlwaysIncludeSortAtBegin()) {
         sortIndex = col.getInitialSortIndex();
         if (sortIndex < 0) {
-          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured. Table: " + m_table.getClass().getName());
+          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured. Table: {}", m_table.getClass().getName());
         }
       }
       else if (col.isInitialAlwaysIncludeSortAtEnd()) {
         sortIndex = col.getInitialSortIndex();
         if (sortIndex < 0) {
-          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured. Table: " + m_table.getClass().getName());
+          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured. Table: {}", m_table.getClass().getName());
         }
       }
       else {

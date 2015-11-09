@@ -360,7 +360,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       });
     }
     else {
-      LOG.warn("there is no inner class of type ITree in " + getClass().getName());
+      LOG.warn("there is no inner class of type ITree in {}", getClass().getName());
     }
   }
 
@@ -475,7 +475,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           }
         }
         catch (Exception e) {
-          LOG.warn("read value for attribute " + id, e);
+          LOG.warn("read value for attribute {}", id, e);
           continue;
         }
         ArrayList<String> displayValueList = new ArrayList<String>();
@@ -493,7 +493,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), id);
         IDataModelAttribute foundAtt = (attPath != null ? attPath.getAttribute() : null);
         if (foundAtt == null) {
-          LOG.warn("cannot find attribute with id=" + id);
+          LOG.warn("cannot find attribute with id={}", id);
           continue;
         }
         ITreeNode node = addAttributeNode(parent, foundAtt, aggregationType, op, valueList, displayValueList);
@@ -510,7 +510,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), id);
         IDataModelEntity foundEntity = (entityPath != null ? entityPath.lastElement() : null);
         if (foundEntity == null) {
-          LOG.warn("cannot find entity with id=" + id);
+          LOG.warn("cannot find entity with id={}", id);
           continue;
         }
         ITreeNode node = addEntityNode(parent, foundEntity, negated, null, text != null ? Collections.singletonList(text) : null);
@@ -578,7 +578,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           }
         }
         catch (Exception e) {
-          LOG.warn("write op " + op, e);
+          LOG.warn("write op {}", op, e);
         }
         List<String> texts = attNode.getTexts();
         if (CollectionUtility.hasElements(texts)) {
@@ -599,7 +599,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
               XmlUtility.setObjectAttribute(xAtt, valueName, value);
             }
             catch (Exception e) {
-              LOG.warn("write value[" + i + "] for attribute " + attNode.getAttribute() + ": " + value, e);
+              LOG.warn("write value[{}] for attribute {}: {}", i, attNode.getAttribute(), value, e);
             }
             i++;
           }
@@ -782,7 +782,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         String externalId = DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(enode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
-            LOG.info("could not find entity data for: " + enode.getEntity());
+            LOG.info("could not find entity data for: {}", enode.getEntity());
           }
           return null;
         }
@@ -796,7 +796,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         String externalId = DataModelUtility.attributePathToExternalId(getDataModel(), interceptResolveAttributePath(anode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
-            LOG.info("could not find attribute data for: " + anode.getAttribute());
+            LOG.info("could not find attribute data for: {}", anode.getAttribute());
           }
           return null;
         }
@@ -829,7 +829,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), externalId);
         IDataModelEntity e = (entityPath != null ? entityPath.lastElement() : null);
         if (e == null) {
-          LOG.warn("could not find entity for: " + enodeData.getEntityExternalId());
+          LOG.warn("could not find entity for: {}", enodeData.getEntityExternalId());
           return null;
         }
         return addEntityNode(parentNode, e, enodeData.isNegative(), null, enodeData.getTexts());
@@ -840,7 +840,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), externalId);
         IDataModelAttribute a = (attPath != null ? attPath.getAttribute() : null);
         if (a == null) {
-          LOG.warn("could not find attribute for: " + anodeData.getAttributeExternalId());
+          LOG.warn("could not find attribute for: {}", anodeData.getAttributeExternalId());
           return null;
         }
         IDataModelAttributeOp op;
@@ -848,7 +848,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           op = DataModelAttributeOp.create(anodeData.getOperator());
         }
         catch (Exception e) {
-          LOG.warn("read op " + anodeData.getOperator(), e);
+          LOG.warn("read op {}", anodeData.getOperator(), e);
           return null;
         }
         return addAttributeNode(parentNode, a, anodeData.getAggregationType(), op, anodeData.getValues(), anodeData.getTexts());

@@ -53,7 +53,7 @@ public class BeanFilter {
         }
       }
       catch (Exception e) {
-        LOG.warn("loading class", e);
+        LOG.warn("Could not resolve known annotated types for [{}]", annotation.name(), e);
       }
     }
 
@@ -79,7 +79,7 @@ public class BeanFilter {
         }
       }
       catch (Exception e) {
-        LOG.warn("loading class", e);
+        LOG.warn("Could not resolve known sub classes of [{}]", ci.name(), e);
       }
     }
   }
@@ -107,7 +107,7 @@ public class BeanFilter {
       collector.add(ci.resolveClass());
     }
     catch (Exception ex) {
-      LOG.warn("loading class", ex);
+      LOG.warn("Could not resolve class [{}]", ci.name(), ex);
     }
   }
 }

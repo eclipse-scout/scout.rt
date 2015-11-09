@@ -308,7 +308,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   public void formAddedNotify() {
-    LOG.debug(this + " added");
+    LOG.debug("{} added", this);
 
     //Clear selection if form gets visible again. It must not happen earlier, since the actions typically depend on the selected row.
     clearTableSelectionIfNecessary();
@@ -342,7 +342,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
     if (selectedRow != null && isDrillDownRow(selectedRow)) {
-      LOG.debug("Clearing row for table " + getPageTableField().getTable());
+      LOG.debug("Clearing row for table {}", getPageTableField().getTable());
 
       getPageTableField().getTable().selectRow(null);
     }
@@ -529,7 +529,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   private void handleTableRowSelected(ITable table, ITableRow tableRow) {
-    LOG.debug("Table row selected: " + tableRow);
+    LOG.debug("Table row selected: {}", tableRow);
 
     // If children are not loaded rowPage cannot be estimated.
     //This is the case when the rows get replaced which restores the selection before the children are loaded (e.g. executed by a search).

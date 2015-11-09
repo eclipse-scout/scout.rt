@@ -238,7 +238,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
     catch (IOException e) {
       if (LOG.isInfoEnabled()) {
-        LOG.info("not serializable value in field " + getClass().getName() + "/" + getLabel() + ": " + e);
+        LOG.info("not serializable value in field {}/{}", getClass().getName(), getLabel(), e);
       }
     }
   }
@@ -252,7 +252,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
     catch (Exception e) {
       // be lenient, maybe the field was changed
-      LOG.warn(null, e);
+      LOG.warn("Could not load form XML [{}]", getClass().getName(), e);
     }
   }
 
@@ -321,7 +321,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   public final void setValue(VALUE rawValue) {
     if (isValueChanging()) {
-      LOG.warn("Loop detection in " + getClass().getName() + " with value " + rawValue, new Exception());
+      LOG.warn("Loop detection in {} with value {}", getClass().getName(), rawValue, new Exception());
       return;
     }
     try {
@@ -396,7 +396,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
   protected void valueChangedInternal() {
     if (LOG.isDebugEnabled()) {
-      LOG.debug(getLabel() + " " + VerboseUtility.dumpObject(getValue()));
+      LOG.debug("{} {}", getLabel(), VerboseUtility.dumpObject(getValue()));
     }
   }
 
@@ -526,7 +526,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   public final void parseAndSetValue(String text) {
     if (isValueParsing()) {
-      LOG.warn("Loop detection in " + getLabel() + " with text " + text);
+      LOG.warn("Loop detection in [{}] with text {}", getClass().getName(), text);
       return;
     }
     try {

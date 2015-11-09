@@ -356,7 +356,7 @@ public class PropertiesHelper {
         }
       }
       catch (MalformedURLException e) {
-        LOG.error("Unable to load '" + propertiesFile + "'.", e);
+        LOG.error("Unable to load '{}'.", propertiesFile, e);
         return null;
       }
     }
@@ -375,7 +375,7 @@ public class PropertiesHelper {
       props.load(in);
     }
     catch (Exception t) {
-      LOG.error("Unable to parse properties file from url '" + propertiesFileUrl.toExternalForm() + "'.", t);
+      LOG.error("Unable to parse properties file from url '{}'.", propertiesFileUrl.toExternalForm(), t);
       return;
     }
     for (Entry<Object, Object> entry : props.entrySet()) {

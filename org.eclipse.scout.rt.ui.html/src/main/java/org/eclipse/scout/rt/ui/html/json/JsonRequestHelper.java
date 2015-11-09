@@ -121,9 +121,7 @@ public class JsonRequestHelper {
       LOG.warn(sb.toString());
       return;
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Returned: " + jsonText);
-    }
+    LOG.debug("Returned: {}", jsonText);
   }
 
   /**
@@ -132,9 +130,7 @@ public class JsonRequestHelper {
   public JSONObject readJsonRequest(final ServletRequest servletRequest) {
     try {
       final String jsonData = IOUtility.getContent(servletRequest.getReader());
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Received: " + jsonData);
-      }
+      LOG.debug("Received: {}", jsonData);
       return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
     }
     catch (RuntimeException | IOException e) {

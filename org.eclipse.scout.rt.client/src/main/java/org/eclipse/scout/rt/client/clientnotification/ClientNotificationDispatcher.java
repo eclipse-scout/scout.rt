@@ -53,7 +53,7 @@ public class ClientNotificationDispatcher {
     for (ClientNotificationMessage message : notifications) {
       ClientNotificationAddress address = message.getAddress();
       Serializable notification = message.getNotification();
-      LOG.debug("Processing client notification " + notification);
+      LOG.debug("Processing client notification {}", notification);
 
       if (address.isNotifyAllNodes()) {
         // notify all nodes
@@ -69,11 +69,11 @@ public class ClientNotificationDispatcher {
       }
       else if (CollectionUtility.hasElements(address.getSessionIds())) {
         // notify all specified sessions
-        LOG.debug("Notify sessions by session id: " + address.getSessionIds());
+        LOG.debug("Notify sessions by session id: {}", address.getSessionIds());
         for (String sessionId : address.getSessionIds()) {
           IClientSession session = notificationService.getClientSession(sessionId);
           if (session == null) {
-            LOG.warn(String.format("received notification for invalid session '%s'.", sessionId));
+            LOG.warn("received notification for invalid session '{}'.", sessionId);
           }
           else {
             dispatch(session, notification);
@@ -81,7 +81,7 @@ public class ClientNotificationDispatcher {
         }
       }
       else if (CollectionUtility.hasElements(address.getUserIds())) {
-        LOG.debug("Notify sessions by user id: " + address.getUserIds());
+        LOG.debug("Notify sessions by user id: {}", address.getUserIds());
         for (String userId : address.getUserIds()) {
           for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
             dispatch(session, notification);

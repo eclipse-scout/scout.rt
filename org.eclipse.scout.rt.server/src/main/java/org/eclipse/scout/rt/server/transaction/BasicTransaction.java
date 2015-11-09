@@ -110,9 +110,7 @@ public class BasicTransaction implements ITransaction {
     for (ITransactionMember mem : getMembers()) {
       try {
         if (mem.needsCommit()) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("commit phase 1 of transaction member '{}'.", mem.getMemberId());
-          }
+          LOG.debug("commit phase 1 of transaction member '{}'.", mem.getMemberId());
           boolean b = mem.commitPhase1();
           allSuccessful = allSuccessful && b;
           if (!allSuccessful) {
@@ -123,7 +121,7 @@ public class BasicTransaction implements ITransaction {
       }
       catch (Throwable t) {
         addFailure(t);
-        LOG.error("commit phase 1 failed with exception for transaction member '" + mem.getMemberId() + "'.", t);
+        LOG.error("commit phase 1 failed with exception for transaction member '{}'.", mem.getMemberId(), t);
         break;
       }
     }
@@ -135,15 +133,13 @@ public class BasicTransaction implements ITransaction {
     for (ITransactionMember mem : getMembers()) {
       try {
         if (mem.needsCommit()) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(" " + mem);
-          }
+          LOG.debug("commit phase 2 of transaction member '{}'.", mem);
           mem.commitPhase2();
         }
       }
       catch (Throwable t) {
         addFailure(t);
-        LOG.error("commit phase 2 failed for transaction member '" + mem.getMemberId() + "'.", t);
+        LOG.error("commit phase 2 failed for transaction member '{}'.", mem.getMemberId(), t);
       }
     }
   }
@@ -153,15 +149,13 @@ public class BasicTransaction implements ITransaction {
     for (ITransactionMember mem : getMembers()) {
       try {
         if (mem.needsCommit()) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(" " + mem);
-          }
+          LOG.debug("rollback of transaction membmer '{}'.", mem);
           mem.rollback();
         }
       }
       catch (Throwable t) {
         addFailure(t);
-        LOG.error("rollback failed for transaction member '" + mem.getMemberId() + "'.", t);
+        LOG.error("rollback failed for transaction member '{}'.", mem.getMemberId(), t);
       }
     }
   }
@@ -175,13 +169,11 @@ public class BasicTransaction implements ITransaction {
     }
     for (ITransactionMember mem : a) {
       try {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(" " + mem);
-        }
+        LOG.debug("release of transaction member '{}'. " + mem);
         mem.release();
       }
       catch (Throwable t) {
-        LOG.error("release " + mem, t);
+        LOG.error("release member {}", mem, t);
       }
     }
   }
@@ -219,7 +211,7 @@ public class BasicTransaction implements ITransaction {
         mem.cancel();
       }
       catch (Throwable t) {
-        LOG.error("cancel " + mem, t);
+        LOG.error("cancel member {}", mem, t);
       }
     }
     return true;

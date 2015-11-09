@@ -167,7 +167,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       }
     }
     catch (Exception t) {
-      LOG.warn("Failed to load icon '" + tempIconName + "'", t);
+      LOG.warn("Failed to load icon '{}'", tempIconName, t);
     }
     finally {
       if (is != null) {

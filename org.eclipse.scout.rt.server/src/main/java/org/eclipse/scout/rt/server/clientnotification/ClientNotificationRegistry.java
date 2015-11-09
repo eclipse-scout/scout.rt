@@ -256,7 +256,7 @@ public class ClientNotificationRegistry {
         if (!queue.getNodeId().equals(excludedUiNodeId)) {
           queue.put(messages);
           if (isQueueExpired(queue)) {
-            LOG.debug("Removing expired queue " + queue.getNodeId());
+            LOG.debug("Removing expired queue {}", queue.getNodeId());
             iter.remove();
           }
         }

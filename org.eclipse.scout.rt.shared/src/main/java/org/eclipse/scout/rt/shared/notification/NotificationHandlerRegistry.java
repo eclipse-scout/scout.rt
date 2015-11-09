@@ -47,9 +47,8 @@ public class NotificationHandlerRegistry {
         handler.handleNotification(notification);
       }
       catch (RuntimeException e) {
-        LOG.error(String.format("Handler '%s' notification with notification '%s' failed.", handler, notification), e);
+        LOG.error("Handler '{}' notification with notification '{}' failed.", handler, notification, e);
       }
     }
   }
-
 }

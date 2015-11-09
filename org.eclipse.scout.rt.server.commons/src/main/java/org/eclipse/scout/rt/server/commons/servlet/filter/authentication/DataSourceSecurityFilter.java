@@ -217,15 +217,7 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     String jndiInitialContextFactory = m_jndiInitialContextFactory;
     String jndiProviderUrl = m_jndiProviderUrl;
     String jndiUrlPkgPrefixes = m_jndiUrlPkgPrefixes;
-    if (LOG.isInfoEnabled()) {
-      LOG.info("Opening rmi connection to: " + jndiName + "," + m_jdbcUserName);
-    }
-    if (LOG.isInfoEnabled()) {
-      LOG.info("  using initial context factory: " + jndiInitialContextFactory);
-    }
-    if (LOG.isInfoEnabled()) {
-      LOG.info("  using provider url: " + jndiProviderUrl);
-    }
+    LOG.info("Opening rmi connection. jndiName: '{}', user: '{}', initialContextFactory: '{}', providerUrl: '{}'", jndiName, m_jdbcUserName, jndiInitialContextFactory, jndiProviderUrl);
     Hashtable<String, String> ht = new Hashtable<String, String>();
     if (jndiInitialContextFactory != null) {
       ht.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialContextFactory);

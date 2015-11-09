@@ -190,31 +190,29 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
     // because that might trigger many very short polling calls until the ui session is really disposed.
     int pollWait = Math.max(Math.min(maxIdle - curIdle, BACKGROUND_POLLING_INTERVAL_SECONDS), 3);
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Polling begin for " + pollWait + " seconds");
-    }
+    LOG.debug("Polling begin for {} seconds", pollWait);
     // Blocks the current thread until:
     // - a model job terminates
     // - the max. wait time has exceeded
     uiSession.waitForBackgroundJobs(pollWait);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Polling end after " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+      LOG.debug("Polling end after {} ms", StringUtility.formatNanos(System.nanoTime() - start));
     }
   }
 
   protected void handleSessionTimeout(HttpServletResponse resp, JsonRequest jsonReq) throws IOException {
-    LOG.info("Request cannot be processed due to UI session timeout [id=" + jsonReq.getUiSessionId() + "]");
+    LOG.info("Request cannot be processed due to UI session timeout [id={}]", jsonReq.getUiSessionId());
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
   protected void handleMaxIdeTimeout(HttpServletResponse resp, JsonRequest jsonReq, HttpSession httpSession, int idleSeconds, int maxIdleSeconds) throws IOException {
-    LOG.info("Detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + maxIdleSeconds + ")");
+    LOG.info("Detected UI session timeout [id={}] after idle of {} seconds (maxInactiveInterval={})", jsonReq.getUiSessionId(), idleSeconds, maxIdleSeconds);
     httpSession.invalidate();
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
   protected void handleUnloadRequest(HttpServletResponse resp, JsonRequest jsonReq, String uiSessionAttributeName, HttpSession httpSession, IUiSession uiSession) throws IOException {
-    LOG.info("Unloading UI session with ID " + jsonReq.getUiSessionId() + " (requested by UI)");
+    LOG.info("Unloading UI session with ID {} (requested by UI)", jsonReq.getUiSessionId());
     if (uiSession != null) {
       // Unbinding the uiSession will cause it to be disposed automatically, see UiSession.valueUnbound()
       uiSession.uiSessionLock().lock();

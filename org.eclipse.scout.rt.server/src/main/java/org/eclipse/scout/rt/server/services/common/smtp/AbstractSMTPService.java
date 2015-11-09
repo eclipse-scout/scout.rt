@@ -217,7 +217,7 @@ public abstract class AbstractSMTPService implements ISMTPService {
       String debugReceiverEmail = getDebugReceiverEmail();
       if (debugReceiverEmail != null) {
         allRecipients = new Address[]{new InternetAddress(debugReceiverEmail)};
-        LOG.debug("SMTP Service: debug receiver email set to: " + debugReceiverEmail);
+        LOG.debug("SMTP Service: debug receiver email set to: {}", debugReceiverEmail);
       }
       // from address
       Address[] fromAddresses = message.getFrom();

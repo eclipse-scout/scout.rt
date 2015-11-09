@@ -56,11 +56,11 @@ public class RadioButtonGroupGrid {
   private void layoutStatic() {
     GridData parentData = m_group.getGridData();
     if (parentData.h <= 0) {
-      LOG.error(m_group.getClass().getName() + " has gridData.h=" + parentData.h + "; expected value>0");
+      LOG.error("{} has gridData.h={}; expected value>0", m_group.getClass().getName(), parentData.h);
       m_gridRows = 1;
     }
     else if (m_fields.length <= 0) {
-      LOG.error(m_group.getClass().getName() + " has fieldCount=" + m_fields.length + "; expected value>0");
+      LOG.error("{} has fieldCount={}; expected value>0", m_group.getClass().getName(), m_fields.length);
       m_gridRows = 1;
     }
     else {

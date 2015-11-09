@@ -62,7 +62,7 @@ public class JettyServer {
         port = Integer.parseInt(portConfig);
       }
       catch (Exception e) {
-        LOG.error("Error while parsing value '" + portConfig + "' for property. Using default port " + port + " instead." + SERVER_PORT_KEY, e);
+        LOG.error("Error while parsing value '{}' for property. Using default port {} instead. {}", portConfig, port, SERVER_PORT_KEY, e);
       }
     }
 
@@ -89,7 +89,7 @@ public class JettyServer {
     webAppContext.setContextPath(contextPath);
     webAppContext.setResourceBase(resourceBase);
     webAppContext.setParentLoaderPriority(true);
-    LOG.info("Starting Jetty with resourceBase=" + resourceBase);
+    LOG.info("Starting Jetty with resourceBase={}", resourceBase);
 
     webAppContext.setConfigurationClasses(new String[]{
         "org.eclipse.jetty.webapp.WebInfConfiguration",

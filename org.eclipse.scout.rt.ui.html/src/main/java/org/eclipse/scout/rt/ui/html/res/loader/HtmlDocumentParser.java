@@ -68,7 +68,7 @@ public class HtmlDocumentParser {
       if (m_params.isCacheEnabled()) {
         HttpCacheObject script = m_params.loadScriptFile(srcAttr);
         if (script == null) {
-          LOG.warn("Failed to locate script referenced in html file '" + m_params.getHtmlPath() + "': " + srcAttr);
+          LOG.warn("Failed to locate script referenced in html file '{}': {}", m_params.getHtmlPath(), srcAttr);
         }
         else {
           fingerprint = Long.toHexString(script.getResource().getFingerprint());
@@ -145,7 +145,7 @@ public class HtmlDocumentParser {
         // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
         replacement = "\n" + replacement.trim() + "\n";
         m.appendReplacement(sb, replacement);
-        LOG.info("Resolved include '" + includeName + "'");
+        LOG.info("Resolved include '{}'", includeName);
       }
     }
     m.appendTail(sb);

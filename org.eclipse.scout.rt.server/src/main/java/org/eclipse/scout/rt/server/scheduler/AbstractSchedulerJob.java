@@ -40,9 +40,7 @@ public abstract class AbstractSchedulerJob implements ISchedulerJob {
 
   @Override
   public boolean acceptTick(TickSignal signal) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("task " + getJobId() + " at " + signal);
-    }
+    LOG.debug("task {} at {}", getJobId(), signal);
     int second = signal.getSecond();
     int minute = signal.getMinute();
     int hour = signal.getHour();
@@ -56,9 +54,7 @@ public abstract class AbstractSchedulerJob implements ISchedulerJob {
     int secondOfDay = signal.getSecondOfDay();
     boolean accepted = execAcceptTick(signal, second, minute, hour, day, week, month, year, dayOfWeek, dayOfMonthReverse, dayOfYear, secondOfDay);
     if (accepted) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info("accepted task " + getJobId() + " triggered at " + signal);
-      }
+      LOG.info("accepted task {} triggered at {}", getJobId(), signal);
     }
     return accepted;
   }

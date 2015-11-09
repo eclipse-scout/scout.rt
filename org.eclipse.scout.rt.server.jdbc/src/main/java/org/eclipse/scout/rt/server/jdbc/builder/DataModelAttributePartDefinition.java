@@ -95,7 +95,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
     if (m_whereClause != null) {
       String low = m_whereClause.toLowerCase().replaceAll("\\s", " ");
       if (low.indexOf("<attribute") >= 0 && low.indexOf("<wherepart") < 0 && low.indexOf(" and ") >= 0) {
-        LOG.info(m_attributeType.getName() + " is a non-trivial attribute and should have the form <wherePart>... AND ...</wherePart> <attribute>...</attribute>: " + m_whereClause);
+        LOG.info("{} is a non-trivial attribute and should have the form <wherePart>... AND ...</wherePart> <attribute>...</attribute>: {}", m_attributeType.getName(), m_whereClause);
       }
     }
   }

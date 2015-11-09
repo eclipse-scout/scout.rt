@@ -726,7 +726,7 @@ public final class IOUtility {
           url = new URL(text);
         }
         catch (Exception e1) {
-          LOG.debug("Could not create url from : " + text + ":" + e1);
+          LOG.debug("Could not create url from '{}'", text, e1);
         }
       }
     }

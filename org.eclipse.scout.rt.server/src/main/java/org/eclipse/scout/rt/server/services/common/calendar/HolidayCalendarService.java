@@ -50,7 +50,7 @@ public class HolidayCalendarService implements IHolidayCalendarService {
           }
         }
         catch (Exception e) {
-          LOG.warn("parsing remote file:" + spec, e);
+          LOG.warn("parsing remote file: {}", spec, e);
         }
       }
     }

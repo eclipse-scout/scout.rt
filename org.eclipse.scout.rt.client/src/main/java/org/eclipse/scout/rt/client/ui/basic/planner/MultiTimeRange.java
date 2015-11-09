@@ -43,7 +43,7 @@ class MultiTimeRange implements Cloneable {
    * if the new time range has overlappings with stored timeranges, the collection is updated accordingly.
    * <p>
    * restrictions: from and to must not be <code>null</code>. from < to.
-   * 
+   *
    * @param from
    * @param to
    * @return the really added {@link TimeRange}s.
@@ -98,7 +98,7 @@ class MultiTimeRange implements Cloneable {
       checkParams(from, to);
     }
     catch (IllegalArgumentException iaex) {
-      LOG.debug("adding [" + from + ", " + to + "] failed: " + iaex);
+      LOG.debug("adding [{}, {}] failed", from, to, iaex);
       return;
     }
     Object oldEntry = m_multipleTimeRangeMap.put(from, new TimeRange(from, to));
@@ -122,7 +122,7 @@ class MultiTimeRange implements Cloneable {
    * calculates overlapping and rearranges correspondingly.
    * <p>
    * restrictions: from and to must not be <code>null</code>. from < to.
-   * 
+   *
    * @param from
    * @param to
    * @return
@@ -179,7 +179,7 @@ class MultiTimeRange implements Cloneable {
 
   /**
    * timerangeIterator()
-   * 
+   *
    * @since 06.02.2006 - tha@bsiag.com
    * @return an {@link Iterator} containing elememts of type {@link TimeRange}.
    */
@@ -189,7 +189,7 @@ class MultiTimeRange implements Cloneable {
 
   /**
    * sumDurationOfTimeranges()
-   * 
+   *
    * @since 06.02.2006 - tha@bsiag.com
    */
   public long sumDurationOfTimeranges() {
@@ -206,7 +206,7 @@ class MultiTimeRange implements Cloneable {
 
   /**
    * getBeginDate()
-   * 
+   *
    * @since 06.02.2006 - tha@bsiag.com
    */
   public Date getBeginDate() {
@@ -218,7 +218,7 @@ class MultiTimeRange implements Cloneable {
 
   /**
    * getEndDate()
-   * 
+   *
    * @since 06.02.2006 - tha@bsiag.com
    */
   public Date getEndDate() {

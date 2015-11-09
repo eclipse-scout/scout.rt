@@ -558,7 +558,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       doClose();
     }
     else {
-      LOG.info("Trying to close a form (" + getClass().getName() + " - " + getTitle() + ") with no enabled close button! override getConfiguredAskIfNeedSave() to false to make this form is unsaveable.");
+      LOG.info("Trying to close a form ({} - {}) with no enabled close button! override getConfiguredAskIfNeedSave() to false to make this form is unsaveable.", getClass().getName(), getTitle());
     }
   }
 
@@ -582,7 +582,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(40)
   protected void execTimer(String timerId) {
-    LOG.info("execTimer " + timerId);
+    LOG.info("execTimer {}", timerId);
   }
 
   /**
@@ -1032,7 +1032,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           exportedFields.add(f);
         }
         else {
-          LOG.warn("Cannot find field with id '" + fieldQId + "' in form '" + getClass().getName() + "' for DTO '" + data.getClass().getName() + "'.");
+          LOG.warn("Cannot find field with id '{}' in form '{}' for DTO '{}'.", fieldQId, getClass().getName(), data.getClass().getName());
         }
       }
     }
@@ -1108,7 +1108,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               BeanUtility.setProperties(clientPart, extensionProperties, false, null);
             }
             else {
-              LOG.warn("cannot find extension for property data '" + data.getClass().getName() + "' in form '" + this.getClass().getName() + "'.");
+              LOG.warn("cannot find extension for property data '{}' in form '{}'.", data.getClass().getName(), this.getClass().getName());
             }
           }
         }
@@ -1218,7 +1218,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }
         else {
-          LOG.warn("cannot find field data for '" + fieldQId + "' in form '" + getClass().getName() + "'.");
+          LOG.warn("cannot find field data for '{}' in form '{}'.", fieldQId, getClass().getName());
         }
       }
     }
@@ -2121,7 +2121,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         interceptDisposeForm();
       }
       catch (Exception t) {
-        LOG.warn("Failed to dispose Form " + getClass().getName(), t);
+        LOG.warn("Failed to dispose Form {}", getClass().getName(), t);
       }
 
       // Detach Form from Desktop.
@@ -2285,7 +2285,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           props.put(name, o);
         }
         catch (Exception e) {
-          LOG.warn("property " + name, e);
+          LOG.warn("Could not load XML property {}", name, e);
         }
       }
     }
@@ -2356,7 +2356,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           loadFromXml(doc.getDocumentElement());
         }
         catch (Exception e) {
-          LOG.warn("loading: " + newPath + " Exception: " + e);
+          LOG.warn("Could not load XML from file: {}", newPath, e);
           MessageBoxes.createOk().withDisplayParent(this).withHeader(TEXTS.get("LoadFormXmlFailedText")).show();
         }
       }
@@ -2920,9 +2920,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       @Override
       public void run() throws Exception {
         try {
-          if (LOG.isInfoEnabled()) {
-            LOG.info("timer {}", timerId);
-          }
+          LOG.info("timer {}", timerId);
           interceptTimer(timerId);
         }
         catch (RuntimeException e) {

@@ -137,7 +137,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       }
     }
     catch (Exception e) {
-      LOG.error(null, e);
+      LOG.error("Unexpected Exception", e);
     }
   }
 

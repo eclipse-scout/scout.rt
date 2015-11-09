@@ -929,13 +929,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       disposeFieldInternal();
     }
     catch (Exception e) {
-      LOG.warn("Field " + getClass().getName(), e);
+      LOG.warn("Field [{}]", getClass().getName(), e);
     }
     try {
       interceptDisposeField();
     }
     catch (Exception e) {
-      LOG.warn("Field " + getClass().getName(), e);
+      LOG.warn("Field [{}]", getClass().getName(), e);
     }
   }
 

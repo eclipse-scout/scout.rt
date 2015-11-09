@@ -168,7 +168,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
         }
       }
       catch (RuntimeException p) {
-        LOG.warn("invalid bookmark folder binary data for id=" + id + ": " + p);
+        LOG.warn("invalid bookmark folder binary data for id={}: {}", id, p);
       }
     }
     return null;
@@ -188,7 +188,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
         }
       }
       catch (RuntimeException p) {
-        LOG.warn("invalid bookmark folder binary data for id=" + id + ": " + p);
+        LOG.warn("invalid bookmark folder binary data for id={}: {}", id, p);
       }
     }
     return null;

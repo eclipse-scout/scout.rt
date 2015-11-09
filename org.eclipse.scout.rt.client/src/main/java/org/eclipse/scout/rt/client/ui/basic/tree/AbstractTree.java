@@ -405,7 +405,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         local = "local".equals(url.getHost());
       }
       catch (MalformedURLException e) {
-        LOG.error("", e);
+        LOG.error("Malformed URL '{}'", ref, e);
       }
     }
     execHyperlinkAction(url, ref, local);
@@ -682,7 +682,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       interceptDisposeTree();
     }
     catch (Exception e) {
-      LOG.warn(getClass().getName(), e);
+      LOG.warn("Exception while disposing tree", e);
     }
   }
 
@@ -1085,7 +1085,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           m_rootNode.ensureChildrenLoaded();
         }
         catch (RuntimeException e) {
-          LOG.error("expanding root node of " + getTitle(), e);
+          LOG.error("expanding root node of {}", getTitle(), e);
         }
       }
     }
@@ -1455,7 +1455,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setNodeExpanded(parent, true);
     // loop detection
     if (level >= 32) {
-      LOG.warn("detected loop on tree node " + parent);
+      LOG.warn("detected loop on tree node {}", parent);
     }
     else {
       List<ITreeNode> children = parent.getChildNodes();
@@ -1485,7 +1485,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void fetchAllCollapsingNodesRec(ITreeNode parent, int level, List<ITreeNode> list) {
     // loop detection
     if (level >= 32) {
-      LOG.warn("detected loop on tree node " + parent);
+      LOG.warn("detected loop on tree node {}", parent);
     }
     else {
       if (parent.isExpanded()) {
@@ -2576,7 +2576,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     try {
       m_processTreeBufferLoopDetection++;
       if (m_processTreeBufferLoopDetection > 100) {
-        LOG.error("LOOP DETECTION in " + getClass() + ". see stack trace for more details.", new Exception("LOOP DETECTION"));
+        LOG.error("LOOP DETECTION in {}. see stack trace for more details.", getClass(), new Exception("LOOP DETECTION"));
         return;
       }
       processDecorationBuffer();
@@ -2603,7 +2603,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
               interceptDecorateCell(node, node.getCellForUpdate());
             }
             catch (Exception t) {
-              LOG.warn("node " + node.getClass() + " " + node.getCell().getText(), t);
+              LOG.warn("node {} ({})", node.getClass(), node.getCell().getText(), t);
             }
           }
         }

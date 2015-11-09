@@ -117,7 +117,7 @@ public class ClientUIPreferences {
         return r;
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get form bounds for [{}]. Loaded value '{}'", form.getClass().getName(), value, e);
       }
     }
     return null;
@@ -600,7 +600,7 @@ public class ClientUIPreferences {
         return Integer.parseInt(value);
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get table column width for [{}]. Loaded value '{}'", col.getClass().getName(), value, e);
       }
     }
     return defaultWidth;
@@ -647,7 +647,7 @@ public class ClientUIPreferences {
         return Integer.parseInt(value);
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get table column view index for [{}]. Loaded value '{}'", col.getClass().getName(), value, e);
       }
     }
     return defaultIndex;
@@ -767,7 +767,7 @@ public class ClientUIPreferences {
         return r;
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get applicatoin window bounds. Loaded value '{}'", value, e);
       }
     }
     return null;
@@ -795,7 +795,7 @@ public class ClientUIPreferences {
         return Integer.parseInt(value);
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get calendar display mode. Loaded value '{}'", value, e);
       }
     }
     return defaultValue;
@@ -813,7 +813,7 @@ public class ClientUIPreferences {
         return TypeCastUtility.castValue(value, Boolean.class);
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get calendar display condensed. Loaded value '{}'", value, e);
       }
     }
     return defaultValue;
@@ -830,7 +830,7 @@ public class ClientUIPreferences {
         return TypeCastUtility.castValue(value, Integer.class);
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get integer property '{}'. Loaded value '{}'", propName, value, e);
         if (setDefaultAsProperty) {
           setPropertyInteger(propName, defaultValue);
         }
@@ -900,7 +900,7 @@ public class ClientUIPreferences {
         return TypeCastUtility.castValue(value, Double.class);
       }
       catch (Exception e) {
-        LOG.warn("value=" + value, e);
+        LOG.warn("could not get double property '{}'. Loaded value '{}'", propName, value, e);
       }
     }
     return null;

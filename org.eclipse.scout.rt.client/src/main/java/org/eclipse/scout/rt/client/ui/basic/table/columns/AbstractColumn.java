@@ -667,7 +667,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     else {
       @SuppressWarnings("unchecked")
       IValueField<VALUE> valueField = (IValueField<VALUE>) editorField;
-      LOG.debug(String.format("complete edit: [value=%s, text=%s, status=%s]", valueField.getValue(), valueField.getDisplayText(), valueField.getErrorStatus()));
+      LOG.debug("complete edit: [value={}, text={}, status={}]", valueField.getValue(), valueField.getDisplayText(), valueField.getErrorStatus());
 
       Cell cell = row.getCellForUpdate(this);
       if (!contentEquals(cell, valueField)) {
@@ -687,7 +687,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         }
       }
 
-      LOG.debug(String.format("cell updated: [value=%s, text=%s, status=%s]", cell.getValue(), cell.getText(), cell.getErrorStatus()));
+      LOG.debug("cell updated: [value={}, text={}, status={}]", cell.getValue(), cell.getText(), cell.getErrorStatus());
     }
   }
 

@@ -47,7 +47,7 @@ public class UiThemeUtility {
     else {
       s_configTheme = CONFIG.getPropertyValue(UiThemeProperty.class);
       s_configThemeRead = true;
-      LOG.info("UI theme configured in config.properties: " + s_configTheme);
+      LOG.info("UI theme configured in config.properties: {}", s_configTheme);
       return s_configTheme;
     }
   }

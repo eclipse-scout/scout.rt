@@ -58,7 +58,7 @@ public class ScriptFileLocator {
     }
 
     // when no file matches
-    LOG.warn("locate " + requestPath + ": does not exist (no library, macro or source module)");
+    LOG.warn("locate {}: does not exist (no library, macro or source module)", requestPath);
     return null;
   }
 

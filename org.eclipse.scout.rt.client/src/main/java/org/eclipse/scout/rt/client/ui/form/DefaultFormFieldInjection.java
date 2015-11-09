@@ -64,14 +64,14 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
     Replace replace = fieldClass.getAnnotation(Replace.class);
     InjectFieldTo injectFieldTo = fieldClass.getAnnotation(InjectFieldTo.class);
     if (replace == null && injectFieldTo == null) {
-      LOG.warn("Ignoring field [" + fieldClass + "] since neither @" + InjectFieldTo.class.getSimpleName() + " nor @" + Replace.class.getSimpleName() + " is declared.");
+      LOG.warn("Ignoring field [{}] since neither @{} nor @{} is declared.", fieldClass, InjectFieldTo.class.getSimpleName(), Replace.class.getSimpleName());
       return;
     }
     if (replace != null && injectFieldTo != null) {
-      LOG.warn("@" + InjectFieldTo.class.getSimpleName() + " annotation is ignored since @" + Replace.class.getSimpleName() + " is available as well on class [" + fieldClass + "]. You should remove one of both annotations.");
+      LOG.warn("@{} annotation is ignored since @{} is available as well on class [{}]. You should remove one of both annotations.", InjectFieldTo.class.getSimpleName(), Replace.class.getSimpleName(), fieldClass);
     }
     else if (injectFieldTo != null && !ICompositeField.class.isAssignableFrom(injectFieldTo.value())) {
-      LOG.warn("Ignoring field [" + fieldClass + "] since it is not injected into an " + ICompositeField.class.getSimpleName() + ", but @" + InjectFieldTo.class.getSimpleName() + "(" + injectFieldTo.value() + ")");
+      LOG.warn("Ignoring field [{}] since it is not injected into an {}, but @{}({})", fieldClass, ICompositeField.class.getSimpleName(), InjectFieldTo.class.getSimpleName(), injectFieldTo.value());
       return;
     }
     m_injectedFieldList.add(fieldClass);

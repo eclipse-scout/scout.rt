@@ -76,15 +76,7 @@ public class SqlConnectionBuilder {
       String jndiInitialContextFactory = sqlService.getJndiInitialContextFactory();
       String jndiProviderUrl = sqlService.getJndiProviderUrl();
       String jndiUrlPkgPrefixes = sqlService.getJndiUrlPkgPrefixes();
-      if (LOG.isInfoEnabled()) {
-        LOG.info("Opening rmi connection to: " + jndiName + "," + user);
-      }
-      if (LOG.isInfoEnabled()) {
-        LOG.info("  using initial context factory: " + jndiInitialContextFactory);
-      }
-      if (LOG.isInfoEnabled()) {
-        LOG.info("  using provider url: " + jndiProviderUrl);
-      }
+      LOG.info("Opening rmi connection. jndiName: '{}', user: '{}', initialContextFactory: '{}', providerUrl: '{}'", jndiName, user, jndiInitialContextFactory, jndiProviderUrl);
       Hashtable<String, String> ht = new Hashtable<String, String>();
       if (jndiInitialContextFactory != null) {
         ht.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialContextFactory);

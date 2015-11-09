@@ -437,7 +437,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       propertySupport.setPropertyString(PROP_KEY_STROKE, scoutKeystroke.getNormalizedKeystroke());
     }
     else {
-      LOG.warn("Could not create keystroke '" + k + "' because it is invalid!");
+      LOG.warn("Could not create keystroke '{}' because it is invalid!", k);
     }
   }
 

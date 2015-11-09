@@ -67,7 +67,7 @@ public final class NlsUtility {
         field.set(null, field.getName());
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        LOG.warn("Could not assign field name to field '{}'", field, e);
       }
     }
   }

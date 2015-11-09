@@ -40,7 +40,7 @@ public class CodeTypeChangedNotification implements Serializable {
     while (codeTypeClassIt.hasNext()) {
       Class<? extends ICodeType<?, ?>> next = codeTypeClassIt.next();
       if (next != null && next.isAssignableFrom(Serializable.class)) {
-        LOG.error("Code type '" + next.getName() + "' is not serializable!");
+        LOG.error("Code type [{}] is not serializable!", next.getName());
         codeTypeClassIt.remove();
       }
     }

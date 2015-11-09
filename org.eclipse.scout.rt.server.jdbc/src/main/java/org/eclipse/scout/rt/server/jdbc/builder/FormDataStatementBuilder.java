@@ -841,12 +841,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
     EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), node.getEntityExternalId());
     IDataModelEntity entity = (entityPath != null ? entityPath.lastElement() : null);
     if (entity == null) {
-      LOG.warn("no entity for external id: " + node.getEntityExternalId());
+      LOG.warn("no entity for external id: {}", node.getEntityExternalId());
       return null;
     }
     DataModelEntityPartDefinition def = m_dataModelEntMap.get(entity.getClass());
     if (def == null) {
-      LOG.warn("no PartDefinition for entity: " + entity);
+      LOG.warn("no PartDefinition for entity: {}", entity);
       return null;
     }
     ComposerEntityNodeData parentEntityNode = getParentNodeOfType(node, ComposerEntityNodeData.class);
@@ -1082,7 +1082,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), node.getAttributeExternalId());
     IDataModelAttribute attribute = (attPath != null ? attPath.getAttribute() : null);
     if (attribute == null) {
-      LOG.warn("no attribute for external id: " + node.getAttributeExternalId());
+      LOG.warn("no attribute for external id: {}", node.getAttributeExternalId());
       return new EntityContribution();
     }
     DataModelAttributePartDefinition def = m_dataModelAttMap.get(attribute.getClass());
@@ -1093,7 +1093,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       }
     }
     if (def == null) {
-      LOG.warn("no PartDefinition for attribute: " + attribute);
+      LOG.warn("no PartDefinition for attribute: {}", attribute);
       return new EntityContribution();
     }
     List<Object> bindValues = new ArrayList<Object>();
@@ -1342,7 +1342,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     String attPart = StringUtility.getTag(stm, "attribute");
     stm = StringUtility.removeTag(stm, "attribute").trim();
     if (stm.length() > 0) {
-      LOG.warn("attribute part is not well-formed; contains wherePart tag and also other sql text: " + stm);
+      LOG.warn("attribute part is not well-formed; contains wherePart tag and also other sql text: {}", stm);
     }
     //
     //from

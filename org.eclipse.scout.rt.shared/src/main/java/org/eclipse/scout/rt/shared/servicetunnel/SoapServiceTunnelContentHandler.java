@@ -161,7 +161,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
       setData(out, msg, compressed);
       y = System.nanoTime() - y;
       if (debugEnabled) {
-        LOG.debug("message encoding took " + y + " nanoseconds");
+        LOG.debug("message encoding took {} nanoseconds", y);
       }
 
       out.write("</data>\n");
@@ -176,7 +176,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
         String sentData = ((DebugOutputStream) stream).getContent(StandardCharsets.UTF_8.name());
         int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
         Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
-        LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
+        LOG.debug("lastWrittenCharacter={}, lastThrownException={}, sentData: {}", lastWrittenCharacter, lastThrownException, sentData);
       }
     }
   }
@@ -220,7 +220,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
       setData(out, msg, compressed);
       y = System.nanoTime() - y;
       if (debugEnabled) {
-        LOG.debug("message encoding took " + y + " nanoseconds");
+        LOG.debug("message encoding took {} nanoseconds", y);
       }
 
       out.write("</data>\n");
@@ -235,7 +235,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
         String sentData = ((DebugOutputStream) stream).getContent(StandardCharsets.UTF_8.name());
         int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
         Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
-        LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
+        LOG.debug("lastWrittenCharacter={}, lastThrownException={}, sentData: {}", lastWrittenCharacter, lastThrownException, sentData);
       }
     }
   }
@@ -255,7 +255,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
       writer.write(base64Data);
     }
     catch (NotSerializableException e) {
-      LOG.error("Error serializing data " + msg);
+      LOG.error("Error serializing data '{}'", msg);
       throw e;
     }
     finally {
@@ -321,15 +321,13 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
         String receivedData = ((DebugInputStream) in).getContent(StandardCharsets.UTF_8.name());
         int lastReadCharacter = ((DebugInputStream) in).getLastReadCharacter();
         Throwable lastThrownException = ((DebugInputStream) in).getLastThrownException();
-        LOG.debug("lastReadCharacter=" + lastReadCharacter + ",lastThrownException=" + lastThrownException + ", receivedData:\n" + receivedData);
+        LOG.debug("lastReadCharacter={}, lastThrownException={}, receivedData:\n{}", lastReadCharacter, lastThrownException, receivedData);
       }
     }
     long y = System.nanoTime();
     Object res = getData(dataPart, compressed);
     y = System.nanoTime() - y;
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("message decoding took " + y + " nanoseconds");
-    }
+    LOG.debug("message decoding took {} nanoseconds", y);
     return res;
   }
 

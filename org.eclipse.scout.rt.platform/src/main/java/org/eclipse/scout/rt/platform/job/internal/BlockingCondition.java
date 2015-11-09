@@ -170,7 +170,7 @@ public class BlockingCondition implements IBlockingCondition {
     }
     catch (final TimeoutException e) {
       unregisterAndMarkAsUnblocked(jobTask);
-      LOG.debug(String.format("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      LOG.debug("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition={}, thread={}]", m_name, Thread.currentThread().getName(), e);
       return false;
     }
     finally {
@@ -226,7 +226,7 @@ public class BlockingCondition implements IBlockingCondition {
       throw new ProcessingException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
     }
     catch (final TimeoutException e) {
-      LOG.debug(String.format("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      LOG.debug("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition={}, thread={}]", m_name, Thread.currentThread().getName(), e);
       return false;
     }
     finally {

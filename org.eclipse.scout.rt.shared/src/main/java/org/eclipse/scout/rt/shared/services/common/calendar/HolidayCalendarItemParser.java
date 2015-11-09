@@ -134,7 +134,7 @@ public class HolidayCalendarItemParser {
         }
       }
       catch (Exception e) {
-        LOG.warn("item " + holidayElem.toString(), e);
+        LOG.warn("Could not parse item '{}'", holidayElem, e);
       }
     }
     newList.addAll(holidayMap.values());
