@@ -7,7 +7,7 @@
     <groupId>${groupId}</groupId>
     <artifactId>${groupId}.parent</artifactId>
     <version>${version}</version>
-	<relativePath>../${groupId}.parent/pom.xml</relativePath>
+    <relativePath>../${groupId}.parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>${groupId}.client</artifactId>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-	  <scope>test</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

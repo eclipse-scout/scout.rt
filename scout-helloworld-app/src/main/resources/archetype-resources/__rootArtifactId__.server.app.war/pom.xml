@@ -7,7 +7,7 @@
     <groupId>${groupId}</groupId>
     <artifactId>${groupId}.parent</artifactId>
     <version>${version}</version>
-	<relativePath>../${groupId}.parent/pom.xml</relativePath>
+    <relativePath>../${groupId}.parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>${groupId}.server.app.war</artifactId>

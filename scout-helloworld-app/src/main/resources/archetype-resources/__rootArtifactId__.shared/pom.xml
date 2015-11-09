@@ -7,7 +7,7 @@
     <groupId>${groupId}</groupId>
     <artifactId>${groupId}.parent</artifactId>
     <version>${version}</version>
-	<relativePath>../${groupId}.parent/pom.xml</relativePath>
+    <relativePath>../${groupId}.parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>${groupId}.shared</artifactId>
@@ -22,9 +22,9 @@
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
-	  <scope>test</scope>
+      <scope>test</scope>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
     </dependency>
@@ -33,5 +33,4 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
   </dependencies>
-
 </project>

@@ -6,8 +6,8 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>1.6.4</version>
-  <relativePath></relativePath>
+    <version>1.6.6</version>
+    <relativePath></relativePath>
   </parent>
 
   <groupId>${groupId}</groupId>
@@ -20,7 +20,7 @@
   <properties>
     <${groupId}.version>${project.version}</${groupId}.version>
     <jdk.source.version>${javaVersion}</jdk.source.version>
-    <scout.version>5.2.0.M3</scout.version>
+    <org.eclipse.scout.rt_version>5.2.0.B001</org.eclipse.scout.rt_version>
   </properties>
 
   <modules>
@@ -34,37 +34,36 @@
 
   <dependencyManagement>
     <dependencies>
-    <!-- Scout Dependencies -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt</artifactId>
-      <version>${scout.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
+      <!-- Scout Dependencies -->
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt</artifactId>
+        <version>${org.eclipse.scout.rt_version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
-    <!-- Application Dependencies -->
-    <dependency>
+      <!-- Application Dependencies -->
+      <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.client</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-    <dependency>
+      <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.shared</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-    <dependency>
+      <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.server</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-    <dependency>
+      <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.ui.html</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
 </project>
