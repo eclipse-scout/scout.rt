@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
@@ -45,7 +46,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * A page containing a list of "menu" entries<br>
@@ -339,6 +339,16 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       return true;
     }
 
+    @Override
+    protected boolean getConfiguredHeaderVisible() {
+      return false;
+    }
+
+    @Override
+    protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
+      // header is invisible -> not necessary to add menus
+    }
+
     @SuppressWarnings("unused")
     public LabelColumn getLabelColumn() {
       return getColumnSet().getColumnByClass(LabelColumn.class);
@@ -346,10 +356,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
 
     @Order(1)
     public class LabelColumn extends AbstractStringColumn {
-      @Override
-      protected String getConfiguredHeaderText() {
-        return ScoutTexts.get("Folders");
-      }
 
       @Override
       protected void decorateCellInternal(Cell cell, ITableRow row) {
