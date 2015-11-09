@@ -24,6 +24,7 @@ public class TableColumnState implements Serializable, Cloneable {
   private byte[] m_columnFilterData;
   private boolean m_groupingActive;
   private String m_aggregationFunction;
+  private String m_backgroundEffect;
 
   public TableColumnState() {
   }
@@ -38,6 +39,7 @@ public class TableColumnState implements Serializable, Cloneable {
     this.m_columnFilterData = state.m_columnFilterData;
     this.m_groupingActive = state.m_groupingActive;
     this.m_aggregationFunction = state.m_aggregationFunction;
+    this.m_backgroundEffect = state.m_backgroundEffect;
   }
 
   public String getClassName() {
@@ -115,6 +117,14 @@ public class TableColumnState implements Serializable, Cloneable {
 
   public void setAggregationFunction(String aggregationFunction) {
     m_aggregationFunction = aggregationFunction;
+  }
+
+  public String getBackgroundEffect() {
+    return m_backgroundEffect;
+  }
+
+  public void setBackgroundEffect(String backgroundEffect) {
+    m_backgroundEffect = backgroundEffect;
   }
 
 }

@@ -394,6 +394,7 @@ public final class BookmarkUtility {
 
       if (c instanceof INumberColumn) {
         colState.setAggregationFunction(((INumberColumn) c).getAggregationFunction());
+        colState.setBackgroundEffect(((INumberColumn) c).getBackgroundEffect());
       }
 
       if (columnSet.isUserSortColumn(c)) {
@@ -443,13 +444,15 @@ public final class BookmarkUtility {
         columnSet.setVisibleColumns(visibleColumns);
       }
 
-      //aggregation functions:
+      //aggregation functions and background effect:
       for (TableColumnState colState : oldColumns) {
-        if (colState.getAggregationFunction() != null) {
-          IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
-          if (col instanceof INumberColumn) {
-            ((INumberColumn) col).setAggregationFunction(colState.getAggregationFunction());
+
+        IColumn<?> col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
+        if (col instanceof INumberColumn) {
+          if (colState.getAggregationFunction() != null) {
+            ((INumberColumn<?>) col).setAggregationFunction(colState.getAggregationFunction());
           }
+          ((INumberColumn<?>) col).setBackgroundEffect(colState.getBackgroundEffect());
         }
       }
 
