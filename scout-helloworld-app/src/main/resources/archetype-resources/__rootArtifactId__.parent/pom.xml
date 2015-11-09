@@ -6,8 +6,8 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>1.5</version>
-	<relativePath></relativePath>
+    <version>1.6.4</version>
+  <relativePath></relativePath>
   </parent>
 
   <groupId>${groupId}</groupId>
@@ -19,8 +19,8 @@
 
   <properties>
     <${groupId}.version>${project.version}</${groupId}.version>
-  	<jdk.source.version>${javaVersion}</jdk.source.version>
-  	<scout.version>5.2.0.B001</scout.version>
+    <jdk.source.version>${javaVersion}</jdk.source.version>
+    <scout.version>5.2.0.B001</scout.version>
   </properties>
 
   <modules>
@@ -33,16 +33,16 @@
   </modules>
 
   <dependencyManagement>
-  	<dependencies>
-	  <!-- Scout Dependencies -->
-	  <dependency>
+    <dependencies>
+    <!-- Scout Dependencies -->
+    <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt</artifactId>
         <version>${scout.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-	  <dependency>
+    <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
         <version>${scout.version}</version>
@@ -50,28 +50,28 @@
         <scope>import</scope>
       </dependency>
 
-	  <!-- Application Dependencies -->
-	  <dependency>
+    <!-- Application Dependencies -->
+    <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.client</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-	  <dependency>
+    <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.shared</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-	  <dependency>
+    <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.server</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-	  <dependency>
+    <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${groupId}.ui.html</artifactId>
         <version>${${groupId}.version}</version>
       </dependency>
-  	</dependencies>
+    </dependencies>
   </dependencyManagement>
 
   <build>
@@ -89,7 +89,7 @@
             <configuration>
               <sources>
                 <source>src/main/webapp</source>
-				<source>src/generated/java</source>
+        <source>src/generated/java</source>
               </sources>
             </configuration>
           </execution>
