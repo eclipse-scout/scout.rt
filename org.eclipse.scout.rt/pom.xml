@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
     <relativePath></relativePath>
   </parent>
 
@@ -444,4 +444,17 @@
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </pluginRepository>
   </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>repo.eclipse.org</id>
+      <name>Scout Repository - Releases</name>
+      <url>https://repo.eclipse.org/content/repositories/scout-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>repo.eclipse.org</id>
+      <name>Scout Repository - Snapshots</name>
+      <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
