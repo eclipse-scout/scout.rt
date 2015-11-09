@@ -68,14 +68,6 @@
 
   &:not(.disabled):hover {
     color: @hover-color;
-
-    &.menu-button.default-menu {
-      background-color: @default-button-hover-background-color;
-    }
-
-    &:not(.default-menu) > .font-icon {
-      color:@hover-color;
-    }
   }
 
   &.disabled {
@@ -140,8 +132,21 @@
   /* cut off. We should find a better solution for this. */
   white-space: nowrap;
 
+  &:not(.disabled):not(.default-menu):hover {
+    color: @button-hover-color;
+
+    & > .font-icon {
+      color:@button-hover-color;
+    }
+  }
+
   &:not(.disabled):active {
-    background-color: @menubar-button-active-color;
+    color: @button-active-color;
+    background-color: @menubar-button-active-background-color;
+
+    & > .font-icon {
+      color: @button-active-color;
+    }
   }
 
   &:focus {
@@ -159,15 +164,21 @@
   &.default-menu:not(.disabled) {
     #scout.font-text-normal(@font-weight-bold);
     background-color: @default-button-background-color;
+    /* same color border is necessary to align the text with text from buttons with a real border */
+    border-color: @default-button-background-color;
     color: @default-button-color;
-    border-width: 0;
 
     &:focus {
       color: @default-button-color;
     }
 
+    &:hover {
+      background-color: @default-button-hover-background-color;
+    }
+
     &:active {
       background-color: @default-button-active-background-color;
+      border-color: @default-button-active-background-color;
     }
 
     & > .font-icon {

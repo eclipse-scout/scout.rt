@@ -114,7 +114,8 @@
 @boxbutton-active-background-color: @palette-gray-4;
 @boxbutton-background-color: @palette-gray-3;
 @boxbutton-border-color: @palette-gray-5;
-@button-active-color: @palette-gray-3;
+@button-active-color: @active-color;
+@button-active-background-color: @palette-gray-3;
 @button-background-color: @control-background-color;
 @button-border-color: @button-color;
 @button-color: @palette-blue-6;
@@ -123,6 +124,7 @@
 @button-disabled-color: @disabled-color;
 @button-font-icon-color: @button-color;
 @button-font-icon-disabled-color: @button-disabled-border-color;
+@button-hover-color: @button-color;
 @calendar-day-color: @palette-gray-7;
 @calendar-mode-active-text-color: @palette-blue-7;
 @calendar-out-background-color: none;
@@ -141,9 +143,12 @@
 @form-background-color: @background-color;
 @form-tool-popup-main-menubar-background-color: @menubar-background-color;
 @group-box-title-border-color: @border-color;
+@key-box-background-color: @palette-orange-2;
+@key-box-border-color: @key-box-background-color;
+@key-box-color: @palette-gray-10;
 @main-menubar-background-color: @menubar-background-color;
 @menubar-background-color: @palette-gray-1;
-@menubar-button-active-color: @button-active-color;
+@menubar-button-active-background-color: @button-active-background-color;
 @menubar-button-background-color: @button-background-color;
 @menubar-button-border-color: @button-border-color;
 @menubar-button-color: @button-color;

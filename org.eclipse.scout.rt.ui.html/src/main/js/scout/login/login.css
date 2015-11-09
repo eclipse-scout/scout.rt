@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 #login-box {
-
   & input,
   & button {
     width: 100%;
@@ -26,6 +25,10 @@
     background-color: @default-button-background-color;
     color: @default-button-color;
     border-width: 0;
+
+    &:not(.disabled):active {
+      background-color: @default-button-active-background-color;
+    }
 
     &.login-error {
       background-color: @palette-red-4;
