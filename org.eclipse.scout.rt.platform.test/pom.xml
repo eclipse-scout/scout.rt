@@ -23,7 +23,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <master_test_timeout>60</master_test_timeout>
+    <master_test_timeout>90</master_test_timeout>
   </properties>
 
   <dependencies>
