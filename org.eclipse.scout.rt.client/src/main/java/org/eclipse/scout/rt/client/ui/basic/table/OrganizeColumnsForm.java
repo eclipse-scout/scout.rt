@@ -1315,13 +1315,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                         m_table.getTableCustomizer().removeColumn((ICustomColumn<?>) selectedCol);
                       }
                     }
-                    // FIXME ASA either remove completely or elaborate
-//                    else {
-//                      if (selectedCol.isColumnFilterActive()) {
-//                        m_table.getUserFilterManager().removeFilterByKey(selectedCol);
-//                      }
-//                      setColumnVisible(selectedRow, false);
-//                    }
 
                   }
                 }

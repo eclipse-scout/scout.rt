@@ -95,6 +95,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
@@ -1892,7 +1893,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * default creates null
    */
   protected ITableCustomizer createTableCustomizer() {
-    return null;
+    return BEANS.get(ITableCustomizerProvider.class).createTableCustomizer(this);
   }
 
   /*
