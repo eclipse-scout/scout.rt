@@ -8,10 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.root-group-box {
-  overflow: hidden;
-}
-
 @root-group-box-padding-left: @bench-padding-x - @mandatory-indicator-width;
 @root-group-box-padding-right: @bench-padding-x;
 
@@ -113,7 +109,6 @@
 
 .group-box-body {
   position: relative;
-  overflow: hidden;
   padding: @group-margin-top 0 @group-margin-bottom 0;
 
   &.y-padding-invisible {
