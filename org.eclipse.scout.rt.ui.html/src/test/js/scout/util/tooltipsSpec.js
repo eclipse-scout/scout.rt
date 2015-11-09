@@ -54,7 +54,7 @@ describe("scout.tooltips", function() {
       parent: new scout.NullWidget(),
       session: session,
       tooltipText: 'Test2',
-      tooltipDelay: 0
+      delay: 0
     });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -83,7 +83,7 @@ describe("scout.tooltips", function() {
         parent: new scout.NullWidget(),
         session: session,
         tooltipText: '',
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -104,7 +104,7 @@ describe("scout.tooltips", function() {
         tooltipText: function() {
           return 'Test3';
         },
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -127,7 +127,7 @@ describe("scout.tooltips", function() {
         tooltipText: function() {
           return undefined;
         },
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -145,7 +145,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -166,7 +166,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -190,7 +190,7 @@ describe("scout.tooltips", function() {
         parent: new scout.NullWidget(),
         session: session,
         tooltipText: 'Test6',
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
@@ -214,7 +214,7 @@ describe("scout.tooltips", function() {
         tooltipText: function() {
           return (formField.$container.is(arguments[0]) && arguments.length == 1) ? 'Test8' : 'InvalidArguments';
         },
-        tooltipDelay: 0
+        delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 

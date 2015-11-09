@@ -43,7 +43,7 @@ scout.tooltips = {
 scout.TooltipSupport = function(options) {
   var defaultOptions = {
     selector: null,
-    tooltipDelay: 350,
+    delay: 350,
     tooltipText: undefined
   };
   options = $.extend({}, defaultOptions, options);
@@ -75,7 +75,7 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
   var $comp = $(event.currentTarget);
   clearTimeout(this._tooltipTimeoutId);
-  this._tooltipTimeoutId = setTimeout(this._showTooltip.bind(this, $comp), this._options.tooltipDelay);
+  this._tooltipTimeoutId = setTimeout(this._showTooltip.bind(this, $comp), this._options.delay);
 };
 
 scout.TooltipSupport.prototype._onMouseLeave = function(event) {

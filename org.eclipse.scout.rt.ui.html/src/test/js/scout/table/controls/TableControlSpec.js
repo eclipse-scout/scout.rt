@@ -136,49 +136,6 @@ describe("TableControl", function() {
 
     });
 
-    describe("tooltipText", function() {
-
-      it("attaches hover listener, but only once", function() {
-        var action = createAction(createModel());
-        action.setParent(table);
-        table.tableControls = [action];
-        table.render(session.$entryPoint);
-
-        spyOn(action.$container, 'hover').and.callThrough();
-
-        var event = createPropertyChangeEvent(action, {
-          "tooltipText": 'my tooltip'
-        });
-        action.onModelPropertyChange(event);
-
-        event = createPropertyChangeEvent(action, {
-          "tooltipText": 'my tooltip new'
-        });
-        action.onModelPropertyChange(event);
-
-        expect(action.$container.hover.calls.count()).toEqual(1);
-      });
-
-      it("attaches hover listener, even when re rendering", function() {
-        var action = createAction(createModel());
-        action.setParent(table);
-        table.tableControls = [action];
-        table.render(session.$entryPoint);
-
-        table.remove();
-        table.render(session.$entryPoint);
-        spyOn(action.$container, 'hover').and.callThrough();
-
-        var event = createPropertyChangeEvent(action, {
-          "tooltipText": 'my tooltip'
-        });
-        action.onModelPropertyChange(event);
-
-        expect(action.$container.hover.calls.count()).toEqual(1);
-      });
-
-    });
-
   });
 
   describe("setSelected", function() {

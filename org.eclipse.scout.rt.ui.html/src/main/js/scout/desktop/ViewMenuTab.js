@@ -95,6 +95,7 @@ scout.ViewMenuTab.prototype._renderSelected = function() {
   } else {
     scout.tooltips.install(this.$container, {
       parent: this.session.desktop,
+      delay: 0,
       text: this.text
     });
   }

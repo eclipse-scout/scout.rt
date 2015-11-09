@@ -11,14 +11,13 @@
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
   this.$title;
-  this._onMouseEvent = this.doAction.bind(this);
   this._breadcrumbEnabled = false;
 };
 scout.inherits(scout.ViewButton, scout.Action);
 
 scout.ViewButton.prototype._render = function($parent) {
   if (this._isMenu()) {
-    this._renderAsMenu($parent);
+    this._renderAsMenuItem($parent);
   } else {
     this._renderAsTab($parent);
   }
@@ -32,17 +31,14 @@ scout.ViewButton.prototype._isTab = function() {
   return this.displayStyle === 'TAB';
 };
 
-scout.ViewButton.prototype._renderAsMenu = function($parent) {
+scout.ViewButton.prototype._renderAsMenuItem = function($parent) {
   this.$container = $parent.appendDiv('view-button-menu')
-    .on('click', this._onMouseEvent);
+    .on('click', this._onMouseEvent.bind(this));
 };
 
 scout.ViewButton.prototype._renderAsTab = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-    .on('mousedown', this._onMouseEvent)
-    .data('tooltipText', function() {
-      return this.text;
-    }.bind(this));
+    .on('mousedown', this._onMouseEvent.bind(this));
 
   this.$title = this.$container.appendSpan('view-button-tab-title');
 };
@@ -51,23 +47,11 @@ scout.ViewButton.prototype._renderAsTab = function($parent) {
  * @override Action.js
  */
 scout.ViewButton.prototype._renderText = function() {
+  this._updateTooltip();
   if (this._isMenu()) {
     scout.ViewButton.parent.prototype._renderText.call(this);
   } else {
     this.$title.css('display', this._breadcrumbEnabled || this._isTab() ? 'none' : '');
-  }
-};
-
-/**
- * @override Action.js
- */
-scout.ViewButton.prototype._renderSelected = function() {
-  scout.ViewButton.parent.prototype._renderSelected.call(this);
-  if (this._isTab()) {
-    scout.tooltips.install(this.$container, {
-      parent: this,
-      text: this.text
-    });
   }
 };
 
@@ -99,6 +83,24 @@ scout.ViewButton.prototype.setBreadcrumbEnabled = function(enabled) {
   this._breadcrumbEnabled = enabled;
   this._renderText();
   this._renderSelected();
+};
+
+scout.ViewButton.prototype._configureTooltip = function() {
+  var options = scout.ViewButton.parent.prototype._configureTooltip.call(this);
+  options.text = this.text;
+  return options;
+};
+
+/**
+ * Compared to Action.js, this.text is used instead of this.tooltipText.
+ * Additionally, tooltip is only shown if it is a view tab and never if it is a menu item in the view menu popup.
+ */
+scout.ViewButton.prototype._shouldInstallTooltip = function() {
+  return this.text && !this.selected && this.enabled && this._isTab();
+};
+
+scout.ViewButton.prototype._onMouseEvent = function(event) {
+  this.doAction();
 };
 
 /**

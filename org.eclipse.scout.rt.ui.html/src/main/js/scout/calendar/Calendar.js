@@ -49,7 +49,7 @@ scout.Calendar.prototype.init = function(model, session, register) {
   this._tooltipSupport = new scout.TooltipSupport({
     parent: this,
     htmlEnabled: true,
-    tooltipDelay: 750
+    delay: 750
   });
 };
 

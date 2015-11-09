@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Action = function() {
-  this._hoverBound = false;
   scout.Action.parent.call(this);
   this._addModelProperties(['text', 'iconId', 'tooltipText', 'keyStroke', 'enabled', 'selected', 'visible', 'tabbable']);
 
@@ -53,9 +52,7 @@ scout.Action.prototype._renderProperties = function() {
 };
 
 scout.Action.prototype._remove = function() {
-  this._hoverBound = false;
   this._removeText();
-  this._removeTooltip();
   scout.Action.parent.prototype._remove.call(this);
 };
 
@@ -87,6 +84,7 @@ scout.Action.prototype._renderIconId = function() {
 scout.Action.prototype._renderEnabled = function(enabled) {
   enabled = scout.helpers.nvl(enabled, this.enabled);
   this.$container.setEnabled(enabled);
+  this._updateTooltip();
 };
 
 scout.Action.prototype._renderVisible = function() {
@@ -95,6 +93,7 @@ scout.Action.prototype._renderVisible = function() {
 
 scout.Action.prototype._renderSelected = function() {
   this.$container.select(this.selected);
+  this._updateTooltip();
 };
 
 scout.Action.prototype._renderKeyStroke = function() {
@@ -107,14 +106,23 @@ scout.Action.prototype._renderKeyStroke = function() {
 };
 
 scout.Action.prototype._renderTooltipText = function() {
-  var tooltipText = this.tooltipText;
-  if (tooltipText && !this._hoverBound) {
-    this.$container.hover(this._onHoverIn.bind(this), this._onHoverOut.bind(this));
-    this._hoverBound = true;
-  } else if (!tooltipText && this.hoverBound) {
-    this.$container.off('mouseenter mouseleave');
-    this._hoverBound = false;
+  this._updateTooltip();
+};
+
+/**
+ * Installs or uninstalls tooltip based on tooltipText, selected and enabled.
+ */
+scout.Action.prototype._updateTooltip = function() {
+  if (this._shouldInstallTooltip()) {
+    scout.tooltips.install(this.$container, this._configureTooltip());
   }
+  else {
+    scout.tooltips.uninstall(this.$container);
+  }
+};
+
+scout.Action.prototype._shouldInstallTooltip = function() {
+  return this.tooltipText && !this.selected && this.enabled;
 };
 
 scout.Action.prototype._renderTabbable = function() {
@@ -133,38 +141,16 @@ scout.Action.prototype._renderToggleAction = function() {
   // nop
 };
 
-scout.Action.prototype._onHoverIn = function() {
-  // Don't show tooltip if action is selected or not enabled
-  if (this.enabled && !this.selected) {
-    this._showTooltip();
-  }
-};
-
-scout.Action.prototype._onHoverOut = function() {
-  this._removeTooltip();
-};
-
-scout.Action.prototype._showTooltip = function() {
-  this.tooltip = scout.create(scout.Tooltip, this._configureTooltip());
-  this.tooltip.render();
-};
-
 scout.Action.prototype._configureTooltip = function() {
   return {
     parent: this,
+    delay: 0,
     text: this.tooltipText,
     $anchor: this.$container,
     arrowPosition: 50,
     arrowPositionUnit: '%',
     position: this.tooltipPosition
   };
-};
-
-scout.Action.prototype._removeTooltip = function() {
-  if (this.tooltip) {
-    this.tooltip.remove();
-    this.tooltip = null;
-  }
 };
 
 scout.Action.prototype._goOffline = function() {

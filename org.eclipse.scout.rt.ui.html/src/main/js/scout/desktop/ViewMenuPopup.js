@@ -19,7 +19,6 @@ scout.ViewMenuPopup = function() {
   this._naviBounds;
   this._breadcrumbEnabled;
   this._tooltip;
-  this._tooltipDelay;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 

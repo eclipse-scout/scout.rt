@@ -158,6 +158,7 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
 
     }
   }
+  this._updateTooltip();
 };
 
 scout.TableControl.prototype._renderEnabled = function(enabled) {
@@ -235,7 +236,6 @@ scout.TableControl.prototype.onResize = function() {
 };
 
 scout.TableControl.prototype._onMouseDown = function() {
-  this._removeTooltip();
   this.toggle();
 };
 
