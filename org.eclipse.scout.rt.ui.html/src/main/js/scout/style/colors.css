@@ -145,7 +145,7 @@
 @group-box-title-border-color: @border-color;
 @key-box-background-color: @palette-orange-2;
 @key-box-border-color: @key-box-background-color;
-@key-box-color: @palette-gray-10;
+@key-box-color: @palette-black;
 @main-menubar-background-color: @menubar-background-color;
 @menubar-background-color: @palette-gray-1;
 @menubar-button-active-background-color: @button-active-background-color;

@@ -11,7 +11,7 @@
 .key-box {
   position: absolute;
   min-width: 34px;
-  padding: 3px 5px;
+  padding: 4px 5px;
   z-index: 100;
   color: @key-box-color;
   background-color: @key-box-background-color;
