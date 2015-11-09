@@ -78,8 +78,7 @@ scout.SplitBox.prototype._render = function($parent) {
       var splitterSize = scout.graphics.getSize(this._$splitter, true);
 
       // Create temporary splitter
-      var $tempSplitter = this._$splitArea
-        .makeDiv('temp-splitter')
+      var $tempSplitter = this._$splitArea.appendDiv('temp-splitter')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
       if (this.splitHorizontal) { // "|"
         $tempSplitter.cssLeft(splitterPosition.left - splitAreaPosition.left);
