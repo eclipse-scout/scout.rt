@@ -228,10 +228,9 @@ scout.FileChooser.prototype.addFiles = function(files) {
       .appendSpan('remove menu-item')
       .on('click', this.removeFile.bind(this, file, $file));
     var $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
-    $remove
-      .appendTextNode('(')
-      .append($removeLink)
-      .appendTextNode(')');
+    $remove.appendTextNode('(');
+    $remove.append($removeLink);
+    $remove.appendTextNode(')');
   }
   this.$uploadButton.setEnabled(this._files.length > 0);
   scout.scrollbars.update(this.$files);
