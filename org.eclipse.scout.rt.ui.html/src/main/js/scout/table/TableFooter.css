@@ -63,12 +63,10 @@
 
   & .tab-box.in-table-control > .tab-area {
     margin-top: 0;
-    position: absolute;
-    top: 0px;
-    left: 0px;
+    margin-left: 0;
 
     &::after {
-      height: 0px;
+      display: none;
     }
 
     & > button {
@@ -85,13 +83,8 @@
     }
   }
 
-  & .tab-content {
-    position: absolute;
-    top: 31px;
-  }
-
   & .tab-area > .tab-item {
-      z-index: 2;
+    z-index: 2;
   }
 
 }
