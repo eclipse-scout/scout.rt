@@ -15,6 +15,7 @@ import java.security.AllPermission;
 import java.security.PermissionCollection;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlService;
 
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlS
  * This service is ignored by default and needs to be registered explicitly.
  */
 @Order(4500)
+@Replace
 public class AllAccessControlService extends UserIdAccessControlService {
 
   @Override
