@@ -14,6 +14,7 @@ scout.TableHeaderMenu = function() {
   this.tableHeader;
   this.table;
   this.$headerItem;
+  this.openAnimated = true;
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChanged', this._onLocationChanged.bind(this));
 };

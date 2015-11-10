@@ -1093,7 +1093,7 @@ scout.Session.prototype.unregisterAdapterClone = function(clone) {
   if (clone.cloneOf === undefined) {
     throw new Error('Tried to unregister a clone but the property cloneOf is not set');
   }
-  var entry = this._clonedModelAdapterRegistry[clone.cloneOf];
+  var entry = this._clonedModelAdapterRegistry[clone.cloneOf.id];
   if (!entry) {
     throw new Error('No clones registered for adapter');
   }

@@ -19,6 +19,60 @@ scout.scrollbars = {
    *
    * @memberOf scout.scrollbars
    */
+
+  _$scrollables: {},
+  _scrollableOptions:{},
+
+  getScrollables: function(session) {
+    return this._$scrollables[session];
+  },
+
+  pushScrollable: function(session, $container) {
+    if (this._$scrollables[session]) {
+      if (this._$scrollables[session].indexOf($container) > -1) {
+        // already pushed
+        return;
+      }
+      this._$scrollables[session].push($container);
+    } else {
+      this._$scrollables[session] = [$container];
+    }
+    this.removeScrollableOptions($container);
+    $.log.debug('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
+  },
+
+  pushScrollableOptions: function($container, options) {
+    if(this._scrollableOptions[$container]){
+      this._scrollableOptions[$container].push(options);
+    }else{
+      this._scrollableOptions[$container] = [options];
+    }
+  },
+
+  getScrollableOptions: function($container) {
+    return this._scrollableOptions[$container];
+  },
+
+  removeScrollableOptions: function($container) {
+    if(this._scrollableOptions[$container]){
+      delete this._scrollableOptions[$container];
+    }
+  },
+
+  removeScrollable: function(session, $container) {
+    var initLength = 0;
+    if (this._$scrollables[session]) {
+      initLength = this._$scrollables[session].length;
+      scout.arrays.$remove(this._$scrollables[session], $container);
+      $.log.debug('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
+      if (initLength === this._$scrollables[session].length) {
+        throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
+      }
+    } else {
+      throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
+    }
+  },
+
   install: function($container, options) {
     var scrollbars, scrollbar, nativeScrollbars,
       htmlContainer = scout.HtmlComponent.optGet($container),
@@ -41,7 +95,8 @@ scout.scrollbars = {
       htmlContainer.scrollable = true;
     }
     $container.data('scrollable', true);
-    session.detachHelper.pushScrollable($container);
+    this.pushScrollable(session, $container);
+    this.pushScrollableOptions($container, options);
     return $container;
 
     function installNativeScrollbars() {
@@ -68,13 +123,14 @@ scout.scrollbars = {
       });
       scrollbars = [];
       if (options.axis === 'both') {
-        options.axis = 'y';
-        scrollbar = scout.create(scout.Scrollbar, options);
+        var scrollOptions = $.extend({}, options);
+        scrollOptions.axis = 'y';
+        scrollbar = scout.create(scout.Scrollbar, scrollOptions);
         scrollbars.push(scrollbar);
 
-        options.axis = 'x';
+        scrollOptions.axis = 'x';
         options.mouseWheelNeedsShift = true;
-        scrollbar = scout.create(scout.Scrollbar, options);
+        scrollbar = scout.create(scout.Scrollbar, scrollOptions);
         scrollbars.push(scrollbar);
       } else {
         scrollbar = scout.create(scout.Scrollbar, options);
@@ -105,7 +161,7 @@ scout.scrollbars = {
         scrollbar.remove();
       });
     }
-    session.detachHelper.removeScrollable($container);
+    this.removeScrollable(session,$container);
     $container.removeData('scrollable');
     $container.css('overflow', '');
     $container.removeData('scrollbars');

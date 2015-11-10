@@ -13,7 +13,10 @@ scout.PopupWithHead = function() {
   this.$head;
   this.$body;
   this.$deco;
+  this.$parent;
   this._headVisible = true;
+  this.openAnimated = true;
+  this.resizeHandler = this.onResize.bind(this);
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);
 
@@ -23,11 +26,24 @@ scout.PopupWithHead.prototype._createLayout = function() {
 
 scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);
-  this.$body = this.$container.appendDiv('popup-body');
+  this.$parent = $parent;
+  this.$parent.getWindow(true).on('resize', this.resizeHandler);
+
+  this.$body = this._$createNewBody();
   if (this._headVisible) {
     this._renderHead();
   }
+};
+
+scout.PopupWithHead.prototype.onResize = function() {
+  this.$parent.getWindow(true).off('resize', this.resizeHandler);
+  this.close();
+};
+
+scout.PopupWithHead.prototype._$createNewBody = function() {
+  this.$body = this.$container.appendDiv('popup-body');
   this._modifyBody();
+  return this.$body;
 };
 
 scout.PopupWithHead.prototype.rerenderHead = function() {
@@ -111,6 +127,10 @@ scout.PopupWithHead.prototype.addClassToBody = function(clazz) {
  * @override Popup.js
  */
 scout.PopupWithHead.prototype._position = function($container, switchIfNecessary) {
+  if (!this.$container) {
+    //when layouting menu bar menues are first removed and then newly added prevent this.$contaier = null;
+    return;
+  }
   var openingDirectionX, openingDirectionY, left, top, overlap, pos;
   if (!this._headVisible) {
     // If head is not visible, use default implementation
@@ -173,12 +193,6 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   bodySize = scout.graphics.getSize(this.$body, true);
   bodyWidth = bodySize.width;
 
-  // body min-width
-  if (bodyWidth < headSize.width) {
-    this.$body.width(headSize.width - 2);
-    bodyWidth = headSize.width;
-  }
-
   pos = this.$headBlueprint.offset();
   left = pos.left;
   headInsets = scout.graphics.getInsets(this.$head);
@@ -219,5 +233,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
       .width(headSize.width - 2);
   }
 
+  this.openingDirectionX = openingDirectionX;
+  this.openingDirectionY = openingDirectionY;
   this.setLocation(new scout.Point(left, top));
 };

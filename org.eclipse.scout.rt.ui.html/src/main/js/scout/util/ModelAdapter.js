@@ -105,6 +105,7 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
     event.coalesce = coalesceFunc;
   }
   this.remoteHandler(event, delay);
+  this.trigger('send', event);
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {

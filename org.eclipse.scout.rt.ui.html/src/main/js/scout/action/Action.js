@@ -248,7 +248,7 @@ scout.Action.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
   }
-  this.selected = selected;
+  this._setProperty('selected', selected);
   if (this.rendered) {
     this._renderSelected();
   }

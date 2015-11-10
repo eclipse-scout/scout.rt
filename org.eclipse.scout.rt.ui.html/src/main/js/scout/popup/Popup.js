@@ -26,6 +26,7 @@ scout.Popup = function() {
   this.focusableContainer;
   this.openingDirectionX;
   this.openingDirectionY;
+  this.openAnimated = false;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -75,10 +76,60 @@ scout.Popup.prototype.open = function($parent, event) {
   this._triggerPopupOpenEvent();
 };
 
+scout.Popup.prototype._uninstallAllChildScrollbars = function(){
+  var $scrollables = scout.scrollbars.getScrollables(this.session),
+  handledScrollables = [];
+  $scrollables.forEach(function($scrollable){
+    if(this.$container.has($scrollable).length>0){
+      var options = scout.scrollbars.getScrollableOptions($scrollable);
+      handledScrollables.push({$scrollable: $scrollable, options: options});
+      scout.scrollbars.uninstall($scrollable, this.session);
+    }
+
+  }.bind(this));
+  return handledScrollables;
+};
+
 scout.Popup.prototype._open = function($parent, event) {
   this.render($parent, event);
+  var oldPopupSize = scout.graphics.getSize(this.$container);
+
+  this.animationPrepare = this.openAnimated;
   this.revalidateLayout();
   this.position();
+
+  var handledScrollables = this._uninstallAllChildScrollbars();
+
+  var popupSize = scout.graphics.getSize(this.$container);
+  if (this.openAnimated) {
+    this.animating = true;
+    this.$container.cssHeightAnimated(popupSize.height - 40, popupSize.height, {
+      progress: function() {
+        this.revalidateLayout();
+        this.position();
+      }.bind(this),
+      duration: 100,
+      complete: function() {
+        this.animating = false;
+        this.animationPrepare = false;
+        this.trigger('popupOpened', {
+          popup: this
+        });
+      }.bind(this)
+    }).css('overflow', 'visible');
+  }
+
+
+
+  this.events.on('popupOpened', function() {
+      handledScrollables.forEach(function(scrollable){
+        if(scrollable.options){
+          scrollable.options.forEach(function(options){
+            scout.scrollbars.install(scrollable.$scrollable, options);
+          }.bind(this));
+        }
+      }.bind(this));
+  }.bind(this));
 };
 
 scout.Popup.prototype.render = function($parent, event) {

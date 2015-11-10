@@ -280,7 +280,14 @@ scout.Widget.prototype._createKeyStrokeContext = function() {
 };
 
 scout.Widget.prototype.trigger = function(type, event) {
-  event = event || {};
+  if (event) {
+    // create a shallow copy of the given event. Otherwise this function would
+    // have a side-effect on the given event because it adds the 'source' property
+    // which causes problems in some cases.
+    event = $.extend({}, event);
+  } else {
+    event = {};
+  }
   event.source = this;
   this.events.trigger(type, event);
 };

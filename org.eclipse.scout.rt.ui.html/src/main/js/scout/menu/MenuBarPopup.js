@@ -18,6 +18,7 @@ scout.MenuBarPopup = function() {
   this.$headBlueprint;
   this.ignoreEvent;
   this._headVisible = true;
+  this.openAnimated = true;
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
@@ -42,7 +43,7 @@ scout.MenuBarPopup.prototype._getMenuItems = function() {
  */
 scout.MenuBarPopup.prototype.close = function(event) {
   if (!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent) {
-    scout.MenuBarPopup.parent.prototype.close.call(this);
+    scout.MenuBarPopup.parent.prototype.close.call(this, event);
   }
 };
 

@@ -148,6 +148,9 @@ scout.Button.prototype._openPopup = function() {
   popup.open();
   return popup;
 };
+scout.Button.prototype._doActionTogglesSubMenu = function() {
+  return false;
+};
 
 scout.Button.prototype.setSelected = function(selected) {
   this.selected = selected;

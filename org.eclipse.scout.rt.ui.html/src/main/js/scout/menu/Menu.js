@@ -16,6 +16,13 @@ scout.Menu = function() {
   this.popup;
   this.excludedByFilter = false;
 
+  this.subMenuExpanded = false;
+
+  /**
+   * This property is set if this is a subMenu. The property is set when this submenu is rendered.
+   */
+  this.parentMenu;
+
   /**
    * This property is true when the menu instance was moved into a overflow-menu
    * when there's not enough space on the screen (see MenuBarLayout.js). When set
@@ -73,12 +80,57 @@ scout.Menu.prototype._renderItem = function($parent) {
 
 scout.Menu.prototype._renderSelected = function() {
   if (this.selected) {
+    if (this._doActionTogglesSubMenu()) {
+      this._renderSubMenuItems(this, this.childActions);
+    } else
     if (this._doActionTogglesPopup()) {
       this._openPopup();
     }
   } else {
-    this._closePopup();
+    if (this._doActionTogglesSubMenu() && this.rendered) {
+      this._removeSubMenuItems(this);
+    } else {
+      this._closePopup();
+      this._closeSubMenues();
+    }
   }
+};
+
+scout.Menu.prototype._closeSubMenues = function() {
+  this.childActions.forEach(function(menu) {
+    if (menu._doActionTogglesPopup()) {
+      menu._closeSubMenues();
+      menu.setSelected(false);
+    }
+  });
+};
+
+scout.Menu.prototype._removeSubMenuItems = function(parentMenu) {
+  if (this.parent instanceof scout.ContextMenuPopup) {
+    this.parent.removeSubMenuItems(parentMenu, true);
+  } else if (this.parent instanceof scout.Menu) {
+    this.parent._removeSubMenuItems(parentMenu);
+  }
+};
+
+scout.Menu.prototype._renderSubMenuItems = function(parentMenu, actions) {
+  this.subMenuExpanded = true;
+  if (this.parent instanceof scout.ContextMenuPopup) {
+    this.parent.renderSubMenuItems(parentMenu, actions, true);
+  } else if (this.parent instanceof scout.Menu) {
+    this.parent._renderSubMenuItems(parentMenu, actions);
+  }
+};
+
+scout.Menu.prototype._doActionTogglesSubMenu = function() {
+  return this.parent instanceof scout.ContextMenuPopup || this.parent instanceof scout.Menu;
+};
+
+scout.Menu.prototype._getSubMenuLevel = function() {
+  if (this.parent instanceof scout.ContextMenuPopup) {
+    return 0;
+  }
+  return scout.Menu.parent.prototype._getSubMenuLevel.call(this) + 1;
 };
 
 scout.Menu.prototype._onMouseEvent = function(event) {

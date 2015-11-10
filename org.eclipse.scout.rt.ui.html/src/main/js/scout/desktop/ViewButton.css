@@ -133,4 +133,5 @@
   background-color: @view-menu-popup-background-color;
   border-right: solid 1px @border-color;
   border-top: solid 1px @border-color;
+  overflow: hidden;
 }

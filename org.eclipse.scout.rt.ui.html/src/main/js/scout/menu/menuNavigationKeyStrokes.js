@@ -15,13 +15,15 @@ scout.menuNavigationKeyStrokes = {
       new scout.MenuNavigationUpKeyStroke(popup, menuItemClass),
       new scout.MenuNavigationDownKeyStroke(popup, menuItemClass),
       new scout.MenuNavigationExecKeyStroke(popup, menuItemClass),
-      new scout.MenuExecByNumberKeyStroke(popup, menuItemClass)
+      new scout.MenuExecByNumberKeyStroke(popup, menuItemClass),
+      new scout.SubCloseKeyStroke(popup, menuItemClass)
     ]);
   },
 
   _findMenuItems: function(popup, menuItemClass) {
     return {
       $all: popup.$body.find('.' + menuItemClass),
+      $allVisible: popup.$body.find('.' + menuItemClass + ':visible'),
       $selected: popup.$body.find('.' + menuItemClass + '.selected')
     };
   },
@@ -56,7 +58,7 @@ scout.MenuNavigationUpKeyStroke.prototype.handle = function(event) {
   if (menuItems.$selected.length > 0) {
     scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$selected.prevAll(':visible').first());
   } else {
-    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$all.first());
+    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$allVisible.last());
   }
 };
 
@@ -77,7 +79,7 @@ scout.MenuNavigationDownKeyStroke.prototype.handle = function(event) {
   if (menuItems.$selected.length > 0) {
     scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
   } else {
-    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$all.first());
+    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$allVisible.first());
   }
 };
 
@@ -97,6 +99,14 @@ scout.MenuNavigationExecKeyStroke.prototype.handle = function(event) {
   this._simulateLeftClickOnItems(scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected);
 };
 
+scout.MenuNavigationExecKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.MenuNavigationExecKeyStroke.parent.prototype._accept.call(this, event);
+  if (!accepted || this.field.bodyAnimating || this.field.animating) {
+    return false;
+  }
+  return accepted;
+};
+
 scout.MenuNavigationExecKeyStroke.prototype._simulateLeftClickOnItems = function($menuItems) {
   ['mousedown', 'mouseup', 'click'].forEach(function(eventType) {
     $menuItems.trigger({
@@ -104,6 +114,44 @@ scout.MenuNavigationExecKeyStroke.prototype._simulateLeftClickOnItems = function
       which: 1
     });
   }); // simulate left-mouse click (full click event sequence in order, see scout.Menu.prototype._onMouseEvent)
+};
+
+/**
+ * SubCloseKeyStroke
+ */
+scout.SubCloseKeyStroke = function(popup, menuItemClass) {
+  scout.SubCloseKeyStroke.parent.call(this, popup, menuItemClass);
+  this._menuItemClass = menuItemClass;
+  this.field = popup;
+  this.which = [scout.keys.BACKSPACE];
+  this.renderingHints.render = true;
+  this.renderingHints.$drawingArea = function($drawingArea, event) {
+    return event._$element;
+  }.bind(this);
+};
+
+scout.inherits(scout.SubCloseKeyStroke, scout.MenuNavigationExecKeyStroke);
+
+
+scout.SubCloseKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.MenuExecByNumberKeyStroke.parent.prototype._accept.call(this, event);
+  if (!accepted) {
+    return false;
+  }
+
+  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass+'.expanded');
+
+  if (menuItems.$all.length>0) {
+    event._$element = menuItems.$all;
+    return true;
+  }
+  return false;
+};
+
+scout.SubCloseKeyStroke.prototype.handle = function(event) {
+  if (event._$element) {
+    this._simulateLeftClickOnItems(event._$element);
+  }
 };
 
 /**
@@ -129,7 +177,7 @@ scout.MenuExecByNumberKeyStroke.prototype._accept = function(event) {
 
   var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
   var index = scout.codesToKeys[event.which];
-  event._$element = menuItems.$all.eq(index - 1);
+  event._$element = menuItems.$allVisible.eq(index - 1);
 
   if (event._$element) {
     return true;

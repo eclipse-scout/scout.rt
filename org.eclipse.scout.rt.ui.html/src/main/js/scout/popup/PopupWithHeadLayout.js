@@ -16,15 +16,29 @@ scout.inherits(scout.PopupWithHeadLayout, scout.PopupLayout);
 
 scout.PopupWithHeadLayout.prototype.layout = function($container) {
   scout.PopupWithHeadLayout.parent.prototype.layout.call(this, $container);
+
   var htmlComp = this.popup.htmlComp,
     popupSize = htmlComp.getSize();
 
-  // Set size of body
-  popupSize = popupSize.subtract(htmlComp.getInsets());
-  scout.graphics.setSize(this.popup.$body, popupSize);
+  //while animating the body animation sets the size.
+  if (!this.popup.bodyAnimating) {
+    // Set size of body
+    popupSize = popupSize.subtract(htmlComp.getInsets());
+    if (this._headVisible) {
+      var headSize = scout.graphics.getSize(this.popup.$head, true);
+      //adjust popupsize if head changed size
+      if (popupSize.width < headSize.width) {
+        popupSize.width = headSize.width;
+        scout.graphics.setSize(htmlComp.$comp, popupSize);
+      }
+    }
 
-  if (this.popup.$body.data('scrollable')) {
-    scout.scrollbars.update(this.popup.$body);
+    scout.graphics.setSize(this.popup.$body, popupSize);
+
+    if (this.popup.$body.data('scrollable') && !this.popup.animationPrepare) {
+      scout.scrollbars.update(this.popup.$body);
+
+    }
   }
 };
 
@@ -63,8 +77,22 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
   var htmlComp = this.popup.htmlComp,
     prefSize;
 
-  prefSize = scout.graphics.prefSize(this.popup.$body, true)
-    .add(htmlComp.getInsets());
+  if (!this.popup.bodyAnimating) {
+    var popupStyleBackup = this.popup.$container.attr('style');
+    this.popup.$container.css({
+      width: 'auto',
+      height: 'auto'
+    });
+    prefSize = scout.graphics.prefSize(this.popup.$body, true)
+      .add(htmlComp.getInsets());
+    this.popup.$container.attr('style', popupStyleBackup);
+  } else {
+    prefSize = scout.graphics.getSize(this.popup.$body, true);
+  }
 
+  if (this._headVisible) {
+    var headSize = scout.graphics.getSize(this.popup.$head, true);
+    prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
+  }
   return prefSize;
 };

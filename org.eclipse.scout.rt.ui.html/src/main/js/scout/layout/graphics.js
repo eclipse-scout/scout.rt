@@ -41,8 +41,13 @@ scout.graphics = {
       'white-space': 'no-wrap'
     });
 
+    var prefSize;
     // measure
-    var prefSize = scout.graphics.getSize($elem, includeMargin);
+    if (useCssSize) {
+      prefSize = scout.graphics.getSize($elem, includeMargin);
+    } else {
+      prefSize = scout.graphics.getScrollSizes($elem, includeMargin);
+    }
 
     // reset the modified style attribute
     $elem.attrOrRemove('style', oldStyle);
@@ -50,6 +55,21 @@ scout.graphics = {
     $elem.scrollTop(oldScrollTop);
 
     return prefSize;
+  },
+
+  getScrollSizes: function($comp, includeMargin) {
+    var marginWidth = 0,
+      marginHeight = 0,
+      scrollWidth = $comp[0] ?  $comp[0].scrollWidth : 0,
+      scrollHeight = $comp[0]? $comp[0].scrollHeight : 0 ;
+    includeMargin = scout.helpers.nvl(includeMargin, false);
+    if (includeMargin) {
+      marginHeight += parseFloat(scout.helpers.nvl($comp.css('margin-top'),0)) + parseFloat(scout.helpers.nvl($comp.css('margin-bottom'),0));
+      marginWidth += parseFloat(scout.helpers.nvl($comp.css('margin-left'),0)) + parseFloat(scout.helpers.nvl($comp.css('margin-right'),0));
+    }
+    return new scout.Dimension(
+      scrollWidth + marginWidth + parseFloat($comp.css("border-left-width")) + parseFloat($comp.css("border-right-width")),
+      scrollHeight + marginHeight + parseFloat($comp.css("border-top-width")) + parseFloat($comp.css("border-bottom-width")));
   },
 
   /* These functions are designed to be used with box-sizing:box-model. The only reliable

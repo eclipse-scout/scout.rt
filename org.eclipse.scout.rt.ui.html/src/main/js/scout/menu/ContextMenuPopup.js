@@ -13,6 +13,8 @@ scout.ContextMenuPopup = function() {
 
   // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
   this._headVisible = false;
+  this.openAnimated = false;
+  this.$oldBodies = [];
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
@@ -38,38 +40,291 @@ scout.ContextMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeConte
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
-  scout.scrollbars.install(this.$body, {
-    parent: this
-  });
+  if (this.openAnimated) {
+    this.events.on('popupOpened', function() {
+      scout.scrollbars.install(this.$body, {
+        parent: this
+      });
+    }.bind(this));
+  } else {
+    scout.scrollbars.install(this.$body, {
+      parent: this
+    });
+  }
   this._renderMenuItems();
 };
 
+<<<<<<< Upstream, based on origin/releases/5.2.x
 scout.ContextMenuPopup.prototype._renderMenuItems = function() {
   var menuClone, menus = this._getMenuItems();
   if(this.menu && this.menu.filterFunc){
     // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
     menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ?   'menuBar': 'contextMenu');
   }
+=======
+scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
+  var duration = 300;
+
+  this.$body = parentMenu.parentMenu.$subMenuBody;
+  //move new body to back;
+  this.$body.insertBefore(parentMenu.$subMenuBody);
+
+  if (parentMenu.parentMenu._doActionTogglesSubMenu) {
+    parentMenu.parentMenu._doActionTogglesSubMenu();
+  }
+
+  var displayBackup = parentMenu.$subMenuBody.css('display');
+  parentMenu.$subMenuBody.css({
+    width: 'auto',
+    height: 'auto',
+    display: 'none'
+  });
+
+  var actualBounds = this.htmlComp.getBounds();
+  var actualSize = this.htmlComp.getSize();
+
+  this.revalidateLayout();
+  this.position();
+
+  parentMenu.$subMenuBody.css('display', displayBackup);
+  var position;
+  position = parentMenu.$placeHolder.position();
+
+  if (animated && this.rendered) {
+
+    this.bodyAnimating = true;
+    parentMenu.$subMenuBody.css({
+      width: 'auto',
+      height: 'auto'
+    });
+    var targetBounds = this.htmlComp.getBounds();
+    var targetSize = this.htmlComp.getSize();
+    this.$body.css('box-shadow', 'none');
+
+    //set container to element
+    parentMenu.$subMenuBody.cssTop();
+    //move new body to top of popup.
+    parentMenu.$subMenuBody.cssHeightAnimated(actualSize.height, parentMenu.$container.cssHeight(), {
+      duration: duration,
+      queue: false
+    });
+
+    var endTopposition = position.top - this.$body.cssHeight(),
+      startTopposition = 0 - actualSize.height,
+      topMargin = 0;
+    if (this.openingDirectionY === 'up') {
+      var headSize = scout.graphics.getSize(this.$head, true);
+      topMargin = 0 - headSize.height;
+      endTopposition = endTopposition - headSize.height;
+      if (actualSize.height < targetSize.height) {
+        startTopposition = targetSize.height - actualSize.height + topMargin + startTopposition;
+      }
+    }
+
+    parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
+      duration: duration,
+      queue: false,
+      complete: function() {
+        scout.scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
+        if (parentMenu.$container) { //check if $container is not removed before by closing operation.
+          parentMenu.$placeHolder.replaceWith(parentMenu.$container);
+          parentMenu.$container.toggleClass('expanded');
+          this._updateFirstLastClass();
+        }
+        parentMenu.$subMenuBody.detach();
+        scout.scrollbars.install(this.$body, {
+          parent: this
+        });
+        this.$body.css('box-shadow', "");
+        this.bodyAnimating = false;
+        this.animationPrepare = false;
+      }.bind(this)
+    });
+
+    this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
+      duration: duration,
+      progress: this.revalidateLayout.bind(this),
+      queue: false
+    });
+
+    if (targetSize.height != actualSize.height) {
+      this.$body.cssHeightAnimated(actualSize.height, targetSize.height, {
+        duration: duration,
+        queue: false
+      });
+      if (this.openingDirectionY === 'up') {
+        this.$body.cssTopAnimated(targetSize.height - actualSize.height + topMargin, topMargin, {
+          duration: duration,
+          queue: false
+        });
+      }
+    }
+  }
+};
+
+scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus, animated, initialSubMenuRendering) {
+  if (!this.session.desktop.rendered && !initialSubMenuRendering) {
+    this.initialSubmenusToRender = {
+      parentMenu: parentMenu,
+      menus: menus
+    };
+    return;
+  }
+  var actualBounds = this.htmlComp.getBounds();
+  var actualSize = this.htmlComp.getSize();
+
+  parentMenu.parentMenu.$subMenuBody = this.$body;
+
+  if (!parentMenu.$subMenuBody) {
+    this.$body = this._$createNewBody();
+    parentMenu.$subMenuBody = this.$body;
+    this._renderMenuItems(menus, initialSubMenuRendering);
+  } else {
+    //append $body
+    this.$body = parentMenu.$subMenuBody;
+  }
+  var $insertAfterElement = parentMenu.$container.prev();
+  var position = parentMenu.$container.position();
+  parentMenu.$placeHolder = parentMenu.$container.clone();
+  if ($insertAfterElement.length) {
+    parentMenu.$placeHolder.insertAfter($insertAfterElement);
+  } else {
+    parentMenu.parentMenu.$subMenuBody.prepend(parentMenu.$placeHolder);
+  }
+
+  this.$body.insertAfter(parentMenu.parentMenu.$subMenuBody);
+  this.$body.prepend(parentMenu.$container);
+  parentMenu.$container.toggleClass('expanded');
+
+  //sets this.animationBounds;
+  this.revalidateLayout();
+  this.position();
+
+  if (animated && this.rendered) {
+    var duration = 300;
+    this.bodyAnimating = true;
+    parentMenu.parentMenu.$subMenuBody.css({
+      width: 'auto',
+      height: 'auto'
+    });
+    var targetBounds = this.htmlComp.getBounds();
+    var targetSize = this.htmlComp.getSize();
+    this.$body.css('box-shadow', 'none');
+    //set container to element
+    this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
+      duration: duration,
+      progress: this.revalidateLayout.bind(this),
+      complete: function() {
+        this.bodyAnimating = false;
+        this.animationPrepare = false;
+      }.bind(this),
+      queue: false
+    });
+
+    this.$body.cssHeightAnimated(parentMenu.$container.cssHeight(), targetSize.height, {
+      duration: duration,
+      queue: false
+    });
+
+    var endTopposition = 0 - targetSize.height,
+      startTopposition = position.top - parentMenu.parentMenu.$subMenuBody.cssHeight(),
+      topMargin = 0;
+    if (this.openingDirectionY === 'up') {
+      var headSize = scout.graphics.getSize(this.$head, true);
+      topMargin = 0 - headSize.height;
+      endTopposition = endTopposition - headSize.height;
+      if (actualSize.height > targetSize.height) {
+        startTopposition = targetSize.height - actualSize.height + topMargin + startTopposition;
+      }
+    }
+
+    //move new body to top of popup.
+    this.$body.cssTopAnimated(startTopposition, endTopposition, {
+      duration: duration,
+      queue: false,
+      complete: function() {
+        scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
+        parentMenu.parentMenu.$subMenuBody.detach();
+        this.$body.cssTop(topMargin);
+        scout.scrollbars.install(this.$body, {
+          parent: this
+        });
+        this._updateFirstLastClass();
+        this.$body.css('box-shadow', "");
+      }.bind(this)
+    });
+
+    if (actualSize.height != targetSize.height) {
+      parentMenu.parentMenu.$subMenuBody.cssHeightAnimated(actualSize.height, targetSize.height, {
+        duration: duration,
+        queue: false
+      });
+      if (this.openingDirectionY === 'up') {
+        parentMenu.parentMenu.$subMenuBody.cssTopAnimated(targetSize.height - actualSize.height + topMargin, topMargin, {
+          duration: duration,
+          queue: false
+        });
+      }
+    }
+  } else {
+    if (!initialSubMenuRendering) {
+      scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
+    }
+    parentMenu.parentMenu.$subMenuBody.detach();
+    scout.scrollbars.install(this.$body, {
+      parent: this
+    });
+    this._updateFirstLastClass();
+  }
+};
+
+scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
+  var menuClone;
+  menus = menus ? menus : this._getMenuItems();
+>>>>>>> 837a255 HtmlUI: subMenues with animations
   if (!menus || menus.length === 0) {
     return;
   }
-  menus.forEach(function(menu) {
+
+  menus.some(function(menu) {
     // Invisible menus are rendered as well because their visibility might change dynamically
     if (menu.separator) {
       return;
     }
-    if (this.options.cloneMenuItems) {
+    //preserver loosing original parent
+    var parentMenu = menu.parent;
+    if (this.options.cloneMenuItems && !menu.cloneOf) {
       menu = menu.cloneAdapter({
         parent: this,
         filterFunc: menu.filterFunc
       });
+      menu.on('propertyChange', function(event) {
+        if (event.selected) {
+          var propertyChangeEvent = {
+            properties: {
+              selected: event.selected
+            }
+          };
+          menu.cloneOf.onModelPropertyChange(propertyChangeEvent);
+        }
+      });
     } else {
       menu.setParent(this);
+    }
+    //just set once because on second executen of this menu.parent is set to a popup.
+    if (!menu.parentMenu) {
+      menu.parentMenu = parentMenu;
     }
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
     menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
   }, this);
+  while (this.initialSubmenusToRender && !initialSubMenuRendering) {
+    var parentMenu = this.initialSubmenusToRender.parentMenu,
+      subMenus = this.initialSubmenusToRender.menus;
+    this.initialSubmenusToRender = undefined;
+    this.renderSubMenuItems(parentMenu, subMenus, false, true);
+  }
   this._updateFirstLastClass();
 };
 
@@ -94,6 +349,15 @@ scout.ContextMenuPopup.prototype._remove = function() {
   }, this);
   scout.scrollbars.uninstall(this.$body, this.session);
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
+};
+
+scout.ContextMenuPopup.prototype.close = function(event) {
+  if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
+    if (this.$container) {
+      this.$container.stop(true);
+    }
+    scout.ContextMenuPopup.parent.prototype.close.call(this, event);
+  }
 };
 
 /**

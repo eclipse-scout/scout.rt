@@ -74,6 +74,13 @@
   & > .menu-item.context-menu-item-first {
     border-top: 1px solid transparent; //@border-color;
   }
+
+  & > .menu-item.expanded:after {
+    #scout.transform(rotate(180deg));
+    padding-left: 0px;
+    padding-right: 10px;
+  }
+
   & > .menu-item.context-menu-item-last {
     border-bottom: 1px solid transparent; //@border-color;
   }
