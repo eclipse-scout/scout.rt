@@ -20,7 +20,7 @@
   <properties>
     <${groupId}.version>${project.version}</${groupId}.version>
     <jdk.source.version>${javaVersion}</jdk.source.version>
-    <org.eclipse.scout.rt_version>5.2.0.B001</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>5.2.0.M3</org.eclipse.scout.rt_version>
   </properties>
 
   <modules>
