@@ -231,7 +231,7 @@ scout.TableHeader.prototype._headerItemTooltip = function($col) {
     return column.headerTooltip;
   } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
     $col = $col.clone();
-    $col.find('.table-header-item-state').remove();
+    $col.children('.table-header-item-state').remove();
     return $col.text();
   }
 };
@@ -296,7 +296,7 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
     $header = column.$header,
     filtered = this.table.getFilter(column.id);
 
-  $header.find('.table-header-item-state').remove();
+  $header.children('.table-header-item-state').remove();
   $state = $header.appendSpan('table-header-item-state');
   $state.empty();
   $header.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
@@ -606,7 +606,9 @@ scout.TableHeader.prototype._onTableDataScroll = function() {
 };
 
 scout.TableHeader.prototype._onTableAddRemoveFilter = function(event) {
-  if (event.filter.filterType === scout.ColumnUserFilter.Type) {
-    this._renderColumnState(event.filter.column);
+  var column = event.filter.column;
+  // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
+  if (event.filter.filterType === scout.ColumnUserFilter.Type && column.$header) {
+    this._renderColumnState(column);
   }
 };
