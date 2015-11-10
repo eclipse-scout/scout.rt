@@ -66,7 +66,7 @@
                     <include>**/pom.xml</include>
                   </includes>
                   <!-- token finds the <scm><tag> and places the ${master_release_tagName} string there -->
-                  <token>(\\x3corg.eclipse.scout.rt_version\\x3e)[0-9A-Z\\.]*(\\x3c/org.eclipse.scout.rt_version\\x3e)</token>
+                  <token>(\\x3corg.eclipse.scout.rt_version\\x3e)[0-9A-Z\\.-]*(\\x3c/org.eclipse.scout.rt_version\\x3e)</token>
                   <value>$1${org.eclipse.scout.rt_version}$2</value>
                   <unescape>true</unescape>
                 </configuration>
