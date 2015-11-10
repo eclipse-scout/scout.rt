@@ -396,10 +396,11 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   var insets = scout.graphics.getInsets(this.$controlContainer),
     contentHeight = control.height - insets.top - insets.bottom;
 
-  // adjust content
   this.$controlContent.outerHeight(contentHeight);
-  if (!this.open) {
-    this.$controlContainer.outerHeight(0); // start animation at zero
+
+  // If container is opened the first time, set the height to 0 to make animation work
+  if (this.$controlContainer[0].style.height === '') {
+    this.$controlContainer.outerHeight(0);
   }
 
   // open container, stop existing (close) animations before
