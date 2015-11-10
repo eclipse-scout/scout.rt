@@ -11,18 +11,23 @@
 @root-group-box-padding-left: @bench-padding-x - @mandatory-indicator-width;
 @root-group-box-padding-right: @bench-padding-x;
 
-.root-group-box > .group-box-body,
-.root-group-box > .group-box-title {
-  /* group-box-body may be scrollable. */
-  /* that's why the body has a padding instead of the root-group-box (to place the scrollbars inside the body) */
-  padding-left: @root-group-box-padding-left;
-  padding-right: @root-group-box-padding-right;
-}
+.root-group-box {
+  /* necessary if dialog gets really small */
+  overflow: hidden;
 
-.root-group-box > .group-box-body {
-  & > .scrollbar.y-axis {
-    /* override margin reset from group-box-body (see below) */
-    margin-right: @scrollbar-side-margin;
+  & > .group-box-body,
+  & > .group-box-title {
+    /* group-box-body may be scrollable. */
+    /* that's why the body has a padding instead of the root-group-box (to place the scrollbars inside the body) */
+    padding-left: @root-group-box-padding-left;
+    padding-right: @root-group-box-padding-right;
+  }
+
+  & > .group-box-body {
+    & > .scrollbar.y-axis {
+      /* override margin reset from group-box-body (see below) */
+      margin-right: @scrollbar-side-margin;
+    }
   }
 }
 

@@ -56,8 +56,16 @@
   & > .form {
     background-color: @table-control-form-background-color;
 
-    & > .root-group-box > .main-menubar {
-      #scout.main-menubar-light;
+    & > .root-group-box {
+
+      & > .group-box-body {
+        /* to make sure fields are not drawn over the menubar when making table control container very small */
+        overflow: hidden;
+      }
+
+      & > .main-menubar {
+        #scout.main-menubar-light;
+      }
     }
   }
 
