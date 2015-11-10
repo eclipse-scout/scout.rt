@@ -46,6 +46,7 @@ import org.mockito.ArgumentMatcher;
  * Test for {@link BasicSecurityFilter}
  */
 @RunWith(PlatformTestRunner.class)
+@SuppressWarnings("deprecation")
 public class BasicSecurityFilterTest {
   private HttpServletRequest m_requestMock;
   private HttpServletResponse m_responseMock;

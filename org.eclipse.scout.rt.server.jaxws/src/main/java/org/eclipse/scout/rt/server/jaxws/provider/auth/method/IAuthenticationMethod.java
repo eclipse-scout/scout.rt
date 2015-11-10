@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.auth.method;
 
+import java.security.Principal;
 import java.util.Set;
 
-import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
+import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 
 /**
  * Functionality to challenge the webservice client to provide credentials, like <i>Basic Access Authentication</i> or
@@ -29,15 +30,17 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthentica
 public interface IAuthenticationMethod {
 
   /**
-   * Challenges the client for authentication and authenticates credentials against the given {@link IAuthenticator}.
+   * Challenges the client for authentication and verifies credentials against the given {@link ICredentialVerifier}.
    *
    * @param messageContext
-   *          <code>MessageContext</code> to access the SOAP message or HTTP headers.
-   * @param authenticator
-   *          <code>Authenticator</code> to be used to validate credentials
-   * @return Authenticated {@link Subject}, or <code>null</code> if authentication failed.
+   *          to access the SOAP message or HTTP headers.
+   * @param credentialVerifier
+   *          used to verify a user's credentials.
+   * @param principalProducer
+   *          used to produce {@link Principal} objects for authenticated users.
+   * @return authenticated {@link Principal}, or <code>null</code> if forbidden.
    */
-  Subject authenticate(SOAPMessageContext messageContext, IAuthenticator authenticator) throws Exception;
+  Principal authenticate(SOAPMessageContext messageContext, ICredentialVerifier credentialVerifier, IPrincipalProducer principalProducer) throws Exception;
 
   /**
    * @return Headers supported by this authentication method, or an empty {@link Set} if not used.

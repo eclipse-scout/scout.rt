@@ -29,27 +29,64 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 
 /**
- * <h4>AbstractChainableSecurityFilter</h4> The following properties can be set in the <code>web.xml</code> file:
- * <ul>
- * <li><code>realm=abcde</code> <b>default: "Default"</b></li>
- * <li><code>failover=true/false</code> <b>default false</b></li>
- * </ul>
- * <p>
- * <h5>NOTE</h5> All security filters inheriting from {@link AbstractChainableSecurityFilter} are chainable. What means
- * can be used together with other Filters. To make this filter chainable set the flag failover to true. <b>Ensure to
- * set the failover flag on the last security filter to false!</b>
- * <p>
- * Make sure to dectivate session persistence. In tomcat: in server.xml inside <Context> tag add
+ * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
+ *             authenticators chained yourself. See {@link IAuthenticator} and its subclasses.
+ *             <p>
+ *             Example client-side filter:
  *
- * <pre>
- * &lt;Manager className="org.apache.catalina.session.StandardManager" pathname=""&gt; &lt;/Manager&gt;
- * </pre>
+ *             <pre>
+ *             &#64;Override
+ *             public void doFilter(final ServletRequest request, final ServletResponse response, FilterChain chain) throws IOException, ServletException {
+ *               final HttpServletRequest req = (HttpServletRequest) request;
+ *               final HttpServletResponse resp = (HttpServletResponse) response;
  *
- * @since 1.0.3 06.02.2009 TODO imo remove in 6.0
+ *               if (m_formAuthenticator.handle(req, resp, chain)) {
+ *                 return;
+ *               }
+ *
+ *               if (m_trivialAuthenticator.handle(req, resp, chain)) {
+ *                 return;
+ *               }
+ *
+ *               if (m_devAuthenticator.handle(req, resp, chain)) {
+ *                 return;
+ *               }
+ *
+ *               ...
+ *
+ *               m_formAuthenticator.forwardToLoginForm(req, resp);
+ *             }
+ *             </pre>
+ *
+ *             Example server-side filter:
+ *
+ *             <pre>
+ *             &#64;Override
+ *             public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
+ *               final HttpServletRequest req = (HttpServletRequest) request;
+ *               final HttpServletResponse resp = (HttpServletResponse) response;
+ *
+ *               if (m_trivialAuthenticator.handle(req, resp, chain)) {
+ *                 return;
+ *               }
+ *
+ *               if (m_tunnelTokenAuthenticator.handle(req, resp, chain)) {
+ *                 return;
+ *               }
+ *
+ *               if (m_devAuthenticator.handle(req, resp, chain)) {
+ *                 return;
+ *               }
+ *
+ *               resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+ *             }
+ *             </pre>
  */
+@Deprecated
 public abstract class AbstractChainableSecurityFilter implements Filter {
   public static final String PROP_SUBJECT = Subject.class.getName();
 

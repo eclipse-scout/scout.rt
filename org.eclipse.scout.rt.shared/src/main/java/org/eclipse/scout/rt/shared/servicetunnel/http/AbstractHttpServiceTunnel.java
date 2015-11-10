@@ -144,7 +144,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) {
-    if (!DefaultAuthToken.isActive()) {
+    if (!DefaultAuthToken.isEnabled()) {
       return null;
     }
 

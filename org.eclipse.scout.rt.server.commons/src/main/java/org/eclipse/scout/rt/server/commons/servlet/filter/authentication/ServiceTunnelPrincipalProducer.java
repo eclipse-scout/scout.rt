@@ -8,27 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.job;
+package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 
 /**
- * Provider used in 'shared' Plug-Ins to work on concrete <code>RunContexts</code>, e.g. for lookup calls.<br/>
- * TODO [dwi] try to eliminate this class
+ * Producer for {@link ServiceTunnelPrincipal} objects.
  *
- * @since 5.1
+ * @since 5.2
  */
-@ApplicationScoped
-public interface IRunContextProvider {
+public class ServiceTunnelPrincipalProducer implements IPrincipalProducer {
 
-  /**
-   * Creates a "snapshot" of the current calling context.
-   */
-  RunContext copyCurrent();
-
-  /**
-   * Creates an empty <code>RunContext</code>.
-   */
-  RunContext empty();
+  @Override
+  public ServiceTunnelPrincipal produce(final String username) {
+    return new ServiceTunnelPrincipal(username);
+  }
 }

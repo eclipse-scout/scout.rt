@@ -17,17 +17,17 @@ import java.lang.annotation.Target;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContextProducer;
+import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
-import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
 
 /**
  * Describes a JAX-WS handler to intercept webservice requests.
  * <p>
- * Please note:<br/>
- * To run the handler on behalf of a {@link ServerRunContext}, annotate the handler class with
- * {@link RunWithServerRunContext}. Thereto, the {@link ServerRunContext} is initialized with the authenticated
- * {@link Subject} of the ongoing webservice request, or if not applicable, with the {@link Subject} as configured in
+ * To run the handler on behalf of a {@link RunContext}, annotate the handler class with {@link RunWithRunContext}.
+ * Thereto, a {@link RunContext} is produced as described by {@link RunContextProducer}, and is initialized with the
+ * authenticated user, or if not authenticated, with the {@link Subject} as configured in
  * {@link JaxWsHandlerSubjectProperty}.
  *
  * @since 5.1
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
 public @interface Handler {
 
   /**
-   * The handler to be installed.
+   * The handler to be installed which will be looked up as a bean.
    */
   Clazz value();
 
@@ -53,7 +53,7 @@ public @interface Handler {
    * <pre>
    * &#064;ApplicationScoped
    * public class ExampleHandler implements SOAPHandler&lt;SOAPMessageContext&gt; {
-   * 
+   *
    *   &#064;Resource
    *   private Map&lt;String, String&gt; m_initParams;
    *   ...

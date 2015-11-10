@@ -29,10 +29,11 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
+import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication.NullAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler.HandlerType;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
 /**
@@ -113,21 +114,28 @@ public class PortTypeProxyDescriptor {
   }
 
   /**
+   * @return <code>true</code> if there is an authentication handler to be installed.
+   */
+  public boolean isAuthenticationEnabled() {
+    return !NullAuthenticationMethod.class.getName().replaceAll("\\$", "\\.").equals(getAuthMethod().replaceAll("\\$", "\\."));
+  }
+
+  /**
    * @return qualified name of the {@link IAuthenticationMethod} used.
    */
   public String getAuthMethod() {
     final AnnotationMirror authenticationAnnotation = (AnnotationMirror) AnnotationUtil.getAnnotationValue(m_annotationMirror, "authentication", m_env.getElementUtils()).getValue();
     final AnnotationMirror clazzAnnotation = (AnnotationMirror) AnnotationUtil.getAnnotationValue(authenticationAnnotation, "method", m_env.getElementUtils()).getValue();
-    return m_env.getElementUtils().getTypeElement(AnnotationUtil.resolveClass(clazzAnnotation, m_env)).getQualifiedName().toString();
+    return AnnotationUtil.resolveClass(clazzAnnotation, m_env);
   }
 
   /**
-   * @return qualified name of the {@link IAuthenticator} used.
+   * @return qualified name of the {@link ICredentialVerifier} used.
    */
-  public String getAuthenticator() {
+  public String getAuthVerifier() {
     final AnnotationMirror authenticationAnnotation = (AnnotationMirror) AnnotationUtil.getAnnotationValue(m_annotationMirror, "authentication", m_env.getElementUtils()).getValue();
-    final AnnotationMirror clazzAnnotation = (AnnotationMirror) AnnotationUtil.getAnnotationValue(authenticationAnnotation, "authenticator", m_env.getElementUtils()).getValue();
-    return m_env.getElementUtils().getTypeElement(AnnotationUtil.resolveClass(clazzAnnotation, m_env)).getQualifiedName().toString();
+    final AnnotationMirror clazzAnnotation = (AnnotationMirror) AnnotationUtil.getAnnotationValue(authenticationAnnotation, "verifier", m_env.getElementUtils()).getValue();
+    return AnnotationUtil.resolveClass(clazzAnnotation, m_env);
   }
 
   /**

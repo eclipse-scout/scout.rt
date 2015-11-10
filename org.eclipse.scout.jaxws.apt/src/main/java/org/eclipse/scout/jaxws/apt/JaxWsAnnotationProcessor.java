@@ -94,7 +94,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected static final String WEBSERVICE_CONTEXT_FIELD_NAME = "m_webServiceContext";
   protected static final String HANDLE_UNDECLARED_FAULT_METHOD_NAME = "handleUndeclaredFault";
   protected static final String SERVLET_RUN_CONTEXT_FIELD_NAME = "servletRunContext";
-  protected static final String REQUEST_RUN_CONTEXT_FIELD_NAME = "requestRunContext";
+  protected static final String RUN_CONTEXT_FIELD_NAME = "requestRunContext";
 
   private Logger m_logger;
 
@@ -206,7 +206,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     if (_handlerChainAnnotation != null) {
       m_logger.logInfo("Handler file not generated because provided as binding file [file=%s]", _handlerChainAnnotation.file());
     }
-    else if (!descriptor.getHandlerChain().isEmpty() || descriptor.getAuthentication().enabled()) {
+    else if (!descriptor.getHandlerChain().isEmpty() || descriptor.isAuthenticationEnabled()) {
       portTypeProxy.annotate(HandlerChain.class).param("file", new HandlerArtifactProcessor().generateHandlerArtifacts(portTypeProxy, descriptor, processingEnv, m_logger));
     }
 
@@ -266,21 +266,21 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected void addMethodProxyImplementation(final JCodeModel model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String portTypeQualifiedName) {
     final JBlock methodBody = method.body();
 
-    // Declare variables 'servletRunContext' and 'requestRunContext'.
+    // Declare variables 'servletRunContext' and 'runContext'.
     final JVar servletRunContext = methodBody
         .decl(JMod.FINAL, model.ref(RunContext.class), SERVLET_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsServletRunContexts.class)
             .staticInvoke("copyCurrent")
             .invoke("withWebServiceContext")
             .arg(webServiceContext));
-    final JVar requestRunContext = methodBody
-        .decl(JMod.FINAL, model.ref(RunContext.class), REQUEST_RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class)
-            .staticInvoke("getRunContextForRequest")
+    final JVar runContext = methodBody
+        .decl(JMod.FINAL, model.ref(RunContext.class), RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class)
+            .staticInvoke("getRunContext")
             .arg(webServiceContext.invoke("getMessageContext")));
 
     final JTryBlock tryBlock = methodBody._try();
 
     // Invoke port type on behalf of RunContext.
-    final JInvocation runContextInvocation = createRunContextInvocation(model, servletRunContext, requestRunContext, voidMethod, method, portTypeQualifiedName);
+    final JInvocation runContextInvocation = createRunContextInvocation(model, servletRunContext, runContext, voidMethod, method, portTypeQualifiedName);
     if (voidMethod) {
       tryBlock.body().add(runContextInvocation);
     }
@@ -314,18 +314,18 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
    * @return
    */
   @Internal
-  protected JInvocation createRunContextInvocation(final JCodeModel model, final JVar servletRunContext, final JVar requestRunContext, final boolean voidMethod, final JMethod portTypeMethod, final String portTypeName) {
+  protected JInvocation createRunContextInvocation(final JCodeModel model, final JVar servletRunContext, final JVar runContext, final boolean voidMethod, final JMethod portTypeMethod, final String portTypeName) {
     final JDefinedClass servletRunContextCallable;
-    final JDefinedClass requestRunContextCallable;
+    final JDefinedClass runContextCallable;
     final String runMethodName;
     if (voidMethod) {
       servletRunContextCallable = model.anonymousClass(IRunnable.class);
-      requestRunContextCallable = model.anonymousClass(IRunnable.class);
+      runContextCallable = model.anonymousClass(IRunnable.class);
       runMethodName = "run";
     }
     else {
       servletRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
-      requestRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
+      runContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
       runMethodName = "call";
     }
 
@@ -335,21 +335,21 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
       beanInvocation.arg(parameter);
     }
 
-    // Implement RequestRunContext callable.
-    final JMethod requestRunContextRunMethod = requestRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
-    requestRunContextRunMethod.annotate(Override.class);
+    // Implement RunContext callable.
+    final JMethod runContextRunMethod = runContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
+    runContextRunMethod.annotate(Override.class);
     if (voidMethod) {
-      requestRunContextRunMethod.body().add(beanInvocation);
+      runContextRunMethod.body().add(beanInvocation);
     }
     else {
-      requestRunContextRunMethod.body()._return(beanInvocation);
+      runContextRunMethod.body()._return(beanInvocation);
     }
 
     // Create RunContext invocations.
     final JInvocation exceptionTranslator = model.ref(BEANS.class).staticInvoke("get").arg(model.ref(ExceptionTranslator.class).dotclass());
 
     final JInvocation servletRunContextInvocation = servletRunContext.invoke(runMethodName).arg(JExpr._new(servletRunContextCallable)).arg(exceptionTranslator);
-    final JInvocation requestRunContextInvocation = requestRunContext.invoke(runMethodName).arg(JExpr._new(requestRunContextCallable)).arg(exceptionTranslator);
+    final JInvocation runContextInvocation = runContext.invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);
 
     // Implement ServletRunContext callable.
     final JMethod servletRunContextRunMethod = servletRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
@@ -359,12 +359,12 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
     // Assemble the methods.
     if (voidMethod) {
-      servletRunContextCondition._if(requestRunContext.eq(JExpr._null())).add(beanInvocation); // directly invoke Bean method.
-      servletRunContextCondition._else().add(requestRunContextInvocation); // call RequestRunContext to invoke Bean method.
+      servletRunContextCondition._if(runContext.eq(JExpr._null())).add(beanInvocation); // directly invoke Bean method.
+      servletRunContextCondition._else().add(runContextInvocation); // call RunContext to invoke Bean method.
     }
     else {
-      servletRunContextCondition._if(requestRunContext.eq(JExpr._null()))._return(beanInvocation); // directly invoke Bean method.
-      servletRunContextCondition._else()._return(requestRunContextInvocation); // call RequestRunContext to invoke Bean method.
+      servletRunContextCondition._if(runContext.eq(JExpr._null()))._return(beanInvocation); // directly invoke Bean method.
+      servletRunContextCondition._else()._return(runContextInvocation); // call RunContext to invoke Bean method.
     }
     return servletRunContextInvocation;
   }
@@ -467,22 +467,19 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     out.printf("This class is auto-generated by APT triggered by Maven build based on {@link %s}.", descriptor.getDeclaringType().getSimpleName()).println();
     out.println("<p>");
     out.printf(
-        "This proxy intercepts webservice requests and runs them on behalf of a {@link ServerRunContext}, before being propagated to the implementing PortType Bean. Typically, the RunContext is configured by a preceding handler, like {@link %s}.",
+        "This proxy intercepts webservice requests and runs them on behalf of a {@link RunContext}, before being propagated to the implementing PortType bean. Typically, the RunContext is configured by a preceding handler, like {@link %s}.",
         AuthenticationHandler.class.getSimpleName()).println();
     out.println("<p>");
 
     out.println("<table>");
 
-    out.printf("<tr><td>Webservice:</td><td>{@link %s}</td>", descriptor.getPortTypeInterface().getSimpleName().toString()).println();
     out.printf("<tr><td>Proxy descriptor:</td><td>{@link %s}</td>", descriptor.getDeclaringType().getSimpleName().toString()).println();
+    out.printf("<tr><td>Webservice:</td><td>{@link %s}</td>", descriptor.getPortTypeInterface().getSimpleName().toString()).println();
 
     // Authentication
-    if (descriptor.getAuthentication().enabled()) {
+    if (descriptor.isAuthenticationEnabled()) {
       out.printf("<tr><td>Authentication Method:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthMethod())).println();
-      out.printf("<tr><td>Authenticator:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthenticator())).println();
-    }
-    else {
-      out.println("<tr><td>Authentication:</td><td>none</td>");
+      out.printf("<tr><td>Credential verifier:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthVerifier())).println();
     }
 
     // Handlers

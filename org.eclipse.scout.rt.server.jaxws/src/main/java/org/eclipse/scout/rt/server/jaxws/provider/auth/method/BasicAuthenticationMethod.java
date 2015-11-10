@@ -10,22 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.auth.method;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsBasicAuthRealmProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 
 /**
  * Authentication method to apply <i>Basic Access Authentication</i>. This requires requests to provide a valid user
@@ -53,13 +53,13 @@ public class BasicAuthenticationMethod implements IAuthenticationMethod {
   }
 
   @Override
-  public Subject authenticate(final SOAPMessageContext context, final IAuthenticator authenticator) throws Exception {
-    final List<String> authHeaders = BEANS.get(JaxWsImplementorSpecifics.class).getHttpRequestHeader(context, AUTH_BASIC_AUTHORIZATION);
+  public Principal authenticate(final SOAPMessageContext messageContext, final ICredentialVerifier credentialVerifier, final IPrincipalProducer principalProducer) throws Exception {
+    final List<String> authHeaders = BEANS.get(JaxWsImplementorSpecifics.class).getHttpRequestHeader(messageContext, AUTH_BASIC_AUTHORIZATION);
 
     if (authHeaders.isEmpty()) {
       // Challenge the client to provide credentials.
-      m_implementorSpecifics.setHttpResponseHeader(context, AUTH_BASIC_AUTHENTICATE, "Basic realm=\"" + m_realm + "\"");
-      m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+      m_implementorSpecifics.setHttpResponseHeader(messageContext, AUTH_BASIC_AUTHENTICATE, "Basic realm=\"" + m_realm + "\"");
+      m_implementorSpecifics.setHttpResponseCode(messageContext, HttpServletResponse.SC_UNAUTHORIZED);
       return null;
     }
 
@@ -67,13 +67,14 @@ public class BasicAuthenticationMethod implements IAuthenticationMethod {
       if (authHeader.startsWith(AUTH_BASIC_PREFIX)) {
         final String[] credentials = new String(Base64Utility.decode(authHeader.substring(AUTH_BASIC_PREFIX.length())), BASIC_ENCODING).split(":", 2);
         final String username = credentials[0];
-        if (authenticator.authenticate(username, credentials[1])) {
-          return new Subject(true, Collections.singleton(new SimplePrincipal(username)), Collections.emptySet(), Collections.emptySet());
+        final int authStatus = credentialVerifier.verify(username, credentials[1].toCharArray());
+        if (authStatus == ICredentialVerifier.AUTH_OK) {
+          return principalProducer.produce(username);
         }
       }
     }
 
-    m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+    m_implementorSpecifics.setHttpResponseCode(messageContext, HttpServletResponse.SC_FORBIDDEN);
     return null;
   }
 

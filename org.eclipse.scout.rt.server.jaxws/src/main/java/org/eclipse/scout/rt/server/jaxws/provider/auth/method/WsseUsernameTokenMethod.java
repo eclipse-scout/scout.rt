@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.auth.method;
 
+import java.security.Principal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
@@ -26,10 +26,10 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 
 /**
  * Authentication method to apply <i>Message Level WS-Security with UsernameToken Authentication</i>. This requires
@@ -57,19 +57,20 @@ public class WsseUsernameTokenMethod implements IAuthenticationMethod {
   }
 
   @Override
-  public Subject authenticate(final SOAPMessageContext context, final IAuthenticator authenticator) throws Exception {
-    final Entry<String, String> credentials = readWsseCredentials(context);
+  public Principal authenticate(final SOAPMessageContext messageContext, final ICredentialVerifier credentialVerifier, final IPrincipalProducer principalProducer) throws Exception {
+    final Entry<String, String> credentials = readWsseCredentials(messageContext);
     if (credentials == null) {
-      m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+      m_implementorSpecifics.setHttpResponseCode(messageContext, HttpServletResponse.SC_UNAUTHORIZED);
       return null;
     }
 
     final String username = credentials.getKey();
-    if (authenticator.authenticate(username, credentials.getValue())) {
-      return new Subject(true, Collections.singleton(new SimplePrincipal(username)), Collections.emptySet(), Collections.emptySet());
+    final int authStatus = credentialVerifier.verify(username, credentials.getValue().toCharArray());
+    if (authStatus == ICredentialVerifier.AUTH_OK) {
+      return principalProducer.produce(username);
     }
     else {
-      m_implementorSpecifics.setHttpResponseCode(context, HttpServletResponse.SC_UNAUTHORIZED);
+      m_implementorSpecifics.setHttpResponseCode(messageContext, HttpServletResponse.SC_FORBIDDEN);
       return null;
     }
   }

@@ -20,11 +20,9 @@ import javax.xml.ws.WebServiceClient;
 
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
 /**
@@ -99,17 +97,14 @@ public @interface JaxWsPortTypeProxy {
 
   /**
    * The authentication mechanism to be installed on the webservice endpoint, and to specify in which {@link RunContext}
-   * to run authenticated webservice requests. By default, {@link BasicAuthenticationMethod} with
-   * {@link ConfigFileAuthenticator} is used. Authentication can be disabled by setting <i>enabled</i> to
-   * <code>false</code>. If <i>enabled</i>, an {@link AuthenticationHandler} is generated at compile time (APT) and
-   * registered in the handler chain as very first handler.
+   * to run authenticated webservice requests. By default, authentication is disabled. If <i>enabled</i>, an
+   * {@link AuthenticationHandler} is generated at compile time (APT) and registered in the handler chain as very first
+   * handler.
    * <ul>
-   * <li>The {@link IAuthenticator} can be configured to run in a {@link RunContext} by annotating it with
-   * <code>&#064;RunWithRunContext</code> annotation.</li>
-   * <li>The {@link IAuthenticationMethod} and {@link IAuthenticator} must not be visible at compile-time, but can be
-   * referenced with their qualified names instead.</li>
-   * <li>At runtime, {@link IAuthenticationMethod} and {@link IAuthenticator} are resolved by the {@link IPlatform},
-   * meaning that they must be annotated with <code>&#064;ApplicationScoped</code>.</li>
+   * <li>The {@link ICredentialVerifier} can be configured to be invoked in a {@link RunContext} by annotating it with
+   * <code>@RunWithRunContext</code> annotation.</li>
+   * <li>The {@link IAuthenticationMethod} and {@link ICredentialVerifier} must not be visible at compile-time, but can
+   * be referenced with their qualified names instead.</li>
    * <li>If providing a handler binding file yourself, this annotation is ignored.</li>
    * </ul>
    */
@@ -121,11 +116,11 @@ public @interface JaxWsPortTypeProxy {
    * each handler, a proxy handler is created at compile-time and registered in 'handler-chain.xml'.
    * <ul>
    * <li>A handler can be configured to run in a {@link RunContext} by annotating it with
-   * <code>&#064;RunWithRunContext</code> annotation.</li>
+   * <code>@RunWithRunContext</code> annotation.</li>
    * <li>A handler can be instrumented with <i>init-params</i>.</li>
    * <li>A handler must not be visible at compile-time, but can be referenced with its qualified name instead.</li>
    * <li>At runtime, handlers are resolved by the {@link IPlatform}, meaning that a handler must be annotated with
-   * <code>&#064;ApplicationScoped</code></li>
+   * <code>@ApplicationScoped</code></li>
    * <li>If providing a handler binding file yourself, this annotation is ignored.</li>
    * </ul>
    */

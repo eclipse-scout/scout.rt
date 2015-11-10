@@ -42,7 +42,8 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
  * This filter is registered in the scout server plugin.xml as /process by default with order 1'000'000 and has the
  * active flag set to true
  *
- * @deprecated merged into {@link TrivialAuthenticator}, will be deleted in 6.0
+ * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
+ *             authenticators chained yourself; use {@link TrivialAuthenticator} instead.
  */
 @Deprecated
 public class HttpAuthJaasFilter implements Filter {

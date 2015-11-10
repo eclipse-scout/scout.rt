@@ -21,7 +21,9 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.Encoding;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ public class ServletFilterHelper {
 
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = Principal.class.getName();
 
+  public static final String HTTP_HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
   public static final String HTTP_BASIC_AUTH_NAME = "Basic";
@@ -64,6 +67,69 @@ public class ServletFilterHelper {
     session.setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL, principal);
   }
 
+  /**
+   * Returns <code>true</code> if running as a {@link Subject} with a principal corresponding to the authenticated
+   * remote user.
+   *
+   * @see HttpServletRequest#getRemoteUser()
+   */
+  public boolean isRunningWithinSubject(HttpServletRequest req) {
+    String username = req.getRemoteUser();
+    if (username == null || username.isEmpty()) {
+      return false;
+    }
+
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null || subject.getPrincipals().isEmpty()) {
+      return false;
+    }
+
+    for (Principal principal : subject.getPrincipals()) {
+      if (username.equalsIgnoreCase(principal.getName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Tries to find the authenticated principal on {@link HttpSession} or {@link HttpServletRequest}, or if not found,
+   * and there is a remote user set on {@link HttpServletRequest}, a {@link Principal} is created for that remote user.
+   *
+   * @param servletRequest
+   *          the current request.
+   * @param principalProducer
+   *          used to create a principal objects.
+   * @return authenticated principal, or <code>null</code> if not found.
+   */
+  public Principal findPrincipal(HttpServletRequest servletRequest, IPrincipalProducer principalProducer) {
+    // on session cache
+    Principal principal = getPrincipalOnSession(servletRequest);
+    if (principal != null) {
+      return principal;
+    }
+
+    // on request as principal
+    principal = servletRequest.getUserPrincipal();
+    if (principal != null && StringUtility.hasText(principal.getName())) {
+      return principal;
+    }
+
+    // on request as remoteUser
+    String name = servletRequest.getRemoteUser();
+    if (StringUtility.hasText(name)) {
+      return principalProducer.produce(name);
+    }
+
+    return null;
+  }
+
+  /**
+   * Adds the given {@link Principal} to the current calling {@link Subject}, or creates a new {@link Subject} if not
+   * running as a {@link Subject} yet, or the {@link Subject} is read-only.
+   *
+   * @return subject with the given principal added.
+   */
   public Subject createSubject(Principal principal) {
     // create subject if necessary
     Subject subject = Subject.getSubject(AccessController.getContext());

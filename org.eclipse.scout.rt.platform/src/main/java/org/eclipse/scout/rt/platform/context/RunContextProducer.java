@@ -8,27 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.job;
+package org.eclipse.scout.rt.platform.context;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
- * Provider used in 'shared' Plug-Ins to work on concrete <code>RunContexts</code>, e.g. for lookup calls.<br/>
- * TODO [dwi] try to eliminate this class
+ * Producer for {@link RunContext} objects.
+ * <p>
+ * The default implementation creates a copy of the current calling {@link RunContext}.
  *
  * @since 5.1
  */
 @ApplicationScoped
-public interface IRunContextProvider {
+public class RunContextProducer {
 
   /**
-   * Creates a "snapshot" of the current calling context.
+   * Produces a {@link RunContext} for the given {@link Subject}.
    */
-  RunContext copyCurrent();
-
-  /**
-   * Creates an empty <code>RunContext</code>.
-   */
-  RunContext empty();
+  public RunContext produce(final Subject subject) {
+    return RunContexts.copyCurrent().withSubject(subject);
+  }
 }

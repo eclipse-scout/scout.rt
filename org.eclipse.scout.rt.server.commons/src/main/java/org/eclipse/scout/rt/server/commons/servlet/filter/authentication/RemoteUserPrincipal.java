@@ -9,19 +9,21 @@ import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.scout.commons.Assertions;
+
 /**
- * Principal representing {@link HttpServletRequest#getRemoteUser()} in {@link FormBasedLoginFilter}
+ * Principal representing a {@link HttpServletRequest#getRemoteUser()}.
+ *
+ * @since 5.1
  */
 public class RemoteUserPrincipal implements Principal, Serializable {
+
   private static final long serialVersionUID = 1L;
 
-  private String m_name;
+  private final String m_name;
 
-  public RemoteUserPrincipal(String name) {
-    if (name == null) {
-      throw new IllegalArgumentException("name is null");
-    }
-    m_name = name.toLowerCase();
+  public RemoteUserPrincipal(final String name) {
+    m_name = Assertions.assertNotNull(name, "name must not be null").toLowerCase();
   }
 
   @Override
@@ -31,11 +33,11 @@ public class RemoteUserPrincipal implements Principal, Serializable {
 
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    return m_name.hashCode();
   }
 
   @Override
-  public boolean equals(Object other) {
+  public boolean equals(final Object other) {
     if (other == null) {
       return false;
     }

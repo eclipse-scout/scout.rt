@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLivePro
 @Bean
 public class DefaultAuthToken {
 
-  public static boolean isActive() {
+  public static boolean isEnabled() {
     byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
     byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
     return privateKey != null || publicKey != null;
@@ -41,13 +41,6 @@ public class DefaultAuthToken {
   private long m_validUntil;
   private String[] m_customArgs;
   private byte[] m_signature;
-
-  /**
-   * @deprecated Do not create manually, use {@code BEANS.get(BindData.class)} instead.
-   */
-  @Deprecated
-  public DefaultAuthToken() {
-  }
 
   public boolean parse(String token) {
     if (!StringUtility.hasText(token)) {
@@ -170,7 +163,7 @@ public class DefaultAuthToken {
   }
 
   public boolean isValid() {
-    if (!isActive()) {
+    if (!isEnabled()) {
       return false;
     }
     if (getSignature() == null) {

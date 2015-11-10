@@ -58,8 +58,11 @@ import org.slf4j.LoggerFactory;
  * <p>
  *
  * @author Michael Rudolf
- * @since 1.0.3 06.02.2009 TODO imo remove in 6.0 and convert to DataSourceAuthenticator
+ * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
+ *             authenticators chained yourself; see depreciation note of {@link AbstractChainableSecurityFilter}
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataSourceSecurityFilter.class);

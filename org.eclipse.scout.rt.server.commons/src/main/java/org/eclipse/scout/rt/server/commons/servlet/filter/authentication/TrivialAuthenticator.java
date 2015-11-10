@@ -5,12 +5,10 @@
 package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
 import java.io.IOException;
-import java.security.AccessController;
 import java.security.Principal;
 
 import javax.security.auth.Subject;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,16 +16,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 
 /**
- * Checks whether the user is already logged in or the request has valid auth info or the request path is excluded from
- * auth checks
+ * Checks whether the user is already authenticated, or if the request has valid auth info, or if the request path is
+ * excluded from authentication checks.
  * <p>
  * <p>
  * If a subject is already set as {@link Subject#getSubject(java.security.AccessControlContext)} then the filter is
- * transparent.
- * <p>
- * Otherwise {@link HttpServletRequest#getRemoteUser()} or {@link HttpServletRequest#getUserPrincipal()} is checked.
+ * transparent. Otherwise {@link HttpServletRequest#getRemoteUser()} or {@link HttpServletRequest#getUserPrincipal()} is
+ * checked.
  * <p>
  * <h2>init-params</h2>
  * <ul>
@@ -42,41 +41,41 @@ import org.eclipse.scout.rt.platform.Bean;
  * @since 5.0
  */
 @Bean
-public class TrivialAuthenticator {
-  protected PathInfoFilter m_excludePathFilter;
+public class TrivialAuthenticator implements IAuthenticator {
 
-  public void init(FilterConfig filterConfig) throws ServletException {
-    m_excludePathFilter = new PathInfoFilter(filterConfig.getInitParameter("filter-exclude"));
+  private TrivialAuthConfig m_config;
+
+  public void init(final TrivialAuthConfig config) throws ServletException {
+    m_config = config;
   }
 
-  public void destroy() {
-  }
-
-  /**
-   * @return true if the request was handled (caller returns), false if nothing was done (caller continues)
-   */
+  @Override
   public boolean handle(final HttpServletRequest req, final HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
-    //within subject?
-    if (currentSubjectHasValidPrincipal(req)) {
+    if (!m_config.isEnabled()) {
+      return false;
+    }
+
+    // within subject?
+    if (BEANS.get(ServletFilterHelper.class).isRunningWithinSubject(req)) {
       chain.doFilter(req, resp);
       return true;
     }
 
     // already authenticated?
-    Principal principal = findPrincipal(req);
+    final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(req, m_config.getPrincipalProducer());
     if (principal != null) {
       BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, req, resp, chain);
       return true;
     }
 
-    //excluded path
-    if (m_excludePathFilter.accepts(StringUtility.emptyIfNull(req.getServletPath()) + StringUtility.emptyIfNull(req.getPathInfo()))) {
+    // excluded path
+    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(req.getServletPath()) + StringUtility.emptyIfNull(req.getPathInfo()))) {
       chain.doFilter(req, resp);
       return true;
     }
 
     // this is a copy from UiServlet.doGet
-    String contextPath = req.getServletContext().getContextPath();
+    final String contextPath = req.getServletContext().getContextPath();
     if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
       resp.sendRedirect(req.getRequestURI() + "/");
       return true;
@@ -85,44 +84,50 @@ public class TrivialAuthenticator {
     return false;
   }
 
-  /**
-   * @return true, if a {@link Subject} is already set with a principal corresponding to the given username.
-   */
-  protected boolean currentSubjectHasValidPrincipal(HttpServletRequest req) {
-    String username = req.getRemoteUser();
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject != null) {
-      for (Principal p : subject.getPrincipals()) {
-        if (StringUtility.hasText(username) && StringUtility.equalsIgnoreCase(p.getName(), username)) {
-          return true;
-        }
-      }
-    }
-    return false;
+  @Override
+  public void destroy() {
+    // NOOP
   }
 
-  protected Principal findPrincipal(HttpServletRequest req) {
-    Principal principal = null;
+  /**
+   * Configuration for {@link TrivialAuthenticator}.
+   */
+  public static class TrivialAuthConfig {
 
-    // on session cache
-    principal = BEANS.get(ServletFilterHelper.class).getPrincipalOnSession(req);
-    if (principal != null) {
-      return principal;
+    private boolean m_enabled = true;
+    private IPrincipalProducer m_principalProducer = BEANS.get(RemoteUserPrincipalProducer.class);
+    private PathInfoFilter m_exclusionFilter;
+
+    public boolean isEnabled() {
+      return m_enabled;
     }
 
-    // on request as principal
-    principal = req.getUserPrincipal();
-    if (principal != null && StringUtility.hasText(principal.getName())) {
-      return principal;
+    public TrivialAuthConfig withEnabled(final boolean enabled) {
+      m_enabled = enabled;
+      return this;
     }
 
-    // on request as remoteUser
-    principal = null;
-    String name = req.getRemoteUser();
-    if (StringUtility.hasText(name)) {
-      return new RemoteUserPrincipal(name);
+    public IPrincipalProducer getPrincipalProducer() {
+      return m_principalProducer;
     }
 
-    return null;
+    public TrivialAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
+      m_principalProducer = principalProducer;
+      return this;
+    }
+
+    public PathInfoFilter getPathInfoFilter() {
+      return m_exclusionFilter;
+    }
+
+    /**
+     * Exclude resources from authentication.
+     * <p>
+     * Filter format: separate resources by comma, newline or whitespace; usage of wildcard (*) character is supported;
+     */
+    public TrivialAuthConfig withExclusionFilter(final String exclusionFilter) {
+      m_exclusionFilter = new PathInfoFilter(exclusionFilter);
+      return this;
+    }
   }
 }

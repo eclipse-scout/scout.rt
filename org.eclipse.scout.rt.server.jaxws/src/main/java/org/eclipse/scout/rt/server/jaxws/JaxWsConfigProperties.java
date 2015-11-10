@@ -22,8 +22,6 @@ import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.server.jaxws.handler.LogHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsMetroSpecifics;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerProxy;
 
@@ -36,7 +34,7 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Technical {@link Subject} used to authenticate webservice requests; used by {@link IAuthenticator}.
+   * Technical {@link Subject} used to authenticate webservice requests.
    */
   public static class JaxWsAuthenticatorSubjectProperty extends AbstractSubjectConfigProperty {
 
@@ -101,18 +99,6 @@ public final class JaxWsConfigProperties {
     protected String getDefaultValue() {
       return JaxWsMetroSpecifics.class.getName();
     }
-  }
-
-  /**
-   * Users granted to access webservices; used by {@link ConfigFileAuthenticator}.
-   */
-  public static class JaxWsAuthCredentialsProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "jaxws.provider.authentication.credentials";
-    }
-
   }
 
   /**

@@ -27,15 +27,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContextProducer;
+import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
-import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
-import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.InitParam;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +42,9 @@ import org.slf4j.LoggerFactory;
  * This class proxies a JAX-WS handler to be installed on provider side, and adds the following functionality:
  * <ul>
  * <li>Adds support for 'init-params' to initialize the handler (not supported by JAX-WS specification).</li>
- * <li>Runs the handler's methods on behalf of a {@link RunContext} if annotated with {@link RunWithServerRunContext}
+ * <li>Runs the handler's methods on behalf of a {@link RunContext} if annotated with {@link RunWithRunContext}
  * annotation.</li>
  * <li>Obtains the concrete handler instance from {@link IBeanManager}.</li>
- * <li>Provides a default constructor because being instantiated by the JAX-WS implementor.</li>
  * </ul>
  *
  * @since 5.1
@@ -59,19 +57,21 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
 
   private final Handler<CONTEXT> m_handler;
 
-  private final ServerRunContextProvider m_runContextProvider;
+  private final RunContextProducer m_handlerRunContextProducer;
 
   @SuppressWarnings("unchecked")
   public HandlerProxy(final org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler handlerAnnotation) {
     m_handler = BEANS.get(ClazzUtil.resolve(handlerAnnotation.value(), Handler.class, "@Handler.value"));
-    m_runContextProvider = getRunContextProvider(m_handler.getClass());
+
+    final RunWithRunContext runHandleWithRunContext = m_handler.getClass().getAnnotation(RunWithRunContext.class);
+    m_handlerRunContextProducer = (runHandleWithRunContext != null ? BEANS.get(runHandleWithRunContext.value()) : null);
 
     injectInitParams(m_handler, toInitParamMap(handlerAnnotation.initParams()));
   }
 
   @Override
   public boolean handleMessage(final CONTEXT messageContext) {
-    return invokeWithRunContext(messageContext, "handleMessage", new Callable<Boolean>() {
+    return handle(messageContext, "handleMessage", new Callable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {
@@ -82,7 +82,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
 
   @Override
   public boolean handleFault(final CONTEXT messageContext) {
-    return invokeWithRunContext(messageContext, "handleFault", new Callable<Boolean>() {
+    return handle(messageContext, "handleFault", new Callable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {
@@ -93,7 +93,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
 
   @Override
   public void close(final MessageContext messageContext) {
-    invokeWithRunContext(messageContext, "close", new Callable<Void>() {
+    handle(messageContext, "close", new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -104,16 +104,17 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
   }
 
   /**
-   * Method invoked to run the given {@link Callable} on behalf of a {@link RunContext}.
+   * Method invoked to optionally run the given {@link Callable} on behalf of a {@link RunContext}.
    */
   @Internal
-  protected <T> T invokeWithRunContext(final MessageContext messageContext, final String method, final Callable<T> callable) {
+  protected <T> T handle(final MessageContext messageContext, final String method, final Callable<T> callable) {
     try {
-      if (m_runContextProvider == null) {
+      if (m_handlerRunContextProducer == null) {
         return callable.call();
       }
       else {
-        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, HANDLER_SUBJECT)).withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<T>() {
+        final Subject subject = MessageContexts.getSubject(messageContext, HANDLER_SUBJECT);
+        return m_handlerRunContextProducer.produce(subject).call(new Callable<T>() {
           @Override
           public T call() throws Exception {
             return callable.call();
@@ -122,7 +123,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
       }
     }
     catch (final Exception e) {
-      LOG.error(String.format("Failed to intercept message [handler=%s, method=%s, inbound=%s]", m_handler.getClass().getName(), method, MessageContexts.isInboundMessage(messageContext)), e);
+      LOG.error(String.format("Failed to handle message [handler=%s, method=%s, inbound=%s]", m_handler.getClass().getName(), method, MessageContexts.isInboundMessage(messageContext)), e);
       throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // do not send cause to the client
     }
   }
@@ -132,21 +133,6 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
    */
   protected Handler<CONTEXT> getHandlerDelegate() {
     return m_handler;
-  }
-
-  /**
-   * Returns the {@link ServerRunContextProvider} if the given handler is annotated with <code>@RunWithRunContext</code>
-   * , or <code>null</code> if not present.
-   */
-  @Internal
-  protected ServerRunContextProvider getRunContextProvider(final Class<? extends Handler> handlerClass) {
-    final RunWithServerRunContext runWithRunContext = handlerClass.getAnnotation(RunWithServerRunContext.class);
-    if (runWithRunContext != null) {
-      return BEANS.get(runWithRunContext.value());
-    }
-    else {
-      return null;
-    }
   }
 
   /**

@@ -8,27 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.job;
+package org.eclipse.scout.rt.server.commons.authentication;
+
+import java.security.Principal;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
- * Provider used in 'shared' Plug-Ins to work on concrete <code>RunContexts</code>, e.g. for lookup calls.<br/>
- * TODO [dwi] try to eliminate this class
+ * Producer for {@link Principal} objects to represent authenticated users.
  *
- * @since 5.1
+ * @since 5.2
  */
 @ApplicationScoped
-public interface IRunContextProvider {
+public interface IPrincipalProducer {
 
   /**
-   * Creates a "snapshot" of the current calling context.
+   * Creates the principal for the given user.
    */
-  RunContext copyCurrent();
-
-  /**
-   * Creates an empty <code>RunContext</code>.
-   */
-  RunContext empty();
+  Principal produce(String username);
 }

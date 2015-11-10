@@ -95,6 +95,12 @@ public final class SharedConfigProperties {
 
   }
 
+  /**
+   * Property representing the service tunnel URL.
+   * <p>
+   * This property is based on convention over configuration, meaning that without an explicit configuration, the URL
+   * points to '{@link BackendUrlProperty}/process'.
+   */
   public static class ServiceTunnelTargetUrlProperty extends AbstractStringConfigProperty {
 
     @Override

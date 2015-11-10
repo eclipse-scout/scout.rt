@@ -22,7 +22,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * A security filter allowing anonymous access to the application.
+ *
+ * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
+ *             authenticators chained yourself; see depreciation note of {@link AbstractChainableSecurityFilter}
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
 
   public static final String ANONYMOUS_USER_NAME = "anonymous";

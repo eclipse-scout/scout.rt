@@ -73,7 +73,7 @@ public class HandlerArtifactProcessor {
     final List<String> handlers = new ArrayList<>();
 
     // Generate AuthHandler
-    if (descriptor.getAuthentication().enabled()) {
+    if (descriptor.isAuthenticationEnabled()) {
       try {
         final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeProxy, descriptor, env);
         logger.logInfo("Generating AuthHandler for '%s': %s", portTypeProxy.fullName(), authHandlerQualifiedName);
@@ -82,9 +82,6 @@ public class HandlerArtifactProcessor {
       catch (final Exception e) {
         throw new RuntimeException(String.format("Failed to generate AuthHandler for '%s'", portTypeProxy.fullName()), e);
       }
-    }
-    else {
-      logger.logInfo("No AuthHandler registered because authentication is disabled.");
     }
 
     // Add configured handlers.
@@ -127,7 +124,7 @@ public class HandlerArtifactProcessor {
     final JAnnotationUse generatedAnnotation = authHandler.annotate(Generated.class);
     generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
-    generatedAnnotation.param("comments", String.format("Authentication Handler for [method=%s, authenticator=%s]", AptUtil.toSimpleName(descriptor.getAuthMethod()), AptUtil.toSimpleName(descriptor.getAuthenticator())));
+    generatedAnnotation.param("comments", String.format("Authentication Handler for [method=%s, verifier=%s]", AptUtil.toSimpleName(descriptor.getAuthMethod()), AptUtil.toSimpleName(descriptor.getAuthVerifier())));
 
     // Add default constructor with super call to provide authentication annotation.
     final JMethod defaultConstructor = authHandler.constructor(JMod.PUBLIC);

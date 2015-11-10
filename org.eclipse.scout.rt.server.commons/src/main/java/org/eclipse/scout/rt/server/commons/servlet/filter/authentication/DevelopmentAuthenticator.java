@@ -14,59 +14,96 @@ import java.io.IOException;
 import java.security.Principal;
 
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
+import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
+import org.eclipse.scout.rt.server.commons.authentication.SimplePrincipalProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Convenience authentication filter for development mode using the system property user.name
+ * Convenience authenticator if running in development mode using the system property 'user.name'.
  */
 @Bean
-public class DevelopmentAuthenticator {
+public class DevelopmentAuthenticator implements IAuthenticator {
+
   private static final Logger LOG = LoggerFactory.getLogger(DevelopmentAuthenticator.class);
 
   private boolean m_showWarning = true;
-  private boolean m_active;
 
-  public void init(FilterConfig config) throws ServletException {
-    m_active = Platform.get().inDevelopmentMode();
+  private DevAuthConfig m_config;
+
+  public void init() {
+    init(new DevAuthConfig());
   }
 
-  public void destroy() {
+  public void init(final DevAuthConfig config) {
+    m_config = config;
   }
 
-  public boolean isActive() {
-    return m_active;
-  }
-
-  /**
-   * @return true if the request was handled (caller returns), false if nothing was done (caller continues)
-   */
-  public boolean handle(HttpServletRequest req, HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
-    if (!isActive()) {
+  @Override
+  public boolean handle(final HttpServletRequest req, final HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
+    if (!m_config.isEnabled()) {
       return false;
     }
+
     if (m_showWarning) {
-      LOG.warn("+++Development security: Create Subject based on System.getProperty('user.name')");
+      LOG.warn("+++Development security: run with subject {}", m_config.getUsername());
       m_showWarning = false;
     }
-    Principal principal = createDevelopmentPrincipal();
 
-    ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
+    final Principal principal = m_config.getPrincipalProducer().produce(m_config.getUsername());
+    final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
     helper.putPrincipalOnSession(req, principal);
     helper.continueChainAsSubject(principal, req, resp, chain);
     return true;
   }
 
-  protected Principal createDevelopmentPrincipal() {
-    return new SimplePrincipal(System.getProperty("user.name"));
+  @Override
+  public void destroy() {
+    // NOOP
+  }
+
+  /**
+   * Configuration for {@link DevelopmentAuthenticator}.
+   */
+  public static class DevAuthConfig {
+
+    private boolean m_enabled = Platform.get().inDevelopmentMode();
+    private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
+    private String m_username = System.getProperty("user.name");
+
+    public boolean isEnabled() {
+      return m_enabled;
+    }
+
+    public DevAuthConfig withEnabled(final boolean enabled) {
+      m_enabled = enabled;
+      return this;
+    }
+
+    public IPrincipalProducer getPrincipalProducer() {
+      return m_principalProducer;
+    }
+
+    public DevAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
+      m_principalProducer = principalProducer;
+      return this;
+    }
+
+    public String getUsername() {
+      return m_username;
+    }
+
+    public DevAuthConfig withUsername(final String username) {
+      m_username = username;
+      return this;
+    }
   }
 }

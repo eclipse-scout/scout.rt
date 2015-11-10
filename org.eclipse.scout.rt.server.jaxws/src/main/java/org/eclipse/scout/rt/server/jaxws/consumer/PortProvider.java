@@ -35,10 +35,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContextProducer;
+import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
-import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
-import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * Factory for new Port objects to interact with a webservice endpoint.
@@ -107,23 +106,21 @@ public class PortProvider<SERVICE extends Service, PORT> {
 
   /**
    * Proxies the given {@link Handler} to run on behalf of a {@link RunContext}, if the handler is annotated with
-   * {@link RunWithServerRunContext}.
+   * {@link RunWithRunContext}.
    */
   protected Handler<? extends MessageContext> proxyHandler(final Handler<? extends MessageContext> handler) {
-    final RunWithServerRunContext runWithRunContext = handler.getClass().getAnnotation(RunWithServerRunContext.class);
-    if (runWithRunContext == null) {
+    final RunWithRunContext handleWithRunContext = handler.getClass().getAnnotation(RunWithRunContext.class);
+    if (handleWithRunContext == null) {
       return handler;
     }
 
-    // Proxy the handler to run on behalf of a RunContext when being invoked.
-    final ServerRunContextProvider serverRunContextProvider = BEANS.get(runWithRunContext.value());
-
+    final RunContextProducer runContextProducer = BEANS.get(handleWithRunContext.value());
     return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         if (PROXIED_HANDLER_METHODS.contains(method)) {
-          return serverRunContextProvider.provide(Subject.getSubject(AccessController.getContext())).withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
+          return runContextProducer.produce(Subject.getSubject(AccessController.getContext())).call(new Callable<Object>() {
 
             @Override
             public Object call() throws Exception {

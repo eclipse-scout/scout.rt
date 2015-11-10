@@ -35,8 +35,11 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  * </ul>
  * <p>
  *
- * @since 1.0.3 06.02.2009 TODO imo remove in 6.0
+ * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
+ *             authenticators chained yourself; see depreciation note of {@link AbstractChainableSecurityFilter}
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
   public static final String PROP_BASIC_ATTEMPT = "BasicSecurityFilter.basicAttempt";
 

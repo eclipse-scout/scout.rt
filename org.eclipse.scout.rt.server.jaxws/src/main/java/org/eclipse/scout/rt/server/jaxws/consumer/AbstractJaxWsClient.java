@@ -35,12 +35,12 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsConnectTimeoutProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheCorePoolSizeProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheEnabledProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheTTLProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsReadTimeoutProperty;
-import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
 import org.eclipse.scout.rt.server.jaxws.consumer.PortProvider.IPortInitializer;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
@@ -185,9 +185,9 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * This method is invoked the time the service and port is preemptively created and put into cache. Consequently, you
    * cannot do any assumption about the calling thread.
    * <p>
-   * At invocation time, if the handler requires to run on another {@link RunContext} than the one from the calling
-   * context, annotate it with {@link RunWithServerRunContext} annotation, e.g. to run the handler in a separate
-   * transaction to do some logging.
+   * At invocation time, if the handler requires to run in another {@link RunContext} than the one from the calling
+   * context, annotate it with {@link RunWithRunContext} annotation, e.g. to run the handler in a separate transaction
+   * to do some logging.
    * <p>
    * If the endpoint requires to authenticate requests, an authentication handler is typically added to the list, e.g.
    * {@link BasicAuthenticationHandler} for 'Basic authentication', or {@link WsseUsernameTokenAuthenticationHandler}

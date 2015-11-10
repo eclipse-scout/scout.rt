@@ -66,7 +66,7 @@ public class DefaultAuthTokenTest {
 
   @Test
   public void testSimple() {
-    Assert.assertTrue(DefaultAuthToken.isActive());
+    Assert.assertTrue(DefaultAuthToken.isEnabled());
 
     DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
     t.init("foo");
@@ -95,7 +95,7 @@ public class DefaultAuthTokenTest {
 
   @Test
   public void testWithCustomToken() {
-    Assert.assertTrue(DefaultAuthToken.isActive());
+    Assert.assertTrue(DefaultAuthToken.isEnabled());
 
     DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
     t.init("foo", "bar");
