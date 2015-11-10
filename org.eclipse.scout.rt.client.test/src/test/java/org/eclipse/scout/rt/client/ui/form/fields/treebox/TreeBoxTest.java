@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -207,7 +208,6 @@ public class TreeBoxTest {
 
   /**
    * Tests that the content is valid for a filled mandatory field. {@link #isContentValid()}
-   *
    */
   @Test
   public void testContentValid() {
@@ -220,7 +220,6 @@ public class TreeBoxTest {
 
   /**
    * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
-   *
    */
   @Test
   public void testContentInvalid() {
@@ -232,7 +231,6 @@ public class TreeBoxTest {
 
   /**
    * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
-   *
    */
   @Test
   public void testContentInvalidError() {
@@ -241,10 +239,57 @@ public class TreeBoxTest {
     assertFalse(treeBox.isContentValid());
   }
 
+  @Test
+  public void testValidationOfNullValue() {
+    ValidatingTreeBox treeBox = createValidatingTreeBox();
+    findAndCheckNode(treeBox, null);
+    assertEquals(treeBox.getTree().getCheckedNodes().size(), 0);
+  }
+
+  @Test
+  public void testValidation() {
+    ValidatingTreeBox treeBox = createValidatingTreeBox();
+    findAndCheckNode(treeBox, 1L);
+    findAndCheckNode(treeBox, 5L);
+    findAndCheckNode(treeBox, 10L);
+    //up to 16, all is well:
+
+    assertEquals(treeBox.getTree().getCheckedNodes().size(), 3);
+    assertTrue(CollectionUtility.equalsCollection(getCheckedTreeNodeKeys(treeBox), CollectionUtility.hashSet(1L, 5L, 10L)));
+
+    findAndCheckNode(treeBox, 6L);
+    //validation now adjusts value.
+
+    assertEquals(treeBox.getTree().getCheckedNodes().size(), 2);
+    assertTrue(CollectionUtility.equalsCollection(getCheckedTreeNodeKeys(treeBox), CollectionUtility.hashSet(6L, 10L)));
+  }
+
   private SimpleTreeBox createSimpleTreeBox() {
     SimpleTreeBox treeBox = new SimpleTreeBox();
     treeBox.initField();
     return treeBox;
+  }
+
+  private ValidatingTreeBox createValidatingTreeBox() {
+    ValidatingTreeBox treeBox = new ValidatingTreeBox();
+    treeBox.initField();
+    return treeBox;
+  }
+
+  private <T> void findAndCheckNode(ITreeBox<T> treeBox, T pk) {
+    ITreeNode node = treeBox.getTree().findNode(pk);
+    if (node != null) {
+      node.setChecked(true);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> Set<T> getCheckedTreeNodeKeys(ITreeBox<T> treeBox) {
+    Set<T> checkedKeys = CollectionUtility.hashSet();
+    for (ITreeNode n : treeBox.getTree().getCheckedNodes()) {
+      checkedKeys.add((T) n.getPrimaryKey());
+    }
+    return checkedKeys;
   }
 
   public class SimpleTreeBox extends AbstractTreeBox<Long> {
@@ -266,6 +311,54 @@ public class TreeBoxTest {
     @Override
     protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
       return TreeBoxLookupCall.class;
+    }
+  }
+
+  public class ValidatingTreeBox extends AbstractTreeBox<Long> {
+
+    @Override
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+      return TreeBoxLookupCall.class;
+    }
+
+    @Override
+    protected Set<Long> execValidateValue(Set<Long> rawValue) {
+
+      // only allow multi check if the sum of the keys is below 20.
+      // if it exceeds 20, the smallest keys are thrown out, until
+      // condition is satisfied.
+
+      //Does not accept null key.
+
+      rawValue.remove(null);
+
+      long sum = 0L;
+      for (Long l : rawValue) {
+        sum += l;
+      }
+
+      if (sum >= 20) {
+        List<Long> sorted = CollectionUtility.arrayList(rawValue);
+        Collections.sort(sorted);
+        while (sum >= 20) {
+          Long elem = sorted.remove(0);
+          sum -= elem;
+        }
+        return CollectionUtility.hashSet(sorted);
+      }
+      else {
+        return rawValue;
+      }
+
+    }
+
+    public class ValidatingTreeBoxTree extends DefaultTreeBoxTree {
+
+      @Override
+      protected boolean getConfiguredMultiCheck() {
+        return true;
+      }
+
     }
   }
 

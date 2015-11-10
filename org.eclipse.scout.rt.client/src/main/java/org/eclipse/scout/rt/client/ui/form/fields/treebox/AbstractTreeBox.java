@@ -925,6 +925,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     if (m_valueTreeSyncActive) {
       return;
     }
+    boolean resync = false;
     try {
       m_valueTreeSyncActive = true;
       getTree().setTreeChanging(true);
@@ -941,6 +942,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         checkedKeys.add((T) checkedNode.getPrimaryKey());
       }
       checkKeys(checkedKeys);
+      // Due to validate logic, the actual value
+      // may differ now, making a resync of the value is necessary
+      Set<T> validatedCheckedKeys = getCheckedKeys();
+      if (!CollectionUtility.equalsCollection(checkedKeys, validatedCheckedKeys)) {
+        resync = true;
+      }
       if (!getTree().isCheckable()) {
         //checks follow selection
         getTree().visitTree(new ITreeVisitor() {
@@ -956,6 +963,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       getTree().setTreeChanging(false);
       m_valueTreeSyncActive = false;
     }
+    if (resync) {
+      // The value of the treeBox is different
+      // from the one represented in the tree.
+      // Need to sync.
+      syncValueToTree();
+    }
+
     // check if row filter needs to change
     if (!m_tree.getUIFacade().isUIProcessing()) {
       updateActiveNodesFilter();
