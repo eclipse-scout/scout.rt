@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
+package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

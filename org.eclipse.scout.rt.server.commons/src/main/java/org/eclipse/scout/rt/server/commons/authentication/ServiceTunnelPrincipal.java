@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
+package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.Serializable;
 import java.security.Principal;

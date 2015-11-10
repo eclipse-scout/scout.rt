@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
-import org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper;
+import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;

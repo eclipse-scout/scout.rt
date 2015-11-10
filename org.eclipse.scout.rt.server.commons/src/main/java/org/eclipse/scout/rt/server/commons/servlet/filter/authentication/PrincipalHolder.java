@@ -14,7 +14,11 @@ import java.security.Principal;
 
 import org.eclipse.scout.commons.holders.Holder;
 
-//TODO imo remove in 6.0
+/**
+ * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
+ *             authenticators chained yourself; see depreciation note of {@link AbstractChainableSecurityFilter}
+ */
+@Deprecated
 public class PrincipalHolder extends Holder<Principal> {
   private static final long serialVersionUID = 1L;
 

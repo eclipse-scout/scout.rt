@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
+package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -21,9 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
-import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
-import org.eclipse.scout.rt.server.commons.authentication.SimplePrincipalProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

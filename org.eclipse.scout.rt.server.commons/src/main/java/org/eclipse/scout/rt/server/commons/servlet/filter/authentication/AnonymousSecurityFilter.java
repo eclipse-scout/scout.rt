@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 
 /**
  * A security filter allowing anonymous access to the application.

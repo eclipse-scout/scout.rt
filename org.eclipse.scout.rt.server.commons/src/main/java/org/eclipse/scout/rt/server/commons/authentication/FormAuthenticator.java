@@ -18,7 +18,6 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper;
 
 /**
  * Authenticator for Form-based authentication. This authenticator is designed to work with 'scout-login-module.js' with

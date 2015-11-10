@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
-
-import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
+package org.eclipse.scout.rt.server.commons.authentication;
 
 /**
  * Producer for {@link ServiceTunnelPrincipal} objects.

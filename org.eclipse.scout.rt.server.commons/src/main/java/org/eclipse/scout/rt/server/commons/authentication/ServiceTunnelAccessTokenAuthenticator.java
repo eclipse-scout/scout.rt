@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
+package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
-import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 

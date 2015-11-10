@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
+package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -16,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
-import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 
 /**
  * Checks whether the user is already authenticated, or if the request has valid auth info, or if the request path is

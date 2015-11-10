@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.authentication.IAuthenticator;
+import org.eclipse.scout.rt.server.commons.authentication.SecureHttpServletRequestWrapper;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 
 /**
@@ -87,6 +88,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  *             </pre>
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractChainableSecurityFilter implements Filter {
   public static final String PROP_SUBJECT = Subject.class.getName();
 
