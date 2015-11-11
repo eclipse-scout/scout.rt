@@ -23,6 +23,8 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.holders.IntegerHolder;
+import org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension;
+import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionDisposeChain;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield.MainBox.SmartField1;
@@ -33,6 +35,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -141,11 +145,58 @@ public class ActionTest {
     assertEquals("f11", action.getKeyStroke());
   }
 
+  public static class BaseActionExtension extends AbstractActionExtension<BaseAction> {
+
+    public BaseActionExtension(BaseAction owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execDispose(ActionDisposeChain chain) {
+      chain.execDispose();
+      getOwner().additionalDispose();
+    }
+  }
+
+  @Test
+  public void testDisposeAction() {
+    BEANS.get(IExtensionRegistry.class).register(BaseActionExtension.class);
+    try {
+      BaseAction action = new BaseAction();
+      action.dispose();
+      assertTrue(action.m_disposeInternalCalled);
+      assertTrue(action.m_execDisposeCalled);
+      assertTrue(action.m_additionalDisposeCalled);
+    }
+    finally {
+      BEANS.get(IExtensionRegistry.class).deregister(BaseActionExtension.class);
+    }
+  }
+
   @ClassId(TEST_ACTION_CLASS_ID)
   static class AnnotatedAction extends AbstractAction {
   }
 
   public static class BaseAction extends AbstractAction {
+    boolean m_disposeInternalCalled;
+    boolean m_execDisposeCalled;
+    boolean m_additionalDisposeCalled;
+
+    @Override
+    protected void disposeInternal() {
+      super.disposeInternal();
+      m_disposeInternalCalled = true;
+    }
+
+    public void additionalDispose() {
+      m_additionalDisposeCalled = true;
+    }
+
+    @Override
+    protected void execDispose() {
+      super.execDispose();
+      m_execDisposeCalled = true;
+    }
   }
 
   @Replace
@@ -165,4 +216,5 @@ public class ActionTest {
   @Replace
   public static class ExtendedTestActionWithCustomActionId extends TestActionWithCustomActionId {
   }
+
 }

@@ -137,6 +137,15 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     chain.execInitForm(form);
   }
 
+  @Override
+  public void disposeInternal() {
+    super.disposeInternal();
+    FORM form = getForm();
+    if (form != null) {
+      form.dispose();
+    }
+  }
+
   protected static class LocalFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends LocalToolButtonExtension<OWNER> implements IFormToolButtonExtension<FORM, OWNER> {
 
     public LocalFormToolButtonExtension(OWNER owner) {

@@ -354,4 +354,10 @@ public interface ITreeNode {
    * Convenience for getTree().updateNode(this);
    */
   void update();
+
+  /**
+   * Called by the scout framework when the node is disposed in order to release any bound resources. There is usually
+   * no need to call this method by the application's code.
+   */
+  void dispose();
 }

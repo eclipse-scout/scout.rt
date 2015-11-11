@@ -1026,6 +1026,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     getColumnSet().disposeColumns();
   }
 
+  private void disposeMenus() {
+    for (IMenu menu : getMenus()) {
+      menu.dispose();
+    }
+  }
+
   // FIXME AWE/MVI: make TableControls extensible, check copy/paste code in this class
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
@@ -1176,6 +1182,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   protected void disposeTableInternal() {
     disposeColumnsInternal();
+    disposeMenus();
   }
 
   @Override

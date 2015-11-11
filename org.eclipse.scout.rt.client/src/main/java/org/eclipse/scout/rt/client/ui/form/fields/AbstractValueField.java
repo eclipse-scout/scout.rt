@@ -647,6 +647,19 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     setValue(other.getValue());
   }
 
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
+  }
+
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.

@@ -270,6 +270,19 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     return m_uiFacade;
   }
 
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
+  }
+
   private class P_UIFacade implements ITabBoxUIFacade {
     @Override
     public void setSelectedTabFromUI(IGroupBox box) {

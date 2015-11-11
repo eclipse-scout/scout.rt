@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeResolveVirtualChildNodeChain;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -24,6 +25,8 @@ public interface ITreeNodeExtension<OWNER extends AbstractTreeNode> extends IExt
   void execDecorateCell(TreeNodeDecorateCellChain chain, Cell cell);
 
   void execInitTreeNode(TreeNodeInitTreeNodeChain chain);
+
+  void execDispose(TreeNodeDisposeChain chain);
 
   ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node);
 

@@ -437,6 +437,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   protected void disposePlannerInternal() {
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
   }
 
   /*

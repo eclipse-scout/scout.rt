@@ -224,4 +224,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   int getHorizontalAlignment();
 
   void setView(boolean visible, boolean enabled);
+
+  /**
+   * Called by the scout framework when the action is disposed in order to release any bound resources. There is usually
+   * no need to call this method by the application's code.
+   */
+  void dispose();
 }

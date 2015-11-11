@@ -711,4 +711,10 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @return
    */
   int getToolbarLocation();
+
+  /**
+   * Called by the scout framework when the form is disposed in order to release any bound resources. There is usually
+   * no need to call this method by the application's code.
+   */
+  void dispose();
 }

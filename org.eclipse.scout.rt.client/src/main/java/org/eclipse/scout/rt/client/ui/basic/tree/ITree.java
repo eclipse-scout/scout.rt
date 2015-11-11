@@ -445,7 +445,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   void removeNode(ITreeNode node);
 
   /**
-   * clear removed rows from cache
+   * Clears removed nodes from cache and disposes them.
    */
   void clearDeletedNodes();
 

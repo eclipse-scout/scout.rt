@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionActionChain;
+import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitActionChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
@@ -226,6 +227,14 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(10)
   protected void execInitAction() {
+  }
+
+  /**
+   * called by {@link #dispose()}<br>
+   */
+  @ConfigOperation
+  @Order(15)
+  protected void execDispose() {
   }
 
   /**
@@ -736,6 +745,11 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       getOwner().execInitAction();
     }
 
+    @Override
+    public void execDispose(ActionDisposeChain chain) {
+      getOwner().execDispose();
+    }
+
   }
 
   protected final void interceptSelectionChanged(boolean selection) {
@@ -755,4 +769,30 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     ActionInitActionChain chain = new ActionInitActionChain(extensions);
     chain.execInitAction();
   }
+
+  protected final void interceptDispose() {
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
+    ActionDisposeChain chain = new ActionDisposeChain(extensions);
+    chain.execDispose();
+  }
+
+  @Override
+  public final void dispose() {
+    try {
+      disposeInternal();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing action.", e);
+    }
+    try {
+      interceptDispose();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing action.", e);
+    }
+  }
+
+  protected void disposeInternal() {
+  }
+
 }

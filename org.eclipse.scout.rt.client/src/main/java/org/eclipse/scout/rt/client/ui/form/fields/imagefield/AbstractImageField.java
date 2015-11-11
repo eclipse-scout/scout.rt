@@ -37,9 +37,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("480ea07e-9cec-4591-ba73-4bb9aa45a60d")
 public abstract class AbstractImageField extends AbstractFormField implements IImageField {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractImageField.class);
   private IImageFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
   private IContextMenu m_contextMenu;
@@ -465,6 +468,19 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public IImageFieldUIFacade getUIFacade() {
     return m_uiFacade;
+  }
+
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
   }
 
   private class P_UIFacade implements IImageFieldUIFacade {

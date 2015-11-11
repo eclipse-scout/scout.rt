@@ -687,6 +687,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   protected void disposeTreeInternal() {
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Exception while disposing menu.", e);
+      }
+    }
+    getRootNode().dispose();
+    clearDeletedNodes();
   }
 
   @Override
@@ -1631,14 +1641,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       children = resolveNodes(children);
       deselectNodes(children);
-      ((AbstractTreeNode) parent).removeChildNodesInternal(children, true);
+      ((AbstractTreeNode) parent).removeChildNodesInternal(children, true, isAutoDiscardOnDelete());
       decorateAffectedNodeCells(parent, parent.getChildNodes());
       if (!isAutoDiscardOnDelete()) {
         for (ITreeNode child : children) {
           if (child.getStatus() == ITreeNode.STATUS_INSERTED) {
-            // it was new and now it is gone, no further action required
+            // The node was new and now it is gone, so it can be disposed now
+            child.dispose();
           }
           else {
+            // The node will be disposed later.
             child.setStatusInternal(ITableRow.STATUS_DELETED);
             m_deletedNodes.put(child.getPrimaryKey(), child);
           }
@@ -1675,8 +1687,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void clearDeletedNodes() {
-    for (Iterator<ITreeNode> it = m_deletedNodes.values().iterator(); it.hasNext();) {
-      (it.next()).setTreeInternal(null, true);
+    for (ITreeNode node : m_deletedNodes.values()) {
+      node.setTreeInternal(null, true);
+      try {
+        node.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing node.", e);
+      }
     }
     m_deletedNodes.clear();
   }

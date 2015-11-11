@@ -67,4 +67,21 @@ public final class ActionChains {
       callChain(methodInvocation);
     }
   }
+
+  public static class ActionDisposeChain extends AbstractActionChain {
+
+    public ActionDisposeChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
+      super(extensions);
+    }
+
+    public void execDispose() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IActionExtension<? extends AbstractAction> next) {
+          next.execDispose(ActionDisposeChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

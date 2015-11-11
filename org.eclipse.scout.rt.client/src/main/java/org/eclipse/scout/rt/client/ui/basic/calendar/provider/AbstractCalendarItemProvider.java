@@ -235,6 +235,14 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @Override
   public void disposeProvider() {
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
     IFuture<Void> job = m_reloadJob;
     if (job != null) {
       job.cancel(true);

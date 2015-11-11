@@ -54,6 +54,23 @@ public final class TreeNodeChains {
     }
   }
 
+  public static class TreeNodeDisposeChain extends AbstractTreeNodeChain {
+
+    public TreeNodeDisposeChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public void execDispose() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITreeNodeExtension<? extends AbstractTreeNode> next) {
+          next.execDispose(TreeNodeDisposeChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
   public static class TreeNodeResolveVirtualChildNodeChain extends AbstractTreeNodeChain {
 
     public TreeNodeResolveVirtualChildNodeChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {

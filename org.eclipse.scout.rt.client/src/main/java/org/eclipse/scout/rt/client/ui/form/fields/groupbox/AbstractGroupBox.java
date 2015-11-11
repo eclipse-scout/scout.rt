@@ -629,6 +629,19 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return propertySupport.getPropertyInt(PROP_BACKGROUND_IMAGE_HORIZONTAL_ALIGNMENT);
   }
 
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
+  }
+
   private class P_UIFacade implements IGroupBoxUIFacade {
     @Override
     public void setExpandedFromUI(boolean expanded) {

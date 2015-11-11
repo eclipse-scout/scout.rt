@@ -529,10 +529,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public void nodeRemovedNotify() {
+  public void disposeInternal() {
+    super.disposeInternal();
     try {
       interceptDisposePage();
       disposeDetailForm();
+      disposeTable();
     }
     catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
@@ -650,6 +652,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (getDetailForm() != null) {
       getDetailForm().doClose();
       setDetailForm(null);
+    }
+  }
+
+  protected void disposeTable() {
+    if (getTable() != null) {
+      getTable().disposeTable();
+      setTableStatus(null);
     }
   }
 

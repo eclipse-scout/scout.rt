@@ -504,4 +504,8 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
     return value;
   }
 
+  @Override
+  public void dispose() {
+  }
+
 }

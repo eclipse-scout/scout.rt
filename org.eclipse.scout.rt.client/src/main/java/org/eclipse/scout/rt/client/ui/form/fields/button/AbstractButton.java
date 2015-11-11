@@ -36,9 +36,12 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContext
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractButton.class);
   private final EventListenerList m_listenerList = new EventListenerList();
   private int m_systemType;
   private int m_displayStyle;
@@ -414,6 +417,19 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   public void setView(boolean visible, boolean enabled) {
     setVisible(visible);
     setEnabled(enabled);
+  }
+
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
   }
 
   /**

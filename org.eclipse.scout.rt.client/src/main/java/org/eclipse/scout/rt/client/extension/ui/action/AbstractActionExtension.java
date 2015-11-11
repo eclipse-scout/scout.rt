@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.action;
 
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionActionChain;
+import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitActionChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
@@ -35,6 +36,11 @@ public abstract class AbstractActionExtension<OWNER extends AbstractAction> exte
   @Override
   public void execInitAction(ActionInitActionChain chain) {
     chain.execInitAction();
+  }
+
+  @Override
+  public void execDispose(ActionDisposeChain chain) {
+    chain.execDispose();
   }
 
 }

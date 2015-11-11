@@ -136,6 +136,11 @@ public class OutlineMenuWrapper implements IMenu {
   }
 
   @Override
+  public void dispose() {
+    m_wrappedMenu.dispose();
+  }
+
+  @Override
   public void doAction() {
     m_wrappedMenu.doAction();
   }

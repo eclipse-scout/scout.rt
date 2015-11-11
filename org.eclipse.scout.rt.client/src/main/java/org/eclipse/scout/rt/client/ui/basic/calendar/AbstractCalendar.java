@@ -341,6 +341,14 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   private void disposeCalendarInternal() {
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing menu.", e);
+      }
+    }
     for (ICalendarItemProvider p : m_providers) {
       try {
         p.disposeProvider();

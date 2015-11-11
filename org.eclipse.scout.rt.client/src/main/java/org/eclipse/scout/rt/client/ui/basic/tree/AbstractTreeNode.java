@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeResolveVirtualChildNodeChain;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -174,6 +175,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @ConfigOperation
   @Order(20)
   protected void execInitTreeNode() {
+  }
+
+  /**
+   * called by {@link #dispose()}<br>
+   */
+  @ConfigOperation
+  @Order(25)
+  protected void execDispose() {
   }
 
   @ConfigOperation
@@ -923,7 +932,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   /**
    * do not use this internal method
    */
-  public final void removeChildNodesInternal(Collection<? extends ITreeNode> nodes, boolean includeSubtree) {
+  public final void removeChildNodesInternal(Collection<? extends ITreeNode> nodes, boolean includeSubtree, boolean disposeNodes) {
 
     List<ITreeNode> removedNodes = new ArrayList<ITreeNode>();
     synchronized (m_childNodeListLock) {
@@ -942,7 +951,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     }
     // inform nodes of remove
     for (ITreeNode removedNode : removedNodes) {
-      postProcessRemoveRec(removedNode, getTree(), includeSubtree);
+      postProcessRemoveRec(removedNode, getTree(), includeSubtree, disposeNodes);
     }
     resetFilterCache();
   }
@@ -963,7 +972,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       newNode.setParentNodeInternal(this);
       m_childNodeList.get(index).setChildNodeIndexInternal(index);
     }
-    postProcessRemoveRec(oldNode, m_tree, true);
+    postProcessRemoveRec(oldNode, m_tree, true, true);
     postProcessAddRec(newNode, true);
     resetFilterCache();
   }
@@ -981,7 +990,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       // changed the visible property for the page
       if (!node.isVisible()) {
         if (node instanceof AbstractTreeNode) {
-          ((AbstractTreeNode) node.getParentNode()).removeChildNodesInternal(CollectionUtility.arrayList(node), false);
+          ((AbstractTreeNode) node.getParentNode()).removeChildNodesInternal(CollectionUtility.arrayList(node), false, true);
         }
         return;
       }
@@ -1010,15 +1019,18 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public void nodeRemovedNotify() {
   }
 
-  private void postProcessRemoveRec(ITreeNode node, ITree formerTree, boolean includeSubtree) {
+  private void postProcessRemoveRec(ITreeNode node, ITree formerTree, boolean includeSubtree, boolean dispose) {
     if (includeSubtree) {
       for (ITreeNode ch : node.getChildNodes()) {
-        postProcessRemoveRec(ch, formerTree, includeSubtree);
+        postProcessRemoveRec(ch, formerTree, includeSubtree, dispose);
       }
     }
     if (formerTree != null) {
       try {
         node.nodeRemovedNotify();
+        if (dispose) {
+          node.dispose();
+        }
       }
       catch (Exception t) {
         LOG.error("Error removing node", t);
@@ -1124,6 +1136,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     }
 
     @Override
+    public void execDispose(TreeNodeDisposeChain chain) {
+      getOwner().execDispose();
+    }
+
+    @Override
     public ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node) {
       return getOwner().execResolveVirtualChildNode(node);
     }
@@ -1142,9 +1159,45 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     chain.execInitTreeNode();
   }
 
+  protected final void interceptDispose() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    TreeNodeDisposeChain chain = new TreeNodeDisposeChain(extensions);
+    chain.execDispose();
+  }
+
   protected final ITreeNode interceptResolveVirtualChildNode(IVirtualTreeNode node) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     TreeNodeResolveVirtualChildNodeChain chain = new TreeNodeResolveVirtualChildNodeChain(extensions);
     return chain.execResolveVirtualChildNode(node);
+  }
+
+  @Override
+  public final void dispose() {
+    try {
+      disposeInternal();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing node.", e);
+    }
+    try {
+      interceptDispose();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing node.", e);
+    }
+  }
+
+  protected void disposeInternal() {
+    for (ITreeNode childNode : getChildNodes()) {
+      childNode.dispose();
+    }
+    for (IMenu menu : getMenus()) {
+      try {
+        menu.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Exception while disposing menu.", e);
+      }
+    }
   }
 }

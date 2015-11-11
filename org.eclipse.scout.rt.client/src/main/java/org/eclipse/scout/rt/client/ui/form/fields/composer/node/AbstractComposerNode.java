@@ -76,16 +76,6 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
     return m_composerField;
   }
 
-  @Override
-  public void nodeRemovedNotify() {
-    super.nodeRemovedNotify();
-    dispose();
-  }
-
-  public void dispose() {
-    disposeMenus();
-  }
-
   protected void attachAddEntityMenus(Collection<IMenu> menus) {
     EntityNode eNode = null;
     ITreeNode n = this;
@@ -106,14 +96,6 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
     }
     for (IDataModelEntity e : childEntitites) {
       menus.add(new AddEntityMenu(getComposerField(), this, e));
-    }
-  }
-
-  protected void disposeMenus() {
-    for (IMenu menu : getMenus()) {
-      if (menu instanceof AddEntityMenu) {
-        ((AddEntityMenu) menu).dispose();
-      }
     }
   }
 

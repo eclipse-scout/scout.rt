@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeResolveVirtualChildNodeChain;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -33,6 +34,11 @@ public abstract class AbstractTreeNodeExtension<OWNER extends AbstractTreeNode> 
   @Override
   public void execInitTreeNode(TreeNodeInitTreeNodeChain chain) {
     chain.execInitTreeNode();
+  }
+
+  @Override
+  public void execDispose(TreeNodeDisposeChain chain) {
+    chain.execDispose();
   }
 
   @Override

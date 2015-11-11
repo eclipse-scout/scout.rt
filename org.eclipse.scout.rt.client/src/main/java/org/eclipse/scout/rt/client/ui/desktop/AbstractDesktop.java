@@ -1918,12 +1918,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           break;
         }
       }
-      catch (Exception t) {
+      catch (RuntimeException t) {
         LOG.error("extension " + ext, t);
       }
     }
 
     // gather tool button forms
+    // TODO ASA maybe obsolete
     for (IToolButton toolButton : getToolButtons()) {
       if (toolButton instanceof AbstractFormToolButton) {
         AbstractFormToolButton<?> formToolButton = (AbstractFormToolButton<?>) toolButton;
@@ -1949,8 +1950,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     // outlines
     for (IOutline outline : getAvailableOutlines()) {
-      outline.removeAllChildNodes(outline.getRootNode());
-      outline.disposeTree();
+      try {
+        outline.disposeTree();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing outline.", e);
+      }
+    }
+
+    for (IAction action : getActions()) {
+      try {
+        action.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.error("Exception while disposing action.", e);
+      }
     }
 
     fireDesktopClosed();
