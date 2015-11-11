@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServiceTunnelAccessTokenAuthenticator;
+import org.eclipse.scout.rt.server.commons.authentication.ServiceTunnelAccessTokenAuthenticator;
 
 /**
  * <h3>{@link ServerServletFilter}</h3>
@@ -30,7 +30,7 @@ public class ServerServletFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     m_tunnelAuthenticator = BEANS.get(ServiceTunnelAccessTokenAuthenticator.class);
-    m_tunnelAuthenticator.init(filterConfig);
+    m_tunnelAuthenticator.init();
   }
 
   @Override
