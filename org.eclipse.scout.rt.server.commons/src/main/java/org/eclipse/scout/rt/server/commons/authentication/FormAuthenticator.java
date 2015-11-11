@@ -58,7 +58,7 @@ public class FormAuthenticator implements IAuthenticator {
       return false;
     }
 
-    switch (req.getRequestURI()) {
+    switch (getTarget(req)) {
       case "/login":
         return handleLoginRequest(req, resp);
       case "/auth":
@@ -165,6 +165,16 @@ public class FormAuthenticator implements IAuthenticator {
     return new SimpleEntry<>(user, password.toCharArray());
   }
 
+  protected String getTarget(final HttpServletRequest req) {
+    final String pathInfo = req.getPathInfo();
+    if (pathInfo != null) {
+      return pathInfo;
+    }
+
+    final String requestURI = req.getRequestURI();
+    return requestURI.substring(requestURI.lastIndexOf("/"));
+  }
+
   /**
    * Invoke to forward to '/login.html' page so that the user can enter his credentials.
    */
@@ -185,7 +195,7 @@ public class FormAuthenticator implements IAuthenticator {
       try {
         Thread.sleep(500L);
       }
-      catch (InterruptedException e) {
+      catch (final InterruptedException e) {
         // NOOP
       }
       resp.sendError(HttpServletResponse.SC_FORBIDDEN);
