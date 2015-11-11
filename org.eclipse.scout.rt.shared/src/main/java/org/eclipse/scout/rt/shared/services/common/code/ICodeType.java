@@ -20,6 +20,11 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 /**
  * Code types are dynamic enumerations used in front- and back-end. <br>
  * Values are cached on client and server.
+ *
+ * @param CODE_TYPE_ID
+ *          type of the codetype: see {@link #getId()}
+ * @param CODE_ID
+ *          type of the code: see {@link #getCode(Object)}
  */
 @Bean
 @BeanProducer(CodeTypeProducer.class)
