@@ -40,8 +40,6 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Clock = "font:\uE004";
   public static final String Checked = "font:\uE005";
   public static final String Group = "font:\uE006";
-  public static final String Wand = "font:\uE010";
-  public static final String Phone = "font:\uE011";
   public static final String Target = "font:\uE020";
   public static final String World = "font:\uE021";
   public static final String Chart = "font:\uE022";
@@ -49,7 +47,6 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Category = "font:\uE024";
   public static final String Gear = "font:\uE031";
   public static final String Star = "font:\uE032";
-  public static final String Share = "font:\uE033";
   public static final String Person = "font:\uE034";
   public static final String VerticalDots = "font:\uE040";
   public static final String List = "font:\uE041";
