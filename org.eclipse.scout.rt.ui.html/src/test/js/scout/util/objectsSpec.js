@@ -115,4 +115,34 @@ describe("scout.objects", function() {
     });
   });
 
+  describe('values', function() {
+    it('returns object values', function() {
+      var Class = function() {
+        this.a = 'A';
+        this.b = 'B';
+      };
+      var o1 = {
+          a: 'X',
+          b: 'Y',
+          c: 'Z'
+      };
+      var o2 = new Class();
+      o2.a = 'X';
+      o2.c = 'C';
+
+      expect(scout.objects.values()).toEqual([]);
+      expect(scout.objects.values(null)).toEqual([]);
+      expect(scout.objects.values(undefined)).toEqual([]);
+      expect(scout.objects.values({})).toEqual([]);
+      expect(scout.objects.values(o1).length).toBe(3);
+      expect(scout.objects.values(o2).length).toBe(3);
+      expect(scout.objects.values(o1)).toContain('X');
+      expect(scout.objects.values(o1)).toContain('Y');
+      expect(scout.objects.values(o1)).toContain('Z');
+      expect(scout.objects.values(o2)).toContain('X'); // not A
+      expect(scout.objects.values(o2)).toContain('B');
+      expect(scout.objects.values(o2)).toContain('C');
+    });
+  });
+
 });

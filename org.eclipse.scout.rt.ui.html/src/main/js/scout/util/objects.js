@@ -69,6 +69,23 @@ scout.objects = {
   },
 
   /**
+   * Returns an array containing the values of all object properties. By default, only
+   * 'own' properties are returned. The optional argument 'all' can be set to true to
+   * change that behavior.
+   */
+  values: function(obj, all) {
+    var values = [];
+    if (obj) {
+      for (var key in obj) {
+        if (all || obj.hasOwnProperty(key)) {
+          values.push(obj[key]);
+        }
+      }
+    }
+    return values;
+  },
+
+  /**
    * TODO BSH Document
    *
    * How to use:
