@@ -63,8 +63,8 @@ describe("scout.defaultValues", function() {
           },
           "Chart": {
             "chartData": {},
-            "axisData": {
-              "xAxis": {
+            "~axisData": {
+              "~xAxis": {
                 "label": ""
               },
               "yAxis": {
@@ -144,9 +144,6 @@ describe("scout.defaultValues", function() {
         "id": "12",
         "objectType": "Chart",
         "axisData": []
-      }, { // [12]
-        "id": "13",
-        "objectType": "Chart"
       }];
       scout.defaultValues.applyTo(testObjects);
 
@@ -162,19 +159,19 @@ describe("scout.defaultValues", function() {
       expect(testObjects[5].gridData.y).toBe(5);
       expect(testObjects[6].chartData.value).toBe(2);
       expect(testObjects[7].chartData).toEqual({});
+      expect(testObjects[7].axisData).toBe(undefined);
       expect(testObjects[8].chartData).toBe("none");
-      expect(testObjects[9].axisData.xAxis.label).toBe("");
+      expect(testObjects[8].axisData).toBe(undefined);
+      expect(testObjects[9].axisData.xAxis).toBe(undefined);
       expect(testObjects[9].axisData.yAxis.label).toBe("non-default");
       expect(testObjects[10].axisData.length).toBe(3);
-      expect(testObjects[10].axisData[0].xAxis.label).toBe("");
+      expect(testObjects[10].axisData[0].xAxis).toBe(undefined);
       expect(testObjects[10].axisData[0].yAxis.label).toBe("non-default");
-      expect(testObjects[10].axisData[1].xAxis.label).toBe("");
+      expect(testObjects[10].axisData[1].xAxis).toBe(undefined);
       expect(testObjects[10].axisData[1].yAxis.label).toBe("");
-      expect(testObjects[10].axisData[2].xAxis.label).toBe("");
+      expect(testObjects[10].axisData[2].xAxis).toBe(undefined);
       expect(testObjects[10].axisData[2].yAxis.label).toBe("");
       expect(testObjects[11].axisData.length).toBe(0);
-      expect(testObjects[12].axisData.xAxis.label).toBe("");
-      expect(testObjects[12].axisData.yAxis.label).toBe("");
     });
 
     it("can apply default values to JSON considering the model variant", function() {

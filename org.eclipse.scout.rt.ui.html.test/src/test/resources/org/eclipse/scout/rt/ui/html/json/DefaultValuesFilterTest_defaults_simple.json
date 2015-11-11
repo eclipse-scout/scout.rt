@@ -26,12 +26,18 @@
     },
     "Chart": {
       "chartData": {},
-      "axisData": {
-        "xAxis": {
+      "~axisData": {
+        "~xAxis": {
           "label": ""
         },
-        "yAxis": {
+        "~yAxis": {
           "label": ""
+        }
+      },
+      "format": {
+        "lang": "en",
+        "~localeData": {
+          "location": "unknown"
         }
       }
     }

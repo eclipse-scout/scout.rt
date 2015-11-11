@@ -116,6 +116,23 @@
           }
         }
       ]
+    },
+    {
+      "id": "12",
+      "objectType": "Chart",
+      "format": {
+        "lang": "en",
+        "localeData": [
+          {
+            "location": "unknown"
+          },
+          {
+            "location": "here"
+          },
+          {
+          }
+        ]
+      }
     }
   ]
 }

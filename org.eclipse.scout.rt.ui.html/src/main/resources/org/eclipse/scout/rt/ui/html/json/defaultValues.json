@@ -20,7 +20,7 @@
       "mandatory": false,
       "statusVisible": true,
       "menus": [],
-      "gridData": { // works because of special handling in DefaultValuesFilter.filterDefaultObject() and defaultValues._extendWithDefaults()
+      "gridData": {
         "x": -1,
         "y": -1,
         "w": 1,

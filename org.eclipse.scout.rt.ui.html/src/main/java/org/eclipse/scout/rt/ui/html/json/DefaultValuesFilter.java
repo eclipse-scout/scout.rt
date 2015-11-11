@@ -168,7 +168,7 @@ public class DefaultValuesFilter {
       for (Iterator it = json.keys(); it.hasNext();) {
         String prop = (String) it.next();
         Object value = json.opt(prop);
-        if (isPropertyValueEqualToDefaultValue(t, prop, value)) {
+        if (checkPropertyValueEqualToDefaultValue(t, prop, value)) {
           // Property value value is equal to the static default value -> remove the property
           it.remove();
         }
@@ -176,14 +176,21 @@ public class DefaultValuesFilter {
     }
   }
 
-  protected boolean isPropertyValueEqualToDefaultValue(String objectType, String propertyName, Object propertyValue) {
+  protected boolean checkPropertyValueEqualToDefaultValue(String objectType, String propertyName, Object propertyValue) {
     // Try to find a default value until one is found or there are no more parent types to check
     Map<String, Object> properties = m_defaults.get(objectType);
     Object defaultValue = (properties == null ? null : properties.get(propertyName));
-    return isValueEqualToDefaultValue(propertyValue, defaultValue);
+    if (checkValueEqualToDefaultValue(propertyValue, defaultValue)) {
+      return true;
+    }
+    // Special case: Check if there is a "pseudo" default value, which will not
+    // be removed itself, but might have sub-properties removed.
+    defaultValue = (properties == null ? null : properties.get("~" + propertyName));
+    checkValueEqualToDefaultValue(propertyValue, defaultValue);
+    return false;
   }
 
-  protected boolean isValueEqualToDefaultValue(Object value, Object defaultValue) {
+  protected boolean checkValueEqualToDefaultValue(Object value, Object defaultValue) {
     // Now compare the given value to the found default value
     if (value == null && defaultValue == null) {
       return true;
@@ -243,9 +250,16 @@ public class DefaultValuesFilter {
       String prop = (String) it.next();
       Object subValue = valueObject.opt(prop);
       Object subDefaultValue = defaultValueObject.opt(prop);
-      if (isValueEqualToDefaultValue(subValue, subDefaultValue)) {
+      boolean valueEqualToDefaultValue = checkValueEqualToDefaultValue(subValue, subDefaultValue);
+      if (valueEqualToDefaultValue) {
         // Property value value is equal to the static default value -> remove the property
         it.remove();
+      }
+      else {
+        // Special case: Check if there is a "pseudo" default value, which will not
+        // be removed itself, but might have sub-properties removed.
+        subDefaultValue = defaultValueObject.opt("~" + prop);
+        checkValueEqualToDefaultValue(subValue, subDefaultValue);
       }
     }
     // Even more special case: If valueObject is now empty and it used to have the same keys as

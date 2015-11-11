@@ -94,17 +94,24 @@ public class DefaultValuesFilterTest {
     assertEquals(null, ((JSONObject) adapterData.get(9)).opt("enabled"));
     assertEquals(null, ((JSONObject) adapterData.get(9)).opt("chartData"));
     JSONObject axisData = ((JSONObject) adapterData.get(9)).optJSONObject("axisData");
-    assertEquals(null, axisData.opt("xAxis"));
+    assertEquals(0, axisData.optJSONObject("xAxis").length());
     JSONObject yAxis = axisData.optJSONObject("yAxis");
     assertEquals("non-default", yAxis.opt("label"));
 
     JSONArray axisDataArray = ((JSONObject) adapterData.get(10)).optJSONArray("axisData");
     assertEquals(3, axisDataArray.length());
-    assertEquals(null, axisDataArray.getJSONObject(0).opt("xAxis"));
+    assertEquals(0, axisDataArray.getJSONObject(0).optJSONObject("xAxis").length());
     yAxis = axisDataArray.getJSONObject(0).optJSONObject("yAxis");
     assertEquals("non-default", yAxis.opt("label"));
-    assertEquals(0, axisDataArray.getJSONObject(1).length());
-    assertEquals(0, axisDataArray.getJSONObject(2).length());
+    assertEquals(1, axisDataArray.getJSONObject(1).length());
+    assertEquals(2, axisDataArray.getJSONObject(2).length());
+
+    JSONObject format = adapterData.getJSONObject(11).getJSONObject("format");
+    assertEquals(null, format.opt("lang"));
+    assertEquals(3, format.getJSONArray("localeData").length());
+    assertEquals(null, format.getJSONArray("localeData").getJSONObject(0).opt("location"));
+    assertEquals("here", format.getJSONArray("localeData").getJSONObject(1).opt("location"));
+    assertEquals(null, format.getJSONArray("localeData").getJSONObject(2).opt("location"));
   }
 
   @Test

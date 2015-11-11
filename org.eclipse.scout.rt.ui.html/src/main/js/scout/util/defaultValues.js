@@ -122,19 +122,27 @@ scout.defaultValues = {
       return;
     }
     for (var prop in defaults) {
-      // If property does not exist, set the default value.
-      if (object[prop] === undefined) {
-        object[prop] = scout.objects.valueCopy(defaults[prop]);
+      // Support for "pseudo" default values: If a property name in the default values definition
+      // starts with a "~" character, the defined object will _not_ be applied as a default value
+      // for a non-existing property, but inner properties of that object will be applied to an
+      // existing object.
+      var realProp = prop;
+      if (scout.strings.startsWith(prop, '~')) {
+        realProp = prop.substring(1);
+      }
+      // If property does not exist, set the default value and return.
+      if (object[realProp] === undefined) {
+        object[realProp] = scout.objects.valueCopy(defaults[realProp]);
       }
       // Special case: "default objects". If the property value is an object and default
       // value is also an object, extend the property value instead of replacing it.
-      else if (scout.objects.isPlainObject(object[prop]) && scout.objects.isPlainObject(defaults[prop])) {
-        this._extendWithDefaults(object[prop], defaults[prop]);
+      else if (scout.objects.isPlainObject(object[realProp]) && scout.objects.isPlainObject(defaults[prop])) {
+        this._extendWithDefaults(object[realProp], defaults[prop]);
       }
       // Special case: "array of default objects": If the property value is an array of objects and
       // the default value is an object, extend each object in the array with the default value.
-      else if (Array.isArray(object[prop]) && scout.objects.isPlainObject(defaults[prop])) {
-        var objectArray = object[prop];
+      else if (Array.isArray(object[realProp]) && scout.objects.isPlainObject(defaults[prop])) {
+        var objectArray = object[realProp];
         for (var i = 0; i < objectArray.length; i++) {
           if (scout.objects.isPlainObject(objectArray[i])) {
             this._extendWithDefaults(objectArray[i], defaults[prop]);
