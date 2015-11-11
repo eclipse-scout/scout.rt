@@ -131,23 +131,23 @@ public class ClientJobFutureFilterTest {
 
   @Test
   public void testFuture() {
-    assertTrue(ClientJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
-    assertFalse(ModelJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().andMatchFuture(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().andMatchFuture(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
     assertTrue(new JobFutureFilters.FutureFilter(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
 
-    assertFalse(ClientJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
-    assertTrue(ModelJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().andMatchFuture(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().andMatchFuture(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
     assertTrue(new JobFutureFilters.FutureFilter(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
 
-    assertTrue(ModelJobs.newFutureFilter().andMatchAnyFuture(m_modelJobFuture).accept(m_modelJobFuture));
-    assertFalse(ClientJobs.newFutureFilter().andMatchAnyFuture(m_modelJobFuture).accept(m_modelJobFuture));
-    assertFalse(ModelJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture).accept(m_modelJobFuture));
-    assertFalse(ClientJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture).accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().andMatchFuture(m_modelJobFuture).accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().andMatchFuture(m_modelJobFuture).accept(m_modelJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().andMatchFuture(m_clientJobFuture).accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().andMatchFuture(m_clientJobFuture).accept(m_modelJobFuture));
 
-    assertFalse(ModelJobs.newFutureFilter().andMatchAnyFuture(m_modelJobFuture).accept(m_clientJobFuture));
-    assertFalse(ClientJobs.newFutureFilter().andMatchAnyFuture(m_modelJobFuture).accept(m_clientJobFuture));
-    assertFalse(ModelJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture).accept(m_clientJobFuture));
-    assertTrue(ClientJobs.newFutureFilter().andMatchAnyFuture(m_clientJobFuture).accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().andMatchFuture(m_modelJobFuture).accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().andMatchFuture(m_modelJobFuture).accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().andMatchFuture(m_clientJobFuture).accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().andMatchFuture(m_clientJobFuture).accept(m_clientJobFuture));
   }
 
   @Test

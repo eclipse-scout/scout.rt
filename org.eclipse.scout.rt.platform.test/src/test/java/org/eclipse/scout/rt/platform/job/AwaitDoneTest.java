@@ -80,10 +80,10 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput(RunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future1), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
     assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertTrue(m_jobManager.isDone(Jobs.newFutureFilter().andMatchAnyFuture(future1)));
+    assertTrue(m_jobManager.isDone(Jobs.newFutureFilter().andMatchFuture(future1)));
   }
 
   @Test
@@ -112,8 +112,8 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future1), 30, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isDone(Jobs.newFutureFilter().andMatchAnyFuture(future1)));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.isDone(Jobs.newFutureFilter().andMatchFuture(future1)));
     assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
@@ -184,7 +184,7 @@ public class AwaitDoneTest {
         }, 1, TimeUnit.SECONDS);
 
         // start waiting for the job to complete or until cancelled
-        assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 5, TimeUnit.SECONDS));
+        assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 5, TimeUnit.SECONDS));
       }
     }, Jobs.newInput(null)).awaitDoneAndGet();
 

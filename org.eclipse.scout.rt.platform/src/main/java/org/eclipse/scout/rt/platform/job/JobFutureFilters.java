@@ -59,7 +59,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * Registers the given filter to further constrain the Futures to be accepted.
+     * To match all jobs where the given filter evaluates to <code>true</code>.
      */
     public Filter andMatch(final IFilter<IFuture<?>> filter) {
       m_filters.add(filter);
@@ -67,15 +67,15 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs of the given job names.
+     * To match all jobs of the given names.
      */
-    public Filter andMatchAnyName(final String... names) {
+    public Filter andMatchName(final String... names) {
       andMatch(new JobNameFilter(names));
       return this;
     }
 
     /**
-     * To accept only jobs of the given job name regex.
+     * To match all jobs where the given regex matches their name.
      */
     public Filter andMatchNameRegex(final Pattern regex) {
       andMatch(new JobNameRegexFilter(regex));
@@ -83,25 +83,24 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs which belong to the given Futures.
+     * To match all jobs which are represented by the given Futures.
      */
-    public Filter andMatchAnyFuture(final IFuture<?>... futures) {
+    public Filter andMatchFuture(final IFuture<?>... futures) {
       andMatch(new FutureFilter(futures));
       return this;
     }
 
     /**
-     * To accept only jobs which belong to the given Futures.
+     * To match all jobs which are represented by the given Futures.
      */
-    public Filter andMatchAnyFuture(final Collection<IFuture<?>> futures) {
+    public Filter andMatchFuture(final Collection<IFuture<?>> futures) {
       andMatch(new FutureFilter(futures));
       return this;
     }
 
     /**
-     * To accept only the current executing job.
-     *
-     * @see IFuture#CURRENT
+     * To match the currently running job. The currently running job is defined as the job, which the caller of this
+     * method is currently running in.
      */
     public Filter andMatchCurrentFuture() {
       andMatch(new FutureFilter(IFuture.CURRENT.get()));
@@ -109,9 +108,8 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept all jobs except the current executing job.
-     *
-     * @see IFuture#CURRENT
+     * To not match the currently running job. The currently running job is defined as the job, which the caller of this
+     * method is currently running in.
      */
     public Filter andMatchNotCurrentFuture() {
       andMatch(new NotFilter<>(new FutureFilter(IFuture.CURRENT.get())));
@@ -119,7 +117,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs which belong to the given mutex object.
+     * To match all jobs with the given mutex set.
      */
     public Filter andMatchMutex(final Object mutexObject) {
       andMatch(new MutexFilter(mutexObject));
@@ -127,9 +125,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs waiting for a blocking condition to fall.
-     *
-     * @see IBlockingCondition
+     * To match all jobs which are waiting for a blocking condition to fall.
      */
     public Filter andAreBlocked() {
       andMatch(BlockedFilter.TRUE_INSTANCE);
@@ -137,9 +133,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs which are not in blocked state, meaning not waiting for a blocking condition to fall.
-     *
-     * @see IBlockingCondition
+     * To match all jobs which are not waiting for a blocking condition to fall.
      */
     public Filter andAreNotBlocked() {
       andMatch(BlockedFilter.FALSE_INSTANCE);
@@ -147,7 +141,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only periodic jobs.
+     * To match all jobs which are configured to run periodically.
      *
      * @see IJobManager#scheduleWithFixedDelay()
      * @see IJobManager#scheduleAtFixedRate()
@@ -158,7 +152,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs that are executed once.
+     * To match all jobs which are not configured to run periodically (one-shot actions).
      *
      * @see IJobManager#schedule()
      */
@@ -169,7 +163,7 @@ public final class JobFutureFilters {
   }
 
   /**
-   * Filter which accepts any of the given Futures.
+   * Filter which accepts all of the given Futures.
    *
    * @since 5.1
    */

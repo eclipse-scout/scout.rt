@@ -51,8 +51,8 @@ public final class ClientJobFutureFilters {
     }
 
     @Override
-    public Filter andMatchAnyName(final String... names) {
-      return (Filter) super.andMatchAnyName(names);
+    public Filter andMatchName(final String... names) {
+      return (Filter) super.andMatchName(names);
     }
 
     @Override
@@ -61,13 +61,13 @@ public final class ClientJobFutureFilters {
     }
 
     @Override
-    public Filter andMatchAnyFuture(final IFuture<?>... futures) {
-      return (Filter) super.andMatchAnyFuture(futures);
+    public Filter andMatchFuture(final IFuture<?>... futures) {
+      return (Filter) super.andMatchFuture(futures);
     }
 
     @Override
-    public Filter andMatchAnyFuture(final Collection<IFuture<?>> futures) {
-      return (Filter) super.andMatchAnyFuture(futures);
+    public Filter andMatchFuture(final Collection<IFuture<?>> futures) {
+      return (Filter) super.andMatchFuture(futures);
     }
 
     @Override

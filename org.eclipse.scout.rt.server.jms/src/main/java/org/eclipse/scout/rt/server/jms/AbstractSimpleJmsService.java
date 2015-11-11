@@ -123,7 +123,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       // Wait for the consumer to be stopped.
       try {
-        Jobs.getJobManager().awaitDone(ServerJobs.newFutureFilter().andMatchAnyFuture(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        Jobs.getJobManager().awaitDone(ServerJobs.newFutureFilter().andMatchFuture(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       finally {
         m_messageConsumerFuture = null;

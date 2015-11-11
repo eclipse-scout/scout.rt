@@ -498,7 +498,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     try {
       long delay = NumberUtility.nvl(CONFIG.getPropertyValue(JobCompletionDelayOnSessionShutdown.class), 0L);
       if (delay > 0L) {
-        final Filter runningJobsFilter = Jobs.newFutureFilter().andMatchAnyFuture(findRunningJobs());
+        final Filter runningJobsFilter = Jobs.newFutureFilter().andMatchFuture(findRunningJobs());
         Jobs.getJobManager().awaitDone(runningJobsFilter, delay, TimeUnit.SECONDS);
       }
       cancelRunningJobs();
@@ -533,7 +533,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void cancelRunningJobs() {
     final List<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
-      Jobs.getJobManager().cancel(Jobs.newFutureFilter().andMatchAnyFuture(runningJobs), true);
+      Jobs.getJobManager().cancel(Jobs.newFutureFilter().andMatchFuture(runningJobs), true);
 
       LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
           + "[session={}, user={}, jobs=(see next line)]\n{}",

@@ -111,14 +111,14 @@ public class BusyManagerService implements IBusyManagerService, IJobListener {
       return;
     }
 
-    future.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.BLOCKED), new IJobListener() {
+    future.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.BLOCKED), new IJobListener() {
 
       @Override
       public void changed(JobEvent blockedEvent) {
         handler.onJobEnd(future);
       }
     });
-    future.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.UNBLOCKED), new IJobListener() {
+    future.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.UNBLOCKED), new IJobListener() {
 
       @Override
       public void changed(JobEvent blockedEvent) {

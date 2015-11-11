@@ -94,7 +94,7 @@ public class UiJobs {
     // Wait until the job is done (completed or cancelled), or enters a blocking condition.
     boolean timeout;
     try {
-      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {
       // FIXME [dwi] use translator to not work with ProcessingException

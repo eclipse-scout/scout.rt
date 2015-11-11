@@ -108,8 +108,8 @@ public class ServerJobFutureFilterTest {
 
   @Test
   public void testFuture() {
-    assertTrue(ServerJobs.newFutureFilter().andMatchAnyFuture(m_serverJobFuture).accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().andMatchAnyFuture(mock(IFuture.class)).accept(m_jobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchFuture(m_serverJobFuture).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchFuture(mock(IFuture.class)).accept(m_jobFuture));
   }
 
   @Test

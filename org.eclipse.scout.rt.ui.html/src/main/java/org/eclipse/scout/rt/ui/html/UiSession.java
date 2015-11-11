@@ -117,7 +117,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
         ModelJobs.newEventFilter()
-            .andMatchAnyEventType(
+            .andMatchEventType(
                 JobEventType.BLOCKED,
                 JobEventType.DONE,
                 JobEventType.REJECTED,

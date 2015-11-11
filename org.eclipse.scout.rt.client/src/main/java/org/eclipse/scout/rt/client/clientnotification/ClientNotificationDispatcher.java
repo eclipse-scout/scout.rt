@@ -166,7 +166,7 @@ public class ClientNotificationDispatcher {
       futures.addAll(m_notificationFutures);
     }
     // TODO [jgu] how long to wait? Is this method still in use?
-    Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(futures).andMatchNotCurrentFuture(), Integer.MAX_VALUE, TimeUnit.SECONDS);
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(futures).andMatchNotCurrentFuture(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
 
   private class P_NotificationFutureCallback implements IDoneCallback<Void> {

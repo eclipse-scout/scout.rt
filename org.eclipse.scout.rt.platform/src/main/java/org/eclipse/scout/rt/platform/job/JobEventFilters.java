@@ -64,7 +64,7 @@ public final class JobEventFilters {
     }
 
     /**
-     * Registers the given filter to further constrain the events to be accepted.
+     * To match all events where the given filter evaluates to <code>true</code>.
      */
     public Filter andMatch(final IFilter<JobEvent> filter) {
       m_andFilters.add(filter);
@@ -72,23 +72,23 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events of the given event types.
+     * To match all events of the given event types.
      */
-    public Filter andMatchAnyEventType(final JobEventType... eventTypes) {
+    public Filter andMatchEventType(final JobEventType... eventTypes) {
       andMatch(new EventTypeFilter(eventTypes));
       return this;
     }
 
     /**
-     * To accept only events which belong to jobs of the given job name's.
+     * To match all events for jobs which belong to one of the given job names.
      */
-    public Filter andMatchAnyName(final String... names) {
+    public Filter andMatchName(final String... names) {
       andMatch(new FutureEventFilterDelegate(new JobFutureFilters.JobNameFilter(names)));
       return this;
     }
 
     /**
-     * To accept only events which belong to jobs of the given job name's regex.
+     * To match all events for jobs where the given regex matches their job name.
      */
     public Filter andMatchNameRegex(final Pattern regex) {
       andMatch(new FutureEventFilterDelegate(new JobFutureFilters.JobNameRegexFilter(regex)));
@@ -96,33 +96,17 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events which belong to the current executing job.
-     *
-     * @see IFuture#CURRENT
+     * To match all events which belong to the currently running job. The currently running job is defined as the job,
+     * which the caller of this method is currently running in.
      */
     public Filter andMatchCurrentFuture() {
-      return andMatchAnyFuture(IFuture.CURRENT.get());
-    }
-
-    /**
-     * To accept only events which belong to the given Futures.
-     */
-    public Filter andMatchAnyFuture(final IFuture<?>... futures) {
-      return andMatchAnyFuture(Arrays.asList(futures));
-    }
-
-    /**
-     * To accept only events which belong to the given Futures.
-     */
-    public Filter andMatchAnyFuture(final Collection<IFuture<?>> futures) {
-      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
+      andMatchFuture(IFuture.CURRENT.get());
       return this;
     }
 
     /**
-     * To accept events of all all jobs except the current executing job.
-     *
-     * @see IFuture#CURRENT
+     * To match all events which do not belong to the currently running job. The currently running job is defined as the
+     * job, which the caller of this method is currently running in.
      */
     public Filter andMatchNotCurrentFuture() {
       andMatch(new FutureEventFilterDelegate(new NotFilter<>(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get()))));
@@ -130,7 +114,23 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events for jobs which belong to the given mutex object.
+     * To match all events for jobs which belong to one of the given Futures.
+     */
+    public Filter andMatchFuture(final IFuture<?>... futures) {
+      andMatchFuture(Arrays.asList(futures));
+      return this;
+    }
+
+    /**
+     * To match all events for jobs which belong to one of the given Futures.
+     */
+    public Filter andMatchFuture(final Collection<IFuture<?>> futures) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
+      return this;
+    }
+
+    /**
+     * To match all events for jobs with the given mutex set.
      */
     public Filter andMatchMutex(final Object mutexObject) {
       andMatch(new FutureEventFilterDelegate(new JobFutureFilters.MutexFilter(mutexObject)));
@@ -138,7 +138,7 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events for jobs which are executed periodically.
+     * To match all events for periodic running jobs.
      *
      * @see IJobManager#scheduleWithFixedDelay()
      * @see IJobManager#scheduleAtFixedRate()
@@ -149,7 +149,7 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events for jobs which are executed once.
+     * To match all events for not periodic running jobs (one-shot actions).
      *
      * @see IJobManager#schedule()
      */

@@ -67,7 +67,7 @@ public class JobListenerBlockedFutureTest {
         return null;
       }
     }, ClientJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true)));
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.MINUTES));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
     listenerRegistration.dispose();
 
@@ -121,7 +121,7 @@ public class JobListenerBlockedFutureTest {
           return null;
         }
       }, input);
-      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(outerFuture), 1, TimeUnit.MINUTES));
+      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(outerFuture), 1, TimeUnit.MINUTES));
       m_jobManager.shutdown();
     }
     finally {

@@ -57,7 +57,7 @@ public class JobListenerTest {
     IJobListenerRegistration jobListenerRegistration = m_jobManager.addListener(jobListener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SHUTDOWN), shutdownListener);
+    IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.SHUTDOWN), shutdownListener);
 
     IFuture<Void> future = null;
     future = m_jobManager.schedule(new Callable<Void>() {
@@ -66,7 +66,7 @@ public class JobListenerTest {
         return null;
       }
     }, Jobs.newInput(RunContexts.empty()));
-    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES);
     sleep();
     jobListenerRegistration.dispose();
     m_jobManager.shutdown();
@@ -93,7 +93,7 @@ public class JobListenerTest {
     IJobListenerRegistration jobListenerRegistration = m_jobManager.addListener(jobListener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SHUTDOWN), shutdownListener);
+    IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.SHUTDOWN), shutdownListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -104,7 +104,7 @@ public class JobListenerTest {
       }
     }, 200, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()));
     future.cancel(true);
-    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES);
     jobListenerRegistration.dispose();
     m_jobManager.shutdown();
     shutdownListenerRegistration.dispose();
@@ -134,7 +134,7 @@ public class JobListenerTest {
   @Test
   public void testGlobalListener2() throws InterruptedException {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SCHEDULED, JobEventType.DONE), listener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.SCHEDULED, JobEventType.DONE), listener);
 
     IFuture<Void> future = runJob(0, TimeUnit.SECONDS);
     future.awaitDone();
@@ -150,7 +150,7 @@ public class JobListenerTest {
     IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
 
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN).andMatchAnyFuture(future), listener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.ABOUT_TO_RUN).andMatchFuture(future), listener);
 
     // verify
     future.awaitDone();
@@ -167,7 +167,7 @@ public class JobListenerTest {
 
     IFuture<Void> future2 = runJob(500, TimeUnit.MILLISECONDS);
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyFuture(future1, future2), listener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchFuture(future1, future2), listener);
     future2.awaitDone();
     sleep();
 
@@ -183,7 +183,7 @@ public class JobListenerTest {
 
     IFuture<Void> future2 = runJob(500, TimeUnit.MILLISECONDS);
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyFuture(future2).andMatchAnyFuture(future1), listener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchFuture(future2).andMatchFuture(future1), listener);
     future2.awaitDone();
     sleep();
 
@@ -199,7 +199,7 @@ public class JobListenerTest {
 
     IFuture<Void> future2 = runJob(500, TimeUnit.MILLISECONDS);
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyFuture(future2).andMatch(new NotFilter<>(Jobs.newEventFilter().andMatchAnyFuture(future2))), listener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchFuture(future2).andMatch(new NotFilter<>(Jobs.newEventFilter().andMatchFuture(future2))), listener);
     future2.awaitDone();
     sleep();
 
@@ -228,7 +228,7 @@ public class JobListenerTest {
     IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
 
     P_JobChangeListener listener = new P_JobChangeListener();
-    future.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN), listener);
+    future.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.ABOUT_TO_RUN), listener);
 
     // verify
     future.awaitDone();

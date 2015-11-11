@@ -738,7 +738,7 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 10, TimeUnit.SECONDS));
+      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 10, TimeUnit.SECONDS));
       fail();
     }
     catch (ProcessingException e) {
@@ -782,7 +782,7 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 10, TimeUnit.SECONDS));
+      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 10, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
     catch (ProcessingException e) {
@@ -826,7 +826,7 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.NANOSECONDS));
+      assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.NANOSECONDS));
     }
     catch (ProcessingException e) {
       fail();
@@ -869,7 +869,7 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 10, TimeUnit.SECONDS));
+      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 10, TimeUnit.SECONDS));
     }
     catch (ProcessingException e) {
       fail();
