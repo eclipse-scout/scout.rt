@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -30,7 +31,6 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -140,7 +140,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
     }
-    try (OutputStreamWriter out = new OutputStreamWriter(stream, Encoding.UTF_8)) {
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_8.name())) {
 
       // build soap message without sax (hi-speed)
       boolean compressed = isUseCompression();
@@ -173,7 +173,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     }
     finally {
       if (debugEnabled) {
-        String sentData = ((DebugOutputStream) stream).getContent(Encoding.UTF_8);
+        String sentData = ((DebugOutputStream) stream).getContent(StandardCharsets.UTF_8.name());
         int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
         Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
         LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
@@ -187,7 +187,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
     }
-    try (OutputStreamWriter out = new OutputStreamWriter(stream, Encoding.UTF_8)) {
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_8.name())) {
 
       // build soap message without sax (hi-speed)
       boolean compressed = isUseCompression();
@@ -232,7 +232,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     }
     finally {
       if (debugEnabled) {
-        String sentData = ((DebugOutputStream) stream).getContent(Encoding.UTF_8);
+        String sentData = ((DebugOutputStream) stream).getContent(StandardCharsets.UTF_8.name());
         int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
         Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
         LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
@@ -286,7 +286,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     String dataPart = null;
     boolean compressed = true;
     try {
-      Reader r = new BufferedReader(new InputStreamReader(in, Encoding.UTF_8));
+      Reader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8.name()));
       StringBuilder buf = new StringBuilder();
       int ch;
       while ((ch = r.read()) >= 0) {
@@ -318,7 +318,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     }
     finally {
       if (LOG.isDebugEnabled()) {
-        String receivedData = ((DebugInputStream) in).getContent(Encoding.UTF_8);
+        String receivedData = ((DebugInputStream) in).getContent(StandardCharsets.UTF_8.name());
         int lastReadCharacter = ((DebugInputStream) in).getLastReadCharacter();
         Throwable lastThrownException = ((DebugInputStream) in).getLastThrownException();
         LOG.debug("lastReadCharacter=" + lastReadCharacter + ",lastThrownException=" + lastThrownException + ", receivedData:\n" + receivedData);

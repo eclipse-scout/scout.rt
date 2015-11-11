@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -33,11 +34,11 @@ public class UriUtilityTest {
   public void testGetQueryParametersNull() throws Exception {
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, null));
-    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, Encoding.UTF_8));
+    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, StandardCharsets.UTF_8.name()));
     assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(URI.create("scheme://test.com/path?value=1"), null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, null));
-    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, Encoding.UTF_8));
+    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, StandardCharsets.UTF_8.name()));
     assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(new URL("http://test.com/path?value=1"), null));
   }
 
@@ -55,8 +56,8 @@ public class UriUtilityTest {
     URI uri = builder.createURI();
     assertEquals(Collections.singletonMap("key", "äöü"), UriUtility.getQueryParameters(uri));
     //
-    URI utfUri = builder.createURI(Encoding.UTF_8);
-    assertEquals(Collections.singletonMap("key", "äöü"), UriUtility.getQueryParameters(utfUri, Encoding.UTF_8));
+    URI utfUri = builder.createURI(StandardCharsets.UTF_8.name());
+    assertEquals(Collections.singletonMap("key", "äöü"), UriUtility.getQueryParameters(utfUri, StandardCharsets.UTF_8.name()));
   }
 
   @Test

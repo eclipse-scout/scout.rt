@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.text.html.HTMLDocument;
 
@@ -795,7 +796,7 @@ public class HTMLUtilityTest {
   private String readResourceAsText(String relativeFileName) {
     InputStream in = ResourceBase.class.getResourceAsStream(relativeFileName);
     try {
-      return new String(IOUtility.getContent(in), Encoding.UTF_8);
+      return new String(IOUtility.getContent(in), StandardCharsets.UTF_8.name());
     }
     catch (Exception e) {
       fail("could not read input file: " + ResourceBase.class.getPackage() + "/" + relativeFileName);

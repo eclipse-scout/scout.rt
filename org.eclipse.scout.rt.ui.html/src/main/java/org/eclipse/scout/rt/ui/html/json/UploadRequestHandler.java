@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,6 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
@@ -138,7 +138,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {
     ServletFileUpload upload = new ServletFileUpload();
-    upload.setHeaderEncoding(Encoding.UTF_8);
+    upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
     upload.setSizeMax(maxSize);
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
@@ -147,7 +147,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
       if (item.isFormField()) {
         // Handle non-file fields (interpreted as properties)
-        uploadProperties.put(name, Streams.asString(stream, Encoding.UTF_8));
+        uploadProperties.put(name, Streams.asString(stream, StandardCharsets.UTF_8.name()));
       }
       else {
         // Handle files

@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
@@ -46,7 +46,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     String resourcePath = cacheKey.getResourcePath();
     ScriptOutput out = builder.buildScript(resourcePath);
     if (out != null) {
-      BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(resourcePath), Encoding.UTF_8, out.getContent(), out.getLastModified());
+      BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(resourcePath), StandardCharsets.UTF_8.name(), out.getContent(), out.getLastModified());
       return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_ONE_YEAR, content);
     }
     return null;

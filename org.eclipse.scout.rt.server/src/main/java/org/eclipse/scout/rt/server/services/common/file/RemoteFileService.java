@@ -17,12 +17,12 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -178,7 +178,7 @@ public class RemoteFileService implements IRemoteFileService {
 
   @Override
   public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) {
-    return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, Encoding.UTF_8);
+    return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, StandardCharsets.UTF_8.name());
   }
 
   public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName) {

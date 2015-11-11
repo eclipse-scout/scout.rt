@@ -24,6 +24,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
@@ -271,7 +271,7 @@ public class CsvHelper {
   public void exportData(Object[][] data, File f, String encoding, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) {
     try {
       if (encoding == null) {
-        encoding = Encoding.UTF_8;
+        encoding = StandardCharsets.UTF_8.name();
       }
       Writer writer = new OutputStreamWriter(new FileOutputStream(f), encoding);
       try {

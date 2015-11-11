@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +40,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.PreferredValue;
@@ -2335,7 +2335,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void doExportXml(boolean saveAs) {
     // export search parameters
-    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, Encoding.UTF_8)) {
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, StandardCharsets.UTF_8.name())) {
       XmlUtility.wellformDocument(storeToXml(), w);
       BinaryResource res = new BinaryResource("form.xml", bos.toByteArray());
       getDesktop().openUri(res, OpenUriAction.DOWNLOAD);

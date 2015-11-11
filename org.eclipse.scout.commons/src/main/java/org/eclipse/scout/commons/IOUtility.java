@@ -36,6 +36,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,7 +89,7 @@ public final class IOUtility {
    * @return The content of the given {@link InputStream}.
    */
   public static String getContentUtf8(InputStream stream) {
-    return getContent(stream, Encoding.UTF_8);
+    return getContent(stream, StandardCharsets.UTF_8.name());
   }
 
   public static byte[] getContent(InputStream in, int len) throws IOException {
@@ -642,7 +643,7 @@ public final class IOUtility {
     }
 
     try {
-      s = URLEncoder.encode(s, Encoding.UTF_8);
+      s = URLEncoder.encode(s, StandardCharsets.UTF_8.name());
       s = StringUtility.replace(s, "+", "%20");
     }
     catch (UnsupportedEncodingException e) {
@@ -670,7 +671,7 @@ public final class IOUtility {
     }
 
     try {
-      s = URLDecoder.decode(s, Encoding.UTF_8);
+      s = URLDecoder.decode(s, StandardCharsets.UTF_8.name());
     }
     catch (UnsupportedEncodingException e) {
       LOG.error("Unsupported encoding", e);

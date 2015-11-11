@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -43,9 +43,9 @@ public class JsonFileLoader extends AbstractResourceLoader {
       return null;
     }
     // FIXME BSH: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
-    String json = new String(IOUtility.readFromUrl(url), Encoding.UTF_8);
+    String json = new String(IOUtility.readFromUrl(url), StandardCharsets.UTF_8.name());
     json = JsonUtility.stripCommentsFromJson(json);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), Encoding.UTF_8, json.getBytes(Encoding.UTF_8), System.currentTimeMillis());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), StandardCharsets.UTF_8.name(), json.getBytes(StandardCharsets.UTF_8.name()), System.currentTimeMillis());
     return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 

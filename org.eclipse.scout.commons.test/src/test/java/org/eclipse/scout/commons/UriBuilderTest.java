@@ -17,6 +17,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
@@ -199,7 +200,7 @@ public class UriBuilderTest {
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
-    assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI(Encoding.UTF_8).toASCIIString());
+    assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI(StandardCharsets.UTF_8.name()).toASCIIString());
     //
     URI baseUri = new URI("http://www.eclipse.org/scout");
     builder = new UriBuilder(baseUri);

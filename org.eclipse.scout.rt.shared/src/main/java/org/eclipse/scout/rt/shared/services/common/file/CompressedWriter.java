@@ -16,14 +16,13 @@ package org.eclipse.scout.rt.shared.services.common.file;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
-import org.eclipse.scout.commons.Encoding;
-
 public class CompressedWriter extends Writer {
-  private static final String DEFAULT_CHARSETNAME = Encoding.UTF_8;
+  private static final String DEFAULT_CHARSETNAME = StandardCharsets.UTF_8.name();
   private RemoteFile m_remoteFile;
   private ByteArrayOutputStream m_buffer;
   private Deflater m_deflater;

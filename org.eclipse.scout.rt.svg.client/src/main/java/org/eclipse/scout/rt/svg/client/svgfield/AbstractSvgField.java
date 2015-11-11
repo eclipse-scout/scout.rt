@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.EventListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -121,7 +120,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     if (LOG.isTraceEnabled()) {
       try {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        SVGUtility.writeSVGDocument(doc, out, Encoding.UTF_8);
+        SVGUtility.writeSVGDocument(doc, out, StandardCharsets.UTF_8.name());
         LOG.trace(getClass().getName() + ".setSvgDocument\n" + new String(out.toByteArray(), StandardCharsets.UTF_8));
       }
       catch (RuntimeException e) {

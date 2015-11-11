@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.csv.CsvHelper;
@@ -80,7 +80,7 @@ public class CsvSqlAdapter {
   public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
       List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
-      encoding = Encoding.UTF_8;
+      encoding = StandardCharsets.UTF_8.name();
     }
     try {
       CsvSqlSettings params = new CsvSqlSettings();
@@ -135,7 +135,7 @@ public class CsvSqlAdapter {
   public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumNames,
       List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
-      encoding = Encoding.UTF_8;
+      encoding = StandardCharsets.UTF_8.name();
     }
     try {
       CsvSqlSettings params = new CsvSqlSettings();
@@ -246,7 +246,7 @@ public class CsvSqlAdapter {
   public void importDataIntoTable(File f, String encoding, Locale contentLocale, int headerRowCount, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
       List<String> csvColumnNames, List<String> csvColumnTypes, boolean allowVariableColumnCount) {
     if (encoding == null) {
-      encoding = Encoding.UTF_8;
+      encoding = StandardCharsets.UTF_8.name();
     }
     try {
       CsvSqlSettings params = new CsvSqlSettings();

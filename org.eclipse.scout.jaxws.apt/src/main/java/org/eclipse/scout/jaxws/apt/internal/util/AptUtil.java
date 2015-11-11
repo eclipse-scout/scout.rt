@@ -14,12 +14,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 
 import com.sun.codemodel.CodeWriter;
@@ -53,7 +53,7 @@ public final class AptUtil {
 
           @Override
           public void close() throws IOException {
-            final String compilationUnit = interceptContent(toString(Encoding.UTF_8));
+            final String compilationUnit = interceptContent(toString(StandardCharsets.UTF_8.name()));
             try (PrintWriter writer = new PrintWriter(filer.createSourceFile(fqn).openOutputStream())) {
               writer.write(compilationUnit);
               writer.flush();

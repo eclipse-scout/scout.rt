@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -50,12 +50,12 @@ public class HtmlDocumentParser {
 
   public byte[] parseDocument(byte[] document) throws IOException {
     // the order of calls is important: first we must resolve all includes
-    m_workingContent = new String(document, Encoding.UTF_8);
+    m_workingContent = new String(document, StandardCharsets.UTF_8.name());
     replaceIncludeTags();
     replaceMessageTags();
     replaceStylesheetTags();
     replaceScriptTags();
-    return m_workingContent.getBytes(Encoding.UTF_8);
+    return m_workingContent.getBytes(StandardCharsets.UTF_8.name());
   }
 
   protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) throws IOException {
@@ -141,7 +141,7 @@ public class HtmlDocumentParser {
       }
       else {
         byte[] includeContent = IOUtility.readFromUrl(includeUrl);
-        String replacement = new String(includeContent, Encoding.UTF_8);
+        String replacement = new String(includeContent, StandardCharsets.UTF_8.name());
         // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
         replacement = "\n" + replacement.trim() + "\n";
         m.appendReplacement(sb, replacement);

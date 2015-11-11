@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -52,10 +53,10 @@ public class IOUtilityTest {
       utf8File = TestUtility.createTempFileFromFilename("org/eclipse/scout/commons/ioUtilityTestUtf8.txt", getClass());
       ansiFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/commons/ioUtilityTestAnsi.txt", getClass());
 
-      String testContent = IOUtility.getContentInEncoding(utf8File.getPath(), Encoding.UTF_8);
+      String testContent = IOUtility.getContentInEncoding(utf8File.getPath(), StandardCharsets.UTF_8.name());
       assertTrue("content is correct", StringUtility.equalsIgnoreCase(testContent, "TestTestöäü"));
 
-      testContent = IOUtility.getContentInEncoding(ansiFile.getPath(), Encoding.UTF_8);
+      testContent = IOUtility.getContentInEncoding(ansiFile.getPath(), StandardCharsets.UTF_8.name());
       assertFalse("content is correct", StringUtility.equalsIgnoreCase(testContent, "TestTestöäü"));
     }
     finally {
@@ -204,7 +205,7 @@ public class IOUtilityTest {
     try {
       tempFile = createTextTempFile();
 
-      List<String> readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       String[] readLinesArray = readLines.toArray(new String[readLines.size()]);
       assertArrayEquals("arrays with read lines not as expected", LINES, readLinesArray);
     }
@@ -219,7 +220,7 @@ public class IOUtilityTest {
     try {
       tempFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/commons/ioUtilityTestUtf8.txt", getClass());
 
-      List<String> readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       String[] readLinesArray = readLines.toArray(new String[readLines.size()]);
       assertTrue(StringUtility.equalsIgnoreCase(readLinesArray[0], "TestTestöäü"));
     }
@@ -244,7 +245,7 @@ public class IOUtilityTest {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile(FILENAME, EXTENSION, null);
-      List<String> readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       assertTrue("Expected an empty list when reading an empty file.", readLines.isEmpty());
     }
     finally {
@@ -255,7 +256,7 @@ public class IOUtilityTest {
   @Test
   public void testReadLinesNonExistingFile() {
     try {
-      IOUtility.readLines(new File("doesNotExist"), Encoding.UTF_8);
+      IOUtility.readLines(new File("doesNotExist"), StandardCharsets.UTF_8.name());
       fail("Exptected a ProcessingException for non existing file.");
     }
     catch (ProcessingException expected) {
@@ -275,7 +276,7 @@ public class IOUtilityTest {
       IOUtility.appendFile(pw, tempFile2);
       pw.close();
 
-      List<String> readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       List<String> expectedLines = new ArrayList<String>();
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
@@ -300,7 +301,7 @@ public class IOUtilityTest {
       IOUtility.appendFile(pw, tempFile2);
       pw.close();
 
-      List<String> readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       List<String> expectedLines = new ArrayList<String>();
       expectedLines.addAll(Arrays.asList(LINES));
       assertListEquals(expectedLines, readLines);
@@ -349,7 +350,7 @@ public class IOUtilityTest {
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
-      List<String> readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       // expect 3x original content
       assertListEquals(expectedLines, readLines);
 
@@ -359,7 +360,7 @@ public class IOUtilityTest {
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
-      readLines = IOUtility.readLines(tempFile, Encoding.UTF_8);
+      readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       // expect 6x original content
       assertListEquals(expectedLines, readLines);
     }

@@ -14,10 +14,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -146,11 +146,11 @@ public class ScriptFileBuilder {
     }
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(IOUtility.readFromUrl(script.getURL()), Encoding.UTF_8);
+    String content = new String(IOUtility.readFromUrl(script.getURL()), StandardCharsets.UTF_8.name());
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
-      buf.write(content.substring(pos, mat.start()).getBytes(Encoding.UTF_8));
+      buf.write(content.substring(pos, mat.start()).getBytes(StandardCharsets.UTF_8.name()));
       String includePath = basePath + StringUtility.nvl(mat.group(1), mat.group(2));
       ScriptSource includeScript = locateNonFragmentScript(includePath);
       byte[] replacement = null;
@@ -182,15 +182,15 @@ public class ScriptFileBuilder {
       // Add debug information to returned content
       if (!isMinifyEnabled()) {
         if (script.getFileType() == ScriptSource.FileType.JS) {
-          buf.write(("// --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " ---\n").getBytes(Encoding.UTF_8));
+          buf.write(("// --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " ---\n").getBytes(StandardCharsets.UTF_8.name()));
           if (replacement == null) {
-            buf.write("// !!! NOT PROCESSED\n".getBytes(Encoding.UTF_8));
+            buf.write("// !!! NOT PROCESSED\n".getBytes(StandardCharsets.UTF_8.name()));
           }
         }
         else if (script.getFileType() == ScriptSource.FileType.CSS) {
-          buf.write(("/* --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " --- */\n").getBytes(Encoding.UTF_8));
+          buf.write(("/* --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " --- */\n").getBytes(StandardCharsets.UTF_8.name()));
           if (replacement == null) {
-            buf.write("/* !!! NOT PROCESSED */\n".getBytes(Encoding.UTF_8));
+            buf.write("/* !!! NOT PROCESSED */\n".getBytes(StandardCharsets.UTF_8.name()));
           }
         }
       }
@@ -199,13 +199,13 @@ public class ScriptFileBuilder {
       }
       pos = mat.end();
     }
-    buf.write(content.substring(pos).getBytes(Encoding.UTF_8));
+    buf.write(content.substring(pos).getBytes(StandardCharsets.UTF_8.name()));
 
-    String macroContent = buf.toString(Encoding.UTF_8);
+    String macroContent = buf.toString(StandardCharsets.UTF_8.name());
     if (compileAndMinify) {
       macroContent = compileAndMinifyContent(script.getFileType(), macroContent);
     }
-    return new ScriptOutput(pathInfo, macroContent.getBytes(Encoding.UTF_8), lastModified);
+    return new ScriptOutput(pathInfo, macroContent.getBytes(StandardCharsets.UTF_8.name()), lastModified);
   }
 
   protected String compileAndMinifyContent(FileType fileType, String content) throws IOException {
@@ -222,7 +222,7 @@ public class ScriptFileBuilder {
     }
     StringBuilder buf = new StringBuilder();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(IOUtility.readFromUrl(script.getURL()), Encoding.UTF_8);
+    String content = new String(IOUtility.readFromUrl(script.getURL()), StandardCharsets.UTF_8.name());
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -233,7 +233,7 @@ public class ScriptFileBuilder {
       if (includeFragment != null) {
         switch (includeFragment.getNodeType()) {
           case SRC_FRAGMENT: {
-            replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), Encoding.UTF_8);
+            replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), StandardCharsets.UTF_8.name());
             lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
             break;
           }
@@ -272,7 +272,7 @@ public class ScriptFileBuilder {
     if (compileAndMinify) {
       moduleContent = compileAndMinifyContent(script.getFileType(), moduleContent);
     }
-    return new ScriptOutput(pathInfo, moduleContent.getBytes(Encoding.UTF_8), lastModified);
+    return new ScriptOutput(pathInfo, moduleContent.getBytes(StandardCharsets.UTF_8.name()), lastModified);
   }
 
   protected String compileContent(ScriptSource.FileType fileType, String content) throws IOException {

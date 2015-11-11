@@ -11,6 +11,7 @@
 package org.eclipse.scout.commons.mail;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import javax.mail.Address;
 import javax.mail.Message;
@@ -20,14 +21,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
-import org.eclipse.scout.commons.Encoding;
-
 public class CharsetSafeMimeMessage extends MimeMessage {
   private String m_charset;
 
   public CharsetSafeMimeMessage() {
     super((Session) null);
-    m_charset = Encoding.UTF_8;
+    m_charset = StandardCharsets.UTF_8.name();
   }
 
   public CharsetSafeMimeMessage(String charset) {

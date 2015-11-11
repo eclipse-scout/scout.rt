@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -97,7 +97,7 @@ public class JsonRequestHelper {
    */
   public void writeResponse(final ServletResponse servletResponse, final JSONObject jsonResponse) throws IOException {
     String jsonText = jsonResponse.toString();
-    final byte[] data = jsonText.getBytes(Encoding.UTF_8);
+    final byte[] data = jsonText.getBytes(StandardCharsets.UTF_8.name());
     if (LOG.isDebugEnabled() && !LOG.isTraceEnabled() && jsonText.length() > 10000) {
       // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
       jsonText = jsonText.substring(0, 10000) + "...";
@@ -106,7 +106,7 @@ public class JsonRequestHelper {
     if (servletResponse.getContentType() == null) {
       servletResponse.setContentType("application/json");
     }
-    servletResponse.setCharacterEncoding(Encoding.UTF_8);
+    servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
     try {
       servletResponse.getOutputStream().write(data);
     }

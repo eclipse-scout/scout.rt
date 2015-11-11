@@ -1587,7 +1587,7 @@ public final class StringUtility {
     InflaterInputStream inflaterInputStream = new InflaterInputStream(in, inflater);
     StringWriter out = new StringWriter();
     try {
-      InputStreamReader reader = new InputStreamReader(inflaterInputStream, Encoding.UTF_8);
+      InputStreamReader reader = new InputStreamReader(inflaterInputStream, StandardCharsets.UTF_8.name());
       char[] b = new char[102400];
       int len;
       while ((len = reader.read(b)) > 0) {

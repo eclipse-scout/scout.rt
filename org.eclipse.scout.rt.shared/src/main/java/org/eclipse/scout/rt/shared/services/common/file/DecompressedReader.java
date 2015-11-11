@@ -18,10 +18,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
-
-import org.eclipse.scout.commons.Encoding;
 
 public class DecompressedReader extends Reader {
   private RemoteFile m_remoteFile;
@@ -31,7 +30,7 @@ public class DecompressedReader extends Reader {
   private InputStreamReader m_inputReader;
 
   public DecompressedReader(RemoteFile f) {
-    this(f, Encoding.UTF_8);
+    this(f, StandardCharsets.UTF_8.name());
   }
 
   public DecompressedReader(RemoteFile f, String charsetName) {
