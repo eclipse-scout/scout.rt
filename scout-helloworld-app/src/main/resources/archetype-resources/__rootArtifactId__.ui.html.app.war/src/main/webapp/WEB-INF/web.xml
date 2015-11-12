@@ -14,7 +14,7 @@
 
   <filter>
     <filter-name>AuthFilter</filter-name>
-    <filter-class>${groupId}.ui.html.UiHtmlServletFilter</filter-class>
+    <filter-class>${groupId}.ui.html.UiServletFilter</filter-class>
     <init-param>
       <param-name>filter-exclude</param-name>
       <param-value>

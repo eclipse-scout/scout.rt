@@ -15,6 +15,12 @@
   <filter>
     <filter-name>AuthFilter</filter-name>
     <filter-class>${groupId}.server.ServerServletFilter</filter-class>
+    <init-param>
+      <param-name>filter-exclude</param-name>
+      <param-value>
+        /jaxws/*
+      </param-value>
+    </init-param>
   </filter>
 
   <filter-mapping>
