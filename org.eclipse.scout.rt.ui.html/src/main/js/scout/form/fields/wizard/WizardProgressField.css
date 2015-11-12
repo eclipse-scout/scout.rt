@@ -9,10 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 @wizard-progress-height: 60px;
-@wizard-progress-border-width: 3px;
+@wizard-progress-border-width: 1px;
 @wizard-progress-content-h-padding: 15px;
 @wizard-progress-separator-width: 10px;
-@wizard-progress-separator-line-width: 2px;
+@wizard-progress-separator-line-width: 1px;
 
 @wizard-progress-step-background-color: @palette-gray-3;
 @wizard-progress-step-foreground-color: @text-color;
@@ -24,23 +24,64 @@
 @wizard-progress-disabled-step-foreground-color: @text-disabled-color;
 
 .wizard-steps {
-  height: @wizard-progress-height;
+  overflow: hidden;
   margin-left: @mandatory-indicator-width;
   margin-right: 0;
-  white-space: nowrap; /* Allows the last wizard-step to be 100% without line break */
+  padding-bottom: @scrollbar-margin + (2 * @scrollbar-side-margin);
 
-  overflow: hidden;
-  border: @wizard-progress-border-width solid @border-color;
   /* If wizard progress field is in the root-group-box and there is a menubar, */
   /* disable the top-border (because the menubar already has a border) */
-  .menubar ~ .group-box-body > .wizard-progress-field > & {
+  .root-group-box > .menubar.main-menubar ~ .group-box-body > .wizard-progress-field > & {
     border-top-color: transparent;
     margin-top: -@wizard-progress-border-width;
+    padding-top: 0;
   }
 
+  /* If wizard progress field is in the root-group-box, use negative margins to */
+  /* draw it up to the border of the form (like the main-menubar) */
+  .root-group-box > .group-box-body > .wizard-progress-field > & {
+    margin-left: -@root-group-box-padding-left;
+    margin-right: -@root-group-box-padding-right;
+    padding-top: @group-margin-top;
+
+    & > .wizard-steps-body > .wizard-step.first > .wizard-step-content {
+      padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
+    }
+    & > .wizard-steps-body > .wizard-step.last > .wizard-step-content {
+      padding-right: @root-group-box-padding-right;
+    }
+  }
+}
+
+.wizard-steps-body {
+  height: @wizard-progress-height;
+  overflow: hidden;
+  white-space: nowrap; /* Allows the last wizard-step to be 100% without line break */
+  border-top: @wizard-progress-border-width solid @border-color;
+  border-bottom: @wizard-progress-border-width solid @border-color;
   /* This creates a new stacking context: */
   position: relative;
   z-index: 0;
+
+  /* If wizard progress field is in the root-group-box and there is a menubar, */
+  /* disable the top-border (because the menubar already has a border) */
+  /*.root-group-box > .menubar.main-menubar ~ .group-box-body > .wizard-progress-field > .wizard-steps > & {
+    border-top-color: transparent;
+    margin-top: -@wizard-progress-border-width;
+  }*/
+
+  /* If wizard progress field is in the root-group-box, use negative margins to */
+  /* draw it up to the border of the form (like the main-menubar) */
+  /*.root-group-box > .group-box-body > .wizard-progress-field > .wizard-steps > & {
+    margin-left: -@root-group-box-padding-left;
+    margin-right: -@root-group-box-padding-right;
+    border-left: 0;
+    border-right: 0;
+
+    & > .wizard-step.first > .wizard-step-content {
+      padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
+    }
+  }*/
 }
 
 .wizard-step {

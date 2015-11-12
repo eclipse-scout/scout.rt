@@ -53,16 +53,14 @@ scout.graphics = {
       return new scout.Dimension(0, 0);
     }
 
-    var oldStyle = $elem.attr('style'),
-      newWidth = 'auto',
-      newHeight = 'auto';
+    var oldStyle = $elem.attr('style');
+    var oldScrollLeft = $elem.scrollLeft();
+    var oldScrollTop = $elem.scrollTop();
 
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
-    if (useCssSize) {
-      newWidth = '';
-      newHeight = '';
-    }
+    var newWidth = (useCssSize ? '' : 'auto');
+    var newHeight = (useCssSize ? '' : 'auto');
 
     // modify properties which prevent reading the preferred size
     $elem.css({
@@ -76,6 +74,9 @@ scout.graphics = {
 
     // reset the modified style attribute
     $elem.attrOrRemove('style', oldStyle);
+    $elem.scrollLeft(oldScrollLeft);
+    $elem.scrollTop(oldScrollTop);
+
     return prefSize;
   },
 
