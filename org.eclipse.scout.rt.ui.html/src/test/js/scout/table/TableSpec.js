@@ -1066,24 +1066,6 @@ describe("Table", function() {
 
   });
 
-  describe("row double click", function() {
-    it("sends clicked, selection and row action events", function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
-      table.render(session.$entryPoint);
-      // mock function because it does not work without css (columns are one below the other instead of side by side).
-      table._columnAtX = function() {
-        return table.columns[0];
-      };
-      var $row = table.$rows().first();
-      $row.triggerDoubleClick();
-
-      sendQueuedAjaxCalls();
-
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked', 'rowAction']);
-    });
-  });
-
   describe("right click on row", function() {
 
     afterEach(function() {

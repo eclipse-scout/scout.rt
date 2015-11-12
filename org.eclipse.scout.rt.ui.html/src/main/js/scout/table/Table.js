@@ -63,6 +63,7 @@ scout.Table.prototype._init = function(model) {
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
+  this._colorize();
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -978,12 +979,6 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       this._applyFilters($rows);
     }
 
-    this.columns.forEach(function(column) {
-      if (column.backgroundEffect) {
-        column.table.renderColumnBackgroundEffect(column);
-      }
-    });
-
     this._installRows($rows);
 
     // notify
@@ -1650,86 +1645,19 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
 };
 
 scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {
-  column.backgroundEffect = effect;
-  this.sendColumnBackgroundEffect(column);
-  this.renderColumnBackgroundEffect(column);
+  column.setBackgroundEffect(effect);
 };
 
-scout.Table.prototype.sendColumnBackgroundEffect = function(column) {
-  var data = {
-    columnId : column.id,
-    backgroundEffect : column.backgroundEffect
-  };
-  this._send('columnBackgroundEffectChanged', data);
-};
-
-scout.Table.prototype.renderColumnBackgroundEffect = function(column) {
-  var minValue, maxValue, colorFunc, row, value, v, i, $cell,
-      effect = column.backgroundEffect,
-      filteredRows = this.filteredRows();
-
-  for (i = 0; i < this.rows.length; i++) {
-    row = this.rows[i];
-    v = this.cellValue(column, row);
-
-    if (v < minValue || minValue === undefined) {
-      minValue = v;
+/**
+ * Updates the background effect of every column, if column.backgroundEffect is set
+ */
+scout.Table.prototype._colorize = function() {
+  this.columns.forEach(function(column) {
+    if (!column.backgroundEffect) {
+      return;
     }
-    if (v > maxValue || maxValue === undefined) {
-      maxValue = v;
-    }
-  }
-
-  // TODO CRU Don't use hardcoded colors (or make them customizable)
-  // TODO CRU Handle case where model already has set specific cell background colors
-  if (effect === 'colorGradient1') {
-    colorFunc = function($cell, value) {
-      var level = (value - minValue) / (maxValue - minValue);
-
-      var r = Math.ceil(255 - level * (255 - 171)),
-        g = Math.ceil(175 - level * (175 - 214)),
-        b = Math.ceil(175 - level * (175 - 147));
-
-      $cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
-      $cell.css('background-image', '');
-    };
-  } else if (effect === 'colorGradient2') {
-    colorFunc = function($cell, value) {
-      var level = (value - minValue) / (maxValue - minValue);
-
-      var r = Math.ceil(171 - level * (171 - 255)),
-        g = Math.ceil(214 - level * (214 - 175)),
-        b = Math.ceil(147 - level * (147 - 175));
-
-      $cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
-      $cell.css('background-image', '');
-    };
-  } else if (effect === 'barChart') {
-    colorFunc = function($cell, value) {
-      var level = Math.ceil((value - minValue) / (maxValue - minValue) * 100) + '';
-
-      $cell.css('background-color', 'transparent');
-      $cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )');
-    };
-  } else {
-    if (effect !== null) {
-      $.log.warn('Unsupported backgroundEffect: ' + effect);
-    }
-    colorFunc = function($cell, value) {
-      $cell.css('background-image', '');
-      $cell.css('background-color', 'transparent');
-    };
-  }
-
-  for (i = 0; i < filteredRows.length; i++) {
-    row = filteredRows[i];
-    value = this.cellValue(column, row);
-    $cell = this.$cell(column, row.$row);
-
-    if (value !== '') {
-      colorFunc($cell, value);
-    }
-  }
+    column.updateBackgroundEffect();
+  }, this);
 };
 
 scout.Table.prototype._renderRowChecked = function(row) {
@@ -1776,6 +1704,10 @@ scout.Table.prototype.doRowAction = function(row, column) {
   this._sendRowAction(row, column);
 };
 
+scout.Table.prototype._insertRow = function(row) {
+  this._insertRows([row]);
+};
+
 scout.Table.prototype._insertRows = function(rows) {
   var filterChanged = false;
   // Update model
@@ -1800,6 +1732,11 @@ scout.Table.prototype._insertRows = function(rows) {
 
     this._renderRows(rows);
   }
+  this._colorize();
+};
+
+scout.Table.prototype._deleteRow = function(row) {
+  this._deleteRows([row]);
 };
 
 scout.Table.prototype._deleteRows = function(rows) {
@@ -1837,6 +1774,7 @@ scout.Table.prototype._deleteRows = function(rows) {
     this._rowsFiltered();
   }
   this._group();
+  this._colorize();
   if (invalidate) {
     this.invalidateLayoutTree();
   }
@@ -1905,6 +1843,7 @@ scout.Table.prototype._updateRows = function(rows) {
   if (filterChanged) {
     this._rowsFiltered(newInvisibleRows);
   }
+  this._colorize();
 };
 
 scout.Table.prototype._removeTooltipsForRow = function(row) {
@@ -2493,6 +2432,14 @@ scout.Table.prototype._sendColumnMoved = function(column, index) {
   this._send('columnMoved', data);
 };
 
+scout.Table.prototype._sendColumnBackgroundEffectChanged = function(column) {
+  var data = {
+    columnId : column.id,
+    backgroundEffect : column.backgroundEffect
+  };
+  this._send('columnBackgroundEffectChanged', data);
+};
+
 scout.Table.prototype._sendAggregationFunctionChanged = function(column) {
   var data = {
     columnId: column.id,
@@ -3007,8 +2954,7 @@ scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
   event.eventParts.forEach(function(eventPart){
     columnId = eventPart.columnId;
     column = this.columnById(columnId);
-    column.backgroundEffect = eventPart.backgroundEffect;
-    this.renderColumnBackgroundEffect(column);
+    column.setBackgroundEffect(eventPart.backgroundEffect, false);
   }, this);
 };
 

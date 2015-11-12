@@ -33,7 +33,6 @@ scout.Column.prototype.init = function(model) {
   if (this.aggregationFunction) {
     this.setAggregationFunction(this.aggregationFunction);
   }
-
 };
 
 /**
@@ -166,6 +165,16 @@ scout.Column.prototype._cellStyle = function(cell) {
 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   style += scout.helpers.legacyStyle(cell);
+
+  if (this.backgroundEffect && cell.value !== undefined) {
+    var backgroundStyle = this.backgroundEffectFunc(cell.value);
+    if (backgroundStyle.backgroundColor) {
+      style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
+    }
+    if (backgroundStyle.backgroundImage) {
+      style += 'background-image: ' + backgroundStyle.backgroundImage + ';';
+    }
+  }
   return style;
 };
 
@@ -255,4 +264,121 @@ scout.Column.prototype.setAggregationFunction = function(func) {
     this.aggrFinish = scout.aggregation.maxFinish;
     this.aggrSymbol = scout.aggregation.maxSymbol;
   }
+};
+
+scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
+  if (effect && (this.minValue === undefined || this.maxValue === undefined)) {
+    // No need to calculate the values again when switching background effects
+    // If background effect is turned off and on again values will be recalculated
+    // This is necessary because in the meantime rows may got updated, deleted etc.
+    this.calculateMinMaxValues();
+  }
+  this.backgroundEffect = effect;
+  this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
+
+  if (!effect) {
+    // Clear to make sure values are calculated anew the next time a background effect gets set
+    this.minValue = undefined;
+    this.maxValue = undefined;
+  }
+
+  notifyServer = scout.helpers.nvl(notifyServer, true);
+  if (notifyServer) {
+    this.table._sendColumnBackgroundEffectChanged(this);
+  }
+  if (this.table.rendered) {
+    this._renderBackgroundEffect();
+  }
+};
+
+/**
+ * Recalculates the min / max values and renders the background effect again.
+ */
+scout.Column.prototype.updateBackgroundEffect = function() {
+  this.minValue = undefined;
+  this.maxValue = undefined;
+  this.setBackgroundEffect(this.backgroundEffect, false);
+};
+
+scout.Column.prototype._resolveBackgroundEffectFunc = function() {
+  var effect = this.backgroundEffect;
+  // TODO CRU Don't use hardcoded colors (or make them customizable)
+  if (effect === 'colorGradient1') {
+    return this._colorGradient1.bind(this);
+  }
+  if (effect === 'colorGradient2') {
+    return this._colorGradient2.bind(this);
+  }
+  if (effect === 'barChart') {
+    return this._barChart.bind(this);
+  }
+
+  if (effect !== null) {
+    $.log.warn('Unsupported backgroundEffect: ' + effect);
+    return function() {
+      return {};
+    };
+  }
+};
+
+scout.Column.prototype._renderBackgroundEffect = function() {
+  this.table.filteredRows().forEach(function(row) {
+    var cell = this.table.cell(this, row),
+      $cell = this.table.$cell(this, row.$row);
+
+    if (cell.value !== undefined) {
+      $cell[0].style.cssText = this._cellStyle(cell);
+    }
+  }, this);
+};
+
+scout.Column.prototype.calculateMinMaxValues = function() {
+  var row, minValue, maxValue, value,
+    rows = this.table.rows;
+
+  for (var i = 0; i < rows.length; i++) {
+    row = rows[i];
+    value = this.table.cellValue(this, row);
+
+    if (value < minValue || minValue === undefined) {
+      minValue = value;
+    }
+    if (value > maxValue || maxValue === undefined) {
+      maxValue = value;
+    }
+  }
+  this.minValue = minValue;
+  this.maxValue = maxValue;
+};
+
+scout.Column.prototype._colorGradient1 = function(value) {
+  var level = (value - this.minValue) / (this.maxValue - this.minValue);
+
+  var r = Math.ceil(255 - level * (255 - 171)),
+    g = Math.ceil(175 - level * (175 - 214)),
+    b = Math.ceil(175 - level * (175 - 147));
+
+  return {
+    backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
+  };
+};
+
+scout.Column.prototype._colorGradient2 = function(value) {
+  var level = (value - this.minValue) / (this.maxValue - this.minValue);
+
+  var r = Math.ceil(171 - level * (171 - 255)),
+    g = Math.ceil(214 - level * (214 - 175)),
+    b = Math.ceil(147 - level * (147 - 175));
+
+  return {
+    backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
+  };
+};
+
+scout.Column.prototype._barChart = function(value) {
+  var level = Math.ceil((value - this.minValue) / (this.maxValue - this.minValue) * 100) + '';
+
+  return {
+    backgroundImage: 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )'
+  };
 };

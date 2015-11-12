@@ -168,7 +168,7 @@ describe("Column", function() {
     expect($cells0.eq(1).text()).toBe('hi');
   });
 
-  describe("MultilineText", function() {
+  describe("multilineText", function() {
     it("replaces\n with br, but only if htmlEnabled is false", function() {
       var model = helper.createModelFixture(3, 2);
       model.multilineText = true;
@@ -189,7 +189,7 @@ describe("Column", function() {
     });
   });
 
-  describe("TextWrap", function() {
+  describe("textWrap", function() {
     var table, model, $rows, $cells0, $cell0_0, $cell0_1;
 
     beforeEach(function() {
@@ -225,6 +225,116 @@ describe("Column", function() {
       $cells0 = $rows.eq(0).find('.table-cell');
       $cell0_0 = $cells0.eq(0);
       expect($cell0_0).toHaveClass('white-space-nowrap');
+    });
+  });
+
+  describe("background effect", function() {
+    var rgbLevel0= 'rgb(255, 175, 175)';
+    var rgbLevel50 = 'rgb(213, 195, 161)';
+    var rgbLevel100 = 'rgb(171, 214, 147)';
+    var imageLevel50 = 'linear-gradient(to left, rgb(128, 193, 208) 0%, rgb(128, 193, 208) 50%, transparent 50%, transparent 100%)';
+
+    describe("colorGradient1", function() {
+      it("colors cells from red to green", function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var table = helper.createTable(model);
+        var column0 = model.columns[0];
+        table.render(session.$entryPoint);
+
+        table.setColumnBackgroundEffect(column0, 'colorGradient1');
+        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
+      });
+    });
+
+    it("updates colors if row gets deleted", function() {
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var table = helper.createTable(model);
+      var column0 = model.columns[0];
+      table.render(session.$entryPoint);
+
+      table.setColumnBackgroundEffect(column0, 'colorGradient1');
+      table._deleteRow(table.rows[2]);
+      expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel100);
+    });
+
+    it("updates colors if row gets inserted", function() {
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var table = helper.createTable(model);
+      var column0 = model.columns[0];
+      table.render(session.$entryPoint);
+
+      table.setColumnBackgroundEffect(column0, 'colorGradient1');
+      var row = helper.createModelRowByValues(undefined, 200);
+      table._insertRow(row);
+      expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(234, 185, 168)');
+      expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe('rgb(213, 195, 161)');
+      expect(table.$cell(column0, table.rows[3].$row).css('background-color')).toBe(rgbLevel100);
+    });
+
+    it("updates colors if row gets updated", function() {
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var column0 = model.columns[0];
+      column0.backgroundEffect = 'colorGradient1';
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      // Change row 0 value to 150, row 1 now has the lowest values
+      var rows = helper.createModelRows(1, 1);
+      rows[0].id = table.rows[0].id;
+      rows[0].cells[0].value = 150;
+      table._updateRows(rows);
+
+      expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel0);
+      expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel50);
+    });
+
+    it("colors cells if table gets rendered", function() {
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var column0 = model.columns[0];
+      column0.backgroundEffect = 'colorGradient1';
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+      expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+      expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
+    });
+
+    it("restores existing background color if background effect gets removed", function() {
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      model.rows[1].cells[0].backgroundColor = 'ff0000';
+      var table = helper.createTable(model);
+      var column0 = model.columns[0];
+      table.render(session.$entryPoint);
+
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
+      expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+
+      table.setColumnBackgroundEffect(column0, 'colorGradient1');
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+
+      table.setColumnBackgroundEffect(column0, null);
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
+      expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+    });
+
+    describe("barChart", function() {
+      it("does not overwrite existing background color", function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        model.rows[1].cells[0].backgroundColor = 'ff0000';
+        var table = helper.createTable(model);
+        var column0 = model.columns[0];
+        table.render(session.$entryPoint);
+
+        table.setColumnBackgroundEffect(column0, 'barChart');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+      });
     });
   });
 });

@@ -62,13 +62,13 @@ TableSpecHelper.prototype.createModelRowByTexts = function(id, texts, withoutCel
 
 /**
 *
-* @param texts array of texts for the cells in the new row or a string if only one cell should be created.
+* @param values array of values for the cells in the new row or a number if only one cell should be created.
 */
 TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
  values = scout.arrays.ensure(values);
  var cells = [];
  for (var i = 0; i < values.length; i++) {
-   cells[i] = this.createModelCell(values[i], values[i]);
+   cells[i] = this.createModelCell(values[i] + '', values[i]);
  }
  return this.createModelRow(id, cells);
 };
@@ -88,10 +88,10 @@ TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
 TableSpecHelper.prototype.createModelCell = function(text, value) {
   var cell = {};
   scout.defaultValues.applyTo(cell, 'Cell');
-  if (text) {
+  if (text !== undefined) {
     cell.text = text;
   }
-  if (value) {
+  if (value !== undefined) {
     cell.value = value;
   }
   return cell;
