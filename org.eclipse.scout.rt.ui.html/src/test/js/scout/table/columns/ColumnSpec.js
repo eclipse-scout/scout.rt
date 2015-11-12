@@ -238,7 +238,7 @@ describe("Column", function() {
       it("colors cells from red to green", function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
         var table = helper.createTable(model);
-        var column0 = model.columns[0];
+        var column0 = table.columns[0];
         table.render(session.$entryPoint);
 
         table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -251,7 +251,7 @@ describe("Column", function() {
     it("updates colors if row gets deleted", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
       var table = helper.createTable(model);
-      var column0 = model.columns[0];
+      var column0 = table.columns[0];
       table.render(session.$entryPoint);
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -263,7 +263,7 @@ describe("Column", function() {
     it("updates colors if row gets inserted", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
       var table = helper.createTable(model);
-      var column0 = model.columns[0];
+      var column0 = table.columns[0];
       table.render(session.$entryPoint);
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -277,9 +277,9 @@ describe("Column", function() {
 
     it("updates colors if row gets updated", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
-      var column0 = model.columns[0];
-      column0.backgroundEffect = 'colorGradient1';
+      model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
+      var column0 = table.columns[0];
       table.render(session.$entryPoint);
 
       // Change row 0 value to 150, row 1 now has the lowest values
@@ -295,9 +295,9 @@ describe("Column", function() {
 
     it("colors cells if table gets rendered", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
-      var column0 = model.columns[0];
-      column0.backgroundEffect = 'colorGradient1';
+      model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
+      var column0 = table.columns[0];
 
       table.render(session.$entryPoint);
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
@@ -309,7 +309,7 @@ describe("Column", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
       model.rows[1].cells[0].backgroundColor = 'ff0000';
       var table = helper.createTable(model);
-      var column0 = model.columns[0];
+      var column0 = table.columns[0];
       table.render(session.$entryPoint);
 
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
@@ -328,12 +328,57 @@ describe("Column", function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
         model.rows[1].cells[0].backgroundColor = 'ff0000';
         var table = helper.createTable(model);
-        var column0 = model.columns[0];
+        var column0 = table.columns[0];
         table.render(session.$entryPoint);
 
         table.setColumnBackgroundEffect(column0, 'barChart');
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
         expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+      });
+    });
+
+    describe("setBackgroundEffect", function() {
+      it("changes the background effect", function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var table = helper.createTable(model);
+        var column0 = table.columns[0];
+        table.render(session.$entryPoint);
+
+        // initial: No effect
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgba(0, 0, 0, 0)');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+
+        table.setColumnBackgroundEffect(column0, 'colorGradient1');
+        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
+
+        table.setColumnBackgroundEffect(column0, 'barChart');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgba(0, 0, 0, 0)');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+
+        // set to null: no effect
+        table.setColumnBackgroundEffect(column0, null);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgba(0, 0, 0, 0)');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+      });
+
+      it("sends columnBackgroundEffectChanged event", function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var table = helper.createTable(model);
+        var column0 = table.columns[0];
+        table.render(session.$entryPoint);
+
+        table.setColumnBackgroundEffect(column0, 'barChart');
+
+        sendQueuedAjaxCalls();
+        expect(jasmine.Ajax.requests.count()).toBe(1);
+
+        var event = new scout.Event(table.id, 'columnBackgroundEffectChanged', {
+          columnId: column0.id,
+          backgroundEffect: 'barChart'
+        });
+        expect(mostRecentJsonRequest()).toContainEvents(event);
       });
     });
   });

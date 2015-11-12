@@ -167,6 +167,9 @@ scout.Column.prototype._cellStyle = function(cell) {
   style += scout.helpers.legacyStyle(cell);
 
   if (this.backgroundEffect && cell.value !== undefined) {
+    if (!this.backgroundEffectFunc) {
+      this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
+    }
     var backgroundStyle = this.backgroundEffectFunc(cell.value);
     if (backgroundStyle.backgroundColor) {
       style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
@@ -267,25 +270,30 @@ scout.Column.prototype.setAggregationFunction = function(func) {
 };
 
 scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
-  if (effect && (this.minValue === undefined || this.maxValue === undefined)) {
-    // No need to calculate the values again when switching background effects
-    // If background effect is turned off and on again values will be recalculated
-    // This is necessary because in the meantime rows may got updated, deleted etc.
-    this.calculateMinMaxValues();
+  if (this.backgroundEffect === effect) {
+    return;
   }
+
   this.backgroundEffect = effect;
   this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
-
-  if (!effect) {
-    // Clear to make sure values are calculated anew the next time a background effect gets set
-    this.minValue = undefined;
-    this.maxValue = undefined;
-  }
 
   notifyServer = scout.helpers.nvl(notifyServer, true);
   if (notifyServer) {
     this.table._sendColumnBackgroundEffectChanged(this);
   }
+
+  if (this.backgroundEffect && (this.minValue === undefined || this.maxValue === undefined)) {
+    // No need to calculate the values again when switching background effects
+    // If background effect is turned off and on again values will be recalculated
+    // This is necessary because in the meantime rows may got updated, deleted etc.
+    this.calculateMinMaxValues();
+  }
+  if (!this.backgroundEffect) {
+    // Clear to make sure values are calculated anew the next time a background effect gets set
+    this.minValue = undefined;
+    this.maxValue = undefined;
+  }
+
   if (this.table.rendered) {
     this._renderBackgroundEffect();
   }
@@ -295,9 +303,10 @@ scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
  * Recalculates the min / max values and renders the background effect again.
  */
 scout.Column.prototype.updateBackgroundEffect = function() {
-  this.minValue = undefined;
-  this.maxValue = undefined;
-  this.setBackgroundEffect(this.backgroundEffect, false);
+  this.calculateMinMaxValues();
+  if (this.table.rendered) {
+    this._renderBackgroundEffect();
+  }
 };
 
 scout.Column.prototype._resolveBackgroundEffectFunc = function() {

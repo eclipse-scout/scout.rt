@@ -63,7 +63,7 @@ scout.Table.prototype._init = function(model) {
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
-  this._colorize();
+  this._calculateValuesForBackgroundEffect();
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -1005,6 +1005,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     // Grouping cannot be done in init() because row filter only works with rendered rows -> needs to be done always when rows get rendered
     this._group();
     this._renderAggregateRows();
+    this._renderBackgroundEffect();
   }
 };
 
@@ -1649,14 +1650,39 @@ scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {
 };
 
 /**
- * Updates the background effect of every column, if column.backgroundEffect is set
+ * Updates the background effect of every column, if column.backgroundEffect is set.
+ * Meaning: Recalculates the min / max values and renders the background effect again.
  */
-scout.Table.prototype._colorize = function() {
+scout.Table.prototype._updateBackgroundEffect = function() {
   this.columns.forEach(function(column) {
     if (!column.backgroundEffect) {
       return;
     }
     column.updateBackgroundEffect();
+  }, this);
+};
+
+/**
+ * Recalculates the values necessary for the background effect of every column, if column.backgroundEffect is set
+ */
+scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
+  this.columns.forEach(function(column) {
+    if (!column.backgroundEffect) {
+      return;
+    }
+    column.calculateMinMaxValues();
+  }, this);
+};
+
+/**
+ * Renders the background effect of every column, if column.backgroundEffect is set
+ */
+scout.Table.prototype._renderBackgroundEffect = function() {
+  this.columns.forEach(function(column) {
+    if (!column.backgroundEffect) {
+      return;
+    }
+    column._renderBackgroundEffect();
   }, this);
 };
 
@@ -1717,6 +1743,7 @@ scout.Table.prototype._insertRows = function(rows) {
     // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
     this.rows.push(row);
   }
+  this._calculateValuesForBackgroundEffect();
 
   // Update HTML
   if (this.rendered) {
@@ -1732,7 +1759,6 @@ scout.Table.prototype._insertRows = function(rows) {
 
     this._renderRows(rows);
   }
-  this._colorize();
 };
 
 scout.Table.prototype._deleteRow = function(row) {
@@ -1774,7 +1800,7 @@ scout.Table.prototype._deleteRows = function(rows) {
     this._rowsFiltered();
   }
   this._group();
-  this._colorize();
+  this._updateBackgroundEffect();
   if (invalidate) {
     this.invalidateLayoutTree();
   }
@@ -1843,7 +1869,7 @@ scout.Table.prototype._updateRows = function(rows) {
   if (filterChanged) {
     this._rowsFiltered(newInvisibleRows);
   }
-  this._colorize();
+  this._updateBackgroundEffect();
 };
 
 scout.Table.prototype._removeTooltipsForRow = function(row) {
