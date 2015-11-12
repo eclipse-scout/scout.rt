@@ -115,6 +115,7 @@ scout.SearchOutline.prototype._sendSearch = function() {
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {
   // Store locally so that the value persists when changing the outline without performing the search
   this.searchQuery = this.$queryField.val();
+  this._sendSearch();
 };
 
 scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
