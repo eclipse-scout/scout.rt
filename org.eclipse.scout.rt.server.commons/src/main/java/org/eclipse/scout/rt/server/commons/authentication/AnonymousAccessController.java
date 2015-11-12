@@ -19,46 +19,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.Platform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Convenience authenticator if running in development mode using the system property 'user.name'.
+ * Access controller to always continue filter-chain with a fixed user. By default, the user's name is 'anonymous'.
+ * <p>
+ * Typically, this access controller is used when having an application that does not require user authentication.
+ *
+ * @since 5.2
  */
-@Bean
-public class DevelopmentAuthenticator implements IAuthenticator {
+public class AnonymousAccessController implements IAccessController {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DevelopmentAuthenticator.class);
+  private AnonymousAuthConfig m_config;
 
-  private boolean m_showWarning = true;
-
-  private DevAuthConfig m_config;
-
-  public void init() {
-    init(new DevAuthConfig());
+  public AnonymousAccessController init() {
+    init(new AnonymousAuthConfig());
+    return this;
   }
 
-  public void init(final DevAuthConfig config) {
+  public AnonymousAccessController init(final AnonymousAuthConfig config) {
     m_config = config;
+    return this;
   }
 
   @Override
-  public boolean handle(final HttpServletRequest req, final HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
+  public boolean handle(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
     if (!m_config.isEnabled()) {
       return false;
     }
 
-    if (m_showWarning) {
-      LOG.warn("+++Development security: run with subject {}", m_config.getUsername());
-      m_showWarning = false;
-    }
-
     final Principal principal = m_config.getPrincipalProducer().produce(m_config.getUsername());
     final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
-    helper.putPrincipalOnSession(req, principal);
-    helper.continueChainAsSubject(principal, req, resp, chain);
+    helper.putPrincipalOnSession(request, principal);
+    helper.continueChainAsSubject(principal, request, response, chain);
     return true;
   }
 
@@ -68,19 +60,19 @@ public class DevelopmentAuthenticator implements IAuthenticator {
   }
 
   /**
-   * Configuration for {@link DevelopmentAuthenticator}.
+   * Configuration for {@link AnonymousAccessController}.
    */
-  public static class DevAuthConfig {
+  public static class AnonymousAuthConfig {
 
-    private boolean m_enabled = Platform.get().inDevelopmentMode();
+    private boolean m_enabled = true;
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
-    private String m_username = System.getProperty("user.name");
+    private String m_username = "anonymous";
 
     public boolean isEnabled() {
       return m_enabled;
     }
 
-    public DevAuthConfig withEnabled(final boolean enabled) {
+    public AnonymousAuthConfig withEnabled(final boolean enabled) {
       m_enabled = enabled;
       return this;
     }
@@ -89,7 +81,7 @@ public class DevelopmentAuthenticator implements IAuthenticator {
       return m_principalProducer;
     }
 
-    public DevAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
+    public AnonymousAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
       m_principalProducer = principalProducer;
       return this;
     }
@@ -98,7 +90,7 @@ public class DevelopmentAuthenticator implements IAuthenticator {
       return m_username;
     }
 
-    public DevAuthConfig withUsername(final String username) {
+    public AnonymousAuthConfig withUsername(final String username) {
       m_username = username;
       return this;
     }

@@ -7,37 +7,43 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 
 /**
- * Security filter verifying service tunnel access token based on
- * {@link AbstractHttpServiceTunnel#TOKEN_AUTH_HTTP_HEADER} and {@link AbstractHttpServiceTunnel#TOKEN_USER_ID_HEADER}.
+ * Access controller to continue filter-chain if a valid {@link AbstractHttpServiceTunnel#TOKEN_AUTH_HTTP_HEADER Service
+ * Tunnel Token} is provided with the request.
+ * <p>
+ * By design: The {@link Principal} for authenticated users is not put onto {@link HttpSession}, so that every tunnel
+ * request is authenticated.
+ *
+ * @since 5.1
  */
-@Bean
-public class ServiceTunnelAccessTokenAuthenticator implements IAuthenticator {
+public class ServiceTunnelAccessTokenAccessController implements IAccessController {
 
   private ServiceTunnelAccessTokenAuthConfig m_config;
 
-  public void init() throws ServletException {
+  public ServiceTunnelAccessTokenAccessController init() throws ServletException {
     init(new ServiceTunnelAccessTokenAuthConfig());
+    return this;
   }
 
-  public void init(final ServiceTunnelAccessTokenAuthConfig config) throws ServletException {
+  public ServiceTunnelAccessTokenAccessController init(final ServiceTunnelAccessTokenAuthConfig config) throws ServletException {
     m_config = config;
+    return this;
   }
 
   @Override
-  public boolean handle(final HttpServletRequest req, final HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
+  public boolean handle(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
     if (!m_config.isEnabled()) {
       return false;
     }
 
-    final String tokenString = req.getHeader(AbstractHttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
+    final String tokenString = request.getHeader(AbstractHttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
     if (tokenString == null) {
       return false;
     }
@@ -49,27 +55,27 @@ public class ServiceTunnelAccessTokenAuthenticator implements IAuthenticator {
 
     // check subject
     if (!StringUtility.hasText(token.getUserId())) {
-      fail(resp);
+      fail(response);
       return true;
     }
 
     // check TTL
     if (System.currentTimeMillis() > token.getValidUntil()) {
-      fail(resp);
+      fail(response);
       return true;
     }
 
     // check signature
     if (!token.isValid()) {
-      fail(resp);
+      fail(response);
       return true;
     }
 
     final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
     final Principal principal = m_config.getPrincipalProducer().produce(token.getUserId());
 
-    // by design: do not cache principal on session
-    helper.continueChainAsSubject(principal, req, resp, chain);
+    // By design: do not cache principal on session. Otherwise, TrivialAccessController would skip this access controller for subsequent requests.
+    helper.continueChainAsSubject(principal, request, response, chain);
     return true;
   }
 
@@ -83,7 +89,7 @@ public class ServiceTunnelAccessTokenAuthenticator implements IAuthenticator {
   }
 
   /**
-   * Configuration for {@link ServiceTunnelAccessTokenAuthenticator}.
+   * Configuration for {@link ServiceTunnelAccessTokenAccessController}.
    */
   public static class ServiceTunnelAccessTokenAuthConfig {
 

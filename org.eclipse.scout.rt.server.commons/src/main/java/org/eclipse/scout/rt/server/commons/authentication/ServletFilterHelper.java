@@ -71,7 +71,7 @@ public class ServletFilterHelper {
    *
    * @see HttpServletRequest#getRemoteUser()
    */
-  public boolean isRunningWithinSubject(HttpServletRequest req) {
+  public boolean isRunningWithValidSubject(HttpServletRequest req) {
     String username = req.getRemoteUser();
     if (username == null || username.isEmpty()) {
       return false;

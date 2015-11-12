@@ -107,7 +107,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       final HttpServletRequest servletRequest = Assertions.assertNotNull((HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST), "ServletRequest must not be null");
 
       // Check whether already running within Subject (e.g. authenticated by EE container).
-      if (BEANS.get(ServletFilterHelper.class).isRunningWithinSubject(servletRequest)) {
+      if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(servletRequest)) {
         MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(Subject.getSubject(AccessController.getContext())));
         return true;
       }

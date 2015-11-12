@@ -12,70 +12,65 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * Checks whether the user is already authenticated, or if the request has valid auth info, or if the request path is
- * excluded from authentication checks.
+ * Access controller to fast-check user's access to requested resources.
  * <p>
- * <p>
- * If a subject is already set as {@link Subject#getSubject(java.security.AccessControlContext)} then the filter is
- * transparent. Otherwise {@link HttpServletRequest#getRemoteUser()} or {@link HttpServletRequest#getUserPrincipal()} is
- * checked.
- * <p>
- * <h2>init-params</h2>
+ * This access controller continues chain if one of the following criteria applies:
  * <ul>
- * <li>filter-exclude: resource paths (with wildcard '*') that are excluded from this filter, comma, newline or
- * whitespace separated</li>
+ * <li>if running within a {@link Subject} that contains the principal as set in
+ * {@link HttpServletRequest#getRemoteUser()};</li>
+ * <li>if {@link HttpServletRequest#getRemoteUser()} or {@link HttpServletRequest#getUserPrincipal()} is set;</li>
+ * <li>if a {@link HttpSession} exists with a {@link Principal} set in
+ * {@link ServletFilterHelper#SESSION_ATTRIBUTE_FOR_PRINCIPAL};</li>
+ * <li>if the request path is subject for exclusion;
  * </ul>
- * <p>
- * POST requests with json message are responded with a json timeout message
- * <p>
- * access to path "" is redirected using "/"
+ * Also, any request to "" is redirected to "/".
  *
- * @since 5.0
+ * @since 5.1
  */
-@Bean
-public class TrivialAuthenticator implements IAuthenticator {
+public class TrivialAccessController implements IAccessController {
 
   private TrivialAuthConfig m_config;
 
-  public void init(final TrivialAuthConfig config) throws ServletException {
+  public TrivialAccessController init(final TrivialAuthConfig config) throws ServletException {
     m_config = config;
+    return this;
   }
 
   @Override
-  public boolean handle(final HttpServletRequest req, final HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
+  public boolean handle(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
     if (!m_config.isEnabled()) {
       return false;
     }
 
-    // within subject?
-    if (BEANS.get(ServletFilterHelper.class).isRunningWithinSubject(req)) {
-      chain.doFilter(req, resp);
+    // running within a valid subject?
+    if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(request)) {
+      chain.doFilter(request, response);
       return true;
     }
 
-    // already authenticated?
-    final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(req, m_config.getPrincipalProducer());
+    // is already authenticated?
+    final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
     if (principal != null) {
-      BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, req, resp, chain);
+      BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
       return true;
     }
 
-    // excluded path
-    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(req.getServletPath()) + StringUtility.emptyIfNull(req.getPathInfo()))) {
-      chain.doFilter(req, resp);
+    // is excluded path?
+    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
+      chain.doFilter(request, response);
       return true;
     }
 
     // this is a copy from UiServlet.doGet
-    final String contextPath = req.getServletContext().getContextPath();
-    if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
-      resp.sendRedirect(req.getRequestURI() + "/");
+    final String contextPath = request.getServletContext().getContextPath();
+    if (StringUtility.hasText(contextPath) && request.getRequestURI().endsWith(contextPath)) {
+      response.sendRedirect(request.getRequestURI() + "/");
       return true;
     }
 
@@ -88,7 +83,7 @@ public class TrivialAuthenticator implements IAuthenticator {
   }
 
   /**
-   * Configuration for {@link TrivialAuthenticator}.
+   * Configuration for {@link TrivialAccessController}.
    */
   public static class TrivialAuthConfig {
 

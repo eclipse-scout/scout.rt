@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.commons.authentication.SecureHttpServletRequestWrapper;
-import org.eclipse.scout.rt.server.commons.authentication.TrivialAuthenticator;
+import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController;
 
 /**
  * Transformation filter used to create a subject based on {@link HttpServletRequest#getRemoteUser()} or
@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.server.commons.authentication.TrivialAuthenticator;
  * active flag set to true
  *
  * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
- *             authenticators chained yourself; use {@link TrivialAuthenticator} instead.
+ *             authenticators chained yourself; use {@link TrivialAccessController} instead.
  */
 @Deprecated
 public class HttpAuthJaasFilter implements Filter {
