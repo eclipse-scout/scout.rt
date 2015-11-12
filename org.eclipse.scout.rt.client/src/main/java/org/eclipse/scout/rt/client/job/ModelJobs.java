@@ -27,13 +27,13 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 
 /**
- * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a {@link ClientRunContext}
- * and are executed in sequence among the same session. Such jobs are called model jobs with the characteristics that
- * only one model job is active at any given time for the same session. Model jobs are used to interact with the client
- * model to read and write model values. This class is for convenience purpose to facilitate the creation and scheduling
- * of model jobs.
+ * Helper class to schedule jobs that run on behalf of a {@link ClientRunContext} and are executed in sequence among the
+ * same session. Such jobs are called model jobs with the characteristics that only one model job is active at any given
+ * time for the same session. Model jobs are used to interact with the client model to read and write model values. This
+ * class is for convenience purpose to facilitate the creation and scheduling of model jobs.
  * <p>
- * <strong>By definition, a <code>ModelJob</code> requires a <code>ClientSession</code>.</strong>
+ * <strong>By definition, a <code>ModelJob</code> requires a {@link ClientRunContext} and {@link IClientSession} to be
+ * set as its mutex object. That causes all jobs with that session as their mutex-object to be run in sequence.</strong>
  * </p>
  * The following code snippet illustrates what happens behind the scene:
  *

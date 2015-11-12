@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,28 +27,31 @@ import org.junit.runner.RunWith;
 public class ServerJobInputValidatorTest {
 
   @Test
-  public void test1() {
+  public void test() {
     new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(mock(IServerSession.class))));
+    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(null)));
+    new ServerJobInputValidator().validate(new JobInput().withMutex(new Object()).withRunContext(ServerRunContexts.empty()));
+    new ServerJobInputValidator().validate(new JobInput().withMutex(mock(IServerSession.class)).withRunContext(ServerRunContexts.empty()));
     assertTrue(true);
   }
 
   @Test(expected = AssertionException.class)
   public void testNullServerRunContext() {
-    new ServerJobInputValidator().validate(new JobInput());
+    new ServerJobInputValidator().validate(new JobInput().withRunContext(null));
   }
 
   @Test(expected = AssertionException.class)
-  public void testWrongRunContext() {
+  public void testWrongRunContextType() {
     new ServerJobInputValidator().validate(new JobInput().withRunContext(RunContexts.empty()));
   }
 
   @Test(expected = AssertionException.class)
-  public void testNullServerSession1() {
-    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty()));
+  public void testWrongTxScope1() {
+    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withTransactionScope(TransactionScope.MANDATORY)));
   }
 
   @Test(expected = AssertionException.class)
-  public void testNullServerSession2() {
-    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(null)));
+  public void testWrongTxScope2() {
+    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withTransactionScope(TransactionScope.REQUIRED)));
   }
 }

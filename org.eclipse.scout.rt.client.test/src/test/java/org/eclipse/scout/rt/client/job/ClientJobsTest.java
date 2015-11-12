@@ -135,10 +135,11 @@ public class ClientJobsTest {
     assertFalse(ModelJobs.isModelJob(actualFutureHolder.getValue()));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testScheduleWithoutInputWithoutSession() {
     ISession.CURRENT.set(null);
     ClientJobs.schedule(mock(IRunnable.class));
+    assertTrue(true); // it is valid to run a client job without session
   }
 
   @Test

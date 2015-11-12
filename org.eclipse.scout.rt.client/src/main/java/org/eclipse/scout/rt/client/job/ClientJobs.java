@@ -25,11 +25,10 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
- * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a
- * <code>ClientRunContext</code>. Such jobs are called client jobs. This class is for convenience purpose to facilitate
- * the creation and scheduling of client jobs.
+ * Helper class to schedule jobs that run on behalf of a {@link ClientRunContext}. Such jobs are called client jobs.
+ * This class is for convenience purpose to facilitate the creation and scheduling of client jobs.
  * <p>
- * <strong>By definition, a <code>ClientJob</code> requires a <code>ClientSession</code>.</strong>
+ * <strong>By definition, a <code>ClientJob</code> requires a {@link ClientRunContext}.</strong>
  * </p>
  * The following code snippet illustrates what happens behind the scene:
  *

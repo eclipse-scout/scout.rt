@@ -26,34 +26,21 @@ import org.junit.runner.RunWith;
 public class ClientJobInputValidatorTest {
 
   @Test
-  public void test1() {
+  public void test() {
     new ClientJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty().withSession(mock(IClientSession.class), true)));
-    new ClientJobInputValidator().validate(new JobInput().withMutex(new Object()).withRunContext(ClientRunContexts.empty().withSession(mock(IClientSession.class), true)));
+    new ClientJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty().withSession(null, false)));
+    new ClientJobInputValidator().validate(new JobInput().withMutex(new Object()).withRunContext(ClientRunContexts.empty()));
+    new ClientJobInputValidator().validate(new JobInput().withMutex(mock(IClientSession.class)).withRunContext(ClientRunContexts.empty()));
     assertTrue(true);
   }
 
   @Test(expected = AssertionException.class)
   public void testNullClientRunContext() {
-    new ClientJobInputValidator().validate(new JobInput());
+    new ClientJobInputValidator().validate(new JobInput().withRunContext(null));
   }
 
   @Test(expected = AssertionException.class)
-  public void testWrongRunContext() {
+  public void testWrongRunContextType() {
     new ClientJobInputValidator().validate(new JobInput().withRunContext(RunContexts.empty()));
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testSessionMutex() {
-    new ClientJobInputValidator().validate(new JobInput().withMutex(mock(IClientSession.class)).withRunContext(ClientRunContexts.empty().withSession(mock(IClientSession.class), true)));
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testNullClientSession1() {
-    new ClientJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty()));
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testNullClientSession2() {
-    new ClientJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty().withSession(null, true)));
   }
 }

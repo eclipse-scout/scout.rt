@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.job;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -20,8 +19,6 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * Validator for {@link JobInput} used for model jobs.
  *
  * @since 5.1
- * @see JobInput
- * @see ClientRunContext
  */
 @ApplicationScoped
 public class ModelJobInputValidator {
@@ -30,14 +27,9 @@ public class ModelJobInputValidator {
    * Validates the given {@link JobInput} and {@link ClientRunContext}.
    */
   public void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "For model jobs, 'JobInput' must not be null");
-    Assertions.assertNotNull(input.getRunContext(), "For model jobs, 'RunContext' must not be null");
-    Assertions.assertTrue(input.getRunContext() instanceof ClientRunContext, "For model jobs, 'RunContext' must be of the type 'ClientRunContext'");
-
-    final IClientSession clientSession = ((ClientRunContext) input.getRunContext()).getSession();
-    Assertions.assertNotNull(clientSession, "For model jobs, 'clientSession' must not be null");
-    Assertions.assertSame(clientSession, input.getMutex(), "For model jobs, mutex object must be the 'clientSession'");
-
-    Assertions.assertNotNull(input.getRunContext().getRunMonitor(), "For model jobs, 'RunMonitor' on 'RunContext' must not be null");
+    Assertions.assertNotNull(input, "ModelJob requires a 'JobInput'");
+    Assertions.assertTrue(input.getRunContext() instanceof ClientRunContext, "ModelJob requires a 'ClientRunContext'");
+    Assertions.assertNotNull(((ClientRunContext) input.getRunContext()).getSession(), "ModelJob requires a session");
+    Assertions.assertSame(((ClientRunContext) input.getRunContext()).getSession(), input.getMutex(), "ModelJob requires the session as mutex object");
   }
 }

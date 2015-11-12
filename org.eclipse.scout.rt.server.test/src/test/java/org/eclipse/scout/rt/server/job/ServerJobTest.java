@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -46,7 +45,7 @@ public class ServerJobTest {
     ISession.CURRENT.remove();
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testNoSession() {
     ISession.CURRENT.remove();
     ServerJobs.schedule(new IRunnable() {
@@ -55,6 +54,8 @@ public class ServerJobTest {
       public void run() throws Exception {
       }
     }).awaitDoneAndGet();
+
+    assertTrue(true); // it is valid to run a client job without session
   }
 
   @Test

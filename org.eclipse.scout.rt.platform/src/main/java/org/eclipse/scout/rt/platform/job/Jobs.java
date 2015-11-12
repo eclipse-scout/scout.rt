@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 
 /**
- * Factory and utility methods for {@link IJobManager} to schedule jobs that optionally run on behalf of a
- * {@link RunContext}. This class is for convenience purpose to facilitate the creation and scheduling of jobs.
+ * Helper class to schedule jobs that optionally run on behalf of a {@link RunContext}. This class is for convenience
+ * purpose to facilitate the creation and scheduling of jobs.
  * <p/>
  * The following code snippet illustrates what happens behind the scene:
  *
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
  *   final RunContext runContext = RunContexts.copyCurrent().withSubject(...).withLocale(Locale.US);
  *   </i>
  *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
- * 
+ *
  *     &#064;Override
  *     public void run() throws Exception {
  *       if (runContext == null) {
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
  *       }
  *       else {
  *         runContext.run(new IRunnable() {
- * 
+ *
  *           &#064;Override
  *           public void run() throws Exception {
  *             // do some work
@@ -116,7 +116,7 @@ public final class Jobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), Jobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), input);
   }
 
   /**
@@ -137,7 +137,7 @@ public final class Jobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(callable, Jobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(callable, input);
   }
 
   /**
@@ -210,7 +210,7 @@ public final class Jobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), delay, delayUnit, Jobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), delay, delayUnit, input);
   }
 
   /**
@@ -235,7 +235,7 @@ public final class Jobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(callable, delay, delayUnit, Jobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(callable, delay, delayUnit, input);
   }
 
   /**
@@ -260,7 +260,7 @@ public final class Jobs {
    * @see IJobManager#scheduleAtFixedRate(IRunnable, long, long, TimeUnit, JobInput)
    */
   public static IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final JobInput input) {
-    return BEANS.get(IJobManager.class).scheduleAtFixedRate(runnable, initialDelay, period, unit, Jobs.validateInput(input));
+    return BEANS.get(IJobManager.class).scheduleAtFixedRate(runnable, initialDelay, period, unit, input);
   }
 
   /**
@@ -284,7 +284,7 @@ public final class Jobs {
    * @see IJobManager#scheduleWithFixedDelay(IRunnable, long, long, TimeUnit, JobInput)
    */
   public static IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final JobInput input) {
-    return BEANS.get(IJobManager.class).scheduleWithFixedDelay(runnable, initialDelay, delay, unit, Jobs.validateInput(input));
+    return BEANS.get(IJobManager.class).scheduleWithFixedDelay(runnable, initialDelay, delay, unit, input);
   }
 
   /**
@@ -305,10 +305,10 @@ public final class Jobs {
    * <code>
    * // to create a "snapshot" of the current calling state
    * RunContexts.copyCurrent();
-   * 
+   *
    * // to create a "snapshot" of the current calling state, but with some values changed
    * RunContexts.copyCurrent().withSubject(...).withLocale(Locale.US)
-   * 
+   *
    * // to create an empty context with no values set
    * RunContexts.empty();
    * </code>
@@ -332,13 +332,5 @@ public final class Jobs {
    */
   public static JobEventFilters.Filter newEventFilter() {
     return new JobEventFilters.Filter();
-  }
-
-  /**
-   * Validates the given {@link JobInput} and {@link RunContext}.
-   */
-  private static JobInput validateInput(final JobInput input) {
-    BEANS.get(JobInputValidator.class).validate(input);
-    return input;
   }
 }

@@ -14,13 +14,12 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * Validator for {@link JobInput} used for server jobs.
  *
  * @since 5.1
- * @see JobInput
- * @see ServerRunContext
  */
 @ApplicationScoped
 public class ServerJobInputValidator {
@@ -29,13 +28,8 @@ public class ServerJobInputValidator {
    * Validates the given {@link JobInput} and {@link ServerRunContext}.
    */
   public void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "For server jobs, 'JobInput' must not be null");
-    Assertions.assertNotNull(input.getRunContext(), "For server jobs, 'RunContext' must not be null");
-    Assertions.assertTrue(input.getRunContext() instanceof ServerRunContext, "For server jobs, 'RunContext' must be of the type 'ServerRunContext'");
-
-    final ServerRunContext serverRunContext = (ServerRunContext) input.getRunContext();
-    Assertions.assertNotNull(serverRunContext.getSession(), "For server jobs, 'serverSession' must not be null");
-
-    Assertions.assertNotNull(input.getRunContext().getRunMonitor(), "For server jobs, 'RunMonitor' on 'RunContext' must not be null");
+    Assertions.assertNotNull(input, "ServerJob requires a 'JobInput'");
+    Assertions.assertTrue(input.getRunContext() instanceof ServerRunContext, "ServerJob requires a 'ServerRunContext'");
+    Assertions.assertEqual(TransactionScope.REQUIRES_NEW, ((ServerRunContext) input.getRunContext()).getTransactionScope(), "ServerJob requires the transaction scope 'REQUIRES_NEW'");
   }
 }

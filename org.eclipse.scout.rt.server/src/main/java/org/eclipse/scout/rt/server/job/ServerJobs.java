@@ -25,12 +25,11 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
- * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a
- * <code>ServerRunContext</code>. Such jobs are called server jobs. This class is for convenience purpose to facilitate
- * the creation and scheduling of server jobs.
+ * Helper class to schedule jobs that run on behalf of a {@link ServerRunContext}. Such jobs are called server jobs.
+ * This class is for convenience purpose to facilitate the creation and scheduling of server jobs.
  * <p/>
- * <strong>By definition, a <code>ServerJob</code> requires a <code>ServerSession</code> and is run within a new
- * transaction. Other transaction scopes than {@link TransactionScope#REQUIRES_NEW} are not supported.</strong>
+ * <strong>By definition, a <code>ServerJob</code> requires a {@link ServerRunContext} with transaction scope
+ * {@link TransactionScope#REQUIRES_NEW}.</strong>
  * <p/>
  * The following code snippet illustrates what happens behind the scene:
  *
@@ -40,11 +39,11 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  *   final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent().withSession(session).withLocale(Locale.US);
  *   </i>
  *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
- * 
+ *
  *       &#064;Override
  *       public void run() throws Exception {
  *         serverRunContext.run(new IRunnable() {
- * 
+ *
  *           &#064;Override
  *           public void run() throws Exception {
  *             // do some work
@@ -317,10 +316,10 @@ public final class ServerJobs {
    * <code>
    * // to create a "snapshot" of the current calling state
    * ServerRunContexts.copyCurrent();
-   * 
+   *
    * // to create a "snapshot" of the current calling state, but with some values changed
    * ServerRunContexts.copyCurrent().withSession(...).withSubject(...).withLocale(Locale.US)
-   * 
+   *
    * // to create an empty context with no values set
    * ServerRunContexts.empty();
    * </code>

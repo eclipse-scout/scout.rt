@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -41,32 +42,27 @@ public class ModelJobInputValidatorTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testNullClientRunContext() {
-    new ModelJobInputValidator().validate(new JobInput());
+  public void testNullRunContext() {
+    new ModelJobInputValidator().validate(new JobInput().withMutex(m_clientSession).withRunContext(null));
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongRunContext() {
-    new ModelJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty()));
+    new ModelJobInputValidator().validate(new JobInput().withMutex(m_clientSession).withRunContext(RunContexts.empty()));
   }
 
   @Test(expected = AssertionException.class)
-  public void testNullSession() {
-    new ModelJobInputValidator().validate(new JobInput().withMutex(null).withRunContext(ClientRunContexts.empty().withSession(null, true)));
+  public void testNullMutex() {
+    new ModelJobInputValidator().validate(new JobInput().withMutex(null).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, false)));
   }
 
   @Test(expected = AssertionException.class)
-  public void testWrongMutex() {
+  public void testWrongMutexType() {
     new ModelJobInputValidator().validate(new JobInput().withMutex(new Object()).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
   }
 
   @Test(expected = AssertionException.class)
-  public void testNullClientSession1() {
-    new ModelJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty()));
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testNullClientSession2() {
-    new ModelJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty().withSession(null, true)));
+  public void testNullClientSession() {
+    new ModelJobInputValidator().validate(new JobInput().withMutex(m_clientSession).withRunContext(ClientRunContexts.empty().withSession(null, false)));
   }
 }
