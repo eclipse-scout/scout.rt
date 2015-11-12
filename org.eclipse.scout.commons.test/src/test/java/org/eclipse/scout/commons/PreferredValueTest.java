@@ -25,48 +25,64 @@ public class PreferredValueTest {
 
   @Test
   public void test() {
-    PreferredValue<Object> preferredValue = new PreferredValue<Object>(null, false);
+    PreferredValue<Object> preferredValue = new PreferredValue<>(null, false);
     assertNull(preferredValue.get());
-    assertFalse(preferredValue.isPreferred());
+    assertFalse(preferredValue.isPreferredValue());
 
     preferredValue.set(OBJECT_1, false);
     assertSame(OBJECT_1, preferredValue.get());
-    assertFalse(preferredValue.isPreferred());
+    assertFalse(preferredValue.isPreferredValue());
 
     preferredValue.set(OBJECT_2, false);
     assertSame(OBJECT_2, preferredValue.get());
-    assertFalse(preferredValue.isPreferred());
+    assertFalse(preferredValue.isPreferredValue());
 
     preferredValue.set(OBJECT_3, true);
     assertSame(OBJECT_3, preferredValue.get());
-    assertTrue(preferredValue.isPreferred());
+    assertTrue(preferredValue.isPreferredValue());
 
     preferredValue.set(OBJECT_1, false);
     assertSame(OBJECT_3, preferredValue.get());
-    assertTrue(preferredValue.isPreferred());
+    assertTrue(preferredValue.isPreferredValue());
 
     preferredValue.set(OBJECT_2, true);
     assertSame(OBJECT_2, preferredValue.get());
-    assertTrue(preferredValue.isPreferred());
+    assertTrue(preferredValue.isPreferredValue());
+  }
+
+  @Test
+  public void testMarkAsPreferredValue() {
+    PreferredValue<Object> preferredValue = new PreferredValue<>(null, false);
+    preferredValue.set(OBJECT_1, false);
+    assertFalse(preferredValue.isPreferredValue());
+    assertSame(OBJECT_1, preferredValue.get());
+
+    preferredValue.markAsPreferredValue();
+    assertTrue(preferredValue.isPreferredValue());
+    assertSame(OBJECT_1, preferredValue.get());
+
+    preferredValue.set(OBJECT_2, false);
+    assertTrue(preferredValue.isPreferredValue());
+    assertSame(OBJECT_1, preferredValue.get());
   }
 
   @Test
   public void testCopy() {
-    PreferredValue<Object> preferredValue = new PreferredValue<Object>(OBJECT_1, false);
+    PreferredValue<Object> preferredValue = new PreferredValue<>(OBJECT_1, false);
     assertSame(OBJECT_1, preferredValue.get());
-    assertFalse(preferredValue.isPreferred());
+    assertFalse(preferredValue.isPreferredValue());
 
     PreferredValue<Object> copy = preferredValue.copy();
     copy.set(OBJECT_2, false);
     assertSame(OBJECT_1, preferredValue.get());
-    assertFalse(preferredValue.isPreferred());
+    assertFalse(preferredValue.isPreferredValue());
     assertSame(OBJECT_2, copy.get());
-    assertFalse(copy.isPreferred());
+    assertFalse(copy.isPreferredValue());
 
     copy.set(OBJECT_3, true);
     assertSame(OBJECT_1, preferredValue.get());
-    assertFalse(preferredValue.isPreferred());
+    assertFalse(preferredValue.isPreferredValue());
     assertSame(OBJECT_3, copy.get());
-    assertTrue(copy.isPreferred());
+    assertTrue(copy.isPreferredValue());
   }
 }

@@ -2746,6 +2746,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     displayParent = Assertions.assertNotNull(displayParent, "'displayParent' must not be null");
 
     if (m_displayParent.get() == displayParent) {
+      m_displayParent.markAsPreferredValue();
       return;
     }
 

@@ -58,8 +58,16 @@ public class PreferredValue<VALUE> {
   /**
    * @return <code>true</code> if the current value is marked as preferred value.
    */
-  public boolean isPreferred() {
+  public boolean isPreferredValue() {
     return m_preferred;
+  }
+
+  /**
+   * Marks the current value as a preferred value, meaning that it is not overwritten when setting a non-preferred
+   * value.
+   */
+  public void markAsPreferredValue() {
+    m_preferred = true;
   }
 
   /**
