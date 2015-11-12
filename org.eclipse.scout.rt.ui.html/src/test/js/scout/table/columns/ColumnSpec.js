@@ -325,6 +325,10 @@ describe("Column", function() {
 
     describe("barChart", function() {
       it("does not overwrite existing background color", function() {
+        if (!scout.device.supportsCssGradient()) {
+          // PhantomJs does not support gradients
+          return;
+        }
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
         model.rows[1].cells[0].backgroundColor = 'ff0000';
         var table = helper.createTable(model);
@@ -353,9 +357,16 @@ describe("Column", function() {
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
         expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
 
-        table.setColumnBackgroundEffect(column0, 'barChart');
-        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgba(0, 0, 0, 0)');
-        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+        table.setColumnBackgroundEffect(column0, 'colorGradient2');
+        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel0);
+
+        if (scout.device.supportsCssGradient()) {
+          table.setColumnBackgroundEffect(column0, 'barChart');
+          expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgba(0, 0, 0, 0)');
+          expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+        }
 
         // set to null: no effect
         table.setColumnBackgroundEffect(column0, null);

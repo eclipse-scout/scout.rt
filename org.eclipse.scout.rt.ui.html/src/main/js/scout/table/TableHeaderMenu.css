@@ -230,6 +230,8 @@
 
   &.color-red {
     background-image: linear-gradient(to right, @palette-red-2, @palette-green-2);
+    /* Color used as fallback if browser does not support gradients (ie 9) */
+    background-color: @palette-red-2;
     border: 0;
   }
 
@@ -238,6 +240,8 @@
   }
   &.color-green {
     background-image: linear-gradient(to right, @palette-green-2, @palette-red-2);
+    /* Color used as fallback if browser does not support gradients (ie 9) */
+    background-color: @palette-green-2;
     border: 0;
   }
 

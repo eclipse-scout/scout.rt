@@ -220,6 +220,13 @@ scout.Device.prototype.supportsCssAnimation = function() {
   return this.supportsCssProperty('animation');
 };
 
+scout.Device.prototype.supportsCssGradient = function() {
+  var testValue = 'linear-gradient(to left, #000 0%, #000 50%, transparent 50%, transparent 100% )';
+  return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, function(actualValue) {
+    return (actualValue + '').indexOf('gradient') > 0;
+  }));
+};
+
 scout.Device.prototype.supportsCssUserSelect = function() {
   return this.supportsCssProperty('userSelect');
 };
@@ -261,6 +268,30 @@ scout.Device.prototype.supportsCssProperty = function(property) {
     }
     return false;
   });
+};
+
+scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
+  // Check if property is supported at all, otherwise div.style[property] would just add it and checkFunc would always return true
+  if (document.body.style[property] === undefined) {
+    return false;
+  }
+  var div = document.createElement('div');
+  div.style[property] = value;
+  if (checkFunc(div.style[property])) {
+    return true;
+  }
+
+  property = property.charAt(0).toUpperCase() + property.slice(1);
+  for (var i = 0; i < scout.Device.vendorPrefixes.length; i++) {
+    var vendorProperty = scout.Device.vendorPrefixes[i] + property;
+    if (document.body.style[vendorProperty] !== undefined) {
+      div.style[vendorProperty] = value;
+      if (checkFunc(div.style[vendorProperty])) {
+        return true;
+      }
+    }
+  }
+  return false;
 };
 
 /**

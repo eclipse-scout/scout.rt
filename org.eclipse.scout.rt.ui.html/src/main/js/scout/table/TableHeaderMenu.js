@@ -382,10 +382,12 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
     .data('label', this.session.text('ui.fromGreenToRed'))
     .click(this.remove.bind(this))
     .click(onGreenColorClick);
-  this.$coloring.appendDiv('table-header-menu-command color-bar')
-    .data('label', this.session.text('ui.withBarGraph'))
-    .click(this.remove.bind(this))
-    .click(onBarColorClick);
+  if (scout.device.supportsCssGradient()) {
+    this.$coloring.appendDiv('table-header-menu-command color-bar')
+      .data('label', this.session.text('ui.withBarGraph'))
+      .click(this.remove.bind(this))
+      .click(onBarColorClick);
+  }
   this.$coloring.appendDiv('table-header-menu-command color-remove')
     .data('label', this.session.text('ui.remove'))
     .click(this.remove.bind(this))
@@ -486,11 +488,11 @@ scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
     $tableHeaderContainer = this.tableHeader.$container;
 
   this.$container.setVisible(true);
-  containerBounds = scout.graphics.offsetBounds(this.$container),
+  containerBounds = scout.graphics.offsetBounds(this.$container);
 
-    // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
-    // check left side of the header item (necessary if header item is moved outside on the left side of the table)
-    inView = isLocationInView(new scout.Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
+  // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
+  // check left side of the header item (necessary if header item is moved outside on the left side of the table)
+  inView = isLocationInView(new scout.Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
   if (!inView) {
     // if left side of the header is not in view, check if right side of the header and the menu, both must be visible)
     // check right side of the header item (necessary if header item is moved outside on the right side of the table)
