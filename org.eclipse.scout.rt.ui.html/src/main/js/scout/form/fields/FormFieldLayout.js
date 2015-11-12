@@ -70,16 +70,15 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (this._isStatusVisible()) {
     formField.$status
       .cssRight(right)
-      .cssWidth(statusWidth)
-      .cssHeight(this.rowHeight);
+      .cssWidth(statusWidth);
     // If both status and label position is "top", pull status up (without margin on the right side)
     if (formField.statusPosition === scout.FormField.STATUS_POSITION_TOP && labelHasFieldWidth) {
-      // Calculate distance from top border to label line
-      var h = formField.$label.outerHeight(false);
-      // Vertically center status between lines
-      var statusTop = containerPadding.top + Math.floor(h / 2) - (this.rowHeight / 2);
+      var statusHeight = scout.graphics.prefSize(formField.$status).height;
+      // Vertically center status with label
+      var statusTop = containerPadding.top + (formField.$label.height() / 2) - (statusHeight / 2);
       formField.$status
-        .cssTop(statusTop);
+        .cssTop(statusTop)
+        .cssHeight(statusHeight);
       // Add padding to label to prevent overlay of text and status icon
       var w = scout.graphics.getSize(formField.$status, true).width;
       formField.$label.css('padding-right', w + 'px');
@@ -87,6 +86,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       // Default status position
       formField.$status
         .cssTop(top)
+        .cssHeight(this.rowHeight)
         .cssLineHeight(this.rowHeight);
       right += statusWidth + formField.$status.cssMarginX();
     }
