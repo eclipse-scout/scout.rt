@@ -192,7 +192,6 @@
 }
 
 .table-cell-icon {
-
   .font-icon& {
     color: @icon-color;
 
@@ -231,6 +230,26 @@
   &.selection > .table-cell-icon {
     color: @table-aggregate-cell-selection-color;
   }
+}
+
+.column-background-effect-bar-chart {
+  background-color: @column-background-effect-bar-chart-background-color;
+}
+
+.column-background-effect-gradient1-start {
+  background-color: @column-background-effect-gradient1-start-background-color;
+}
+
+.column-background-effect-gradient1-end {
+  background-color: @column-background-effect-gradient1-end-background-color;
+}
+
+.column-background-effect-gradient2-start {
+  background-color: @column-background-effect-gradient2-start-background-color;
+}
+
+.column-background-effect-gradient2-end {
+  background-color: @column-background-effect-gradient2-end-background-color;
 }
 
 /* key box */

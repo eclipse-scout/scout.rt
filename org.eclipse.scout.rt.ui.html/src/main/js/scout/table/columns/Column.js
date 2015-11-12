@@ -368,23 +368,29 @@ scout.Column.prototype.calculateMinMaxValues = function() {
 };
 
 scout.Column.prototype._colorGradient1 = function(value) {
-  var level = (value - this.minValue) / (this.maxValue - this.minValue);
+  var startStyle = scout.styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
+    endStyle = scout.styles.get('column-background-effect-gradient1-end', 'backgroundColor'),
+    startColor = scout.styles.rgb(startStyle.backgroundColor),
+    endColor = scout.styles.rgb(endStyle.backgroundColor);
 
-  var r = Math.ceil(255 - level * (255 - 171)),
-    g = Math.ceil(175 - level * (175 - 214)),
-    b = Math.ceil(175 - level * (175 - 147));
-
-  return {
-    backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
-  };
+  return this._colorGradient(value, startColor, endColor);
 };
 
 scout.Column.prototype._colorGradient2 = function(value) {
+  var startStyle = scout.styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
+    endStyle = scout.styles.get('column-background-effect-gradient2-end', 'backgroundColor'),
+    startColor = scout.styles.rgb(startStyle.backgroundColor),
+    endColor = scout.styles.rgb(endStyle.backgroundColor);
+
+  return this._colorGradient(value, startColor, endColor);
+};
+
+scout.Column.prototype._colorGradient = function(value, startColor, endColor) {
   var level = (value - this.minValue) / (this.maxValue - this.minValue);
 
-  var r = Math.ceil(171 - level * (171 - 255)),
-    g = Math.ceil(214 - level * (214 - 175)),
-    b = Math.ceil(147 - level * (147 - 175));
+  var r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
+    g = Math.ceil(startColor.green - level * (startColor.green - endColor.green)),
+    b = Math.ceil(startColor.blue - level * (startColor.blue - endColor.blue));
 
   return {
     backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
@@ -393,8 +399,8 @@ scout.Column.prototype._colorGradient2 = function(value) {
 
 scout.Column.prototype._barChart = function(value) {
   var level = Math.ceil((value - this.minValue) / (this.maxValue - this.minValue) * 100) + '';
-
+  var color = scout.styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
   return {
-    backgroundImage: 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )'
+    backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
   };
 };

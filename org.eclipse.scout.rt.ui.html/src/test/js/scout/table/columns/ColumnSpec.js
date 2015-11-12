@@ -27,7 +27,6 @@ describe("Column", function() {
     jasmine.clock().uninstall();
   });
 
-
   /**
    * Test assumes that default values for horiz. alignment are set on cell object.
    */
@@ -229,11 +228,36 @@ describe("Column", function() {
   });
 
   describe("background effect", function() {
-    var rgbLevel0= 'rgb(255, 175, 175)';
+    var rgbLevel0 = 'rgb(255, 175, 175)';
     var rgbLevel50 = 'rgb(213, 195, 161)';
     var rgbLevel100 = 'rgb(171, 214, 147)';
-    var imageLevel50 = 'linear-gradient(to left, rgb(128, 193, 208) 0%, rgb(128, 193, 208) 50%, transparent 50%, transparent 100%)';
+    var barChartColor = 'rgb(128, 193, 208)';
+    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, transparent 50%, transparent 100%)';
     var defaultBackgroundColor;
+
+    scout.styles.get = function style(cssClass) {
+      if (cssClass === 'column-background-effect-gradient1-start') {
+        return {
+          backgroundColor: rgbLevel0
+        };
+      } else if (cssClass === 'column-background-effect-gradient1-end') {
+        return {
+          backgroundColor: rgbLevel100
+        };
+      } else if (cssClass === 'column-background-effect-gradient2-start') {
+        return {
+          backgroundColor: rgbLevel100
+        };
+      } else if (cssClass === 'column-background-effect-gradient2-end') {
+        return {
+          backgroundColor: rgbLevel0
+        };
+      } else if (cssClass === 'column-background-effect-bar-chart') {
+        return {
+          backgroundColor: barChartColor
+        };
+      }
+    };
 
     beforeEach(function() {
       var $div = $('<div>').appendTo(session.$entryPoint);

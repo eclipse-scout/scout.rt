@@ -42,6 +42,7 @@ __include("scout/util/objects.js");
 __include("scout/util/polyfills.js");
 __include("scout/util/status.js");
 __include("scout/util/strings.js");
+__include("scout/util/styles.js");
 __include("scout/util/URL.js");
 __include("scout/util/GlassPaneRenderer.js");
 __include("scout/util/filters.js");

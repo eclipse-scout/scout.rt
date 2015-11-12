@@ -229,28 +229,25 @@
   }
 
   &.color-red {
-    background-image: linear-gradient(to right, @palette-red-2, @palette-green-2);
+    background-image: linear-gradient(to right, @column-background-effect-gradient1-start-background-color, @column-background-effect-gradient1-end-background-color);
     /* Color used as fallback if browser does not support gradients (ie 9) */
-    background-color: @palette-red-2;
-    border: 0;
+    background-color: @column-background-effect-gradient1-start-background-color;
   }
 
   &.color-green::after {
     content: @icon-nbsp;
   }
   &.color-green {
-    background-image: linear-gradient(to right, @palette-green-2, @palette-red-2);
+    background-image: linear-gradient(to right, @column-background-effect-gradient2-start-background-color, @column-background-effect-gradient2-end-background-color);
     /* Color used as fallback if browser does not support gradients (ie 9) */
-    background-color: @palette-green-2;
-    border: 0;
+    background-color: @column-background-effect-gradient2-start-background-color;
   }
 
   &.color-bar::after {
     content: @icon-nbsp;
   }
   &.color-bar {
-    background-image: linear-gradient(to right, @table-header-menu-cmd-active-border-color  0%, @table-header-menu-cmd-active-border-color  65%, @palette-white 65%, @palette-white 100% );
-    border: 1px solid @table-header-menu-cmd-active-border-color ;
+    background-image: linear-gradient(to right, @column-background-effect-bar-chart-background-color 0%, @column-background-effect-bar-chart-background-color  65%, @palette-white 65%, @palette-white 100% );
     width: 43px;
     line-height: 29px;
   }
@@ -260,7 +257,6 @@
   }
   &.color-remove {
     background: @palette-white;
-    border: 1px solid @table-header-menu-cmd-active-border-color;
     width: 43px;
     line-height: 29px;
   }
