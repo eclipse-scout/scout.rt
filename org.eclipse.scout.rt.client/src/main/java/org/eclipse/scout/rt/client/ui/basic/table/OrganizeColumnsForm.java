@@ -11,7 +11,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -1468,15 +1467,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     tableFieldTable.getMenuByClass(RemoveFilterMenu.class).setVisible(isFilterActive);
     tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setEnabled(m_table.getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
     tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisible(m_table.getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
-  }
-
-  @Override
-  public void validateForm() {
-    boolean oneColumnIsVisble = getColumnsTableField().getTable().getCheckedRows().size() > 0;
-
-    if (!oneColumnIsVisble) {
-      throw new VetoException(TEXTS.get("OrganizeTableColumnsMinimalColumnCountMessage"));
-    }
   }
 
   /**
