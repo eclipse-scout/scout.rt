@@ -236,10 +236,11 @@ scout.HtmlComponent.prototype.pack = function() {
 };
 
 /**
- * Checks whether $comp is in the DOM or has been removed or detached.
+ * Checks whether $comp is in the DOM or has been removed or detached.<br>
+ * Also returns false if the $comp does not belong to a window (defaultView) anymore. This may happen if it belonged to a popup window which is now closed
  */
 scout.HtmlComponent.prototype.isAttached = function() {
-  return this.$comp.isAttached();
+  return this.$comp.isAttached() && this.$comp[0].ownerDocument.defaultView;
 };
 
 scout.HtmlComponent.prototype.debug = function() {
