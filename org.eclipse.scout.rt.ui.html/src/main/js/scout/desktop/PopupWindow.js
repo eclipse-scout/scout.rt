@@ -28,7 +28,8 @@ scout.PopupWindow.prototype._onUnload = function() {
 
 scout.PopupWindow.prototype._onReady = function() {
   // set container (used as document-root from callers)
-  var scoutElement = this.myWindow.document.getElementsByClassName('scout')[0];
+  var scoutElement = this.myWindow.document.getElementsByClassName('scout')[0],
+    $myWindow = $(this.myWindow);
   this.$container = $(scoutElement);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SingleLayout());
@@ -37,7 +38,7 @@ scout.PopupWindow.prototype._onReady = function() {
     .on('unload', this._onUnload.bind(this))
     .on('resize', this._onResize.bind(this));
 
-  this.$container.height(600);
+  this.$container.height($myWindow.height());
 
   this.form.render(this.$container);
   this.form.htmlComp.validateLayout();
@@ -56,9 +57,8 @@ scout.PopupWindow.prototype._onResize = function() {
   // store window bounds by class ID
   scout.PopupWindow.storeWindowBounds(this.form, new scout.Rectangle(left, top, width, height));
 
-  var $parent = this.$container.parent();
-  var parentSize = new scout.Dimension($parent.width(), $parent.height());
-  this.htmlComp.setSize(parentSize);
+  var windowSize = new scout.Dimension($myWindow.width(), $myWindow.height());
+  this.htmlComp.setSize(windowSize);
 };
 
 scout.PopupWindow.storeWindowBounds = function(form, bounds) {
