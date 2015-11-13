@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
+import org.json.JSONArray;
 
 public class JsonClipboardField<T extends IClipboardField> extends JsonValueField<T> implements IBinaryResourceConsumer {
 
@@ -43,6 +44,12 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
       @Override
       protected List<String> modelValue() {
         return getModel().getAllowedMimeTypes();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return new JSONArray((List<String>) value); // Do NOT remove the cast! It is required to use the correct constructor.
       }
     });
     putJsonProperty(new JsonProperty<IClipboardField>(IClipboardField.PROP_MAXIMUM_SIZE, model) {
