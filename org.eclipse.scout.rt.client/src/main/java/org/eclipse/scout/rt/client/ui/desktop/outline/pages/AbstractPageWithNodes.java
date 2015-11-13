@@ -307,6 +307,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     IFormFieldContextMenu mainBoxContextMenu = form.getRootGroupBox().getContextMenu();
     List<IMenu> menus = mainBoxContextMenu.getChildActions();
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
+      // TODO [15.1] hmu,bsh: menues im ui sammeln anstelle in forms injecten
+      if (menu instanceof OutlineMenuWrapper) {
+        ((OutlineMenuWrapper) menu).getWrappedMenu().setInheritAccessibility(false);
+      }
       menus.add(new OutlineMenuWrapper(menu, menu.getMenuTypes()));
     }
     if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
