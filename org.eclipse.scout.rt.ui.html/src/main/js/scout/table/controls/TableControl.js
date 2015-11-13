@@ -55,6 +55,7 @@ scout.TableControl.prototype._render = function($parent) {
     classes += this.cssClass + '-table-control';
   }
   this.$container = $parent.appendDiv(classes)
+    .on('mousedown', this._onMouseDown.bind(this))
     .data('control', this);
 };
 
@@ -161,16 +162,6 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
   this._updateTooltip();
 };
 
-scout.TableControl.prototype._renderEnabled = function(enabled) {
-  enabled = scout.helpers.nvl(enabled, this.enabled);
-  if (enabled) {
-    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
-  } else {
-    this.$container.off('mousedown');
-  }
-  this.$container.setEnabled(enabled);
-};
-
 /**
  * Returns true if the table control may be displayed (opened).
  */
@@ -187,6 +178,9 @@ scout.TableControl.prototype.toggle = function() {
 };
 
 scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
+  if (!this.enabled || !this.visible) {
+    return;
+  }
   if (selected === this.selected) {
     return;
   }
