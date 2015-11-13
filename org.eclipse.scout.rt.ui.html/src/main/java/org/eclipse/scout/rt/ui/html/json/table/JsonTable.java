@@ -1060,10 +1060,13 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         break;
       case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED:
         handleModelColumnAggregationChanged(event);
+        break;
       case TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED:
         handleModelColumnBackgroundEffectChanged(event);
+        break;
       case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
         handleModelRequestFocusInCell(event);
+        break;
       default:
         // NOP
     }
