@@ -32,10 +32,7 @@ scout.Outline.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, model.session);
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
-  this.outlineOverview = scout.create('OutlineOverview', {
-    parent: this,
-    outline: this
-  });
+  this._syncDefaultDetailForm(this.defaultDetailForm);
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -310,6 +307,24 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
 scout.Outline.prototype._renderDefaultDetailForm = function() {
   if (!this.inBackground) {
     this._showDefaultDetailForm();
+  }
+};
+
+scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
+  this.defaultDetailForm = defaultDetailForm;
+  if (this.defaultDetailForm) {
+    if (this.outlineOverview) {
+      this.outlineOverview.destroy();
+      this.outlineOverview = null;
+    }
+  } else {
+    if (!this.outlineOverview) {
+      // Create outlineOverview if no defaultDetailForm is available
+      this.outlineOverview = scout.create('OutlineOverview', {
+        parent: this,
+        outline: this
+      });
+    }
   }
 };
 

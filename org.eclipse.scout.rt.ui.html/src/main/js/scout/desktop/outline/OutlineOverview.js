@@ -33,6 +33,10 @@ scout.OutlineOverview.prototype._render = function($parent) {
   this.attached = true;
 };
 
+scout.OutlineOverview.prototype.destroy = function() {
+  // nop
+};
+
 /**
  * Method required for objects that act as 'outlineContent'
  */
