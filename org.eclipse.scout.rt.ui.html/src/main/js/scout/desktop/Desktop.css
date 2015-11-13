@@ -106,12 +106,6 @@
     }
 
     & > .table-data {
-      & > .scrollbar.y-axis {
-        /* 2px looks slightly better than the default which is 3px */
-        margin-left: 2px;
-        margin-right: 2px;
-      }
-
       & > .scrollbar.x-axis {
         margin-top: 2px;
         margin-bottom: 2px;
