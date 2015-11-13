@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.StringField = function() {
   scout.StringField.parent.call(this);
+  this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
 };
 scout.inherits(scout.StringField, scout.BasicField);
 
@@ -52,9 +53,7 @@ scout.StringField.prototype._render = function($parent) {
   } else {
     $field = scout.fields.makeTextField($parent);
   }
-  $field
-    .on('blur', this._onFieldBlur.bind(this))
-    .on('select', this._onSelect.bind(this));
+  $field.on('blur', this._onFieldBlur.bind(this));
 
   // add drag and drop support
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
@@ -80,7 +79,9 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderSpellCheckEnabled(this.spellCheckEnabled);
   this._renderHasAction(this.hasAction);
   this._renderMaxLength();
-  // no render operation necessary: this._renderSelectionTrackingEnabled(...);
+  this._renderSelectionStart();
+  this._renderSelectionEnd();
+  this._renderSelectionTrackingEnabled();
 };
 
 scout.StringField.prototype._renderMaxLength = function(maxLength0) {
@@ -100,12 +101,26 @@ scout.StringField.prototype._renderMaxLength = function(maxLength0) {
   }
 };
 
-scout.StringField.prototype._renderSelectionStart = function(selectionStart) {
-  this.$field[0].selectionStart = selectionStart;
+scout.StringField.prototype._renderSelectionStart = function() {
+  this.$field[0].selectionStart = this.selectionStart;
 };
 
-scout.StringField.prototype._renderSelectionEnd = function(selectionEnd) {
-  this.$field[0].selectionEnd = selectionEnd;
+scout.StringField.prototype._renderSelectionEnd = function() {
+  this.$field[0].selectionEnd = this.selectionEnd;
+};
+
+scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
+  this.$field
+    .off('select', this._onSelectionChangingActionHandler)
+    .off('mousedown', this._onSelectionChangingActionHandler)
+    .off('keydown', this._onSelectionChangingActionHandler)
+    .off('input', this._onSelectionChangingActionHandler);
+  if (this.selectionTrackingEnabled) {
+    this.$field.on('select', this._onSelectionChangingActionHandler)
+      .on('mousedown', this._onSelectionChangingActionHandler)
+      .on('keydown', this._onSelectionChangingActionHandler)
+      .on('input', this._onSelectionChangingActionHandler);
+  }
 };
 
 scout.StringField.prototype._renderInputMasked = function(inputMasked) {
@@ -184,16 +199,35 @@ scout.StringField.prototype._onIconClick = function(event) {
   this._send('callAction');
 };
 
-scout.StringField.prototype._onSelect = function(event) {
-  if (this.selectionTrackingEnabled) {
+scout.StringField.prototype._onSelectionChangingAction = function(event) {
+  if (event.type === 'mousedown') {
+    this.$field.getWindow(true).one('mouseup.stringfield', function() {
+      // For some reason, when clicking side an existing selection (which clears the selection), the old
+      // selection is still visible. To get around this case, we use setTimeout to handle the new selection
+      // after it really has been changed.
+      setTimeout(this._updateSelection.bind(this));
+    }.bind(this));
+  } else {
+    this._updateSelection();
+  }
+};
+
+scout.StringField.prototype._updateSelection = function() {
+  var oldSelectionStart = this.selectionStart;
+  var oldSelectionEnd = this.selectionEnd;
+  this.selectionStart = this.$field[0].selectionStart;
+  this.selectionEnd = this.$field[0].selectionEnd;
+  var selectionChanged = (this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd);
+
+  if (selectionChanged) {
     this._sendSelectionChanged();
   }
 };
 
 scout.StringField.prototype._sendSelectionChanged = function() {
   var eventData = {
-    selectionStart: this.$field[0].selectionStart,
-    selectionEnd: this.$field[0].selectionEnd
+    selectionStart: this.selectionStart,
+    selectionEnd: this.selectionEnd
   };
 
   // send delayed to avoid a lot of requests while selecting
