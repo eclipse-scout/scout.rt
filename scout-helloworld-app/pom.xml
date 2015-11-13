@@ -84,15 +84,6 @@
     </developer>
   </developers>
 
-  <developers>
-    <developer>
-      <id>bsi</id>
-      <name>BSI Business Systems Integration AG</name>
-      <organization>BSI Business Systems Integration AG</organization>
-      <organizationUrl>https://www.bsi-software.com/en/technology/eclipse-scout.html</organizationUrl>
-    </developer>
-  </developers>
-
   <mailingLists>
     <mailingList>
       <name>scout-dev Mailing List</name>
