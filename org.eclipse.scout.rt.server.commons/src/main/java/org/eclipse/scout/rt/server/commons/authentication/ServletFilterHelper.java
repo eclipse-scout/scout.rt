@@ -191,7 +191,7 @@ public class ServletFilterHelper {
   }
 
   /**
-   * forward the request to the logout.html
+   * Forwards the request to the logout.html
    * <p>
    * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
    */

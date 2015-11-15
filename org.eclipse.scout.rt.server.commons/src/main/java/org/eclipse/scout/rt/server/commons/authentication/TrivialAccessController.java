@@ -18,7 +18,16 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 
 /**
- * Access controller to fast-check user's access to requested resources.
+ * Access controller to fast-check user's access to requested resources, and handles '/login' and '/logout' requests.
+ * Requests to '/auth' are not handled.
+ * <p>
+ * The name trivial results from this controller's characteristics to only evaluate pre-calculated authentication
+ * information, but never performs an expensive verification. That is why this controller is to be installed as the very
+ * first access controller.
+ * <p>
+ * For requests to '/login', the request is dispatched to login.html<br/>
+ * For requests to '/logout', the associated HTTP session is invalidated (if any), and the request dispatched to
+ * logout.html.
  * <p>
  * This access controller continues chain if one of the following criteria applies:
  * <ul>
@@ -48,26 +57,46 @@ public class TrivialAccessController implements IAccessController {
       return false;
     }
 
-    // running within a valid subject?
+    switch (getTarget(request)) {
+      case "/login":
+        handleLoginRequest(request, response);
+        return true;
+      case "/logout":
+        handleLogoutRequest(request, response);
+        return true;
+      case "/auth":
+        return false;
+      default:
+        return handleRequest(request, response, chain);
+    }
+  }
+
+  @Override
+  public void destroy() {
+    // NOOP
+  }
+
+  protected boolean handleRequest(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
+    // Is running within a valid subject?
     if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(request)) {
       chain.doFilter(request, response);
       return true;
     }
 
-    // is already authenticated?
+    // Is already authenticated?
     final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
     if (principal != null) {
       BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
       return true;
     }
 
-    // is excluded path?
+    // Is request path excluded from authentication?
     if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
       chain.doFilter(request, response);
       return true;
     }
 
-    // this is a copy from UiServlet.doGet
+    // Is a request to base URL? (copy from UiServlet.doGet)
     final String contextPath = request.getServletContext().getContextPath();
     if (StringUtility.hasText(contextPath) && request.getRequestURI().endsWith(contextPath)) {
       response.sendRedirect(request.getRequestURI() + "/");
@@ -77,9 +106,37 @@ public class TrivialAccessController implements IAccessController {
     return false;
   }
 
-  @Override
-  public void destroy() {
-    // NOOP
+  /**
+   * Method invoked on a request targeted to '/login'.<br/>
+   * If login page is installed, the default implementation dispatches to '/login.html' page so that the user can enter
+   * username and password.
+   */
+  protected void handleLoginRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+    if (m_config.isLoginPageInstalled()) {
+      BEANS.get(ServletFilterHelper.class).forwardToLoginForm(request, response);
+    }
+  }
+
+  /**
+   * Method invoked on a request targeted to '/logout'.<br/>
+   * The default implementation invalidates HTTP session (if any) and if logout page is installed, dispatches the
+   * request to '/logout.html' page.
+   */
+  protected void handleLogoutRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+    BEANS.get(ServletFilterHelper.class).doLogout(request);
+    if (m_config.isLoginPageInstalled()) {
+      BEANS.get(ServletFilterHelper.class).forwardToLogoutForm(request, response);
+    }
+  }
+
+  protected String getTarget(final HttpServletRequest request) {
+    final String pathInfo = request.getPathInfo();
+    if (pathInfo != null) {
+      return pathInfo;
+    }
+
+    final String requestURI = request.getRequestURI();
+    return requestURI.substring(requestURI.lastIndexOf('/'));
   }
 
   /**
@@ -90,6 +147,7 @@ public class TrivialAccessController implements IAccessController {
     private boolean m_enabled = true;
     private IPrincipalProducer m_principalProducer = BEANS.get(RemoteUserPrincipalProducer.class);
     private PathInfoFilter m_exclusionFilter;
+    private boolean m_loginPageInstalled = false;
 
     public boolean isEnabled() {
       return m_enabled;
@@ -120,6 +178,19 @@ public class TrivialAccessController implements IAccessController {
      */
     public TrivialAuthConfig withExclusionFilter(final String exclusionFilter) {
       m_exclusionFilter = new PathInfoFilter(exclusionFilter);
+      return this;
+    }
+
+    public boolean isLoginPageInstalled() {
+      return m_loginPageInstalled;
+    }
+
+    /**
+     * Indicates whether this web application has a login and logout page installed, meaning that the request is
+     * dispatched to that page when requesting to log in, or upon logged out.
+     */
+    public TrivialAuthConfig withLoginPageInstalled(final boolean loginPageInstalled) {
+      m_loginPageInstalled = loginPageInstalled;
       return this;
     }
   }

@@ -21,8 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Authenticator for Form-based authentication. This authenticator is designed to collaborate with
- * 'scout-login-module.js' with a 'login.html' and 'logout.html' page in place, and is to be installed in UI server
- * only.
+ * 'scout-login-module.js', and is to be installed in UI server only.
  * <p>
  * User authentication works as following:
  * <ol>
@@ -33,11 +32,6 @@ import org.eclipse.scout.rt.platform.BEANS;
  * user can be fast authenticated by {@link TrivialAccessController}. However, the filter-chain is not continued.
  * Instead, the JavaScript login module take appropriate actions upon HTTP 200 response code.
  * </ol>
- * Furthermore, this authenticator takes care for requests targeted to '/login' and '/logout', by internally dispatching
- * the request to the appropriate resource.
- * <p>
- * This controller is designed to be installed right ahead of {@link TrivialAccessController}. That allows to access
- * '/login' and '/logout' page even for authenticated users.
  *
  * @see scout-login-module.js
  * @see login.js
@@ -61,45 +55,16 @@ public class FormBasedAccessController implements IAccessController {
       return false;
     }
 
-    final String pathInfo = request.getPathInfo();
-    if (pathInfo == null) {
-      return false;
+    if ("/auth".equals(request.getPathInfo())) {
+      return handleAuthRequest(request, response);
     }
 
-    switch (pathInfo) {
-      case "/login":
-        return handleLoginRequest(request, response);
-      case "/auth":
-        return handleAuthRequest(request, response);
-      case "/logout":
-        return handleLogoutRequest(request, response);
-      default:
-        return false;
-    }
+    return false;
   }
 
   @Override
   public void destroy() {
     // NOOP
-  }
-
-  /**
-   * Invoke to handle a login request targeted to '/login'. The default implementation internally dispatches to
-   * '/login.html' page so that the user can enter username and password.
-   */
-  protected boolean handleLoginRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-    forwardToLoginForm(request, response);
-    return true;
-  }
-
-  /**
-   * Invoke to handle a logout request targeted to '/logout'. The default implementation invalidates HTTP session and
-   * internally dispatches to '/logout.html' page.
-   */
-  protected boolean handleLogoutRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-    BEANS.get(ServletFilterHelper.class).doLogout(request);
-    BEANS.get(ServletFilterHelper.class).forwardToLogoutForm(request, response);
-    return true;
   }
 
   /**
@@ -152,13 +117,6 @@ public class FormBasedAccessController implements IAccessController {
       }
     }
     response.sendError(HttpServletResponse.SC_FORBIDDEN);
-  }
-
-  /**
-   * Invoke to forward to '/login.html' page so that the user can enter his credentials.
-   */
-  public void forwardToLoginForm(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, ServletException {
-    BEANS.get(ServletFilterHelper.class).forwardToLoginForm(req, resp);
   }
 
   /**
