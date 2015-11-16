@@ -48,7 +48,7 @@ scout.SearchOutline.prototype._render = function($parent) {
   this.$container.addClass('search-outline');
   this.$searchPanel = this.$container.prependDiv('search-outline-panel');
   this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
-    .on('input', this._onQueryFieldInput.bind(this))
+    .on('input', $.debounce(this._onQueryFieldInput.bind(this)))
     .on('keypress', this._onQueryFieldKeyPress.bind(this));
   this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status');
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
