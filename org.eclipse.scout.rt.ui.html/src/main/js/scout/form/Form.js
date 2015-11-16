@@ -133,7 +133,7 @@ scout.Form.prototype._postRender = function() {
 };
 
 scout.Form.prototype._updateTitle = function() {
-  if (this.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+  if (this.isPopupWindow()) {
     this._updateTitleForWindow();
   } else if (this.isDialog()) {
     this._updateTitleForDom();
@@ -187,6 +187,10 @@ scout.Form.prototype._updateTitleForDom = function() {
 
 scout.Form.prototype.isDialog = function() {
   return this.displayHint === scout.Form.DisplayHint.DIALOG;
+};
+
+scout.Form.prototype.isPopupWindow = function() {
+  return this.displayHint === scout.Form.DisplayHint.POPUP_WINDOW;
 };
 
 scout.Form.prototype.isView = function() {
@@ -342,13 +346,13 @@ scout.Form.prototype._initialFocusElement = function() {
 };
 
 scout.Form.prototype._installFocusContext = function() {
-  if (this.isDialog()) {
+  if (this.isDialog() || this.isPopupWindow()) {
     this.session.focusManager.installFocusContext(this.$container, scout.focusRule.NONE);
   }
 };
 
 scout.Form.prototype._uninstallFocusContext = function() {
-  if (this.isDialog()) {
+  if (this.isDialog() || this.isPopupWindow()) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
 };

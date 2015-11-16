@@ -25,9 +25,9 @@ scout.FormController = function(displayParent, session) {
 scout.FormController.prototype.registerAndRender = function(formAdapterId, position) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
   form.displayParent = this._displayParent;
-  if (form.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+  if (form.isPopupWindow()) {
     this._renderPopupWindow(form);
-  } else if (form.displayHint === scout.Form.DisplayHint.VIEW) {
+  } else if (form.isView()) {
     this._renderView(form, true, position);
   } else {
     this._renderDialog(form, true);
@@ -47,9 +47,9 @@ scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
     return;
   }
 
-  if (form.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+  if (form.isPopupWindow()) {
     this._removePopupWindow(form);
-  } else if (form.displayHint === scout.Form.DisplayHint.VIEW) {
+  } else if (form.isView()) {
     this._removeView(form);
   } else {
     this._removeDialog(form);
@@ -139,7 +139,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return;
   }
 
-  if (dialog.displayHint === scout.Form.DisplayHint.POPUP_WINDOW) {
+  if (dialog.isPopupWindow()) {
     this._renderPopupWindow(dialog);
   } else {
     dialog.render(this.session.desktop.$container);
