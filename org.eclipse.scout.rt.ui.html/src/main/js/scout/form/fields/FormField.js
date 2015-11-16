@@ -192,6 +192,7 @@ scout.FormField.prototype._removePlaceholder = function() {
 
 scout.FormField.prototype._renderLabelVisible = function(visible) {
   this._renderChildVisible(this.$label, visible);
+  this.$container.toggleClass('label-hidden', !visible);
 };
 
 scout.FormField.prototype._renderStatusVisible = function(statusVisible) {
