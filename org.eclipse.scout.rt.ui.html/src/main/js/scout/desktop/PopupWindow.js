@@ -29,19 +29,36 @@ scout.PopupWindow.prototype._onUnload = function() {
 scout.PopupWindow.prototype._onReady = function() {
   // set container (used as document-root from callers)
   var scoutElement = this.myWindow.document.getElementsByClassName('scout')[0],
-    $myWindow = $(this.myWindow);
+    $myWindow = $(this.myWindow),
+    $myDocument = $(this.myWindow.document);
+
   this.$container = $(scoutElement);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SingleLayout());
+  this.$container.height($myWindow.height());
+  this.form.render(this.$container);
 
+  // resize browser-window before layout?
+  if (this.resizeToPrefSize) {
+    var prefSize = this.htmlComp.getPreferredSize(),
+    // we cannot simply set the pref. size of the component as window size,
+    // since the window "chrome" (window-border, -title and location bar)
+    // occupies some space. That's why we measure the difference between
+    // the current document size and the window size first.
+      myWindowSize = new scout.Dimension(this.myWindow.outerWidth, this.myWindow.outerHeight),
+      myDocumentSize = new scout.Dimension($myDocument.width(), $myDocument.height()),
+      windowChromeHoriz = myWindowSize.width - myDocumentSize.width,
+      windowChromeVert = myWindowSize.height - myDocumentSize.height;
+
+    this.myWindow.resizeTo(prefSize.width + windowChromeHoriz, prefSize.height + windowChromeVert);
+    this.resizeToPrefSize = false;
+  }
+  this.form.htmlComp.validateLayout();
+
+  // Attach event handlers on window
   $(this.myWindow)
     .on('unload', this._onUnload.bind(this))
     .on('resize', this._onResize.bind(this));
-
-  this.$container.height($myWindow.height());
-
-  this.form.render(this.$container);
-  this.form.htmlComp.validateLayout();
 };
 
 // FIXME AWE: (2nd screen) sollen wir auch position-changes vom window registrieren (ohne size-change)?

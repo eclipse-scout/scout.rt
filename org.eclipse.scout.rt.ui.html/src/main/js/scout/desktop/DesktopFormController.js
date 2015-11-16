@@ -13,15 +13,17 @@ scout.inherits(scout.DesktopFormController, scout.FormController);
  */
 scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
   var windowSpecs,
+    resizeToPrefSize, // flag used to resize browser-window later (see PopupWindow.js)
     bounds = scout.PopupWindow.readWindowBounds(form);
 
   if (bounds) {
     windowSpecs = 'left=' + bounds.x + ',top=' + bounds.y + ',width=' + bounds.width + ',height=' + bounds.height;
+    resizeToPrefSize = false;
   } else {
-    // FIXME AWE: (2nd screen) use prefSize from dialog here
     var $mainDocument = $(document),
       documentSize = new scout.Dimension($mainDocument.width(), $mainDocument.height());
     windowSpecs = 'left=0,top=0,width=' + documentSize.width + ',height=' + documentSize.height;
+    resizeToPrefSize = true;
   }
 
   // Note: Chrome does not allow to position a popup outside of the primary monitor (Firefox does)
@@ -31,14 +33,15 @@ scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
   windowSpecs += ',location=no,toolbar=no,menubar=no,resizable=yes';
 
   // form ID in URL is required for 'reload window' support
-  var url = 'popup-window.html?formId=' + form.id;
-  // we must use '_blank' as window-name so popups are never reused
-  var newWindow = window.open(url, '_blank', windowSpecs);
+  var url = 'popup-window.html?formId=' + form.id,
+    // we must use '_blank' as window-name so browser-windows are never reused
+    newWindow = window.open(url, '_blank', windowSpecs),
+    popupWindow = new scout.PopupWindow(newWindow, form);
 
-  $.log.debug('Opened new popup window for form ID ' + form.id + ' specs=' + windowSpecs);
-  var popupWindow = new scout.PopupWindow(newWindow, form);
+  popupWindow.resizeToPrefSize = resizeToPrefSize;
   popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
   this._popupWindows.push(popupWindow);
+  $.log.debug('Opened new popup window for form ID ' + form.id + ' specs=' + windowSpecs);
 };
 
 scout.DesktopFormController.prototype._onDocumentPopupWindowReady = function(event, data) {

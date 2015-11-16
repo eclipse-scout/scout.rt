@@ -240,7 +240,7 @@ scout.HtmlComponent.prototype.pack = function() {
  * Also returns false if the $comp does not belong to a window (defaultView) anymore. This may happen if it belonged to a popup window which is now closed
  */
 scout.HtmlComponent.prototype.isAttached = function() {
-  return this.$comp.isAttached() && this.$comp[0].ownerDocument.defaultView;
+  return this.$comp.isAttached() && this.$comp.getWindow();
 };
 
 scout.HtmlComponent.prototype.debug = function() {
