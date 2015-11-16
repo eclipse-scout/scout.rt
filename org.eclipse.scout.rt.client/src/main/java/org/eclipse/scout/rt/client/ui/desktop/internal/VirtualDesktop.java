@@ -165,7 +165,7 @@ public class VirtualDesktop implements IDesktop {
     if (dataTypes == null || dataTypes.length == 0) {
       for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
         EventListenerList list = it.next();
-        list.remove(DataChangeListener.class, listener);
+        list.removeAll(DataChangeListener.class, listener);
         if (list.getListenerCount(DataChangeListener.class) == 0) {
           it.remove();
         }

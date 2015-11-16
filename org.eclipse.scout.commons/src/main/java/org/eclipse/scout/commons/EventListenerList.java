@@ -170,35 +170,65 @@ public class EventListenerList implements IEventListenerSource {
     }
   }
 
+  /**
+   * Do not call this method directly, it must be called from within a listener synchronized block
+   * (e.g. use listenerListLock).
+   */
+  private <T extends EventListener> boolean removeInternal(Class<T> t, T listener) {
+    if (listener == null) {
+      return false;
+    }
+    int index = -1;
+    for (int i = listenerList.length - 2; i >= 0; i -= 2) {
+      if (listenerList[i] == t) {
+        if (listenerList[i + 1] instanceof WeakReference) {
+          if (((WeakReference) listenerList[i + 1]).get() == listener) {
+            index = i;
+            break;
+          }
+        }
+        else {
+          if (listenerList[i + 1] == listener) {
+            index = i;
+            break;
+          }
+        }
+      }
+    }
+    if (index != -1) {
+      Object[] tmp = new Object[listenerList.length - 2];
+      System.arraycopy(listenerList, 0, tmp, 0, index);
+      if (index < tmp.length) {
+        System.arraycopy(listenerList, index + 2, tmp, index, tmp.length - index);
+      }
+      listenerList = (tmp.length == 0) ? NULL_ARRAY : tmp;
+    }
+    return index != -1;
+  }
+
+  /**
+   * Removes the first listener which is equal to the listener parameter from this listener list.
+   */
   public <T extends EventListener> void remove(Class<T> t, T listener) {
     if (listener == null) {
       return;
     }
     synchronized (listenerListLock) {
-      int index = -1;
-      for (int i = listenerList.length - 2; i >= 0; i -= 2) {
-        if (listenerList[i] == t) {
-          if (listenerList[i + 1] instanceof WeakReference) {
-            if (((WeakReference) listenerList[i + 1]).get() == listener) {
-              index = i;
-              break;
-            }
-          }
-          else {
-            if (listenerList[i + 1] == listener) {
-              index = i;
-              break;
-            }
-          }
-        }
-      }
-      if (index != -1) {
-        Object[] tmp = new Object[listenerList.length - 2];
-        System.arraycopy(listenerList, 0, tmp, 0, index);
-        if (index < tmp.length) {
-          System.arraycopy(listenerList, index + 2, tmp, index, tmp.length - index);
-        }
-        listenerList = (tmp.length == 0) ? NULL_ARRAY : tmp;
+      removeInternal(t, listener);
+      maintainListNoLocking();
+    }
+  }
+
+  /**
+   * Removes all listeners which are equal to the listener parameter from this listener list.
+   */
+  public <T extends EventListener> void removeAll(Class<T> t, T listener) {
+    if (listener == null) {
+      return;
+    }
+    synchronized (listenerListLock) {
+      while (removeInternal(t, listener)) {
+        // nop
       }
       maintainListNoLocking();
     }

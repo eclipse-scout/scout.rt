@@ -1595,7 +1595,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (dataTypes == null || dataTypes.length == 0) {
       for (Iterator<EventListenerList> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
         EventListenerList list = it.next();
-        list.remove(DataChangeListener.class, listener);
+        list.removeAll(DataChangeListener.class, listener);
         if (list.getListenerCount(DataChangeListener.class) == 0) {
           it.remove();
         }
@@ -2489,4 +2489,5 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     DesktopGuiDetachedChain chain = new DesktopGuiDetachedChain(extensions);
     chain.execGuiDetached();
   }
+
 }
