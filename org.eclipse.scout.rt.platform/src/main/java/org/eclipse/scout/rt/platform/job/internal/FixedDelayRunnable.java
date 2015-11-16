@@ -29,15 +29,13 @@ import java.util.concurrent.TimeUnit;
 class FixedDelayRunnable implements Runnable {
 
   private final DelayedExecutor m_delayedExecutor;
-  private final JobFutureTask<Void> m_futureTask;
-  private final long m_delay;
-  private final TimeUnit m_unit;
+  private final JobFutureTask<?> m_futureTask;
+  private final long m_delayMillis;
 
-  public FixedDelayRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<Void> futureTask, final long delay, final TimeUnit unit) {
+  public FixedDelayRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<?> futureTask, final long delayMillis) {
     m_delayedExecutor = delayedExecutor;
     m_futureTask = futureTask;
-    m_delay = delay;
-    m_unit = unit;
+    m_delayMillis = delayMillis;
   }
 
   @Override
@@ -51,7 +49,7 @@ class FixedDelayRunnable implements Runnable {
 
     // re-schedule the task if still in 'done-state'.
     if (!m_futureTask.isDone()) {
-      m_delayedExecutor.schedule(this, m_delay, m_unit);
+      m_delayedExecutor.schedule(this, m_delayMillis, TimeUnit.MILLISECONDS);
     }
   }
 }

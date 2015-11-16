@@ -46,12 +46,12 @@ public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implem
 
   @Override
   public final void run() {
-    mutexAcquired();
+    onMutexAcquired();
   }
 
   @Override
   public void reject() {
-    mutexAcquired();
+    onMutexAcquired();
   }
 
   /**
@@ -69,7 +69,8 @@ public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implem
   }
 
   /**
-   * Method invoked once the mutex is acquired for this task.
+   * Method invoked once the mutex is acquired. The implementor of this method is responsible for passing the mutex to
+   * the next task once not needed anymore.
    */
-  protected abstract void mutexAcquired();
+  protected abstract void onMutexAcquired();
 }

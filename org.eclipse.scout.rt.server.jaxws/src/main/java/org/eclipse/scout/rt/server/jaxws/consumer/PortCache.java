@@ -71,13 +71,17 @@ public class PortCache<PORT> {
    */
   public void init() {
     // Start periodic cleanup job.
-    Jobs.scheduleAtFixedRate(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         discardExpiredPorts();
       }
-    }, 1, 1, TimeUnit.MINUTES, Jobs.newInput(RunContexts.empty()).withName("JAX-WS port cache cleanup"));
+    }, Jobs.newInput()
+        .withSchedulingDelay(1, TimeUnit.MINUTES)
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.MINUTES)
+        .withRunContext(RunContexts.empty())
+        .withName("JAX-WS port cache cleanup"));
 
     // Ensures to have at minimum 'corePoolSize' Ports in the cache.
     if (m_corePoolSize > 0) {
@@ -87,7 +91,9 @@ public class PortCache<PORT> {
         public void run() throws Exception {
           ensureCorePool();
         }
-      }, Jobs.newInput(RunContexts.empty()).withName("JAX-WS port cache initializer"));
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.empty())
+          .withName("JAX-WS port cache initializer"));
     }
   }
 

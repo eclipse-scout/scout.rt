@@ -17,9 +17,9 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -47,24 +47,25 @@ public class ScheduleDelayedTest {
   public void testScheduleDelayed() {
     final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
 
-    long delayNano = TimeUnit.SECONDS.toNanos(1);
+    long delayNanos = TimeUnit.SECONDS.toNanos(1);
     long tStartNano = System.nanoTime();
     long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
 
-    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(System.nanoTime());
-        return null;
       }
-    }, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(delayNanos, TimeUnit.NANOSECONDS));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(1, protocol.size());
     Long actualExecutionTime = protocol.get(0);
-    long expectedExecutionTime = tStartNano + delayNano;
+    long expectedExecutionTime = tStartNano + delayNanos;
     long expectedExecutionTimeMin = expectedExecutionTime;
     long expectedExecutionTimeMax = expectedExecutionTime + assertToleranceNano;
 

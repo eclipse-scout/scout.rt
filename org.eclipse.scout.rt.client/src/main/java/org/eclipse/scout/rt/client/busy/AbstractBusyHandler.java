@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -201,7 +202,10 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private void addTimer(IFuture<?> future) {
     P_TimerJob runnable = new P_TimerJob(future);
     future.getJobInput().getRunContext().withProperty(TIMER_PROPERTY, runnable);
-    Jobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS);
+
+    Jobs.schedule(runnable, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(getShortOperationMillis(), TimeUnit.MILLISECONDS));
   }
 
   private void removeTimer(IFuture<?> future) {

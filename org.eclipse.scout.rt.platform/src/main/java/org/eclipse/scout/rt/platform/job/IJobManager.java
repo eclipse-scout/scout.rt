@@ -36,83 +36,46 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 public interface IJobManager {
 
   /**
-   * Runs the given task asynchronously on behalf of a worker thread at the next reasonable opportunity. The caller of
-   * this method continues to run in parallel. If the task is subject for mutual exclusion, the task only commence
-   * execution once acquired the mutex.
+   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. If the task
+   * is subject for mutual exclusion, the task only commence execution once acquired the mutex. The caller of this
+   * method continues to run in parallel.
    * <p>
-   * The {@link IFuture} returned allows to wait for the task to complete or to cancel the execution of the task. To
-   * immediately block waiting for the task to complete, you can use constructions of the form
-   * <code>result = Jobs.schedule(...).awaitDone();</code>.
+   * The job manager will use the {@link JobInput} as provided to run the job.
+   * <p>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
+   * block waiting for the job to complete, you can use constructions of the following form.
+   * <p>
+   * <code>BEANS.get(IJobManager.class).schedule(...).awaitDone();</code>
+   *
+   * @param runnable
+   *          <code>IRunnable</code> to be executed.
+   * @param input
+   *          information about the job with execution instructions for the job manager to run the job.
+   * @return Future to interact with the job like waiting for its completion or to cancel its execution.
+   */
+  IFuture<Void> schedule(IRunnable runnable, JobInput input);
+
+  /**
+   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. If the task is
+   * subject for mutual exclusion, the task only commence execution once acquired the mutex. The caller of this method
+   * continues to run in parallel. Jobs in the form of a {@link Callable} typically return a computation result to the
+   * submitter.
+   * <p>
+   * The job manager will use the {@link JobInput} as provided to run the job.
+   * <p>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
+   * block waiting for the job to complete, you can use constructions of the following form.
+   * <p>
+   * <code>Object result = BEANS.get(IJobManager.class).schedule(...).awaitDoneAndGet();</code>
    *
    * @param callable
-   *          the callable to be executed
+   *          <code>Callable</code> to be executed.
    * @param input
-   *          describes the task to be executed; must not be <code>null</code>.
-   * @return Future to wait for the task's completion or to cancel the task's execution.
+   *          information about the job with execution instructions for the job manager to run the job.
+   * @return Future to interact with the job like waiting for its completion, or to cancel its execution, or to get its
+   *         computation result.
    */
   <RESULT> IFuture<RESULT> schedule(Callable<RESULT> callable, JobInput input);
-
-  /**
-   * Runs the given task asynchronously on behalf of a worker thread after the specified delay has elapsed. The caller
-   * of this method continues to run in parallel. If the task is subject for mutual exclusion, the task only commence
-   * execution once acquired the mutex.
-   * <p>
-   * The {@link IFuture} returned allows to wait for the task to complete or to cancel the execution of the task. To
-   * immediately block waiting for the task to complete, you can use constructions of the form
-   * <code>result = Jobs.schedule(...).awaitDone();</code>.
-   *
-   * @param callable
-   *          the runnable to be executed
-   * @param delay
-   *          the delay after which the task should commence execution.
-   * @param delayUnit
-   *          the time unit of the <code>delay</code> argument.
-   * @param input
-   *          describes the task to be executed; must not be <code>null</code>.
-   * @return Future to wait for the task's completion or to cancel the task's execution.
-   */
-  <RESULT> IFuture<RESULT> schedule(Callable<RESULT> callable, long delay, TimeUnit delayUnit, JobInput input);
-
-  /**
-   * Periodically runs the given task on behalf of a worker thread.<br/>
-   * The first execution is after the given <code>initialDelay</code>, the second after <code>initialDelay+period</code>
-   * , the third after <code>initialDelay+period+period</code> and so on. If an execution takes longer than the
-   * <code>period</code>, the subsequent execution is delayed and starts only once the current execution completed. The
-   * task only terminates via cancellation or termination of the job manager.
-   *
-   * @param runnable
-   *          the runnable to be executed periodically.
-   * @param initialDelay
-   *          the time to delay first run.
-   * @param period
-   *          the period between successive runs.
-   * @param unit
-   *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @param input
-   *          describes the task to be executed; must not be <code>null</code>.
-   * @return Future to cancel the periodic action.
-   */
-  IFuture<Void> scheduleAtFixedRate(IRunnable runnable, long initialDelay, long period, TimeUnit unit, JobInput input);
-
-  /**
-   * Periodically runs the given task on behalf of a worker thread.<br/>
-   * The first execution is after the given <code>initialDelay</code>, and subsequently with the given
-   * <code>delay</code> between the termination of one execution and the commencement of the next. The task only
-   * terminates via cancellation or termination of the job manager.
-   *
-   * @param runnable
-   *          the runnable to be executed periodically.
-   * @param initialDelay
-   *          the time to delay first run.
-   * @param delay
-   *          the fixed delay between successive runs.
-   * @param unit
-   *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @param input
-   *          describes the task to be executed; must not be <code>null</code>.
-   * @return Future to cancel the periodic action.
-   */
-  IFuture<Void> scheduleWithFixedDelay(IRunnable runnable, long initialDelay, long delay, TimeUnit unit, JobInput input);
 
   /**
    * Checks whether all Futures accepted by the given Filter are in 'done-state' (completed or cancelled).

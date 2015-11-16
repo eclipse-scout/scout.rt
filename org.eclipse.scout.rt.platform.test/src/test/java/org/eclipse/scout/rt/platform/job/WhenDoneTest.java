@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -63,7 +64,9 @@ public class WhenDoneTest {
         protocol.add("1");
         return "result";
       }
-    }, 1, TimeUnit.SECONDS); // delayed
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(1, TimeUnit.SECONDS));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
@@ -143,7 +146,9 @@ public class WhenDoneTest {
         protocol.add("1");
         throw pe;
       }
-    }, 1, TimeUnit.SECONDS, Jobs.newInput(null).withLogOnError(false)); // delayed
+    }, Jobs.newInput()
+        .withSchedulingDelay(1, TimeUnit.SECONDS)
+        .withLogOnError(false));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
@@ -183,7 +188,8 @@ public class WhenDoneTest {
         protocol.add("1");
         throw error;
       }
-    }, Jobs.newInput(null).withLogOnError(false));
+    }, Jobs.newInput()
+        .withLogOnError(false));
     try {
       future.awaitDoneAndGet();
       fail("exception expected");
@@ -227,7 +233,9 @@ public class WhenDoneTest {
         protocol.add("1");
         return "result";
       }
-    }, 1, TimeUnit.SECONDS); // delayed
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(1, TimeUnit.SECONDS));
 
     future.cancel(true);
 

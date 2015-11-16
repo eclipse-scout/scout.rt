@@ -52,33 +52,42 @@ public class JobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, 0, TimeUnit.MILLISECONDS).awaitDoneAndGet();
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDoneAndGet();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
-    Jobs.scheduleAtFixedRate(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDone();
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withPeriodicExecutionAtFixedRate(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
-    Jobs.scheduleWithFixedDelay(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDone();
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withPeriodicExecutionWithFixedDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
   }
@@ -94,7 +103,7 @@ public class JobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, Jobs.newInput(null)).awaitDoneAndGet();
+    }, Jobs.newInput()).awaitDoneAndGet();
 
     assertNull(actualFuture.getJobInput().getRunContext());
 
@@ -105,33 +114,39 @@ public class JobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
+    }, Jobs.newInput()
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDoneAndGet();
 
     assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
-    Jobs.scheduleAtFixedRate(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDone();
+    }, Jobs.newInput()
+        .withPeriodicExecutionAtFixedRate(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
-    Jobs.scheduleWithFixedDelay(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDone();
+    }, Jobs.newInput()
+        .withPeriodicExecutionWithFixedDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertNull(actualFuture.getJobInput().getRunContext());
   }
@@ -139,12 +154,8 @@ public class JobsTest {
   @Test
   public void testNewInput() {
     RunContext runContext = RunContexts.empty();
-    assertSame(runContext, Jobs.newInput(runContext).getRunContext());
-    assertEquals("scout-thread", Jobs.newInput(null).getThreadName());
-  }
-
-  @Test
-  public void testNewInputNullInput() {
-    assertNull(Jobs.newInput(null).getRunContext());
+    assertSame(runContext, Jobs.newInput().withRunContext(runContext).getRunContext());
+    assertEquals("scout-thread", Jobs.newInput().getThreadName());
+    assertNull(Jobs.newInput().getRunContext());
   }
 }

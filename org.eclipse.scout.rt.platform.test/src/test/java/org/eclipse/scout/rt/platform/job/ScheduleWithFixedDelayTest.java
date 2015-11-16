@@ -51,12 +51,12 @@ public class ScheduleWithFixedDelayTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final int nRuns = 3;
-    long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
-    long delayNano = TimeUnit.MILLISECONDS.toNanos(500);
+    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
+    long delayNanos = TimeUnit.MILLISECONDS.toNanos(500);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
-    IFuture<Void> future = m_jobManager.scheduleWithFixedDelay(new IRunnable() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -67,14 +67,17 @@ public class ScheduleWithFixedDelayTest {
           protocol.add(System.nanoTime());
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
+        .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNano + i * delayNano;
+      long expectedExecutionTime = tStartNano + initialDelayNanos + i * delayNanos;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -90,12 +93,12 @@ public class ScheduleWithFixedDelayTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final int nRuns = 3;
-    long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
-    long delayNano = TimeUnit.MILLISECONDS.toNanos(500);
+    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
+    long delayNanos = TimeUnit.MILLISECONDS.toNanos(500);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
-    IFuture<Void> future = m_jobManager.scheduleWithFixedDelay(new IRunnable() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -106,14 +109,18 @@ public class ScheduleWithFixedDelayTest {
           protocol.add(System.nanoTime());
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
+        .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS)
+        .withLogOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNano + i * delayNano;
+      long expectedExecutionTime = tStartNano + initialDelayNanos + i * delayNanos;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -130,12 +137,12 @@ public class ScheduleWithFixedDelayTest {
 
     final int nRuns = 3;
     final long sleepTimeNano = TimeUnit.MILLISECONDS.toNanos(300);
-    long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
-    long delayNano = TimeUnit.MILLISECONDS.toNanos(500);
+    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
+    long delayNanos = TimeUnit.MILLISECONDS.toNanos(500);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
-    IFuture<Void> future = m_jobManager.scheduleWithFixedDelay(new IRunnable() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -147,14 +154,18 @@ public class ScheduleWithFixedDelayTest {
           Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
+        .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS)
+        .withLogOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNano + i * (sleepTimeNano + delayNano);
+      long expectedExecutionTime = tStartNano + initialDelayNanos + i * (sleepTimeNano + delayNanos);
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -171,12 +182,12 @@ public class ScheduleWithFixedDelayTest {
 
     final int nRuns = 3;
     final long sleepTimeNano = TimeUnit.MILLISECONDS.toNanos(1500);
-    long initialDelayNano = TimeUnit.MILLISECONDS.toNanos(300);
-    long delayNano = TimeUnit.MILLISECONDS.toNanos(500);
+    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
+    long delayNanos = TimeUnit.MILLISECONDS.toNanos(500);
     long tStartNano = System.nanoTime();
 
     // Schedule a job which runs 5 times and cancels itself afterwards.
-    IFuture<Void> future = m_jobManager.scheduleWithFixedDelay(new IRunnable() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -188,14 +199,18 @@ public class ScheduleWithFixedDelayTest {
           Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
+        .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS)
+        .withLogOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNano + i * (sleepTimeNano + delayNano);
+      long expectedExecutionTime = tStartNano + initialDelayNanos + i * (sleepTimeNano + delayNanos);
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {

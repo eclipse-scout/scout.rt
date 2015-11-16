@@ -129,7 +129,9 @@ public class ModelJobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, 0, TimeUnit.MILLISECONDS).awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDoneAndGet();
 
     assertTrue(ModelJobs.isModelJob(actualFuture));
     assertFalse(ClientJobs.isClientJob(actualFuture));

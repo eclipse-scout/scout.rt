@@ -176,20 +176,20 @@ public interface IFuture<RESULT> extends ICancellable {
    * associated job completes successfully or with an exception, or was cancelled. Thereby, the callback is invoked in
    * any thread with no {@code RunContext} applied. If the job is already in 'done' state when the callback is
    * registered, the callback is invoked immediately.
-   * <p/>
+   * <p>
    * The following code snippet illustrates its usage:
    *
    * <pre>
    * <code>
    * Jobs.schedule(new IRunnable() {
-   * 
+   *
    *   &#064;Override
    *   public void run() throws Exception {
    *     // do some work
    *   }
    * })<strong>
    * .whenDone(new IDoneCallback&lt;Void&gt;() {
-   * 
+   *
    *   &#064;Override
    *   public void onDone(DoneEvent&lt;Void&gt; event) {
    *     // invoked once the job completes
@@ -197,8 +197,12 @@ public interface IFuture<RESULT> extends ICancellable {
    * })</strong>;
    * </code>
    * </pre>
+   *
+   * @param callback
+   *          callback to be notified once the Future enters 'done' state.
+   * @return The future to support for method chaining.
    */
-  void whenDone(IDoneCallback<RESULT> callback);
+  IFuture<RESULT> whenDone(IDoneCallback<RESULT> callback);
 
   /**
    * Registers the given listener to be notified about job lifecycle events related to this Future, and which comply

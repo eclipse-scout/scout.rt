@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
@@ -216,11 +215,12 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     RunMonitor.CURRENT.get().registerCancellable(monitor);
 
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
-    final JobInput jobInput = Jobs.newInput(createCurrentRunContext().withRunMonitor(monitor)).withName(createServiceRequestName(requestSequence));
-
     ServiceTunnelResponse serviceResponse;
     try {
-      serviceResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet();
+      serviceResponse = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
+          .withRunContext(createCurrentRunContext().withRunMonitor(monitor))
+          .withName(createServiceRequestName(requestSequence)))
+          .awaitDoneAndGet();
     }
     catch (final ProcessingException e) {
       if (e.isInterruption() && !monitor.isCancelled()) {

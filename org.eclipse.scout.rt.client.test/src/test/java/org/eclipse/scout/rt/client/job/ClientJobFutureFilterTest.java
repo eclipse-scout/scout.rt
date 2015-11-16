@@ -55,7 +55,7 @@ public class ClientJobFutureFilterTest {
     JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true));
     when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
 
-    JobInput jobInput = Jobs.newInput(RunContexts.empty());
+    JobInput jobInput = Jobs.newInput().withRunContext(RunContexts.empty());
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
   }
 

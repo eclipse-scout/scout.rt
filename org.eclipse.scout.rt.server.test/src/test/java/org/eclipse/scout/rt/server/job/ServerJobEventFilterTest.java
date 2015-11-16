@@ -54,7 +54,7 @@ public class ServerJobEventFilterTest {
     JobInput serverJobInput = ServerJobs.newInput(ServerRunContexts.empty().withSession(m_serverSession1));
     when(m_serverJobFuture.getJobInput()).thenReturn(serverJobInput);
 
-    JobInput jobInput = Jobs.newInput(RunContexts.empty());
+    JobInput jobInput = Jobs.newInput().withRunContext(RunContexts.empty());
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
   }
 

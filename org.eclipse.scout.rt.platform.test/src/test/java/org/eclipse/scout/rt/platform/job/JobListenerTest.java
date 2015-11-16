@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -60,12 +60,13 @@ public class JobListenerTest {
     IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.SHUTDOWN), shutdownListener);
 
     IFuture<Void> future = null;
-    future = m_jobManager.schedule(new Callable<Void>() {
+    future = m_jobManager.schedule(new IRunnable() {
+
       @Override
-      public Void call() throws Exception {
-        return null;
+      public void run() throws Exception {
+        // NOOP
       }
-    }, Jobs.newInput(RunContexts.empty()));
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
     m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES);
     sleep();
     jobListenerRegistration.dispose();
@@ -96,13 +97,16 @@ public class JobListenerTest {
     IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.SHUTDOWN), shutdownListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
-    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         hasStarted.setValue(Boolean.TRUE);
-        return null;
       }
-    }, 200, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(200, TimeUnit.MILLISECONDS));
+
     future.cancel(true);
     m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES);
     jobListenerRegistration.dispose();
@@ -261,13 +265,13 @@ public class JobListenerTest {
   }
 
   private IFuture<Void> runJob(long delay, TimeUnit unit) {
-    IFuture<Void> future2 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
-        return null;
+      public void run() throws Exception {
+        // NOOP
       }
-    }, delay, unit, Jobs.newInput(null));
+    }, Jobs.newInput().withSchedulingDelay(delay, unit));
     return future2;
   }
 

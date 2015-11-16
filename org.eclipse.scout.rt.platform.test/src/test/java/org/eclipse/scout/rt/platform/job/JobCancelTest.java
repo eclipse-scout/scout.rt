@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -77,10 +76,10 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-before");
         }
@@ -97,9 +96,8 @@ public class JobCancelTest {
         }
 
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     assertTrue(setupLatch.await());
 
@@ -122,10 +120,10 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-before");
         }
@@ -142,9 +140,10 @@ public class JobCancelTest {
         }
 
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
     assertTrue(setupLatch.await());
 
@@ -164,14 +163,15 @@ public class JobCancelTest {
   public void testCancelBeforeRunning() throws Exception {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add("running");
-        return null;
       }
-    }, 500, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(500, TimeUnit.MILLISECONDS));
 
     // RUN THE TEST
     future.cancel(true);
@@ -192,7 +192,7 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future = m_jobManager.scheduleAtFixedRate(new IRunnable() {
+    final IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -201,7 +201,11 @@ public class JobCancelTest {
           verifyLatch.await();
         }
       }
-    }, 10L, 10L, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withSchedulingDelay(10, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionAtFixedRate(10, TimeUnit.MILLISECONDS)
+        .withLogOnError(false));
 
     assertTrue(setupLatch.await());
 
@@ -224,10 +228,10 @@ public class JobCancelTest {
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
 
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add("running-1");
         try {
           latch.countDownAndBlock();
@@ -238,14 +242,15 @@ public class JobCancelTest {
         finally {
           protocol.add("done-1");
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
-    IFuture<Void> future2 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add("running-2");
         try {
           latch.countDownAndBlock();
@@ -256,19 +261,20 @@ public class JobCancelTest {
         finally {
           protocol.add("done-2");
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
     assertTrue(latch.await());
 
     // SHUTDOWN
     m_jobManager.shutdown();
 
-    IFuture<Void> future3 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add("running-3");
         try {
           latch.countDownAndBlock();
@@ -279,9 +285,10 @@ public class JobCancelTest {
         finally {
           protocol.add("done-3");
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
     // VERIFY
     assertEquals(CollectionUtility.hashSet("running-1", "running-2", "interrupted-1", "interrupted-2", "done-1", "done-2"), protocol);
@@ -304,14 +311,16 @@ public class JobCancelTest {
 
     final AtomicReference<IFuture<?>> childFutureRef = new AtomicReference<>();
 
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
+
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
 
         //attach to child runmonitor -> nested cancel
-        IFuture<?> childFuture = m_jobManager.schedule(new Callable<Void>() {
+        IFuture<?> childFuture = m_jobManager.schedule(new IRunnable() {
+
           @Override
-          public Void call() throws Exception {
+          public void run() throws Exception {
             try {
               setupLatch.countDownAndBlock();
             }
@@ -326,9 +335,11 @@ public class JobCancelTest {
             }
             job2DoneLatch.countDown();
             verifyLatch.countDown();
-            return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-2").withLogOnError(false));
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent())
+            .withName("job-2")
+            .withLogOnError(false));
         childFutureRef.set(childFuture);
 
         try {
@@ -344,9 +355,10 @@ public class JobCancelTest {
           protocol.add("job-1-cancelled (monitor)");
         }
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1"));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName("job-1"));
 
     assertTrue(setupLatch.await());
     childFutureRef.get().cancel(true);
@@ -371,14 +383,15 @@ public class JobCancelTest {
     final BlockingCountDownLatch job1DoneLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         //re-use runmonitor -> nested cancel
-        m_jobManager.schedule(new Callable<Void>() {
+        m_jobManager.schedule(new IRunnable() {
+
           @Override
-          public Void call() throws Exception {
+          public void run() throws Exception {
             try {
               setupLatch.countDownAndBlock();
             }
@@ -392,14 +405,17 @@ public class JobCancelTest {
               protocol.add("job-2-cancelled (monitor)");
             }
             verifyLatch.countDown();
-            return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-2").withLogOnError(false));
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent())
+            .withName("job-2")
+            .withLogOnError(false));
 
         //does not re-use runmonitor -> no nested cancel
-        m_jobManager.schedule(new Callable<Void>() {
+        m_jobManager.schedule(new IRunnable() {
+
           @Override
-          public Void call() throws Exception {
+          public void run() throws Exception {
             try {
               setupLatch.countDownAndBlock();
             }
@@ -413,9 +429,11 @@ public class JobCancelTest {
               protocol.add("job-3-cancelled (monitor)");
             }
             verifyLatch.countDown();
-            return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).withName("job-3").withLogOnError(false));
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
+            .withName("job-3")
+            .withLogOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -431,9 +449,10 @@ public class JobCancelTest {
         }
         job1DoneLatch.countDown();
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1"));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName("job-1"));
 
     assertTrue(setupLatch.await());
     future1.cancel(true);
@@ -464,10 +483,10 @@ public class JobCancelTest {
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(4);
 
     // Job-1 (common-id) => CANCEL
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         try {
           setupLatch.countDownAndBlock();
         }
@@ -475,15 +494,18 @@ public class JobCancelTest {
           protocol.add("job-1-interrupted");
         }
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(null).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName(commonJobName)
+        .withMutex(null)
+        .withLogOnError(false));
 
     // Job-2 (common-id) => CANCEL
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         try {
           setupLatch.countDownAndBlock();
         }
@@ -491,19 +513,23 @@ public class JobCancelTest {
           protocol.add("job-2-interrupted");
         }
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(null).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName(commonJobName)
+        .withMutex(null)
+        .withLogOnError(false));
 
     // Job-3 (common-id) => CANCEL
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         // Job-3a (other name, same re-used runMonitor => CANCEL AS WELL)
-        m_jobManager.schedule(new Callable<Void>() {
+        m_jobManager.schedule(new IRunnable() {
+
           @Override
-          public Void call() throws Exception {
+          public void run() throws Exception {
             try {
               setupLatch.countDownAndBlock();
             }
@@ -511,23 +537,30 @@ public class JobCancelTest {
               protocol.add("job-3a-interrupted");
             }
             verifyLatch.countDown();
-            return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).withName("otherName").withMutex(null).withLogOnError(false));
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent())
+            .withName("otherName")
+            .withMutex(null)
+            .withLogOnError(false));
 
         // Job-3b (other name, other runMonitor => NO CANCEL)
-        m_jobManager.schedule(new Callable<Void>() {
+        m_jobManager.schedule(new IRunnable() {
+
           @Override
-          public Void call() throws Exception {
+          public void run() throws Exception {
             try {
               setupLatch.countDownAndBlock();
             }
             catch (InterruptedException e) {
               protocol.add("job-3b-interrupted");
             }
-            return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).withName("otherName").withMutex(null).withLogOnError(false));
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
+            .withName("otherName")
+            .withMutex(null)
+            .withLogOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -536,24 +569,29 @@ public class JobCancelTest {
           protocol.add("job-3-interrupted");
         }
         verifyLatch.countDown();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(null));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName(commonJobName)
+        .withMutex(null));
 
     // Job-4 (common-id, but not-null mutex)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         try {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
           protocol.add("job-4-interrupted");
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(new Object()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName(commonJobName)
+        .withMutex(new Object())
+        .withLogOnError(false));
 
     assertTrue(setupLatch.await());
     m_jobManager.cancel(Jobs.newFutureFilter().andMatchName(commonJobName).andMatchMutex(null), true);
@@ -581,7 +619,7 @@ public class JobCancelTest {
       public void run() throws Exception {
         executed.set(true);
       }
-    }, Jobs.newInput(runContext));
+    }, Jobs.newInput().withRunContext(runContext));
 
     future.awaitDone();
     assertFalse(executed.get());

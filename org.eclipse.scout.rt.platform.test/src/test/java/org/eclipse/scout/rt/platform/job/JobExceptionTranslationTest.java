@@ -53,7 +53,7 @@ public class JobExceptionTranslationTest {
       public void run() throws Exception {
         throw error;
       }
-    }, Jobs.newInput(null));
+    }, Jobs.newInput());
 
     // Test with default translator (ProcessingExceptionTranslator)
     try {
@@ -101,7 +101,7 @@ public class JobExceptionTranslationTest {
       public void run() throws Exception {
         throw error;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     // Test with default translator (ProcessingExceptionTranslator)
     try {

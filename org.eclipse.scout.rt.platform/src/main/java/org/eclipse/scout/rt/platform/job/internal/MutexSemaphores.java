@@ -146,7 +146,7 @@ public class MutexSemaphores {
     final MutexAcquisitionFutureTask mutexAcquisitionTask = new MutexAcquisitionFutureTask(mutexObject) {
 
       @Override
-      protected void mutexAcquired() {
+      protected void onMutexAcquired() {
         synchronized (acquisitionLock) {
           final MutexSemaphore mutexSemaphore = getMutexSemaphore(mutexObject);
 

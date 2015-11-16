@@ -30,13 +30,13 @@ import java.util.concurrent.TimeUnit;
 class FixedRateRunnable implements Runnable {
 
   private final DelayedExecutor m_delayedExecutor;
-  private final JobFutureTask<Void> m_futureTask;
+  private final JobFutureTask<?> m_futureTask;
   private final long m_periodNanos;
 
-  public FixedRateRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<Void> futureTask, final long period, final TimeUnit unit) {
+  public FixedRateRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<?> futureTask, final long periodMillis) {
     m_delayedExecutor = delayedExecutor;
     m_futureTask = futureTask;
-    m_periodNanos = unit.toNanos(period);
+    m_periodNanos = TimeUnit.MILLISECONDS.toNanos(periodMillis);
   }
 
   @Override
@@ -46,13 +46,13 @@ class FixedRateRunnable implements Runnable {
       return;
     }
 
-    final long beforeExecutionNanoTime = System.nanoTime();
+    final long startTimeNanos = System.nanoTime();
 
     m_futureTask.run();
 
     // re-schedule the task if still in 'done-state'.
     if (!m_futureTask.isDone()) {
-      final long elapsedNanos = System.nanoTime() - beforeExecutionNanoTime;
+      final long elapsedNanos = System.nanoTime() - startTimeNanos;
       final long remainingNanos = m_periodNanos - elapsedNanos;
       m_delayedExecutor.schedule(this, remainingNanos, TimeUnit.NANOSECONDS); // run the job once the remaining delay is expired.
     }

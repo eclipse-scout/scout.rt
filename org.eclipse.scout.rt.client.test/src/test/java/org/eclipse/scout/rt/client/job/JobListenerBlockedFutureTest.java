@@ -18,9 +18,9 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -61,10 +61,11 @@ public class JobListenerBlockedFutureTest {
     IJobListenerRegistration listenerRegistration = m_jobManager.addListener(listener);
     IClientSession clientSession = mock(IClientSession.class);
 
-    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
       @Override
-      public Void call() throws Exception {
-        return null;
+      public void run() throws Exception {
+        // NOOP
       }
     }, ClientJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true)));
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES));
@@ -103,24 +104,24 @@ public class JobListenerBlockedFutureTest {
       final JobInput input = ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true));
 
       // start recording of events
-      outerFuture = m_jobManager.schedule(new Callable<Void>() {
+      outerFuture = m_jobManager.schedule(new IRunnable() {
+
         @Override
-        public Void call() throws Exception {
-          innerFuture.setValue(m_jobManager.schedule(new Callable<Void>() {
+        public void run() throws Exception {
+          innerFuture.setValue(m_jobManager.schedule(new IRunnable() {
+
             @Override
-            public Void call() throws Exception {
+            public void run() throws Exception {
               condition.setBlocking(false);
 
               // Wait until the outer future is re-acquiring the mutex.
               m_jobManager.waitForPermitsAcquired(input.getMutex(), 2); // 2=outer-job + inner-job
-              return null;
             }
-          }, 200, TimeUnit.MILLISECONDS, input));
+          }, input.copy().withSchedulingDelay(200, TimeUnit.MILLISECONDS)));
 
           condition.waitFor();
-          return null;
         }
-      }, input);
+      }, input.copy());
       assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(outerFuture), 1, TimeUnit.MINUTES));
       m_jobManager.shutdown();
     }

@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -353,7 +354,8 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
             public void run() throws Exception {
               closeMessageBox();
             }
-          }, dt, TimeUnit.MILLISECONDS);
+          }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+              .withSchedulingDelay(dt, TimeUnit.MILLISECONDS));
         }
         // start sub event dispatch thread
         waitFor();

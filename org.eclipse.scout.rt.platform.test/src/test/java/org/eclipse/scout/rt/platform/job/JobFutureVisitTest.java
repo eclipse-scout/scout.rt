@@ -17,10 +17,10 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
@@ -65,95 +65,116 @@ public class JobFutureVisitTest {
     latch = new BlockingCountDownLatch(3);
 
     // SESSION 1 (JOB-1)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc1.waitFor();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex1_job1").withMutex(m_mutexObject1).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex1_job1")
+        .withMutex(m_mutexObject1)
+        .withLogOnError(false));
 
     // SESSION 1 (JOB-2)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         latch.countDownAndBlock();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex1_job2").withMutex(m_mutexObject1).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex1_job2")
+        .withMutex(m_mutexObject1)
+        .withLogOnError(false));
 
     // SESSION 1 (JOB-3)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex1_job3").withMutex(m_mutexObject1));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex1_job3")
+        .withMutex(m_mutexObject1));
 
     // =========
     // SESSION 2 (JOB-1)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex2_job1").withMutex(m_mutexObject2));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex2_job1")
+        .withMutex(m_mutexObject2));
 
     // SESSION 2 (JOB-2)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc2.waitFor();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex2_job2").withMutex(m_mutexObject2).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex2_job2")
+        .withMutex(m_mutexObject2)
+        .withLogOnError(false));
 
     // SESSION 2  (JOB-3)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc2.setBlocking(false);
 
         m_jobManager.waitForPermitsAcquired(m_mutexObject2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
 
         latch.countDownAndBlock();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex2_job3").withMutex(m_mutexObject2).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex2_job3")
+        .withMutex(m_mutexObject2)
+        .withLogOnError(false));
 
     // SESSION 2  (JOB-4)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex2_job4").withMutex(m_mutexObject2));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex2_job4")
+        .withMutex(m_mutexObject2));
 
     // =========
     // SESSION 3 (JOB-1)
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         latch.countDownAndBlock();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.empty()).withName("mutex3_job1").withMutex(m_mutexObject3).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("mutex3_job1")
+        .withMutex(m_mutexObject3)
+        .withLogOnError(false));
 
     assertTrue(latch.await());
   }

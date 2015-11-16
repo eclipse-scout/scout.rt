@@ -356,11 +356,15 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       ClientRunContext runContext = ClientRunContexts.copyCurrent().withSession(session, true);
       if (refreshInterval > 0) {
         // interval load
-        m_reloadJob = ClientJobs.scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext));
+        m_reloadJob = ClientJobs.schedule(runnable,
+            ClientJobs.newInput(runContext)
+                .withSchedulingDelay(startDelayMillis, TimeUnit.MILLISECONDS)
+                .withPeriodicExecutionWithFixedDelay(refreshInterval, TimeUnit.MILLISECONDS));
       }
       else {
         // single load
-        m_reloadJob = ClientJobs.schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext));
+        m_reloadJob = ClientJobs.schedule(runnable, ClientJobs.newInput(runContext)
+            .withSchedulingDelay(startDelayMillis, TimeUnit.MILLISECONDS));
       }
     }
   }

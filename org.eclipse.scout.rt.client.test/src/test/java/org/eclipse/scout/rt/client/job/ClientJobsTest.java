@@ -101,35 +101,43 @@ public class ClientJobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, 0, TimeUnit.MILLISECONDS).awaitDoneAndGet();
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDoneAndGet();
 
     assertTrue(ClientJobs.isClientJob(actualFuture));
     assertFalse(ModelJobs.isModelJob(actualFuture));
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
-    ClientJobs.scheduleAtFixedRate(new IRunnable() {
+    ClientJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent())).awaitDone();
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionAtFixedRate(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertTrue(ClientJobs.isClientJob(actualFutureHolder.getValue()));
     assertFalse(ModelJobs.isModelJob(actualFutureHolder.getValue()));
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
-    ClientJobs.scheduleWithFixedDelay(new IRunnable() {
+    ClientJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent())).awaitDone();
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionWithFixedDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertTrue(ClientJobs.isClientJob(actualFutureHolder.getValue()));
     assertFalse(ModelJobs.isModelJob(actualFutureHolder.getValue()));

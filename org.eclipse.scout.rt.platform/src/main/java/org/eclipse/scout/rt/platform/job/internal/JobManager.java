@@ -56,10 +56,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation of {@link IJobManager}.
  * <p/>
- * This job manager is not based on {@link ScheduledThreadPoolExecutor} due to its fixed-size thread pool. That means,
- * that once the <code>core-pool-size</code> is exceeded, the creation of on-demand threads up to a
- * <code>maximum-pool-size</code> would not be supported. Instead, 'delayed scheduling' is implemented by
- * {@link DelayedExecutor}.
+ * This job manager is based on {@link ThreadPoolExecutor} and not {@link ScheduledThreadPoolExecutor} because
+ * {@link ScheduledThreadPoolExecutor} is based on a fixed-size thread pool. That means, that once the
+ * <code>core-pool-size</code> is exceeded, the creation of on-demand threads up to a <code>maximum-pool-size</code>
+ * would not be supported. Instead, 'delayed scheduling' is implemented by {@link DelayedExecutor}.
  *
  * @since 5.1
  */
@@ -88,51 +88,66 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public final <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
-    final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input, false);
+  public IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
+    return schedule(Callables.callable(runnable), input);
+  }
 
-    if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-      m_executor.execute(futureTask);
+  @Override
+  public final <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
+    Assertions.assertNotNull(input, "'JobInput' must not be null");
+    final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
+
+    switch (input.getSchedulingRule()) {
+      case JobInput.SCHEDULING_RULE_ONE_TIME:
+        scheduleOneTimeJob(futureTask, input.getSchedulingDelay());
+        break;
+      case JobInput.SCHEDULING_RULE_AT_FIXED_RATE:
+        Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
+        schedulePeriodicJob(new FixedRateRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        break;
+      case JobInput.SCHEDULING_RULE_WITH_FIXED_DELAY:
+        Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
+        schedulePeriodicJob(new FixedDelayRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        break;
+      default:
+        throw new UnsupportedOperationException("Unsupported scheduling rule");
     }
 
     return futureTask;
   }
 
-  @Override
-  public final <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input, false);
+  /**
+   * Method invoked to schedule a one-time job.
+   */
+  protected <RESULT> void scheduleOneTimeJob(final JobFutureTask<RESULT> futureTask, final long schedulingDelay) {
+    if (schedulingDelay > 0L) {
+      m_delayedExecutor.schedule(new Runnable() {
 
-    m_delayedExecutor.schedule(new Runnable() {
-
-      @Override
-      public void run() {
-        if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-          futureTask.run();
+        @Override
+        public void run() {
+          if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
+            futureTask.run();
+          }
         }
+      }, schedulingDelay, TimeUnit.MILLISECONDS);
+    }
+    else {
+      if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
+        m_executor.execute(futureTask);
       }
-    }, delay, delayUnit);
-
-    return futureTask;
+    }
   }
 
-  @Override
-  public final IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final JobInput input) {
-    final JobFutureTask<Void> futureTask = createJobFutureTask(Callables.callable(runnable), input, true);
-    Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
-
-    m_delayedExecutor.schedule(new FixedRateRunnable(m_delayedExecutor, futureTask, period, unit), initialDelay, unit);
-
-    return futureTask;
-  }
-
-  @Override
-  public final IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final JobInput input) {
-    final JobFutureTask<Void> futureTask = createJobFutureTask(Callables.callable(runnable), input, true);
-    Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
-
-    m_delayedExecutor.schedule(new FixedDelayRunnable(m_delayedExecutor, futureTask, delay, unit), initialDelay, unit);
-
-    return futureTask;
+  /**
+   * Method invoked to schedule a periodic job.
+   */
+  protected void schedulePeriodicJob(final Runnable periodicRunnable, final long schedulingDelay) {
+    if (schedulingDelay > 0L) {
+      m_delayedExecutor.schedule(periodicRunnable, schedulingDelay, TimeUnit.MILLISECONDS);
+    }
+    else {
+      m_executor.execute(periodicRunnable);
+    }
   }
 
   @Override
@@ -199,18 +214,14 @@ public class JobManager implements IJobManager, IPlatformListener {
    *          callable to be given to the executor for execution.
    * @param input
    *          input that describes the job to be executed.
-   * @param periodic
-   *          <code>true</code> if this is a periodic action, <code>false</code> if executed only once.
    */
   @Internal
-  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input, final boolean periodic) {
-    Assertions.assertNotNull(input, "'JobInput' must not be null");
-
+  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input) {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
 
     final JobInput inputCopy = input.copy().withName(StringUtility.nvl(input.getName(), callable.getClass().getName()));
     final InvocationChain<RESULT> invocationChain = new InvocationChain<>();
-    final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, periodic, invocationChain, callable);
+    final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, invocationChain, callable);
 
     // Add functionality to be applied while executing the Callable (Thread-Locals, RunContext, ...).
     interceptInvocationChain(invocationChain, futureTask, runMonitor, inputCopy);

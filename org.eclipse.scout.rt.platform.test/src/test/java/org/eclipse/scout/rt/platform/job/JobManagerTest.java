@@ -16,9 +16,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -49,32 +49,35 @@ public class JobManagerTest {
   public void testVisit() throws Exception {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         latch.countDownAndBlock();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
-    IFuture<Void> future2 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         latch.countDownAndBlock();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
-    IFuture<Void> future3 = m_jobManager.schedule(new Callable<Void>() {
+    IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         latch.countDownAndBlock();
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
     assertTrue(latch.await());
 
@@ -100,10 +103,10 @@ public class JobManagerTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(3);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         try {
           setupLatch.countDownAndBlock();
         }
@@ -113,14 +116,15 @@ public class JobManagerTest {
         finally {
           verifyLatch.countDown();
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         try {
           setupLatch.countDownAndBlock();
         }
@@ -130,14 +134,15 @@ public class JobManagerTest {
         finally {
           verifyLatch.countDown();
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
-    m_jobManager.schedule(new Callable<Void>() {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      public void run() throws Exception {
         try {
           setupLatch.countDownAndBlock();
         }
@@ -147,9 +152,10 @@ public class JobManagerTest {
         finally {
           verifyLatch.countDown();
         }
-        return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withLogOnError(false));
 
     assertTrue(setupLatch.await());
 

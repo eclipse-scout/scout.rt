@@ -11,10 +11,8 @@
 package org.eclipse.scout.rt.client.job;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -33,28 +31,31 @@ import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
  * class is for convenience purpose to facilitate the creation and scheduling of model jobs.
  * <p>
  * <strong>By definition, a <code>ModelJob</code> requires a {@link ClientRunContext} and {@link IClientSession} to be
- * set as its mutex object. That causes all jobs with that session as their mutex-object to be run in sequence.</strong>
+ * set as its mutex object. That causes all jobs with that session as their mutex object to be run in sequence in the
+ * model thread. At any given time, there is only one model thread per client session.</strong>
  * </p>
- * The following code snippet illustrates what happens behind the scene:
+ * The following code snippet illustrates how the job is finally run:
  *
  * <pre>
- *   <i>
- *   final IClientSession session = ...;
- *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().session(session).locale(Locale.US);
- *   </i>
- *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
+ * <i>
+ * final IClientSession session = ...;
+ * final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent()
+ *          .withSession(session)
+ *          .withLocale(Locale.US);
+ * </i>
+ * BEANS.get(IJobManager.class).schedule(new IRunnable() {
  *
- *       &#064;Override
- *       public void run() throws Exception {
- *         clientRunContext.run(new IRunnable() {
+ *     &#064;Override
+ *     public void run() throws Exception {
+ *       clientRunContext.run(new IRunnable() {
  *
- *           &#064;Override
- *           public void run() throws Exception {
- *             // do some work
- *           }
- *         });
- *       }
- *     }, BEANS.get(JobInput.class).<strong>mutex(session)</strong>);
+ *         &#064;Override
+ *         public void run() throws Exception {
+ *           // do some work
+ *         }
+ *       });
+ *     }
+ *   }, BEANS.get(JobInput.class).<strong>mutex(session)</strong>);
  * </pre>
  *
  * @since 5.1
@@ -67,202 +68,149 @@ public final class ModelJobs {
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously on behalf of a model thread at the next reasonable opportunity. The
-   * caller of this method continues to run in parallel. The job will only commence execution once acquired the model
-   * mutex.
+   * Runs the given {@link IRunnable} asynchronously in the model thread once acquired the model mutex. The caller of
+   * this method continues to run in parallel.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
-   * </p>
+   * <strong>Do not wait for this job to complete if being a model job yourself as this would cause a deadlock.</strong>
    * <p>
-   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
+   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext} to run the job.
+   * <p>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
+   * block waiting for the job to complete, you can use constructions of the following form.
+   * <p>
+   * <code>ModelJobs.schedule(...).awaitDone();</code>
    *
    * @param runnable
    *          <code>IRunnable</code> to be executed.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   * @return Future to interact with the job like waiting for its completion or to cancel its execution.
+   * @see IJobManager#schedule(IRunnable, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable) {
-    return ModelJobs.schedule(runnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    return BEANS.get(IJobManager.class).schedule(runnable, ModelJobs.validateInput(ModelJobs.newInput(ClientRunContexts.copyCurrent())));
   }
 
   /**
-   * Runs the given {@link Callable} asynchronously on behalf of a model thread at the next reasonable opportunity. The
-   * caller of this method continues to run in parallel. The job will only commence execution once acquired the model
-   * mutex.
+   * Runs the given {@link Callable} asynchronously in the model thread once acquired the model mutex. The caller of
+   * this method continues to run in parallel. Jobs in the form of a {@link Callable} typically return a computation
+   * result to the submitter.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
-   * </p>
-   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * <p/>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
+   * <strong>Do not wait for this job to complete if being a model job yourself as this would cause a deadlock.</strong>
+   * <p>
+   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext} to run the job.
+   * <p>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
+   * block waiting for the job to complete, you can use constructions of the following form.
+   * <p>
+   * <code>Object result = ModelJobs.schedule(...).awaitDoneAndGet();</code>
    *
    * @param callable
    *          <code>Callable</code> to be executed.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   * @return Future to interact with the job like waiting for its completion, or to cancel its execution, or to get its
+   *         computation result.
+   * @see IJobManager#schedule(Callable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable) {
-    return ModelJobs.schedule(callable, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    return BEANS.get(IJobManager.class).schedule(callable, ModelJobs.validateInput(ModelJobs.newInput(ClientRunContexts.copyCurrent())));
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously on behalf of a model thread at the next reasonable opportunity. The
-   * caller of this method continues to run in parallel. The job will only commence execution once acquired the model
-   * mutex.
+   * Runs the given {@link Callable} asynchronously in the model thread once acquired the model mutex. The caller of
+   * this method continues to run in parallel.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
-   * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
+   * <strong>Do not wait for this job to complete if being a model job yourself as this would cause a deadlock.</strong>
+   * <p>
+   * The job manager will use the {@link JobInput} as provided to run the job.
+   * <p>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
+   * block waiting for the job to complete, you can use constructions of the following form.
+   * <p>
+   * <code>ModelJobs.schedule(...).awaitDone();</code>
    *
    * @param runnable
    *          <code>IRunnable</code> to be executed.
    * @param input
-   *          describes the job to be executed and contains execution instructions like 'expiration', and tells the job
-   *          manager in what {@link ClientRunContext} to run the job.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   *          information about the job with execution instructions for the job manager to run the job.
+   * @return Future to interact with the job like waiting for its completion or to cancel its execution.
+   * @see IJobManager#schedule(IRunnable, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), ModelJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(runnable, ModelJobs.validateInput(input));
   }
 
   /**
-   * Runs the given {@link Callable} asynchronously on behalf of a model thread at the next reasonable opportunity. The
-   * caller of this method continues to run in parallel. The job will only commence execution once acquired the model
-   * mutex.
+   * Runs the given {@link Callable} asynchronously in the model thread once acquired the model mutex. The caller of
+   * this method continues to run in parallel. Jobs in the form of a {@link Callable} typically return a computation
+   * result to the submitter.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
-   * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
+   * <strong>Do not wait for this job to complete if being a model job yourself as this would cause a deadlock.</strong>
+   * <p>
+   * The job manager will use the {@link JobInput} as provided to run the job.
+   * <p>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
+   * block waiting for the job to complete, you can use constructions of the following form.
+   * <p>
+   * <code>Object result = ModelJobs.schedule(...).awaitDoneAndGet();</code>
    *
    * @param callable
    *          <code>Callable</code> to be executed.
    * @param input
-   *          describes the job to be executed and contains execution instructions like 'expiration', and tells the job
-   *          manager in what {@link ClientRunContext} to run the job.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   *          information about the job with execution instructions for the job manager to run the job.
+   * @return Future to interact with the job like waiting for its completion, or to cancel its execution, or to get its
+   *         computation result.
+   * @see IJobManager#schedule(Callable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
     return BEANS.get(IJobManager.class).schedule(callable, ModelJobs.validateInput(input));
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously on behalf of a model thread after the specified delay has elapsed.
-   * The caller of this method continues to run in parallel. The job will only commence execution once acquired the
-   * model mutex.
+   * Creates a {@link JobInput} initialized with the given {@link ClientRunContext} and with the session set as it's
+   * mutex.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
-   * </p>
-   * <p>
-   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
+   * The job input returned can be associated with meta information about the job and with execution instructions to
+   * tell the job manager how to run the job. The input is to be given to the job manager alongside with the
+   * {@link IRunnable} or {@link Callable} to be executed.
    *
-   * @param runnable
-   *          <code>IRunnable</code> to be executed.
-   * @param delay
-   *          the delay after which the job should commence execution.
-   * @param delayUnit
-   *          the time unit of the <code>delay</code> argument.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
+   * @param clientRunContext
+   *          The {@link ClientRunContext} to be associated with the {@link JobInput} returned; must not be
+   *          <code>null</code>.
    */
-  public static IFuture<Void> schedule(final IRunnable runnable, final long delay, final TimeUnit delayUnit) {
-    return ModelJobs.schedule(runnable, delay, delayUnit, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+  public static JobInput newInput(final ClientRunContext clientRunContext) {
+    Assertions.assertNotNull(clientRunContext, "ClientRunContext required for model jobs");
+    Assertions.assertNotNull(clientRunContext.getSession(), "ClientSession required for model jobs");
+    return BEANS.get(JobInput.class).withThreadName("scout-model-thread").withRunContext(clientRunContext).withMutex(clientRunContext.getSession());
   }
 
   /**
-   * Runs the given {@link Callable} asynchronously on behalf of a model thread after the specified delay has elapsed.
-   * The caller of this method continues to run in parallel. The job will only commence execution once acquired the
-   * model mutex.
+   * Creates a filter to accept futures of all model jobs (and not client jobs) that comply with some specific
+   * characteristics. The filter returned accepts all model job futures. The filter is designed to support method
+   * chaining.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
+   * To accept both, model and client jobs, use a construct like the following:
    * </p>
-   * <p>
-   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
    *
-   * @param callable
-   *          <code>Callable</code> to be executed.
-   * @param delay
-   *          the delay after which the job should commence execution.
-   * @param delayUnit
-   *          the time unit of the <code>delay</code> argument.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
+   * <pre>
+   * new OrFilter&lt;&gt;(ModelJobs.newFutureFilter(), ClientJobs.newFutureFilter());
+   * </pre>
    */
-  public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final long delay, final TimeUnit delayUnit) {
-    return ModelJobs.schedule(callable, delay, delayUnit, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+  public static ClientJobFutureFilters.Filter newFutureFilter() {
+    return new ClientJobFutureFilters.Filter().andMatch(ClientJobFutureFilters.ModelJobFilter.INSTANCE);
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously on behalf of a model thread after the specified delay has elapsed.
-   * The caller of this method continues to run in parallel. The job will only commence execution once acquired the
-   * model mutex.
+   * Creates a filter to accept events of all model jobs (and not client jobs) that comply with some specific
+   * characteristics. The filter returned accepts all model job events. The filter is designed to support method
+   * chaining.
    * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
+   * To accept both, model and client jobs, use a construct like the following:
    * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
    *
-   * @param runnable
-   *          <code>IRunnable</code> to be executed.
-   * @param delay
-   *          the delay after which the job should commence execution.
-   * @param delayUnit
-   *          the time unit of the <code>delay</code> argument.
-   * @param input
-   *          describes the job to be executed and contains execution instructions like 'expiration', and tells the job
-   *          manager in what {@link ClientRunContext} to run the job.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
+   * <pre>
+   * new OrFilter&lt;&gt;(ModelJobs.newEventFilter(), ClientJobs.newEventFilter());
+   * </pre>
    */
-  public static IFuture<Void> schedule(final IRunnable runnable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), delay, delayUnit, ModelJobs.validateInput(input));
-  }
-
-  /**
-   * Runs the given {@link Callable} asynchronously on behalf of a model thread after the specified delay has elapsed.
-   * The caller of this method continues to run in parallel. The job will only commence execution once acquired the
-   * model mutex.
-   * <p>
-   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
-   * </p>
-   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
-   * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = ModelJobs.schedule(...).awaitDone();</code>.
-   *
-   * @param callable
-   *          <code>Callable</code> to be executed.
-   * @param delay
-   *          the delay after which the job should commence execution.
-   * @param delayUnit
-   *          the time unit of the <code>delay</code> argument.
-   * @param input
-   *          describes the job to be executed and contains execution instructions like 'expiration', and tells the job
-   *          manager in what {@link ClientRunContext} to run the job.
-   * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
-   */
-  public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(callable, delay, delayUnit, ModelJobs.validateInput(input));
+  public static ClientJobEventFilters.Filter newEventFilter() {
+    return new ClientJobEventFilters.Filter().andMatch(ClientJobEventFilters.MODEL_JOB_EVENT_FILTER);
   }
 
   /**
@@ -296,66 +244,6 @@ public final class ModelJobs {
       return false; // this is a client job
     }
     return true;
-  }
-
-  /**
-   * Creates a {@link JobInput} initialized with the given {@link ClientRunContext}
-   * <p>
-   * A <code>JobInput</code> contains information about the job like its name and execution instructions, whereas a
-   * <code>RunContext</code> defines contextual values such as <code>Subject</code>, <code>Locale</code>,
-   * <code>Session</code>, and more. The context given to the <code>JobInput</code> is applied during the job's
-   * execution. A context is created as following:
-   * </p>
-   *
-   * <pre>
-   * <code>
-   * // to create a "snapshot" of the current calling state
-   * ClientRunContexts.copyCurrent();
-   *
-   * // to create a "snapshot" of the current calling state, but with some values changed
-   * ClientRunContexts.copyCurrent().session(...).subject(...).locale(Locale.US)
-   *
-   * // to create an empty context with no values set
-   * ClientRunContexts.empty();
-   * </code>
-   * </pre>
-   */
-  public static JobInput newInput(final ClientRunContext clientRunContext) {
-    Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for model jobs");
-    Assertions.assertNotNull(clientRunContext.getSession(), "'ClientSession' must not be null for model jobs");
-    return BEANS.get(JobInput.class).withThreadName("scout-model-thread").withRunContext(clientRunContext).withMutex(clientRunContext.getSession());
-  }
-
-  /**
-   * Creates a filter to accept Futures of all model jobs (and not client jobs) that comply with some specific
-   * characteristics. The filter returned accepts all model job Futures. The filter is designed to support method
-   * chaining.
-   * <p>
-   * To accept both, model and client jobs, use a construct like the following:
-   * </p>
-   *
-   * <pre>
-   * new OrFilter&lt;&gt;(ModelJobs.newFutureFilter(), ClientJobs.newFutureFilter());
-   * </pre>
-   */
-  public static ClientJobFutureFilters.Filter newFutureFilter() {
-    return new ClientJobFutureFilters.Filter().andMatch(ClientJobFutureFilters.ModelJobFilter.INSTANCE);
-  }
-
-  /**
-   * Creates a filter to accept events of all model jobs (and not client jobs) that comply with some specific
-   * characteristics. The filter returned accepts all model job events. The filter is designed to support method
-   * chaining.
-   * <p>
-   * To accept both, model and client jobs, use a construct like the following:
-   * </p>
-   *
-   * <pre>
-   * new OrFilter&lt;&gt;(ModelJobs.newEventFilter(), ClientJobs.newEventFilter());
-   * </pre>
-   */
-  public static ClientJobEventFilters.Filter newEventFilter() {
-    return new ClientJobEventFilters.Filter().andMatch(ClientJobEventFilters.MODEL_JOB_EVENT_FILTER);
   }
 
   /**

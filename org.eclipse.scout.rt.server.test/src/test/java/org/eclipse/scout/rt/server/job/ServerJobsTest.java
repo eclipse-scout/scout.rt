@@ -100,33 +100,41 @@ public class ServerJobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, 0, TimeUnit.MILLISECONDS).awaitDoneAndGet();
+    }, ServerJobs.newInput(ServerRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDoneAndGet();
 
     assertTrue(ServerJobs.isServerJob(actualFuture));
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
-    ServerJobs.scheduleAtFixedRate(new IRunnable() {
+    ServerJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, ServerJobs.newInput(ServerRunContexts.copyCurrent())).awaitDone();
+    }, ServerJobs.newInput(ServerRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionAtFixedRate(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
-    ServerJobs.scheduleWithFixedDelay(new IRunnable() {
+    ServerJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, ServerJobs.newInput(ServerRunContexts.copyCurrent())).awaitDone();
+    }, ServerJobs.newInput(ServerRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionWithFixedDelay(0, TimeUnit.MILLISECONDS))
+        .awaitDone();
 
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
   }

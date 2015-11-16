@@ -49,7 +49,8 @@ public class RunMonitorJobTest {
         assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
         assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
     assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
 
@@ -70,7 +71,8 @@ public class RunMonitorJobTest {
         assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
         assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
     assertNull(RunMonitorEx.CURRENT.get());
 
@@ -90,7 +92,8 @@ public class RunMonitorJobTest {
       public void run() throws Exception {
         assertTrue(currentMonitor.containsCancellable(RunMonitorEx.CURRENT.get()));
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
 
@@ -107,7 +110,8 @@ public class RunMonitorJobTest {
       public void run() throws Exception {
         assertNotNull(RunMonitorEx.CURRENT.get());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     assertNull(RunMonitorEx.CURRENT.get());
   }

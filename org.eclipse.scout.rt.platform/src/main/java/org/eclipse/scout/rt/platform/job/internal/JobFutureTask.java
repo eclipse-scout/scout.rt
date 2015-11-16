@@ -64,14 +64,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final JobManager m_jobManager;
   protected final RunMonitor m_runMonitor;
   protected final JobInput m_input;
-  protected final boolean m_periodic;
   protected final Long m_expirationDate;
 
   protected volatile boolean m_blocked;
   protected final DonePromise<RESULT> m_donePromise;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
-  public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final boolean periodic, final InvocationChain<RESULT> invocationChain, final Callable<RESULT> callable) {
+  public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final InvocationChain<RESULT> invocationChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
 
       @Override
@@ -83,7 +82,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
     m_input = input;
-    m_periodic = periodic;
 
     m_donePromise = new DonePromise<>(this);
     m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
@@ -129,7 +127,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
         cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
       }
 
-      if (m_periodic) {
+      if (isPeriodic()) {
         super.runAndReset(); // periodic action
       }
       else {
@@ -155,7 +153,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public boolean isPeriodic() {
-    return m_periodic;
+    return m_input.getSchedulingRule() != JobInput.SCHEDULING_RULE_ONE_TIME;
   }
 
   @Override
@@ -296,8 +294,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public void whenDone(final IDoneCallback<RESULT> callback) {
+  public IFuture<RESULT> whenDone(final IDoneCallback<RESULT> callback) {
     m_donePromise.whenDone(callback);
+    return this;
   }
 
   @Override
@@ -359,7 +358,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("job", m_input);
-    builder.attr("periodic", m_periodic);
+    builder.attr("periodic", isPeriodic());
     builder.attr("blocked", m_blocked);
     builder.attr("expirationDate", m_expirationDate);
     return builder.toString();

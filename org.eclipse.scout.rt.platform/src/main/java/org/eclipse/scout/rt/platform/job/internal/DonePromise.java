@@ -80,7 +80,7 @@ class DonePromise<RESULT> {
           public void run() throws Exception {
             callback.onDone(m_doneEvent);
           }
-        }, Jobs.newInput(null).withName("'Future#whenDone' notification"));
+        }, Jobs.newInput().withName("'Future#whenDone' notification"));
       }
     }
     finally {

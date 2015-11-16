@@ -89,7 +89,7 @@ class DelayedExecutor {
       try {
         while (!m_executor.isShutdown()) {
           try {
-            m_executor.execute(m_delayedTaskQueue.take()); // 'DelayQueue#take' blocks until a Runnable gets expired to be executed.
+            m_executor.execute(m_delayedTaskQueue.take()); // 'DelayQueue#take' blocks until a Runnable's delay expired to be executed.
           }
           catch (final InterruptedException e) {
             if (!m_executor.isShutdown()) {

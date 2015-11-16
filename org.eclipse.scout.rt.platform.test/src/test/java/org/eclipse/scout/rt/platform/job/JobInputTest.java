@@ -31,7 +31,7 @@ public class JobInputTest {
 
   @Test
   public void testCopy() {
-    JobInput input = Jobs.newInput(RunContexts.empty());
+    JobInput input = Jobs.newInput().withRunContext(RunContexts.empty());
     input.withName("name");
 
     JobInput copy = input.copy();
@@ -42,8 +42,10 @@ public class JobInputTest {
 
   @Test
   public void testFillCurrentName() {
-    assertNull(Jobs.newInput(RunContexts.copyCurrent()).getName());
-    assertEquals("ABC", Jobs.newInput(RunContexts.copyCurrent()).withName("ABC").getName());
+    assertNull(Jobs.newInput().withRunContext(RunContexts.copyCurrent()).getName());
+    assertEquals("ABC", Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName("ABC").getName());
   }
 
 }

@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
@@ -134,9 +133,10 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
     final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
 
-    final RunMonitor runMonitor = BEANS.get(RunMonitor.class); // do not link the RunMonitor with the current RunMonitor to not cancel this request.
-    final JobInput jobInput = Jobs.newInput(m_tunnel.createCurrentRunContext().withRunMonitor(runMonitor)).withName("Cancellation request [%s]", requestSequence);
-    final ServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet(10, TimeUnit.SECONDS);
+    final ServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
+        .withRunContext(m_tunnel.createCurrentRunContext().withRunMonitor(BEANS.get(RunMonitor.class))) // do not link the RunMonitor with the current RunMonitor to not cancel this request.))
+        .withName("Cancellation request [%s]", requestSequence))
+        .awaitDoneAndGet(10, TimeUnit.SECONDS);
 
     if (cancelResponse == null) {
       return false;

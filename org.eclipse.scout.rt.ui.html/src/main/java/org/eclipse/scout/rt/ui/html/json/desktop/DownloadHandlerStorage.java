@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
@@ -57,13 +58,14 @@ public class DownloadHandlerStorage {
   }
 
   protected void scheduleRemoval(final String key, long ttl) {
-    IFuture<?> future = Jobs.schedule(new IRunnable() {
+    m_futureMap.put(key, Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         removeOnTimeout(key);
       }
-    }, ttl, TimeUnit.MILLISECONDS);
-    m_futureMap.put(key, future);
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(ttl, TimeUnit.MILLISECONDS)));
   }
 
   protected void removeOnTimeout(String key) {

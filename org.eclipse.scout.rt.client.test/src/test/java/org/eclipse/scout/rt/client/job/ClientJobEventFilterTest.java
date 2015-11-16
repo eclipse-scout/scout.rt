@@ -38,14 +38,19 @@ public class ClientJobEventFilterTest {
 
   @Mock
   private IJobManager m_jobManager;
+
   @Mock
   private IFuture<?> m_clientJobFuture;
+
   @Mock
   private IFuture<?> m_modelJobFuture;
+
   @Mock
   private IFuture<?> m_jobFuture;
+
   @Mock
   private IClientSession m_clientSession1;
+
   @Mock
   private IClientSession m_clientSession2;
 
@@ -59,7 +64,7 @@ public class ClientJobEventFilterTest {
     JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true));
     when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
 
-    JobInput jobInput = Jobs.newInput(RunContexts.empty());
+    JobInput jobInput = Jobs.newInput().withRunContext(RunContexts.empty());
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
   }
 

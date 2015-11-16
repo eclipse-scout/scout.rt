@@ -2917,7 +2917,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
   protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) {
-    return ClientJobs.scheduleAtFixedRate(new IRunnable() {
+    return ClientJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -2937,7 +2937,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Form timer")).awaitDone();
       }
-    }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(intervalSeconds, TimeUnit.SECONDS)
+        .withPeriodicExecutionAtFixedRate(intervalSeconds, TimeUnit.SECONDS));
   }
 
   /**
@@ -2947,7 +2949,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     final long startMillis = System.currentTimeMillis();
     final long delayMillis = TimeUnit.SECONDS.toMillis(seconds);
 
-    return ClientJobs.scheduleAtFixedRate(new IRunnable() {
+    return ClientJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -2977,7 +2979,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }).awaitDone();
       }
-    }, 0, 1, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("Close timer"));
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(0, TimeUnit.SECONDS)
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
+        .withLogOnError(false)
+        .withName("Close timer"));
   }
 
   private abstract static class P_AbstractCollectingFieldVisitor<T> implements IFormFieldVisitor {

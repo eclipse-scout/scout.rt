@@ -107,18 +107,19 @@ public class ClientNotificationDispatcher {
     }
     else {
       // dispatch async
-      IRunnable dispatchRunnable = new IRunnable() {
+      IFuture<Void> future = ClientJobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           dispatchSync(notification);
         }
-      };
-      IFuture<Void> future = Jobs.schedule(dispatchRunnable, Jobs.newInput(ClientRunContexts.copyCurrent()));
+      }, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
+
       synchronized (m_notificationFutures) {
         m_notificationFutures.add(future);
-        future.whenDone(new P_NotificationFutureCallback(future));
       }
+
+      future.whenDone(new P_NotificationFutureCallback(future));
     }
   }
 
@@ -138,17 +139,20 @@ public class ClientNotificationDispatcher {
       dispatchSync(notification);
     }
     else {
-      IRunnable dispatchRunnable = new IRunnable() {
+      IFuture<Void> future = ClientJobs.schedule(new IRunnable() {
+
         @Override
         public void run() throws Exception {
           dispatchSync(notification);
         }
-      };
-      IFuture<Void> future = ClientJobs.schedule(dispatchRunnable, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
+      }, ClientJobs.newInput(ClientRunContexts.empty()
+          .withSession(session, true)));
+
       synchronized (m_notificationFutures) {
         m_notificationFutures.add(future);
-        future.whenDone(new P_NotificationFutureCallback(future));
       }
+
+      future.whenDone(new P_NotificationFutureCallback(future));
     }
   }
 
@@ -170,16 +174,16 @@ public class ClientNotificationDispatcher {
   }
 
   private class P_NotificationFutureCallback implements IDoneCallback<Void> {
-    private IFuture<Void> m_furture;
+    private IFuture<Void> m_future;
 
     public P_NotificationFutureCallback(IFuture<Void> furture) {
-      m_furture = furture;
+      m_future = furture;
     }
 
     @Override
     public void onDone(DoneEvent<Void> event) {
       synchronized (m_notificationFutures) {
-        m_notificationFutures.remove(m_furture);
+        m_notificationFutures.remove(m_future);
       }
     }
   }

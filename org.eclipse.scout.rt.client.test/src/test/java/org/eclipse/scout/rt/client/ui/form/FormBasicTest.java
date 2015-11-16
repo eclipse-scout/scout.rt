@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -68,7 +69,8 @@ public class FormBasicTest {
         Thread.sleep(200L);
         testSequence.add(3);
       }
-    }, 200, TimeUnit.MILLISECONDS);
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withSchedulingDelay(200, TimeUnit.MILLISECONDS));
 
     try {
       f.start(new FormHandler());
