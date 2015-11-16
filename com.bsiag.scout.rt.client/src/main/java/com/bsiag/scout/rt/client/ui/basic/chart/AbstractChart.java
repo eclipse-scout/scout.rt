@@ -30,37 +30,60 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
 
 /**
- * Legend: write the text for the legend into groupName of {@link ChartValueGroupBean}. <br/>
- * {@link IChartType.PIE}, {@link IChartType.DONUT}: Sectors on pie or donut represents a single
- * {@link ChartValueGroupBean} on the {@link ChartBean} ChartBean. For each {@link ChartValueGroupBean} there can be
- * only one value. On the {@link ChartBean} there are no axes set. <br/>
- * {@link IChartType.LINE} Each line represents a single {@link ChartValueGroupBean} on the {@link ChartBean}. All added
+ * <h1>Chart types</h1>
+ * <h2>Pie and Donut Chart</h2> ({@link IChartType.PIE}, {@link IChartType.DONUT})
+ * <p>
+ * Sectors on pie or donut represent a single {@link ChartValueGroupBean} on the {@link ChartBean}. For each
+ * {@link ChartValueGroupBean} there can be only one value. On the {@link ChartBean} there are no axes set.
+ * <h2>Line Chart</h2> ({@link IChartType.LINE})
+ * <p>
+ * Each line represents a single {@link ChartValueGroupBean} on the {@link ChartBean}. All added
  * {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
- * {@link ChartBean.getAxes()[0]}. Each label in this list corresponds to the index in the value list in the
- * {@link ChartValueGroupBean}</br>
- * {@link IChartType.BAR} Each bar group in the same color represents a single {@link ChartValueGroupBean} on the
- * {@link ChartBean}. All added {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are
- * read out of {@link ChartBean.getAxes()[0]}. Each label in this list corresponds to the index in the value list in the
- * {@link ChartValueGroupBean}</br>
- * {@link IChartType.FULFILLMENT} There have to be exactly two {@link ChartValueGroupBean} on the {@link ChartBean},
- * with just one value each. The first group contains the degree of fulfillment and the second group contains the value
- * to fulfill.</br>
- * {@link IChartType.SALESFUNNEL} A salesfunnel consists of n {@link ChartValueGroupBean}. Each represents a bar in the
- * chart. Every group must have at least one value and at most two values.
- * {@link IChartType.PROP_SALESFUNNEL_PROPORTIONAL}, {@link IChartType.PROP_SALESFUNNEL_CALC_CONVERSION_RATE} are custom
- * properties for a salesfunnel. Propotional defines if the bars should be rendered smaller from top to bottom or if
- * they get a size according to their values. {@link IChartType.PROP_SALESFUNNEL_CALC_CONVERSION_RATE} specifies whether
- * the conversion rate should be rendered(true or false)<br/>
- * {@link IChartType.SPEEDO} For a speedo chart there have to be just one {@link ChartValueGroupBean} on the
- * {@link ChartBean}. The first value on the group is the min value of the range, the second the actual value is the
- * actual value for the pointer and the third value is the max value for the range. The
- * {@link IChartType.PROP_SPEEDO_CHART_GREEN_AREA_POSITION} is a custom property which defines where the green area is
- * located on the speedo.<br/>
- * {@link IChartType.VENN} A Venn-chart consist of one to seven {@link ChartValueGroupBean} with exactly one value.
- * First there are all values for the own circle followed by all combinations. The venn chart is limited to three
- * circles. {@link IChartType.PROP_VENN_NUMBER_OF_CIRCLES} specifies the number of circles. Example for data-> three
- * circles:{"Set A", "Set B", "Set C", "A-B", "A-C", "B-C", "A-B-C"}<br/>
- * Two circles:{"Set A", "Set B", "A-B"}<br/>
+ * {@link ChartBean#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
+ * the {@link ChartValueGroupBean}.
+ * <h2>Bar Chart</h2> ({@link IChartType.BAR})
+ * <p>
+ * Each bar group in the same color represents a single {@link ChartValueGroupBean} on the {@link ChartBean}. All added
+ * {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
+ * {@link ChartBean#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
+ * the {@link ChartValueGroupBean}.
+ * <p>
+ * <h2>Fulfillment cCart</h2> ({@link IChartType.FULFILLMENT})
+ * <p>
+ * There have to be exactly two {@link ChartValueGroupBean} on the {@link ChartBean}, with just one value each. The
+ * first group contains the degree of fulfillment and the second group contains the value to fulfill.
+ * <h2>Sales Funnel Chart</h2> ({@link IChartType.SALESFUNNEL})
+ * <p>
+ * A salesfunnel consists of n {@link ChartValueGroupBean}. Each represents a bar in the chart. Every group must have at
+ * least one value and at most two values.
+ * <p>
+ * There are custom attributes for the sales funnel chart:
+ * <ul>
+ * <li>{@link IChartType#PROP_SALESFUNNEL_NORMALIZED} defines if the bars should be rendered smaller from top to bottom
+ * (true) or if they get a size according to their values (false).
+ * <li>{@link IChartType.PROP_SALESFUNNEL_CALC_CONVERSION_RATE} specifies whether the conversion rate should be rendered
+ * (true or false).
+ * </ul>
+ * <h2>Speedo Chart</h2> ({@link IChartType.SPEEDO})
+ * <p>
+ * For a speedo chart there have to be just one {@link ChartValueGroupBean} on the {@link ChartBean}. The first value on
+ * the group is the min value of the range, the second the actual value is the actual value for the pointer and the
+ * third value is the max value for the range. The {@link IChartType#PROP_SPEEDO_CHART_GREEN_AREA_POSITION} is a custom
+ * property which defines where the green area is located on the speedo.
+ * <h2>Venn Chart</h2> ({@link IChartType.VENN})
+ * <p>
+ * A Venn-chart consist of one to seven {@link ChartValueGroupBean} with exactly one value. First there are all values
+ * for the own circle followed by all combinations. The venn chart is limited to three circles.
+ * {@link IChartType.PROP_VENN_NUMBER_OF_CIRCLES} specifies the number of circles.
+ * <p>
+ * Examples:
+ * <ul>
+ * <li>Three circles: {"Set A", "Set B", "Set C", "A-B", "A-C", "B-C", "A-B-C"}
+ * <li>Two circles:{"Set A", "Set B", "A-B"}
+ * </ul>
+ * <h1>Other attributes</h1>
+ * <h2>Legend</h2> Write the text for the legend into groupName of {@link ChartValueGroupBean}.
+ * <p>
  *
  * @since 5.2
  */
