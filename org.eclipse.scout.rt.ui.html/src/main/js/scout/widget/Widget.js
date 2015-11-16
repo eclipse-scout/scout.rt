@@ -309,9 +309,9 @@ scout.Widget.prototype.entryPoint = function($element) {
   if (!$element.length) {
     throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
   }
-  var ownerWindow = $element.getWindow();
-  if (ownerWindow.popupWindow) {
-    return ownerWindow.popupWindow.$container;
+  var myWindow = $element.getWindow();
+  if (myWindow.popupWindow) {
+    return myWindow.popupWindow.$container;
   } else {
     return this.session.$entryPoint;
   }

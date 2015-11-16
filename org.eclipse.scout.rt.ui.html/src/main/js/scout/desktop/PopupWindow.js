@@ -55,6 +55,10 @@ scout.PopupWindow.prototype._onReady = function() {
   }
   this.form.htmlComp.validateLayout();
 
+  // Must register some top-level keystroke-handlers on popup-window
+  // We do the same thing here, as with the $entryPoint of the main window
+  this.session.keyStrokeManager.installTopLevelKeyStrokeHandlers(this.$container);
+
   // Attach event handlers on window
   $(this.myWindow)
     .on('unload', this._onUnload.bind(this))

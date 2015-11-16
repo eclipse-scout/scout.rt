@@ -14,25 +14,30 @@ scout.KeyStrokeManager = function(session) {
   this._helpRendered = false;
   this._renderedKeys = [];
 
-  // Prevent browser to interpret F1 (help).
-  this.$entryPoint.keydown(swallowHelpKeyStroke.bind(this));
-  this.$entryPoint.keyup(swallowHelpKeyStroke.bind(this));
-  if ('onhelp' in window) { // FIXME AWE: (2nd screen) check if F1 / KeystrokeManager works in popup-window (check all window references in this file)
-    window.onhelp = scout.filters.returnFalse;
-  }
+  this.installTopLevelKeyStrokeHandlers(this.$entryPoint);
+};
 
-  // Prevent browser to interpret backspace.
-  this.$entryPoint.keydown(swallowBackspaceStroke.bind(this));
-  this.$entryPoint.keyup(swallowBackspaceStroke.bind(this));
+scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($container) {
+  var
+    myWindow = $container.getWindow(),
+    // Swallow F1 (online help) key stroke
+    helpHandler = function(event) {
+      return !this._isHelpKeyStroke(event);
+    }.bind(this),
+    // Swallow Backspace (browser navigation) key stroke
+    backspaceHandler = function(event) {
+      return event.which !== scout.keys.BACKSPACE;
+    }.bind(this);
 
-  // ===== Helper functions ===== //
+  $container
+    .keydown(helpHandler)
+    .keyup(helpHandler);
+  $container
+    .keydown(backspaceHandler)
+    .keyup(backspaceHandler);
 
-  function swallowHelpKeyStroke(event) {
-    return !this._isHelpKeyStroke(event);
-  }
-
-  function swallowBackspaceStroke(event) {
-    return (event.which !== scout.keys.BACKSPACE);
+  if ('onhelp' in myWindow) { // FIXME AWE: (2nd screen) check if F1 / KeystrokeManager works in popup-window (check all window references in this file)
+    myWindow.onhelp = scout.filters.returnFalse;
   }
 };
 
@@ -61,7 +66,7 @@ scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeCon
       if (event.originalEvent.renderingHelp || !this._helpRendered) {
         event.originalEvent.renderingHelp = true; // flag to let superior keyStrokeContexts render their help keys
         this._helpRendered = true; // flag to only render help once, if help key is held down
-        this._installHelpDisposeListener();
+        this._installHelpDisposeListener(event);
         this._renderKeys(keyStrokeContext, event);
       }
     } else {
@@ -171,20 +176,30 @@ scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
   return event.which === scout.keys.F1;
 };
 
-scout.KeyStrokeManager.prototype._installHelpDisposeListener = function() {
-  var helpDisposeListener = function() {
-    this.$entryPoint.off('keyup', helpDisposeListener);
-    $(window).off('blur', helpDisposeListener);
-    this._helpRendered = false;
+scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
+  var helpDisposeHandler, $topLevelContainer,
+    $myWindow = $(event.currentTarget).getWindow(true);
 
+  // FIXME AWE: (2nd screen) basically this is the same thing as in Widget#entryPoint.
+  // Provide a static function?
+  if ($myWindow[0].popupWindow) {
+    $topLevelContainer = $myWindow[0].popupWindow.$container;
+  } else {
+    $topLevelContainer = this.$entryPoint;
+  }
+
+  helpDisposeHandler = function() {
+    $topLevelContainer.off('keyup', helpDisposeHandler);
+    $myWindow.off('blur', helpDisposeHandler);
+    this._helpRendered = false;
     this._renderedKeys.forEach(function(key) {
       key.remove();
     });
     this._renderedKeys = [];
   }.bind(this);
 
-  this.$entryPoint.on('keyup', helpDisposeListener);
-  $(window).on('blur', helpDisposeListener); // once the current browser tab/window is left
+  $topLevelContainer.on('keyup', helpDisposeHandler);
+  $myWindow.on('blur', helpDisposeHandler); // once the current browser tab/window is left
 
   return false;
 };
