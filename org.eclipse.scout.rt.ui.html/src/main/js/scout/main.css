@@ -112,7 +112,7 @@ input, textarea, button {
   #scout.font-text-normal();
 }
 
-input, .input-field, textarea, .clipboard-field & > .field {
+input, .input-field, textarea, .clipboard-field > .field {
   background-color: @control-background-color;
   color: @control-color;
   border: 1px solid @border-color;

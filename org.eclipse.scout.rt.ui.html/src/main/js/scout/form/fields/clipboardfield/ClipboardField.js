@@ -43,7 +43,9 @@ scout.ClipboardField.prototype._render = function($parent) {
     }.bind(this));
   this.dragAndDropHandler.install(this.$field);
 
-  this.$field.attr('contenteditable', 'true')
+  this.$field
+    .attr('contenteditable', 'true')
+    .attr('tabindex', '0')
     .on('paste', this._onPaste.bind(this))
     .on('copy', this._onCopy.bind(this))
     .on('cut', this._onCopy.bind(this));
