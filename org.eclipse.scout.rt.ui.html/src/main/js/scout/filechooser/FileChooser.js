@@ -224,6 +224,8 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this.$files.empty();
     }
     var $file = this.$files.appendElement('<li>', 'file', file.name);
+    // Append a space to allow the browser to break the line here when it gets too long
+    $file.append(" ");
     var $remove = $file
       .appendSpan('remove menu-item')
       .on('click', this.removeFile.bind(this, file, $file));

@@ -56,14 +56,12 @@
           content: @icon-file;
           float: left;
           width: @file-list-indent;
-          margin-top: 1px;
           padding-left: 2px;
         }
 
         & > .remove {
-          line-height: 20px; /* override line-height of .menu-item */
+          line-height: normal; /* override line-height of .menu-item */
           display: inline;
-          padding-left: @button-padding;
 
           & > .remove-link {
             text-decoration: underline;
