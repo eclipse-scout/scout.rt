@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>1.6.6</version>
+    <version>1.6.7</version>
     <relativePath></relativePath>
   </parent>
 
@@ -442,6 +442,15 @@
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </pluginRepository>
+    <!-- Bintray Repository for test-release of https://github.com/mojohaus/flatten-maven-plugin/pull/13 -->
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>bintray-bsi-business-systems-integration-ag-scout-eclipse-org</id>
+      <name>bintray-plugins</name>
+      <url>http://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
     </pluginRepository>
   </pluginRepositories>
 
