@@ -11,4 +11,5 @@
 .html-field > .field {
   margin-left: @mandatory-indicator-width;
   #scout.user-select(text);
+  overflow: hidden;
 }

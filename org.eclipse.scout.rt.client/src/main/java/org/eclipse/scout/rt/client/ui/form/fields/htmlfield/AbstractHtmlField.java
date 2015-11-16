@@ -43,7 +43,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   private static final Logger LOG = LoggerFactory.getLogger(AbstractHtmlField.class);
 
   private IHtmlFieldUIFacade m_uiFacade;
-  private boolean m_scrollBarEnabled;
   private Set<BinaryResource> m_attachments;
 
   public AbstractHtmlField() {
@@ -105,7 +104,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
-    m_scrollBarEnabled = getConfiguredScrollBarEnabled();
+    setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setHtmlEnabled(true);
   }
 
@@ -176,8 +175,14 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
+  public void setScrollBarEnabled(boolean scrollBarEnabled) {
+    // TODO BSH/AWE Cleanup scroll[bB]ar[s] confusion
+    propertySupport.setPropertyBool(PROP_SCROLLBARS_ENABLED, scrollBarEnabled);
+  }
+
+  @Override
   public boolean isScrollBarEnabled() {
-    return m_scrollBarEnabled;
+    return propertySupport.getPropertyBool(PROP_SCROLLBARS_ENABLED);
   }
 
   private class P_UIFacade implements IHtmlFieldUIFacade {

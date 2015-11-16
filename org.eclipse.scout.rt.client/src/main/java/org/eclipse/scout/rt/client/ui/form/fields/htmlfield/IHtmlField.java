@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
  * like scrolling. <br>
  * Compared to the {@link IBrowserField}, the content is embedded directly into the main html document without using an
  * iframe.
- * 
+ *
  * @see IBrowserField
  * @see ILabelField
  */
@@ -41,13 +41,11 @@ public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlC
 
   String getScrollToAnchor();
 
+  void setScrollBarEnabled(boolean scrollBarEnabled);
+
   boolean isScrollBarEnabled();
 
   void scrollToEnd();
-
-  /*
-   * Runtime
-   */
 
   IHtmlFieldUIFacade getUIFacade();
 
