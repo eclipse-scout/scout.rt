@@ -23,7 +23,7 @@
   <artifactId>org.eclipse.scout.rt</artifactId>
   <version>5.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Eclipse Scout RT Parent Module</name>
+  <name>Eclipse Scout RT</name>
 
   <prerequisites>
     <maven>3.2.2</maven>
