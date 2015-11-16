@@ -12,9 +12,9 @@ scout.DatePickerLayout = function(datePicker) {
   this._datePicker = datePicker;
   this._cache = {
     monthWidth: 0,
-    daySize: 0,
     cssDaySize: 0,
-    dayMargin: 0,
+    dayMarginHoriz: 0,
+    dayMarginVert: 0,
     dayPaddingTop: 0
   };
 };
@@ -22,11 +22,7 @@ scout.inherits(scout.DatePickerLayout, scout.AbstractLayout);
 
 scout.DatePickerLayout.COLUMNS = 7;
 scout.DatePickerLayout.ROWS = 6; // rows excl. weekday row
-scout.DatePickerLayout.MIN_DAY_SIZE = 26;
-scout.DatePickerLayout.SIDE_RATIO = 1.3918;
-
-// FIXME AWE: seitenverhältnis vom date-picker verbessern (nicht quadratisch, sondern leicht rechteckig)
-// FIXME AWE: animation verbessern (links und rechts abdecken, damit DIVs die reinsliden nicht sichtbar sind)
+scout.DatePickerLayout.DAY_SIZE = 26; // size of day (exkl. padding and margin) is always fix - margin and padding is variable
 
 scout.DatePickerLayout.prototype.layout = function($container) {
   var
@@ -47,35 +43,37 @@ scout.DatePickerLayout.prototype.layout = function($container) {
     monthHeight = containerSize.height - headerHeight,
     dayWidth = Math.floor(scrollableSize.width / scout.DatePickerLayout.COLUMNS),
     dayHeight = Math.floor((monthHeight - headerHeight) / scout.DatePickerLayout.ROWS),
-    daySize = Math.max(scout.DatePickerLayout.MIN_DAY_SIZE, Math.min(dayWidth, dayHeight)),
-    monthWidth = daySize * scout.DatePickerLayout.COLUMNS,
-    monthMarginLeftRight = Math.max(0, Math.floor((scrollableSize.width - monthWidth) / 2)),
+    dayMarginHoriz = Math.max(0, Math.floor(dayWidth - scout.DatePickerLayout.DAY_SIZE) / 2),
+    dayMarginVert  = Math.max(0, Math.floor(dayHeight - scout.DatePickerLayout.DAY_SIZE) / 2),
+    monthWidth = dayWidth * scout.DatePickerLayout.COLUMNS,
+    monthMarginHoriz = Math.max(0, Math.floor((scrollableSize.width - monthWidth) / 2)),
     // measure first day in calendar, so we know how we must set
     // paddings and margins for each day
     dayTextSize = this._measureDaySize($month),
-    dayMargin = Math.max(0, (daySize - scout.DatePickerLayout.MIN_DAY_SIZE) / 2),
-    cssDaySize = daySize - 2 * dayMargin,
-    dayPaddingTop = Math.max(0, (cssDaySize - dayTextSize.height) / 2);
+    cssDaySize = new scout.Dimension(
+        dayWidth - 2 * dayMarginHoriz,
+        dayHeight - 2 * dayMarginVert),
+    dayPaddingTop = Math.max(0, (cssDaySize.height - dayTextSize.height) / 2);
 
   // we set padding instead of width, because background-color and bottom-border
   // should always use 100% of the popup width
   // we must add the horiz. padding from the scrollable to the header, so the
   // header is aligned
   $header
-    .css('padding-left', monthMarginLeftRight + scrollableInsets.left + dayMargin)
-    .css('padding-right', monthMarginLeftRight + scrollableInsets.right + dayMargin);
+    .css('padding-left', monthMarginHoriz + scrollableInsets.left + dayMarginHoriz)
+    .css('padding-right', monthMarginHoriz + scrollableInsets.right + dayMarginHoriz);
 
   // only set left margin to center the scrollable
   $scrollable
     .cssWidth(monthWidth + scrollableInsets.horizontal())
     .cssHeight(monthHeight + scrollableInsets.vertical())
-    .css('margin-left', monthMarginLeftRight);
+    .css('margin-left', monthMarginHoriz);
 
   // store results in cache (so the can be access during animation, without recalculating the whole layout)
   this._cache.monthWidth = monthWidth;
-  this._cache.daySize = daySize;
   this._cache.cssDaySize = cssDaySize;
-  this._cache.dayMargin = dayMargin;
+  this._cache.dayMarginHoriz = dayMarginHoriz;
+  this._cache.dayMarginVert = dayMarginVert;
   this._cache.dayPaddingTop = dayPaddingTop;
 
   this._layoutMonth($month);
@@ -112,17 +110,19 @@ scout.DatePickerLayout.prototype._layoutMonth = function($month) {
     if ($element.hasClass('date-picker-day')) {
       // days
       $element
-        .css('margin', cache.dayMargin)
+        .css('margin', cache.dayMarginVert + 'px ' + cache.dayMarginHoriz + 'px')
         .css('padding-top', cache.dayPaddingTop)
-        .cssWidth(cache.cssDaySize)
-        .cssHeight(cache.cssDaySize);
+        .cssWidth(cache.cssDaySize.width)
+        .cssHeight(cache.cssDaySize.height);
       // helps to center days between 10 and 19 nicer (especially when website is zoomed > 100%)
       if (dayInMonth > 9 && dayInMonth < 20) {
         $element.css('padding-right', 2);
       }
     } else {
-      // weekdays: only set width, the rest is defined by CSS
-      $element.cssWidth(cache.daySize);
+      // weekdays: only set width and horiz. margins, the rest is defined by CSS
+      $element
+        .css('margin', '0 ' + cache.dayMarginHoriz + 'px')
+        .cssWidth(cache.cssDaySize.width);
     }
   });
 };
