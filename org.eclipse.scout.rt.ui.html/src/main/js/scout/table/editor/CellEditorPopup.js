@@ -125,11 +125,16 @@ scout.CellEditorPopup.prototype.position = function() {
 
 scout.CellEditorPopup.prototype.completeEdit = function() {
   var field = this.cell.field;
+  if (this.completeCellEditRequested) {
+    // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
+    return;
+  }
 
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
   field.acceptInput();
 
   this.table._sendCompleteCellEdit(field.id);
+  this.completeCellEditRequested = true;
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {

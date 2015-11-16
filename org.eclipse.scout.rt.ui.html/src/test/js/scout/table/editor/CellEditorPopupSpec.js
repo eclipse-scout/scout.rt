@@ -232,6 +232,21 @@ describe("CellEditor", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
+    it("sends completeCellEdit only once", function() {
+      var popup = createTableAndStartCellEdit();
+      popup.completeEdit();
+      popup.completeEdit();
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(mostRecentJsonRequest().events.length).toBe(1);
+      var event = new scout.Event(popup.table.id, 'completeCellEdit', {
+        fieldId: popup.cell.field.id
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+
     it("does not remove the popup and its field (will be done by endCellEdit)", function() {
       var popup = createTableAndStartCellEdit();
       popup.completeEdit();
