@@ -107,6 +107,8 @@ scout.scrollbars = {
     }
     session.detachHelper.removeScrollable($container);
     $container.removeData('scrollable');
+    $container.css('overflow', '');
+    $container.removeData('scrollbars');
 
     var htmlContainer = scout.HtmlComponent.optGet($container);
     if (htmlContainer) {
