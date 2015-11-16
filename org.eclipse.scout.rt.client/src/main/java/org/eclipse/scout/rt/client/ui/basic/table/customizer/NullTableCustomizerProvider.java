@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
-// TODO ASA javadoc
+/**
+ * Default implementation, that just returns <code>null</code> as {@link ITableCustomizer}.
+ */
 public class NullTableCustomizerProvider implements ITableCustomizerProvider {
 
   @Override

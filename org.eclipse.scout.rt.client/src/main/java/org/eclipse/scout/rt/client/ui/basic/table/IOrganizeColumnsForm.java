@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-// TODO ASA javadoc
+/**
+ * Form to be used inside {@link OrganizeColumnsMenu}
+ */
 public interface IOrganizeColumnsForm extends IForm {
 
   void reload();

@@ -13,7 +13,11 @@ package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
-//TODO ASA javadoc
+/**
+ * Provider for {@link ITableCustomizer}
+ *
+ * @since 5.2
+ */
 @ApplicationScoped
 public interface ITableCustomizerProvider {
 

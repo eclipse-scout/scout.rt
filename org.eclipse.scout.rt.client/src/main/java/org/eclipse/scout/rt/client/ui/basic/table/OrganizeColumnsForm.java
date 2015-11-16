@@ -118,7 +118,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
       @Override
       protected int getConfiguredGridColumnCount() {
-        return 6;
+        return 5;
       }
 
       @Order(5.0)
@@ -136,7 +136,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("Profiles");
+          return TEXTS.get("SavedSettings");
         }
 
         @Override
@@ -365,7 +365,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected void execAction() {
-//                ensureNewConfigRowExists();
                 String newConfigName = newConfigName();
                 storeCurrentStateAsConfig(newConfigName);
                 ITableRow newRow = new TableRow(getTable().getColumnSet());
@@ -374,7 +373,9 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 try {
                   getTable().setTableChanging(true);
                   newRow = getTable().addRow(newRow);
-                  newRow.getCellForUpdate(getTable().getConfigNameColumn()).setEditable(false);
+//                  newRow.getCellForUpdate(getTable().getConfigNameColumn()).setEditable(false);
+                  getTable().selectRow(newRow);
+                  getMenuByClass(RenameMenu.class).doAction();
                 }
                 finally {
                   getTable().setTableChanging(false);
@@ -411,32 +412,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                   applyAll(configName);
                   getColumnsTableField().reloadTableData();
                 }
-              }
-
-            }
-
-            @Order(30.0)
-            public class RenameMenu extends AbstractMenu {
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
-              }
-
-              @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("Rename");
-              }
-
-              @Override
-              protected String getConfiguredKeyStroke() {
-                return combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.ENTER);
-              }
-
-              @Override
-              protected void execAction() {
-                getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
-                getTable().requestFocusInCell(getConfigNameColumn(), getSelectedRow());
+                getTable().deselectAllEnabledRows();
               }
 
             }
@@ -452,7 +428,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             protected String newConfigName() {
               int profileNr = 1;
-              String baseName = TEXTS.get("Profile") + " ";
+              String baseName = TEXTS.get("New") + " ";
               while (getColumnSet().getColumnByClass(ConfigNameColumn.class).getValues().contains(baseName + profileNr)) {
                 ++profileNr;
               }
@@ -466,6 +442,33 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 }
               }
               return false;
+            }
+
+            @Order(30.0)
+            public class UpdateMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected String getConfiguredText() {
+                return TEXTS.get("Update");
+              }
+
+              @Override
+              protected void execAction() {
+                List<ITableRow> rows = getSelectedRows();
+                for (ITableRow row : rows) {
+                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
+                    String config = getConfigNameColumn().getValue(row);
+                    deleteConfig(config);
+                    storeCurrentStateAsConfig(config);
+                  }
+                }
+                getTable().deselectAllEnabledRows();
+              }
             }
 
             @Order(40.0)
@@ -500,7 +503,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Order(50.0)
-            public class UpdateMenu extends AbstractMenu {
+            public class RenameMenu extends AbstractMenu {
 
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
@@ -509,20 +512,20 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredText() {
-                return TEXTS.get("Update");
+                return TEXTS.get("Rename");
+              }
+
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.ENTER);
               }
 
               @Override
               protected void execAction() {
-                List<ITableRow> rows = getSelectedRows();
-                for (ITableRow row : rows) {
-                  if (getConfigTypeColumn().getValue(row) == ConfigType.CUSTOM) {
-                    String config = getConfigNameColumn().getValue(row);
-                    deleteConfig(config);
-                    storeCurrentStateAsConfig(config);
-                  }
-                }
+                getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
+                getTable().requestFocusInCell(getConfigNameColumn(), getSelectedRow());
               }
+
             }
           }
 
@@ -607,21 +610,18 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                     sb.append(col.getSortIndex() + 1);
                   }
                   if (col.isGroupingActive()) {
-                    // FIXME ASA when decided that we keep "G", instead of symbol: create translated text
-                    sb.append("G");
+                    sb.append(TEXTS.get("GroupingAbbreviation"));
                   }
                   getTable().getGroupAndSortColumn().setValue(row, sb.toString());
 
                   // CustomColumn
                   if (col instanceof ICustomColumn<?>) {
-                    // FIXME ASA when decided that we keep "C", instead of symbol: create translated text
-                    getTable().getCustomColumnColumn().setValue(row, "C");
+                    getTable().getCustomColumnColumn().setValue(row, TEXTS.get("CustomColumAbbreviation"));
                   }
 
                   // filter
                   if (col.isColumnFilterActive()) {
-                    // FIXME ASA when decided that we keep "F", instead of symbol: create translated text
-                    getTable().getFilterColumn().setValue(row, "F");
+                    getTable().getFilterColumn().setValue(row, TEXTS.get("FilterAbbreviation"));
                   }
 
                   //width
@@ -1257,6 +1257,41 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Order(80.0)
+            public class RemoveMenu extends AbstractMenu {
+
+              @Override
+              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+              }
+
+              @Override
+              protected String getConfiguredIconId() {
+                return AbstractIcons.Minus;
+              }
+
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return AbstractKeyStroke.DELETE;
+              }
+
+              @Override
+              protected void execAction() {
+                if (m_table != null) {
+                  for (ITableRow selectedRow : getSelectedRows()) {
+                    IColumn<?> selectedCol = getKeyColumn().getValue(selectedRow);
+                    if (selectedCol instanceof ICustomColumn<?>) {
+                      if (m_table.getTableCustomizer() != null) {
+                        m_table.getTableCustomizer().removeColumn((ICustomColumn<?>) selectedCol);
+                      }
+                    }
+
+                  }
+                }
+                reloadTableData();
+              }
+            }
+
+            @Order(90.0)
             public class ModifyCustomColumnMenu extends AbstractMenu {
 
               @Override
@@ -1284,41 +1319,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 getColumnsTableField().reloadTableData();
               }
 
-            }
-
-            @Order(90.0)
-            public class RemoveMenu extends AbstractMenu {
-
-              @Override
-              protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-                return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
-              }
-
-              @Override
-              protected String getConfiguredIconId() {
-                return AbstractIcons.Remove;
-              }
-
-              @Override
-              protected String getConfiguredKeyStroke() {
-                return AbstractKeyStroke.DELETE;
-              }
-
-              @Override
-              protected void execAction() {
-                if (m_table != null) {
-                  for (ITableRow selectedRow : getSelectedRows()) {
-                    IColumn<?> selectedCol = getKeyColumn().getValue(selectedRow);
-                    if (selectedCol instanceof ICustomColumn<?>) {
-                      if (m_table.getTableCustomizer() != null) {
-                        m_table.getTableCustomizer().removeColumn((ICustomColumn<?>) selectedCol);
-                      }
-                    }
-
-                  }
-                }
-                reloadTableData();
-              }
             }
 
             @Order(100.0)
