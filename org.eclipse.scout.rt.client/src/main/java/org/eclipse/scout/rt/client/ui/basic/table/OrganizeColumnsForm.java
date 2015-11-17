@@ -1554,8 +1554,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         m_table.getTableCustomizer().removeAllColumns();
         m_table.getTableCustomizer().setSerializedData(tableCustomizerData);
       }
-      m_table.resetColumnConfiguration();
-      m_table.getReloadHandler().reload();
+      if (m_table.getReloadHandler() != null) {
+        // FIXME ASA discuss
+        m_table.resetColumnConfiguration();
+        m_table.getReloadHandler().reload();
+      }
     }
     for (IColumn<?> col : m_table.getColumnSet().getColumns()) {
       col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
