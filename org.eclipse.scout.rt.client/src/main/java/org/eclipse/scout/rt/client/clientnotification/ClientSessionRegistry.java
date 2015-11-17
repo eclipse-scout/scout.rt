@@ -229,12 +229,14 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   public List<IClientSession> getAllClientSessions() {
     List<IClientSession> result = new LinkedList<IClientSession>();
     synchronized (m_cacheLock) {
-      for (Entry<String, WeakReference<IClientSession>> e : m_sessionIdToSession.entrySet()) {
+      Iterator<Entry<String, WeakReference<IClientSession>>> iterator = m_sessionIdToSession.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Entry<String, WeakReference<IClientSession>> e = iterator.next();
         if (e.getValue().get() != null) {
           result.add(e.getValue().get());
         }
         else {
-          m_sessionIdToSession.remove(e.getKey());
+          iterator.remove();
         }
       }
     }
