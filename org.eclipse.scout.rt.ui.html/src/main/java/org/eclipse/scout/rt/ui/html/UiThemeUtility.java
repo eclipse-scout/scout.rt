@@ -97,9 +97,6 @@ public class UiThemeUtility {
 
   /**
    * Returns the given theme name or null if the theme name is equals 'default'.
-   *
-   * @param theme
-   * @return
    */
   public static String getThemeName(String theme) {
     if (UiThemeProperty.DEFAULT_THEME.equals(theme)) {

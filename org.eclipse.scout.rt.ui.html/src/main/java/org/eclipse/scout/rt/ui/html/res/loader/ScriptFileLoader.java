@@ -67,12 +67,12 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     return null;
   }
 
-  private String getTheme(HttpCacheKey cacheKey) {
+  protected String getTheme(HttpCacheKey cacheKey) {
     Object[] cacheAttributes = cacheKey.getCacheAttributes();
     if (cacheAttributes != null && cacheAttributes.length > 0) {
+      // TODO AWE Can we find a better way to retrieve the theme than "knowing" that the first element will be the theme? Maybe a map? (BSH)
       return UiThemeUtility.getThemeName((String) cacheAttributes[0]);
     }
     return null;
   }
-
 }

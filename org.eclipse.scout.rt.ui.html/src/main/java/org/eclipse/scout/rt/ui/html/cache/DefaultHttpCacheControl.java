@@ -100,11 +100,10 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
     String etag = obj.createETag();
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
-    boolean compareByEtag = ifNoneMatch != null;
+    boolean clientSentEtag = (ifNoneMatch != null);
 
     // Check If-None-Match (Etag)
-    // When the Etag comparison fails, we must not check for If-Modified-Since
-    if (compareByEtag) {
+    if (clientSentEtag) {
       if (notModified(ifNoneMatch, etag)) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Use http cached object (If-None-Match/Etag): " + req.getPathInfo());
@@ -112,10 +111,10 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
         resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return true;
       }
+      // When the Etag comparison fails (i.e. file was modified), we must _not_ check for If-Modified-Since!
     }
-
     // Check If-Modified-Since
-    if (!compareByEtag) {
+    else {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
