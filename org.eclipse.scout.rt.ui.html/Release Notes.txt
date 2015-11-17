@@ -635,6 +635,8 @@ An application that requires a facility to compose an e-mail it should simply cr
 with the fields required for that application (Multiline-StringField for plain-text E-Mails,
 RichTextField for HTML e-mails, FileChooserField for file uploads, etc.)
 
+Deleted ICustomField/AbstractCustomField and all associated classes and files.
+
 ================================================================================================
 Known Bugs:
 ------------------------------------------------------------------------------------------------
