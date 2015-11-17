@@ -21,8 +21,8 @@ scout.strings = {
     text = this.asString(text);
     encodeHtml = scout.helpers.nvl(encodeHtml, true);
     if (encodeHtml) {
-      text = scout.strings.encode(text);
-    }
+      text = scout.strings.encode(text);}
+
     return text.replace(/\n/g, '<br>').replace(/\r/g, '');
   },
 
@@ -36,6 +36,10 @@ scout.strings = {
     // Replace remaining && by a single &
     text = text.replace(/&&/g, '&');
     return text;
+  },
+
+  insertAt: function(text, insertText, position){
+    return text.substr(0, position) + insertText + text.substr(position);
   },
 
   getMnemonic: function(text, resolveKey) {
