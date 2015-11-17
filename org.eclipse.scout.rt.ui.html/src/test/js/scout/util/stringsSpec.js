@@ -351,4 +351,20 @@ describe("scout.strings", function() {
 
   });
 
+  describe("insertAt", function() {
+
+    it("can insert strings into other strings", function() {
+      expect(scout.strings.insertAt()).toBe(undefined);
+      expect(scout.strings.insertAt(null)).toBe(null);
+      expect(scout.strings.insertAt('')).toBe('');
+      expect(scout.strings.insertAt('Hello')).toBe('Hello');
+      expect(scout.strings.insertAt('Hello', '_')).toBe('Hello');
+      expect(scout.strings.insertAt('Hello', '_', 0)).toBe('_Hello');
+      expect(scout.strings.insertAt('Hello', '_', 3)).toBe('Hel_lo');
+      expect(scout.strings.insertAt('Hello', '_', 200)).toBe('Hello_');
+      expect(scout.strings.insertAt('Hello', '_', 'bla')).toBe('Hello');
+    });
+
+  });
+
 });

@@ -39,7 +39,15 @@ scout.strings = {
   },
 
   insertAt: function(text, insertText, position){
-    return text.substr(0, position) + insertText + text.substr(position);
+    if (text === undefined || text === null || text === '') {
+      return text;
+    }
+    text = this.asString(text);
+    insertText = this.asString(insertText);
+    if (insertText && (typeof position === 'number' || position instanceof Number) && position >= 0) {
+      return text.substr(0, position) + insertText + text.substr(position);
+    }
+    return text;
   },
 
   getMnemonic: function(text, resolveKey) {
