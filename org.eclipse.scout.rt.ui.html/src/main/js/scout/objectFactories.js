@@ -147,11 +147,6 @@ scout.defaultObjectFactories = [{
     return new scout.BrowserField();
   }
 }, {
-  objectType: 'MailField',
-  create: function() {
-    return new scout.MailField();
-  }
-}, {
   objectType: 'ColorField',
   create: function() {
     return new scout.ColorField();

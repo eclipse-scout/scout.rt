@@ -629,6 +629,12 @@ The drawback is that it is not possible in every case. Example: If an invisible 
 Furthermore smartcolumns can not be sorted by the ui because the value is not known.
 Migration: If you implemented custom sorting (e.g. by overriding AbstractColumn#compareTableRows), you have to set getConfiguredUiSortPossible to false
 
+AWE 17.11.2015
+Deleted IMailField/AbstractMailField and all associated classes and files.
+An application that requires a facility to compose an e-mail it should simply create a form
+with the fields required for that application (Multiline-StringField for plain-text E-Mails,
+RichTextField for HTML e-mails, FileChooserField for file uploads, etc.)
+
 ================================================================================================
 Known Bugs:
 ------------------------------------------------------------------------------------------------

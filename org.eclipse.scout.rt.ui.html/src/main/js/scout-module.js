@@ -256,7 +256,6 @@ __include("scout/form/fields/imagefield/ImageFieldLayout.js");
 __include("scout/form/fields/labelfield/LabelField.js");
 __include("scout/form/fields/listbox/ListBox.js");
 __include("scout/form/fields/listbox/ListBoxLayout.js");
-__include("scout/form/fields/mailfield/MailField.js");
 __include("scout/form/fields/numberfield/NumberField.js");
 __include("scout/form/fields/placeholder/PlaceholderField.js");
 __include("scout/form/fields/plannerfield/PlannerField.js");
