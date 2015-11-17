@@ -23,7 +23,7 @@ public class FinalValue<VALUE> {
 
   private volatile VALUE m_value;
   private final Object m_lock = new Object();
-  private volatile boolean initialized = false;
+  private volatile boolean m_initialized = false;
 
   /**
    * Create without initial value
@@ -53,7 +53,7 @@ public class FinalValue<VALUE> {
    */
   public void set(final VALUE value) {
     synchronized (m_lock) {
-      Assertions.assertFalse(initialized, "%s can only be set once.", getClass().getSimpleName());
+      Assertions.assertFalse(m_initialized, "%s can only be set once.", getClass().getSimpleName());
       setIfAbsent(value);
     }
   }
@@ -82,7 +82,7 @@ public class FinalValue<VALUE> {
    *           if the producer throws an exception
    */
   public VALUE setIfAbsent(final Callable<VALUE> producer) {
-    if (m_value != null) {
+    if (m_initialized) {
       return m_value;
     }
 
@@ -90,7 +90,7 @@ public class FinalValue<VALUE> {
       if (m_value == null) {
         try {
           m_value = producer.call();
-          initialized = true;
+          m_initialized = true;
         }
         catch (final RuntimeException e) {
           throw e;
@@ -110,6 +110,6 @@ public class FinalValue<VALUE> {
    * @return <code>true</code>, if it has been initialized.
    */
   public boolean isInitialized() {
-    return initialized;
+    return m_initialized;
   }
 }

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.navigation.internal;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -21,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListen
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
-@Client
 public class NavigationHistoryService implements INavigationHistoryService {
 
   @Override

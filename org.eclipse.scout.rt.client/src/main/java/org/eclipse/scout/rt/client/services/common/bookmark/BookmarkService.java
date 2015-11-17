@@ -17,7 +17,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * service state is per {@link IClientSession} instance
  */
-@Client
 public class BookmarkService implements IBookmarkService {
   private static final Logger LOG = LoggerFactory.getLogger(BookmarkService.class);
   private static final String SESSION_DATA_KEY = "bookmarkServiceState";

@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.platform.context;
 
 import java.security.AccessController;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +22,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Callables;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IAdaptable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
@@ -53,6 +56,7 @@ public class RunContext implements IAdaptable {
   protected Subject m_subject;
   protected Locale m_locale;
   protected PropertyMap m_propertyMap = new PropertyMap();
+  protected Deque<String> m_identifiers = new LinkedList<>();
 
   /**
    * Runs the given {@link IRunnable} on behalf of this {@link RunContext}. Use this method if you run code that does
@@ -156,8 +160,8 @@ public class RunContext implements IAdaptable {
         .add(new SubjectProcessor<RESULT>(m_subject))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(PrinicpalContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
-        .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap));
-
+        .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
+        .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers));
   }
 
   /**
@@ -286,13 +290,36 @@ public class RunContext implements IAdaptable {
     return this;
   }
 
+  /**
+   * Gets a live reference to the identifiers of this run context.
+   *
+   * @return A {@link Deque} with all identifiers of this context having the current identifier on top of the deque.
+   * @see RunContextIdentifiers#isCurrent(String)
+   */
+  public Deque<String> getIdentifiers() {
+    return m_identifiers;
+  }
+
+  /**
+   * Pushes a new identifier on top of the identifiers {@link Deque}.
+   *
+   * @param id
+   *          The new top identifier.
+   * @return this
+   * @see RunContextIdentifiers#isCurrent(String)
+   */
+  public RunContext withIdentifier(String id) {
+    m_identifiers.push(id);
+    return this;
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.ref("runMonitor", getRunMonitor());
     builder.ref("subject", getSubject());
     builder.attr("locale", getLocale());
-
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     return builder.toString();
   }
 
@@ -304,6 +331,7 @@ public class RunContext implements IAdaptable {
     m_subject = origin.m_subject;
     m_locale = origin.m_locale;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
+    m_identifiers = new LinkedList<>(origin.m_identifiers);
   }
 
   /**
@@ -319,6 +347,13 @@ public class RunContext implements IAdaptable {
     m_locale = NlsLocale.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
     m_runMonitor = BEANS.get(RunMonitor.class);
+
+    m_identifiers = new LinkedList<>();
+    Deque<String> existingIds = RunContextIdentifiers.CURRENT.get();
+    if (existingIds != null) {
+      m_identifiers.addAll(existingIds);
+    }
+
     if (RunMonitor.CURRENT.get() != null) {
       RunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
     }
@@ -336,6 +371,7 @@ public class RunContext implements IAdaptable {
     m_locale = null;
     m_runMonitor = BEANS.get(RunMonitor.class);
     m_propertyMap = new PropertyMap();
+    m_identifiers = new LinkedList<>();
   }
 
   /**

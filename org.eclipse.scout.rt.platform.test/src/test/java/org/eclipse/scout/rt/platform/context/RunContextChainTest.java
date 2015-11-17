@@ -63,6 +63,11 @@ public class RunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
+    // 6. ThreadLocalProcessor for RunContextIdentifiers.CURRENT
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(RunContextIdentifiers.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+
     assertFalse(chainIterator.hasNext());
   }
 }

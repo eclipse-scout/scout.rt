@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.jms.Message;
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
@@ -92,6 +93,7 @@ public class JmsRunContext extends RunContext {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     builder.ref("message", getJmsMessage());
     return builder.toString();
   }

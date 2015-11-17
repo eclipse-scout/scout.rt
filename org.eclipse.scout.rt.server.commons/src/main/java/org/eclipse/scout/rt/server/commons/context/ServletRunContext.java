@@ -18,6 +18,7 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
@@ -110,6 +111,7 @@ public class ServletRunContext extends RunContext {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     builder.ref("servletRequest", getServletRequest());
     builder.ref("servletResponse", getServletResponse());
     return builder.toString();

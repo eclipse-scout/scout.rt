@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.cache.CacheBuilder;
@@ -22,7 +21,6 @@ import org.eclipse.scout.rt.shared.cache.ICache;
 /**
  * @since 5.2
  */
-@Order(5050)
 public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
 
   @Override

@@ -15,24 +15,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Cache of available permission types (not instances)
  * <p>
  * Service state is per {@link IClientSession} type and stored in global map
  */
-@Client
-@Order(4900)
 public class PermissionServiceClientProxy implements IPermissionService {
-  private static final Logger LOG = LoggerFactory.getLogger(PermissionServiceClientProxy.class);
 
   private final Object m_stateLock = new Object();
   private final Map<Object, ServiceState> m_stateMap = new HashMap<Object, ServiceState>();
@@ -42,11 +35,10 @@ public class PermissionServiceClientProxy implements IPermissionService {
 
   private ServiceState getServiceState() {
     IClientSession session = ClientSessionProvider.currentSession();
-    if (session == null) {
-      LOG.warn("could not find a client session");
-      return null;
+    Object key = null;
+    if (session != null) {
+      key = session.getClass();
     }
-    Object key = session.getClass();
     synchronized (m_stateLock) {
       ServiceState data = (ServiceState) m_stateMap.get(key);
       if (data == null) {
@@ -72,7 +64,7 @@ public class PermissionServiceClientProxy implements IPermissionService {
     }
   }
 
-  private IPermissionService getRemoteService() {
+  protected IPermissionService getRemoteService() {
     return ServiceTunnelUtility.createProxy(IPermissionService.class);
   }
 

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
@@ -45,6 +46,11 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * @see RunContext
  */
 public class ClientRunContext extends RunContext {
+
+  /**
+   * Identifier used in {@link RunContext#withIdentifier(String)} to mark a run context as client run context
+   */
+  public static final String CLIENT_RUN_CONTEXT_IDENTIFIER = "Client";
 
   protected IClientSession m_session;
   protected UserAgent m_userAgent;
@@ -210,6 +216,7 @@ public class ClientRunContext extends RunContext {
     builder.ref("runMonitor", getRunMonitor());
     builder.attr("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
     builder.ref("desktop", getDesktop());
@@ -235,6 +242,7 @@ public class ClientRunContext extends RunContext {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
+    m_identifiers.push(CLIENT_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = UserAgent.CURRENT.get();
     m_session = ClientSessionProvider.currentSession();
     m_desktop = resolveCurrentDesktop();
@@ -245,6 +253,7 @@ public class ClientRunContext extends RunContext {
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
+    m_identifiers.push(CLIENT_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = null;
     m_session = null;
     m_desktop = null;
@@ -268,13 +277,11 @@ public class ClientRunContext extends RunContext {
       return desktop;
     }
 
-    final IClientSession session = (IClientSession) ISession.CURRENT.get();
-    if (session != null) {
-      return session.getDesktopElseVirtualDesktop();
+    ISession currentSession = ISession.CURRENT.get();
+    if (currentSession instanceof IClientSession) {
+      return ((IClientSession) currentSession).getDesktopElseVirtualDesktop();
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   @SuppressWarnings("unchecked")

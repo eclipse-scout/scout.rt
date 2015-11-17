@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -25,7 +24,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Server
 public class LogoutService implements ILogoutService {
   private static final Logger LOG = LoggerFactory.getLogger(LogoutService.class);
 

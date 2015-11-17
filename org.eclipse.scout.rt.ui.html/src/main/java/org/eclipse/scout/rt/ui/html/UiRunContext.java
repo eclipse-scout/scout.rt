@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
@@ -120,6 +121,7 @@ public class UiRunContext extends RunContext {
     builder.ref("runMonitor", getRunMonitor());
     builder.attr("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     builder.ref("session", getSession());
     builder.ref("jsonRequest", getJsonRequest());
     return builder.toString();

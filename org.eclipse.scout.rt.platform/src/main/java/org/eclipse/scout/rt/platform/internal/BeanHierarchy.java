@@ -26,7 +26,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 
 /**
  * This class is not thread safe
@@ -35,15 +34,14 @@ public class BeanHierarchy<T> {
 
   private final Class<T> m_clazz;
   private final Set<IBean<T>> m_beans;
-  private final Map<Object, List<IBean<T>>> m_singleQueryByScope;
-  private final Map<Object, List<IBean<T>>> m_allQueryByScope;
   private final ReadWriteLock m_queryCacheLock;
+
+  private List<IBean<T>> m_single;
+  private List<IBean<T>> m_all;
 
   public BeanHierarchy(Class<T> clazz) {
     m_clazz = clazz;
     m_beans = new HashSet<>();
-    m_singleQueryByScope = new HashMap<>();
-    m_allQueryByScope = new HashMap<>();
     m_queryCacheLock = new ReentrantReadWriteLock();
   }
 
@@ -73,8 +71,8 @@ public class BeanHierarchy<T> {
    *         that represent the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not
    *         part of the result. Also if C extends A without {@link Replace} then C is not part of the result.
    */
-  public List<IBean<T>> querySingle(IBeanScopeEvaluator evaluator) {
-    return query(evaluator, true);
+  public List<IBean<T>> querySingle() {
+    return query(true);
   }
 
   /**
@@ -82,22 +80,15 @@ public class BeanHierarchy<T> {
    *         the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not part of the
    *         result. But if C extends A without {@link Replace} then C is part of the result.
    */
-  public List<IBean<T>> queryAll(IBeanScopeEvaluator evaluator) {
-    return query(evaluator, false);
-  }
-
-  protected Object getCurrentScope(IBeanScopeEvaluator evaluator) {
-    if (evaluator == null) {
-      return null;
-    }
-    return evaluator.getCurrentScope();
+  public List<IBean<T>> queryAll() {
+    return query(false);
   }
 
   protected void invalidate() {
     m_queryCacheLock.writeLock().lock();
     try {
-      m_singleQueryByScope.clear();
-      m_allQueryByScope.clear();
+      m_single = null;
+      m_all = null;
     }
     finally {
       m_queryCacheLock.writeLock().unlock();
@@ -105,22 +96,18 @@ public class BeanHierarchy<T> {
   }
 
   @SuppressWarnings("unchecked")
-  protected List<IBean<T>> query(IBeanScopeEvaluator evaluator, boolean querySingle) {
-    Object scope = getCurrentScope(evaluator);
+  protected List<IBean<T>> query(boolean querySingle) {
 
-    List<IBean<T>> singleList;
-    List<IBean<T>> allList;
-
+    boolean isInitialized = false;
     m_queryCacheLock.readLock().lock();
     try {
-      singleList = m_singleQueryByScope.get(scope);
-      allList = m_allQueryByScope.get(scope);
+      isInitialized = m_single != null && m_all != null;
     }
     finally {
       m_queryCacheLock.readLock().unlock();
     }
 
-    if (singleList == null || allList == null) {
+    if (!isInitialized) {
       m_queryCacheLock.writeLock().lock();
       try {
         List<IBean<T>> list = new ArrayList<>(m_beans);
@@ -134,11 +121,6 @@ public class BeanHierarchy<T> {
             it.remove();
           }
           lastSeen = bean.getBeanClazz();
-        }
-        // TODO[aho] remove filtering
-        //filter beans not matching scope
-        if (evaluator != null) {
-          list = evaluator.filter(list, scope);
         }
 
         //manage replaced beans
@@ -180,8 +162,7 @@ public class BeanHierarchy<T> {
           }
         }
 
-        allList = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
-        m_allQueryByScope.put(scope, allList);
+        m_all = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
 
         //now retain only beans that are exactly of type refClazz, but only if refClass is not an interface
         if (!refClazz.isInterface()) {
@@ -211,8 +192,7 @@ public class BeanHierarchy<T> {
             it.remove();
           }
         }
-        singleList = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
-        m_singleQueryByScope.put(scope, singleList);
+        m_single = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
       }
       finally {
         m_queryCacheLock.writeLock().unlock();
@@ -220,9 +200,9 @@ public class BeanHierarchy<T> {
     }
 
     if (querySingle) {
-      return singleList;
+      return m_single;
     }
-    return allList;
+    return m_all;
   }
 
   private static final Comparator<IBean<?>> ORDER_COMPARATOR = new Comparator<IBean<?>>() {

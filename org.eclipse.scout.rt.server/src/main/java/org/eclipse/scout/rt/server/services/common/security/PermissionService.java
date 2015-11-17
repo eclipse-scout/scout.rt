@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
  * sure your permission classes are available in the {@link ClassInventory}.
  * </p>
  */
+@Order(4900)
 public class PermissionService implements IPermissionService {
 
   private static final Logger LOG = LoggerFactory.getLogger(PermissionService.class);

@@ -21,13 +21,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
-@Client
 public class FileService implements IFileService {
   private String m_rootPath = null;
 
@@ -77,7 +74,7 @@ public class FileService implements IFileService {
       spec.setLastModified(f.lastModified());
     }
     //
-    if (checkCache && OfflineState.isOnlineInCurrentThread()) {
+    if (checkCache) {
       IRemoteFileService svc = BEANS.get(IRemoteFileService.class);
       spec = svc.getRemoteFile(spec);
       try {

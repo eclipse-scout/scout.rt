@@ -13,13 +13,15 @@ package org.eclipse.scout.rt.platform.interceptor;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 
 /**
- * Interface for bean decorator/interceptor used in {@link IBeanDecorationFactory}
+ * Interface for bean decorations used in {@link IBeanDecorationFactory}.
  */
-public interface IBeanInterceptor<T> {
+public interface IBeanDecorator<T> {
 
   /**
-   * A method is being called on a {@link IBeanInvocationContext}
-   *
+   * Callback executed when a method is called on a bean.
+   * 
+   * @param context
+   *          The context of the method call. Contains information about the method and the arguments being invoked.
    * @return the result of the call
    */
   Object invoke(IBeanInvocationContext<T> context);

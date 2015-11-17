@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.context;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
@@ -27,7 +26,6 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
@@ -47,7 +45,6 @@ public class ServerRunContextTest {
     NlsLocale.CURRENT.remove();
     ScoutTexts.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    OfflineState.CURRENT.remove();
   }
 
   @After
@@ -62,7 +59,6 @@ public class ServerRunContextTest {
     assertNull(runContext.getSession());
     assertNull(runContext.getUserAgent());
     assertNull(runContext.getLocale());
-    assertFalse(runContext.isOffline());
     assertEquals(TransactionScope.REQUIRES_NEW, runContext.getTransactionScope());
   }
 
@@ -74,7 +70,6 @@ public class ServerRunContextTest {
     runContext.withSession(mock(IServerSession.class));
     runContext.withUserAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
     runContext.withLocale(Locale.CANADA_FRENCH);
-    runContext.withOffline(true);
     runContext.withTransactionScope(TransactionScope.MANDATORY);
 
     ServerRunContext copy = runContext.copy();
@@ -83,7 +78,6 @@ public class ServerRunContextTest {
     assertSame(runContext.getSubject(), copy.getSubject());
     assertSame(runContext.getUserAgent(), copy.getUserAgent());
     assertSame(runContext.getLocale(), copy.getLocale());
-    assertSame(runContext.isOffline(), copy.isOffline());
     assertEquals(TransactionScope.MANDATORY, runContext.getTransactionScope());
   }
 

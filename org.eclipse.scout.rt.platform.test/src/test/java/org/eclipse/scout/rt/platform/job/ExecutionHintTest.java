@@ -35,6 +35,7 @@ public class ExecutionHintTest {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(4);
+    final BlockingCountDownLatch finishLatch = new BlockingCountDownLatch(3);
 
     // job-1
     Jobs.schedule(new IRunnable() {
@@ -46,6 +47,7 @@ public class ExecutionHintTest {
         }
         catch (InterruptedException e) {
           protocol.add("job-1-interrupted");
+          finishLatch.countDown();
         }
       }
     }, Jobs.newInput()
@@ -62,6 +64,7 @@ public class ExecutionHintTest {
         }
         catch (InterruptedException e) {
           protocol.add("job-2-interrupted");
+          finishLatch.countDown();
         }
       }
     }, Jobs.newInput()
@@ -95,6 +98,7 @@ public class ExecutionHintTest {
         }
         catch (InterruptedException e) {
           protocol.add("job-4-interrupted");
+          finishLatch.countDown();
         }
       }
     }, Jobs.newInput()
@@ -108,6 +112,8 @@ public class ExecutionHintTest {
         .andMatchExecutionHint("UI-JOB")
         .toFilter(), true);
 
+    assertTrue(finishLatch.await());
+
     Set<String> expected = new HashSet<>();
     expected.add("job-1-interrupted");
     expected.add("job-2-interrupted");
@@ -118,20 +124,20 @@ public class ExecutionHintTest {
   }
 
   @Test
-  public void testintChangeWhileRunning() {
+  public void testHintChangeWhileRunning() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
+    final String hint = "USER-INTERACTION-REQUIRED";
 
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
       @Override
       public void run() throws Exception {
         protocol.add("a");
 
         Thread.sleep(500);
 
-        IFuture.CURRENT.get().addExecutionHint("USER-INTERACTION-REQUIRED");
+        IFuture.CURRENT.get().addExecutionHint(hint);
 
         latch.countDownAndBlock();
 
@@ -142,7 +148,7 @@ public class ExecutionHintTest {
     // Wait until the job completes, or until tagged as 'USER-INTERACTION-REQUIRED'
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .andMatchNotExecutionHint("USER-INTERACTION-REQUIRED")
+        .andMatchNotExecutionHint(hint)
         .toFilter(), 10, TimeUnit.SECONDS));
 
     protocol.add("b");

@@ -15,22 +15,22 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link IBeanInterceptor} that uses the {@link IServiceTunnel} available in the current {@link IClientSession}.
+ * {@link IBeanDecorator} that uses the {@link IServiceTunnel} available in the current {@link IClientSession}.
  */
-public class TunnelToServerBeanInterceptor<T> implements IBeanInterceptor<T> {
+public class TunnelToServerBeanDecorator<T> implements IBeanDecorator<T> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TunnelToServerBeanInterceptor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TunnelToServerBeanDecorator.class);
 
   private final Class<?> m_serviceInterfaceClass;
 
-  public TunnelToServerBeanInterceptor(Class<?> interfaceClass) {
+  public TunnelToServerBeanDecorator(Class<?> interfaceClass) {
     m_serviceInterfaceClass = interfaceClass;
   }
 

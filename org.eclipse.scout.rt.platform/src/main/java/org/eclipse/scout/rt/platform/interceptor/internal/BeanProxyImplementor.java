@@ -15,11 +15,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 
 /**
@@ -27,22 +29,18 @@ import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
  */
 public class BeanProxyImplementor<T> implements InvocationHandler {
   private final IBean<T> m_bean;
-  private final IBeanInterceptor<T> m_interceptor;
-  private final T m_impl;
+  private final IBeanDecorator<T> m_interceptor;
   private final Class[] m_types;
   private final T m_proxy;
+  private final FinalValue<T> m_beanInstance;
 
   @SuppressWarnings("unchecked")
-  public BeanProxyImplementor(IBean<T> bean, IBeanInterceptor<T> interceptor, T impl, Class... types) {
+  public BeanProxyImplementor(IBean<T> bean, IBeanDecorator<T> interceptor, Class... types) {
     m_bean = bean;
     m_interceptor = interceptor;
-    m_impl = impl;
     m_types = types;
+    m_beanInstance = new FinalValue<>();
     m_proxy = (T) Proxy.newProxyInstance(BeanProxyImplementor.class.getClassLoader(), m_types, this);
-  }
-
-  public T getImpl() {
-    return m_impl;
   }
 
   public T getProxy() {
@@ -51,16 +49,32 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
 
   @Override
   public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-    switch (method.getName()) {
-      case "hashCode": {
-        return (m_impl != null) ? m_impl.hashCode() : m_proxy.hashCode();
+    final T instance = m_beanInstance.setIfAbsent(new Callable<T>() {
+      @Override
+      public T call() throws Exception {
+        return m_bean.getInstance();
       }
-      case "equals": {
-        return m_proxy == args[0];
+    });
+
+    if ("hashCode".equals(method.getName()) && (args == null || args.length == 0) && method.getParameterTypes().length == 0) {
+      if (instance == null) {
+        return hashCode();
       }
-      case "toString": {
-        return "{proxy}" + ((m_impl != null) ? m_impl.toString() : Arrays.toString(m_types));
+      return instance.hashCode();
+    }
+    else if ("equals".equals(method.getName()) && args != null && args.length == 1 && method.getParameterTypes().length == 1 && method.getParameterTypes()[0].equals(Object.class)) {
+      return m_proxy == args[0];
+    }
+    else if ("toString".equals(method.getName()) && (args == null || args.length == 0) && method.getParameterTypes().length == 0) {
+      StringBuilder b = new StringBuilder();
+      b.append("{proxy} ");
+      if (instance != null) {
+        b.append(instance.toString());
       }
+      else {
+        b.append(Arrays.toString(m_types));
+      }
+      return b.toString();
     }
 
     IBeanInvocationContext<T> ic = new IBeanInvocationContext<T>() {
@@ -71,7 +85,7 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
 
       @Override
       public T getTargetObject() {
-        return m_impl;
+        return instance;
       }
 
       @Override
@@ -87,7 +101,7 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
       @Override
       public Object proceed() {
         try {
-          return method.invoke(m_impl, args);
+          return method.invoke(instance, args);
         }
         catch (IllegalAccessException e) {
           throw new ProcessingException("access denied", e);

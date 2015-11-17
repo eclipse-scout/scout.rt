@@ -10,16 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 
 /**
  * Used in {@link IBeanManager}
  * <p>
- * Knows how to decorate an object instance of a {@link IBean} wrapped with a runtime context (multiple interceptors)
- * using all the known {@link BeanInvocationHint} annotations on the beans
+ * Knows how to decorate an object instance of a {@link IBean} wrapped with a runtime context (multiple decorators)
  * <p>
- * see {@link IBeanInstanceProducer}
  * 
+ * @see IBeanDecorator
  * @since 5.1
  */
 @Bean
@@ -27,5 +26,5 @@ public interface IBeanDecorationFactory {
   /**
    * @return the decorated instance
    */
-  <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<? extends T> queryType);
+  <T> IBeanDecorator<T> decorate(IBean<T> bean, Class<? extends T> queryType);
 }

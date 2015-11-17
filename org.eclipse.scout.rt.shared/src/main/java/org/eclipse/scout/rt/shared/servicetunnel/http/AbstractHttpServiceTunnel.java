@@ -39,15 +39,11 @@ import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandl
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
  */
 public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractHttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
@@ -62,9 +58,6 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   public AbstractHttpServiceTunnel(URL url) {
     m_serverUrl = url;
     m_active = url != null;
-    if (url == null) {
-      LOG.warn(String.format("No target url configured. Please specify a target URL in the config.properties using property '%s'.", BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey()));
-    }
   }
 
   protected static URL getConfiguredServerUrl() {
@@ -105,6 +98,10 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     // fast check of wrong URL's for this tunnel
     if (!"http".equalsIgnoreCase(getServerUrl().getProtocol()) && !"https".equalsIgnoreCase(getServerUrl().getProtocol())) {
       throw new IOException("URL '" + getServerUrl().toString() + "' is not supported by this tunnel ('" + getClass().getName() + "').");
+    }
+    if (!isActive()) {
+      String key = BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey();
+      throw new IllegalArgumentException("No target URL configured. Please specify a target URL in the config.properties using property '" + key + "'.");
     }
 
     // configure POST with text/xml

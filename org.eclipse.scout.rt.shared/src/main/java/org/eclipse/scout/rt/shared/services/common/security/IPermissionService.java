@@ -13,13 +13,12 @@ package org.eclipse.scout.rt.shared.services.common.security;
 import java.security.Permission;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Support service for querying available Permission types.
  */
-@ApplicationScoped
-public interface IPermissionService {
+public interface IPermissionService extends IService {
 
   /**
    * @return Returns all permissions classes that are necessary for this scout application. The actual strategy to find

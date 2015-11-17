@@ -44,22 +44,24 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
         LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on public interfaces, not on " + ci.name());
         continue;
       }
-      Class<?> c;
+
       try {
-        c = ci.resolveClass();
+        Class<?> c = ci.resolveClass();
+        registerTunnelToServerProxy(beanManager, c);
       }
       catch (Exception e) {
         LOG.warn("loading class", e);
-        continue;
       }
-
-      if (!acceptClass(beanManager, c)) {
-        LOG.debug("ignoring class [{}]", c);
-        continue;
-      }
-
-      beanManager.registerBean(createBeanMetaData(c));
     }
+  }
+
+  protected void registerTunnelToServerProxy(final IBeanManager beanManager, Class<?> c) {
+    if (!acceptClass(beanManager, c)) {
+      LOG.debug("ignoring class [{}]", c);
+      return;
+    }
+
+    beanManager.registerBean(createBeanMetaData(c));
   }
 
   /**

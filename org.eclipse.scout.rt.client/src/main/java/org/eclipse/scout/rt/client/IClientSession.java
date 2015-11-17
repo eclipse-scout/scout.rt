@@ -137,8 +137,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   Subject getOfflineSubject();
 
-  void goOffline();
-
   /**
    * @param newMap
    */

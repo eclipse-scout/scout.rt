@@ -25,7 +25,6 @@ public final class AnnotationFactory {
   }
 
   public static TunnelToServer createTunnelToServer() {
-
     return TUNNEL_TO_SERVER;
   }
 }

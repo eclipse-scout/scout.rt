@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -92,6 +93,13 @@ public class FinalValueTest {
     String value2 = s.setIfAbsent("other");
     assertTestValue(s);
     assertEquals(TEST_VALUE, value2);
+  }
+
+  @Test
+  public void testNoDoubleInitializationTry() throws Exception {
+    FinalValue<String> s = new FinalValue<>();
+    s.setIfAbsent((String) null);
+    Assert.assertNull(s.setIfAbsent("should not matter"));
   }
 
   private void assertTestValue(FinalValue<String> s) {

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions;
@@ -30,13 +31,13 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
+import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
+import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
 
 public class BeanManagerImplementor implements IBeanManager {
   private final ReentrantReadWriteLock m_lock;
   private final Map<Class<?>, BeanHierarchy> m_beanHierarchies;
   private IBeanDecorationFactory m_beanDecorationFactory;
-  private IBeanScopeEvaluator m_scopeEvaluator;
 
   public BeanManagerImplementor() {
     this(null);
@@ -58,7 +59,13 @@ public class BeanManagerImplementor implements IBeanManager {
     try {
       @SuppressWarnings("unchecked")
       BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
-      return (h == null) ? Collections.<IBean<T>> emptyList() : h.querySingle(getScopeEvaluator());
+      if (h == null) {
+        return Collections.<IBean<T>> emptyList();
+      }
+      else {
+        List<IBean<T>> singleBean = h.querySingle();
+        return getDecoratedBeans(singleBean, beanClazz);
+      }
     }
     finally {
       m_lock.readLock().unlock();
@@ -74,7 +81,8 @@ public class BeanManagerImplementor implements IBeanManager {
       if (h == null) {
         return Collections.emptyList();
       }
-      return h.queryAll(getScopeEvaluator());
+      List<IBean<T>> allBeans = h.queryAll();
+      return getDecoratedBeans(allBeans, beanClazz);
     }
     finally {
       m_lock.readLock().unlock();
@@ -83,7 +91,7 @@ public class BeanManagerImplementor implements IBeanManager {
 
   protected Collection<Class<?>> listImplementedTypes(IBean<?> bean) {
     //interfaces
-    LinkedHashSet<Class<?>> set = new LinkedHashSet<>();
+    Set<Class<?>> set = new LinkedHashSet<>();
     set.addAll(BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class));
     //super types
     Class c = bean.getBeanClazz();
@@ -93,6 +101,30 @@ public class BeanManagerImplementor implements IBeanManager {
     }
     set.add(Object.class);
     return set;
+  }
+
+  protected <T> List<IBean<T>> getDecoratedBeans(List<IBean<T>> beans, Class<T> beanClazz) {
+    IBeanDecorationFactory beanDecorationFactory = getBeanDecorationFactory();
+    if (beanDecorationFactory == null || !beanClazz.isInterface()) {
+      return beans;
+    }
+
+    // apply decorations
+    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
+    for (IBean<T> bean : beans) {
+      result.add(getDecoratedBean(bean, beanClazz, beanDecorationFactory));
+    }
+    return result;
+  }
+
+  protected <T> IBean<T> getDecoratedBean(IBean<T> bean, Class<T> beanClazz, IBeanDecorationFactory beanDecorationFactory) {
+    IBeanDecorator<T> decorator = beanDecorationFactory.decorate(bean, beanClazz);
+    if (decorator == null) {
+      return bean;
+    }
+
+    T proxy = new BeanProxyImplementor<T>(bean, decorator, beanClazz).getProxy();
+    return new BeanImplementor<T>(new BeanMetaData(beanClazz).withInitialInstance(proxy).withAnnotations(bean.getBeanAnnotations().values()));
   }
 
   @Override
@@ -114,7 +146,7 @@ public class BeanManagerImplementor implements IBeanManager {
   public <T> IBean<T> registerBean(BeanMetaData beanData) {
     m_lock.writeLock().lock();
     try {
-      IBean<T> bean = new BeanImplementor<T>(beanData, this);
+      IBean<T> bean = new BeanImplementor<T>(beanData);
       for (Class<?> type : listImplementedTypes(bean)) {
         BeanHierarchy h = m_beanHierarchies.get(type);
         if (h == null) {
@@ -204,16 +236,6 @@ public class BeanManagerImplementor implements IBeanManager {
   @Internal
   protected IBeanDecorationFactory getBeanDecorationFactory() {
     return m_beanDecorationFactory;
-  }
-
-  @Internal
-  public IBeanScopeEvaluator getScopeEvaluator() {
-    return m_scopeEvaluator;
-  }
-
-  @Internal
-  public void setScopeEvaluator(IBeanScopeEvaluator scopeEvaluator) {
-    m_scopeEvaluator = scopeEvaluator;
   }
 
   public void startCreateImmediatelyBeans() {

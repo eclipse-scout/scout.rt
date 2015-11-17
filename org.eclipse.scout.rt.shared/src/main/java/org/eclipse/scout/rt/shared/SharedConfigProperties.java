@@ -19,11 +19,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
-import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
-import org.eclipse.scout.rt.shared.TierState.Tier;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 
 public final class SharedConfigProperties {
@@ -133,31 +131,6 @@ public final class SharedConfigProperties {
   }
 
   /**
-   * can be one of the following values: frontend, backend, undefined
-   */
-  public static class TierProperty extends AbstractConfigProperty<Tier> {
-
-    @Override
-    protected Tier getDefaultValue() {
-      return parse(ConfigUtility.getProperty("scout.osgi.tier")); // legacy
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.tier";
-    }
-
-    @Override
-    protected Tier parse(String value) {
-      if (!StringUtility.hasText(value)) {
-        return null;
-      }
-
-      return Enum.valueOf(Tier.class, value);
-    }
-  }
-
-  /**
    * Property to specify if remote proxy beans should be created for interfaces annotated with {@link TunnelToServer}.
    * Default is <code>true</code>.
    */
@@ -169,17 +142,9 @@ public final class SharedConfigProperties {
     }
 
     @Override
-    protected Boolean createValue() {
-      // if no backend url is set proxy instances will not be created
-      if (StringUtility.isNullOrEmpty(BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue())) {
-        return Boolean.FALSE;
-      }
-      return super.createValue();
-    }
-
-    @Override
     public Boolean getDefaultValue() {
-      return Boolean.TRUE;
+      // if no backend url is set proxy instances will not be created by default
+      return Boolean.valueOf(StringUtility.hasText(BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue()));
     }
   }
 

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -88,8 +87,7 @@ public class ServiceOperationInvoker {
       Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
       Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       Object[] args = serviceReq.getArgs();
-      checkServiceAccess(serviceInterfaceClass, serviceOp, args);
-      Object service = BEANS.get(serviceInterfaceClass);
+      Object service = getValidatedServiceAccess(serviceInterfaceClass, serviceOp, args);
 
       Object data = serviceUtility.invoke(serviceOp, service, args);
       Object[] outParameters = serviceUtility.extractHolderArguments(args);
@@ -124,12 +122,13 @@ public class ServiceOperationInvoker {
   /**
    * Check, if the service can be accessed
    */
-  protected void checkServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object[] args) {
+  protected Object getValidatedServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object[] args) {
     Object service = BEANS.opt(serviceInterfaceClass);
     checkServiceAvailable(serviceInterfaceClass, service);
     checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, args);
     checkRemoteServiceAccessByAnnotations(serviceInterfaceClass, service.getClass(), serviceOp, args);
     checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, args);
+    return service; // if we come there, the service is available and valid to call
   }
 
   /**
@@ -180,21 +179,15 @@ public class ServiceOperationInvoker {
       catch (Throwable t) {
         //nop
       }
-      if (m != null) {
-        Annotation[] methodAnnotations = m.getAnnotations();
-        for (Annotation ann : methodAnnotations) {
-          if (ann.annotationType() == RemoteServiceAccessDenied.class) {
-            throw new SecurityException("access denied (code 2b).");
-          }
-        }
+      if (m != null && m.isAnnotationPresent(RemoteServiceAccessDenied.class)) {
+        throw new SecurityException("access denied (code 2b).");
       }
+
       //type level
-      Annotation[] classAnnotations = c.getAnnotations();
-      for (Annotation ann : classAnnotations) {
-        if (ann.annotationType() == RemoteServiceAccessDenied.class) {
-          throw new SecurityException("access denied (code 2c).");
-        }
+      if (c.isAnnotationPresent(RemoteServiceAccessDenied.class)) {
+        throw new SecurityException("access denied (code 2c).");
       }
+
       //next
       if (c == interfaceClass) {
         break;

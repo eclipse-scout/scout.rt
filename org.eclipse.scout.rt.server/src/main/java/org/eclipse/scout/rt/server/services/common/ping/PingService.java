@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.ping;
 
-import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 
-@Server
 public class PingService implements IPingService {
 
   @Override

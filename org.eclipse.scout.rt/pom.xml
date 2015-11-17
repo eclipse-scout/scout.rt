@@ -54,6 +54,8 @@
     <module>../org.eclipse.scout.rt.svg.client</module>
     <module>../org.eclipse.scout.rt.svg.client.test</module>
 
+    <module>../org.eclipse.scout.rt.serverbridge</module>
+
     <module>../org.eclipse.scout.rt.ui.html</module>
     <module>../org.eclipse.scout.rt.ui.html.test</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
@@ -213,6 +215,12 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.serverbridge</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
 

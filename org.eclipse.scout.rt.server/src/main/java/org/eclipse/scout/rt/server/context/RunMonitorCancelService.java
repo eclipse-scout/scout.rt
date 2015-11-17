@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.server.context;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 
-@Server
 public class RunMonitorCancelService implements IRunMonitorCancelService {
 
   @Override

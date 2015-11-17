@@ -37,14 +37,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -56,7 +54,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -65,7 +62,6 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
@@ -582,37 +578,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     if (m_memoryPolicy != null) {
       m_memoryPolicy.addNotify();
     }
-  }
-
-  public void goOnline() {
-    if (OfflineState.isOfflineDefault()) {
-      OfflineState.setOfflineDefault(false);
-    }
-  }
-
-  @Override
-  public void goOffline() {
-    final String keyName = "offline.user";
-    IPreferences pref = ClientUIPreferences.getClientPreferences(this);
-    if (getUserId() != null && OfflineState.isOnlineDefault() && pref != null) {
-      pref.put(keyName, getUserId());
-    }
-
-    // create new backend subject
-    String offlineUser = null;
-    if (pref != null) {
-      offlineUser = pref.get(keyName, null);
-    }
-    if (offlineUser == null) {
-      offlineUser = getUserId();
-      if (offlineUser == null) {
-        offlineUser = "anonymous";
-      }
-    }
-
-    m_offlineSubject = new Subject();
-    m_offlineSubject.getPrincipals().add(new SimplePrincipal(offlineUser));
-    OfflineState.setOfflineDefault(true);
   }
 
   @Override

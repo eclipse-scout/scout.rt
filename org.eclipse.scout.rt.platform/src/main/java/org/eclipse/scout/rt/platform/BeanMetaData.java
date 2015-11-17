@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.platform;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
@@ -251,6 +253,22 @@ public class BeanMetaData {
    */
   public BeanMetaData withAnnotation(Annotation annotation) {
     m_beanAnnotations.put(annotation.annotationType(), annotation);
+    return this;
+  }
+
+  /**
+   * Adds all {@link Annotation}s in the given {@link Collection}.
+   * 
+   * @param annotations
+   *          The {@link Annotation}s to add.
+   * @return this
+   */
+  public BeanMetaData withAnnotations(Collection<Annotation> annotations) {
+    if (CollectionUtility.hasElements(annotations)) {
+      for (Annotation a : annotations) {
+        withAnnotation(a);
+      }
+    }
     return this;
   }
 

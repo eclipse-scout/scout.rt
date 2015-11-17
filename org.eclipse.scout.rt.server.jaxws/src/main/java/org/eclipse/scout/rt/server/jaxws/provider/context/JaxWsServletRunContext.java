@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
@@ -116,6 +117,7 @@ public class JaxWsServletRunContext extends ServletRunContext {
     builder.ref("runMonitor", getRunMonitor());
     builder.attr("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     builder.ref("servletRequest", getServletRequest());
     builder.ref("servletResponse", getServletResponse());
     builder.ref("webServiceContext", getWebServiceContext());

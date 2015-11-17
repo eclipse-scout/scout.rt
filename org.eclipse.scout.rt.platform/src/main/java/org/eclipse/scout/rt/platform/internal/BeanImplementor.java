@@ -18,21 +18,16 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
-import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
-import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
 
 public class BeanImplementor<T> implements IBean<T> {
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private final T m_initialInstance;
   private IBeanInstanceProducer<T> m_producer;
-  private BeanManagerImplementor m_beanManager;
 
   @SuppressWarnings("unchecked")
-  public BeanImplementor(BeanMetaData beanData, BeanManagerImplementor beanManager) {
-    m_beanManager = beanManager;
+  public BeanImplementor(BeanMetaData beanData) {
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
@@ -70,17 +65,13 @@ public class BeanImplementor<T> implements IBean<T> {
 
   @Override
   public T getInstance() {
-    //produce
-    T instance = m_initialInstance != null ? m_initialInstance : m_producer != null ? m_producer.produce(this) : null;
-    //decorate
-    IBeanDecorationFactory deco = m_beanManager.getBeanDecorationFactory();
-    if (deco != null && m_beanClazz.isInterface()) {
-      IBeanInterceptor<T> interceptor = deco.decorate(this, m_beanClazz);
-      if (interceptor != null) {
-        instance = new BeanProxyImplementor<T>(this, interceptor, instance, m_beanClazz).getProxy();
+    if (m_initialInstance == null) {
+      if (m_producer == null) {
+        return null;
       }
+      return m_producer.produce(this);
     }
-    return instance;
+    return m_initialInstance;
   }
 
   @Override
@@ -90,7 +81,6 @@ public class BeanImplementor<T> implements IBean<T> {
 
   protected void dispose() {
     m_producer = null;
-    m_beanManager = null;
   }
 
   @Override

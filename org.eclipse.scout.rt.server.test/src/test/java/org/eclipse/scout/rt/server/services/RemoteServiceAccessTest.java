@@ -61,6 +61,8 @@ public class RemoteServiceAccessTest {
     //
     assertAccessible(bo, IPingService.class, IPingService.class.getMethod("ping", String.class), PingService.class);
     assertNonAccessible(bo, ISqlService.class, ISqlService.class.getMethod("commit"), AbstractSqlService.class);
+
+    assertNonAccessible(bo, IMockChildProcessService.class, IMockChildProcessService.class.getMethod("interna1"), MockChildProcessService.class);
   }
 
   private static void assertAccessible(ServiceOperationInvokerMock bo, Class<?> serviceInterfaceClass, Method serviceOp, Class<?> serviceImplClass) throws Exception {
@@ -86,6 +88,7 @@ public class RemoteServiceAccessTest {
       m_permissionCollection = new Permissions();
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.IMockProcessService", "*"));
+      m_permissionCollection.add(new RemoteServiceAccessPermission("*.INonTunnelProcessService", "*"));
     }
 
     public void test(Class<?> interfaceClass, Method interfaceMethod, Class<?> implClass) throws Exception {
@@ -111,6 +114,36 @@ public class RemoteServiceAccessTest {
     void interna2();
 
     void interna3();
+  }
+
+  interface IMockChildProcessService extends IMockProcessService {
+    void internal4();
+
+    @Override
+    void interna1();
+  }
+
+  class MockChildProcessService implements IMockChildProcessService {
+
+    @Override
+    public void hello() {
+    }
+
+    @Override
+    public void interna1() {
+    }
+
+    @Override
+    public void interna2() {
+    }
+
+    @Override
+    public void interna3() {
+    }
+
+    @Override
+    public void internal4() {
+    }
   }
 
   abstract class AbstractMockProcessService implements IMockProcessService {

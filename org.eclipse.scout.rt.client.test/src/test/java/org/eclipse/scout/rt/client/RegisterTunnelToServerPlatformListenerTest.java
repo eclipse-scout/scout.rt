@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
@@ -142,8 +142,8 @@ public class RegisterTunnelToServerPlatformListenerTest {
 
   private static final class FixtureClientBeanDecorationFactory extends ClientBeanDecorationFactory {
     @Override
-    protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<? extends T> queryType) {
-      return new IBeanInterceptor<T>() {
+    protected <T> IBeanDecorator<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<? extends T> queryType) {
+      return new IBeanDecorator<T>() {
         @Override
         public Object invoke(IBeanInvocationContext<T> context) {
           Method method = context.getTargetMethod();

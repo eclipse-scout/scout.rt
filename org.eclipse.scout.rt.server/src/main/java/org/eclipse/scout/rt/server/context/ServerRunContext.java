@@ -15,7 +15,7 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.BooleanUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.chain.InvocationChain;
@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -59,20 +58,23 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class ServerRunContext extends RunContext {
 
+  /**
+   * Identifier used in {@link RunContext#withIdentifier(String)} to mark a run context as server run context
+   */
+  public static final String SERVER_RUN_CONTEXT_IDENTIFIER = "Server";
+
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected String m_clientNodeId;
   protected TransactionalClientNotificationCollector m_transactionalClientNotificationCollector;
   protected TransactionScope m_transactionScope;
   protected ITransaction m_transaction;
-  protected boolean m_offline;
 
   @Override
   protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
     super.interceptInvocationChain(invocationChain);
 
     invocationChain
-        .add(new ThreadLocalProcessor<>(OfflineState.CURRENT, m_offline))
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
@@ -232,31 +234,19 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public boolean isOffline() {
-    return m_offline;
-  }
-
-  /**
-   * Indicates to run in offline mode.
-   */
-  public ServerRunContext withOffline(final boolean offline) {
-    m_offline = offline;
-    return this;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.ref("runMonitor", getRunMonitor());
     builder.attr("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
     builder.attr("clientNodeId", getClientNodeId());
     builder.ref("transactionalClientNotificationCollector", getTransactionalClientNotificationCollector());
     builder.ref("transaction", getTransaction());
     builder.attr("transactionScope", getTransactionScope());
-    builder.attr("offline", isOffline());
     return builder.toString();
   }
 
@@ -273,30 +263,29 @@ public class ServerRunContext extends RunContext {
     m_clientNodeId = originRunContext.m_clientNodeId;
     m_transactionScope = originRunContext.m_transactionScope;
     m_transaction = originRunContext.m_transaction;
-    m_offline = originRunContext.m_offline;
   }
 
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
+    m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = UserAgent.CURRENT.get();
     m_transactionalClientNotificationCollector = TransactionalClientNotificationCollector.CURRENT.get();
     m_clientNodeId = IClientNodeId.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
-    m_offline = BooleanUtility.nvl(OfflineState.CURRENT.get(), false);
     m_session = ServerSessionProvider.currentSession();
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
+    m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = null;
     m_transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
     m_clientNodeId = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;
-    m_offline = false;
     m_session = null;
   }
 

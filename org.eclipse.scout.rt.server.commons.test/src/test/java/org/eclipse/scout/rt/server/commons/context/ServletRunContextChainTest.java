@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
+import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -66,27 +67,32 @@ public class ServletRunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 6. ThreadLocalProcessor for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
+    // 6. ThreadLocalProcessor for RunContextIdentifiers.CURRENT
+    c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(RunContextIdentifiers.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+
+    // 7. ThreadLocalProcessor for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 7. ThreadLocalProcessor for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
+    // 8. ThreadLocalProcessor for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 8. DiagnosticContextValueProcessor
+    // 9. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("http.session.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 9. DiagnosticContextValueProcessor
+    // 10. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("http.request.uri", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 10. DiagnosticContextValueProcessor
+    // 11. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("http.request.method", ((DiagnosticContextValueProcessor) c).getMdcKey());

@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
@@ -96,7 +95,6 @@ public class PlatformImplementor implements IPlatform {
 
         //validateBeanManager();
         validateConfiguration();
-        initBeanScopeEvaluator();
         initBeanDecorationFactory();
 
         changeState(State.BeanManagerValid, true);
@@ -145,16 +143,6 @@ public class PlatformImplementor implements IPlatform {
       context.registerClass(bean);
     }
     return context;
-  }
-
-  protected void initBeanScopeEvaluator() {
-    if (m_beanContext.getScopeEvaluator() != null) {
-      return;
-    }
-    IBean<IBeanScopeEvaluator> bean = m_beanContext.optBean(IBeanScopeEvaluator.class);
-    if (bean != null) {
-      m_beanContext.setScopeEvaluator(bean.getInstance());
-    }
   }
 
   protected void initBeanDecorationFactory() {
