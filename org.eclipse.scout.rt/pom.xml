@@ -76,6 +76,9 @@
     <!-- Sonar properties -->
     <sonar.branch>releases_5.2.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
+    <sonar.exclusions>file:**/resources/WebContent/**</sonar.exclusions>
+    <sonar.coverage.exclusions>file:*.test/**,
+      file:**/resources/WebContent/**</sonar.coverage.exclusions>
   </properties>
 
   <dependencyManagement>
