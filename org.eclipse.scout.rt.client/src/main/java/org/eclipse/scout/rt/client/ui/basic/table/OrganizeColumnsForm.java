@@ -11,7 +11,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -314,11 +313,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 if (!StringUtility.isNullOrEmpty(newValue)) {
                   switch (getConfigTypeColumn().getValue(row)) {
                     case CUSTOM:
-                      P_TableState tableStateBackup = createTableStateSnpashot();
-                      applyAll(oldValue);
-                      deleteConfig(oldValue);
-                      storeCurrentStateAsConfig(newValue);
-                      restoreTableState(tableStateBackup);
+                      ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+                      prefs.renameTableColumnsConfig(m_table, oldValue, newValue);
                       break;
                     case DEFAULT:
                     default:
@@ -1529,48 +1525,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     return super.isFormLoading() || m_loading;
   }
 
-  protected P_TableState createTableStateSnpashot() {
-    P_TableState tableState = new P_TableState();
-    if (m_table.getTableCustomizer() != null) {
-
-      tableState.setTableCustomizerData(m_table.getTableCustomizer().getSerializedData());
-    }
-    tableState.setColumnStates(BookmarkUtility.backupTableColumns(m_table));
-    tableState.setData(m_table.getTableData());
-    if (m_table.getUserFilterManager() != null) {
-      tableState.setUserFilterData(m_table.getUserFilterManager().getSerializedData());
-    }
-    return tableState;
-  }
-
-  protected void restoreTableState(P_TableState tableState) {
-    try {
-      m_table.setTableChanging(true);
-      if (m_table.getTableCustomizer() != null) {
-        m_table.getTableCustomizer().removeAllColumns();
-        m_table.getTableCustomizer().setSerializedData(tableState.getTableCustomizerData());
-        ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
-      }
-      m_table.resetColumnConfiguration();
-      BookmarkUtility.restoreTableColumns(m_table, tableState.getColumnStates());
-      if (m_table.getUserFilterManager() != null) {
-        m_table.getUserFilterManager().setSerializedData(tableState.getUserFilterData());
-      }
-      m_table.addRowsByMatrix(tableState.getData());
-    }
-    finally {
-      m_table.setTableChanging(false);
-    }
-  }
-
   protected void storeCurrentStateAsConfig(String configName) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
-    if (prefs != null) {
-      prefs.addTableColumnsConfig(m_table, configName);
-      prefs.setAllTableColumnPreferences(m_table, configName);
-      if (m_table.getTableCustomizer() != null) {
-        prefs.setTableCustomizerData(m_table.getTableCustomizer(), configName);
-      }
+    prefs.addTableColumnsConfig(m_table, configName);
+    prefs.setAllTableColumnPreferences(m_table, configName);
+    if (m_table.getTableCustomizer() != null) {
+      prefs.setTableCustomizerData(m_table.getTableCustomizer(), configName);
     }
   }
 
