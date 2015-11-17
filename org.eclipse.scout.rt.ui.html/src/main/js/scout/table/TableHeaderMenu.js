@@ -75,6 +75,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // Coloring
   if (column.type === 'number') {
     this._renderColoringGroup();
+    this._renderSelectedColoring();
   }
 
   // Filtering
@@ -91,7 +92,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   this._renderFilterGroup();
 
   // name all label elements
-  $('.header-text', this.$container).each(function(i, elem) {
+  $('.table-header-menu-group-text', this.$container).each(function(i, elem) {
     var $elem = $(elem);
     $elem.text($elem.data('label'));
   });
@@ -101,17 +102,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     .on('mouseleave', '.table-header-menu-command', this._onCommandMouseleave.bind(this));
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
-
-  // copy flags to menu
-  if ($headerItem.hasClass('sort-asc')) {
-    this.$container.addClass('sort-asc');
-  }
-  if ($headerItem.hasClass('sort-desc')) {
-    this.$container.addClass('sort-desc');
-  }
-  if ($headerItem.hasClass('filter')) {
-    this.$container.addClass('filter');
-  }
 };
 
 scout.TableHeaderMenu.prototype._remove = function() {
@@ -121,60 +111,25 @@ scout.TableHeaderMenu.prototype._remove = function() {
   scout.TableHeaderMenu.parent.prototype._remove.call(this);
 };
 
-scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
-  var iconPlus = '\uF067',
-    groupCount = this._groupColumnCount(),
-    func = this.column.aggregationFunction;
-
-  if (this.$groupColumnAdditional) {
-    this.$groupColumnAdditional.removeClass('selected');
-  }
-
-  if (this.$groupColumnAdditional) {
-    if (groupCount === 0 || this.column.grouped) {
-      this.$groupColumnAdditional.hide();
-    } else {
-      this.$groupColumnAdditional.show().attr('data-icon', iconPlus);
-    }
-  }
-
-  if (this.$groupColumn && this.column.grouped) {
-    this.$groupColumn.addClass('selected');
-    this.$groupColumn.show();
-  }
-
-  if (func) {
-    if (func === 'sum') {
-      this.$aggregationFunctionSum.addClass('selected');
-    } else if (func === 'avg') {
-      this.$aggregationFunctionAvg.addClass('selected');
-    } else if (func === 'min') {
-      this.$aggregationFunctionMin.addClass('selected');
-    } else if (func === 'max') {
-      this.$aggregationFunctionMax.addClass('selected');
-    }
-  }
-};
-
 scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
   var table = this.table,
     column = this.column,
     pos = table.columns.indexOf(column);
 
   this.$moving = this.$container.appendDiv('table-header-menu-group');
-  this.$moving.appendDiv('header-text')
+  this.$moving.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Move'));
 
-  this.$moving.appendDiv('table-header-menu-command move-top')
+  this.$moving.appendDiv('table-header-menu-command move move-top')
     .data('label', this.session.text('ui.toBegin'))
     .click(moveToTop);
-  this.$moving.appendDiv('table-header-menu-command move-up')
+  this.$moving.appendDiv('table-header-menu-command move move-up')
     .data('label', this.session.text('ui.forward'))
     .click(moveUp);
-  this.$moving.appendDiv('table-header-menu-command move-down')
+  this.$moving.appendDiv('table-header-menu-command move move-down')
     .data('label', this.session.text('ui.backward'))
     .click(moveDown);
-  this.$moving.appendDiv('table-header-menu-command move-bottom')
+  this.$moving.appendDiv('table-header-menu-command move move-bottom')
     .data('label', this.session.text('ui.toEnd'))
     .click(moveToBottom);
 
@@ -206,36 +161,44 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     that = this;
 
   this.$sorting = this.$container.appendDiv('table-header-menu-group');
-  this.$sorting.appendDiv('header-text')
+  this.$sorting.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ColumnSorting'));
 
   if (!table.hasPermanentHeadOrTailSortColumns()) {
-    this.$sortAsc = this.$sorting.appendDiv('table-header-menu-command toggle sort-asc')
+    this.$sortAsc = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-asc')
       .data('label', this.session.text('ui.ascending'))
-      .click(this.remove.bind(this))
-      .click(function() {
-        sort('asc', false, $(this).hasClass('selected'));
-      });
-    this.$sortDesc = this.$sorting.appendDiv('table-header-menu-command toggle sort-desc')
+      .data('direction', 'asc')
+      .click(onSortClick.bind(this));
+    this.$sortDesc = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-desc')
       .data('label', this.session.text('ui.descending'))
-      .click(this.remove.bind(this))
-      .click(function() {
-        sort('desc', false, $(this).hasClass('selected'));
-      });
+      .data('direction', 'desc')
+      .click(onSortClick.bind(this));
   }
 
-  this.$sortAscAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort-asc-add')
+  this.$sortAscAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-asc-add')
     .data('label', this.session.text('ui.ascendingAdditionally'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      sort('asc', true, $(this).hasClass('selected'));
-    });
-  this.$sortDescAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort-desc-add')
+    .data('direction', 'asc')
+    .click(onSortAdditionalClick.bind(this));
+  this.$sortDescAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-desc-add')
     .data('label', this.session.text('ui.descendingAdditionally'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      sort('desc', true, $(this).hasClass('selected'));
-    });
+    .data('direction', 'desc')
+    .click(onSortAdditionalClick.bind(this));
+
+  function onSortClick(event) {
+    var $target = $(event.currentTarget),
+      direction = $target.data('direction');
+
+    this.remove();
+    sort(direction, false, $target.isSelected());
+  }
+
+  function onSortAdditionalClick(event) {
+    var $target = $(event.currentTarget),
+      direction = $target.data('direction');
+
+    this.remove();
+    sort(direction, true, $target.isSelected());
+  }
 
   function sort(direction, multiSort, remove) {
     table.sort(column, direction, multiSort, remove);
@@ -292,33 +255,35 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     column = this.column;
 
   this.$grouping = this.$container.appendDiv('table-header-menu-group');
-  this.$grouping.appendDiv('header-text')
+  this.$grouping.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Grouping'));
 
   this.$groupColumn = this.$grouping.appendDiv('table-header-menu-command toggle group-column')
     .data('label', this.session.text('ui.groupingApply'))
-    .click(this.remove.bind(this))
-    .click(onGroupClick);
+    .click(onGroupClick.bind(this));
 
   this.$groupColumnAdditional = this.$grouping.appendDiv('table-header-menu-command toggle group-column-additional')
     .data('label', this.session.text('ui.additionally'))
-    .click(this.remove.bind(this))
-    .click(onAdditionalGroupClick);
+    .click(onAdditionalGroupClick.bind(this));
 
-  function onGroupClick() {
-    var direction = 'asc';
+  function onGroupClick(event) {
+    var direction = 'asc',
+      $target = $(event.currentTarget);
     if (column.sortIndex >= 0 && (!column.sortAscending)) {
       direction = 'desc';
     }
-    groupColumn($(this), column, direction, false);
+    this.remove();
+    groupColumn($target, column, direction, false);
   }
 
-  function onAdditionalGroupClick() {
-    var direction = 'asc';
+  function onAdditionalGroupClick(event) {
+    var direction = 'asc',
+      $target = $(event.currentTarget);
     if (column.sortIndex >= 0 && (!column.sortAscending)) {
       direction = 'desc';
     }
-    groupColumn($(this), column, direction, true);
+    this.remove();
+    groupColumn($target, column, direction, true);
   }
 
   function groupColumn($command, column, direction, additional) {
@@ -327,42 +292,66 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   }
 };
 
+scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
+  var iconPlus = '\uF067',
+    groupCount = this._groupColumnCount(),
+    func = this.column.aggregationFunction;
+
+  if (this.$groupColumnAdditional) {
+    this.$groupColumnAdditional.removeClass('selected');
+  }
+
+  if (this.$groupColumnAdditional) {
+    if (groupCount === 0 || this.column.grouped) {
+      this.$groupColumnAdditional.hide();
+    } else {
+      this.$groupColumnAdditional.show().attr('data-icon', iconPlus);
+    }
+  }
+
+  if (this.$groupColumn && this.column.grouped) {
+    this.$groupColumn.addClass('selected');
+    this.$groupColumn.show();
+  }
+
+  if (func) {
+    if (func === 'sum') {
+      this.$aggregationFunctionSum.addClass('selected');
+    } else if (func === 'avg') {
+      this.$aggregationFunctionAvg.addClass('selected');
+    } else if (func === 'min') {
+      this.$aggregationFunctionMin.addClass('selected');
+    } else if (func === 'max') {
+      this.$aggregationFunctionMax.addClass('selected');
+    }
+  }
+};
+
 scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   var table = this.table,
     column = this.column;
   this.$aggregation = this.$container.appendDiv('table-header-menu-group');
-  this.$aggregation.appendDiv('header-text')
+  this.$aggregation.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Aggregation'));
 
   this.$aggregationFunctionSum = this.$aggregation.appendDiv('table-header-menu-command aggregation-function sum')
     .data('label', this.session.text('ui.Sum'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      changeAggregation('sum');
-    });
+    .click(changeAggregation.bind(this, 'sum'));
 
   this.$aggregationFunctionAvg = this.$aggregation.appendDiv('table-header-menu-command aggregation-function avg')
     .data('label', this.session.text('ui.Average'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      changeAggregation('avg');
-    });
+    .click(changeAggregation.bind(this, 'avg'));
 
   this.$aggregationFunctionMin = this.$aggregation.appendDiv('table-header-menu-command aggregation-function min')
     .data('label', this.session.text('ui.Minimum'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      changeAggregation('min');
-    });
+    .click(changeAggregation.bind(this, 'min'));
 
   this.$aggregationFunctionMax = this.$aggregation.appendDiv('table-header-menu-command aggregation-function max')
     .data('label', this.session.text('ui.Maximum'))
-    .click(this.remove.bind(this))
-    .click(function() {
-      changeAggregation('max');
-    });
+    .click(changeAggregation.bind(this, 'max'));
 
   function changeAggregation(func) {
+    this.remove();
     table.changeAggregation(column, func);
   }
 };
@@ -371,48 +360,51 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   var table = this.table,
     column = this.column;
   this.$coloring = this.$container.appendDiv('table-header-menu-group');
-  this.$coloring.appendDiv('header-text')
-    .data('label', this.session.text('ui.ColorCells'));
+  this.$coloring.appendDiv('table-header-menu-group-text')
+    .data('label', this.session.text('ui.Coloring'));
 
-  this.$coloring.appendDiv('table-header-menu-command color-red')
+  this.$coloring.appendDiv('table-header-menu-command toggle color color-gradient1')
     .data('label', this.session.text('ui.fromRedToGreen'))
-    .click(this.remove.bind(this))
-    .click(onRedColorClick);
-  this.$coloring.appendDiv('table-header-menu-command color-green')
+    .data('backgroundEffect', 'colorGradient1')
+    .click(onBackgroundEffectClick.bind(this));
+
+  this.$coloring.appendDiv('table-header-menu-command toggle color color-gradient2')
     .data('label', this.session.text('ui.fromGreenToRed'))
-    .click(this.remove.bind(this))
-    .click(onGreenColorClick);
+    .data('backgroundEffect', 'colorGradient2')
+    .click(onBackgroundEffectClick.bind(this));
+
   if (scout.device.supportsCssGradient()) {
-    this.$coloring.appendDiv('table-header-menu-command color-bar')
-      .data('label', this.session.text('ui.withBarGraph'))
-      .click(this.remove.bind(this))
-      .click(onBarColorClick);
-  }
-  this.$coloring.appendDiv('table-header-menu-command color-remove')
-    .data('label', this.session.text('ui.remove'))
-    .click(this.remove.bind(this))
-    .click(onRemoveColorClick);
-
-  function onRedColorClick() {
-    table.setColumnBackgroundEffect(column, 'colorGradient1');
+    this.$coloring.appendDiv('table-header-menu-command toggle color color-bar-chart')
+      .data('label', this.session.text('ui.withBarChart'))
+      .data('backgroundEffect', 'barChart')
+      .click(onBackgroundEffectClick.bind(this));
   }
 
-  function onGreenColorClick() {
-    table.setColumnBackgroundEffect(column, 'colorGradient2');
-  }
+  function onBackgroundEffectClick(event) {
+    var $target = $(event.currentTarget),
+      effect = $target.data('backgroundEffect');
 
-  function onBarColorClick() {
-    table.setColumnBackgroundEffect(column, 'barChart');
+    if ($target.isSelected()) {
+      effect = null;
+    }
+    this.remove();
+    table.setColumnBackgroundEffect(column, effect);
   }
+};
 
-  function onRemoveColorClick() {
-    table.setColumnBackgroundEffect(column, null);
-  }
+scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
+  var bgEffect = this.column.backgroundEffect;
+
+  $('.table-header-menu-command', this.$coloring).each(function(index, elem) {
+    var $elem = $(elem),
+      effect = $elem.data('backgroundEffect');
+    $elem.select(effect === this.column.backgroundEffect);
+  }.bind(this));
 };
 
 scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
   this.$filtering = this.$container.appendDiv('table-header-menu-group-filter');
-  this.$filtering.appendDiv('header-text')
+  this.$filtering.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterBy'));
 
   this.$filteringContainer = this.$filtering.appendDiv('table-header-menu-filter-container');
@@ -546,15 +538,15 @@ scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
 
 scout.TableHeaderMenu.prototype._onCommandMouseenterClick = function(event) {
   var $command = $(event.currentTarget),
-    $text = $command.siblings('.header-text'),
-    text = ($command.hasClass('selected') && $command.hasClass('toggle')) ? this.session.text('ui.remove') : $command.data('label');
+    $text = $command.siblings('.table-header-menu-group-text'),
+    text = ($command.isSelected() && $command.hasClass('toggle')) ? this.session.text('ui.remove') : $command.data('label');
 
   $text.text($text.data('label') + ' ' + text);
 };
 
 scout.TableHeaderMenu.prototype._onCommandMouseleave = function(event) {
   var $command = $(event.currentTarget),
-    $text = $command.siblings('.header-text');
+    $text = $command.siblings('.table-header-menu-group-text');
 
   $text.text($text.data('label'));
 };

@@ -35,7 +35,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
       otherGroupsHeight += $group.outerHeight(true);
     }
   });
-  otherGroupsHeight += this.popup.$filtering.find('.header-text').outerHeight(true);
+  otherGroupsHeight += this.popup.$filtering.find('.table-header-menu-group-text').outerHeight(true);
 
   popupSize = popupSize
     .subtract(htmlComp.getInsets())
