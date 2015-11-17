@@ -466,17 +466,14 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
 };
 
 scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(cons) {
-  var gridW = cons.gridw,
-    env = scout.HtmlEnvironment;
-  return env.formColumnWidth * gridW + env.formColumnGap * Math.max(0, gridW - 1);
+  var gridW = cons.gridw;
+  return (scout.HtmlEnvironment.formColumnWidth * gridW) + (this.m_hgap * Math.max(0, gridW - 1));
 };
 
 scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
   var gridH = cons.gridh,
-    env = scout.HtmlEnvironment,
     addition = cons.logicalRowHeightAddition || 0;
-
-  return env.formRowHeight * gridH + env.formRowGap * Math.max(0, gridH - 1) + addition;
+  return (scout.HtmlEnvironment.formRowHeight * gridH) + (this.m_vgap * Math.max(0, gridH - 1)) + addition;
 };
 
 scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
