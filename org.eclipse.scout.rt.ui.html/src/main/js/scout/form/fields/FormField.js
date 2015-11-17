@@ -469,6 +469,14 @@ scout.FormField.prototype._goOnline = function() {
  */
 scout.FormField.prototype.addLabel = function() {
   this.$label = this.$container.appendElement('<label>');
+  scout.tooltips.install(this.$label, {
+    parent: this,
+    tooltipText: function($label) {
+      if ($label.isContentTruncated()) {
+        return $label.text();
+      }
+    }
+  });
 };
 
 /**
