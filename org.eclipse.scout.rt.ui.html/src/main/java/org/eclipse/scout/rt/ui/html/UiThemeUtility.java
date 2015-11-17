@@ -92,7 +92,16 @@ public class UiThemeUtility {
    * returns null in that case.
    */
   public static String getThemeForLookup(HttpServletRequest req) {
-    String theme = getTheme(req);
+    return getThemeName(getTheme(req));
+  }
+
+  /**
+   * Returns the given theme name or null if the theme name is equals 'default'.
+   *
+   * @param theme
+   * @return
+   */
+  public static String getThemeName(String theme) {
     if (UiThemeProperty.DEFAULT_THEME.equals(theme)) {
       theme = null;
     }

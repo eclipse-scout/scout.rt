@@ -100,19 +100,27 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
     String etag = obj.createETag();
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
-    if (notModified(ifNoneMatch, etag)) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Use http cached object (etag): " + req.getPathInfo());
+    boolean compareByEtag = ifNoneMatch != null;
+
+    // Check If-None-Match (Etag)
+    // When the Etag comparison fails, we must not check for If-Modified-Since
+    if (compareByEtag) {
+      if (notModified(ifNoneMatch, etag)) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Use http cached object (If-None-Match/Etag): " + req.getPathInfo());
+        }
+        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        return true;
       }
-      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      return true;
     }
-    else {
+
+    // Check If-Modified-Since
+    if (!compareByEtag) {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Use http cached object (ifModifiedSince): " + req.getPathInfo());
+          LOG.debug("Use http cached object (If-Modified-Since): " + req.getPathInfo());
         }
         resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return true;

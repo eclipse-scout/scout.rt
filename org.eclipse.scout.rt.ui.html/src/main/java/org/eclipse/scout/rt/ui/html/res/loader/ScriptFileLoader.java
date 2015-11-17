@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
+import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
@@ -39,15 +41,36 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   }
 
   @Override
+  public HttpCacheKey createCacheKey(String resourcePath, Locale locale) {
+    if (FileType.JS == FileType.resolveFromFilename(resourcePath)) {
+      // JavaScript files are always the same, no matter what the theme or the locale is
+      return new HttpCacheKey(resourcePath);
+    }
+    else {
+      // CSS files are different for depending on the current theme (but don't depend on the locale)
+      Object[] cacheAttributes = new Object[]{UiThemeUtility.getThemeForLookup(getRequest())};
+      return new HttpCacheKey(resourcePath, null, cacheAttributes);
+    }
+  }
+
+  @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), m_scriptProcessor);
     builder.setMinifyEnabled(isMinify());
-    builder.setTheme(UiThemeUtility.getThemeForLookup(getRequest()));
+    builder.setTheme(getTheme(cacheKey));
     String resourcePath = cacheKey.getResourcePath();
     ScriptOutput out = builder.buildScript(resourcePath);
     if (out != null) {
       BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(resourcePath), StandardCharsets.UTF_8.name(), out.getContent(), out.getLastModified());
       return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_ONE_YEAR, content);
+    }
+    return null;
+  }
+
+  private String getTheme(HttpCacheKey cacheKey) {
+    Object[] cacheAttributes = cacheKey.getCacheAttributes();
+    if (cacheAttributes != null && cacheAttributes.length > 0) {
+      return UiThemeUtility.getThemeName((String) cacheAttributes[0]);
     }
     return null;
   }
