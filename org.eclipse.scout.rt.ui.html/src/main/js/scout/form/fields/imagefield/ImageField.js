@@ -80,8 +80,7 @@ scout.ImageField.prototype._renderScrollBarEnabled = function() {
 
   if (this.scrollBarEnabled) {
     scout.scrollbars.install(this.$fieldContainer, {
-      parent: this,
-      invertColors: true
+      parent: this
     });
   } else {
     scout.scrollbars.uninstall(this.$fieldContainer, this.session);

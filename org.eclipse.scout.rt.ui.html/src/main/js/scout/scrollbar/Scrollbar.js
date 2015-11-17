@@ -32,7 +32,6 @@ scout.Scrollbar.prototype._init = function(options) {
   scout.Scrollbar.parent.prototype._init.call(this, options);
   var defaults = {
     axis: 'y',
-    invertColors: false,
     borderless: false,
     updateScrollbarPos: true,
     mouseWheelNeedsShift: false
@@ -49,9 +48,6 @@ scout.Scrollbar.prototype._render = function($parent) {
     .addClass(this.axis + '-axis');
   this._$thumb = this.$container.appendDiv('scrollbar-thumb')
     .addClass(this.axis + '-axis');
-  if (this.invertColors) {
-    this._$thumb.addClass('inverted');
-  }
   if (this.borderless) {
     this.$container.addClass('borderless');
   }

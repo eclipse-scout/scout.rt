@@ -49,7 +49,6 @@ scout.TreeCompact.prototype._render = function($parent) {
   this.$nodesWrapper = this.$container.appendDiv('nodes-wrapper');
   scout.scrollbars.install(this.$nodesWrapper, {
     parent: this,
-    invertColors: true,
     borderless: true
   });
   this.$nodes = this.$nodesWrapper.appendDiv('nodes');
