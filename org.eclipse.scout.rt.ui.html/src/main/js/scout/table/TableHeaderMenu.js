@@ -66,10 +66,11 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   if (containsNumberColumn) {
     if (column.type !== 'number') {
       this._renderGroupingGroup();
+      this._renderSelectedGrouping();
     } else {
       this._renderAggregationGroup();
+      this._renderSelectedAggregation();
     }
-    this._renderSelectedGrouping();
   }
 
   // Coloring
@@ -212,59 +213,65 @@ scout.TableHeaderMenu.prototype._renderSelectedSorting = function() {
     return;
   }
 
-  var addIcon = '\uF067',
-    sortCount = this._sortColumnCount();
+  var showAddCommands = false,
+    sortCount = this._sortColumnCount(),
+    addIcon;
 
-  $('.table-header-menu-command', this.$sorting).removeClass('selected');
+  $('.table-header-menu-command', this.$sorting).select(false);
 
-  //TODO: fko cgu: use column properties instead of css class?
   if (sortCount === 1 && !this.table.hasPermanentHeadOrTailSortColumns()) {
-    if (this.$headerItem.hasClass('sort-asc')) {
-      this.$sortAsc.addClass('selected');
-      addIcon = null;
-    } else if (this.$headerItem.hasClass('sort-desc')) {
-      this.$sortDesc.addClass('selected');
-      addIcon = null;
+    if (this.column.sortActive) {
+      if (this.column.sortAscending) {
+        this.$sortAsc.select(true);
+      } else {
+        this.$sortDesc.select(true);
+      }
+    } else {
+      showAddCommands = true;
     }
   } else if (sortCount > 1 || this.table.hasPermanentHeadOrTailSortColumns()) {
-    if (this.$headerItem.hasClass('sort-asc')) {
-      this.$sortAscAdd.addClass('selected');
+    showAddCommands = true;
+    if (this.column.sortActive) {
+      if (this.column.sortAscending) {
+        this.$sortAscAdd.select(true);
+      } else {
+        this.$sortDescAdd.select(true);
+      }
       addIcon = this.column.sortIndex + 1;
-    } else if (this.$headerItem.hasClass('sort-desc')) {
-      this.$sortDescAdd.addClass('selected');
-      addIcon = this.column.sortIndex + 1;
+      this.$sortAscAdd.attr('data-icon', addIcon);
+      this.$sortDescAdd.attr('data-icon', addIcon);
     }
-  } else {
-    addIcon = null;
   }
 
-  if (addIcon) {
-    this.$sortAscAdd.show().attr('data-icon', addIcon);
-    this.$sortDescAdd.show().attr('data-icon', addIcon);
-  } else {
-    if (!this.table.hasPermanentHeadOrTailSortColumns()) {
-      this.$sortAscAdd.hide();
-      this.$sortDescAdd.hide();
-    }
-  }
+  this.$sortAscAdd.setVisible(showAddCommands);
+  this.$sortDescAdd.setVisible(showAddCommands);
 };
 
 scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   var that = this,
     table = this.table,
-    column = this.column;
+    column = this.column,
+    groupCount = this._groupColumnCount();
 
   this.$grouping = this.$container.appendDiv('table-header-menu-group');
   this.$grouping.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Grouping'));
 
-  this.$groupColumn = this.$grouping.appendDiv('table-header-menu-command toggle group-column')
+  this.$groupColumn = this.$grouping.appendDiv('table-header-menu-command toggle group')
     .data('label', this.session.text('ui.groupingApply'))
     .click(onGroupClick.bind(this));
 
-  this.$groupColumnAdditional = this.$grouping.appendDiv('table-header-menu-command toggle group-column-additional')
+  this.$groupColumnAdditional = this.$grouping.appendDiv('table-header-menu-command toggle group-add')
     .data('label', this.session.text('ui.additionally'))
     .click(onAdditionalGroupClick.bind(this));
+
+  if (groupCount === 0) {
+    this.$groupColumnAdditional.hide();
+  } else if (groupCount === 1 && this.column.grouped) {
+    this.$groupColumnAdditional.hide();
+  } else if (groupCount > 1) {
+    this.$groupColumnAdditional.show();
+  }
 
   function onGroupClick(event) {
     var direction = 'asc',
@@ -293,36 +300,17 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
 };
 
 scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
-  var iconPlus = '\uF067',
-    groupCount = this._groupColumnCount(),
-    func = this.column.aggregationFunction;
+  var groupCount = this._groupColumnCount();
 
-  if (this.$groupColumnAdditional) {
-    this.$groupColumnAdditional.removeClass('selected');
-  }
+  this.$groupColumn.select(false);
+  this.$groupColumnAdditional.select(false);
 
-  if (this.$groupColumnAdditional) {
-    if (groupCount === 0 || this.column.grouped) {
-      this.$groupColumnAdditional.hide();
-    } else {
-      this.$groupColumnAdditional.show().attr('data-icon', iconPlus);
-    }
-  }
-
-  if (this.$groupColumn && this.column.grouped) {
-    this.$groupColumn.addClass('selected');
-    this.$groupColumn.show();
-  }
-
-  if (func) {
-    if (func === 'sum') {
-      this.$aggregationFunctionSum.addClass('selected');
-    } else if (func === 'avg') {
-      this.$aggregationFunctionAvg.addClass('selected');
-    } else if (func === 'min') {
-      this.$aggregationFunctionMin.addClass('selected');
-    } else if (func === 'max') {
-      this.$aggregationFunctionMax.addClass('selected');
+  if (this.column.grouped) {
+    if (groupCount === 1) {
+      this.$groupColumn.select(true);
+    } else if (groupCount > 1) {
+      this.$groupColumnAdditional.select(true)
+        .attr('data-icon', this.column.sortIndex + 1);
     }
   }
 };
@@ -353,6 +341,21 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   function changeAggregation(func) {
     this.remove();
     table.changeAggregation(column, func);
+  }
+};
+
+scout.TableHeaderMenu.prototype._renderSelectedAggregation = function() {
+  var func = this.column.aggregationFunction;
+  if (func) {
+    if (func === 'sum') {
+      this.$aggregationFunctionSum.select(true);
+    } else if (func === 'avg') {
+      this.$aggregationFunctionAvg.select(true);
+    } else if (func === 'min') {
+      this.$aggregationFunctionMin.select(true);
+    } else if (func === 'max') {
+      this.$aggregationFunctionMax.select(true);
+    }
   }
 };
 
@@ -414,7 +417,7 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
       .on('click', this._onFilterClick.bind(this));
 
     if (this.filter.selectedValues.indexOf(availableValue.key) > -1) {
-      $filteringItem.addClass('selected');
+      $filteringItem.select(true);
     }
     if (index === arr.length - 1) {
       // mark last element

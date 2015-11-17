@@ -121,9 +121,15 @@
     content: @icon-long-arrow-down;
   }
 
-  &.sort-asc-add::after,
-  &.sort-desc-add::after {
-    content: attr(data-icon);
+  &.sort-asc-add,
+  &.sort-desc-add {
+    &::after {
+      content: @icon-plus;
+    }
+
+    &.selected::after {
+       content: attr(data-icon);
+    }
   }
 
   &.toggle.selected:hover {
@@ -142,8 +148,8 @@
     }
   }
 
-  &.group-column::before,
-  &.group-column-additional::before {
+  &.group::before,
+  &.group-add::before {
     position: relative;
     top: 0px;
     font-size: 20px;
@@ -151,13 +157,14 @@
     content: @icon-group;
   }
 
-  &.group-column::after,
-  &.group-column-additional::after {
-    content: attr(data-icon);
-  }
+  &.group-add {
+    &::after {
+      content: @icon-plus;
+    }
 
-  &.group-column-additional::after {
-    content: @icon-plus;
+    &.selected::after {
+       content: attr(data-icon);
+    }
   }
 
   &.aggregation-function {
