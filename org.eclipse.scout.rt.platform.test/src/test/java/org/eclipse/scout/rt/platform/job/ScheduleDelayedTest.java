@@ -62,7 +62,9 @@ public class ScheduleDelayedTest {
         .withSchedulingDelay(delayNanos, TimeUnit.NANOSECONDS));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 30, TimeUnit.SECONDS));
     assertEquals(1, protocol.size());
     Long actualExecutionTime = protocol.get(0);
     long expectedExecutionTime = tStartNano + delayNanos;

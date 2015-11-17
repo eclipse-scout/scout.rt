@@ -35,15 +35,15 @@ public class JobInput {
   /**
    * Indicates to execute a job exactly one time.
    */
-  public static final int SCHEDULING_RULE_ONE_TIME = 1 << 0;
+  public static final int SCHEDULING_RULE_SINGLE_EXECUTION = 1 << 0;
   /**
    * Indicates to execute a job periodically with a fixed delay.
    */
-  public static final int SCHEDULING_RULE_WITH_FIXED_DELAY = 1 << 1;
+  public static final int SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY = 1 << 1;
   /**
    * Indicates to execute a job periodically at a fixed rate.
    */
-  public static final int SCHEDULING_RULE_AT_FIXED_RATE = 1 << 2;
+  public static final int SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE = 1 << 2;
   /**
    * Indicates that an executable always should commence execution regardless of how long it was waiting for its
    * execution to start.
@@ -58,7 +58,7 @@ public class JobInput {
   protected RunContext m_runContext;
   protected long m_schedulingDelay;
   protected long m_periodicDelay;
-  protected int m_schedulingRule = SCHEDULING_RULE_ONE_TIME;
+  protected int m_schedulingRule = SCHEDULING_RULE_SINGLE_EXECUTION;
 
   public String getName() {
     return m_name;
@@ -118,8 +118,8 @@ public class JobInput {
    *          the time unit of the <code>period</code> argument.
    */
   public JobInput withPeriodicExecutionAtFixedRate(final long period, final TimeUnit unit) {
-    Assertions.assertTrue(m_schedulingRule == SCHEDULING_RULE_ONE_TIME || m_schedulingRule == SCHEDULING_RULE_AT_FIXED_RATE, "Periodic scheduling rule already set");
-    m_schedulingRule = SCHEDULING_RULE_AT_FIXED_RATE;
+    Assertions.assertTrue(m_schedulingRule == SCHEDULING_RULE_SINGLE_EXECUTION || m_schedulingRule == SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE, "Periodic scheduling rule already set");
+    m_schedulingRule = SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE;
     m_periodicDelay = unit.toMillis(period);
     return this;
   }
@@ -137,8 +137,8 @@ public class JobInput {
    *          the time unit of the <code>delay</code> argument.
    */
   public JobInput withPeriodicExecutionWithFixedDelay(final long delay, final TimeUnit unit) {
-    Assertions.assertTrue(m_schedulingRule == SCHEDULING_RULE_ONE_TIME || m_schedulingRule == SCHEDULING_RULE_WITH_FIXED_DELAY, "Periodic scheduling rule already set");
-    m_schedulingRule = SCHEDULING_RULE_WITH_FIXED_DELAY;
+    Assertions.assertTrue(m_schedulingRule == SCHEDULING_RULE_SINGLE_EXECUTION || m_schedulingRule == SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY, "Periodic scheduling rule already set");
+    m_schedulingRule = SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY;
     m_periodicDelay = unit.toMillis(delay);
     return this;
   }
@@ -236,8 +236,9 @@ public class JobInput {
   }
 
   /**
-   * Returns the scheduling rule to run the job, and is one of {@link #SCHEDULING_RULE_ONE_TIME}, or
-   * {@link #SCHEDULING_RULE_AT_FIXED_RATE}, or {@link #SCHEDULING_RULE_WITH_FIXED_DELAY}.
+   * Returns the scheduling rule to run the job, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
+   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
+   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY}.
    */
   public int getSchedulingRule() {
     return m_schedulingRule;

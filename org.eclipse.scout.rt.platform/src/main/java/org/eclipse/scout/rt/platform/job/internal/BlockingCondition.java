@@ -128,7 +128,9 @@ public class BlockingCondition implements IBlockingCondition {
       }
 
       registerAndMarkAsBlocked(jobTask);
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.BLOCKED, jobTask, this));
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.BLOCKED)
+          .withFuture(jobTask)
+          .withBlockingCondition(this));
 
       // Pass the mutex to next task if being a mutex task.
       if (jobTask.isMutexTask()) {
@@ -165,7 +167,9 @@ public class BlockingCondition implements IBlockingCondition {
       // Note: If released gracefully, the job's blocking-state is unset by the releaser.
 
       m_lock.unlock();
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.UNBLOCKED, jobTask, this));
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.UNBLOCKED)
+          .withFuture(jobTask)
+          .withBlockingCondition(this));
     }
 
     // Acquire the mutex anew if being a mutex task.
@@ -173,7 +177,9 @@ public class BlockingCondition implements IBlockingCondition {
       m_jobManager.getMutexSemaphores().acquire(jobTask); // Wait until the mutex is acquired.
     }
 
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED, jobTask, this));
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED)
+        .withFuture(jobTask)
+        .withBlockingCondition(this));
 
     return true;
   }

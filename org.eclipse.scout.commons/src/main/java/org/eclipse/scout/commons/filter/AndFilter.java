@@ -27,8 +27,7 @@ public class AndFilter<ELEMENT> implements IFilter<ELEMENT> {
 
   @SafeVarargs
   public AndFilter(final IFilter<ELEMENT>... filters) {
-    Assertions.assertTrue(filters.length > 0, "Must have one filter at minimum");
-    m_filters = CollectionUtility.arrayList(filters);
+    this(CollectionUtility.arrayList(filters));
   }
 
   public AndFilter(final Collection<IFilter<ELEMENT>> filters) {

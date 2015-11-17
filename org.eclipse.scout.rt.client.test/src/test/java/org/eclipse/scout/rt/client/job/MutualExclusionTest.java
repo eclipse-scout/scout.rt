@@ -126,7 +126,7 @@ public class MutualExclusionTest {
           modelThreadProtocol.add("model-thread-1");
         }
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -137,7 +137,7 @@ public class MutualExclusionTest {
           modelThreadProtocol.add("model-thread-2");
         }
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -148,7 +148,7 @@ public class MutualExclusionTest {
           modelThreadProtocol.add("model-thread-3");
         }
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
 
@@ -211,7 +211,7 @@ public class MutualExclusionTest {
               public void run() throws Exception {
                 protocol.add(9);
               }
-            });
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
             try {
               future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(RuntimeExceptionTranslator.class));
@@ -222,7 +222,7 @@ public class MutualExclusionTest {
 
             protocol.add(6);
           }
-        });
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
         protocol.add(2);
 
@@ -239,15 +239,15 @@ public class MutualExclusionTest {
               public void run() throws Exception {
                 protocol.add(10);
               }
-            });
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
             protocol.add(8);
           }
-        });
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
         protocol.add(3);
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.arrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), protocol);
@@ -272,7 +272,7 @@ public class MutualExclusionTest {
           public void run() throws Exception {
             protocol.add(3);
           }
-        });
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
         try {
           future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(ExceptionTranslator.class));
@@ -284,7 +284,7 @@ public class MutualExclusionTest {
           protocol.add(4);
         }
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.arrayList(1, 2, 3), protocol);
@@ -441,7 +441,7 @@ public class MutualExclusionTest {
         }
         verifyLatch.countDown();
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -457,7 +457,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("running-3");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     setupLatch.await();
     assertTrue(future1.isBlocked());
@@ -929,7 +929,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     final IFuture<Void> future2 = ModelJobs.schedule(new IRunnable() {
 
@@ -939,7 +939,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     final IFuture<Void> future3 = ModelJobs.schedule(new IRunnable() {
 
@@ -949,7 +949,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -957,7 +957,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("job-4-running");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -1002,7 +1002,7 @@ public class MutualExclusionTest {
 
         protocol.add("job-5-ending");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
@@ -1074,7 +1074,7 @@ public class MutualExclusionTest {
                   public void run() throws Exception {
                     protocol.add("job-4-running");
                   }
-                });
+                }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
                 protocol.add("job-3-before-signaling");
                 BC.setBlocking(false);
@@ -1089,21 +1089,21 @@ public class MutualExclusionTest {
                   public void run() throws Exception {
                     protocol.add("job-5-running");
                   }
-                });
+                }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
               }
-            });
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
             protocol.add("job-2-beforeAwait");
             BC.waitFor();
             protocol.add("JOB-X-AFTERAWAIT");
           }
-        });
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
         protocol.add("job-1-beforeAwait");
         BC.waitFor();
         protocol.add("JOB-X-AFTERAWAIT");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
@@ -1137,14 +1137,14 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         BC.waitFor();
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         BC.waitFor();
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
   }
@@ -1186,7 +1186,7 @@ public class MutualExclusionTest {
         protocol.add("3: afterWaitFor [outer]");
         done.release();
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
     runnable.throwOnError();
@@ -1219,7 +1219,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("3: afterWaitFor");
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     waitForPermitsAcquired(m_jobManager.getMutexSemaphores(), m_clientSession, 0); // Wait until job1 is blocked
     assertTrue(BC.isBlocking());
@@ -1236,7 +1236,8 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("5: afterWaitFor");
       }
-    }).awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+        .awaitDoneAndGet();
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
@@ -1269,7 +1270,7 @@ public class MutualExclusionTest {
             Thread.sleep(100);
             BC.setBlocking(false);
           }
-        });
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
         BC.waitFor();
         protocol.add("2: running");
       }

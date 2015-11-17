@@ -40,10 +40,10 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -53,15 +53,16 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobFutureFilters.Filter;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
@@ -498,8 +499,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     try {
       long delay = NumberUtility.nvl(CONFIG.getPropertyValue(JobCompletionDelayOnSessionShutdown.class), 0L);
       if (delay > 0L) {
-        final Filter runningJobsFilter = Jobs.newFutureFilter().andMatchFuture(findRunningJobs());
-        Jobs.getJobManager().awaitDone(runningJobsFilter, delay, TimeUnit.SECONDS);
+        Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+            .andMatchFuture(findRunningJobs())
+            .toFilter(), delay, TimeUnit.SECONDS);
       }
       cancelRunningJobs();
     }
@@ -533,7 +535,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void cancelRunningJobs() {
     final List<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
-      Jobs.getJobManager().cancel(Jobs.newFutureFilter().andMatchFuture(runningJobs), true);
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(runningJobs)
+          .toFilter(), true);
 
       LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
           + "[session={}, user={}, jobs=(see next line)]\n{}",
@@ -546,7 +550,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    */
   protected List<IFuture<?>> findRunningJobs() {
     CollectorVisitor<IFuture<?>> collector = new CollectorVisitor<>();
-    Jobs.getJobManager().visit(ClientJobs.newFutureFilter().andMatchNotCurrentFuture().andMatchCurrentSession(), collector);
+    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+        .andMatchRunContext(ClientRunContext.class)
+        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchNotFuture(IFuture.CURRENT.get())
+        .toFilter(), collector);
     return collector.getElements();
   }
 

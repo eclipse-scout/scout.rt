@@ -18,9 +18,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
@@ -71,7 +71,8 @@ public class TimeoutServerRunContextStatement extends Statement {
     }
     else {
       // timeout specified. Run statement in a new server job and wait the amount specified.
-      IFuture<Void> future = ServerJobs.schedule(nestedRunnable, ServerJobs.newInput(runContext));
+      IFuture<Void> future = Jobs.schedule(nestedRunnable, Jobs.newInput()
+          .withRunContext(runContext));
       try {
         future.awaitDoneAndGet(m_timeoutMillis, TimeUnit.MILLISECONDS);
       }

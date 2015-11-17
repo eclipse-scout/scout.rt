@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.filter.OrFilter;
+import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 
@@ -81,8 +82,17 @@ public interface IJobManager {
    * Checks whether all Futures accepted by the given Filter are in 'done-state' (completed or cancelled).
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>Jobs.newFutureFilter().andMatchAnyFuture(...);</code>
+   * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
+   * criteria joined by logical 'AND' operation.
+   * <p>
+   * Example:
+   * 
+   * <pre>
+   * Jobs.newFutureFilterBuilder()
+   *     .andMatchFuture(...)
+   *     .andMatch(...)
+   *     .toFilter();
+   * </pre>
    *
    * @param filter
    *          filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all Futures are
@@ -96,8 +106,17 @@ public interface IJobManager {
    * cancelled), or the given timeout elapses.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>Jobs.newFutureFilter().andMatchAnyFuture(...);</code>
+   * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
+   * criteria joined by logical 'AND' operation.
+   * <p>
+   * Example:
+   * 
+   * <pre>
+   * Jobs.newFutureFilterBuilder()
+   *     .andMatchFuture(...)
+   *     .andMatch(...)
+   *     .toFilter();
+   * </pre>
    *
    * @param filter
    *          filter to limit the Futures to await to become 'done'. If <code>null</code>, all Futures are awaited,
@@ -117,8 +136,29 @@ public interface IJobManager {
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Use a {@link CollectorVisitor} to collect all visited Futures. Also see
-   * {@link JobFutureFilters} for simplified usage: <code>Jobs.newFutureFilter().notCurrentFuture().notBlocked();</code>
+   * a filter in {@link NotFilter}. See {@link newFutureFilterBuilder} to create a filter to match multiple criteria
+   * joined by logical 'AND' operation. Use a {@link CollectorVisitor} to collect all visited Futures.
+   * <p>
+   * Example:
+   *
+   * <pre>
+   * Jobs.newFutureFilterBuilder()
+   *     .andMatchFuture(...)
+   *     .andMatch(...)
+   *     .toFilter();
+   * </pre>
+   *
+   * Example collector:
+   *
+   * <pre>
+   * CollectorVisitor&lt;IFuture&lt;?>&gt; collector = new CollectorVisitor&lt;&gt;();
+   * Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+   *     .andMatchRunContext(ClientRunContext.class)
+   *     .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+   *     .toFilter(), collector);
+   *
+   * List&lt;IFuture&lt;?&gt;&gt; futures = collector.getElements();
+   * </pre>
    *
    * @param filter
    *          to limit the Futures to be visited. If <code>null</code>, all Futures are visited, which is the same as
@@ -133,8 +173,17 @@ public interface IJobManager {
    * Cancels all Futures which are accepted by the given Filter.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>Jobs.newFutureFilter().andMatchAnyFuture(...);</code>
+   * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
+   * criteria joined by logical 'AND' operation.
+   * <p>
+   * Example:
+   * 
+   * <pre>
+   * Jobs.newFutureFilterBuilder()
+   *     .andMatchFuture(...)
+   *     .andMatch(...)
+   *     .toFilter();
+   * </pre>
    *
    * @param filter
    *          to limit the Futures to be cancelled. If <code>null</code>, all Futures are cancelled, which is the same
@@ -180,9 +229,18 @@ public interface IJobManager {
    * listener is already registered, that previous registration is replaced.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobEventFilters} for simplified usage:<br/>
-   * <code>Jobs.newEventFilter().andMatchAnyFuture(..);</code>
-   * </p>
+   * a filter in {@link NotFilter}. Also see {@link JobEventFilterBuilder} to create a filter to match multiple criteria
+   * joined by logical 'AND' operation.
+   * <p>
+   * Example:
+   * 
+   * <pre>
+   * Jobs.newEventFilterBuilder()
+   *     .andMatchEventType(JobEventType.SCHEDULED, JobEventType.DONE)
+   *     .andMatchFuture(...)
+   *     .andMatch(...)
+   *     .toFilter();
+   * </pre>
    *
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.

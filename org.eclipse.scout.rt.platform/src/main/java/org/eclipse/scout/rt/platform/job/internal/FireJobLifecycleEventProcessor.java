@@ -40,7 +40,7 @@ public class FireJobLifecycleEventProcessor<RESULT> implements IInvocationDecora
 
   @Override
   public IUndecorator<RESULT> decorate() throws Exception {
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, m_eventType, m_future));
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, m_eventType).withFuture(m_future));
     return null;
   }
 }

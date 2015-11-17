@@ -594,7 +594,10 @@ public class JobCancelTest {
         .withLogOnError(false));
 
     assertTrue(setupLatch.await());
-    m_jobManager.cancel(Jobs.newFutureFilter().andMatchName(commonJobName).andMatchMutex(null), true);
+    m_jobManager.cancel(Jobs.newFutureFilterBuilder()
+        .andMatchName(commonJobName)
+        .andMatchMutex(null)
+        .toFilter(), true);
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3-interrupted", "job-3a-interrupted"), protocol);

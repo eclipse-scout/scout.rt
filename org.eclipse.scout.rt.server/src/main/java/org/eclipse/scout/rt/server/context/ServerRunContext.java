@@ -68,7 +68,7 @@ public class ServerRunContext extends RunContext {
   protected boolean m_offline;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
     super.interceptInvocationChain(invocationChain);
 
     invocationChain
@@ -305,5 +305,16 @@ public class ServerRunContext extends RunContext {
     final ServerRunContext copy = BEANS.get(ServerRunContext.class);
     copy.copyValues(this);
     return copy;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getAdapter(final Class<T> type) {
+    if (ISession.class.isAssignableFrom(type)) {
+      return (T) m_session;
+    }
+    else {
+      return null;
+    }
   }
 }

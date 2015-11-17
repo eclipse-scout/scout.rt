@@ -47,10 +47,12 @@ public class ThreadNameDecorator<RESULT> implements IInvocationDecorator<RESULT>
 
     // Install job listener to decorate the thread name
     final IJobListenerRegistration listenerRegistration = IFuture.CURRENT.get().addListener(
-        Jobs.newEventFilter().andMatchEventType(
-            JobEventType.BLOCKED,
-            JobEventType.UNBLOCKED,
-            JobEventType.RESUMED),
+        Jobs.newEventFilterBuilder()
+            .andMatchEventType(
+                JobEventType.BLOCKED,
+                JobEventType.UNBLOCKED,
+                JobEventType.RESUMED)
+            .toFilter(),
         new IJobListener() {
           @Override
           public void changed(final JobEvent event) {

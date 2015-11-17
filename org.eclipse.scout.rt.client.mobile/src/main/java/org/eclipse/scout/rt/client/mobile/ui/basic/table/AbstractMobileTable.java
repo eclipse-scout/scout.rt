@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.DefaultTableRowFormProvider;
@@ -260,7 +261,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
       public void run() throws Exception {
         clearSelection();
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   protected void clearSelection() {

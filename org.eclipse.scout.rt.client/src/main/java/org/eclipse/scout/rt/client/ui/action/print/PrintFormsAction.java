@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -210,7 +211,7 @@ public class PrintFormsAction extends AbstractAction {
             }
           });
         }
-      });
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
     }
   }
 

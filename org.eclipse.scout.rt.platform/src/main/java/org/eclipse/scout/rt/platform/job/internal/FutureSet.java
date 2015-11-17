@@ -67,12 +67,15 @@ public class FutureSet {
   /**
    * Invoke to initialize this {@link FutureSet}.
    */
-  public void init(IJobManager jobManager) {
-    m_listenerRegistration = jobManager.addListener(
-        Jobs.newEventFilter().andMatchEventType(JobEventType.BLOCKED, JobEventType.UNBLOCKED),
+  public void init(final IJobManager jobManager) {
+    m_listenerRegistration = jobManager.addListener(Jobs.newEventFilterBuilder()
+        .andMatchEventType(
+            JobEventType.BLOCKED,
+            JobEventType.UNBLOCKED)
+        .toFilter(),
         new IJobListener() {
           @Override
-          public void changed(JobEvent event) {
+          public void changed(final JobEvent event) {
             m_writeLock.lock();
             try {
               m_changedCondition.signalAll();
@@ -102,7 +105,7 @@ public class FutureSet {
       m_writeLock.unlock();
     }
 
-    for (IFuture<?> runningFuture : runningFutures) {
+    for (final IFuture<?> runningFuture : runningFutures) {
       runningFuture.cancel(true);
     }
   }

@@ -113,7 +113,9 @@ public class PortCache<PORT> {
       public void run() throws Exception {
         m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withName("Producing PortType to be put into cache"));
 
     // Return port from cache, or create a new one.
     if (portCacheEntry != null) {

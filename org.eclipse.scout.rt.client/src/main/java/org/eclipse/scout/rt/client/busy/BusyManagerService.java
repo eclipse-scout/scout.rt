@@ -15,8 +15,6 @@ import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -65,7 +63,7 @@ public class BusyManagerService implements IBusyManagerService, IJobListener {
   }
 
   private IBusyHandler getHandlerInternal(IFuture<?> future) {
-    if (ClientJobs.isClientJob(future) || ModelJobs.isModelJob(future)) {
+    if (future.getJobInput().getRunContext() instanceof ClientRunContext) {
       return getHandler(((ClientRunContext) future.getJobInput().getRunContext()).getSession());
     }
     else {
@@ -111,20 +109,26 @@ public class BusyManagerService implements IBusyManagerService, IJobListener {
       return;
     }
 
-    future.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.BLOCKED), new IJobListener() {
+    future.addListener(Jobs.newEventFilterBuilder()
+        .andMatchEventType(JobEventType.BLOCKED)
+        .toFilter(), new IJobListener() {
 
-      @Override
-      public void changed(JobEvent blockedEvent) {
-        handler.onJobEnd(future);
-      }
-    });
-    future.addListener(Jobs.newEventFilter().andMatchEventType(JobEventType.UNBLOCKED), new IJobListener() {
+          @Override
+          public void changed(JobEvent blockedEvent) {
+            handler.onJobEnd(future);
+          }
+        });
 
-      @Override
-      public void changed(JobEvent blockedEvent) {
-        handler.onJobBegin(future);
-      }
-    });
+    future.addListener(Jobs.newEventFilterBuilder()
+        .andMatchEventType(JobEventType.UNBLOCKED)
+        .toFilter(), new IJobListener() {
+
+          @Override
+          public void changed(JobEvent blockedEvent) {
+            handler.onJobBegin(future);
+          }
+        });
+
     handler.onJobBegin(future);
   }
 

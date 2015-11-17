@@ -28,18 +28,12 @@ public class JobEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
   private final JobEventType m_eventType;
-  private final IFuture<?> m_future;
-  private final IBlockingCondition m_blockingCondition;
+  private IFuture<?> m_future;
+  private IBlockingCondition m_blockingCondition;
 
-  public JobEvent(final IJobManager jobManager, final JobEventType type, final IFuture<?> future) {
-    this(jobManager, type, future, null);
-  }
-
-  public JobEvent(final IJobManager jobManager, final JobEventType type, final IFuture<?> future, final IBlockingCondition blockingCondition) {
+  public JobEvent(final IJobManager jobManager, final JobEventType type) {
     super(jobManager);
     m_eventType = Assertions.assertNotNull(type);
-    m_future = future;
-    m_blockingCondition = blockingCondition;
   }
 
   @Override
@@ -55,12 +49,28 @@ public class JobEvent extends EventObject {
   }
 
   /**
+   * To associate this event with a {@link IBlockingCondition}.
+   */
+  public JobEvent withBlockingCondition(final IBlockingCondition blockingCondition) {
+    m_blockingCondition = blockingCondition;
+    return this;
+  }
+
+  /**
    * @return blocking condition which a 'blocking event' is associated with; is <code>null</code> for other events.
    * @see JobEventType#BLOCKED
    * @see JobEventType#UNBLOCKED
    */
   public IBlockingCondition getBlockingCondition() {
     return m_blockingCondition;
+  }
+
+  /**
+   * To associate this event with a {@link IFuture}.
+   */
+  public JobEvent withFuture(final IFuture<?> future) {
+    m_future = future;
+    return this;
   }
 
   /**

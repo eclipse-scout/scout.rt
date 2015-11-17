@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -107,13 +106,15 @@ public class ClientNotificationDispatcher {
     }
     else {
       // dispatch async
-      IFuture<Void> future = ClientJobs.schedule(new IRunnable() {
+      IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           dispatchSync(notification);
         }
-      }, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
+      }, Jobs.newInput()
+          .withRunContext(ClientRunContexts.copyCurrent())
+          .withName("Dispatching client notification"));
 
       synchronized (m_notificationFutures) {
         m_notificationFutures.add(future);
@@ -139,14 +140,15 @@ public class ClientNotificationDispatcher {
       dispatchSync(notification);
     }
     else {
-      IFuture<Void> future = ClientJobs.schedule(new IRunnable() {
+      IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           dispatchSync(notification);
         }
-      }, ClientJobs.newInput(ClientRunContexts.empty()
-          .withSession(session, true)));
+      }, Jobs.newInput()
+          .withRunContext(ClientRunContexts.empty().withSession(session, true))
+          .withName("Dispatching client notification"));
 
       synchronized (m_notificationFutures) {
         m_notificationFutures.add(future);
@@ -170,7 +172,10 @@ public class ClientNotificationDispatcher {
       futures.addAll(m_notificationFutures);
     }
     // TODO [jgu] how long to wait? Is this method still in use?
-    Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(futures).andMatchNotCurrentFuture(), Integer.MAX_VALUE, TimeUnit.SECONDS);
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(futures)
+        .andMatchNotFuture(IFuture.CURRENT.get())
+        .toFilter(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
 
   private class P_NotificationFutureCallback implements IDoneCallback<Void> {

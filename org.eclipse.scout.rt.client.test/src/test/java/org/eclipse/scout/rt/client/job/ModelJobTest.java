@@ -57,7 +57,7 @@ public class ModelJobTest {
       @Override
       public void run() throws Exception {
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   @Test

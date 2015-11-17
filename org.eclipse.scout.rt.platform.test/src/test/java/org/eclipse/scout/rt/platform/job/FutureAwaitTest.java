@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -78,7 +79,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -122,7 +124,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -219,7 +222,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -263,7 +267,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -307,7 +312,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -403,7 +409,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -447,7 +454,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -538,7 +546,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -582,7 +591,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -716,7 +726,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -738,7 +749,9 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 10, TimeUnit.SECONDS));
+      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(future)
+          .toFilter(), 10, TimeUnit.SECONDS));
       fail();
     }
     catch (ProcessingException e) {
@@ -760,7 +773,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -782,7 +796,9 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 10, TimeUnit.SECONDS));
+      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(future)
+          .toFilter(), 10, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
     catch (ProcessingException e) {
@@ -804,7 +820,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -826,7 +843,9 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.NANOSECONDS));
+      assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(future)
+          .toFilter(), 1, TimeUnit.NANOSECONDS));
     }
     catch (ProcessingException e) {
       fail();
@@ -869,7 +888,9 @@ public class FutureAwaitTest {
 
     // Run test and verify
     try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 10, TimeUnit.SECONDS));
+      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(future)
+          .toFilter(), 10, TimeUnit.SECONDS));
     }
     catch (ProcessingException e) {
       fail();

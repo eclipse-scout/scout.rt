@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
@@ -122,7 +123,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
           }
         }
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   public void refreshStatus() {

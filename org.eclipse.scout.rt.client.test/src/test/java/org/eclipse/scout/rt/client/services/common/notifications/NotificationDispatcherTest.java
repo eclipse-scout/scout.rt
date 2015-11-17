@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
-import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -80,19 +80,21 @@ public class NotificationDispatcherTest {
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend JUnit model thread", true);
     final String stringNotification = "A simple string notification";
 
-    ClientJobs.schedule(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         final ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
         dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), stringNotification);
         dispatcher.waitForPendingNotifications();
       }
-    }).whenDone(new IDoneCallback<Void>() {
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        cond.setBlocking(false);
-      }
-    });
+    }, Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent()))
+        .whenDone(new IDoneCallback<Void>() {
+          @Override
+          public void onDone(DoneEvent<Void> event) {
+            cond.setBlocking(false);
+          }
+        });
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(0)).handleNotification(Mockito.any(INotificationGroup.class));
@@ -102,7 +104,7 @@ public class NotificationDispatcherTest {
   public void testSuperClassNotification() {
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend JUnit model thread1", true);
 
-    ClientJobs.schedule(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
@@ -111,12 +113,14 @@ public class NotificationDispatcherTest {
         dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification02());
         dispatcher.waitForPendingNotifications();
       }
-    }).whenDone(new IDoneCallback<Void>() {
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        cond.setBlocking(false);
-      }
-    });
+    }, Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent()))
+        .whenDone(new IDoneCallback<Void>() {
+          @Override
+          public void onDone(DoneEvent<Void> event) {
+            cond.setBlocking(false);
+          }
+        });
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));

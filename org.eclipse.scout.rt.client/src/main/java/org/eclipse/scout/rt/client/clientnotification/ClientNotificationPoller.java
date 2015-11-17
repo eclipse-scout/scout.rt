@@ -21,12 +21,12 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -46,12 +46,12 @@ public class ClientNotificationPoller {
     // ensure the poller starts only once.
     Assertions.assertNull(m_pollerFuture);
     if (BEANS.get(IServiceTunnel.class).isActive()) {
-      m_pollerFuture = ClientJobs.schedule(new P_NotificationPollJob(),
-          ClientJobs.newInput(ClientRunContexts.copyCurrent()
+      m_pollerFuture = Jobs.schedule(new P_NotificationPollJob(), Jobs.newInput()
+          .withRunContext(ClientRunContexts.copyCurrent()
               .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
               .withUserAgent(UserAgent.createDefault())
               .withSession(null, false))
-              .withName(ClientNotificationPoller.class.getSimpleName()));
+          .withName(ClientNotificationPoller.class.getSimpleName()));
     }
     else {
       LOG.debug("Starting without notifications due to no proxy service is available");

@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertKeyToValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertValueToKeyChain;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
@@ -38,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -203,21 +203,23 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             new FormFieldProvisioningContext(AbstractMixedSmartField.this));
         prepareKeyLookup(call, interceptConvertValueToKey(getValue()));
 
-        m_backgroundJobFuture.set(ClientJobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
+        m_backgroundJobFuture.set(Jobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
           @Override
           public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
             List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
             filterKeyLookup(call, result);
             return cleanupResultList(result);
           }
-        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("Fetch smart-field data")));
+        }, Jobs.newInput()
+            .withRunContext(ClientRunContexts.copyCurrent())
+            .withName("Fetching smart-field data")));
 
         ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             waitForLookupRows();
           }
-        });
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
       }
     }
     catch (RuntimeException e) {

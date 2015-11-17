@@ -40,6 +40,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
@@ -218,7 +219,8 @@ public class ServiceTunnelServletTest {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (Callable<?> job : jobs) {
-      futures.add(Jobs.schedule(job));
+      futures.add(Jobs.schedule(job, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())));
     }
 
     for (IFuture<?> future : futures) {

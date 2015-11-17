@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 
@@ -75,9 +76,11 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean isBlocked();
 
   /**
-   * @return <code>true</code> if this is a periodic job, or <code>false</code> if executed only once.
+   * Returns the scheduling rule how this job is executed, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
+   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
+   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY}.
    */
-  boolean isPeriodic();
+  int getSchedulingRule();
 
   /**
    * Waits if necessary for the job to complete, or until cancelled. This method does not throw an exception if
@@ -205,16 +208,9 @@ public interface IFuture<RESULT> extends ICancellable {
   IFuture<RESULT> whenDone(IDoneCallback<RESULT> callback);
 
   /**
-   * Registers the given listener to be notified about job lifecycle events related to this Future, and which comply
-   * with the given filter. If the listener is already registered, that previous registration is replaced.
-   * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobEventFilters} for simplified usage:<br/>
-   * <code>Jobs.newEventFilter().andMatchAnyFuture(..);</code>
-   * </p>
+   * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener
+   * is already registered, that previous registration is replaced.
    *
-   * @param filter
-   *          filter to only get notified about events of interest - that is for events accepted by the filter.
    * @param listener
    *          listener to be registered.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
@@ -223,9 +219,24 @@ public interface IFuture<RESULT> extends ICancellable {
   IJobListenerRegistration addListener(IJobListener listener);
 
   /**
-   * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener
-   * is already registered, that previous registration is replaced.
+   * Registers the given listener to be notified about job lifecycle events related to this Future, and which comply
+   * with the given filter. If the listener is already registered, that previous registration is replaced.
+   * <p>
+   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
+   * a filter in {@link NotFilter}. Also see {@link JobEventFilterBuilder} to create a filter to match multiple criteria
+   * joined by logical 'AND' operation.
+   * <p>
+   * Example:
    *
+   * <pre>
+   * Jobs.newEventFilterBuilder()
+   *     .andMatchEventType(JobEventType.SCHEDULED, JobEventType.DONE)
+   *     .andMatch(...)
+   *     .toFilter();
+   * </pre>
+   *
+   * @param filter
+   *          filter to only get notified about events of interest - that is for events accepted by the filter.
    * @param listener
    *          listener to be registered.
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to

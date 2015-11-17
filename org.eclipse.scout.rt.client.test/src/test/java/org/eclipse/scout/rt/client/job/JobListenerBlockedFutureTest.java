@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -67,8 +66,12 @@ public class JobListenerBlockedFutureTest {
       public void run() throws Exception {
         // NOOP
       }
-    }, ClientJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true)));
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(future), 1, TimeUnit.MINUTES));
+    }, Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty().withSession(clientSession, true)));
+
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
     listenerRegistration.dispose();
 
@@ -94,9 +97,9 @@ public class JobListenerBlockedFutureTest {
     final IBlockingCondition condition = m_jobManager.createBlockingCondition("test condition", true);
 
     P_JobChangeListener modelJobListener = new P_JobChangeListener();
-    P_JobChangeListener clientJobListener = new P_JobChangeListener();
-    IJobListenerRegistration modelJobListenerRegistration = m_jobManager.addListener(ModelJobs.newEventFilter(), modelJobListener);
-    IJobListenerRegistration clientJobListenerRegistration = m_jobManager.addListener(ClientJobs.newEventFilter(), clientJobListener);
+    P_JobChangeListener jobListener = new P_JobChangeListener();
+    IJobListenerRegistration modelJobListenerRegistration = m_jobManager.addListener(ModelJobs.newEventFilterBuilder().toFilter(), modelJobListener);
+    IJobListenerRegistration jobListenerRegistration = m_jobManager.addListener(Jobs.newEventFilterBuilder().toFilter(), jobListener);
     IFuture<Void> outerFuture = null;
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
@@ -122,12 +125,14 @@ public class JobListenerBlockedFutureTest {
           condition.waitFor();
         }
       }, input.copy());
-      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFuture(outerFuture), 1, TimeUnit.MINUTES));
+      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(outerFuture)
+          .toFilter(), 1, TimeUnit.MINUTES));
       m_jobManager.shutdown();
     }
     finally {
       modelJobListenerRegistration.dispose();
-      clientJobListenerRegistration.dispose();
+      jobListenerRegistration.dispose();
     }
 
     // verify Event Types
@@ -141,9 +146,20 @@ public class JobListenerBlockedFutureTest {
     expectedStati.add(JobEventType.DONE); // inner
     expectedStati.add(JobEventType.RESUMED); // outer
     expectedStati.add(JobEventType.DONE); // outer
-    expectedStati.add(JobEventType.SHUTDOWN);
     assertEquals(expectedStati, modelJobListener.m_stati);
-    assertEquals(Collections.singletonList(JobEventType.SHUTDOWN), clientJobListener.m_stati);
+
+    expectedStati = new ArrayList<>();
+    expectedStati.add(JobEventType.SCHEDULED); // outer
+    expectedStati.add(JobEventType.ABOUT_TO_RUN); // outer
+    expectedStati.add(JobEventType.SCHEDULED); // inner
+    expectedStati.add(JobEventType.BLOCKED); // outer
+    expectedStati.add(JobEventType.ABOUT_TO_RUN); // inner
+    expectedStati.add(JobEventType.UNBLOCKED); // outer
+    expectedStati.add(JobEventType.DONE); // inner
+    expectedStati.add(JobEventType.RESUMED); // outer
+    expectedStati.add(JobEventType.DONE); // outer
+    expectedStati.add(JobEventType.SHUTDOWN);
+    assertEquals(expectedStati, jobListener.m_stati);
 
     // verify Futures
     List<IFuture<?>> expectedFutures = new ArrayList<>();
@@ -156,9 +172,21 @@ public class JobListenerBlockedFutureTest {
     expectedFutures.add(innerFuture.getValue()); // done
     expectedFutures.add(outerFuture); // resumed
     expectedFutures.add(outerFuture); // done
-    expectedFutures.add(null); // shutdown
     assertEquals(expectedFutures, modelJobListener.m_futures);
-    assertEquals(Collections.singletonList(null), clientJobListener.m_futures); // shutdown
+
+    expectedFutures = new ArrayList<>();
+    expectedFutures.add(outerFuture); // scheduled
+    expectedFutures.add(outerFuture); // about to run
+    expectedFutures.add(innerFuture.getValue()); // scheduled
+    expectedFutures.add(outerFuture); // blocked
+    expectedFutures.add(innerFuture.getValue()); // about to run
+    expectedFutures.add(outerFuture); // unblocked
+    expectedFutures.add(innerFuture.getValue()); // done
+    expectedFutures.add(outerFuture); // resumed
+    expectedFutures.add(outerFuture); // done
+    expectedFutures.add(null); // shutdown
+    assertEquals(expectedFutures, jobListener.m_futures);
+
   }
 
   private static final class P_JobChangeListener implements IJobListener {

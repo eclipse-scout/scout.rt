@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -191,7 +192,9 @@ public class MultipleSessionTest {
     assertTrue(setupLatch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
 
-    Jobs.getJobManager().cancel(ModelJobs.newFutureFilter().andMatchSession(m_clientSession1), true); // cancels job-1-S1 and job-2-S1, meaning that job-2-S1 never starts running.
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(m_clientSession1))
+        .toFilter(), true); // cancels job-1-S1 and job-2-S1, meaning that job-2-S1 never starts running.
     awaitAllCancelledLatch.unblock();
 
     assertTrue(interruptedJob1_S1_Latch.await());

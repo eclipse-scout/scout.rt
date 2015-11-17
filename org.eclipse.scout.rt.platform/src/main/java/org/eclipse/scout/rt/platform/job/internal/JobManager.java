@@ -98,16 +98,16 @@ public class JobManager implements IJobManager, IPlatformListener {
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
 
     switch (input.getSchedulingRule()) {
-      case JobInput.SCHEDULING_RULE_ONE_TIME:
-        scheduleOneTimeJob(futureTask, input.getSchedulingDelay());
+      case JobInput.SCHEDULING_RULE_SINGLE_EXECUTION:
+        scheduleSingleExecutingJob(futureTask, input.getSchedulingDelay());
         break;
-      case JobInput.SCHEDULING_RULE_AT_FIXED_RATE:
+      case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
         Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
-        schedulePeriodicJob(new FixedRateRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        schedulePeriodicExecutingJob(new FixedRateRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
-      case JobInput.SCHEDULING_RULE_WITH_FIXED_DELAY:
+      case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
         Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
-        schedulePeriodicJob(new FixedDelayRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        schedulePeriodicExecutingJob(new FixedDelayRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       default:
         throw new UnsupportedOperationException("Unsupported scheduling rule");
@@ -117,9 +117,9 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Method invoked to schedule a one-time job.
+   * Method invoked to schedule a single executing job.
    */
-  protected <RESULT> void scheduleOneTimeJob(final JobFutureTask<RESULT> futureTask, final long schedulingDelay) {
+  protected <RESULT> void scheduleSingleExecutingJob(final JobFutureTask<RESULT> futureTask, final long schedulingDelay) {
     if (schedulingDelay > 0L) {
       m_delayedExecutor.schedule(new Runnable() {
 
@@ -139,9 +139,9 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Method invoked to schedule a periodic job.
+   * Method invoked to schedule a periodic executing job.
    */
-  protected void schedulePeriodicJob(final Runnable periodicRunnable, final long schedulingDelay) {
+  protected void schedulePeriodicExecutingJob(final Runnable periodicRunnable, final long schedulingDelay) {
     if (schedulingDelay > 0L) {
       m_delayedExecutor.schedule(periodicRunnable, schedulingDelay, TimeUnit.MILLISECONDS);
     }
@@ -184,7 +184,7 @@ public class JobManager implements IJobManager, IPlatformListener {
       m_mutexSemaphores.clear();
     }
 
-    fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
+    fireEvent(new JobEvent(this, JobEventType.SHUTDOWN));
   }
 
   @Override

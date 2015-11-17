@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
@@ -34,13 +33,13 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.Calendar
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsInBackgroundChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.ICalendarItemProviderExtension;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -303,7 +302,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           public void run() throws Exception {
             propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
           }
-        }).awaitDone();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+            .awaitDone();
       }
       catch (ProcessingException e) {
         // NOOP (interrupted)
@@ -353,18 +353,20 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       long refreshInterval = getRefreshIntervalMillis();
       P_ReloadJob runnable = new P_ReloadJob(minDate, maxDate);
 
-      ClientRunContext runContext = ClientRunContexts.copyCurrent().withSession(session, true);
       if (refreshInterval > 0) {
         // interval load
-        m_reloadJob = ClientJobs.schedule(runnable,
-            ClientJobs.newInput(runContext)
-                .withSchedulingDelay(startDelayMillis, TimeUnit.MILLISECONDS)
-                .withPeriodicExecutionWithFixedDelay(refreshInterval, TimeUnit.MILLISECONDS));
+        m_reloadJob = Jobs.schedule(runnable, Jobs.newInput()
+            .withRunContext(ClientRunContexts.copyCurrent().withSession(session, true))
+            .withSchedulingDelay(startDelayMillis, TimeUnit.MILLISECONDS)
+            .withPeriodicExecutionWithFixedDelay(refreshInterval, TimeUnit.MILLISECONDS)
+            .withName("Loading calendar items"));
       }
       else {
         // single load
-        m_reloadJob = ClientJobs.schedule(runnable, ClientJobs.newInput(runContext)
-            .withSchedulingDelay(startDelayMillis, TimeUnit.MILLISECONDS));
+        m_reloadJob = Jobs.schedule(runnable, Jobs.newInput()
+            .withRunContext(ClientRunContexts.copyCurrent().withSession(session, true))
+            .withSchedulingDelay(startDelayMillis, TimeUnit.MILLISECONDS)
+            .withName("Loading calendar items"));
       }
     }
   }
@@ -411,7 +413,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
               }
             }
           }
-        }).awaitDone();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDone();
       }
       finally {
         setLoadInProgress(false);

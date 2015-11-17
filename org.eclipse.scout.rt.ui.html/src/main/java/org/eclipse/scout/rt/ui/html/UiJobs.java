@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 
 /**
  * Utility methods to work with the Job API from UI.
@@ -55,8 +55,10 @@ public class UiJobs {
 
     boolean timeout;
     try {
-      Filter filter = ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotBlocked();
-      timeout = !Jobs.getJobManager().awaitDone(filter, AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      timeout = !Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilterBuilder()
+          .andMatch(new SessionFutureFilter(clientSession))
+          .andAreNotBlocked()
+          .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {
       throw new UiException("Interrupted while waiting for model jobs to complete [clientSession=%s]", e, clientSession);
@@ -94,7 +96,10 @@ public class UiJobs {
     // Wait until the job is done (completed or cancelled), or enters a blocking condition.
     boolean timeout;
     try {
-      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFuture(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(future)
+          .andAreNotBlocked()
+          .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {
       // FIXME [dwi] use translator to not work with ProcessingException

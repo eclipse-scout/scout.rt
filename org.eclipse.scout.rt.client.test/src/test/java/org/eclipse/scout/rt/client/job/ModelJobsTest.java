@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -25,9 +24,9 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -55,23 +54,49 @@ public class ModelJobsTest {
 
   @Test
   public void testIsModelJob() {
+    IClientSession session1 = mock(IClientSession.class);
+    IClientSession session2 = mock(IClientSession.class);
+
+    // not a model job (no Future)
     assertFalse(ModelJobs.isModelJob(null));
 
-    IFuture<?> future = mock(IFuture.class);
-    when(future.getJobInput()).thenReturn(new JobInput());
-    assertFalse(ModelJobs.isModelJob(future));
+    // not a model job (no ClientRunContext)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput())));
 
-    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new RunContext()));
-    assertFalse(ModelJobs.isModelJob(future));
+    // not a model job (no ClientRunContext)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(RunContexts.empty()))));
 
-    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()));
-    assertFalse(ModelJobs.isModelJob(future));
+    // not a model job (no mutex and not session on ClientRunContext)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty()))));
 
-    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(new Object()));
-    assertFalse(ModelJobs.isModelJob(future));
+    // not a model job (no mutex)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty().withSession(session1, false)))));
 
-    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(mock(IClientSession.class)));
-    assertTrue(ModelJobs.isModelJob(future));
+    // not a model job (wrong mutex type)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty().withSession(session1, false))
+        .withMutex(new Object()))));
+
+    // not a model job (different session on ClientRunContext and mutex)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty()
+            .withSession(session1, false))
+        .withMutex(session2))));
+
+    // not a model job (no session on ClientRunContext)
+    assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty()
+            .withSession(null, false))
+        .withMutex(session1))));
+
+    // this is a model job (same session on ClientRunContext and mutex)
+    assertTrue(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty()
+            .withSession(session1, false))
+        .withMutex(session1))));
   }
 
   @Test
@@ -117,10 +142,10 @@ public class ModelJobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }).awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+        .awaitDoneAndGet();
 
     assertTrue(ModelJobs.isModelJob(actualFuture));
-    assertFalse(ClientJobs.isClientJob(actualFuture));
 
     // Test schedule with delay
     actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
@@ -134,13 +159,13 @@ public class ModelJobsTest {
         .awaitDoneAndGet();
 
     assertTrue(ModelJobs.isModelJob(actualFuture));
-    assertFalse(ClientJobs.isClientJob(actualFuture));
+    assertTrue(actualFuture.getJobInput().getRunContext() instanceof ClientRunContext);
   }
 
   @Test(expected = AssertionException.class)
   public void testScheduleWithoutInputWithoutSession() {
     ISession.CURRENT.set(null);
-    ModelJobs.schedule(mock(IRunnable.class));
+    ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   @Test

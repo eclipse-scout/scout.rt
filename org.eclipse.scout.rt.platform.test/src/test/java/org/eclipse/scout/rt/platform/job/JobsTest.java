@@ -41,7 +41,9 @@ public class JobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }).awaitDoneAndGet();
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()))
+        .awaitDoneAndGet();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 

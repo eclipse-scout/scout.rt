@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.jms.JmsConfigProperties.JmsRequestTimeoutProperty;
 import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
-import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +122,10 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       // Wait for the consumer to be stopped.
       try {
-        Jobs.getJobManager().awaitDone(ServerJobs.newFutureFilter().andMatchFuture(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        // TODO [dwi]: Filter: wrong usage --> COMPLETED
+        Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+            .andMatchFuture(m_messageConsumerFuture)
+            .toFilter(), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       finally {
         m_messageConsumerFuture = null;

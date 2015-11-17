@@ -20,6 +20,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Callables;
+import org.eclipse.scout.commons.IAdaptable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ThreadLocalProcessor;
 import org.eclipse.scout.commons.ToStringBuilder;
@@ -46,7 +47,7 @@ import org.eclipse.scout.rt.platform.logging.PrinicpalContextValueProvider;
  * @since 5.1
  */
 @Bean
-public class RunContext {
+public class RunContext implements IAdaptable {
 
   protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
   protected Subject m_subject;
@@ -344,5 +345,10 @@ public class RunContext {
     final RunContext copy = BEANS.get(RunContext.class);
     copy.copyValues(this);
     return copy;
+  }
+
+  @Override
+  public <T> T getAdapter(final Class<T> type) {
+    return null;
   }
 }

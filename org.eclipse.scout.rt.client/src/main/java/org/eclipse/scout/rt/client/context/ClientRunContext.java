@@ -53,7 +53,7 @@ public class ClientRunContext extends RunContext {
   protected IDesktop m_desktop;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
+  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
     super.interceptInvocationChain(invocationChain);
 
     invocationChain
@@ -271,6 +271,17 @@ public class ClientRunContext extends RunContext {
     final IClientSession session = (IClientSession) ISession.CURRENT.get();
     if (session != null) {
       return session.getDesktopElseVirtualDesktop();
+    }
+    else {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getAdapter(final Class<T> type) {
+    if (ISession.class.isAssignableFrom(type)) {
+      return (T) m_session;
     }
     else {
       return null;

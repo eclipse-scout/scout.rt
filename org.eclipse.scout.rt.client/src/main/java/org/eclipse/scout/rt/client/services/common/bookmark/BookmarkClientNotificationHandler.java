@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.notification.AbstractObservableNotificationHandler;
@@ -26,6 +27,6 @@ public class BookmarkClientNotificationHandler extends AbstractObservableNotific
         BEANS.get(IBookmarkService.class).loadBookmarks();
         BookmarkClientNotificationHandler.super.handleNotification(notification);
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 }

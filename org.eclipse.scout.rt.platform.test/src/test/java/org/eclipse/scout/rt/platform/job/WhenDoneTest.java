@@ -105,7 +105,8 @@ public class WhenDoneTest {
         protocol.add("1");
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
     future.awaitDoneAndGet();
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
@@ -283,7 +284,8 @@ public class WhenDoneTest {
           continueRunningLatch.countDownAndBlock(); // continue running
         }
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     assertTrue(setupLatch.await());
 
@@ -320,7 +322,9 @@ public class WhenDoneTest {
         protocol.add("1");
         return "result";
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
+
     future.awaitDoneAndGet();
     future.cancel(true);
 

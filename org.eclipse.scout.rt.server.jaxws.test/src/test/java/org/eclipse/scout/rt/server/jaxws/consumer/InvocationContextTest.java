@@ -245,7 +245,8 @@ public class InvocationContextTest {
         setupLatch.await();
         runMonitor.cancel(true);
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test by invoking the web service with a specific RunMonitor to test cancellation.
     RunContexts.empty().withRunMonitor(runMonitor).run(new IRunnable() {

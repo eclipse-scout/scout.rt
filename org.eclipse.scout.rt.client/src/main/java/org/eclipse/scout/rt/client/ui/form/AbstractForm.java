@@ -83,7 +83,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -2917,7 +2916,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
   protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) {
-    return ClientJobs.schedule(new IRunnable() {
+    return Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -2937,9 +2936,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Form timer")).awaitDone();
       }
-    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+    }, Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent())
         .withSchedulingDelay(intervalSeconds, TimeUnit.SECONDS)
-        .withPeriodicExecutionAtFixedRate(intervalSeconds, TimeUnit.SECONDS));
+        .withPeriodicExecutionAtFixedRate(intervalSeconds, TimeUnit.SECONDS)
+        .withName("form-timer"));
   }
 
   /**
@@ -2949,7 +2950,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     final long startMillis = System.currentTimeMillis();
     final long delayMillis = TimeUnit.SECONDS.toMillis(seconds);
 
-    return ClientJobs.schedule(new IRunnable() {
+    return Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -2977,9 +2978,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               }
             }
           }
-        }).awaitDone();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+            .awaitDone();
       }
-    }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
+    }, Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent())
         .withSchedulingDelay(0, TimeUnit.SECONDS)
         .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
         .withLogOnError(false)

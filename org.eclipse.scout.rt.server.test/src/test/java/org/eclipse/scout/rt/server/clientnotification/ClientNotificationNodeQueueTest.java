@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -59,7 +60,8 @@ public class ClientNotificationNodeQueueTest {
       public List<ClientNotificationMessage> call() throws Exception {
         return m_queue.getNotifications(10, 100, TimeUnit.MILLISECONDS);
       }
-    });
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     m_queue.put(new ClientNotificationMessage(allNodes, "test", true));
     m_queue.put(new ClientNotificationMessage(allNodes, "test2", true));

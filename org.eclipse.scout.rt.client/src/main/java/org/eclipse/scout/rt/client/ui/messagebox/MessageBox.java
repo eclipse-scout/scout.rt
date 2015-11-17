@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -349,13 +348,15 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
         IFuture<Void> autoCloseFuture = null;
         if (getAutoCloseMillis() > 0) {
           final long dt = getAutoCloseMillis();
-          autoCloseFuture = ClientJobs.schedule(new IRunnable() {
+          autoCloseFuture = Jobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
               closeMessageBox();
             }
-          }, ClientJobs.newInput(ClientRunContexts.copyCurrent())
-              .withSchedulingDelay(dt, TimeUnit.MILLISECONDS));
+          }, Jobs.newInput()
+              .withRunContext(ClientRunContexts.copyCurrent())
+              .withSchedulingDelay(dt, TimeUnit.MILLISECONDS)
+              .withName("Closing message box"));
         }
         // start sub event dispatch thread
         waitFor();

@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -116,7 +117,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_jsonEventProcessor = createJsonEventProcessor();
 
     m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
-        ModelJobs.newEventFilter()
+        ModelJobs.newEventFilterBuilder()
             .andMatchEventType(
                 JobEventType.BLOCKED,
                 JobEventType.DONE,
@@ -138,7 +139,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
                 ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().getRunContext();
                 return runContext.getSession() == getClientSession();
               }
-            }),
+            })
+            .toFilter(),
         new IJobListener() {
           @Override
           public void changed(JobEvent event) {
@@ -690,7 +692,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   @Override
   public void processCancelRequest() {
     // Cancel all running model jobs for the requested session (interrupt if necessary)
-    Jobs.getJobManager().cancel(ModelJobs.newFutureFilter().andMatchSession(getClientSession()).andAreNotBlocked(), true);
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(getClientSession()))
+        .andAreNotBlocked()
+        .toFilter(), true);
   }
 
   @Override

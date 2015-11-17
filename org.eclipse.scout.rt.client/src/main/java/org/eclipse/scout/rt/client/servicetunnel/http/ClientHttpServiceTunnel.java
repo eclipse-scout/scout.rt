@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -120,18 +119,22 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
       return;
     }
     final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend request processing thread during client notification handling.", true);
-    ClientJobs.schedule(new IRunnable() {
+    Jobs.schedule(new IRunnable() {
+
       @Override
       public void run() throws Exception {
         ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
         notificationDispatcher.dispatchNotifications(notifications);
       }
-    }).whenDone(new IDoneCallback<Void>() {
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        cond.setBlocking(false);
-      }
-    });
+    }, Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent()))
+        .whenDone(new IDoneCallback<Void>() {
+
+          @Override
+          public void onDone(DoneEvent<Void> event) {
+            cond.setBlocking(false);
+          }
+        });
     cond.waitFor();
   }
 

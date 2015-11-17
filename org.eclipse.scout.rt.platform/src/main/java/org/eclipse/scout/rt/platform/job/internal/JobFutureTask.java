@@ -89,7 +89,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager.registerFuture(this);
     m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
 
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.SCHEDULED, this));
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(this));
   }
 
   /**
@@ -99,7 +99,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected void done() {
     m_runMonitor.unregisterCancellable(this);
     m_jobManager.unregisterFuture(this);
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(this));
     m_donePromise.onDone();
     m_listeners.clear();
 
@@ -108,7 +108,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public final void reject() {
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED, this));
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED).withFuture(this));
     cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
     m_jobManager.passMutexIfMutexOwner(this);
   }
@@ -127,11 +127,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
         cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
       }
 
-      if (isPeriodic()) {
-        super.runAndReset(); // periodic action
+      if (m_input.getSchedulingRule() == JobInput.SCHEDULING_RULE_SINGLE_EXECUTION) {
+        super.run();
       }
       else {
-        super.run(); // one shot action
+        super.runAndReset();
       }
     }
     finally {
@@ -152,8 +152,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public boolean isPeriodic() {
-    return m_input.getSchedulingRule() != JobInput.SCHEDULING_RULE_ONE_TIME;
+  public int getSchedulingRule() {
+    return m_input.getSchedulingRule();
   }
 
   @Override
@@ -358,7 +358,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("job", m_input);
-    builder.attr("periodic", isPeriodic());
     builder.attr("blocked", m_blocked);
     builder.attr("expirationDate", m_expirationDate);
     return builder.toString();
