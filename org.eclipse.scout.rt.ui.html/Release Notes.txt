@@ -637,6 +637,9 @@ RichTextField for HTML e-mails, FileChooserField for file uploads, etc.)
 
 Deleted ICustomField/AbstractCustomField and all associated classes and files.
 
+Deleted IDocumentField/AbstractDocumentField and all associated classes and files. Replaced by 
+new office integration (Word plug-in instead of embedded Word instance in Swing).
+
 ================================================================================================
 Known Bugs:
 ------------------------------------------------------------------------------------------------
