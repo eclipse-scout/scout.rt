@@ -60,10 +60,10 @@ public class ClientRunContextStatement extends Statement {
           final Subject subject =
               Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
-          // Obtain the client session. Depending on the session provider, a new session is created or a cached session returned.
-          final IClientSession clientSession = BEANS.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent());
+          // Obtain the client session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
+          final IClientSession clientSession = BEANS.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent().withSubject(subject));
 
-          // Run the test in a new ClientRunContext. The subject is set explicitly to not use the one defined on the session.
+          // Run the test in a new ClientRunContext. The subject is set explicitly in case a different subject is defined on the session.
           ClientRunContexts.copyCurrent().withSession(clientSession, true).withSubject(subject).run(new IRunnable() {
 
             @Override

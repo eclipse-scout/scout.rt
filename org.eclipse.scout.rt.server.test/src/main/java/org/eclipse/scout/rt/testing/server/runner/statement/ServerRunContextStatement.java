@@ -60,10 +60,10 @@ public class ServerRunContextStatement extends Statement {
           final Subject subject =
               Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
-          // Obtain the server session. Depending on the session provider, a new session is created or a cached session returned.
-          final IServerSession serverSession = BEANS.get(serverSessionProvider).provide(ServerRunContexts.copyCurrent());
+          // Obtain the server session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
+          final IServerSession serverSession = BEANS.get(serverSessionProvider).provide(ServerRunContexts.copyCurrent().withSubject(subject));
 
-          // Run the test in a new ServerRunContext. The subject is set explicitly to not use the one defined on the session.
+          // Run the test in a new ServerRunContext. The subject is set explicitly in case a different subject is defined on the session.
           ServerRunContexts.copyCurrent().withSession(serverSession).withSubject(subject).run(new IRunnable() {
 
             @Override
