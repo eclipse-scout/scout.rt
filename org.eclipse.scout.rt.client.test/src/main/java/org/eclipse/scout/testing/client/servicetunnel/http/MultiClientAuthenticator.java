@@ -32,7 +32,10 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
  * // default user if no client session mapping is available
  * MultiClientAuthenticator.setDefaultUser(&quot;alice&quot;);
  * </pre>
+ *
+ * @deprecated will be removed in 'O' release.
  */
+@Deprecated
 public class MultiClientAuthenticator extends Authenticator {
 
   private static final Map<String, String> USER_PASSWORDS = new HashMap<String, String>();
