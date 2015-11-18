@@ -62,7 +62,9 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
   if (messageBox.rendered) {
     return;
   }
-  // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup window
+  // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup-window
+  // Since the message box doesn't have a DOM element as parent when render is called, we must find the
+  // entryPoint by using the model.
   var $mbParent;
   if (this._displayParent instanceof scout.Form && this._displayParent.isPopupWindow()) {
     $mbParent = this._displayParent.popupWindow.$container;

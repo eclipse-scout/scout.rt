@@ -36,7 +36,7 @@ scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($co
     .keydown(backspaceHandler)
     .keyup(backspaceHandler);
 
-  if ('onhelp' in myWindow) { // FIXME AWE: (2nd screen) check if F1 / KeystrokeManager works in popup-window (check all window references in this file)
+  if ('onhelp' in myWindow) {
     myWindow.onhelp = scout.filters.returnFalse;
   }
 };
@@ -177,17 +177,10 @@ scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
 };
 
 scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
-  var helpDisposeHandler, $topLevelContainer,
+  var helpDisposeHandler,
     $currentTarget = $(event.currentTarget),
-    $myWindow = $currentTarget.getWindow(true);
-
-  // FIXME AWE: (2nd screen) basically this is the same thing as in Widget#entryPoint.
-  // Provide a static function?
-  if ($myWindow[0].popupWindow) {
-    $topLevelContainer = $myWindow[0].popupWindow.$container; // FIXME AWE: (2nd screen) das if/else ist nun gar nicht mehr nötig, oder?
-  } else {
+    $myWindow = $currentTarget.getWindow(true),
     $topLevelContainer = $currentTarget.getEntryPoint();
-  }
 
   helpDisposeHandler = function() {
     $topLevelContainer.off('keyup', helpDisposeHandler);

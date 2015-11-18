@@ -1035,9 +1035,17 @@
     return $('body', this.getDocument());
   };
 
-  $.fn.getEntryPoint = function() {
+  /**
+   * @return the closest DOM element that has the 'scout' class.
+   */
+  $.fn.getEntryPoint = function(index) {
     // FIXME AWE: (2nd screen) testen ob closest viel langsamer ist, als wenn wir uns auf window/document den entry point merken.
-    return this.closest('.scout');
+    var $element = this.closest('.scout');
+    if (index === undefined) {
+      return $element;
+    } else {
+      return $element[index];
+    }
   };
 
   /**

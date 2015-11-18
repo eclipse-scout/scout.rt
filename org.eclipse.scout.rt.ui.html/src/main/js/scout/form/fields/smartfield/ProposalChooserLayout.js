@@ -108,7 +108,8 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
  * and doesn't try to find the preferred size by algorithm.
  */
 scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
-  var $oldParent = $container.parent();
+  var $oldParent = $container.parent(),
+    $entryPoint = $container.getEntryPoint(); // must read entryPoint before we detach $container
 
   // modify
   this._typeHandler.modifyDom($container);
@@ -118,7 +119,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     .css('height', 'auto');
 
   $container.detach();
-  var $measurementDiv = this._proposalChooser.entryPoint()
+  var $measurementDiv = $entryPoint
     .appendDiv('measurement')
     .append($container);
   var prefSize = scout.graphics.getVisibleSize($measurementDiv);
