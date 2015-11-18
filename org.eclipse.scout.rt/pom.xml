@@ -76,9 +76,9 @@
     <!-- Sonar properties -->
     <sonar.branch>releases_5.2.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
-    <sonar.exclusions>file:**/resources/WebContent/**</sonar.exclusions>
-    <sonar.coverage.exclusions>file:*.test/**,
-      file:**/resources/WebContent/**</sonar.coverage.exclusions>
+    <sonar.exclusions>**/resources/WebContent/**</sonar.exclusions>
+    <sonar.coverage.exclusions>*.test/**,
+      **/resources/WebContent/**</sonar.coverage.exclusions>
   </properties>
 
   <dependencyManagement>
@@ -101,7 +101,6 @@
         <artifactId>jul-to-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
@@ -131,6 +130,11 @@
         <artifactId>org.eclipse.scout.commons</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.commons.test</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
@@ -140,16 +144,9 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.commons.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
@@ -161,7 +158,6 @@
         <artifactId>org.eclipse.scout.rt.shared</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
@@ -179,7 +175,6 @@
         <artifactId>org.eclipse.scout.rt.server</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.test</artifactId>
@@ -203,7 +198,6 @@
         <artifactId>org.eclipse.scout.rt.client</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.test</artifactId>
@@ -233,7 +227,6 @@
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
@@ -245,7 +238,6 @@
         <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor.test</artifactId>
@@ -263,13 +255,11 @@
         <artifactId>org.eclipse.scout.dev.jetty</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test.affix</artifactId>
