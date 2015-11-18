@@ -20,7 +20,7 @@ scout.inherits(scout.StringFieldEnterKeyStroke, scout.KeyStroke);
 scout.StringFieldEnterKeyStroke.prototype._applyPropagationFlags = function(event) {
   scout.StringFieldEnterKeyStroke.parent.prototype._applyPropagationFlags.call(this, event);
 
-  var activeElement = this.field.$container.getActiveElement();
+  var activeElement = this.field.$container.getActiveElement(true);
   this.preventInvokeAcceptInputOnActiveValueField = !event.isPropagationStopped() && activeElement.tagName.toLowerCase() === 'textarea';
   if (this.preventInvokeAcceptInputOnActiveValueField) {
     event.stopPropagation();

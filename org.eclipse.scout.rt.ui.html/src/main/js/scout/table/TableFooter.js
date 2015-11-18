@@ -40,7 +40,7 @@ scout.TableFooter.prototype._render = function($parent) {
   $parent = $parent || this.table.$container;
 
   this.$container = $parent.appendDiv('table-footer');
-  this._$window = $parent.getWindow(true);
+  this._$window = $parent.getWindow();
   this._$body = $parent.getBody();
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);

@@ -78,7 +78,7 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
     // If the mouse is released on a table row, onMouseUp gets called by the table's mouseUp listener.
   }
 
-  $row.getWindow(true).one('mouseup.selectionHandler', this.onMouseUp.bind(this));
+  $row.getWindow().one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   this.lastActionRow = row;
   if (event.which === 3) {
     this.table.onContextMenu(event);

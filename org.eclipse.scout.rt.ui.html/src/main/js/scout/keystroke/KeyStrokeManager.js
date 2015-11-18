@@ -19,7 +19,7 @@ scout.KeyStrokeManager = function(session) {
 
 scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($container) {
   var
-    myWindow = $container.getWindow(),
+    myWindow = $container.getWindow(true),
     // Swallow F1 (online help) key stroke
     helpHandler = function(event) {
       return !this._isHelpKeyStroke(event);
@@ -179,7 +179,7 @@ scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
 scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
   var helpDisposeHandler,
     $currentTarget = $(event.currentTarget),
-    $myWindow = $currentTarget.getWindow(true),
+    $myWindow = $currentTarget.getWindow(),
     $topLevelContainer = $currentTarget.getEntryPoint();
 
   helpDisposeHandler = function() {

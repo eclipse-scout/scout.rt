@@ -27,7 +27,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var activeElement = this.field.$container.getActiveElement(),
+  var activeElement = this.field.$container.getActiveElement(true),
     elementType = activeElement.tagName.toLowerCase();
   if (activeElement.className !== 'table-text-filter' &&
     (elementType === 'textarea' || elementType === 'input') &&

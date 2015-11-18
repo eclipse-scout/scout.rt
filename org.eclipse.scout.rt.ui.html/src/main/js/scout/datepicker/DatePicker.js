@@ -178,7 +178,7 @@ scout.DatePicker.prototype._onSwipe = function(event) {
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
-  event = event || this.$container.getWindow().event;
+  event = event || this.$container.getWindow(true).event;
   var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
   var diff = (wheelData >= 0 ? -1 : 1);
   this.shiftViewDate(0, diff, 0);

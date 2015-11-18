@@ -43,7 +43,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var activeElement = this.field.$container.getActiveElement(),
+  var activeElement = this.field.$container.getActiveElement(true),
     activeElementType = activeElement.tagName.toLowerCase(),
     focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
   if (activeElement.className === 'table-text-filter' || !focusOnInputField) {

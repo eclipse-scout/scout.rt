@@ -46,7 +46,7 @@ scout.FocusContext.prototype._dispose = function() {
  */
 scout.FocusContext.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
-    var activeElement = this.$container.getActiveElement(),
+    var activeElement = this.$container.getActiveElement(true),
       $focusableElements = this.$container.find(':tabbable'),
       firstFocusableElement = $focusableElements.first()[0],
       lastFocusableElement = $focusableElements.last()[0];
@@ -80,7 +80,7 @@ scout.FocusContext.prototype._onFocusIn = function(event) {
 
   // Do not update current focus context nor validate focus if target is $entryPoint.
   // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glasspanes.
-  if (event.target === this.$container.getEntryPoint(0)) {
+  if (event.target === this.$container.getEntryPoint(true)) {
     return;
   }
 
@@ -169,7 +169,7 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
 
   // Focus $entryPoint if current focus is to be blured.
   // Otherwise, the HTML body would be focused which makes global keystrokes (like backspace) not to work anymore.
-  elementToFocus = elementToFocus || this.$container.getEntryPoint(0);
+  elementToFocus = elementToFocus || this.$container.getEntryPoint(true);
 
   // Only focus element if different to current focused element
   if (scout.focusUtils.isActiveElement(elementToFocus)) {

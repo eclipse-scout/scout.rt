@@ -68,7 +68,7 @@ scout.focusUtils = {
     }
     var activeElement;
     if (element instanceof jQuery) {
-      activeElement = element.getActiveElement();
+      activeElement = element.getActiveElement(true);
       element = element[0];
     } else {
       activeElement = element.ownerDocument.activeElement;

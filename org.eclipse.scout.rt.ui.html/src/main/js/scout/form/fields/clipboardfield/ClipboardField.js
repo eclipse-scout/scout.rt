@@ -72,7 +72,7 @@ scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
 };
 
 scout.ClipboardField.prototype._onCopy = function(event) {
-  var dataTransfer, myWindow = this.$container.getWindow();
+  var dataTransfer, myWindow = this.$container.getWindow(true);
   if (event.originalEvent.clipboardData) {
     dataTransfer = event.originalEvent.clipboardData;
   } else if (myWindow.clipboardData) {
@@ -104,7 +104,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
 };
 
 scout.ClipboardField.prototype._onPaste = function(event) {
-  var dataTransfer, myWindow = this.$container.getWindow();
+  var dataTransfer, myWindow = this.$container.getWindow(true);
   if (event.originalEvent.clipboardData) {
     dataTransfer = event.originalEvent.clipboardData;
   } else if (myWindow.clipboardData) {
