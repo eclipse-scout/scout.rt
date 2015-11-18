@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.KeyStrokeManager = function(session) {
+  var $mainEntryPoint = session.$entryPoint;
   this.session = session;
-  this.$entryPoint = session.$entryPoint;
   this._helpRendered = false;
   this._renderedKeys = [];
 
-  this.installTopLevelKeyStrokeHandlers(this.$entryPoint);
+  this.installTopLevelKeyStrokeHandlers($mainEntryPoint);
 };
 
 scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($container) {
@@ -178,14 +178,15 @@ scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
 
 scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
   var helpDisposeHandler, $topLevelContainer,
-    $myWindow = $(event.currentTarget).getWindow(true);
+    $currentTarget = $(event.currentTarget),
+    $myWindow = $currentTarget.getWindow(true);
 
   // FIXME AWE: (2nd screen) basically this is the same thing as in Widget#entryPoint.
   // Provide a static function?
   if ($myWindow[0].popupWindow) {
-    $topLevelContainer = $myWindow[0].popupWindow.$container;
+    $topLevelContainer = $myWindow[0].popupWindow.$container; // FIXME AWE: (2nd screen) das if/else ist nun gar nicht mehr nötig, oder?
   } else {
-    $topLevelContainer = this.$entryPoint;
+    $topLevelContainer = $currentTarget.getEntryPoint();
   }
 
   helpDisposeHandler = function() {

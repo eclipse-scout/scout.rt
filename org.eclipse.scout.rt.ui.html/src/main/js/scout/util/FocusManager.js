@@ -20,35 +20,37 @@
 scout.FocusManager = function(session, options) {
   options = options || {};
 
+  var $mainEntryPoint = session.$entryPoint;
   this.session = session;
-  this.$entryPoint = session.$entryPoint;
   this.active = scout.helpers.nvl(options.focusManagerActive, scout.device.focusManagerActive);
 
   this._focusContexts = [];
   this._glassPaneTargets = [];
 
   // Make $entryPoint focusable and install focus context.
-  var portletPartId = this.$entryPoint.data('partid') || '0';
-  this.$entryPoint.attr('tabindex', portletPartId);
+  var portletPartId = $mainEntryPoint.data('partid') || '0';
+  $mainEntryPoint.attr('tabindex', portletPartId);
 
-  // Install 'mousedown' on $entryPoint to accept or prevent focus gain.
-  this.$entryPoint.on('mousedown', function(event) {
+  this.installTopLevelMouseHandlers($mainEntryPoint);
+  this.installFocusContext($mainEntryPoint, scout.focusRule.AUTO);
+};
+
+scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container) {
+  // Install 'mousedown' on top-level $container to accept or prevent focus gain
+  $container.on('mousedown', function(event) {
     if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
       event.preventDefault();
     } else {
-      //Because in ie divs are focusable also without tabindex we have to handle it here-> select next parent with tabindex.
+      // Because in IE divs are focusable also without tabindex we have to handle it here -> select next parent with tabindex.
       this._handleIEEvent(event);
     }
     return true;
   }.bind(this));
-
-  // Install a focus context for the $entryPoint.
-  this.installFocusContext(this.$entryPoint, scout.focusRule.AUTO);
 };
 
 scout.FocusManager.prototype._handleIEEvent = function(event) {
   var $element = $(event.target);
-  if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && $element.is("div")) {
+  if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && $element.is('div')) {
     var $elementToFocus = $element.closest('div[tabindex]');
     if ($elementToFocus) {
       this.requestFocus($elementToFocus.get(0));
@@ -193,10 +195,11 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
  */
 scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
   var firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
+    $entryPoint = $container.getEntryPoint(),
     $candidates = $container
     .find(':focusable')
     .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
-    .not(this.$entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback. */
+    .not($entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback. */
     .filter(filter || scout.filters.returnTrue);
 
   for (i = 0; i < $candidates.length; i++) {
@@ -285,7 +288,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element) 
   }
 
   // 6. Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
-  if (scout.focusUtils.containsParentFocusableByMouse($element, this.$entryPoint)) {
+  if (scout.focusUtils.containsParentFocusableByMouse($element, $element.getEntryPoint())) {
     return true;
   }
 

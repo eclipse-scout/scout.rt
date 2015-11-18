@@ -1035,6 +1035,11 @@
     return $('body', this.getDocument());
   };
 
+  $.fn.getEntryPoint = function() {
+    // FIXME AWE: (2nd screen) testen ob closest viel langsamer ist, als wenn wir uns auf window/document den entry point merken.
+    return this.closest('.scout');
+  };
+
   /**
    * Select all text within an element, e.g. within a content editable div element.
    */

@@ -74,12 +74,13 @@ scout.FocusContext.prototype._onKeyDown = function(event) {
  * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
  */
 scout.FocusContext.prototype._onFocusIn = function(event) {
-  $(event.target).on('remove', this._removeListener);
+  var $target = $(event.target);
+  $target.on('remove', this._removeListener);
   this._focusedField = event.target;
 
   // Do not update current focus context nor validate focus if target is $entryPoint.
   // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glasspanes.
-  if (event.target === this.focusManager.$entryPoint[0]) {
+  if (event.target === $target.getEntryPoint()[0]) {
     return;
   }
 
@@ -168,7 +169,8 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
 
   // Focus $entryPoint if current focus is to be blured.
   // Otherwise, the HTML body would be focused which makes global keystrokes (like backspace) not to work anymore.
-  elementToFocus = elementToFocus || this.focusManager.$entryPoint[0];
+  var $elementToFocus = $(elementToFocus);
+  elementToFocus = elementToFocus || $elementToFocus.getEntryPoint()[0];
 
   // Only focus element if different to current focused element
   if (scout.focusUtils.isActiveElement(elementToFocus)) {
@@ -176,7 +178,7 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   }
 
   // Focus the requested element.
-  $(elementToFocus).focus();
+  $elementToFocus.focus();
   if ($.log.isDebugEnabled()) {
     $.log.debug('Focus set to ' + scout.graphics.debugOutput(elementToFocus));
   }
