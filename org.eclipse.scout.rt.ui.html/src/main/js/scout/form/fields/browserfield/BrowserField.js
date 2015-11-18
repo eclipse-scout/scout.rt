@@ -20,7 +20,7 @@ scout.BrowserField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($parent.makeElement('<iframe>'));
   this.addStatus();
-  this.myWindow = $parent.getWindow(true);
+  this.myWindow = $parent.window(true);
 
   this._postMessageListener = this._onPostMessage.bind(this);
   this.myWindow.addEventListener('message', this._postMessageListener);

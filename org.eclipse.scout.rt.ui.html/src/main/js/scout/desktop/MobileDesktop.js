@@ -31,7 +31,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.navigation.setBreadcrumbEnabled(true);
   this.navigation.onOutlineChanged(this.outline, true);
 
-  $parent.getWindow().on('resize', this.onResize.bind(this));
+  $parent.window().on('resize', this.onResize.bind(this));
 };
 
 /**

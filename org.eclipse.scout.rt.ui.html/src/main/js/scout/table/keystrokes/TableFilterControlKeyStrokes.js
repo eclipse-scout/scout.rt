@@ -32,7 +32,7 @@ scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.TableFilterControlKeyStrokes.prototype._drawKeyBox = function($container, drawedKeys) {
-  var activeElement = this._field.$container.getActiveElement(true),
+  var activeElement = this._field.$container.activeElement(true),
     elementType = activeElement.tagName.toLowerCase(),
     $filterinput = $('.table-text-filter', this._field.$container);
   if ((elementType === 'textarea' || elementType === 'input') && $filterinput[0] !== activeElement) {
@@ -58,7 +58,7 @@ scout.TableFilterControlKeyStrokes.prototype.checkAndDrawKeyBox = function($cont
  * @Override scout.KeyStroke
  */
 scout.TableFilterControlKeyStrokes.prototype.accept = function(event) {
-  var activeElement = this._field.$container.getActiveElement(true),
+  var activeElement = this._field.$container.activeElement(true),
     elementType = activeElement.tagName.toLowerCase();
 
   if (activeElement.className !== 'table-text-filter' && (elementType === 'textarea' || elementType === 'input')) {

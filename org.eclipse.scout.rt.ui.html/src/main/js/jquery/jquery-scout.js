@@ -216,7 +216,7 @@
   };
 
   $.fn.appendTextNode = function(text) {
-    return $(this.getDocument(true).createTextNode(text)).appendTo(this);
+    return $(this.document(true).createTextNode(text)).appendTo(this);
   };
 
   // append SVG
@@ -411,7 +411,7 @@
    * @return true if the element is attached (= is in the dom tree), false if not
    */
   $.fn.isAttached = function() {
-    return $.contains(this.getDocument(true).documentElement, this[0]);
+    return $.contains(this.document(true).documentElement, this[0]);
   };
 
   /**
@@ -745,7 +745,7 @@
           left = Math.max(100 - $handle.width(), left);
           left = Math.min($('body').width() - 100, left);
           top = Math.max(0, top); // must not be dragged outside of top, otherwise dragging back is impossible
-          top = Math.min($handle.getWindow().height() - 100, top);
+          top = Math.min($handle.window().height() - 100, top);
           $draggable.offset({
             top: top,
             left: left
@@ -886,7 +886,7 @@
 
   $.fn.backupSelection = function() {
     var field = this[0];
-    if (field && field === this.getActiveElement(true)) {
+    if (field && field === this.activeElement(true)) {
       return {
         selectionStart: field.selectionStart,
         selectionEnd: field.selectionEnd,
@@ -898,7 +898,7 @@
 
   $.fn.restoreSelection = function(selection) {
     var field = this[0];
-    if (field && field === this.getActiveElement(true) && selection) {
+    if (field && field === this.activeElement(true) && selection) {
       field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
     }
   };
@@ -950,7 +950,7 @@
    * @param text (optional) adds a child text-node with given text (no HTML content)
    */
   $.fn.makeElement = function(element, cssClass, text) {
-    var myDocument = this.getDocument(true);
+    var myDocument = this.document(true);
     if (myDocument === undefined || element === undefined) {
       return new Error('missing arguments: document, element');
     }
@@ -985,7 +985,7 @@
   };
 
   $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
-    var myDocument = this.getDocument(true);
+    var myDocument = this.document(true);
     if (myDocument === undefined || type === undefined) {
       return new Error('missing arguments: document, type');
     }
@@ -1006,7 +1006,7 @@
    * @return HTML document reference (ownerDocument) of the HTML element.
    * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
    */
-  $.fn.getDocument = function(domElement) {
+  $.fn.document = function(domElement) {
     var myDocument = this.length ? this[0].ownerDocument : null;
     return domElement ? myDocument : $(myDocument);
   };
@@ -1015,8 +1015,8 @@
    * @return HTML window reference (defaultView) of the HTML element
    * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
    */
-  $.fn.getWindow = function(domElement) {
-    var myDocument = this.getDocument(true),
+  $.fn.window = function(domElement) {
+    var myDocument = this.document(true),
       myWindow = myDocument ? myDocument.defaultView : null;
     return domElement ? myWindow : $(myWindow);
   };
@@ -1025,8 +1025,8 @@
    * @return HTML document reference (ownerDocument) of the HTML element.
    * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
    */
-  $.fn.getActiveElement = function(domElement) {
-    var myDocument = this.getDocument(true),
+  $.fn.activeElement = function(domElement) {
+    var myDocument = this.document(true),
       activeElement = myDocument ? myDocument.activeElement : null;
     return domElement ? activeElement : $(activeElement);
   };
@@ -1034,15 +1034,15 @@
   /**
    * @return the BODY element of the HTML document in which the current HTML element is placed.
    */
-  $.fn.getBody = function() {
-    return $('body', this.getDocument(true));
+  $.fn.body = function() {
+    return $('body', this.document(true));
   };
 
   /**
    * @return the closest DOM element that has the 'scout' class.
    * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
    */
-  $.fn.getEntryPoint = function(domElement) {
+  $.fn.entryPoint = function(domElement) {
     var $element = this.closest('.scout');
     return domElement ? $element[0] : $element;
   };
@@ -1052,8 +1052,8 @@
    */
   $.fn.selectAllText = function() {
     var range,
-      myDocument = this.getDocument(true),
-      myWindow = this.getWindow(true),
+      myDocument = this.document(true),
+      myWindow = this.window(true),
       element = this[0];
 
     if (myDocument.body.createTextRange) {

@@ -97,7 +97,7 @@ scout.ValueField.prototype.addField = function($field) {
 
 scout.ValueField.prototype._onStatusMousedown = function(event) {
   if (this.menus && this.menus.length > 0) {
-    var $activeElement = this.$container.getActiveElement();
+    var $activeElement = this.$container.activeElement();
     if ($activeElement.data('valuefield') === this ||
         $activeElement.parent().data('valuefield') === this) {
       this.acceptInput();

@@ -109,7 +109,7 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
  */
 scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
   var $oldParent = $container.parent(),
-    $entryPoint = $container.getEntryPoint(); // must read entryPoint before we detach $container
+    $entryPoint = $container.entryPoint(); // must read entryPoint before we detach $container
 
   // modify
   this._typeHandler.modifyDom($container);

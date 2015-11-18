@@ -309,7 +309,7 @@ scout.Widget.prototype.entryPoint = function($element) {
   if (!$element.length) {
     throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
   }
-  return $element.getEntryPoint();
+  return $element.entryPoint();
 };
 
 scout.Widget.prototype.on = function(type, func) {

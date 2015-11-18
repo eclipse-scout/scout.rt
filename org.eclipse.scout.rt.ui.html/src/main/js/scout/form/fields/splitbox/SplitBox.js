@@ -27,8 +27,8 @@ scout.SplitBox.prototype._render = function($parent) {
   this.addField(this._$splitArea);
   this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
-  this._$window = $parent.getWindow();
-  this._$body = $parent.getBody();
+  this._$window = $parent.window();
+  this._$body = $parent.body();
 
   // Add fields and splitter
   if (this.firstField) {

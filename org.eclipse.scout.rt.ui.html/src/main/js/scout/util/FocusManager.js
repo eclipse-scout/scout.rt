@@ -195,7 +195,7 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
  */
 scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
   var firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
-    $entryPoint = $container.getEntryPoint(),
+    $entryPoint = $container.entryPoint(),
     $candidates = $container
     .find(':focusable')
     .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
@@ -288,7 +288,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element) 
   }
 
   // 6. Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
-  if (scout.focusUtils.containsParentFocusableByMouse($element, $element.getEntryPoint())) {
+  if (scout.focusUtils.containsParentFocusableByMouse($element, $element.entryPoint())) {
     return true;
   }
 

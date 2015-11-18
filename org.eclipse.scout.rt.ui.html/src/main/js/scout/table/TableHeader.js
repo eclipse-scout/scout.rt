@@ -44,8 +44,8 @@ scout.TableHeader.prototype._render = function($parent) {
   }
   this.menuBar.render(this.$container);
   this._$menuBar = this.menuBar.$container;
-  this._$window = this.$container.getWindow();
-  this._$body = this.$container.getBody();
+  this._$window = this.$container.window();
+  this._$body = this.$container.body();
 
   this.updateMenuBar();
 

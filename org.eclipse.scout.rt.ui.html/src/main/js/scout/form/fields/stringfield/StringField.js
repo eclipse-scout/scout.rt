@@ -201,7 +201,7 @@ scout.StringField.prototype._onIconClick = function(event) {
 
 scout.StringField.prototype._onSelectionChangingAction = function(event) {
   if (event.type === 'mousedown') {
-    this.$field.getWindow().one('mouseup.stringfield', function() {
+    this.$field.window().one('mouseup.stringfield', function() {
       // For some reason, when clicking side an existing selection (which clears the selection), the old
       // selection is still visible. To get around this case, we use setTimeout to handle the new selection
       // after it really has been changed.

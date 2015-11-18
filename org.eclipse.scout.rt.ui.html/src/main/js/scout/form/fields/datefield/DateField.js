@@ -442,7 +442,7 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
 
   // If the focus has changed to another field in the meantime, don't predict anything and
   // don't show the picker. Just validate the input.
-  if (this.$dateField[0] !== this.$dateField.getActiveElement(true)) {
+  if (this.$dateField[0] !== this.$dateField.activeElement(true)) {
     return;
   }
 
@@ -569,7 +569,7 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
 
   // If the focus has changed to another field in the meantime, don't predict anything and
   // don't show the picker. Just validate the input.
-  if (this.$timeField[0] !== this.$timeField.getActiveElement(true)) {
+  if (this.$timeField[0] !== this.$timeField.activeElement(true)) {
     return;
   }
 

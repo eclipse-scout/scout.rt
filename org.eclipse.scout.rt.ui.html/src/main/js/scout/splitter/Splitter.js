@@ -34,8 +34,8 @@ scout.Splitter.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
     .on('mousedown', this._onMouseDown.bind(this));
-  this._$window = $parent.getWindow();
-  this._$body = $parent.getBody();
+  this._$window = $parent.window();
+  this._$body = $parent.body();
 };
 
 /**

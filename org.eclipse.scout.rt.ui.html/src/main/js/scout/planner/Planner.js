@@ -831,7 +831,7 @@ scout.Planner.prototype._findScale = function(x) {
 /* -- helper ---------------------------------------------------- */
 
 scout.Planner.prototype._$elementFromPoint = function(x, y) {
-  return $(this.$container.getDocument(true).elementFromPoint(x, y));
+  return $(this.$container.document(true).elementFromPoint(x, y));
 };
 
 scout.Planner.prototype._dateFormat = function(date, pattern) {
