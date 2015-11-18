@@ -332,10 +332,16 @@ scout.Device.prototype.isTableAdditionalDivRequired = function() {
   }.bind(this));
 };
 
-scout.Device.prototype.supportsIframeSecurityAttribute = function() {
-  return this.supportsFeature('_iframeSecurityAttribute', function(property) {
+scout.Device.prototype.requiresIframeSecurityAttribute = function() {
+  return this.supportsFeature('_requiresIframeSecurityAttribute', function(property) {
     var test = document.createElement('iframe');
-    return ('security' in test);
+    var supportsSandbox = ('sandbox' in test);
+
+    if (supportsSandbox){
+      return false;
+    } else {
+      return ('security' in test);
+    }
   }.bind(this));
 };
 
