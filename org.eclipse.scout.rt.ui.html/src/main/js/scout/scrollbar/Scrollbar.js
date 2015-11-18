@@ -33,7 +33,6 @@ scout.Scrollbar.prototype._init = function(options) {
   var defaults = {
     axis: 'y',
     borderless: false,
-    updateScrollbarPos: true,
     mouseWheelNeedsShift: false
   };
 
@@ -175,11 +174,9 @@ scout.Scrollbar.prototype.update = function() {
   }
 
   // Position the scrollbar(s)
-  if (this.updateScrollbarPos) {
-    // Always update both to make sure every scrollbar (x and y) is positioned correctly
-    this.$container.cssRight(-1 * scrollLeft);
-    this.$container.cssBottom(-1 * scrollTop);
-  }
+  // Always update both to make sure every scrollbar (x and y) is positioned correctly
+  this.$container.cssRight(-1 * scrollLeft);
+  this.$container.cssBottom(-1 * scrollTop);
 };
 
 /*
@@ -187,10 +184,8 @@ scout.Scrollbar.prototype.update = function() {
  */
 scout.Scrollbar.prototype.reset = function() {
   this._$thumb.css(this._dim.toLowerCase(), 0);
-  if (this.updateScrollbarPos) {
-    this.$container.cssRight(0);
-    this.$container.cssBottom(0);
-  }
+  this.$container.cssRight(0);
+  this.$container.cssBottom(0);
 };
 
 scout.Scrollbar.prototype.scroll = function(posDiff) {
@@ -204,9 +199,7 @@ scout.Scrollbar.prototype.scroll = function(posDiff) {
 
   // Thumb and scrollbar would be updated by the scroll handler. To make it more fluent it is done here as well
   this._$thumb.css(this._dir, posNew);
-  if (this.updateScrollbarPos) {
-    this.$container.css(this._dirReverse, -1 * scrollPos);
-  }
+  this.$container.css(this._dirReverse, -1 * scrollPos);
 };
 
 /**
