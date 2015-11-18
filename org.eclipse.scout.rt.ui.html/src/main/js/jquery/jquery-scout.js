@@ -287,6 +287,10 @@
     return this.makeDiv(cssClass, htmlContent, id).appendTo(this);
   };
 
+  $.fn.prependElement = function(element, cssClass, text) {
+    return this.makeElement(element, cssClass, text).prependTo(this);
+  };
+
   $.fn.appendElement = function(element, cssClass, text) {
     return this.makeElement(element, cssClass, text).appendTo(this);
   };

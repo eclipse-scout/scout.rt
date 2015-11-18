@@ -32,7 +32,7 @@ scout.Table = function(model) {
   this.tooltips = [];
   this._aggregateRows = [];
   this._animationRowLimit = 25;
-  this._blockLoadThreshold = 100;
+  this._blockLoadThreshold = 50;
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
@@ -42,6 +42,8 @@ scout.Table = function(model) {
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
+  this.firstRenderedRowIndex = -1;
+  this.lastRenderedRowIndex = -1;
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
@@ -224,6 +226,7 @@ scout.Table.prototype._render = function($parent) {
   this.$data.on('mousedown', '.table-row', onMouseDown)
     .on('mouseup', '.table-row', onMouseUp)
     .on('dblclick', '.table-row', onDoubleClick)
+    .on('scroll', this._onDataScroll.bind(this))
     .on('contextmenu', '.table-row', function(event) {
       event.preventDefault();
       event.stopPropagation();
@@ -973,77 +976,111 @@ scout.Table.prototype._updateRowWidth = function() {
 /**
  * @param new rows to append at the end of this.$data. If undefined this.rows is used.
  */
-scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlockSelected) {
-  var $rows, numRowsLoaded,
+scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) {
+  var $rows, fromRow, toRow,
     rowString = '',
-    that = this;
+    that = this,
+    height = 0,
+    numRowsRendered = 0;
 
-  lastRowOfBlockSelected = lastRowOfBlockSelected ? lastRowOfBlockSelected : false;
-  startRowIndex = startRowIndex !== undefined ? startRowIndex : 0;
   rows = rows || this.rows;
-  numRowsLoaded = startRowIndex;
-  if (rows.length > 0) {
-    this._removeEmptyData();
-
-    // Build $rows (as string instead of jQuery objects for efficiency reasons)
-    var previousRowSelected = false,
-      followingRowSelected = false;
-    for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + this._blockLoadThreshold); r++) {
-      var row = rows[r],
-        rowSelected = this.selectedRows.indexOf(row) > -1;
-
-      if (r === startRowIndex) {
-        previousRowSelected = lastRowOfBlockSelected;
-      } else {
-        previousRowSelected = this.selectedRows.indexOf(rows[r - 1]) > -1;
-      }
-      if (r < Math.min(rows.length, startRowIndex + this._blockLoadThreshold) - 1) {
-        followingRowSelected = this.selectedRows.indexOf(rows[r + 1]) > -1;
-      } else {
-        followingRowSelected = false;
-      }
-      rowString += this._buildRowDiv(row, rowSelected, previousRowSelected, followingRowSelected);
-    }
-    numRowsLoaded = r;
-
-    // append block of rows
-    $rows = this.$data.appendElement(rowString);
-
-    // Link model and jQuery objects and render selection borders
-    $rows.each(function(index, rowObject) {
-      var $row = $(rowObject);
-      var row = rows[startRowIndex + index];
-      scout.Table.linkRowToDiv(row, $row);
-      lastRowOfBlockSelected = $row.isSelected();
-    }.bind(this));
-
-    this._installRows($rows);
-
-    // notify
-    this._triggerRowsSelected();
-
-    if (this.scrollToSelection) {
-      // Execute delayed because table may be not layouted yet
-      setTimeout(this.revealSelection.bind(this));
-    }
+  if (rows.length === 0) {
+    return;
   }
 
-  // repaint and append next block
-  this._renderRowsInProgress = false;
-  if (rows.length > numRowsLoaded) {
-    this._renderRowsInProgress = true;
-    setTimeout(function() {
-      that._renderRows(rows, startRowIndex + that._blockLoadThreshold, lastRowOfBlockSelected);
-      // Manual validation necessary due to set timeout
-      that.validateLayoutTree();
-    }, 0);
+  prepend = scout.nvl(prepend, false);
+  fromIndex = scout.nvl(fromIndex, 0);
+  toIndex = scout.nvl(toIndex, Math.min(rows.length, this._blockLoadThreshold) - 1);
+  fromRow = this.rows[fromIndex],
+    toRow = this.rows[toIndex];
+  if (this.firstRenderedRowIndex === -1 || fromIndex < this.firstRenderedRowIndex) {
+    this.firstRenderedRowIndex = fromIndex;
+  }
+  if (toIndex > this.lastRenderedRowIndex) {
+    this.lastRenderedRowIndex = toIndex;
+  }
+  this._removeEmptyData();
+
+  // Build $rows (as string instead of jQuery objects due to efficiency reasons)
+  for (var r = fromIndex; r <= toIndex; r++) {
+    var row = rows[r];
+    rowString += this._buildRowDiv(row);
+    numRowsRendered++;
+  }
+
+  // append block of rows
+  $rows = this.$data.makeElement(rowString);
+  if (prepend) {
+    if (this.$fillBefore) {
+      $rows = $rows.insertAfter(this.$fillBefore);
+    } else {
+      $rows = $rows.prependTo(this.$data);
+    }
   } else {
-    // When all blocks are rendered, render the aggregate rows
-    // Grouping cannot be done in init() because row filter only works with rendered rows -> needs to be done always when rows get rendered
-    this._group();
-    this._renderAggregateRows();
-    this._renderBackgroundEffect();
+    if (this.$fillAfter) {
+      $rows = $rows.insertBefore(this.$fillAfter);
+    } else {
+      $rows = $rows.appendTo(this.$data);
+    }
   }
+
+  // Link model and jQuery objects
+  $rows.each(function(index, rowObject) {
+    var $row = $(rowObject);
+    var row = rows[fromIndex + index];
+    scout.Table.linkRowToDiv(row, $row);
+  });
+
+  // calculate block height
+  height = toRow.$row.offset().top + toRow.$row.outerHeight(true) - fromRow.$row.offset().top;
+
+  this._installRows($rows);
+
+  // notify
+  this._triggerRowsSelected();
+
+  // When all blocks are rendered, render the aggregate rows
+  // Grouping cannot be done in init() because row filter only works with rendered rows -> needs to be done always when rows get rendered
+  this._group();
+  this._renderAggregateRows();
+  this._renderBackgroundEffect();
+  $.log.trace(numRowsRendered + ' rows rendered from ' + fromIndex + ' to ' + toIndex + '. FirstRenderedRowIndex: ' + this.firstRenderedRowIndex + '. LastRenderedRowIndex: ' + this.lastRenderedRowIndex);
+  return height;
+};
+
+scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
+  var numRowsRemoved = 0,
+    height = 0,
+    fromRow = this.rows[fromIndex],
+    toRow = this.rows[toIndex];
+
+  // calculate block height
+  height = toRow.$row.offset().top + toRow.$row.outerHeight(true) - fromRow.$row.offset().top;
+
+  for (var i = fromIndex; i <= toIndex; i++) {
+    var row = this.rows[i];
+    row.$row.remove();
+    row.$row = null;
+    numRowsRemoved++;
+  }
+
+  if (this.firstRenderedRowIndex === fromIndex && toIndex === this.lastRenderedRowIndex) {
+    // all rendered rows removed
+    this.firstRenderedRowIndex = -1;
+    this.lastRenderedRowIndex = -1;
+  } else {
+    // Set the new index borders of the rendered rows
+    // -> rows were removed on top of the rendered rows
+    if (toIndex < this.lastRenderedRowIndex && toIndex > this.firstRenderedRowIndex) {
+      this.firstRenderedRowIndex = toIndex + 1;
+    }
+    // -> rows were removed on the bottom of rendered rows
+    if (fromIndex >= this.firstRenderedRowIndex && fromIndex < this.lastRenderedRowIndex) {
+      this.lastRenderedRowIndex = fromIndex - 1;
+    }
+  }
+  $.log.trace(numRowsRemoved + ' rows removed from ' + fromIndex + ' to ' + toIndex + '. FirstRenderedRowIndex: ' + this.firstRenderedRowIndex + '. LastRenderedRowIndex: ' + this.lastRenderedRowIndex);
+  return height;
 };
 
 scout.Table.prototype._removeRows = function($rows) {
@@ -1948,6 +1985,9 @@ scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
 };
 
 scout.Table.prototype.scrollTo = function(row) {
+  if (!row.$row) {
+    this._renderRows(this.rows, this.rows.indexOf(row) - 10); //XXX
+  }
   scout.scrollbars.scrollTo(this.$data, row.$row);
 };
 
@@ -2009,6 +2049,10 @@ scout.Table.prototype.renderSelection = function(rows) {
       previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
       followingIndex = filteredRows.indexOf(row) + 1,
       followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
+
+    if (!row.$row) {
+      continue;
+    }
 
     // Note: We deliberately use the '+' operator on booleans here! That way, _all_ methods are executed (boolean
     // operators might stop in between) and the variable classChanged contains a number > 1 (which is truthy) when
@@ -2869,6 +2913,103 @@ scout.Table.prototype._renderMultilineText = function() {
 scout.Table.prototype._renderAutoResizeColumns = function() {
   if (this.autoResizeColumns) {
     this.invalidateLayoutTree();
+  }
+};
+
+scout.Table.prototype._onDataScroll = function() {
+  if (this.firstRenderedRowIndex === 0 &&
+    this.lastRenderedRowIndex === this.rows.length - 1) {
+    // All rows rendered -> do nothing
+    return;
+  }
+
+  var rowsRendered = this._ensureBottomRowsVisible();
+  if (!rowsRendered) {
+    this._ensureTopRowsVisible();
+  }
+};
+
+scout.Table.prototype._ensureBottomRowsVisible = function() {
+  var inView, fromIndex, toIndex, removedRowsHeight, renderedRowsHeight;
+  var lastRenderedRow = this.rows[this.lastRenderedRowIndex];
+  var lastRenderedRowOffset = lastRenderedRow.$row.offset();
+  var renderedRowsCount = this.lastRenderedRowIndex - this.firstRenderedRowIndex + 1;
+  var dataOffsetBounds = scout.graphics.offsetBounds(this.$data);
+
+  inView = lastRenderedRowOffset.top < dataOffsetBounds.y + dataOffsetBounds.height;
+  if (!inView || this.lastRenderedRowIndex === this.rows.length - 1) {
+    return;
+  }
+
+  toIndex = Math.min(this.lastRenderedRowIndex + this._blockLoadThreshold, this.rows.length - 1);
+  fromIndex = toIndex - (2 * this._blockLoadThreshold - 1);
+  if (renderedRowsCount === 2 * this._blockLoadThreshold) {
+    if (this.firstRenderedRowIndex !== fromIndex) {
+      removedRowsHeight = this._removeRowsFromTo(this.firstRenderedRowIndex, fromIndex - 1);
+    }
+  }
+  renderedRowsHeight = this._renderRows(this.rows, this.lastRenderedRowIndex + 1, toIndex);
+
+  if (removedRowsHeight) {
+    if (!this.$fillBefore) {
+      this.$fillBefore = this.$data.prependDiv('table-data-fill');
+    }
+    removedRowsHeight += this.$fillBefore.outerHeight();
+    this.$fillBefore.cssHeight(removedRowsHeight);
+    $.log.trace('FillBefore height: ' + removedRowsHeight);
+  }
+  if (renderedRowsHeight) {
+    if (this.$fillAfter) {
+      renderedRowsHeight = this.$fillAfter.outerHeight() - renderedRowsHeight;
+      this.$fillAfter.cssHeight(renderedRowsHeight);
+      $.log.trace('FillAfter height: ' + renderedRowsHeight);
+    }
+
+    // When scrolling fast newly inserted rows may already be out of view -> add next block if necessary
+    this._ensureBottomRowsVisible();
+    return true;
+  }
+};
+
+scout.Table.prototype._ensureTopRowsVisible = function() {
+  var inView, fromIndex, toIndex, removedRowsHeight, renderedRowsHeight;
+  var renderedRowsCount = this.lastRenderedRowIndex - this.firstRenderedRowIndex + 1;
+  fromIndex = Math.max(this.firstRenderedRowIndex - this._blockLoadThreshold, 0);
+  toIndex = fromIndex + (2 * this._blockLoadThreshold - 1);
+  var firstRenderedRow = this.rows[this.firstRenderedRowIndex];
+  var firstRenderedRowOffset = firstRenderedRow.$row.offset();
+  var dataOffsetBounds = scout.graphics.offsetBounds(this.$data);
+  inView = firstRenderedRowOffset.top > dataOffsetBounds.y;
+  if (!inView || this.firstRenderedRowIndex === 0) {
+    return;
+  }
+
+  if (renderedRowsCount === 2 * this._blockLoadThreshold) {
+    if (this.firstRenderedRowIndex !== fromIndex) {
+      removedRowsHeight = this._removeRowsFromTo(toIndex + 1, this.lastRenderedRowIndex);
+    }
+  }
+  renderedRowsHeight = this._renderRows(this.rows, fromIndex, this.firstRenderedRowIndex - 1, true);
+
+  if (removedRowsHeight) {
+    if (!this.$fillAfter) {
+      this.$fillAfter = this.$data.appendDiv('table-data-fill');
+    }
+    removedRowsHeight += this.$fillAfter.outerHeight();
+    this.$fillAfter.cssHeight(removedRowsHeight);
+    $.log.trace('FillAfter height: ' + removedRowsHeight);
+  }
+  if (renderedRowsHeight) {
+    if (this.$fillBefore) {
+      renderedRowsHeight = this.$fillBefore.outerHeight() - renderedRowsHeight;
+      this.$fillBefore.cssHeight(renderedRowsHeight);
+      $.log.trace('FillBefore height: ' + renderedRowsHeight);
+    }
+
+    // When scrolling fast newly inserted rows may already be out of view -> add next block if necessary
+    // FIXME CGU this is slow for large tables when clicking at the end, maybe we should calculate the rows which probably are at that position and render those
+    this._ensureTopRowsVisible();
+    return true;
   }
 };
 

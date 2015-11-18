@@ -10,7 +10,7 @@
  ******************************************************************************/
 /* global log4javascript */
 scout.logging = {
-  defaultLevel: 'debug',
+  defaultLevel: 'trace',
 
   /***
    * Loads log4javascript.min.js if logging is enabled.

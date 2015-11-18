@@ -44,6 +44,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.TableRowCount",
         "ui.NumRowsSelected",
         "ui.NumRowsSelectedMin",
+        "ui.NumRowsRendered",
         "ui.NumRowsFiltered",
         "ui.NumRowsFilteredBy",
         "ui.NumRowsFilteredMin",

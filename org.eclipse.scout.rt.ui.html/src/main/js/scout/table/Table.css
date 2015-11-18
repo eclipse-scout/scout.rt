@@ -54,6 +54,10 @@
   }
 }
 
+.table-data-fill {
+  width: 100%;
+}
+
 .table-row,
 .table-aggregate-row {
   position:relative;
