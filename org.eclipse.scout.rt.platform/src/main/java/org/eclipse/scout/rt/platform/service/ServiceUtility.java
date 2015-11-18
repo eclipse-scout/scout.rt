@@ -32,9 +32,6 @@ public class ServiceUtility {
   public Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
     Assertions.assertNotNull(serviceClass, "service class is null");
     try {
-      if (serviceClass == null) {
-        throw new ProcessingException("service class is null");
-      }
       return serviceClass.getMethod(operation, paramTypes);
     }
     catch (NoSuchMethodException | SecurityException e) {
