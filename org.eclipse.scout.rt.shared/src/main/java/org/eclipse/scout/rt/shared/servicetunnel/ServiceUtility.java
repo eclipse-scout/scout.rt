@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.service;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
-import org.eclipse.scout.rt.platform.service.internal.AbstractHolderArgumentVisitor;
+import org.eclipse.scout.rt.shared.servicetunnel.internal.AbstractHolderArgumentVisitor;
 
 @ApplicationScoped
 public class ServiceUtility {
