@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,6 +71,7 @@ public class ServerTestRunnerTimeoutTest {
       for (Failure f : result.getFailures()) {
         sb.append("\n  ");
         sb.append(f.getException());
+        sb.append(Arrays.asList(f.getException().getStackTrace()));
       }
       Assert.fail(sb.toString());
     }
