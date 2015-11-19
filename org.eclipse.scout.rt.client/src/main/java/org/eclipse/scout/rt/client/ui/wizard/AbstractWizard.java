@@ -1013,14 +1013,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doFinish() {
     if (isOpen()) {
-      CloseType oldType = getCloseType();
-      try {
-        setCloseTypeInternal(CloseType.Finished);
-        interceptFinish();
-      }
-      finally {
-        setCloseTypeInternal(oldType);
-      }
+      interceptFinish();
+      setCloseTypeInternal(CloseType.Finished);
     }
   }
 
@@ -1030,14 +1024,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doCancel() {
     if (isOpen()) {
-      CloseType oldType = getCloseType();
-      try {
-        setCloseTypeInternal(CloseType.Cancelled);
-        interceptCancel();
-      }
-      finally {
-        setCloseTypeInternal(oldType);
-      }
+      interceptCancel();
+      setCloseTypeInternal(CloseType.Cancelled);
     }
   }
 
@@ -1047,14 +1035,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doSuspend() {
     if (isOpen()) {
-      CloseType oldType = getCloseType();
-      try {
-        setCloseTypeInternal(CloseType.Suspended);
-        interceptSuspend();
-      }
-      finally {
-        setCloseTypeInternal(oldType);
-      }
+      interceptSuspend();
+      setCloseTypeInternal(CloseType.Suspended);
     }
   }
 
