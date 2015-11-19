@@ -165,6 +165,9 @@ scout.arrays = {
   },
 
   eachSibling: function(arr, element, func) {
+    if (!arr || !func) {
+      return;
+    }
     for (var i = 0; i < arr.length; i++) {
       var elementAtI = arr[i];
       if (elementAtI !== element) {
@@ -174,6 +177,9 @@ scout.arrays = {
   },
 
   find: function(arr, predicate) {
+    if (!arr || !predicate) {
+      return null;
+    }
     for (var i = 0; i < arr.length; i++) {
       var element = arr[i];
       if (predicate(element)) {
@@ -191,6 +197,9 @@ scout.arrays = {
   },
 
   findFromNext: function(arr, startIndex, predicate) {
+    if (!arr || !predicate) {
+      return null;
+    }
     for (var i = startIndex; i < arr.length; i++) {
       var element = arr[i];
       if (predicate(element)) {
@@ -200,6 +209,9 @@ scout.arrays = {
   },
 
   findFromPrev: function(arr, startIndex, predicate) {
+    if (!arr || !predicate) {
+      return null;
+    }
     for (var i = startIndex; i >= 0; i--) {
       var element = arr[i];
       if (predicate(element)) {

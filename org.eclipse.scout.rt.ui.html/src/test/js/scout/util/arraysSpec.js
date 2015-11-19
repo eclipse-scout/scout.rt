@@ -246,6 +246,9 @@ describe("scout.arrays", function() {
     it("returns the element for which the given predicate returns true", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
+      expect(scout.arrays.find()).toBe(null);
+      expect(scout.arrays.find(arr)).toBe(null);
+
       var element = scout.arrays.find(arr, function(element) {
         return element === 'c';
       });
@@ -263,6 +266,9 @@ describe("scout.arrays", function() {
 
     it("returns the element for which the given predicate returns true, starting from a given index", function() {
       var arr = ['a', 'b', 'c', 'd'];
+
+      expect(scout.arrays.find()).toBe(null);
+      expect(scout.arrays.find(arr)).toBe(null);
 
       var element = scout.arrays.findFrom(arr, 1, function(element) {
         return element === 'c';
@@ -309,20 +315,20 @@ describe("scout.arrays", function() {
       expect(element).toBeFalsy();
     });
 
-  });
+    it("searches from right to left if backwards is true", function() {
+      var arr = ['a', 'b', 'c', 'd'];
 
-  it("searches from right to left if backwards is true", function() {
-    var arr = ['a', 'b', 'c', 'd'];
+      var element = scout.arrays.findFrom(arr, 2, function(element) {
+        return element === 'a';
+      }, true);
+      expect(element).toBeTruthy();
 
-    var element = scout.arrays.findFrom(arr, 2, function(element) {
-      return element === 'a';
-    }, true);
-    expect(element).toBeTruthy();
+      element = scout.arrays.findFrom(arr, 2, function(element) {
+        return element === 'd';
+      }, true);
+      expect(element).toBeFalsy();
+    });
 
-    element = scout.arrays.findFrom(arr, 2, function(element) {
-      return element === 'd';
-    }, true);
-    expect(element).toBeFalsy();
   });
 
   describe("format", function() {
