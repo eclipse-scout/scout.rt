@@ -28,9 +28,10 @@ scout.PopupWindow.prototype._onUnload = function() {
 
 scout.PopupWindow.prototype._onReady = function() {
   // set container (used as document-root from callers)
-  var scoutElement = this.myWindow.document.getElementsByClassName('scout')[0],
+  var myDocument = this.myWindow.document,
+    scoutElement = myDocument.getElementsByClassName('scout')[0],
     $myWindow = $(this.myWindow),
-    $myDocument = $(this.myWindow.document);
+    $myDocument = $(myDocument);
 
   this.$container = $(scoutElement);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -59,12 +60,17 @@ scout.PopupWindow.prototype._onReady = function() {
   // We do the same thing here, as with the $entryPoint of the main window
   this.session.keyStrokeManager.installTopLevelKeyStrokeHandlers(this.$container);
   this.session.focusManager.installTopLevelMouseHandlers(this.$container);
+  scout._installGlobalMouseDownInterceptor(myDocument);
 
   // Attach event handlers on window
   $(this.myWindow)
     .on('unload', this._onUnload.bind(this))
     .on('resize', this._onResize.bind(this));
+
+  // Delegate uncaught JavaScript errors in the popup-window to the main-window
+  this.myWindow.onerror = this.myWindow.opener.onerror;
 };
+
 
 // FIXME AWE: (2nd screen) sollen wir auch position-changes vom window registrieren (ohne size-change)?
 // Falls ja, bräuchte es das hier: http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript

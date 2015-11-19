@@ -68,7 +68,8 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
     // Popup menu is handled by this menu itself
     return scout.ButtonAdapterMenu.parent.prototype.doAction.call(this, srcEvent);
   }
-  // Eventhing else is delegated to the button
+
+  // Everything else is delegated to the button
   var actionExecuted = this.button.doAction();
   if (actionExecuted && this.isToggleAction() && this.rendered) {
     this.setSelected(!this.selected);

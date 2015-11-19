@@ -185,6 +185,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
 
     if (uploadFunctionTimeoutCount >= this._fileUploadWaitRetryCountTimeout) {
       var boxOptions = {
+        entryPoint: this.$container.entryPoint(),
         header: this.session.text('ui.ClipboardTimeoutTitle'),
         body: this.session.text('ui.ClipboardTimeout'),
         yesButtonText: this.session.text('Ok')

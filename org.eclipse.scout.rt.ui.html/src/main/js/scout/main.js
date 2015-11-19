@@ -67,7 +67,7 @@ scout._init = function(options) {
 
   scout.helpers.prepareDOM();
   this._installGlobalJavascriptErrorHandler();
-  this._installGlobalMouseDownInterceptor();
+  this._installGlobalMouseDownInterceptor(document);
 
   var tabId = scout.dates.timestamp();
   $('.scout').each(function() {
@@ -174,12 +174,18 @@ scout._checkBrowserCompability = function(options) {
   return false;
 };
 
-// FIXME AWE: (2nd screen) check if we must apply the global error handler to popups too
+// FIXME AWE: (2nd screen) - prüfen ob das popup-window blockiert ist wenn im main-window die fatal error message box offen ist!
+
+/**
+ * Note: we do not install an error handler on popup-windows because everything is controlled by the main-window
+ * so exceptions will also occur in that window. This also means, the fatal message-box will be displayed in the
+ * main-window, even when a popup-window is opened and active.
+ */
 scout._installGlobalJavascriptErrorHandler = function() {
   window.onerror = function(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {
-      var errorCode = getJsErrorCode(error);
-      var logStr = errorMessage + ' at ' + fileName + ':' + lineNumber;
+      var errorCode = getJsErrorCode(error),
+        logStr = errorMessage + ' at ' + fileName + ':' + lineNumber;
       if (error && error.stack) {
         logStr = error.stack;
       }
@@ -188,21 +194,20 @@ scout._installGlobalJavascriptErrorHandler = function() {
       if (window.console) {
         window.console.log(logStr);
       }
-      // FIXME Improve this!
+      // FIXME BSH: Improve this! Accessing session at index 0 is not a good idea when a window has multiple scout instances (portlet use-case)
       if (scout.sessions.length > 0) {
-        var session = scout.sessions[0];
-        var boxOptions = {
-          header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
-          body: scout.strings.join('\n\n',
-            session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
-            session.optText('ui.UiInconsistentMsg', '')),
-          yesButtonText: session.optText('ui.Reload', 'Reload'),
-          yesButtonAction: function() {
-            scout.reloadPage();
-          },
-          noButtonText: session.optText('ui.Ignore', 'Ignore'),
-          hiddenText: logStr
-        };
+        var session = scout.sessions[0],
+          boxOptions = {
+            header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
+            body: scout.strings.join('\n\n',
+              session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
+              session.optText('ui.UiInconsistentMsg', '')),
+            yesButtonText: session.optText('ui.Reload', 'Reload'),
+            yesButtonAction: scout.reloadPage,
+            noButtonText: session.optText('ui.Ignore', 'Ignore'),
+            hiddenText: logStr
+          };
+
         session.showFatalMessage(boxOptions, errorCode);
         session.sendLogRequest(logStr);
       }
@@ -250,8 +255,8 @@ scout._installGlobalJavascriptErrorHandler = function() {
 /**
  * Installs a global 'mousedown' interceptor to invoke 'aboutToBlurByMouseDown' on value field before anything else gets executed.
  */
-scout._installGlobalMouseDownInterceptor = function() {
-  document.addEventListener('mousedown', function(event) {
+scout._installGlobalMouseDownInterceptor = function(myDocument) {
+  myDocument.addEventListener('mousedown', function(event) {
     scout.ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
 };
