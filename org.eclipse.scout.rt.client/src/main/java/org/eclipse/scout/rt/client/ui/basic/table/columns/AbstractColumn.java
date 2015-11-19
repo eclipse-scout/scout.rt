@@ -876,10 +876,15 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void initColumn() {
-    ClientUIPreferences env = ClientUIPreferences.getInstance();
-    setVisible(env.getTableColumnVisible(this, m_visibleProperty));
-    setWidth(env.getTableColumnWidth(this, getWidth()));
-    setVisibleColumnIndexHint(env.getTableColumnViewIndex(this, getVisibleColumnIndexHint()));
+    // Apply prefs only if header is enabled (because the user is not able to change or reset anything if the header is disabled)
+    if (getTable() != null && getTable().isHeaderEnabled()) {
+      ClientUIPreferences env = ClientUIPreferences.getInstance();
+      setVisible(env.getTableColumnVisible(this, m_visibleProperty));
+      if (!isFixedWidth()) {
+        setWidth(env.getTableColumnWidth(this, getWidth()));
+      }
+      setVisibleColumnIndexHint(env.getTableColumnViewIndex(this, getVisibleColumnIndexHint()));
+    }
     //
     interceptInitColumn();
   }
