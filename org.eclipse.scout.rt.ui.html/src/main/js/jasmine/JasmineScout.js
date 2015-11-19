@@ -18,13 +18,16 @@ function mostRecentJsonRequest() {
 }
 
 function sandboxSession(options) {
-  var session;
+  var session,
+    $sandbox = $('#sandbox');
+
+  $sandbox.addClass('scout');
   options = options || {};
   options.uiSessionId = options.uiSessionId || '1.1';
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
-  session = new scout.Session($('#sandbox'), options);
+  session = new scout.Session($sandbox, options);
   session.locale = new LocaleSpecHelper().createLocale('de');
   session.desktop = scout.create('Desktop', {
     parent: session.rootAdapter
@@ -37,7 +40,7 @@ function sandboxSession(options) {
 
 function sandboxDesktop() {
   var $sandbox = window.sandbox();
-  $sandbox.addClass('desktop');
+  $sandbox.addClass('scout desktop');
   return $sandbox;
 }
 
