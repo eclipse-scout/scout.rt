@@ -42,6 +42,11 @@ scout.DesktopNavigation.prototype.render = function($parent) {
     }
   }
 
+  if (this._breadcrumbEnabled === undefined && this.desktop.outline) {
+    // Read initial value from active outline
+    this.setBreadcrumbEnabled(this.desktop.outline.breadcrumbEnabled);
+  }
+
   this.$container = this.$navigation.appendDiv('navigation-container')
     .on('mousedown', this._onNavigationMousedown.bind(this));
 };
@@ -84,12 +89,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
     this.outline.remove();
   }
   this.outline = outline;
-  if (this._breadcrumbEnabled === undefined) {
-    // Read initial value from active outline
-    this.setBreadcrumbEnabled(outline.breadcrumbEnabled);
-  } else {
-    this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
-  }
+  this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
   this.outline.render(this.$container);
   this.outline.handleOutlineContent(bringToFront);
   this._updateViewButtons(outline);
