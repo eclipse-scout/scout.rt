@@ -32,8 +32,9 @@ scout.TouchPopupLayout.prototype.layout = function($container) {
  * @override AbstractLayout.js
  */
 scout.TouchPopupLayout.prototype.preferredLayoutSize = function($container) {
-  var screenWidth = $(document).width(),
-    screenHeight = $(document).height(),
+  var $document = $container.document(),
+    screenWidth = $document.width(),
+    screenHeight = $document.height(),
     minPopupWidth = scout.HtmlEnvironment.formColumnWidth / 2,
     maxPopupHeight = scout.HtmlEnvironment.formRowHeight * 15,
     popupWidth = scout.HtmlEnvironment.formColumnWidth,

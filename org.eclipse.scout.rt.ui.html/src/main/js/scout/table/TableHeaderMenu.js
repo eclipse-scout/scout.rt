@@ -91,7 +91,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   this._renderFilterGroup();
 
   // name all label elements
-  $('.header-text').each(function(i, elem) {
+  $('.header-text', this.$container).each(function(i, elem) {
     var $elem = $(elem);
     $elem.text($elem.data('label'));
   });

@@ -127,7 +127,7 @@ scout.Popup.prototype.close = function(event) {
 scout.Popup.prototype._attachCloseHandler = function() {
   // Install mouse close handler
   this._mouseDownHandler = this._onMouseDown.bind(this);
-  $(document).on('mousedown', this._mouseDownHandler);
+  this.$container.document().on('mousedown', this._mouseDownHandler);
 
   // Install popup open close handler
   this._popupOpenHandler = this._onPopupOpen.bind(this);
@@ -155,7 +155,7 @@ scout.Popup.prototype._detachCloseHandler = function() {
 
   // Uninstall mouse close handler
   if (this._mouseDownHandler) {
-    $(document).off('mousedown', this._mouseDownHandler);
+    this.$container.document().off('mousedown', this._mouseDownHandler);
     this._mouseDownHandler = null;
   }
 };

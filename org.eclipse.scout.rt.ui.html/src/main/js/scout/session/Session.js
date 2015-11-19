@@ -638,19 +638,20 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 
   options = options || {};
   var model = {
-    session: this,
-    parent: this.desktop || new scout.NullWidget(),
-    iconId: options.iconId,
-    severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
-    header: options.header,
-    body: options.body,
-    hiddenText: options.hiddenText,
-    yesButtonText: options.yesButtonText,
-    noButtonText: options.noButtonText,
-    cancelButtonText: options.cancelButtonText
-  };
+      session: this,
+      parent: this.desktop || new scout.NullWidget(),
+      iconId: options.iconId,
+      severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
+      header: options.header,
+      body: options.body,
+      hiddenText: options.hiddenText,
+      yesButtonText: options.yesButtonText,
+      noButtonText: options.noButtonText,
+      cancelButtonText: options.cancelButtonText
+    },
+    messageBox = scout.create('MessageBox', model),
+    $entryPoint = options.entryPoint || this.$entryPoint;
 
-  var messageBox = scout.create('MessageBox', model);
   messageBox.remoteHandler = function(event) {
     if ('action' === event.type) {
       delete this._fatalMessagesOnScreen[errorCode];
@@ -665,7 +666,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
       }
     }
   }.bind(this);
-  messageBox.render(this.$entryPoint);
+  messageBox.render($entryPoint);
 };
 
 scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize, allowedTypes) {

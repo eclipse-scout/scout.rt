@@ -743,7 +743,7 @@
           var left = orig_offset.left + (event.pageX - orig_event.pageX);
           // do not drop outside of viewport (and leave a margin of 100 pixels)
           left = Math.max(100 - $handle.width(), left);
-          left = Math.min($('body').width() - 100, left);
+          left = Math.min($handle.body().width() - 100, left);
           top = Math.max(0, top); // must not be dragged outside of top, otherwise dragging back is impossible
           top = Math.min($handle.window().height() - 100, top);
           $draggable.offset({

@@ -74,8 +74,9 @@ scout.Tooltip.prototype._render = function($parent) {
     // Every user action will remove the tooltip
     this._mousedownHandler = this._onDocumentMousedown.bind(this);
     this._keydownHandler = this._onDocumentKeydown.bind(this);
-    $(document).on('mousedown', this._mousedownHandler);
-    $(document).on('keydown', this._keydownHandler);
+    this.$container.document()
+      .on('mousedown', this._mousedownHandler)
+      .on('keydown', this._keydownHandler);
   }
 
   if (this.$anchor) {
@@ -95,8 +96,9 @@ scout.Tooltip.prototype._postRender = function() {
 };
 
 scout.Tooltip.prototype._remove = function() {
-  $(document).off('mousedown', this._mousedownHandler);
-  $(document).off('keydown', this._keydownHandler);
+  this.$container.document()
+    .off('mousedown', this._mousedownHandler)
+    .off('keydown', this._keydownHandler);
   if (this._scrollHandler) {
     scout.scrollbars.offScroll(this._scrollHandler);
     this._scrollHandler = null;

@@ -105,7 +105,7 @@ scout.Scrollbar.prototype._onThumbMousedown = function(event) {
   this.trigger('scrollstart');
   this._begin = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
   this._$thumb.addClass('scrollbar-thumb-move');
-  $(document)
+  this._$thumb.document()
     .on('mousemove', this._onThumbMousemoveHandler)
     .one('mouseup', this._onThumbMouseupHandler);
   return false;
@@ -117,7 +117,7 @@ scout.Scrollbar.prototype._onThumbMousemove = function(event) {
 
 scout.Scrollbar.prototype._onThumbMouseup = function() {
   this._$thumb.removeClass('scrollbar-thumb-move');
-  $(document)
+  this._$thumb.document()
     .off('mousemove', this._onThumbMousemoveHandler);
   this.trigger('scrollend');
   return false;

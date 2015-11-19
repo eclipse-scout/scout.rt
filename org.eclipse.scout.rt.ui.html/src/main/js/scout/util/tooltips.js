@@ -23,12 +23,11 @@ scout.tooltips = {
 
   /**
    * Finds every tooltip whose $anchor belongs to $context.
-   *
    */
   find: function($context) {
     var $tooltips, i, tooltip,
       tooltips = [];
-    $tooltips = $('.tooltip');
+    $tooltips = $('.tooltip', $context.document(true));
 
     for (i = 0; i < $tooltips.length; i++) {
       tooltip = $tooltips.eq(i).data('tooltip');

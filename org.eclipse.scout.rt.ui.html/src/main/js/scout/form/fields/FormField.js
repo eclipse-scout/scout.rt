@@ -80,7 +80,7 @@ scout.FormField.prototype._init = function(model) {
  * <pre>
  * this.addContainer($parent, 'form-field');
  * this.addLabel();
- * this.addField($('&lt;div&gt;').text('foo'));
+ * this.addField($parent.makeDiv('foo', 'bar'));
  * this.addMandatoryIndicator();
  * this.addStatus();
  * </pre>

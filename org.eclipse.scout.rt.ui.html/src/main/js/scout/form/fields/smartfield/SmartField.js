@@ -394,7 +394,7 @@ scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, f
 
 // FIXME AWE/DWI: check if we can find next tabbable in the current focus-context (FocusManager)
 scout.SmartField.prototype._focusNextTabbable = function() {
-  var $tabElements = $(':tabbable');
+  var $tabElements = this.entryPoint().find(':tabbable');
   var nextIndex = 0;
   var fieldIndex = $tabElements.index(this.$field);
   if (fieldIndex + 1 < $tabElements.length) {

@@ -397,7 +397,7 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
   // selected date
   if (scout.dates.compare(this.selectedDate, selectedDate) !== 0) {
     changed = true;
-    $('.calendar-day').each(function(index, element) {
+    $('.calendar-day', this.$container).each(function(index, element) {
       var $day = $(element),
         date = $day.data('date');
       if (scout.dates.compare(date, this.selectedDate) === 0) {
@@ -662,19 +662,20 @@ scout.Calendar.prototype.layoutAxis = function() {
   // set weekname or day schedule
   if (this._isMonth()) {
     var session = this.session;
-    $('.calendar-week-name').each(function(index) {
+    $('.calendar-week-name', this.$container).each(function(index) {
       if (index > 0) {
         $e = $(this);
         $e.text(session.text('ui.CW', scout.dates.weekInYear($e.next().data('date'))));
       }
     });
   } else {
-    $('.calendar-week-name').text('');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8) + '%');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13) + '%');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17) + '%');
-    $selected.parent().appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', this._dayPosition(-1) + '%');
+    $('.calendar-week-name', this.$container).text('');
+    var $parent = $selected.parent();
+    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8) + '%');
+    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');
+    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13) + '%');
+    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17) + '%');
+    $parent.appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', this._dayPosition(-1) + '%');
   }
 };
 
