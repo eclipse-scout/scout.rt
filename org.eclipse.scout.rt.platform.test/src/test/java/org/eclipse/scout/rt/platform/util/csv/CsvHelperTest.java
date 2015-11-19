@@ -45,6 +45,7 @@ public class CsvHelperTest {
 
   private CsvHelper m_csvHelper;
   private File m_testFile;
+  private List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
   @Before
   public void setUp() throws Exception {
@@ -64,7 +65,6 @@ public class CsvHelperTest {
         {"b", "b", 123.34, "b", "b"},
         {"d", "d", 123.34, "d", "d"}
     };
-    List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
     m_csvHelper.exportData(m_data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
 
@@ -79,7 +79,8 @@ public class CsvHelperTest {
     catch (ProcessingException e) {
       HashSet<String> contextMessages = CollectionUtility.hashSet(e.getStatus().getContextMessages());
       assertTrue(contextMessages.remove("lineNr=2"));
-      assertEquals(1, contextMessages.size());
+      String fullMessage = e.getMessage() + " " + Arrays.asList(e.getStackTrace());
+      assertEquals("expected a single context message " + fullMessage, 1, contextMessages.size());
       String msg = CollectionUtility.firstElement(contextMessages);
       assertFalse(msg.startsWith("colIndex="));
       assertFalse(msg.startsWith("cell="));
@@ -94,8 +95,6 @@ public class CsvHelperTest {
         {"c", "c", "d", "c", "c"},
         {"d", "d", 123.34, "d", "d"}
     };
-    List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
-
     m_csvHelper.exportData(m_data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
 
     Reader reader = new FileReader(m_testFile);
@@ -119,7 +118,6 @@ public class CsvHelperTest {
         {"c", "c", "c", "c", "c"},
         {"d", "d", "d", "d", "d"}
     };
-    List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
     m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
 
@@ -136,7 +134,6 @@ public class CsvHelperTest {
         {"c", "c", "c", "c", "c"},
         {"d", "d", "d", "d", "d"}
     };
-    List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
     m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
 
