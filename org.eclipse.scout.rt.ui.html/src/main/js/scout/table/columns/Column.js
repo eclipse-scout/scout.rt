@@ -13,7 +13,7 @@ scout.Column = function() {
   this.showSeparator = true; // currently a UI-only property, defaults to true
 };
 
-scout.Column.DEFAULT_MIN_WIDTH = 80;
+scout.Column.DEFAULT_MIN_WIDTH = 50;
 scout.Column.NARROW_MIN_WIDTH = 30; // for columns without text (icon, check box)
 
 scout.Column.prototype.init = function(model) {
@@ -145,6 +145,13 @@ scout.Column.prototype._cellCssClass = function(cell) {
     cssClass += ' has-error';
   }
   cssClass += ' halign-' + scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
+  var columnPosition = this.table.columns.indexOf(this);
+  if (columnPosition === 0) {
+    cssClass += ' first';
+  }
+  if (columnPosition === this.table.columns.length - 1) {
+    cssClass += ' last';
+  }
 
   //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {

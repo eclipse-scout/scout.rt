@@ -69,13 +69,12 @@ scout.TableLayout.prototype.layout = function($container) {
 scout.TableLayout.prototype._layoutColumns = function() {
   var newWidth, weight,
     relevantColumns = [],
-    columns = this.table.columns,
     currentWidth = 0,
     totalInitialWidth = 0,
-    minWidthAdjustment = 0,
-    availableWidth = this.table.$data.width() - this.table.rowBorderWidth;
+    availableWidth = Math.floor(this.table.$data.width() - this.table.rowBorderWidth);
 
-  columns.forEach(function(column) {
+  // Handle fixed columns
+  this.table.columns.forEach(function(column) {
     if (column.fixedWidth) {
       availableWidth -= column.width;
     } else {
@@ -90,33 +89,54 @@ scout.TableLayout.prototype._layoutColumns = function() {
     return;
   }
 
-  // First resize columns which will get smaller than the minimum width
-  columns = relevantColumns;
-  columns.forEach(function(column) {
+  var remainingWidth = availableWidth;
+
+  // First, filter columns which would get smaller than their minimal size
+  var minWidthColumns = relevantColumns.filter(function(column) {
     if (totalInitialWidth === 0) {
       weight = 1 / relevantColumns.length;
     } else {
       weight = column.initialWidth / totalInitialWidth;
     }
-    newWidth = weight * availableWidth;
+    newWidth = Math.floor(weight * remainingWidth);
     if (newWidth < column.minWidth) {
       newWidth = column.minWidth;
-      minWidthAdjustment += newWidth;
-      totalInitialWidth -= column.initialWidth;
-      scout.arrays.remove(relevantColumns, column);
+      remainingWidth = Math.max(remainingWidth - newWidth, 0);
+      return true;
+    }
+    return false;
+  }.bind(this));
+  // Resize them to their minimal width
+  minWidthColumns.forEach(function(column, index) {
+    scout.arrays.remove(relevantColumns, column);
+
+    newWidth = column.minWidth;
+    totalInitialWidth -= column.initialWidth;
+    // If this is the last column, add remaining space (due to rounding) to this column
+    if (index === minWidthColumns.length - 1 && remainingWidth > 0 && relevantColumns.length === 0) {
+      newWidth += remainingWidth;
+      remainingWidth = 0;
+    }
+    if (newWidth !== column.width) {
       this.table.resizeColumn(column, newWidth);
     }
   }.bind(this));
-  availableWidth -= minWidthAdjustment;
 
   // Then resize the others
-  relevantColumns.forEach(function(column) {
+  availableWidth = remainingWidth;
+  relevantColumns.forEach(function(column, index) {
     if (totalInitialWidth === 0) {
       weight = 1 / relevantColumns.length;
     } else {
       weight = column.initialWidth / totalInitialWidth;
     }
-    newWidth = weight * availableWidth;
+    newWidth = Math.floor(weight * availableWidth);
+    remainingWidth -= newWidth;
+    // If this is the last column, add remaining space (due to rounding) to this column
+    if (index === relevantColumns.length - 1 && remainingWidth > 0) {
+      newWidth += remainingWidth;
+      remainingWidth = 0;
+    }
     if (newWidth !== column.width) {
       this.table.resizeColumn(column, newWidth);
     }

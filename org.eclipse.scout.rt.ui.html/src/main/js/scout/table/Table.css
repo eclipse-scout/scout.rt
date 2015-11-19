@@ -46,6 +46,11 @@
   /*   from .table-data's height. See TableLayout.layout(). */
   margin-top: -1px;
   padding-top: 1px;
+
+  & > .scrollbar.y-axis {
+    /* Make scrollbar visually centered */
+    margin-top: @scrollbar-margin + 1px;
+  }
 }
 
 .table-row,
@@ -115,6 +120,13 @@
   &.empty {
     /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
     text-overflow: clip;
+  }
+
+  /* see also: .table-header-item.last (TableHeader.css) */
+  &.last.halign-left,
+  &.last.halign-center,
+  &.last.halign-right {
+    padding-right: @scrollbar-size + (@scrollbar-side-margin * 2);
   }
 
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable::before {

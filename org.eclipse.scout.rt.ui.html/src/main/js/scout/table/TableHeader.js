@@ -86,20 +86,24 @@ scout.TableHeader.prototype._renderColumns = function() {
 
 scout.TableHeader.prototype._renderColumn = function(column, index) {
   var columnWidth = column.width,
+    marginLeft = '',
+    marginRight = '',
     isFirstColumn = (index === 0),
     isLastColumn = (index === this.table.columns.length - 1);
 
   if (isFirstColumn) {
-    columnWidth += this.table.rowBorderLeftWidth;
+    marginLeft = this.table.rowBorderLeftWidth;
   } else if (isLastColumn) {
-    columnWidth += this.table.rowBorderRightWidth;
+    marginRight = this.table.rowBorderRightWidth;
   }
 
   var $header = this.$filler.beforeDiv('table-header-item')
     .setEnabled(this.enabled)
     .data('column', column)
     .css('min-width', columnWidth + 'px')
-    .css('max-width', columnWidth + 'px');
+    .css('max-width', columnWidth + 'px')
+    .css('margin-left', marginLeft)
+    .css('margin-right', marginRight);
   if (this.enabled) {
     $header
       .on('click', this._onHeaderItemClick.bind(this))
@@ -107,6 +111,12 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   }
   $header.toggleAttr('data-modelclass', !!column.modelClass, column.modelClass);
   $header.toggleAttr('data-classid', !!column.classId, column.classId);
+  if (isFirstColumn) {
+    $header.addClass('first');
+  }
+  else if (isLastColumn) {
+    $header.addClass('last');
+  }
 
   column.$header = $header;
 
@@ -161,14 +171,16 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     $header = column.$header,
     $headerResize,
     columnWidth = column.width,
+    marginLeft = '',
+    marginRight = '',
     menuBarWidth = (this._$menuBar.isVisible() ? this._$menuBar.outerWidth() : 0),
     isFirstColumn = this.table.columns.indexOf(column) === 0,
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
 
   if (isFirstColumn) {
-    columnWidth += this.table.rowBorderLeftWidth;
+    marginLeft = this.table.rowBorderLeftWidth;
   } else if (isLastColumn) {
-    columnWidth += this.table.rowBorderRightWidth;
+    marginRight = this.table.rowBorderRightWidth;
     remainingHeaderSpace = Math.max(this.$container.width() - this.table.rowWidth, 0);
     remainingHeaderSpace = this.$container.width() - this.table.rowWidth;
     $headerResize = $header.next('.table-header-resize');
@@ -187,7 +199,9 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   }
   $header
     .css('min-width', columnWidth)
-    .css('max-width', columnWidth);
+    .css('max-width', columnWidth)
+    .css('margin-left', marginLeft)
+    .css('margin-right', marginRight);
 };
 
 scout.TableHeader.prototype._reconcileScrollPos = function() {
@@ -284,7 +298,7 @@ scout.TableHeader.prototype._renderColumnText = function(column) {
     $header.html('&nbsp;');
     $header.addClass('empty');
   } else {
-    $header.text(text);
+    $header.html(scout.strings.nl2br(text));
     $header.removeClass('empty');
   }
 
@@ -372,6 +386,16 @@ scout.TableHeader.prototype._onTableColumnMoved = function(event) {
   } else {
     $headers.eq(newPos).after($moveHeader);
     $headers.eq(newPos).after($moveResize);
+  }
+
+  // Update first/last markers
+  if ($headers.length > 0) {
+    $headers.eq(0).removeClass('first');
+    $headers.eq($headers.length - 1).removeClass('last');
+  }
+  if (this.table.columns.length > 0) {
+    this.table.columns[0].$header.addClass('first');
+    this.table.columns[this.table.columns.length - 1].$header.addClass('last');
   }
 
   // Update header size due to header menu items if moved from or to last position

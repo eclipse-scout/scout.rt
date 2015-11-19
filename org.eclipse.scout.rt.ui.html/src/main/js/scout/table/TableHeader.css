@@ -59,8 +59,6 @@
     2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */
   vertical-align: bottom;
   cursor: pointer;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
 
   &.disabled {
     cursor: default;
@@ -73,11 +71,19 @@
     text-overflow: clip;
   }
 
+  /* see also: .table-cell.last (Table.css) */
+  &.last.halign-left,
+  &.last.halign-center,
+  &.last.halign-right {
+    padding-right: @scrollbar-size + (@scrollbar-side-margin * 2);
+  }
+
   &.halign-right {
     text-align: right;
     padding-right: @table-cell-padding-left;
     padding-left: @table-cell-padding-right;
   }
+
   &.halign-center {
     text-align: center;
     padding-right: @table-cell-padding-left;

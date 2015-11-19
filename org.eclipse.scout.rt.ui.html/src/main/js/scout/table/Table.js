@@ -1721,11 +1721,14 @@ scout.Table.prototype.checkRow = function(row, checked) {
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
-  if (!row) {
-    return;
+  column = column || this.columns[0];
+  if (column && column.guiOnly) {
+    column = scout.arrays.find(this.columns, function(col) {
+      return !col.guiOnly;
+    });
   }
-  if (!column) {
-    column = this.columns[0];
+  if (!row || !column) {
+    return;
   }
   this._sendRowAction(row, column);
 };
@@ -2409,6 +2412,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
     return;
   }
   var colNum = this.columns.indexOf(column) + 1;
+  width = Math.floor(width);
   column.width = width;
   this._updateRowWidth();
 
