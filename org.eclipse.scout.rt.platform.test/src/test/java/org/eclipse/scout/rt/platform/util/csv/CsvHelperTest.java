@@ -60,13 +60,12 @@ public class CsvHelperTest {
 
   @Test
   public void testExceptionInDataConsumer() throws Exception {
-    Object[][] m_data = new Object[][]{
+    Object[][] data = new Object[][]{
         {"a", "a", 123.34, "a", "a"},
         {"b", "b", 123.34, "b", "b"},
         {"d", "d", 123.34, "d", "d"}
     };
-
-    m_csvHelper.exportData(m_data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
+    export(data);
 
     Reader reader = new FileReader(m_testFile);
     IDataConsumer dataConsumer = mock(IDataConsumer.class);
@@ -89,13 +88,13 @@ public class CsvHelperTest {
 
   @Test
   public void testExceptionInvalidFormat() throws Exception {
-    Object[][] m_data = new Object[][]{
+    Object[][] data = new Object[][]{
         {"a", "a", 123.34, "a", "a"},
         {"b", "b", 123.34, "b", "b"},
         {"c", "c", "d", "c", "c"},
         {"d", "d", 123.34, "d", "d"}
     };
-    m_csvHelper.exportData(m_data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
+    export(data);
 
     Reader reader = new FileReader(m_testFile);
     try {
@@ -119,7 +118,7 @@ public class CsvHelperTest {
         {"d", "d", "d", "d", "d"}
     };
 
-    m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
+    export(data);
 
     Reader reader = new FileReader(m_testFile);
     Object[][] result = m_csvHelper.importData(reader, 1, Arrays.asList(new String[]{"string", "string", "string", "string", "string"}), 4);
@@ -135,7 +134,7 @@ public class CsvHelperTest {
         {"d", "d", "d", "d", "d"}
     };
 
-    m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
+    export(data);
 
     String content = IOUtility.getContent(new FileReader(m_testFile));
     String[] lines = content.split("\n");
@@ -146,6 +145,10 @@ public class CsvHelperTest {
       String[] x = line.split(",");
       assertEquals(x.length, 5);
     }
+  }
+
+  private void export(Object[][] data) {
+    m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
   }
 
   /**
