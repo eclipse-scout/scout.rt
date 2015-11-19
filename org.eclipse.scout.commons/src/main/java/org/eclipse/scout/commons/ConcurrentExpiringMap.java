@@ -593,7 +593,13 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     }
   }
 
-  public static class ExpiringElement<V> {
+  public interface IExpiringElement<V> {
+    public V getValue();
+
+    public long getTimestamp();
+  }
+
+  public static class ExpiringElement<V> implements IExpiringElement<V> {
     private final long m_timestamp;
     private final V m_value;
 
@@ -605,10 +611,12 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
       m_value = value;
     }
 
+    @Override
     public long getTimestamp() {
       return m_timestamp;
     }
 
+    @Override
     public V getValue() {
       return m_value;
     }

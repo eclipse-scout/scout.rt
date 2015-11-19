@@ -15,86 +15,36 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ConcurrentExpiringMap.ExpiringElement;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
+ * Tests for {@link ConcurrentExpiringMap}
+ *
  * @since 5.2
  */
 public class ConcurrentExpiringMapTest {
   private static final long TIME_TO_LIVE_MILLISECONDS = 40;
 
-  private ConcurrentExpiringMap<Integer, String> createMap(boolean letExpire) {
-    ConcurrentExpiringMap<Integer, String> map = new ConcurrentExpiringMap<>(TIME_TO_LIVE_MILLISECONDS, TimeUnit.MILLISECONDS);
-    map.put(1, "1");
-    if (letExpire) {
-      expire();
+  private TestConcurrentExpiringMap createMap(boolean expired) {
+    if (expired) {
+      return createMapExpired();
     }
-    return map;
-  }
-
-  private ConcurrentExpiringMap<Integer, String> createMapTouchOnGet() {
-    ConcurrentExpiringMap<Integer, String> map = new ConcurrentExpiringMap<>(new ConcurrentHashMap<Integer, ExpiringElement<String>>(), TIME_TO_LIVE_MILLISECONDS, true, false, 0, 0);
-    map.put(1, "1");
-    return map;
-  }
-
-  private ConcurrentExpiringMap<Integer, String> createMapTouchOnIterate() {
-    ConcurrentExpiringMap<Integer, String> map = new ConcurrentExpiringMap<>(new ConcurrentHashMap<Integer, ExpiringElement<String>>(), TIME_TO_LIVE_MILLISECONDS, true, true, 0, 0);
-    map.put(1, "1");
-    return map;
-  }
-
-  private void expire() {
-    sleepUninterruptibly(TIME_TO_LIVE_MILLISECONDS + 5);
-  }
-
-  private void expireHalf() {
-    sleepUninterruptibly(TIME_TO_LIVE_MILLISECONDS / 2 + 5);
-  }
-
-  /**
-   * In case {@link Thread#sleep(long)} is interrupted, the interrupt exception is ignored and sleep is continued.
-   * <p>
-   * This method is required, as when executing tests (in eclipse) {@link Thread#sleep(long)} does not sleep long
-   * enough. Either because of interruption or any other scheduling reason. This method guarantees the time.
-   *
-   * @param millis
-   *          the length of time to sleep in milliseconds
-   */
-  private void sleepUninterruptibly(long millis) {
-    long currentMillis = System.currentTimeMillis();
-    long targetMillis = currentMillis + millis;
-    boolean interrupted = false;
-    while (currentMillis < targetMillis) {
-      try {
-        Thread.sleep(targetMillis - currentMillis);
-      }
-      catch (InterruptedException e) {
-        interrupted = true;
-      }
-      currentMillis = System.currentTimeMillis();
-    }
-    if (interrupted) {
-      // at least reset interrupted status on thread
-      Thread.currentThread().interrupt();
+    else {
+      return createMapNotExpired();
     }
   }
 
   @Test
   public void testGetExpires() {
     assertNull(createMap(true).get(1));
-  }
-
-  @Test
-  public void testGetNotExpires() {
-    assertEquals("1", createMap(false).get(1));
   }
 
   @Test
@@ -105,6 +55,11 @@ public class ConcurrentExpiringMapTest {
   @Test
   public void testContainsKeyNotExpires() {
     assertTrue(createMap(false).containsKey(1));
+  }
+
+  @Test
+  public void testGetNotExpires() {
+    assertEquals("1", createMap(false).get(1));
   }
 
   @Test
@@ -125,6 +80,26 @@ public class ConcurrentExpiringMapTest {
   @Test
   public void testIsEmptyNotExpires() {
     assertFalse(createMap(false).isEmpty());
+  }
+
+  private TestConcurrentExpiringMap createMapExpired() {
+    long currentTime = System.currentTimeMillis();
+    TestConcurrentExpiringMap map = createTestMap();
+    map.setTimestamp(currentTime - TIME_TO_LIVE_MILLISECONDS - 1);
+    return map;
+  }
+
+  private TestConcurrentExpiringMap createMapNotExpired() {
+    TestConcurrentExpiringMap map = createTestMap();
+    long currentTime = System.currentTimeMillis();
+    map.setTimestamp(currentTime);
+    return map;
+  }
+
+  private TestConcurrentExpiringMap createTestMap() {
+    TestConcurrentExpiringMap map = new TestConcurrentExpiringMap(TIME_TO_LIVE_MILLISECONDS, TimeUnit.MILLISECONDS);
+    map.put(1, "1");
+    return map;
   }
 
   @Test
@@ -211,9 +186,11 @@ public class ConcurrentExpiringMapTest {
 
   @Test
   public void testReplace() {
-    ConcurrentExpiringMap<Integer, String> map = createMap(false);
+    TestConcurrentExpiringMap map = createMap(false);
+    map.setTimestamp(System.currentTimeMillis() + 100);
 
     assertNull(map.replace(2, "1"));
+
     assertEquals(1, map.size());
     assertEquals("1", map.get(1));
 
@@ -223,82 +200,80 @@ public class ConcurrentExpiringMapTest {
   }
 
   @Test
-  public void testTouchOnGetContainsKeyExpires() {
-    ConcurrentExpiringMap<Integer, String> map = createMapTouchOnGet();
-    expireHalf();
-    assertTrue(map.containsKey(1));
-    expireHalf();
-    assertFalse(map.containsKey(1));
-  }
-
-  @Test
-  public void testTouchOnGetContainsValueExpires() {
-    ConcurrentExpiringMap<Integer, String> map = createMapTouchOnGet();
-    expireHalf();
-    assertTrue(map.containsValue("1"));
-    expireHalf();
-    assertFalse(map.containsValue("1"));
-  }
-
-  @Test
-  public void testTouchOnGetIterateEntriesExpires() {
-    ConcurrentExpiringMap<Integer, String> map = createMapTouchOnGet();
-    expireHalf();
-    assertTrue(map.entrySet().iterator().hasNext());
-    expireHalf();
-    assertFalse(map.entrySet().iterator().hasNext());
-  }
-
-  @Test
-  public void testTouchOnGetGetNotExpires() {
-    ConcurrentExpiringMap<Integer, String> map = createMapTouchOnGet();
-    expireHalf();
-    assertEquals("1", map.get(1));
-    expireHalf();
-    assertEquals("1", map.get(1));
-  }
-
-  @Test
-  public void testTouchOnIterateIterateEntriesNotExpires() {
-    ConcurrentExpiringMap<Integer, String> map = createMapTouchOnIterate();
-    expireHalf();
-    assertTrue(map.entrySet().iterator().hasNext());
-    expireHalf();
-    assertTrue(map.entrySet().iterator().hasNext());
-  }
-
-  @Test
   public void testBoundedSize() {
     int targetSize = 10;
     final IntegerHolder countEvicted = new IntegerHolder(0);
+    long now = System.currentTimeMillis();
+    int overflowSize = targetSize * 3 / 2;
 
-    ConcurrentExpiringMap<Integer, String> map = new ConcurrentExpiringMap<Integer, String>(0, TimeUnit.MILLISECONDS, targetSize) {
+    TestConcurrentExpiringMap map = new TestConcurrentExpiringMap(0, TimeUnit.MILLISECONDS, targetSize) {
 
       @Override
       protected void execEntryEvicted(Integer key, String value) {
         Integer currentCount = countEvicted.getValue();
         countEvicted.setValue(currentCount + 1);
-        // assert LRU behavior
-        assertEquals(currentCount, key);
       }
     };
-    for (int i = 0; i < targetSize; i++) {
+    map.setTimestamp(now - 1);
+
+    //put in some expired values
+    for (int i = 0; i < overflowSize - 1; i++) {
       map.put(i, String.valueOf(i));
+      assertEquals(Integer.valueOf(0), countEvicted.getValue());
     }
-    assertEquals(targetSize, map.size());
+    assertEquals(overflowSize - 1, map.size());
 
     // access elements to assert LRU behavior
-    sleepUninterruptibly(5);
-    for (int i = 0; i < targetSize; i++) {
-      sleepUninterruptibly(5);
+    for (int i = 0; i < overflowSize - 1; i++) {
       assertEquals(String.valueOf(i), map.get(i));
     }
-    sleepUninterruptibly(5);
+    assertEquals(Integer.valueOf(0), countEvicted.getValue());
 
     // overload
-    for (int i = targetSize; i < targetSize * 2; i++) {
+    for (int i = overflowSize; i < (overflowSize - 1) * 2; i++) {
       map.put(i, String.valueOf(i));
     }
-    assertEquals(targetSize * 2 - countEvicted.getValue(), map.size());
+    assertEquals(Integer.valueOf(overflowSize), countEvicted.getValue());
   }
+
+  /**
+   * Map with mocked timestamp
+   */
+  class TestConcurrentExpiringMap extends ConcurrentExpiringMap<Integer, String> {
+    private List<ExpiringElement<String>> m_elements = new ArrayList<>();
+    private Long m_timestamp = System.currentTimeMillis();
+
+    public TestConcurrentExpiringMap(long timeToLiveDuration, TimeUnit timeToLiveUnit) {
+      super(timeToLiveDuration, timeToLiveUnit);
+    }
+
+    public TestConcurrentExpiringMap(long timeToLiveDuration, TimeUnit timeToLiveUnit, int targetSize) {
+      super(timeToLiveDuration, timeToLiveUnit, targetSize);
+    }
+
+    /**
+     * Set timestamp for all elements
+     */
+    public void setTimestamp(long timestamp) {
+      m_timestamp = timestamp;
+      for (ExpiringElement<String> e : m_elements) {
+        Mockito.when(e.getTimestamp()).thenReturn(timestamp);
+      }
+    }
+
+    /**
+     * Create a mock element with the given timestamp and value See {@link #setTimestamp(long)}.
+     */
+    @Override
+    protected ExpiringElement<String> createElement(String value) {
+      @SuppressWarnings("unchecked")
+      ExpiringElement<String> element = Mockito.mock(ExpiringElement.class);
+      Mockito.when(element.getValue()).thenReturn(value);
+      Mockito.when(element.getTimestamp()).thenReturn(m_timestamp);
+      m_elements.add(element);
+      return element;
+    }
+
+  }
+
 }
