@@ -538,8 +538,10 @@ public final class StringUtility {
     if (text == null) {
       return null;
     }
-    for (int i = 0; i < tagNames.length; i++) {
-      text = removeTag(text, tagNames[i]);
+    if (tagNames != null) {
+      for (int i = 0; i < tagNames.length; i++) {
+        text = removeTag(text, tagNames[i]);
+      }
     }
     return text;
   }

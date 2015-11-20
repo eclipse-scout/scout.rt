@@ -362,6 +362,20 @@ public class StringUtilityTest {
   }
 
   /**
+   * Tests for {@link StringUtility#removeTags(String)} and {@link StringUtility#removeTags(String, String[])}
+   */
+  @Test
+  public void testRemoveTags() {
+    String input = "<html><body>some<b> bold </b> <b>text</b></body></html>";
+    assertEquals(null, StringUtility.removeTags(null));
+    assertEquals("some bold  text", StringUtility.removeTags(input));
+    assertEquals(null, StringUtility.removeTags(null, null));
+    assertEquals(input, StringUtility.removeTags(input, null));
+    assertEquals("<html><body>some </body></html>", StringUtility.removeTags(input, new String[]{"b"}));
+    assertEquals("", StringUtility.removeTags(input, new String[]{"html"}));
+  }
+
+  /**
    * Test for {@link StringUtility#replaceTags(String, String, String)}
    */
   @Test
