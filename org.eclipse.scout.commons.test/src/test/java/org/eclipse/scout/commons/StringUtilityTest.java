@@ -596,4 +596,14 @@ public class StringUtilityTest {
     assertEquals("test_text_info_12___", StringUtility.filterText("test-text/info.12345", "a-zA-Z0-2", "_"));
   }
 
+  @Test
+  public void testTokenizeNullString() {
+    assertArrayEquals(new String[0], StringUtility.tokenize(null, 'c'));
+  }
+
+  @Test
+  public void testTokenizeNull() {
+    assertArrayEquals(new String[]{"Chuck", "Norris"}, StringUtility.tokenize("Chuck Norris", ' '));
+  }
+
 }
