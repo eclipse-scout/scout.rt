@@ -400,15 +400,13 @@ public final class HTMLUtility {
 
         @Override
         public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
-          if (nm == HTML.Attribute.FACE || nm == HTML.Attribute.SIZE || nm == CSS.Attribute.FONT_FAMILY || nm == CSS.Attribute.FONT_SIZE) {
-            if (atts instanceof MutableAttributeSet) {
-              List<MutableAttributeSet> elements = attributesToRemove.get(nm);
-              if (elements == null) {
-                elements = new ArrayList<MutableAttributeSet>();
-                attributesToRemove.put(nm, elements);
-              }
-              elements.add((MutableAttributeSet) atts);
+          if ((nm == HTML.Attribute.FACE || nm == HTML.Attribute.SIZE || nm == CSS.Attribute.FONT_FAMILY || nm == CSS.Attribute.FONT_SIZE) && atts instanceof MutableAttributeSet) {
+            List<MutableAttributeSet> elements = attributesToRemove.get(nm);
+            if (elements == null) {
+              elements = new ArrayList<MutableAttributeSet>();
+              attributesToRemove.put(nm, elements);
             }
+            elements.add((MutableAttributeSet) atts);
           }
         }
       });
