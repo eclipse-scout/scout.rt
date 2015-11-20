@@ -565,4 +565,21 @@ public class StringUtilityTest {
     assertEquals("all metachars: \\^\\[\\.\\$\\{\\*\\(\\\\\\+\\)\\|\\?\\<\\>", StringUtility.escapeRegexMetachars("all metachars: ^[.${*(\\+)|?<>"));
   }
 
+  @Test
+  public void testEqualsIgnoreNewLines() {
+    String test = "no\ndifference";
+    assertEquals(true, StringUtility.equalsIgnoreCase(test, test));
+    assertEquals(false, StringUtility.equalsIgnoreCase(test, null));
+    assertEquals(false, StringUtility.equalsIgnoreCase(null, test));
+  }
+
+  @Test
+  public void testFilterText() {
+    String test = "test-text/info.12345";
+    assertEquals(test, StringUtility.filterText(test, null, "_"));
+    assertEquals(null, StringUtility.filterText(null, "a-zA-Z0-2", "-"));
+    assertEquals("testtextinfo12", StringUtility.filterText(test, "a-zA-Z0-2", ""));
+    assertEquals("test_text_info_12___", StringUtility.filterText("test-text/info.12345", "a-zA-Z0-2", "_"));
+  }
+
 }
