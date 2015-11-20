@@ -132,7 +132,7 @@ public class CellRange implements Serializable {
   }
 
   private String formatItem(int row, int col) {
-    String s = "";
+    StringBuilder sb = new StringBuilder();
     while (col >= 0) {
       int n = col % 26;
       if (n == 0 && col >= 26) {
@@ -140,7 +140,7 @@ public class CellRange implements Serializable {
       }
       if (n > 0) {
         char ch = (char) ('A' + n - 1);
-        s = ch + s;
+        sb.insert(0, ch);
       }
       if (col == 0) {
         col = -1;
@@ -150,9 +150,9 @@ public class CellRange implements Serializable {
       }
     }
     if (row > 0) {
-      s = s + row;
+      sb.append(row);
     }
-    return s;
+    return sb.toString();
   }
 
   public void parse(String s) {// A4:C5
