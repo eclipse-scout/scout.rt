@@ -11,7 +11,9 @@
 package org.eclipse.scout.commons.beans;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,6 +29,19 @@ import org.junit.Test;
 public class FastBeanUtilityTest {
 
   public static class MyBean {
+    public Long getId() {
+      return null;
+    }
+
+    @SuppressWarnings("unused")
+    private void myMethod() {
+    }
+
+    public void setId(Long id) {
+    }
+  }
+
+  public static class MyOtherBean {
     public Long getId() {
       return null;
     }
@@ -205,6 +220,20 @@ public class FastBeanUtilityTest {
         assertEquals(Long.class, contributeMap.get("id").getPropertyType());
       }
     }
+  }
+
+  @Test
+  public void testCompareMethods() {
+    Class clazz1 = MyBean.class;
+    Method[] methods1 = FastBeanUtility.getDeclaredPublicMethods(clazz1);
+    Class clazz2 = MyOtherBean.class;
+    Method[] methods2 = FastBeanUtility.getDeclaredPublicMethods(clazz2);
+
+    assertTrue(FastBeanUtility.compareMethods(null, null));
+    assertFalse(FastBeanUtility.compareMethods(methods1[0], null));
+    assertFalse(FastBeanUtility.compareMethods(null, methods2[0]));
+    assertTrue(FastBeanUtility.compareMethods(methods1[0], methods1[0]));
+    assertFalse(FastBeanUtility.compareMethods(methods1[0], methods2[0]));
   }
 
   private ArrayList<Method[]> perm1(Method[] m) {
