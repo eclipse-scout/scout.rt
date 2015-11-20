@@ -20,11 +20,20 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
+  var $glassPane;
   this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
     // Render glasspanes onto glasspane targets.
-    this._$glassPanes.push($(glassPaneTarget)
+    $glassPane = $(glassPaneTarget)
       .appendDiv('glasspane')
-      .on('mousedown', this._onMousedown.bind(this)));
+      .on('mousedown', this._onMousedown.bind(this));
+
+    // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
+    // is blocked, since the element that blocks (e.g a message-box) may be opened in the main-window.
+    if ($glassPane.window(true).popupWindow) {
+      $glassPane.addClass('dark');
+    }
+
+    this._$glassPanes.push($glassPane);
     this._$glassPaneTargets.push(glassPaneTarget);
 
     // Register 'glassPaneTarget' in focus manager.

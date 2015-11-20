@@ -500,12 +500,12 @@
     background-color: transparent;
     #scout.animation(none);
     cursor: wait;
+  }
 
-    &.dark {
-      background-color: rgba(0, 0, 0, 0.1);
-      #scout.animation(fadeIn ease-in 1);
-      #scout.animation-duration(0.25s);
-    }
+  &.dark {
+    background-color: rgba(0, 0, 0, 0.1);
+    #scout.animation(fadeIn ease-in 1);
+    #scout.animation-duration(0.25s);
   }
 }
 

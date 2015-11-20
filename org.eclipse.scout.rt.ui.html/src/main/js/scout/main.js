@@ -174,8 +174,6 @@ scout._checkBrowserCompability = function(options) {
   return false;
 };
 
-// FIXME AWE: (2nd screen) - prüfen ob das popup-window blockiert ist wenn im main-window die fatal error message box offen ist!
-
 /**
  * Note: we do not install an error handler on popup-windows because everything is controlled by the main-window
  * so exceptions will also occur in that window. This also means, the fatal message-box will be displayed in the
