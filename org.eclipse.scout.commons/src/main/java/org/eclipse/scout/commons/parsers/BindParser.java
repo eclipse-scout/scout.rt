@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * <p>
  * Syntax (EBNF):
- * 
+ *
  * <pre>
  * statement      = S? token-list .
  * token-list     = token (S? token)* .
@@ -161,14 +161,7 @@ public class BindParser {
     if (LOG.isTraceEnabled()) {
       trace("parseToken");
     }
-    if (parseText() != null
-        || parseExtendedBind() != null
-        || parseChar()) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (parseText() != null || parseExtendedBind() != null || parseChar());
   }
 
   private String parseText() {

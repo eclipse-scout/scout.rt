@@ -110,14 +110,7 @@ public class IntoParser {
     if (LOG.isTraceEnabled()) {
       trace("parseToken");
     }
-    if (parseText()
-        || parseInto()
-        || parseChar()) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (parseText() || parseInto() || parseChar());
   }
 
   private boolean parseText() {
