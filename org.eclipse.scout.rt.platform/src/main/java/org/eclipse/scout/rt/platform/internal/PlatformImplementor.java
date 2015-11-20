@@ -46,7 +46,7 @@ public class PlatformImplementor implements IPlatform {
   private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
-  private AtomicReference<State> m_state; // may be read at any time by any thread
+  private final AtomicReference<State> m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanContext;
 
   public PlatformImplementor() {
@@ -271,16 +271,23 @@ public class PlatformImplementor implements IPlatform {
       case PlatformStopped:
         return EnumSet.of(State.PlatformStopping);
       case PlatformInvalid:
-        return EnumSet.of(State.BeanManagerPrepared, State.BeanManagerValid, State.PlatformStopped);
+        return EnumSet.of(State.BeanManagerPrepared, State.BeanManagerValid, State.PlatformStarted, State.PlatformStopping, State.PlatformStopped);
     }
     return EnumSet.noneOf(State.class);
   }
 
   protected void fireStateEvent(State newState) {
-    PlatformEvent e = new PlatformEvent(this, newState);
-    for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
-      IPlatformListener listener = bean.getInstance();
-      listener.stateChanged(e);
+    PlatformEvent event = new PlatformEvent(this, newState);
+    try {
+      for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
+        IPlatformListener listener = bean.getInstance();
+        listener.stateChanged(event);
+      }
+    }
+    catch (RuntimeException | Error e) {
+      LOG.error("Error during event listener notification.", e);
+      changeState(State.PlatformInvalid, true);
+      throw e;
     }
   }
 
