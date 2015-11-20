@@ -1313,7 +1313,7 @@ public final class TypeCastUtility {
     if ("true".equals(o)) {
       return true;
     }
-    if (o.equals("1")) {
+    if ("1".equals(o)) {
       return true;
     }
     if ("yes".equals(o)) {

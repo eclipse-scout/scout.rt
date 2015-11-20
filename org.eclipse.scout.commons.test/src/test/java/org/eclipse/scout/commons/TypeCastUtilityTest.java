@@ -89,6 +89,26 @@ public class TypeCastUtilityTest {
     assertTrue(TypeCastUtility.castValue(createCustomBigDecimal(1), boolean.class));
   }
 
+  @Test
+  public void testCastStringToBoolean() throws Exception {
+    assertTrue(TypeCastUtility.castValue("1", boolean.class));
+    assertTrue(TypeCastUtility.castValue("true", boolean.class));
+    assertTrue(TypeCastUtility.castValue("on", boolean.class));
+    assertTrue(TypeCastUtility.castValue("yes", boolean.class));
+    assertTrue(TypeCastUtility.castValue("x", boolean.class));
+
+    assertFalse(TypeCastUtility.castValue("0", boolean.class));
+    assertFalse(TypeCastUtility.castValue("false", boolean.class));
+    assertFalse(TypeCastUtility.castValue("off", boolean.class));
+    assertFalse(TypeCastUtility.castValue("no", boolean.class));
+    assertFalse(TypeCastUtility.castValue(" ", boolean.class));
+
+    assertFalse(TypeCastUtility.castValue("something", boolean.class));
+
+    assertFalse(TypeCastUtility.castValue(null, boolean.class));
+
+  }
+
   protected BigDecimal createCustomBigDecimal(long l) {
     int scale = 10;
     int precision = 30;
