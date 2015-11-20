@@ -94,10 +94,8 @@ public final class ConfigurationUtility {
   @SuppressWarnings("unchecked")
   public static <T> Class<T> filterClassIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
     for (Class c : classes) {
-      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
-        if (!isInjectFieldAnnotationPresent(c)) {
-          return c;
-        }
+      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()) && !isInjectFieldAnnotationPresent(c)) {
+        return c;
       }
     }
     return null;

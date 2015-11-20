@@ -14,6 +14,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -267,6 +268,18 @@ public class ConfigurationUtilityTest {
   public void testAnnotatedClassIdFallback() {
     assertEquals(ClassWithoutClassId.class.getName(), ConfigurationUtility.getAnnotatedClassIdWithFallback(ClassWithoutClassId.class));
     assertEquals(ClassWithoutClassId.class.getSimpleName(), ConfigurationUtility.getAnnotatedClassIdWithFallback(ClassWithoutClassId.class, true));
+  }
+
+  @Test
+  public void testFilterClassIgnoringInjectFieldAnnotationExpectingNullValue() {
+    Class<Replacement> filteredValue = ConfigurationUtility.filterClassIgnoringInjectFieldAnnotation(new Class[]{Replacement.class}, Replacement.class);
+    assertNull(filteredValue);
+  }
+
+  @Test
+  public void testFilterClassIgnoringInjectFieldAnnotationExpectingMatch() {
+    Class<Original> filteredValue = ConfigurationUtility.filterClassIgnoringInjectFieldAnnotation(new Class[]{Original.class}, Original.class);
+    assertEquals(Original.class, filteredValue);
   }
 
   public static List<Class<?>> classList(Class<?>... classes) {
