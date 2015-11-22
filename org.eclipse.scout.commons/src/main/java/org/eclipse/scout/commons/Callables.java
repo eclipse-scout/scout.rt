@@ -39,19 +39,4 @@ public final class Callables {
       }
     };
   }
-
-  /**
-   * @return callable that does nothing when being called.
-   */
-  public static <RESULT> Callable<Void> nullCallable() {
-    return NULL_CALLABLE;
-  }
-
-  private static final Callable<Void> NULL_CALLABLE = new Callable<Void>() {
-
-    @Override
-    public Void call() throws Exception {
-      return null; // NOOP
-    }
-  };
 }

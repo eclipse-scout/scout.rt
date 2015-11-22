@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -79,8 +80,6 @@ public class JobManager implements IJobManager, IPlatformListener {
     m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", CONFIG.getPropertyValue(JobManagerDispatcherThreadCountProperty.class));
 
     m_mutexSemaphores = BEANS.get(MutexSemaphores.class);
-    m_mutexSemaphores.init(m_executor);
-
     m_listeners = BEANS.get(JobListeners.class);
 
     m_futures = BEANS.get(FutureSet.class);
@@ -99,55 +98,19 @@ public class JobManager implements IJobManager, IPlatformListener {
 
     switch (input.getSchedulingRule()) {
       case JobInput.SCHEDULING_RULE_SINGLE_EXECUTION:
-        scheduleSingleExecutingJob(futureTask, input.getSchedulingDelay());
+        scheduleDelayed(futureTask, input.getSchedulingDelay());
         break;
       case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
-        Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
-        schedulePeriodicExecutingJob(new FixedRateRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        scheduleDelayed(new FixedRateRunnable(m_executor, m_delayedExecutor, m_mutexSemaphores, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
-        Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
-        schedulePeriodicExecutingJob(new FixedDelayRunnable(m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        scheduleDelayed(new FixedDelayRunnable(m_executor, m_delayedExecutor, m_mutexSemaphores, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       default:
         throw new UnsupportedOperationException("Unsupported scheduling rule");
     }
 
     return futureTask;
-  }
-
-  /**
-   * Method invoked to schedule a single executing job.
-   */
-  protected <RESULT> void scheduleSingleExecutingJob(final JobFutureTask<RESULT> futureTask, final long schedulingDelay) {
-    if (schedulingDelay > 0L) {
-      m_delayedExecutor.schedule(new Runnable() {
-
-        @Override
-        public void run() {
-          if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-            futureTask.run();
-          }
-        }
-      }, schedulingDelay, TimeUnit.MILLISECONDS);
-    }
-    else {
-      if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-        m_executor.execute(futureTask);
-      }
-    }
-  }
-
-  /**
-   * Method invoked to schedule a periodic executing job.
-   */
-  protected void schedulePeriodicExecutingJob(final Runnable periodicRunnable, final long schedulingDelay) {
-    if (schedulingDelay > 0L) {
-      m_delayedExecutor.schedule(periodicRunnable, schedulingDelay, TimeUnit.MILLISECONDS);
-    }
-    else {
-      m_executor.execute(periodicRunnable);
-    }
   }
 
   @Override
@@ -202,6 +165,50 @@ public class JobManager implements IJobManager, IPlatformListener {
     return m_listeners.add(filter, listener);
   }
 
+  /**
+   * Runs the given task asynchronously, but not before the given delay elapses.
+   */
+  @Internal
+  protected void scheduleDelayed(final IRejectableRunnable runnable, final long schedulingDelay) {
+    if (schedulingDelay <= 0L) {
+      competeForMutexAndExecute(runnable);
+    }
+    else {
+      m_delayedExecutor.schedule(new IRejectableRunnable() {
+
+        @Override
+        public void run() {
+          competeForMutexAndExecute(runnable);
+        }
+
+        @Override
+        public void reject() {
+          runnable.reject();
+        }
+      }, schedulingDelay, TimeUnit.MILLISECONDS);
+    }
+  }
+
+  /**
+   * Executes the given runnable, and if being a mutually exclusive task, acquires the mutex first.
+   */
+  private void competeForMutexAndExecute(final IRejectableRunnable runnable) {
+    if (runnable instanceof JobFutureTask && ((JobFutureTask) runnable).getMutexObject() != null) {
+      final JobFutureTask<?> mutexTask = (JobFutureTask) runnable;
+
+      m_mutexSemaphores.competeForMutex(mutexTask, Position.TAIL, new IMutexAcquiredCallback() {
+
+        @Override
+        public void onMutexAcquired() {
+          m_executor.execute(mutexTask);
+        }
+      });
+    }
+    else {
+      m_executor.execute(runnable);
+    }
+  }
+
   @Internal
   protected void fireEvent(final JobEvent eventToFire) {
     m_listeners.notifyListeners(eventToFire);
@@ -252,8 +259,8 @@ public class JobManager implements IJobManager, IPlatformListener {
           LOG.error("Job rejected because no more threads or queue slots available. [runnable={}]", runnable);
         }
 
-        if (runnable instanceof IRejectable) {
-          ((IRejectable) runnable).reject();
+        if (runnable instanceof IRejectableRunnable) {
+          ((IRejectableRunnable) runnable).reject();
         }
       }
     };
@@ -323,8 +330,8 @@ public class JobManager implements IJobManager, IPlatformListener {
    */
   @Internal
   protected void passMutexIfMutexOwner(final JobFutureTask<?> task) {
-    if (task.isMutexTask() && task.isMutexOwner()) {
-      m_mutexSemaphores.passMutexToNextTask(task);
+    if (task.getMutexObject() != null && task.isMutexOwner()) {
+      m_mutexSemaphores.passMutexToNextTask(task.getMutexObject(), task);
     }
   }
 

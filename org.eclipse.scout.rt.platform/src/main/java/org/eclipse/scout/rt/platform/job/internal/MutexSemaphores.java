@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +38,10 @@ public class MutexSemaphores {
 
   private static final Logger LOG = LoggerFactory.getLogger(MutexSemaphores.class);
 
-  private static final boolean POSITION_TAIL = true;
-  private static final boolean POSITION_HEAD = false;
-
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
 
   private final Map<Object, MutexSemaphore> m_mutexSemaphores = new HashMap<>();
-
-  private volatile ExecutorService m_executor;
 
   public MutexSemaphores() {
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -54,17 +50,9 @@ public class MutexSemaphores {
   }
 
   /**
-   * Initializes this class with the executor to schedule pending mutex taks once a mutex task of the same mutex-object
-   * completes.
-   */
-  public void init(final ExecutorService executor) {
-    m_executor = executor;
-  }
-
-  /**
    * @return <code>true</code> if the given task is a mutex task and currently owns the mutex.
    */
-  public boolean isMutexOwner(final IMutexTask<?> task) {
+  public boolean isMutexOwner(final JobFutureTask<?> task) {
     m_readLock.lock();
     try {
       final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(task.getMutexObject());
@@ -79,159 +67,121 @@ public class MutexSemaphores {
   }
 
   /**
-   * Tries to acquire the mutex for the task's mutex-object. If not available at the time of invocation, the task is put
-   * into the queue of pending tasks and will compete for the mutex once all queued tasks of that mutex-object
-   * acquired/released the mutex.
+   * Blocks the calling thread until the mutex is acquired for the given task.
    *
-   * @param task
-   *          the task to acquire the mutex for; must be a mutex task.
-   * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
-   */
-  public boolean tryAcquireElseOfferTail(final IMutexTask<?> task) {
-    return tryAcquireElseOffer(task, POSITION_TAIL);
-  }
-
-  /**
-   * Tries to acquire the mutex for the task's mutex-object. If not available at the time of invocation, the task is put
-   * into the queue of pending tasks and will compete for the mutex once being at first position in the queue.
-   *
-   * @param task
-   *          the task to acquire the mutex for; must be a mutex task.
-   * @param tail
-   *          position where to add the task if the mutex cannot be acquired yet.
-   * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
-   */
-  private boolean tryAcquireElseOffer(final IMutexTask<?> task, final boolean tail) {
-    Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
-
-    if (m_executor.isShutdown()) {
-      task.cancel(true);
-      return false;
-    }
-
-    m_writeLock.lock();
-    try {
-      if (m_executor.isShutdown()) {
-        task.cancel(true);
-        return false;
-      }
-
-      return getMutexSemaphore(task.getMutexObject()).tryAcquireElseOffer(task, tail);
-    }
-    finally {
-      m_writeLock.unlock();
-    }
-  }
-
-  /**
-   * Blocks the calling thread until the given task acquired the task's mutex-object.
-   *
-   * @param task
-   *          the task to acquire the mutex; must be a mutex task.
+   * @param mutexTask
+   *          the task to acquire the mutex for.
+   * @param queuePosition
+   *          position in the queue of competing tasks.
    * @throws ProcessingException
-   *           is thrown if the current thread is interrupted while waiting for the mutex to become available, or upon
-   *           shutdown of the job manager.
+   *           is thrown if the current thread is interrupted while waiting for the mutex to become available.
    */
-  public void acquire(final IMutexTask<?> task) {
-    Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
-    final Object mutexObject = task.getMutexObject();
+  public void acquireMutex(final JobFutureTask<?> mutexTask, final Position queuePosition) {
     final Object acquisitionLock = new Object();
+    final AtomicBoolean waitingForMutex = new AtomicBoolean(true);
 
-    if (m_executor.isShutdown()) {
-      task.cancel(true);
-      throw new ProcessingException(String.format("Failed to acquire mutex because job manager is shutdown [task=%s]", task));
-    }
-
-    // Create the task to re-acquire the mutex. This task is queued to compete for the mutex anew.
-    final MutexAcquisitionFutureTask mutexAcquisitionTask = new MutexAcquisitionFutureTask(mutexObject) {
+    competeForMutex(mutexTask, queuePosition, new IMutexAcquiredCallback() {
 
       @Override
-      protected void onMutexAcquired() {
+      public void onMutexAcquired() {
         synchronized (acquisitionLock) {
-          final MutexSemaphore mutexSemaphore = getMutexSemaphore(mutexObject);
-
-          if (isAwaitMutex()) {
-            mutexSemaphore.replaceMutexOwner(this, task); // make the task the mutex-owner.
+          if (waitingForMutex.get()) {
             acquisitionLock.notify();
           }
           else {
-            passMutexToNextTask(this);
+            passMutexToNextTask(mutexTask.getMutexObject(), mutexTask);
           }
         }
       }
-    };
+    });
 
-    // Try to acquire the mutex, or wait for the mutex to become available.
-    if (tryAcquireElseOffer(mutexAcquisitionTask, POSITION_HEAD)) {
-      getMutexSemaphore(mutexObject).replaceMutexOwner(mutexAcquisitionTask, task); // make the task the mutex-owner.
-    }
-    else {
-      synchronized (acquisitionLock) {
-        while (!isMutexOwner(task)) {
-          try {
-            acquisitionLock.wait();
-          }
-          catch (final InterruptedException e) {
-            mutexAcquisitionTask.stopAwaitMutex();
-
-            Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-            throw new ProcessingException(String.format("Interrupted while re-acquiring the mutex [%s]", task), e);
-          }
+    // Block the current thread until the mutex is acquired.
+    synchronized (acquisitionLock) {
+      while (!isMutexOwner(mutexTask)) {
+        try {
+          acquisitionLock.wait();
+        }
+        catch (final InterruptedException e) {
+          waitingForMutex.set(false);
+          Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+          throw new ProcessingException(String.format("Interrupted while re-acquiring the mutex [%s]", mutexTask), e);
         }
       }
     }
   }
 
   /**
-   * Passes the tasks's mutex to the first task in the queue.
+   * Makes the given task to compete for its mutex. When acquired, the callback is invoked. The callback is invoked
+   * immediately in the calling thread if the mutex was free.
    *
-   * @param task
-   *          task which currently is the mutex-owner.
-   * @return task which is the new mutex-owner, <code>null</code> if the queue was empty.
+   * @param mutexTask
+   *          the task to acquire the mutex for.
+   * @param queuePosition
+   *          position in the queue of competing tasks.
+   * @param mutexAcquiredCallback
+   *          the callback to be invoked once acquired the mutex.
    */
-  public IMutexTask<?> releaseAndPoll(final IMutexTask<?> task) {
-    Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
+  public void competeForMutex(final JobFutureTask<?> mutexTask, final Position queuePosition, final IMutexAcquiredCallback mutexAcquiredCallback) {
+    Assertions.assertTrue(mutexTask.getMutexObject() != null, "Task must have a mutex [task=%s]", mutexTask);
+    final Object mutexObject = mutexTask.getMutexObject();
 
-    if (m_executor.isShutdown()) {
-      return null;
-    }
+    // Create the task to compete for the mutex.
+    final IMutexAcquisitionTask acquisitionTask = new IMutexAcquisitionTask() {
 
-    final Object mutexObject = task.getMutexObject();
+      @Override
+      public void mutexAcquired() {
+        getMutexSemaphore(mutexObject).replaceMutexOwner(this, mutexTask); // make the task the mutex-owner.
+        mutexAcquiredCallback.onMutexAcquired();
+      }
 
+      @Override
+      public String toString() {
+        return String.format("Mutex acquisition for '%s'", mutexTask.getJobInput().getName());
+      }
+    };
+
+    final boolean mutexFree;
     m_writeLock.lock();
     try {
-      if (m_executor.isShutdown()) {
-        return null;
-      }
-
-      final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
-      Assertions.assertNotNull(mutexSemaphore, "Inconsistency detected: Mutex semaphore must not be null when being the mutex owner");
-      Assertions.assertTrue(mutexSemaphore.isMutexOwner(task), "Inconsistency detected: wrong mutex owner [expected=%s, actual=%s]", task, mutexSemaphore.getMutexOwner());
-
-      final IMutexTask<?> nextTask = mutexSemaphore.releaseAndPoll();
-      if (nextTask == null) {
-        m_mutexSemaphores.remove(mutexObject);
-      }
-
-      return nextTask;
+      mutexFree = getMutexSemaphore(mutexObject).tryAcquireElseOffer(queuePosition, acquisitionTask);
     }
     finally {
       m_writeLock.unlock();
+    }
+
+    if (mutexFree) {
+      getMutexSemaphore(mutexObject).replaceMutexOwner(acquisitionTask, mutexTask); // make the task the mutex-owner.
+      mutexAcquiredCallback.onMutexAcquired();
     }
   }
 
   /**
    * Use this method to pass the mutex to the next task in the queue.
    */
-  public void passMutexToNextTask(final IMutexTask<?> currentMutexOwner) {
-    final IMutexTask<?> nextTask = releaseAndPoll(currentMutexOwner);
-    if (nextTask != null) {
-      try {
-        m_executor.execute(nextTask);
+  public void passMutexToNextTask(final Object mutexObject, final JobFutureTask<?> currentMutexOwner) {
+    final IMutexAcquisitionTask nextTask;
+
+    m_writeLock.lock();
+    try {
+      final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
+      Assertions.assertNotNull(mutexSemaphore, "Inconsistency detected: Mutex semaphore must not be null when being the mutex owner");
+      Assertions.assertTrue(mutexSemaphore.isMutexOwner(currentMutexOwner), "Inconsistency detected: wrong mutex owner [expected=%s, actual=%s]", currentMutexOwner, mutexSemaphore.getMutexOwner());
+
+      nextTask = mutexSemaphore.releaseAndPoll();
+      if (nextTask == null) {
+        m_mutexSemaphores.remove(mutexObject);
+        return;
       }
-      catch (final Throwable t) {
-        LOG.error(String.format("Failed to execute mutex task [task=%s]", nextTask), t);
-      }
+    }
+    finally {
+      m_writeLock.unlock();
+    }
+
+    try {
+      nextTask.mutexAcquired();
+    }
+    catch (final Throwable t) {
+      LOG.error("Failed to pass mutex to next task [task={}]", nextTask, t);
     }
   }
 
@@ -285,5 +235,4 @@ public class MutexSemaphores {
       m_writeLock.unlock();
     }
   }
-
 }

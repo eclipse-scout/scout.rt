@@ -28,9 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -51,10 +49,7 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.MutexAcquisitionFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
@@ -606,8 +601,8 @@ public class MutualExclusionTest {
   }
 
   /**
-   * We have 3 jobs that get scheduled simultaneously. The first waits some time so that job2 and job3 get queued. If
-   * job2 gets scheduled, it is rejected by the executor. This test verifies, that job3 still gets scheduled.
+   * We have 3 jobs that get scheduled simultaneously. The first waits some time so that job2 and job3 get queued. When
+   * job2 gets scheduled, it is rejected by the executor. This test verifies, that job2 still gets scheduled.
    */
   @Test
   public void testRejection() {
@@ -621,6 +616,11 @@ public class MutualExclusionTest {
       protected ExecutorService createExecutor() {
         return executorMock;
       }
+
+      @Override
+      public MutexSemaphores getMutexSemaphores() {
+        return m_mutexSemaphores;
+      }
     }
 
     final TestJobManager jobManager = new TestJobManager();
@@ -630,92 +630,58 @@ public class MutualExclusionTest {
             .withInitialInstance(jobManager)
             .withApplicationScoped(true)));
 
-    final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
-
-    // Simulate the executor.
-    final AtomicInteger count = new AtomicInteger();
+    // Executor mock
     doAnswer(new Answer<Future>() {
 
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
-        Runnable runnable = (Runnable) invocation.getArguments()[0];
-        if (runnable instanceof JobFutureTask<?>) {
-          final JobFutureTask<?> futureTask = (JobFutureTask) invocation.getArguments()[0];
+        final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
-          switch (count.incrementAndGet()) {
-            case 1: // job-1: RUN
-              s_executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                  try {
-                    jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
-                    ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
-                    try {
-                      futureTask.run(); // let job1 run
-                    }
-                    finally {
-                      ThreadInfo.CURRENT.remove();
-                    }
-                  }
-                  catch (InterruptedException e) {
-                    // NOOP
-                  }
-                }
-              });
-              break;
-            case 2: // job-2: REJECT
-              futureTask.reject();
-              break;
-            case 3: // job-3: RUN
-              s_executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
-                  try {
-                    futureTask.run();
-                  }
-                  finally {
-                    ThreadInfo.CURRENT.remove();
-                  }
-                }
-              });
-              break;
+        // Reject job-2 from being scheduled
+        if (runnable instanceof JobFutureTask) {
+          JobFutureTask job = (JobFutureTask) runnable;
+          if ("job-2".equals(job.getJobInput().getName())) {
+            job.reject();
+            return null;
           }
         }
-        else {
-          s_executor.execute(runnable);
-        }
+
+        s_executor.execute(runnable);
         return null;
       }
     }).when(executorMock).execute(any(Runnable.class));
 
+    // Job-1
     final IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
+        // Wait until all 3 jobs are scheduled.
+        waitForPermitsAcquired(jobManager.getMutexSemaphores(), m_clientSession, 3);
+
         protocol.add("running-job-1");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-1"));
+
+    // Job-2
     final IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("running-job-2");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-2"));
+
+    // Job-3
     IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("running-job-3");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-3"));
 
-    jobsScheduledLatch.countDown(); // notify that all jobs are scheduled.
     assertTrue(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
-
     assertEquals(Arrays.asList("running-job-1", "running-job-3"), protocol);
     assertTrue(jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(future1.isCancelled());
@@ -724,20 +690,21 @@ public class MutualExclusionTest {
   }
 
   /**
-   * We have 4 jobs that get scheduled simultaneously. The first waits some time so that job2, job3 and job4 get queued.
-   * Job1 then enters a blocking condition, which allows job2 to run. While job2 is running, it unblocks job1 so that
-   * job1 competes for the mutex anew. After job2 completes, job1 is rejected by the executor. However, to mutex was
-   * acquired and therefore job1 can run. After job1 complete, job3 and job4 gets scheduled.
+   * We have 5 jobs that get scheduled simultaneously. The first waits some time so that job2, job3, job4 and job5 get
+   * queued. Job1 then enters a blocking condition, which allows job2 to run. But job2 gets rejected by the executor,
+   * which allows job3 to run. After job3 completes, job1 is resumed and continues running. After job1 complete, job4
+   * gets scheduled. Job4 in turn gets blocked, which prevents job5 from running.
    */
   @Test
-  public void testBlockedJobRejection() throws InterruptedException {
+  public void testBlockedJobs() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final ScheduledExecutorService executorMock = mock(ScheduledExecutorService.class);
+    final ExecutorService executorMock = mock(ExecutorService.class);
+
     class TestJobManager extends JobManager {
 
       @Override
-      protected ScheduledExecutorService createExecutor() {
+      protected ExecutorService createExecutor() {
         return executorMock;
       }
 
@@ -754,77 +721,39 @@ public class MutualExclusionTest {
             .withInitialInstance(jobManager)
             .withApplicationScoped(true)));
 
-    final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
-    final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);
-
-    // mock the executor: Executor#execute
-    final AtomicInteger count = new AtomicInteger();
+    // Executor mock
     doAnswer(new Answer<Future>() {
 
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
-        Runnable runnable = (Runnable) invocation.getArguments()[0];
-        if (runnable instanceof JobFutureTask<?>) {
-          final JobFutureTask<?> futureTask = (JobFutureTask) runnable;
+        final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
-          switch (count.incrementAndGet()) {
-            case 1: // job-1: RUN
-              s_executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                  try {
-                    jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
-
-                    ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
-                    try {
-                      futureTask.run();
-                    }
-                    finally {
-                      ThreadInfo.CURRENT.remove();
-                    }
-                  }
-                  catch (InterruptedException e) {
-                    // NOOP
-                  }
-                }
-              });
-              break;
-            case 2: // job-2: RUN after job1 enters blocking condition
-            case 3: // job-3: gets scheduled
-            case 4: // job-4: gets scheduled
-              s_executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
-                  try {
-                    futureTask.run();
-                  }
-                  finally {
-                    ThreadInfo.CURRENT.remove();
-                  }
-                }
-              });
-              break;
+        // Reject job-2 from being scheduled
+        if (runnable instanceof JobFutureTask) {
+          JobFutureTask job = (JobFutureTask) runnable;
+          if ("job-2".equals(job.getJobInput().getName())) {
+            job.reject();
+            return null;
           }
         }
-        else if (runnable instanceof MutexAcquisitionFutureTask) {
-          ((MutexAcquisitionFutureTask) runnable).reject(); // job-1:  re-acquires the mutex after being released from the blocking condition
-        }
-        else {
-          s_executor.execute(runnable);
-        }
+
+        s_executor.execute(runnable);
         return null;
       }
     }).when(executorMock).execute(any(Runnable.class));
 
+    final BlockingCountDownLatch job4RunningLatch = new BlockingCountDownLatch(1);
+
     final IBlockingCondition BC = jobManager.createBlockingCondition("bc", true);
 
+    // Job-1
     IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
+        // Wait until all 5 jobs are scheduled.
+        waitForPermitsAcquired(jobManager.getMutexSemaphores(), m_clientSession, 5);
+
         try {
           protocol.add("running-job-1 (a)");
           BC.waitFor();
@@ -840,83 +769,103 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
 
+    // Job-2
     IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add("running-job-2 (a)");
-        BC.setBlocking(false);
-
-        // Wait until job-1 tried to re-acquire the mutex.
-        waitForPermitsAcquired(jobManager.getMutexSemaphores(), m_clientSession, 4); // 4 = job1(re-acquiring), job2(owner), job3, job4
-        protocol.add("running-job-2 (b)");
+        protocol.add("running-job-2");
       }
 
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
 
+    // Job-3
     IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add("running-job-3");
-        job3RunningLatch.countDownAndBlock();
+        protocol.add("running-job-3 (a)");
+
+        BC.setBlocking(false);
+
+        // Wait until job-1 tried to re-acquire the mutex.
+        waitForPermitsAcquired(jobManager.getMutexSemaphores(), m_clientSession, 4); // 4 = job1(re-acquiring), job3(owner), job4, job5
+        protocol.add("running-job-3 (b)");
 
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
 
+    // Job-4
     IFuture<Void> future4 = jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("running-job-4");
 
+        try {
+          job4RunningLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("job-4 [interrupted]");
+        }
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-4"));
 
-    jobsScheduledLatch.countDown(); // notify that all jobs are scheduled.
+    // Job-5
+    IFuture<Void> future5 = jobManager.schedule(new IRunnable() {
 
-    assertTrue(job3RunningLatch.await());
-    assertFalse(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 is pending
-    assertFalse(jobManager.isDone(new AlwaysFilter<IFuture<?>>())); // job-4 is pending
+      @Override
+      public void run() throws Exception {
+        protocol.add("running-job-5");
+      }
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-5"));
+
+    assertTrue(job4RunningLatch.await());
+    assertFalse(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 and job-5 are pending
+    assertFalse(jobManager.isDone(new AlwaysFilter<IFuture<?>>())); // job-4 and job-5 are pending
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("running-job-1 (a)");
-    expectedProtocol.add("running-job-2 (a)");
-    expectedProtocol.add("running-job-2 (b)");
+    expectedProtocol.add("running-job-3 (a)");
+    expectedProtocol.add("running-job-3 (b)");
     expectedProtocol.add("running-job-1 (b)");
     expectedProtocol.add("running-job-1 (e) [model-thread]");
-    expectedProtocol.add("running-job-3");
+    expectedProtocol.add("running-job-4");
     assertEquals(expectedProtocol, protocol);
 
     assertFalse(future1.isCancelled());
     assertTrue(future1.isDone());
 
-    assertFalse(future2.isCancelled());
+    assertTrue(future2.isCancelled());
     assertTrue(future2.isDone());
 
     assertFalse(future3.isCancelled());
-    assertFalse(future3.isDone());
+    assertTrue(future3.isDone());
 
     assertFalse(future4.isCancelled());
     assertFalse(future4.isDone());
 
-    // cancel job3
-    future3.cancel(true);
+    assertFalse(future5.isCancelled());
+    assertFalse(future5.isDone());
+
+    // cancel job4
+    future4.cancel(true);
     assertTrue(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
-    expectedProtocol.add("running-job-4");
+    expectedProtocol.add("job-4 [interrupted]");
+    expectedProtocol.add("running-job-5");
     assertEquals(expectedProtocol, protocol);
 
     assertTrue(jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
 
-    assertTrue(future3.isCancelled());
-    assertTrue(future3.isDone());
-
-    assertFalse(future4.isCancelled());
+    assertTrue(future4.isCancelled());
     assertTrue(future4.isDone());
+
+    assertFalse(future5.isCancelled());
+    assertTrue(future5.isDone());
   }
 
-  public void runTestBlockingConditionMultipleFlat(final IBlockingCondition BC) throws InterruptedException {
+  private void runTestBlockingConditionMultipleFlat(final IBlockingCondition BC) throws InterruptedException {
     BC.setBlocking(true);
 
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
@@ -929,7 +878,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-1"));
 
     final IFuture<Void> future2 = ModelJobs.schedule(new IRunnable() {
 
@@ -939,7 +888,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-2"));
 
     final IFuture<Void> future3 = ModelJobs.schedule(new IRunnable() {
 
@@ -949,7 +898,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-3"));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -957,7 +906,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("job-4-running");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-4"));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -1002,7 +951,7 @@ public class MutualExclusionTest {
 
         protocol.add("job-5-ending");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-5"));
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 

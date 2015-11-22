@@ -155,6 +155,17 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
       m_thread.setName(buildThreadName());
     }
 
+    /**
+     * Invoke to reset the {@link ThreadInfo}.
+     */
+    public synchronized void reset() {
+      m_currentThreadName = null;
+      m_currentJobName = null;
+      m_currentJobState = JobState.Idle;
+      m_currentJobStateInfo = null;
+      m_thread.setName(buildThreadName());
+    }
+
     private String buildThreadName() {
       final StringWriter writer = new StringWriter();
       final PrintWriter out = new PrintWriter(writer);

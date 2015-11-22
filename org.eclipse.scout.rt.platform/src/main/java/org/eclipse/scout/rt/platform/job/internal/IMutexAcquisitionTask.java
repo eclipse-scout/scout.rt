@@ -13,17 +13,15 @@ package org.eclipse.scout.rt.platform.job.internal;
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
- * A task of this type is notified if being rejected by the executor. This may occur when being scheduled and no more
- * threads or queue slots are available, or upon shutdown of the executor.
+ * This task is used to compete for the mutex.
  *
  * @since 5.1
  */
 @Internal
-public interface IRejectable {
+public interface IMutexAcquisitionTask {
 
   /**
-   * Method invoked if this task was rejected by the executor from being scheduled. When being invoked and this task is
-   * a mutual exclusive task, it is the mutex owner.
+   * Invoke to pass the mutex to this acquisition task.
    */
-  void reject();
+  void mutexAcquired();
 }

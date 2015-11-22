@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.slf4j.Logger;
@@ -133,9 +134,9 @@ public class BlockingCondition implements IBlockingCondition {
           .withBlockingCondition(this));
 
       // Pass the mutex to next task if being a mutex task.
-      if (jobTask.isMutexTask()) {
+      if (jobTask.getMutexObject() != null) {
         Assertions.assertTrue(jobTask.isMutexOwner(), "Unexpected inconsistency: Current FutureTask must be mutex owner [task=%s, thread=%s]", jobTask, Thread.currentThread().getName());
-        m_jobManager.getMutexSemaphores().passMutexToNextTask(jobTask);
+        m_jobManager.getMutexSemaphores().passMutexToNextTask(jobTask.getMutexObject(), jobTask);
       }
 
       blockUntilSignaledOrTimeout(timeout, unit, new IBlockingGuard() {
@@ -173,8 +174,8 @@ public class BlockingCondition implements IBlockingCondition {
     }
 
     // Acquire the mutex anew if being a mutex task.
-    if (jobTask.isMutexTask()) {
-      m_jobManager.getMutexSemaphores().acquire(jobTask); // Wait until the mutex is acquired.
+    if (jobTask.getMutexObject() != null) {
+      m_jobManager.getMutexSemaphores().acquireMutex(jobTask, Position.HEAD); // Wait until the mutex is acquired.
     }
 
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED)

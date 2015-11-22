@@ -59,7 +59,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IRejectableRunnable {
 
   protected final JobManager m_jobManager;
   protected final RunMonitor m_runMonitor;
@@ -109,7 +109,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   @Override
   public final void reject() {
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED).withFuture(this));
-    cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
+    cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
     m_jobManager.passMutexIfMutexOwner(this);
   }
 
@@ -156,14 +156,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return m_input.getSchedulingRule();
   }
 
-  @Override
+  /**
+   * @return the mutex object, or <code>null</code> if not being a mutual exclusive task.
+   */
   public Object getMutexObject() {
     return m_input.getMutex();
-  }
-
-  @Override
-  public boolean isMutexTask() {
-    return getMutexObject() != null;
   }
 
   /**

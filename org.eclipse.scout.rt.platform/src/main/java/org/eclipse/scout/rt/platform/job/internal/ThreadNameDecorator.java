@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * Processor to decorate the thread-name of the worker-thread during the time of executing a job.
  * <p>
  * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
- * {@link Callable}.
+ * {@link Callable}. #d
  *
  * @since 5.1
  */
@@ -44,6 +44,9 @@ public class ThreadNameDecorator<RESULT> implements IInvocationDecorator<RESULT>
   @Override
   public IUndecorator<RESULT> decorate() throws Exception {
     final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
+    if (currentThreadInfo == null) {
+      return null;
+    }
 
     // Install job listener to decorate the thread name
     final IJobListenerRegistration listenerRegistration = IFuture.CURRENT.get().addListener(
@@ -79,7 +82,7 @@ public class ThreadNameDecorator<RESULT> implements IInvocationDecorator<RESULT>
       @Override
       public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
         listenerRegistration.dispose();
-        currentThreadInfo.updateNameAndState(null, null, JobState.Idle);
+        currentThreadInfo.reset();
       }
     };
   }

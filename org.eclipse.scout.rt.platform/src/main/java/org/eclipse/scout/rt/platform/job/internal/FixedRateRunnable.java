@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2
@@ -27,14 +30,18 @@ import java.util.concurrent.TimeUnit;
  * @see ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)
  * @see FixedDelayRunnable
  */
-class FixedRateRunnable implements Runnable {
+class FixedRateRunnable implements IRejectableRunnable {
 
+  private final ExecutorService m_executor;
   private final DelayedExecutor m_delayedExecutor;
+  private final MutexSemaphores m_mutexSemaphores;
   private final JobFutureTask<?> m_futureTask;
   private final long m_periodNanos;
 
-  public FixedRateRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<?> futureTask, final long periodMillis) {
+  public FixedRateRunnable(final ExecutorService executor, final DelayedExecutor delayedExecutor, final MutexSemaphores mutexSemaphores, final JobFutureTask<?> futureTask, final long periodMillis) {
+    m_executor = executor;
     m_delayedExecutor = delayedExecutor;
+    m_mutexSemaphores = mutexSemaphores;
     m_futureTask = futureTask;
     m_periodNanos = TimeUnit.MILLISECONDS.toNanos(periodMillis);
   }
@@ -48,8 +55,39 @@ class FixedRateRunnable implements Runnable {
 
     final long startTimeNanos = System.nanoTime();
 
-    m_futureTask.run();
+    if (m_futureTask.getMutexObject() == null) {
+      m_futureTask.run();
+      scheduleNextExecution(startTimeNanos);
+    }
+    else {
+      m_mutexSemaphores.competeForMutex(m_futureTask, Position.TAIL, new IMutexAcquiredCallback() {
 
+        @Override
+        public void onMutexAcquired() {
+          m_executor.execute(new IRejectableRunnable() {
+
+            @Override
+            public void run() {
+              m_futureTask.run();
+              scheduleNextExecution(startTimeNanos);
+            }
+
+            @Override
+            public void reject() {
+              m_futureTask.reject();
+            }
+          });
+        }
+      });
+    }
+  }
+
+  @Override
+  public void reject() {
+    m_futureTask.reject();
+  }
+
+  private void scheduleNextExecution(final long startTimeNanos) {
     // re-schedule the task if still in 'done-state'.
     if (!m_futureTask.isDone()) {
       final long elapsedNanos = System.nanoTime() - startTimeNanos;

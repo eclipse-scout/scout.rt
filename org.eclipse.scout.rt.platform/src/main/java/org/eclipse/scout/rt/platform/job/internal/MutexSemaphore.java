@@ -38,10 +38,10 @@ public class MutexSemaphore {
   private static final Logger LOG = LoggerFactory.getLogger(MutexSemaphore.class);
 
   private volatile Object m_mutexObject;
-  private final Deque<IMutexTask<?>> m_pendingQueue;
+  private final Deque<IMutexAcquisitionTask> m_pendingQueue;
 
   private volatile int m_permits;
-  private volatile IMutexTask<?> m_mutexOwner;
+  private volatile Object m_mutexOwner;
 
   public MutexSemaphore() {
     m_permits = 0;
@@ -60,39 +60,54 @@ public class MutexSemaphore {
     return m_permits;
   }
 
-  protected boolean isMutexOwner(final IMutexTask<?> task) {
+  protected boolean isMutexOwner(final Object task) {
     return m_mutexOwner == task;
   }
 
-  protected IMutexTask<?> getMutexOwner() {
+  protected Object getMutexOwner() {
     return m_mutexOwner;
   }
 
-  protected boolean tryAcquireElseOffer(final IMutexTask<?> task, final boolean tail) {
+  /**
+   * Tries to acquire the mutex, either immediately if free, or puts the acquisition task into the queue of competing
+   * tasks.
+   *
+   * @param position
+   *          position in the queue of competing tasks.
+   * @param task
+   *          the mutex acquisition task to acquire the mutex for.
+   * @return <code>true</code> if the mutex was free and was acquired for the given acquisition task.
+   */
+  protected boolean tryAcquireElseOffer(final Position position, final IMutexAcquisitionTask task) {
     if (m_permits++ == 0) {
       m_mutexOwner = task;
       return true;
     }
     else {
-      if (tail) {
-        m_pendingQueue.offerLast(task);
-      }
-      else {
-        m_pendingQueue.offerFirst(task);
+      switch (position) {
+        case HEAD:
+          m_pendingQueue.offerFirst(task);
+          break;
+        case TAIL:
+          m_pendingQueue.offerLast(task);
+          break;
+        default:
+          throw new IllegalArgumentException();
       }
       return false;
     }
   }
 
-  protected void replaceMutexOwner(final IMutexTask<?> currentMutexOwner, final IMutexTask<?> newMutexOwner) {
+  protected void replaceMutexOwner(final IMutexAcquisitionTask currentMutexOwner, final JobFutureTask<?> newMutexOwner) {
     if (!isMutexOwner(currentMutexOwner)) {
       LOG.error("Unexpected inconsistency: current task must be mutex-owner [currentTask={}, newMutexOwner={}, currentMutexOwner={}]", new Object[]{currentMutexOwner, newMutexOwner, getMutexOwner()});
     }
     m_mutexOwner = newMutexOwner;
   }
 
-  protected IMutexTask<?> releaseAndPoll() {
-    m_mutexOwner = m_pendingQueue.poll();
+  protected IMutexAcquisitionTask releaseAndPoll() {
+    final IMutexAcquisitionTask mutexOwner = m_pendingQueue.poll();
+    m_mutexOwner = mutexOwner;
 
     m_permits--;
 
@@ -101,7 +116,7 @@ public class MutexSemaphore {
       m_permits = 0;
     }
 
-    return m_mutexOwner;
+    return mutexOwner;
   }
 
   protected void clear() {
@@ -117,5 +132,9 @@ public class MutexSemaphore {
     builder.attr("permits", m_permits);
     builder.attr("pendingQueue", m_pendingQueue);
     return builder.toString();
+  }
+
+  public static enum Position {
+    HEAD, TAIL;
   }
 }

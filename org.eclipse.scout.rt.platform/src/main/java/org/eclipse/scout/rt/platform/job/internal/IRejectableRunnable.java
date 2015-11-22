@@ -10,28 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.concurrent.RunnableFuture;
-
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
- * A task that might be executed in mutually exclusive manner.
+ * Runnable to be given to the executor, and which is notified if being rejected by the executor. This may occur when
+ * being scheduled and no more threads or queue slots are available, or upon shutdown of the executor.
  *
  * @since 5.1
  */
 @Internal
-interface IMutexTask<RESULT> extends RunnableFuture<RESULT> {
+public interface IRejectableRunnable extends Runnable {
 
   /**
-   * Indicates whether this task is to be executed in mutually exclusive manner.
-   *
-   * @return <code>true</code> if this is a mutex task, meaning to be executed in sequence among tasks with the same
-   *         mutex object.
+   * Rejects this runnable from being executed. If this task is a mutual exclusive task, this task continues to be the
+   * mutex owner.
    */
-  boolean isMutexTask();
-
-  /**
-   * Returns the mutex object, or <code>null</code> if not being a mutually exclusive task.
-   */
-  Object getMutexObject();
+  void reject();
 }

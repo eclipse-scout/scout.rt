@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically with the given 'fixed-delay' upon completion of its
@@ -26,14 +29,18 @@ import java.util.concurrent.TimeUnit;
  * @see ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)
  * @see FixedRateRunnable
  */
-class FixedDelayRunnable implements Runnable {
+class FixedDelayRunnable implements IRejectableRunnable {
 
+  private final ExecutorService m_executor;
   private final DelayedExecutor m_delayedExecutor;
+  private final MutexSemaphores m_mutexSemaphores;
   private final JobFutureTask<?> m_futureTask;
   private final long m_delayMillis;
 
-  public FixedDelayRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<?> futureTask, final long delayMillis) {
+  public FixedDelayRunnable(final ExecutorService executor, final DelayedExecutor delayedExecutor, final MutexSemaphores mutexSemaphores, final JobFutureTask<?> futureTask, final long delayMillis) {
+    m_executor = executor;
     m_delayedExecutor = delayedExecutor;
+    m_mutexSemaphores = mutexSemaphores;
     m_futureTask = futureTask;
     m_delayMillis = delayMillis;
   }
@@ -45,8 +52,39 @@ class FixedDelayRunnable implements Runnable {
       return;
     }
 
-    m_futureTask.run();
+    if (m_futureTask.getMutexObject() == null) {
+      m_futureTask.run();
+      scheduleNextExecution();
+    }
+    else {
+      m_mutexSemaphores.competeForMutex(m_futureTask, Position.TAIL, new IMutexAcquiredCallback() {
 
+        @Override
+        public void onMutexAcquired() {
+          m_executor.execute(new IRejectableRunnable() {
+
+            @Override
+            public void run() {
+              m_futureTask.run();
+              scheduleNextExecution();
+            }
+
+            @Override
+            public void reject() {
+              m_futureTask.reject();
+            }
+          });
+        }
+      });
+    }
+  }
+
+  @Override
+  public void reject() {
+    m_futureTask.reject();
+  }
+
+  private void scheduleNextExecution() {
     // re-schedule the task if still in 'done-state'.
     if (!m_futureTask.isDone()) {
       m_delayedExecutor.schedule(this, m_delayMillis, TimeUnit.MILLISECONDS);
