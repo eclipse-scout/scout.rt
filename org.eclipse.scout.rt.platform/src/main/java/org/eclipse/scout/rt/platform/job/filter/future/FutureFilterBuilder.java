@@ -182,4 +182,20 @@ public class FutureFilterBuilder {
     andMatch(new RunContextFutureFilter(runContextClazz));
     return this;
   }
+
+  /**
+   * To match all jobs which are tagged with the given execution hint.
+   */
+  public FutureFilterBuilder andMatchExecutionHint(final Object executionHint) {
+    andMatch(new ExecutionHintFutureFilter(executionHint));
+    return this;
+  }
+
+  /**
+   * To match all jobs which are not tagged with the given execution hint.
+   */
+  public FutureFilterBuilder andMatchNotExecutionHint(final Object hint) {
+    andMatchNot(new ExecutionHintFutureFilter(hint));
+    return this;
+  }
 }

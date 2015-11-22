@@ -243,4 +243,20 @@ public interface IFuture<RESULT> extends ICancellable {
    *         unregister the listener.
    */
   IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
+
+  /**
+   * Associates this {@link IFuture} with an execution hint, which can be evaluated by filters like when listening to
+   * job lifecycle events, or when waiting for job completion, or by the job manager.
+   */
+  void addExecutionHint(Object hint);
+
+  /**
+   * Removes an execution hint from this {@link IFuture}. Has no effect if not associated yet.
+   */
+  void removeExecutionHint(Object hint);
+
+  /**
+   * Returns, whether the given 'execution hint' is associated with this {@link IFuture}.
+   */
+  boolean containsExecutionHint(Object hint);
 }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
@@ -59,6 +61,8 @@ public class JobInput {
   protected long m_schedulingDelay;
   protected long m_periodicDelay;
   protected int m_schedulingRule = SCHEDULING_RULE_SINGLE_EXECUTION;
+
+  protected Set<Object> m_executionHints = new HashSet<>();
 
   public String getName() {
     return m_name;
@@ -235,6 +239,19 @@ public class JobInput {
     return this;
   }
 
+  public Set<Object> getExecutionHints() {
+    return m_executionHints;
+  }
+
+  /**
+   * Associates the job with an execution hint, which can be evaluated by filters like when listening to job lifecycle
+   * events, or when waiting for job completion, or by the job manager.
+   */
+  public JobInput withExecutionHint(final Object hint) {
+    m_executionHints.add(hint);
+    return this;
+  }
+
   /**
    * Returns the scheduling rule to run the job, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
    * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
@@ -256,6 +273,7 @@ public class JobInput {
     builder.attr("schedulingDelay", m_schedulingDelay);
     builder.attr("periodicDelay", m_periodicDelay);
     builder.attr("runContext", m_runContext);
+    builder.attr("executionHints", m_executionHints);
 
     return builder.toString();
   }
@@ -274,6 +292,7 @@ public class JobInput {
     copy.m_schedulingDelay = m_schedulingDelay;
     copy.m_periodicDelay = m_periodicDelay;
     copy.m_schedulingRule = m_schedulingRule;
+    copy.m_executionHints = new HashSet<>(m_executionHints);
 
     return copy;
   }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -70,6 +71,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final DonePromise<RESULT> m_donePromise;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
+  protected Set<Object> m_executionHints = new HashSet<>();
+
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final InvocationChain<RESULT> invocationChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
 
@@ -88,6 +91,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
     m_jobManager.registerFuture(this);
     m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
+
+    m_executionHints.addAll(input.getExecutionHints());
 
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(this));
   }
@@ -170,12 +175,26 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return m_jobManager.isMutexOwner(this);
   }
 
-  /**
-   * @return the {@link JobInput} associated with this Future.
-   */
   @Override
   public JobInput getJobInput() {
     return m_input;
+  }
+
+  @Override
+  public void addExecutionHint(final Object executionHint) {
+    m_executionHints.add(executionHint);
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+  }
+
+  @Override
+  public void removeExecutionHint(final Object executionHint) {
+    m_executionHints.remove(executionHint);
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+  }
+
+  @Override
+  public boolean containsExecutionHint(final Object executionHint) {
+    return m_executionHints.contains(executionHint);
   }
 
   /**

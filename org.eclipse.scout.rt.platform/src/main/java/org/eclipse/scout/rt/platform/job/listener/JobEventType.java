@@ -60,5 +60,9 @@ public enum JobEventType {
    *
    * @see IBlockingCondition
    */
-  RESUMED
+  RESUMED,
+  /**
+   * Indicates a change in the execution hints of a job.
+   */
+  EXECUTION_HINT_CHANGED
 }

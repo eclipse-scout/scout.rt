@@ -71,7 +71,8 @@ public class FutureSet {
     m_listenerRegistration = jobManager.addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(
             JobEventType.BLOCKED,
-            JobEventType.UNBLOCKED)
+            JobEventType.UNBLOCKED,
+            JobEventType.EXECUTION_HINT_CHANGED)
         .toFilter(),
         new IJobListener() {
           @Override

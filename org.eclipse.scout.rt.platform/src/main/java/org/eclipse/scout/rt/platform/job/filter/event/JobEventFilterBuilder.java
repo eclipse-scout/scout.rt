@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.filter.future.ExecutionHintFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameRegexFutureFilter;
@@ -185,6 +186,22 @@ public class JobEventFilterBuilder {
    */
   public JobEventFilterBuilder andMatchRunContext(final Class<? extends RunContext> runContextClazz) {
     andMatch(new FutureFilterWrapperJobEventFilter(new RunContextFutureFilter(runContextClazz)));
+    return this;
+  }
+
+  /**
+   * To match all events related to jobs tagged with the given execution hint.
+   */
+  public JobEventFilterBuilder andMatchExecutionHint(final Object hint) {
+    andMatch(new FutureFilterWrapperJobEventFilter(new ExecutionHintFutureFilter(hint)));
+    return this;
+  }
+
+  /**
+   * To match all events related to jobs not tagged with the given execution hint.
+   */
+  public JobEventFilterBuilder andMatchNotExecutionHint(final Object hint) {
+    andMatchNot(new FutureFilterWrapperJobEventFilter(new ExecutionHintFutureFilter(hint)));
     return this;
   }
 
