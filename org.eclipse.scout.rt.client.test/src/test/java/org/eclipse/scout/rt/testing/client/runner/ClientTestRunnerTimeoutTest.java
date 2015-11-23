@@ -75,6 +75,7 @@ public class ClientTestRunnerTimeoutTest {
         if (f.getException() != null && f.getException().getCause() != null) {
           sb.append("Cause:");
           sb.append(f.getException().getCause());
+          sb.append(f.getException().getCause().getStackTrace());
         }
       }
       Assert.fail(sb.toString());
