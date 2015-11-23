@@ -859,31 +859,6 @@
     });
   };
 
-  /**
-   * Sets the cursor style of the jQuery object to 'wait' or 'default', depending on the
-   * argument 'wait'.
-   *
-   * This is a workaround needed for Chrome. Usually, it would be sufficient to simply add
-   * or remove a CSS class with the desired cursor style. However, due to a bug in Chrome,
-   * the cursor change is not triggered until the mouse is moved. Because this behavior
-   * could be very confusing, this function implements a workaround. The target cursor
-   * style is set within a setTimeout() call, while the cursor is first set to a different
-   * value. This ensures that Chrome is notified about the cursor change.
-   *
-   * Chrome bug: https://code.google.com/p/chromium/issues/detail?id=26723
-   */
-  $.fn.setMouseCursorWait = function(wait, defaultCursorStyle) {
-    defaultCursorStyle = defaultCursorStyle || 'default';
-    var cursor1 = (wait ? defaultCursorStyle : 'wait');
-    var cursor2 = (wait ? 'wait' : defaultCursorStyle);
-
-    this.css('cursor', cursor1);
-    setTimeout(function() {
-      this.css('cursor', cursor2);
-    }.bind(this));
-    return this;
-  };
-
   $.fn.backupSelection = function() {
     var field = this[0];
     if (field && field === this.activeElement(true)) {

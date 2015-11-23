@@ -37,9 +37,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
   this._glassPaneRenderer.renderGlassPanes();
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
-    $glassPane
-      .addClass('busy')
-      .setMouseCursorWait(true);
+    $glassPane.addClass('busy');
   });
 
   // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout)
@@ -96,9 +94,7 @@ scout.BusyIndicator.prototype._remove = function() {
 
   // Remove glasspane
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
-    $glassPane
-      .removeClass('busy')
-      .setMouseCursorWait(false);
+    $glassPane.removeClass('busy');
   });
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);

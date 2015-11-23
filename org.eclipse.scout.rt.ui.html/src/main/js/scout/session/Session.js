@@ -887,12 +887,12 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
   if (applicationLoading) {
     this._applicationLoadingTimeoutId = setTimeout(function() {
       if (!this.desktop || !this.desktop.rendered) {
-        this.$entryPoint.appendDiv('application-loading').setMouseCursorWait(true).hide().fadeIn();
+        this.$entryPoint.appendDiv('application-loading').hide().fadeIn();
       }
     }.bind(this), 500);
   } else {
     clearTimeout(this._applicationLoadingTimeoutId);
-    this.$entryPoint.children('.application-loading').setMouseCursorWait(false).remove();
+    this.$entryPoint.children('.application-loading').remove();
   }
 };
 
