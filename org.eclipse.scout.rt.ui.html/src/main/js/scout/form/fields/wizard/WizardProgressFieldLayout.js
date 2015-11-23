@@ -18,7 +18,10 @@ scout.WizardProgressFieldLayout.prototype.layout = function($container) {
 
   // Explicitly set width of body to scrollWidth because container is scrollable. Otherwise,
   // the body would have the wrong size because it has "overflow: hidden" set.
-  this.formField.$wizardStepsBody.width(this.formField.$wizardStepsBody[0].scrollWidth);
+  var $body = this.formField.$wizardStepsBody;
+  $body.width('auto'); // reset previously set width to ensure 'scrollWidth' returns the preferred size
+  var bodyWidth = $body[0].scrollWidth;
+  $body.width(bodyWidth);
 
   this.formField.scrollToActiveStep();
 };

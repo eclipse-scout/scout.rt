@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 .wrapped-form-field > .form {
+  background-color: transparent;
 
   /* Reset padding set in GroupBox.css */
   & > .root-group-box > .group-box-body,

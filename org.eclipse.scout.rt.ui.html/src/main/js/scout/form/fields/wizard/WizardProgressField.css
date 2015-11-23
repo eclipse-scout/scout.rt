@@ -14,74 +14,59 @@
 @wizard-progress-separator-width: 10px;
 @wizard-progress-separator-line-width: 1px;
 
-@wizard-progress-step-background-color: @palette-gray-3;
-@wizard-progress-step-foreground-color: @text-color;
-@wizard-progress-step-separator-color: @palette-gray-5;
-@wizard-progress-active-step-background-color: @item-selection-background-color;
-@wizard-progress-active-step-foreground-color: @wizard-progress-step-foreground-color;
-@wizard-progress-active-step-separator-color: @wizard-progress-step-separator-color;
-@wizard-progress-disabled-step-background-color: @background-color;
-@wizard-progress-disabled-step-foreground-color: @text-disabled-color;
+@wizard-progress-border-color: @border-color;
+@wizard-step-after-current-background-color: @palette-blue-0;
+@wizard-step-after-current-color: @wizard-step-default-color;
+@wizard-step-after-current-separator-color: @wizard-step-default-separator-color;
+@wizard-step-before-current-background-color: @palette-blue-0;
+@wizard-step-before-current-color: @wizard-step-default-color;
+@wizard-step-before-current-separator-color: @border-color;
+@wizard-step-current-background-color: @active-inverted-background-color;
+@wizard-step-current-color: @active-inverted-color;
+@wizard-step-current-separator-color: @wizard-step-default-separator-color;
+@wizard-step-default-background-color: @control-background-color;
+@wizard-step-default-color: @control-color;
+@wizard-step-default-separator-color: @border-color;
+@wizard-step-disabled-background-color: @wizard-step-default-background-color;
+@wizard-step-disabled-color: @palette-gray-6;
+@wizard-step-disabled-separator-color: @wizard-step-default-separator-color;
+
+#scout {
+
+  .wizard-step-color(@color) {
+    color: @color;
+  }
+
+  .wizard-step-background-color(@background-color) {
+    background-color: @background-color;
+
+    & .wizard-step-separator::after {
+      border-left-color: @background-color;
+    }
+  }
+
+  .wizard-step-separator-color(@separator-color) {
+    & .wizard-step-separator::before {
+      border-left-color: @separator-color;
+    }
+  }
+}
 
 .wizard-steps {
   overflow: hidden;
   margin-left: @mandatory-indicator-width;
   margin-right: 0;
   padding-bottom: @scrollbar-margin + (2 * @scrollbar-side-margin);
-
-  /* If wizard progress field is in the root-group-box and there is a menubar, */
-  /* disable the top-border (because the menubar already has a border) */
-  .root-group-box > .menubar.main-menubar ~ .group-box-body > .wizard-progress-field > & {
-    border-top-color: transparent;
-    margin-top: -@wizard-progress-border-width;
-    padding-top: 0;
-  }
-
-  /* If wizard progress field is in the root-group-box, use negative margins to */
-  /* draw it up to the border of the form (like the main-menubar) */
-  .root-group-box > .group-box-body > .wizard-progress-field > & {
-    margin-left: -@root-group-box-padding-left;
-    margin-right: -@root-group-box-padding-right;
-    padding-top: @group-margin-top;
-
-    & > .wizard-steps-body > .wizard-step.first > .wizard-step-content {
-      padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
-    }
-    & > .wizard-steps-body > .wizard-step.last > .wizard-step-content {
-      padding-right: @root-group-box-padding-right;
-    }
-  }
 }
 
 .wizard-steps-body {
   height: @wizard-progress-height;
   overflow: hidden;
   white-space: nowrap; /* Allows the last wizard-step to be 100% without line break */
-  border-top: @wizard-progress-border-width solid @border-color;
-  border-bottom: @wizard-progress-border-width solid @border-color;
+  border: @wizard-progress-border-width solid @wizard-progress-border-color;
   /* This creates a new stacking context: */
   position: relative;
   z-index: 0;
-
-  /* If wizard progress field is in the root-group-box and there is a menubar, */
-  /* disable the top-border (because the menubar already has a border) */
-  /*.root-group-box > .menubar.main-menubar ~ .group-box-body > .wizard-progress-field > .wizard-steps > & {
-    border-top-color: transparent;
-    margin-top: -@wizard-progress-border-width;
-  }*/
-
-  /* If wizard progress field is in the root-group-box, use negative margins to */
-  /* draw it up to the border of the form (like the main-menubar) */
-  /*.root-group-box > .group-box-body > .wizard-progress-field > .wizard-steps > & {
-    margin-left: -@root-group-box-padding-left;
-    margin-right: -@root-group-box-padding-right;
-    border-left: 0;
-    border-right: 0;
-
-    & > .wizard-step.first > .wizard-step-content {
-      padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
-    }
-  }*/
 }
 
 .wizard-step {
@@ -89,53 +74,11 @@
   height: @wizard-progress-height - (2 * @wizard-progress-border-width);
   line-height: @wizard-progress-height - (2 * @wizard-progress-border-width);
   position: relative;
-
-  &:last-child {
-    & > .wizard-step-content {
-      max-width: none;
-    }
-  }
-
-  /* Step types */
-  color: @wizard-progress-step-foreground-color;
-  background-color: @wizard-progress-step-background-color;
-  &.disabled {
-    color: @wizard-progress-disabled-step-foreground-color;
-    background-color: @wizard-progress-disabled-step-background-color;
-
-    & .wizard-step-separator::after {
-      /* border-left-color must match background color of .wizard-step */
-      border-left-color: @wizard-progress-disabled-step-background-color;
-    }
-  }
-  &.active {
-    color: @wizard-progress-active-step-foreground-color;
-    background-color: @wizard-progress-active-step-background-color;
-
-    & .wizard-step-separator::after {
-      /* border-left-color must match background color of .wizard-step */
-      border-left-color: @wizard-progress-active-step-background-color;
-    }
-    & .wizard-step-separator::before {
-      border-left-color: @wizard-progress-active-step-separator-color;
-    }
-  }
-  &.before-active {
-    & .wizard-step-separator::before {
-      border-left-color: @wizard-progress-active-step-separator-color;
-    }
-  }
-  &.all-before-active {
-  }
-  &.all-after-active {
-    color: @wizard-progress-disabled-step-foreground-color;
-    background-color: @wizard-progress-disabled-step-background-color;
-
-    & .wizard-step-separator::after {
-      /* border-left-color must match background color of .wizard-step */
-      border-left-color: @wizard-progress-disabled-step-background-color;
-    }
-  }
+  color: @wizard-step-default-color;
+  background-color: @wizard-step-default-background-color;
+  /* Spacing */
+  padding-left: @wizard-progress-separator-width + @wizard-progress-content-h-padding;
+  padding-right: @wizard-progress-content-h-padding;
 
   /* Step content */
   & > .wizard-step-content {
@@ -146,10 +89,6 @@
     margin-top: -2px; /* TODO BSH Why is this necessary? inline-block seems to add some implicit margins, which causes the block not to be vertically centered */
     min-height: 30px;
 
-    /* Spacing */
-    padding-left: @wizard-progress-separator-width + @wizard-progress-content-h-padding;
-    padding-right: @wizard-progress-content-h-padding;
-
     & > .wizard-step-title {
       #scout.overflow-ellipsis-nowrap();
       font-weight: bold;
@@ -158,8 +97,11 @@
       #scout.overflow-ellipsis-nowrap();
     }
   }
-  &:first-child > .wizard-step-content {
+  &.first {
     padding-left: @wizard-progress-content-h-padding;
+  }
+  &.last > .wizard-step-content {
+    max-width: none;
   }
 
   /* Step separator */
@@ -182,14 +124,13 @@
     }
     &::after {
       /* border-left-color must match background color of .wizard-step */
-      border-left-color: @wizard-progress-step-background-color;
+      border-left-color: @wizard-step-default-background-color;
     }
     &::before {
       margin-left: @wizard-progress-separator-line-width;
-      border-left-color: @wizard-progress-step-separator-color;
+      border-left-color: @wizard-step-default-separator-color;
     }
   }
-
 
   /* Hover state */
   &.action-enabled:hover {
@@ -198,5 +139,67 @@
     & > .wizard-step-content > .wizard-step-title {
       text-decoration: underline;
     }
+  }
+
+  /* Step types */
+  &.disabled {
+    #scout.wizard-step-color(@wizard-step-disabled-color);
+    #scout.wizard-step-background-color(@wizard-step-disabled-background-color);
+    #scout.wizard-step-separator-color(@wizard-step-disabled-separator-color);
+  }
+  &:not(.disabled) {
+    &.current {
+      #scout.wizard-step-color(@wizard-step-current-color);
+      #scout.wizard-step-background-color(@wizard-step-current-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-current-separator-color);
+    }
+    &.left-of-current {
+      #scout.wizard-step-separator-color(@wizard-step-current-separator-color);
+    }
+    &.before-current {
+      #scout.wizard-step-color(@wizard-step-before-current-color);
+      #scout.wizard-step-background-color(@wizard-step-before-current-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-before-current-separator-color);
+    }
+    &.after-current {
+      #scout.wizard-step-color(@wizard-step-after-current-color);
+      #scout.wizard-step-background-color(@wizard-step-after-current-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-after-current-separator-color);
+    }
+  }
+}
+
+/* Special rules for wizard container form */
+.form.wizard-container-form > .root-group-box {
+
+  /* Remove the menubar border, instead the .wizard-steps's border will be used */
+  & > .main-menubar {
+    border-bottom: 0;
+  }
+
+  /* If wizard progress field is in the root-group-box, use negative margins to */
+  /* draw it up to the border of the form (like the main-menubar itself). */
+  & > .group-box-body > .wizard-progress-field > .wizard-steps {
+    margin-left: -@root-group-box-padding-left;
+    margin-right: -@root-group-box-padding-right;
+
+    /* Align first and last step content with form fields */
+    & > .wizard-steps-body {
+      border-left: 0;
+      border-right: 0;
+
+      & > .wizard-step.first {
+        padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
+      }
+      & > .wizard-step.last {
+        padding-right: @root-group-box-padding-right;
+      }
+    }
+  }
+
+  /* FIXME BSH Try to find a better solution */
+  & > .group-box-body > .group-box > .group-box-body {
+    padding-top: 0;
+    padding-bottom: @group-margin-bottom;
   }
 }

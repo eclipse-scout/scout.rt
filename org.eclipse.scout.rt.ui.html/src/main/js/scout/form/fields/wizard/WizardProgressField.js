@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.WizardProgressField = function() {
   scout.WizardProgressField.parent.call(this);
+
+  // Used to determine direction of transition ("going backward" or "going forward")
   this.previousActiveWizardStepIndex;
 };
 scout.inherits(scout.WizardProgressField, scout.FormField);
@@ -24,9 +26,15 @@ scout.WizardProgressField.prototype._render = function($parent) {
     parent: this,
     axis: 'x'
   });
-};
 
-scout.WizardProgressField.ACTIVE_STEP_SCROLL_PADDING = 20;
+  // If this field is the first field in a form's main box, mark the form as "wizard-container-form"
+  if (this.parent instanceof scout.GroupBox &&
+      this.parent.controls[0] === this &&
+      this.parent.parent instanceof scout.Form) {
+    var form = this.parent.parent;
+    form.$container.addClass('wizard-container-form');
+  }
+};
 
 scout.WizardProgressField.prototype._renderProperties = function() {
   scout.WizardProgressField.parent.prototype._renderProperties.call(this);
@@ -81,12 +89,14 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
     // TODO BSH Wizard | Add icon
   }.bind(this));
 
-  this.invalidateLayout();
+  this.invalidateLayoutTree(false);
 };
 
 scout.WizardProgressField.prototype._syncActiveWizardStepIndex = function(activeWizardStepIndex) {
   this.previousActiveWizardStepIndex = this.activeWizardStepIndex;
-  this.activeWizardStepIndex = activeWizardStepIndex;
+  // Ensure this.activeWizardStepIndex always has a value. If the server has no active step set (may
+  // happen during transition between steps), we use -1 as dummy value
+  this.activeWizardStepIndex = scout.helpers.nvl(activeWizardStepIndex, -1);
 };
 
 scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
@@ -98,25 +108,25 @@ scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
   // update background color for this.$wizardStepsBody, use same as for last step (otherwise there might be white space after last step)
   this.$wizardStepsBody.css('background-color', $wizardSteps.eq(this.wizardSteps.length - 1).css('background-color'));
 
-  this.invalidateLayout();
+  this.invalidateLayoutTree(false);
 };
 
 scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep) {
-  $wizardStep.removeClass('all-before-active before-active active all-after-active after-active');
+  $wizardStep.removeClass('current before-current after-current left-of-current right-of-current');
   var wizardStepIndex = this._wizardStepIndex($wizardStep);
   if (wizardStepIndex >= 0 && this.activeWizardStepIndex >= 0) {
     if (wizardStepIndex < this.activeWizardStepIndex) {
-      $wizardStep.addClass('all-before-active');
+      $wizardStep.addClass('before-current');
       if (wizardStepIndex === this.activeWizardStepIndex - 1) {
-        $wizardStep.addClass('before-active');
+        $wizardStep.addClass('left-of-current');
       }
     } else if (wizardStepIndex > this.activeWizardStepIndex) {
-      $wizardStep.addClass('all-after-active');
+      $wizardStep.addClass('after-current');
       if (wizardStepIndex === this.activeWizardStepIndex + 1) {
-        $wizardStep.addClass('after-active');
+        $wizardStep.addClass('right-of-current');
       }
     } else {
-      $wizardStep.addClass('active');
+      $wizardStep.addClass('current');
     }
   }
 };
@@ -142,18 +152,21 @@ scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
 };
 
 scout.WizardProgressField.prototype.scrollToActiveStep = function() {
-  var $currentStep = this.wizardSteps[this.activeWizardStepIndex].$wizardStep;
-  var scrollLeft = this.$field.scrollLeft();
-  var currentStepLeft = $currentStep.position().left;
-  var currentStepWidth = $currentStep.width();
-  var fieldWidth = this.$field.width();
+  var currentStep = this.wizardSteps[this.activeWizardStepIndex];
+  if (currentStep) {
+    var $currentStep = currentStep.$wizardStep;
+    var scrollLeft = this.$field.scrollLeft();
+    var currentStepLeft = $currentStep.position().left;
+    var currentStepWidth = $currentStep.width();
+    var fieldWidth = this.$field.width();
 
-  // If going forward, try to scroll the steps such that the center of active step is not after 75% of the available space.
-  // If going backward, try to scroll the steps such that the center of the active step is not before 25% of the available space.
-  var goingBack = (this.previousActiveWizardStepIndex > this.activeWizardStepIndex);
-  var p1 = scrollLeft + Math.floor(fieldWidth * (goingBack ? 0.25 : 0.75));
-  var p2 = currentStepLeft + Math.floor(currentStepWidth / 2);
-  if ((goingBack && p2 < p1) || (!goingBack && p2 > p1)) {
-    scout.scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1));
+    // If going forward, try to scroll the steps such that the center of active step is not after 75% of the available space.
+    // If going backward, try to scroll the steps such that the center of the active step is not before 25% of the available space.
+    var goingBack = (this.previousActiveWizardStepIndex > this.activeWizardStepIndex);
+    var p1 = scrollLeft + Math.floor(fieldWidth * (goingBack ? 0.25 : 0.75));
+    var p2 = currentStepLeft + Math.floor(currentStepWidth / 2);
+    if ((goingBack && p2 < p1) || (!goingBack && p2 > p1)) {
+      scout.scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1));
+    }
   }
 };
