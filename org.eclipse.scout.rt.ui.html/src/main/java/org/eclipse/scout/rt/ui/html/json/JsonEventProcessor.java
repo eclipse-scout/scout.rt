@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.UiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +51,9 @@ public class JsonEventProcessor {
       jsonAdapter.handleUiEvent(event);
       jsonAdapter.cleanUpEventFilters();
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
       LOG.error("Error while handling event '" + event.getType() + "' for adapter " + jsonAdapter, e);
-      throw new UiException(e);
+      throw e;
     }
   }
 }
