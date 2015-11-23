@@ -179,8 +179,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
         return "dialog";
       case IForm.DISPLAY_HINT_VIEW:
         return "view";
-      case IForm.DISPLAY_HINT_POPUP_DIALOG:
-        return "popupDialog";
       case IForm.DISPLAY_HINT_POPUP_WINDOW:
         return "popupWindow";
       default:

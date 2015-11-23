@@ -66,20 +66,18 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   String PROP_PERSPECTIVE_ID = "perspectiveId";
 
   /**
-   * Hint to render a {@link IForm} as dialog in a separate window. A dialog can be modal or non-modal.
+   * Hint to render an {@link IForm} as dialog in a separate window. A dialog can be modal or non-modal.
    */
   int DISPLAY_HINT_DIALOG = 0;
+
   /**
-   * Hint to render a {@link IForm} as pop-up window that is closed automatically once a mouse click outside the pop-up
-   * occurs.
+   * Hint to render an {@link IForm} as native (browser-) window, which can be positioned on a second screen. A
+   * popup-window can be modal or non-modal.
    */
   int DISPLAY_HINT_POPUP_WINDOW = 10;
+
   /**
-   * Hint to render a {@link IForm} as dialog that is positioned at current focus location.
-   */
-  int DISPLAY_HINT_POPUP_DIALOG = 12;
-  /**
-   * Hint to render a {@link IForm} as view. Typically, a view is not modal and has the {@link IDesktop} as its
+   * Hint to render an {@link IForm} as view. Typically, a view is not modal and has the {@link IDesktop} as its
    * {@link IDisplayParent}.
    */
   int DISPLAY_HINT_VIEW = 20;
@@ -89,10 +87,12 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * <code>true</code> for dialogs and <code>false</code> for views.
    */
   int MODALITY_HINT_AUTO = 0;
+
   /**
    * Hint to render a {@link IForm} in modal state.
    */
   int MODALITY_HINT_MODAL = 10;
+
   /**
    * Hint to render a {@link IForm} in non-modal state.
    */

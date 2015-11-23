@@ -26,7 +26,6 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 scout.Form.DisplayHint = {
   DIALOG: 'dialog',
   POPUP_WINDOW: 'popupWindow',
-  POPUP_DIALOG: 'popupDialog',
   VIEW: 'view'
 };
 

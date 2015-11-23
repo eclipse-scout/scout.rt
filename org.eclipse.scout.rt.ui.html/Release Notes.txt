@@ -637,8 +637,13 @@ RichTextField for HTML e-mails, FileChooserField for file uploads, etc.)
 
 Deleted ICustomField/AbstractCustomField and all associated classes and files.
 
-Deleted IDocumentField/AbstractDocumentField and all associated classes and files. Replaced by 
+Deleted IDocumentField/AbstractDocumentField and all associated classes and files. Replaced by
 new office integration (Word plug-in instead of embedded Word instance in Swing).
+
+AWE 23.11.2015
+Removed display-hint IForm#DISPLAY_HINT_POPUP_DIALOG. Not supported anymore. Use dialog or
+popup-window instead.
+
 
 ================================================================================================
 Known Bugs:

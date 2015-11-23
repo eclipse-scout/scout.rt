@@ -2721,7 +2721,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     switch (displayHint) {
       case DISPLAY_HINT_DIALOG:
-      case DISPLAY_HINT_POPUP_DIALOG:
       case DISPLAY_HINT_POPUP_WINDOW:
       case DISPLAY_HINT_VIEW: {
         m_displayHint = displayHint;
@@ -2733,7 +2732,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     // Update modality hint if not explicitly set yet.
-    boolean modal = (displayHint == IForm.DISPLAY_HINT_DIALOG || displayHint == IForm.DISPLAY_HINT_POPUP_DIALOG);
+    boolean modal = (displayHint == IForm.DISPLAY_HINT_DIALOG);
     m_modal.set(modal, false);
     m_displayParent.set(resolveDisplayParent(), false);
   }
