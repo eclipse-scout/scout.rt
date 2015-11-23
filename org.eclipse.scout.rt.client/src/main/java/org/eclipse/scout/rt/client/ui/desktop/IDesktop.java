@@ -726,8 +726,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   boolean isGuiAvailable();
 
-  void changeVisibilityAfterOfflineSwitch();
-
   /**
    * This method is used internally within the framework.
    * <p>

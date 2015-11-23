@@ -676,10 +676,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void changeVisibilityAfterOfflineSwitch() {
-  }
-
-  @Override
   public boolean doBeforeClosingInternal() {
     throw createUnsupportedOperationException();
   }

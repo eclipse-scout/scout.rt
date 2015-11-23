@@ -2269,10 +2269,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  @Override
-  public void changeVisibilityAfterOfflineSwitch() {
-  }
-
   /**
    * <p>
    * Default behavior of the pre-hook is to delegate the before closing call to the each desktop extension. The method
