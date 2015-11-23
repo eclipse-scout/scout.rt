@@ -65,6 +65,7 @@ scout._init = function(options) {
     return;
   }
 
+  scout.polyfills.install(window);
   scout.helpers.prepareDOM();
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor(document);

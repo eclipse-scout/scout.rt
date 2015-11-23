@@ -29,11 +29,13 @@ scout.PopupWindow.prototype._onUnload = function() {
 scout.PopupWindow.prototype._onReady = function() {
   // set container (used as document-root from callers)
   var myDocument = this.myWindow.document,
-    scoutElement = myDocument.getElementsByClassName('scout')[0],
     $myWindow = $(this.myWindow),
     $myDocument = $(myDocument);
 
-  this.$container = $(scoutElement);
+  // Install polyfills on new window
+  scout.polyfills.install(this.myWindow);
+
+  this.$container = $('.scout', myDocument);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SingleLayout());
   this.$container.height($myWindow.height());
@@ -71,9 +73,9 @@ scout.PopupWindow.prototype._onReady = function() {
   this.myWindow.onerror = this.myWindow.opener.onerror;
 };
 
-
-// FIXME AWE: (2nd screen) sollen wir auch position-changes vom window registrieren (ohne size-change)?
-// Falls ja, bräuchte es das hier: http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
+// Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
+// if we need to do that in a later release we should take a look on the SO-post below:
+// http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
 scout.PopupWindow.prototype._onResize = function() {
   var $myWindow = $(this.myWindow),
     width = $myWindow.width(),

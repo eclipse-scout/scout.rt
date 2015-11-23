@@ -22,9 +22,11 @@ scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
 
 scout.CalendarComponent.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.CalendarComponent.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-  keyStrokeContext.$bindTarget = this.session.$entryPoint; // TODO [dwi] solve issue that we do not have a $container here
-  keyStrokeContext.$scopeTarget = this.session.$entryPoint; // TODO [dwi] solve issue that we do not have a $container here
-  // FIXME AWE: (2nd screen) wrong usage of entryPoint, cannot use entryPoint from session, will not work with multiple windows
+  var entryPointFunc = function() {
+    return this.parent.$grid.entryPoint(); // TODO [dwi] solve issue that we do not have a $container here
+  }.bind(this);
+  keyStrokeContext.$bindTarget = entryPointFunc;
+  keyStrokeContext.$scopeTarget = entryPointFunc;
 };
 
 /**
