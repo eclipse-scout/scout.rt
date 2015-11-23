@@ -79,7 +79,7 @@ public class CsvHelperTest {
       HashSet<String> contextMessages = CollectionUtility.hashSet(e.getStatus().getContextMessages());
       assertTrue(contextMessages.remove("lineNr=2"));
       String fullMessage = e.getMessage() + " " + Arrays.asList(e.getStackTrace());
-      assertEquals("expected a single context message " + fullMessage, 1, contextMessages.size());
+      assertEquals("expected a single context message: " + contextMessages + " full Exception Message : " + fullMessage, 1, contextMessages.size());
       String msg = CollectionUtility.firstElement(contextMessages);
       assertFalse(msg.startsWith("colIndex="));
       assertFalse(msg.startsWith("cell="));
