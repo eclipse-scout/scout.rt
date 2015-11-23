@@ -75,7 +75,7 @@ public class ServerTestRunnerTimeoutTest {
         if (f.getException() != null && f.getException().getCause() != null) {
           sb.append("Cause:");
           sb.append(f.getException().getCause());
-          sb.append(f.getException().getCause().getStackTrace());
+          sb.append(Arrays.asList(f.getException().getCause().getStackTrace()));
         }
       }
       Assert.fail(sb.toString());
