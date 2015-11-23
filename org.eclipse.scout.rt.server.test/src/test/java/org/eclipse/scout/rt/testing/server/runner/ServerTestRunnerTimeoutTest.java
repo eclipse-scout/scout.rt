@@ -70,6 +70,8 @@ public class ServerTestRunnerTimeoutTest {
       sb.append(":");
       for (Failure f : result.getFailures()) {
         sb.append("\n  ");
+        sb.append(f.getDescription().getMethodName());
+        sb.append("\n  ");
         sb.append(f.getException());
         sb.append(Arrays.asList(f.getException().getStackTrace()));
         if (f.getException() != null && f.getException().getCause() != null) {
