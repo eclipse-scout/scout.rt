@@ -41,7 +41,7 @@ public class PortCache<PORT> {
 
   protected final Deque<PortCacheEntry<PORT>> m_queue;
 
-  protected final PortProvider<? extends Service, PORT> m_portProvider;
+  protected final PortProducer<? extends Service, PORT> m_portProducer;
 
   protected final int m_corePoolSize;
 
@@ -52,17 +52,17 @@ public class PortCache<PORT> {
    *          number of Ports to have preemptively in the cache.
    * @param timeToLive
    *          time-to-live [ms] for a Port in the cache if the 'corePoolSize' is exceeded.
-   * @param portProvider
+   * @param portProducer
    *          factory to create new Ports.
    */
-  public PortCache(final int corePoolSize, final long timeToLive, final PortProvider<? extends Service, PORT> portProvider) {
-    this(corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
+  public PortCache(final int corePoolSize, final long timeToLive, final PortProducer<? extends Service, PORT> portProducer) {
+    this(corePoolSize, timeToLive, portProducer, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
   }
 
-  PortCache(final int corePoolSize, final long timeToLive, final PortProvider<? extends Service, PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
+  PortCache(final int corePoolSize, final long timeToLive, final PortProducer<? extends Service, PORT> portProducer, final Deque<PortCacheEntry<PORT>> queue) {
     m_corePoolSize = corePoolSize;
     m_timeToLive = timeToLive;
-    m_portProvider = portProvider;
+    m_portProducer = portProducer;
     m_queue = queue;
   }
 
@@ -111,7 +111,7 @@ public class PortCache<PORT> {
 
       @Override
       public void run() throws Exception {
-        m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
+        m_queue.offer(new PortCacheEntry<>(m_portProducer.produce(), m_timeToLive));
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
@@ -122,7 +122,7 @@ public class PortCache<PORT> {
       return portCacheEntry.get();
     }
     else {
-      return m_portProvider.provide();
+      return m_portProducer.produce();
     }
   }
 
@@ -147,7 +147,7 @@ public class PortCache<PORT> {
    */
   protected void ensureCorePool() {
     while (m_queue.size() < m_corePoolSize) {
-      m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
+      m_queue.offer(new PortCacheEntry<>(m_portProducer.produce(), m_timeToLive));
     }
   }
 

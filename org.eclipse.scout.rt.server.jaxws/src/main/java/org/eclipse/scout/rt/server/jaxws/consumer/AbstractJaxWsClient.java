@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheCor
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheEnabledProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheTTLProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsReadTimeoutProperty;
-import org.eclipse.scout.rt.server.jaxws.consumer.PortProvider.IPortInitializer;
+import org.eclipse.scout.rt.server.jaxws.consumer.PortProducer.IPortInitializer;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
@@ -114,7 +114,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   protected String m_username;
   protected String m_password;
 
-  protected PortProvider<SERVICE, PORT> m_portProvider;
+  protected PortProducer<SERVICE, PORT> m_portProducer;
   protected PortCache<PORT> m_portCache;
 
   public AbstractJaxWsClient() {
@@ -137,7 +137,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     m_targetNamespace = m_webServiceClientAnnotation.targetNamespace();
     m_serviceName = m_webServiceClientAnnotation.name();
 
-    m_portProvider = getConfiguredPortProvider(m_serviceClazz, m_portTypeClazz, m_wsdlLocation, m_targetNamespace, m_serviceName, new IPortInitializer() {
+    m_portProducer = getConfiguredPortProducer(m_serviceClazz, m_portTypeClazz, m_wsdlLocation, m_targetNamespace, m_serviceName, new IPortInitializer() {
 
       @Override
       public void initWebServiceFeatures(final List<WebServiceFeature> webServiceFeatures) {
@@ -151,7 +151,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     });
 
     if (CONFIG.getPropertyValue(getConfiguredPortCacheEnabledProperty())) {
-      m_portCache = new PortCache<>(CONFIG.getPropertyValue(getConfiguredPortCacheCorePoolSizeProperty()), TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty())), m_portProvider);
+      m_portCache = new PortCache<>(CONFIG.getPropertyValue(getConfiguredPortCacheCorePoolSizeProperty()), TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty())), m_portProducer);
       m_portCache.init();
     }
   }
@@ -166,7 +166,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * webservice operations invoked.
    */
   public InvocationContext<PORT> newInvocationContext() {
-    final PORT port = (m_portCache != null ? m_portCache.get() : m_portProvider.provide());
+    final PORT port = (m_portCache != null ? m_portCache.get() : m_portProducer.produce());
 
     final InvocationContext<PORT> portHandle = new InvocationContext<>(port, getClass().getSimpleName());
     portHandle.withEndpointUrl(m_endpointUrl);
@@ -383,10 +383,10 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to provide another {@link PortProvider} to create new port objects.
+   * Overwrite to work with another {@link PortProducer} to create new port objects.
    */
-  protected PortProvider<SERVICE, PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation, final String targetNamespace, final String serviceName,
+  protected PortProducer<SERVICE, PORT> getConfiguredPortProducer(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation, final String targetNamespace, final String serviceName,
       final IPortInitializer portInitializer) {
-    return new PortProvider<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
+    return new PortProducer<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
   }
 }

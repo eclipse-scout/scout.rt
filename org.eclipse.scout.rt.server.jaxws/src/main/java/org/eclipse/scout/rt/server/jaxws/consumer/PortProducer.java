@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
  *
  * @since 5.1
  */
-public class PortProvider<SERVICE extends Service, PORT> {
+public class PortProducer<SERVICE extends Service, PORT> {
 
   protected static final Set<Method> PROXIED_HANDLER_METHODS = CollectionUtility.hashSet(Handler.class.getDeclaredMethods()); // only methods declared directly on the handler are proxied.
 
@@ -55,7 +55,7 @@ public class PortProvider<SERVICE extends Service, PORT> {
   protected final String m_targetNamespace;
   protected final IPortInitializer m_initializer;
 
-  public PortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final String serviceName, final URL wsdlLocation, final String targetNamespace, final IPortInitializer initializer) {
+  public PortProducer(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final String serviceName, final URL wsdlLocation, final String targetNamespace, final IPortInitializer initializer) {
     m_serviceClazz = serviceClazz;
     m_portTypeClazz = portTypeClazz;
     m_serviceName = serviceName;
@@ -67,7 +67,7 @@ public class PortProvider<SERVICE extends Service, PORT> {
   /**
    * Creates a new Port to interact with the webservice endpoint.
    */
-  public PORT provide() {
+  public PORT produce() {
     try {
       // Create the service
       final Constructor<? extends Service> constructor = m_serviceClazz.getConstructor(URL.class, QName.class);

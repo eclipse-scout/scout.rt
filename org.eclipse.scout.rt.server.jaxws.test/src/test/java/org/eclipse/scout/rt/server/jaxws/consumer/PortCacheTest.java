@@ -29,14 +29,14 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class PortCacheTest {
 
-  private PortProvider<Service, Object> m_portProvider;
+  private PortProducer<Service, Object> m_portProvider;
 
   @Before
   public void before() {
-    m_portProvider = new PortProvider<Service, Object>(null, null, null, null, null, null) {
+    m_portProvider = new PortProducer<Service, Object>(null, null, null, null, null, null) {
 
       @Override
-      public Object provide() {
+      public Object produce() {
         return new Object();
       }
     };
