@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -248,14 +249,17 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     if (!BEANS.get(IServiceTunnel.class).isActive()) {
       return;
     }
-    switch (event.getType()) {
-      case SessionEvent.TYPE_STARTED:
-        sessionStarted((IClientSession) event.getSource());
-        break;
-      case SessionEvent.TYPE_STOPPED:
-        sessionStopped((IClientSession) event.getSource());
-      default:
-        break;
+    ISession source = event.getSource();
+    if (source instanceof IClientSession) {
+      switch (event.getType()) {
+        case SessionEvent.TYPE_STARTED:
+          sessionStarted((IClientSession) source);
+          break;
+        case SessionEvent.TYPE_STOPPED:
+          sessionStopped((IClientSession) source);
+        default:
+          break;
+      }
     }
   }
 
