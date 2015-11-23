@@ -258,6 +258,6 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   protected String createServiceRequestName(long requestSequence) {
     IFuture<?> currentFuture = IFuture.CURRENT.get();
     String scheduledBy = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
-    return String.format("Remote service request [seq=%s]; scheduled by %s", requestSequence, scheduledBy);
+    return String.format("Tunneling service request [seq=%s]; scheduled by %s", requestSequence, scheduledBy);
   }
 }

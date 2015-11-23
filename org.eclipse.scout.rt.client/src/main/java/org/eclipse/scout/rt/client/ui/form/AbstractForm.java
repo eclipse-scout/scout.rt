@@ -2934,13 +2934,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName(), "timerId=" + timerId);
             }
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Form timer")).awaitDone();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withName("Form timer"))
+            .awaitDone();
       }
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent())
         .withSchedulingDelay(intervalSeconds, TimeUnit.SECONDS)
         .withPeriodicExecutionAtFixedRate(intervalSeconds, TimeUnit.SECONDS)
-        .withName("form-timer"));
+        .withName("Form timer"));
   }
 
   /**

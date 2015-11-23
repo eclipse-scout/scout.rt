@@ -98,7 +98,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
         public void run() throws Exception {
           desktop.releaseUnusedPages();
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Check memory"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Checking memory"));
     }
   }
 

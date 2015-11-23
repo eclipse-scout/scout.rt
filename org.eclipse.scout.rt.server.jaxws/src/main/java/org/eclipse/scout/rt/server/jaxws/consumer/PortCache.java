@@ -81,7 +81,7 @@ public class PortCache<PORT> {
         .withSchedulingDelay(1, TimeUnit.MINUTES)
         .withPeriodicExecutionAtFixedRate(1, TimeUnit.MINUTES)
         .withRunContext(RunContexts.empty())
-        .withName("JAX-WS port cache cleanup"));
+        .withName("Cleaning up JAX-WS port cache"));
 
     // Ensures to have at minimum 'corePoolSize' Ports in the cache.
     if (m_corePoolSize > 0) {
@@ -93,7 +93,7 @@ public class PortCache<PORT> {
         }
       }, Jobs.newInput()
           .withRunContext(RunContexts.empty())
-          .withName("JAX-WS port cache initializer"));
+          .withName("Initializing JAX-WS port cache"));
     }
   }
 

@@ -345,7 +345,7 @@ public class InvocationContext<PORT> {
         }
       }, Jobs.newInput()
           .withRunContext(currentRunContext)
-          .withName("JAX-WS request [%s]", operation));
+          .withName("Handling JAX-WS request [%s]", operation));
 
       try {
         future.awaitDone(); // wait until completed or interrupted.

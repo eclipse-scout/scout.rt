@@ -1058,7 +1058,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         };
 
         if (background || !ModelJobs.isModelThread()) {
-          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Smartfield text lookup"));
+          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+              .withName("Fetching lookup data [text-lookup]"));
         }
         else {
           try {
@@ -1164,7 +1165,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         };
 
         if (background || !ModelJobs.isModelThread()) {
-          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("ContentAssistField browse lookup"));
+          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+              .withName("Fetching lookup data [browse-lookup]"));
         }
         else {
           try {

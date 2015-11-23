@@ -85,7 +85,7 @@ class DelayedExecutor {
 
     @Override
     public void run() {
-      ThreadInfo.CURRENT.get().updateNameAndState(m_threadName, null, JobState.Running);
+      ThreadInfo.CURRENT.get().updateNameAndState(null, m_threadName, JobState.Running);
       try {
         while (!m_executor.isShutdown()) {
           try {
