@@ -82,6 +82,7 @@ public class JsonResponse {
    * @param propertyName
    *          property name
    * @param newValue
+   *          property value
    */
   public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     // coalesce
@@ -97,12 +98,8 @@ public class JsonResponse {
       props = JsonObjectUtility.newOrderedJSONObject();
       event.getData().put("properties", props);
     }
-
-    // If text is null it won't be transferred -> set to empty string
-    if (newValue == null) {
-      newValue = "";
-    }
-    props.put(propertyName, newValue);
+    // Add special NULL object for null values to preserve them in the resulting JSON string
+    props.put(propertyName, (newValue == null ? JSONObject.NULL : newValue));
   }
 
   public void addActionEvent(String eventTarget, String eventType) {

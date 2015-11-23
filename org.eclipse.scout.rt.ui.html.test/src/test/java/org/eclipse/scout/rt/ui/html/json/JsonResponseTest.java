@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
@@ -67,7 +69,8 @@ public class JsonResponseTest {
   }
 
   /**
-   * Property with the value null get converted to "" (empty string)
+   * Test that properties with the value null get get added to the response. Normal Java "null" objects would get
+   * removed by JSONObject, therefore the special NULL marker object should be used.
    */
   @Test
   public void testJsonEventPropertyNullToEmptyString() throws JSONException {
@@ -75,7 +78,13 @@ public class JsonResponseTest {
     JSONObject json = m_uiSession.currentJsonResponse().toJson();
     JSONArray events = json.getJSONArray(JsonResponse.PROP_EVENTS);
     JSONObject props = events.getJSONObject(0).getJSONObject("properties");
-    assertEquals(props.get("name"), "");
+    assertTrue(props.has("name"));
+    assertTrue(props.isNull("name"));
+    assertNotEquals(null, props.get("name"));
+    // JSONObject.NULL is equal to null, but this cannot be checked with assertEquals() due to the junit implementation
+    assertEquals(JSONObject.NULL, props.get("name")); // NULL object is equal to null
+    assertTrue(props.get("name").equals(null));
+    assertTrue(events.toString().contains("\"name\":null"));
   }
 
   @Test
