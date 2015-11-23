@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Locale;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -32,6 +33,7 @@ public class DynamicNlsTest {
     assertTrue(textMap.isEmpty());
   }
 
+  @Ignore("Performance Test: Not reliable")
   @Test(timeout = 1000)
   public void testMissingKeyPerformance() {
     TestResourceBundleTexts nls = TestResourceBundleTexts.getInstance();
