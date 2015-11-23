@@ -1693,7 +1693,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         node.dispose();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing node.", e);
+        LOG.warn("Exception while disposing node.", e);
       }
     }
     m_deletedNodes.clear();

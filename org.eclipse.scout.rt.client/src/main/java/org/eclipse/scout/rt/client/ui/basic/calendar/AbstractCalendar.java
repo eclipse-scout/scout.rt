@@ -346,7 +346,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         menu.dispose();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing menu.", e);
+        LOG.warn("Exception while disposing menu.", e);
       }
     }
     for (ICalendarItemProvider p : m_providers) {

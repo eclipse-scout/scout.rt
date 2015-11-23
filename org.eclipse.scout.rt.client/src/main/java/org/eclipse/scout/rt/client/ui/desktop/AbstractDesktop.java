@@ -1954,7 +1954,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         outline.disposeTree();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing outline.", e);
+        LOG.warn("Exception while disposing outline.", e);
       }
     }
 
@@ -1963,7 +1963,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         action.dispose();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing action.", e);
+        LOG.warn("Exception while disposing action.", e);
       }
     }
 

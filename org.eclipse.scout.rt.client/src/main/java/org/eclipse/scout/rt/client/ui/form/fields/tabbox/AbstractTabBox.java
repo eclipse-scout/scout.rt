@@ -278,7 +278,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         menu.dispose();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing menu.", e);
+        LOG.warn("Exception while disposing menu.", e);
       }
     }
   }

@@ -655,7 +655,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         menu.dispose();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing menu.", e);
+        LOG.warn("Exception while disposing menu.", e);
       }
     }
   }

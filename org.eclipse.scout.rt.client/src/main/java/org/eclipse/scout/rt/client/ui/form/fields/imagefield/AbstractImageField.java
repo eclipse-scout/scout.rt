@@ -478,7 +478,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
         menu.dispose();
       }
       catch (RuntimeException e) {
-        LOG.error("Exception while disposing menu.", e);
+        LOG.warn("Exception while disposing menu.", e);
       }
     }
   }
