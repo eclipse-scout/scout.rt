@@ -65,13 +65,17 @@ public class ServerTestRunnerTimeoutTest {
       StringBuilder sb = new StringBuilder();
       sb.append("expected ");
       sb.append(expectedFailureCount);
-      sb.append(" but catched ");
+      sb.append(" but caught ");
       sb.append(result.getFailureCount());
       sb.append(":");
       for (Failure f : result.getFailures()) {
         sb.append("\n  ");
         sb.append(f.getException());
         sb.append(Arrays.asList(f.getException().getStackTrace()));
+        if (f.getException() != null && f.getException().getCause() != null) {
+          sb.append("Cause:");
+          sb.append(f.getException().getCause());
+        }
       }
       Assert.fail(sb.toString());
     }
