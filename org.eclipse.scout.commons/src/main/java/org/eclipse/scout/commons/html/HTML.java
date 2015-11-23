@@ -121,6 +121,17 @@ public final class HTML {
   }
 
   /**
+   * Create a html element for &lt;hr&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.hr().toEncodedHtml(); <br>
+   * </p>
+   */
+  public static IHtmlElement hr() {
+    return new EmptyHtmlNodeBuilder("hr");
+  }
+
+  /**
    * Create a html element with encoded text for &lt;h1&gt;text&lt;/h1&gt;.
    * <p>
    * Example:<br>
