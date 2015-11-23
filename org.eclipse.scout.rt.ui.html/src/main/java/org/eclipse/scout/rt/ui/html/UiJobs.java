@@ -16,6 +16,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BooleanUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -26,7 +27,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -128,19 +128,37 @@ public class UiJobs {
    * session startup) nobody will release the waitFor lock.
    */
   public <RESULT> RESULT runAsModelJobAndHandleException(final Callable<RESULT> callable, final JobInput jobInput) {
-    return runAsModelJob(new Callable<RESULT>() {
-      @Override
-      public RESULT call() throws Exception {
-        try {
-          return callable.call();
+    try {
+      return runAsModelJob(new Callable<RESULT>() {
+        @Override
+        public RESULT call() throws Exception {
+          try {
+            return callable.call();
+          }
+          catch (Exception e) {
+            // Handle exceptions from model while still being inside the model job. This is important in case the original
+            // HTTP thread is no longer waiting (e.g. because a blocking condition was entered in the model job) and could
+            // therefore not handle this exception.
+            e = BEANS.get(ExceptionTranslator.class).translate(e);
+            BEANS.get(ExceptionHandler.class).handle(e);
+            return null;
+          }
         }
-        catch (Exception e) {
-          e = BEANS.get(ExceptionTranslator.class).translate(e);
+      }, jobInput, ExceptionTranslator.class);
+    }
+    catch (final Exception e) {
+      // Handle exceptions that occur while waiting for the model job. This is important in case the HTTP thread is still
+      // waiting but is interrupted before the model job finished (e.g. because of a cancel request). If the exception would
+      // not be caught here, it would fall down to the JsonMessageRequestHandler and cause a "code 20" error in the UI.
+      ModelJobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
           BEANS.get(ExceptionHandler.class).handle(e);
-          return null;
         }
-      }
-    }, jobInput, RuntimeExceptionTranslator.class);
+      }, jobInput.withName("Handling exception"));
+      return null;
+    }
   }
 
   /**
