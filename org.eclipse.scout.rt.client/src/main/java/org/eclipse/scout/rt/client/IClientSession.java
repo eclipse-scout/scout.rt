@@ -133,11 +133,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
   void setMemoryPolicy(IMemoryPolicy memoryPolicy);
 
   /**
-   * @return Subject used for offline operations
-   */
-  Subject getOfflineSubject();
-
-  /**
    * @param newMap
    */
   void replaceSharedVariableMapInternal(SharedVariableMap newMap);

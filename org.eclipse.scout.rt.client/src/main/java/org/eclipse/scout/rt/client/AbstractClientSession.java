@@ -85,7 +85,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private String m_id;
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
-  private Subject m_offlineSubject;
   private Subject m_subject;
 
   /* locked by m_sharedVarLock*/
@@ -198,15 +197,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   public void setUserAgent(UserAgent userAgent) {
     UserAgent.set(userAgent);
     m_userAgent = userAgent;
-  }
-
-  @Override
-  public Subject getOfflineSubject() {
-    return m_offlineSubject;
-  }
-
-  protected void setOfflineSubject(Subject offlineSubject) {
-    m_offlineSubject = offlineSubject;
   }
 
   @Override
