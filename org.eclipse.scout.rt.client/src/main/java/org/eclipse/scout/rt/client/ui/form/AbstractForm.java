@@ -2922,30 +2922,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
   protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) {
-    return Jobs.schedule(new IRunnable() {
+    return ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        ModelJobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              if (LOG.isInfoEnabled()) {
-                LOG.info("timer {}", timerId);
-              }
-              interceptTimer(timerId);
-            }
-            catch (RuntimeException e) {
-              throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName(), "timerId=" + timerId);
-            }
+        try {
+          if (LOG.isInfoEnabled()) {
+            LOG.info("timer {}", timerId);
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-            .withName("Form timer"))
-            .awaitDone();
+          interceptTimer(timerId);
+        }
+        catch (RuntimeException e) {
+          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName(), "timerId=" + timerId);
+        }
       }
-    }, Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent())
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withSchedulingDelay(intervalSeconds, TimeUnit.SECONDS)
         .withPeriodicExecutionAtFixedRate(intervalSeconds, TimeUnit.SECONDS)
         .withName("Form timer"));
@@ -2958,39 +2949,31 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     final long startMillis = System.currentTimeMillis();
     final long delayMillis = TimeUnit.SECONDS.toMillis(seconds);
 
-    return Jobs.schedule(new IRunnable() {
+    return ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        ModelJobs.schedule(new IRunnable() {
+        final long elapsedMillis = System.currentTimeMillis() - startMillis;
+        final long remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(delayMillis - elapsedMillis);
 
-          @Override
-          public void run() throws Exception {
-            final long elapsedMillis = System.currentTimeMillis() - startMillis;
-            final long remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(delayMillis - elapsedMillis);
+        if (!isCloseTimerArmed()) {
+          setSubTitle(null);
+        }
+        else if (remainingSeconds > 0) {
+          setSubTitle("" + remainingSeconds);
+        }
+        else {
+          setCloseTimerArmed(false); // cancel the periodic action
 
-            if (!isCloseTimerArmed()) {
-              setSubTitle(null);
-            }
-            else if (remainingSeconds > 0) {
-              setSubTitle("" + remainingSeconds);
-            }
-            else {
-              setCloseTimerArmed(false); // cancel the periodic action
-
-              try {
-                interceptCloseTimer();
-              }
-              catch (RuntimeException e) {
-                throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
-              }
-            }
+          try {
+            interceptCloseTimer();
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
-            .awaitDone();
+          catch (RuntimeException e) {
+            throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "form=" + getClass().getName());
+          }
+        }
       }
-    }, Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent())
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withSchedulingDelay(0, TimeUnit.SECONDS)
         .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
         .withLogOnError(false)
