@@ -60,11 +60,7 @@ public class ClientRunContextStatement extends Statement {
           final Subject subject =
               Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
-<<<<<<< Upstream, based on branch 'releases/5.2.x' of ssh://dwiehl@git.eclipse.org:29418/scout/org.eclipse.scout.rt.git
           // Obtain the client session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
-=======
-          // Obtain the client session. Depending on the session provider, a new session is created or a cached session returned.
->>>>>>> feeeb9d Remove ServerJobs and ClientJobs as obsolete now
           final IClientSession clientSession = BEANS.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent().withSubject(subject));
 
           // Run the test in a new ClientRunContext. The subject is set explicitly in case a different subject is defined on the session.

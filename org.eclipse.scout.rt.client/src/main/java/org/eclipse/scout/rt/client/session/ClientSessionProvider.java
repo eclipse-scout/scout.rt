@@ -68,7 +68,11 @@ public class ClientSessionProvider {
             beforeStartSession(clientSession);
             clientSession.start(sessionId);
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true)).withName("initialize clientSession").withLogOnError(false)).awaitDoneAndGet();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
+            .withSession(clientSession, true))
+            .withName("Starting ClientSession [sessionId=%s]", sessionId)
+            .withLogOnError(false))
+            .awaitDoneAndGet();
 
         return clientSession;
       }
