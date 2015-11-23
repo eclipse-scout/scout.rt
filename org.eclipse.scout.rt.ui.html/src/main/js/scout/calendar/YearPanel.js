@@ -224,8 +224,28 @@ scout.YearPanel.prototype._onYearClick = function(event) {
   var diff = $(event.target).data('year-diff'),
     year = this.selectedDate.getFullYear(),
     month = this.selectedDate.getMonth(),
-    date = this.selectedDate.getDate();
-  this.selectedDate = new Date(year + diff, month, date);
+    date = this.selectedDate.getDate(),
+    newDate = new Date(year + diff, month, date),
+    oldWeek,
+    newWeek,
+    weekDiff;
+
+  if (this.alwaysSelectFirstDay) {
+    // find date based on mode
+    if (this._isDisplayModeWeek() || this._isDisplayModeCalendarWeek() || this._isDisplayModeWork()) {
+      oldWeek = scout.dates.weekInYear(this.selectedDate);
+      newWeek = scout.dates.weekInYear(newDate);
+      weekDiff = oldWeek - newWeek;
+      // shift new selection that week in year does not change and the new selection is a monday.
+      newDate = scout.dates.shift(newDate, 0, 0, weekDiff * 7);
+      newDate = scout.dates.shiftToNextOrPrevMonday(newDate, 0);
+    } else if (this._isDisplayModeMonth() || this._isDisplayModeYear()) {
+      // set to first day of month
+      newDate = new Date(year + diff, month, 1);
+    }
+  }
+
+  this.selectedDate = newDate;
   this.trigger('dateSelect', {
     date: this.selectedDate
   });
