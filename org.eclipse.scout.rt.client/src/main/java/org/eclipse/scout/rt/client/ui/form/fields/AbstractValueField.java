@@ -392,7 +392,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   /**
-   * internal single observer for value changed triggers
+   * This method is called in <code>setValue()</code> when the value has changed (compared to the previous value).
+   * Overwrite this method to do something in that case. The default implementation writes label and value of the field
+   * to the log.
    */
   protected void valueChangedInternal() {
     if (LOG.isDebugEnabled()) {

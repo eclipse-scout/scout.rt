@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -180,21 +181,14 @@ public class SmartFieldTest {
   }
 
   public static class StyleLookupService extends TestingLookupService {
+
+    private boolean m_allow = true;
+
     @PostConstruct
     protected void initializeService() {
       List<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
-      rows.add(new LookupRow<Long>(10L, "Red")
-          .withIconId(ICON_FILE)
-          .withTooltipText("Red tooltip")
-          .withBackgroundColor("ff8888")
-          .withForegroundColor("880000")
-          .withFont(FontSpec.parse("italic")));
-      rows.add(new LookupRow<Long>(20L, "Yellow")
-          .withIconId(ICON_FILE)
-          .withTooltipText("Yellow tooltip")
-          .withBackgroundColor("ffff88")
-          .withForegroundColor("888800")
-          .withFont(FontSpec.parse("italic")));
+      rows.add(createRedLookupRow());
+      rows.add(createYellowLookupRow());
       rows.add(new LookupRow<Long>(30L, "Green")
           .withIconId(ICON_FILE)
           .withTooltipText("Green tooltip")
@@ -210,6 +204,41 @@ public class SmartFieldTest {
       rows.add(new LookupRow<Long>(50L, "Empty"));
       setRows(rows);
     }
+
+    public void allowLookup(boolean allow) {
+      m_allow = allow;
+    }
+
+    protected void checkLookupAllowed() {
+      if (!m_allow) {
+        throw new AssertionError("No lookup should be performed for that test-case");
+      }
+    }
+
+    @Override
+    public List<ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) {
+      checkLookupAllowed();
+      return super.getDataByAll(call);
+    }
+
+    @Override
+    public List<ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) {
+      checkLookupAllowed();
+      return super.getDataByKey(call);
+    }
+
+    @Override
+    public List<ILookupRow<Long>> getDataByText(ILookupCall<Long> call) {
+      checkLookupAllowed();
+      return super.getDataByText(call);
+    }
+
+    @Override
+    public List<ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
+      checkLookupAllowed();
+      return super.getDataByRec(call);
+    }
+
   }
 
   public static class StyleLookupCall extends LookupCall<Long> {
@@ -218,6 +247,10 @@ public class SmartFieldTest {
     @Override
     protected final Class<? extends ILookupService<Long>> getConfiguredService() {
       return StyleLookupService.class;
+    }
+
+    protected void allowLookup(boolean allow) {
+      ((StyleLookupService) getLookupService()).allowLookup(allow);
     }
   }
 
@@ -234,49 +267,99 @@ public class SmartFieldTest {
   public void testStyle_SetValue() throws Throwable {
     StyleField f = m_form.getStyleField();
     f.setValue(10L);
-    assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
+    assertRedFieldStyle(f);
     f.setValue(50L);
-    assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+    assertDefaultFieldStyle(f);
     f.setValue(20L);
-    assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
+    assertYellowFieldStyle(f);
     f.setValue(null);
+    assertDefaultFieldStyle(f);
+  }
+
+  private void assertYellowFieldStyle(StyleField f) {
+    assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
+  }
+
+  private void assertDefaultFieldStyle(StyleField f) {
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+  }
+
+  private void assertRedFieldStyle(StyleField f) {
+    assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
+  }
+
+  private void assertGreenFieldStyle(StyleField f) {
+    assertFieldStyle(f, ICON_FILE, "Green tooltip", "88ff88", "008800", "italic");
   }
 
   @Test
   public void testStyle_UIFacade() throws Throwable {
     StyleField f = m_form.getStyleField();
     f.getUIFacade().acceptProposalFromUI("Red", false, false);
-    assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
+    assertRedFieldStyle(f);
     f.getUIFacade().acceptProposalFromUI("Empty", false, false);
-    assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+    assertDefaultFieldStyle(f);
     f.getUIFacade().acceptProposalFromUI("Yellow", false, false);
-    assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
+    assertYellowFieldStyle(f);
     f.getUIFacade().acceptProposalFromUI(null, false, false);
-    assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+    assertDefaultFieldStyle(f);
   }
 
   @Test
   public void testStyle_AcceptProposal() throws Throwable {
     StyleField f = m_form.getStyleField();
-    f.acceptProposal(new LookupRow<Long>(10L, "Red")
+    f.acceptProposal(createRedLookupRow());
+    assertRedFieldStyle(f);
+    f.acceptProposal(new LookupRow<Long>(50L, "Empty"));
+    assertDefaultFieldStyle(f);
+    f.acceptProposal(createYellowLookupRow());
+    assertYellowFieldStyle(f);
+    f.setValue(null);
+    assertDefaultFieldStyle(f);
+  }
+
+  private static ILookupRow<Long> createRedLookupRow() {
+    return new LookupRow<Long>(10L, "Red")
         .withIconId(ICON_FILE)
         .withTooltipText("Red tooltip")
         .withBackgroundColor("ff8888")
         .withForegroundColor("880000")
-        .withFont(FontSpec.parse("italic")));
-    assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
-    f.acceptProposal(new LookupRow<Long>(50L, "Empty"));
-    assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    f.acceptProposal(new LookupRow<Long>(20L, "Yellow")
+        .withFont(FontSpec.parse("italic"));
+  }
+
+  private static ILookupRow<Long> createYellowLookupRow() {
+    return new LookupRow<Long>(20L, "Yellow")
         .withIconId(ICON_FILE)
         .withTooltipText("Yellow tooltip")
         .withBackgroundColor("ffff88")
         .withForegroundColor("888800")
-        .withFont(FontSpec.parse("italic")));
-    assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
-    f.setValue(null);
-    assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+        .withFont(FontSpec.parse("italic"));
+  }
+
+  /**
+   * Only perform a lookup when its necessary. When user has selected a lookup row from the proposal-chooser no lookup
+   * should be performed.
+   */
+  @Test
+  public void testLookupOnlyWhenNecessary() throws Exception {
+    StyleField f = m_form.getStyleField();
+    StyleLookupCall lookupCall = (StyleLookupCall) f.getLookupCall();
+    // expect lookup is performed
+    lookupCall.allowLookup(true);
+    f.setValue(10L);
+    assertRedFieldStyle(f);
+
+    // expect lookup is not performed
+    lookupCall.allowLookup(false);
+    f.acceptProposal(createYellowLookupRow());
+    assertYellowFieldStyle(f);
+
+    // expect lookup is performed again
+    // additionally this test ensures that the lookup-row from the previous test (value=20L)
+    // is not reused by mistake.
+    lookupCall.allowLookup(true);
+    f.setValue(30L);
+    assertGreenFieldStyle(f);
   }
 
   @After

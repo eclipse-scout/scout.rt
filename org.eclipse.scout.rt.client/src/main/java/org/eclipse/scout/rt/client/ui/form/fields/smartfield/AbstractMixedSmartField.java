@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -187,18 +188,26 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   protected void valueChangedInternal() {
+    // When a current lookup-row is available, we don't need to perform a lookup
+    // Usually this happens after the user has selected a row from the proposal-chooser (table or tree).
+    if (getCurrentLookupRow() != null) {
+      safeInstallLookupRowContext(Collections.singletonList(getCurrentLookupRow()));
+      return;
+    }
+
     ILookupCall<LOOKUP_KEY> lookupCall = getLookupCall();
     if (lookupCall == null) {
       return;
     }
+
+    // When no current-lookup row is available we must perform a lookup by key (local or remote)
     try {
       if (lookupCall instanceof LocalLookupCall) {
         List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
         safeInstallLookupRowContext(rows);
       }
       else {
-        // enqueue LookupRow fetcher
-        // this will later on call installLookupRowContext()
+        // Enqueue LookupRow fetcher. this will later on call installLookupRowContext()
         final ILookupCall<LOOKUP_KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(lookupCall,
             new FormFieldProvisioningContext(AbstractMixedSmartField.this));
         prepareKeyLookup(call, interceptConvertValueToKey(getValue()));
