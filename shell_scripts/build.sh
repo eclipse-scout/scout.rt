@@ -1,4 +1,5 @@
-#!/usr/local/bin/bash
+#!/bin/bash
+
 BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
 
@@ -33,4 +34,4 @@ _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
 # Parallel executions of maven modules and tests.
 # Half of CPU core are used in to keep other half for OS and other programs.
-mvn clean install -e -B -T0.5C -Dmaster_test_forkCount=0.5C $_MAVEN_OPTS
+mvn clean install -T0.5C -Dmaster_test_forkCount=0.5C $_MAVEN_OPTS

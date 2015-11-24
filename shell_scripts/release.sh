@@ -1,4 +1,5 @@
-#!/usr/local/bin/bash
+#!/bin/bash
+
 BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
 
@@ -9,14 +10,14 @@ TAG=
 function usage {
   cat << EOF
 
-	${PRG} [-h] --git_username <EGerritUser> -r <RELEASE>
+	${PRG} [-h] --git_username <EGerritUser> --release <RELEASE> --tag <TAG>
 
 	-h                                - Usage info
 	-u | --git_username <EGerritUser> - Eclipse Gerrit Username of Commiter, SSH Key is used for authorisation
-	-u | --git_username <RELEASE>     - <RELEASE> name (Optional / Default: TEST_RELEASE)
+	-r | --release <RELEASE>          - <RELEASE> name (Optional / Default: TEST_RELEASE)
 	-t | --tag <TAG>                  - <TAG> name (Optional / Default: Project Version)
 
-	Example: ${PRG} -r NIGHTLY
+	Example: ${PRG} -u sleicht -r NIGHTLY
 
 EOF
 }
@@ -50,23 +51,23 @@ if [[ -z  "$GIT_USERNAME" ]]; then
 	usage
 	exit 7
 fi
-if [[ -z  "$TAG" ]]; then
-	TAG=$RELEASE
+if [[ "$TAG" ]]; then
+	_MAVEN_OPTS="$_MAVEN_OPTS -Dmaster_release_tagName=$TAG"
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
 # Parallel executions of maven modules and tests.
 # Half of CPU core are used in to keep other half for OS and other programs.
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -Dmaster_release_tagName=$TAG -f org.eclipse.scout.rt -N $_MAVEN_OPTS
+mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -f org.eclipse.scout.rt -N $_MAVEN_OPTS
 processError
 
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
-mvn -Prelease.checkin -Dmaster_release_tagName=$TAG -Declipse_gerrit_username=$GIT_USERNAME -e -f org.eclipse.scout.rt $_MAVEN_OPTS
+mvn -Prelease.checkin -Declipse_gerrit_username=$GIT_USERNAME -f org.eclipse.scout.rt $_MAVEN_OPTS
 processError
 
-mvn -Prelease.tag -Dmaster_release_tagName=$TAG -Declipse_gerrit_username=$GIT_USERNAME -e -f org.eclipse.scout.rt $_MAVEN_OPTS
+mvn -Prelease.tag -Declipse_gerrit_username=$GIT_USERNAME -Dmaster_release_pushChanges=true -f org.eclipse.scout.rt $_MAVEN_OPTS
 processError
 
 git reset HEAD~1 --hard

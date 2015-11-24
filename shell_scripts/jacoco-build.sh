@@ -1,5 +1,4 @@
-#!/bin/sh
-export MAVEN_OPTS='-Xmx256m'
+#!/bin/bash
 
 # Parallel executions of maven modules and tests.
 # Half of CPU core are used in to keep other half for OS and other programs.
