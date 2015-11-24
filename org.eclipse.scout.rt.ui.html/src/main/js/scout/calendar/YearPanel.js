@@ -16,9 +16,20 @@ scout.YearPanel = function() {
   this.$yearList;
   this.selectedDate;
   this.displayMode;
+  this.alwaysSelectFirstDay;
   this._addEventSupport();
 };
 scout.inherits(scout.YearPanel, scout.Widget);
+
+scout.YearPanel.prototype._init = function(model) {
+  scout.YearPanel.parent.prototype._init.call(this, model);
+
+  // If true, it is only possible to select the first day of a range, depending of the selected mode
+  // day mode: every day may be selected
+  // week, work week, calendar week mode: only first day of week may be selected
+  // year, month mode: only first day of month may be selected
+  this.alwaysSelectFirstDay = model.alwaysSelectFirstDay;
+};
 
 scout.YearPanel.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('year-panel-container');
@@ -243,44 +254,33 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     $day2, date2;
 
   // find hover based on mode
-  // in case of planner: selected day is first day of week, hover only for days and weeks
-  if (this.$container.parent().hasClass('planner')) {
-    if (this._isDisplayModeDay()) {
-      startHover = new Date(year, month, date);
-      endHover = new Date(year, month, date);
-    } else if (this._isDisplayModeWeek()) {
-      startHover = new Date(year, month, date - day);
-      endHover = new Date(year, month, date - day + 6);
-    } else if (this._isDisplayModeWork()) {
-      startHover = new Date(year, month, date - day);
-      endHover = new Date(year, month, date - day + 4);
-    } else if (this._isDisplayModeYear()) {
-      startHover = new Date(year, month, 1);
-      endHover = startHover;
-    } else {
-      startHover = new Date(year, month, date - day);
-      endHover = startHover;
-    }
+  if (this._isDisplayModeDay()) {
+    startHover = new Date(year, month, date);
+    endHover = new Date(year, month, date);
+  } else if (this._isDisplayModeWeek()) {
+    startHover = new Date(year, month, date - day);
+    endHover = new Date(year, month, date - day + 6);
+  } else if (this._isDisplayModeWork()) {
+    startHover = new Date(year, month, date - day);
+    endHover = new Date(year, month, date - day + 4);
 
-    date1 = startHover;
-  } else {
-    if (this._isDisplayModeDay()) {
-      startHover = new Date(year, month, date);
-      endHover = new Date(year, month, date);
-    } else if (this._isDisplayModeWeek()) {
-      startHover = new Date(year, month, date - day);
-      endHover = new Date(year, month, date - day + 6);
-    } else if (this._isDisplayModeMonth()) {
-      startHover = new Date(year, month, 1);
-      endHover = new Date(year, month + 1, 0);
-    } else if (this._isDisplayModeWork()) {
-      startHover = new Date(year, month, date - day);
-      endHover = new Date(year, month, date - day + 4);
-      // in case of work week: selected date has to be opart of range
-      if (date1 > endHover) {
-        date1 = endHover;
-      }
+    // don't allow selecting a weekend day
+    if (date1 > endHover) {
+      date1 = endHover;
     }
+  } else if (this._isDisplayModeMonth()) {
+    startHover = new Date(year, month, 1);
+    endHover = new Date(year, month + 1, 0);
+  } else if (this._isDisplayModeYear()) {
+    startHover = new Date(year, month, 1);
+    endHover = startHover;
+  } else {
+    startHover = new Date(year, month, date - day);
+    endHover = startHover;
+  }
+
+  if (this.alwaysSelectFirstDay) {
+    date1 = startHover;
   }
 
   // loop days and colorize based on hover start and hover end

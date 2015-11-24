@@ -60,7 +60,8 @@ scout.Planner.SelectionMode = {
 scout.Planner.prototype._init = function(model) {
   scout.Planner.parent.prototype._init.call(this, model);
   this._yearPanel = scout.create(scout.YearPanel, {
-    parent: this
+    parent: this,
+    alwaysSelectFirstDay: true
   });
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
   this._header = scout.create(scout.PlannerHeader, {
