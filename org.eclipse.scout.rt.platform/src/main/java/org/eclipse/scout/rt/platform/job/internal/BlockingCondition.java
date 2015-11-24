@@ -19,14 +19,14 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
+import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.slf4j.Logger;
@@ -122,6 +122,8 @@ public class BlockingCondition implements IBlockingCondition {
    *           if the waiting thread was interrupted.
    */
   protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit) {
+    final IMutex mutex = jobTask.getMutex();
+
     m_lock.lock();
     try {
       if (!m_blocking) {
@@ -133,10 +135,9 @@ public class BlockingCondition implements IBlockingCondition {
           .withFuture(jobTask)
           .withBlockingCondition(this));
 
-      // Pass the mutex to next task if being a mutex task.
-      if (jobTask.getMutexObject() != null) {
-        Assertions.assertTrue(jobTask.isMutexOwner(), "Unexpected inconsistency: Current FutureTask must be mutex owner [task=%s, thread=%s]", jobTask, Thread.currentThread().getName());
-        m_jobManager.getMutexSemaphores().passMutexToNextTask(jobTask.getMutexObject(), jobTask);
+      // If being a mutual exclusive task, release the mutex.
+      if (mutex != null) {
+        mutex.release(jobTask);
       }
 
       blockUntilSignaledOrTimeout(timeout, unit, new IBlockingGuard() {
@@ -173,9 +174,9 @@ public class BlockingCondition implements IBlockingCondition {
           .withBlockingCondition(this));
     }
 
-    // Acquire the mutex anew if being a mutex task.
-    if (jobTask.getMutexObject() != null) {
-      m_jobManager.getMutexSemaphores().acquireMutex(jobTask, Position.HEAD); // Wait until the mutex is acquired.
+    // Acquire the mutex anew if being a mutual exclusive task. If not free, the current thread is blocked until available.
+    if (mutex != null) {
+      mutex.acquire(jobTask, QueuePosition.HEAD);
     }
 
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED)

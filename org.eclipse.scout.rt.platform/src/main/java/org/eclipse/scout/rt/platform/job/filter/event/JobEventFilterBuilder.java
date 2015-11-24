@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.filter.future.ExecutionHintFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
@@ -155,8 +156,8 @@ public class JobEventFilterBuilder {
   /**
    * To match all events for jobs which have the given mutex object set.
    */
-  public JobEventFilterBuilder andMatchMutex(final Object mutexObject) {
-    andMatch(new FutureFilterWrapperJobEventFilter(new MutexFutureFilter(mutexObject)));
+  public JobEventFilterBuilder andMatchMutex(final IMutex mutex) {
+    andMatch(new FutureFilterWrapperJobEventFilter(new MutexFutureFilter(mutex)));
     return this;
   }
 

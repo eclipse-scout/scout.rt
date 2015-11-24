@@ -53,7 +53,7 @@ public class JobInput {
   public static final long INFINITE_EXPIRATION = 0;
 
   protected String m_name;
-  protected Object m_mutexObject;
+  protected IMutex m_mutex;
   protected long m_expirationTime = INFINITE_EXPIRATION;
   protected boolean m_logOnError = true;
   protected String m_threadName = "scout-thread";
@@ -164,17 +164,19 @@ public class JobInput {
    * Returns the mutex object, if the job is to be run in sequence among other jobs with the same mutex object, or
    * <code>null</code> to run the job at the next reasonable opportunity.
    */
-  public Object getMutex() {
-    return m_mutexObject;
+  public IMutex getMutex() {
+    return m_mutex;
   }
 
   /**
    * Sets the mutex object to run the job in sequence among other jobs with the same mutex object, so that no two such
    * jobs are run in parallel at the same time. By default, no mutex object is set, meaning the job is not executed in
    * mutually exclusive manner.
+   *
+   * @see Jobs#newMutex()
    */
-  public JobInput withMutex(final Object mutexObject) {
-    m_mutexObject = mutexObject;
+  public JobInput withMutex(final IMutex mutex) {
+    m_mutex = mutex;
     return this;
   }
 
@@ -265,7 +267,7 @@ public class JobInput {
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("name", m_name);
-    builder.ref("mutexObject", m_mutexObject);
+    builder.ref("mutex", m_mutex);
     builder.attr("expirationTime", m_expirationTime);
     builder.attr("logOnError", m_logOnError);
     builder.attr("threadName", m_threadName);
@@ -284,7 +286,7 @@ public class JobInput {
   public JobInput copy() {
     final JobInput copy = BEANS.get(JobInput.class);
     copy.m_name = m_name;
-    copy.m_mutexObject = m_mutexObject;
+    copy.m_mutex = m_mutex;
     copy.m_expirationTime = m_expirationTime;
     copy.m_logOnError = m_logOnError;
     copy.m_threadName = m_threadName;

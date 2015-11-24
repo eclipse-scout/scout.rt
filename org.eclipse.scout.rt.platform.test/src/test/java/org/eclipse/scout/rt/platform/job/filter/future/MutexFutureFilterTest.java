@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -27,8 +28,8 @@ public class MutexFutureFilterTest {
 
   @Test
   public void test() {
-    Object mutex1 = new Object();
-    Object mutex2 = new Object();
+    IMutex mutex1 = Jobs.newMutex();
+    IMutex mutex2 = Jobs.newMutex();
 
     IFuture<Void> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex1));
     IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex1));

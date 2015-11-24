@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
@@ -133,8 +134,8 @@ public class FutureFilterBuilder {
   /**
    * To match all jobs which have the given mutex object set.
    */
-  public FutureFilterBuilder andMatchMutex(final Object mutexObject) {
-    andMatch(new MutexFutureFilter(mutexObject));
+  public FutureFilterBuilder andMatchMutex(final IMutex mutex) {
+    andMatch(new MutexFutureFilter(mutex));
     return this;
   }
 

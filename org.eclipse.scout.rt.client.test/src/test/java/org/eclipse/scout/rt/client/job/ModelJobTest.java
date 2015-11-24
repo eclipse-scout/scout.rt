@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,6 +23,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -28,20 +31,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
 public class ModelJobTest {
 
-  @Mock
   private IClientSession m_clientSession1;
-  @Mock
   private IClientSession m_clientSession2;
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
+    m_clientSession1 = mock(IClientSession.class);
+    when(m_clientSession1.getModelJobMutex()).thenReturn(Jobs.newMutex());
+
+    m_clientSession2 = mock(IClientSession.class);
+    when(m_clientSession2.getModelJobMutex()).thenReturn(Jobs.newMutex());
   }
 
   @After

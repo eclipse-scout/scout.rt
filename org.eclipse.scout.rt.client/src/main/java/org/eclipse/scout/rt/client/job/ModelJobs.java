@@ -34,10 +34,10 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
  * time for the same session. Model jobs are used to interact with the client model to read and write model values. This
  * class is for convenience purpose to facilitate the creation and scheduling of model jobs.
  * <p>
- * <strong>By definition, a <code>ModelJob</code> requires a {@link ClientRunContext} and {@link IClientSession} to be
- * set as its mutex object. That causes all jobs with that session as their mutex object to be run in sequence in the
- * model thread. At any given time, there is only one model thread per client session.</strong>
- * <p/>
+ * <strong>By definition, a <code>ModelJob</code> requires a {@link ClientRunContext} and the {@link IClientSession}'s
+ * 'model-job-mutex' to be set as its mutex object. That causes all jobs within that session to be run in sequence in
+ * the model thread. At any given time, there is only one model thread per client session.</strong>
+ * <p>
  * Example:
  *
  * <pre>
@@ -69,7 +69,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
  *     }
  *   }, BEANS.get(JobInput.class)
  *        .withRunContext(clientRunContext)
- *        .<strong>mutex(clientRunContext.getSession())</strong>);
+ *        .<strong>withMutex(clientRunContext.getSession().getModelJobMutex())</strong>);
  * </pre>
  *
  * @since 5.1
@@ -175,7 +175,11 @@ public final class ModelJobs {
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "ClientRunContext required for model jobs");
     Assertions.assertNotNull(clientRunContext.getSession(), "ClientSession required for model jobs");
-    return BEANS.get(JobInput.class).withThreadName("scout-model-thread").withRunContext(clientRunContext).withMutex(clientRunContext.getSession());
+    Assertions.assertNotNull(clientRunContext.getSession().getModelJobMutex(), "Mutex required for model jobs");
+    return BEANS.get(JobInput.class)
+        .withThreadName("scout-model-thread")
+        .withRunContext(clientRunContext)
+        .withMutex(clientRunContext.getSession().getModelJobMutex());
   }
 
   /**
@@ -226,7 +230,7 @@ public final class ModelJobs {
    */
   public static boolean isModelThread(final IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    return ModelJobs.isModelJob(currentFuture) && ((JobFutureTask) currentFuture).isMutexOwner() && (IClientSession) currentFuture.getJobInput().getMutex() == clientSession;
+    return ModelJobs.isModelJob(currentFuture) && ((JobFutureTask) currentFuture).isMutexOwner();
   }
 
   /**
@@ -236,6 +240,11 @@ public final class ModelJobs {
     if (future == null) {
       return false;
     }
+
+    if (future.getJobInput().getMutex() == null) {
+      return false;
+    }
+
     if (!(future.getJobInput().getRunContext() instanceof ClientRunContext)) {
       return false;
     }
@@ -245,7 +254,7 @@ public final class ModelJobs {
       return false;
     }
 
-    return future.getJobInput().getMutex() == clientSession;
+    return future.getJobInput().getMutex() == clientSession.getModelJobMutex();
   }
 
   /**

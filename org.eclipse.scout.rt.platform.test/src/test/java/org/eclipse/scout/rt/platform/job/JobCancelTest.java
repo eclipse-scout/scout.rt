@@ -590,7 +590,7 @@ public class JobCancelTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
-        .withMutex(new Object())
+        .withMutex(Jobs.newMutex())
         .withLogOnError(false));
 
     assertTrue(setupLatch.await());

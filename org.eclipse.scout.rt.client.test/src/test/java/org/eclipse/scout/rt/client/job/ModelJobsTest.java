@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -33,18 +34,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
 public class ModelJobsTest {
 
-  @Mock
   private IClientSession m_clientSession;
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
+    m_clientSession = mock(IClientSession.class);
+    when(m_clientSession.getModelJobMutex()).thenReturn(Jobs.newMutex());
   }
 
   @After
@@ -55,7 +54,10 @@ public class ModelJobsTest {
   @Test
   public void testIsModelJob() {
     IClientSession session1 = mock(IClientSession.class);
+    when(session1.getModelJobMutex()).thenReturn(Jobs.newMutex());
+
     IClientSession session2 = mock(IClientSession.class);
+    when(session2.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
     // not a model job (no Future)
     assertFalse(ModelJobs.isModelJob(null));
@@ -78,31 +80,34 @@ public class ModelJobsTest {
     // not a model job (wrong mutex type)
     assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty().withSession(session1, false))
-        .withMutex(new Object()))));
+        .withMutex(Jobs.newMutex()))));
 
     // not a model job (different session on ClientRunContext and mutex)
     assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(session1, false))
-        .withMutex(session2))));
+        .withMutex(session2.getModelJobMutex()))));
 
     // not a model job (no session on ClientRunContext)
     assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(null, false))
-        .withMutex(session1))));
+        .withMutex(session1.getModelJobMutex()))));
 
     // this is a model job (same session on ClientRunContext and mutex)
     assertTrue(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(session1, false))
-        .withMutex(session1))));
+        .withMutex(session1.getModelJobMutex()))));
   }
 
   @Test
   public void testIsModelThread() {
     final IClientSession clientSession1 = mock(IClientSession.class);
+    when(clientSession1.getModelJobMutex()).thenReturn(Jobs.newMutex());
+
     final IClientSession clientSession2 = mock(IClientSession.class);
+    when(clientSession2.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -124,7 +129,7 @@ public class ModelJobsTest {
 
           @Override
           public void run() throws Exception {
-            assertFalse(ModelJobs.isModelThread());
+            assertTrue(ModelJobs.isModelThread());
           }
         });
       }
@@ -174,7 +179,7 @@ public class ModelJobsTest {
 
     assertSame(runContext, ModelJobs.newInput(runContext).getRunContext());
     assertEquals("scout-model-thread", ModelJobs.newInput(runContext).getThreadName());
-    assertSame(m_clientSession, ModelJobs.newInput(runContext).getMutex());
+    assertSame(m_clientSession.getModelJobMutex(), ModelJobs.newInput(runContext).getMutex());
   }
 
   @Test(expected = AssertionException.class)

@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -31,8 +32,8 @@ public class FutureFilterBuilderTest {
 
   @Test
   public void test() {
-    Object mutex1 = new Object();
-    Object mutex2 = new Object();
+    IMutex mutex1 = Jobs.newMutex();
+    IMutex mutex2 = Jobs.newMutex();
 
     IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("A"));
@@ -213,7 +214,7 @@ public class FutureFilterBuilderTest {
 
   @Test
   public void testFutureExclusion() {
-    Object mutex = new Object();
+    IMutex mutex = Jobs.newMutex();
 
     IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
     IFuture<?> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());

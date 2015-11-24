@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
+import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -42,11 +45,11 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class JobListenerBlockedFutureTest {
 
-  private P_JobManager m_jobManager;
+  private IJobManager m_jobManager;
 
   @Before
   public void before() {
-    m_jobManager = new P_JobManager();
+    m_jobManager = new JobManager();
   }
 
   @After
@@ -96,6 +99,9 @@ public class JobListenerBlockedFutureTest {
   public void testEventsForBlockingJob() throws Exception {
     final IBlockingCondition condition = m_jobManager.createBlockingCondition("test condition", true);
 
+    IClientSession clientSession = mock(IClientSession.class);
+    when(clientSession.getModelJobMutex()).thenReturn(Jobs.newMutex());
+
     P_JobChangeListener modelJobListener = new P_JobChangeListener();
     P_JobChangeListener jobListener = new P_JobChangeListener();
     IJobListenerRegistration modelJobListenerRegistration = m_jobManager.addListener(ModelJobs.newEventFilterBuilder().toFilter(), modelJobListener);
@@ -103,7 +109,6 @@ public class JobListenerBlockedFutureTest {
     IFuture<Void> outerFuture = null;
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
-      IClientSession clientSession = mock(IClientSession.class);
       final JobInput input = ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true));
 
       // start recording of events
@@ -118,7 +123,7 @@ public class JobListenerBlockedFutureTest {
               condition.setBlocking(false);
 
               // Wait until the outer future is re-acquiring the mutex.
-              m_jobManager.waitForPermitsAcquired(input.getMutex(), 2); // 2=outer-job + inner-job
+              waitForPermitsAcquired(input.getMutex(), 2); // 2=outer-job + inner-job
             }
           }, input.copy().withSchedulingDelay(200, TimeUnit.MILLISECONDS)));
 
@@ -189,6 +194,21 @@ public class JobListenerBlockedFutureTest {
 
   }
 
+  /**
+   * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
+   */
+  private static void waitForPermitsAcquired(IMutex mutex, int expectedPermitCount) throws InterruptedException {
+    long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+
+    // Wait until the other jobs tried to re-acquire the mutex.
+    while (mutex.getCompetitorCount() != expectedPermitCount) {
+      if (System.currentTimeMillis() > deadline) {
+        fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, mutex.getCompetitorCount()));
+      }
+      Thread.sleep(10);
+    }
+  }
+
   private static final class P_JobChangeListener implements IJobListener {
 
     private final List<JobEventType> m_stati = new ArrayList<>();
@@ -198,24 +218,6 @@ public class JobListenerBlockedFutureTest {
     public void changed(JobEvent event) {
       m_stati.add(event.getType());
       m_futures.add(event.getFuture());
-    }
-  }
-
-  private class P_JobManager extends JobManager {
-
-    /**
-     * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
-     */
-    public void waitForPermitsAcquired(Object mutexObject, int expectedPermitCount) throws InterruptedException {
-      long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
-
-      // Wait until the other jobs tried to re-acquire the mutex.
-      while (m_mutexSemaphores.getPermitCount(mutexObject) != expectedPermitCount) {
-        if (System.currentTimeMillis() > deadline) {
-          fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, m_mutexSemaphores.getPermitCount(mutexObject)));
-        }
-        Thread.sleep(10);
-      }
     }
   }
 }

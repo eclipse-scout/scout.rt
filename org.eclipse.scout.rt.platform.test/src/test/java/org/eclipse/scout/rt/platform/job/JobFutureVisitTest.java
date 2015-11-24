@@ -38,9 +38,9 @@ import org.junit.runner.RunWith;
 public class JobFutureVisitTest {
 
   private P_JobManager m_jobManager;
-  private Object m_mutexObject1;
-  private Object m_mutexObject2;
-  private Object m_mutexObject3;
+  private IMutex m_mutex1;
+  private IMutex m_mutex2;
+  private IMutex m_mutex3;
 
   private Set<String> protocol;
 
@@ -53,9 +53,9 @@ public class JobFutureVisitTest {
   public void before() throws InterruptedException {
     m_jobManager = new P_JobManager();
 
-    m_mutexObject1 = new Object();
-    m_mutexObject2 = new Object();
-    m_mutexObject3 = new Object();
+    m_mutex1 = Jobs.newMutex();
+    m_mutex2 = Jobs.newMutex();
+    m_mutex3 = Jobs.newMutex();
 
     // prepare the test-case
     protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
@@ -75,7 +75,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job1")
-        .withMutex(m_mutexObject1)
+        .withMutex(m_mutex1)
         .withLogOnError(false));
 
     // SESSION 1 (JOB-2)
@@ -89,7 +89,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job2")
-        .withMutex(m_mutexObject1)
+        .withMutex(m_mutex1)
         .withLogOnError(false));
 
     // SESSION 1 (JOB-3)
@@ -102,7 +102,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job3")
-        .withMutex(m_mutexObject1));
+        .withMutex(m_mutex1));
 
     // =========
     // SESSION 2 (JOB-1)
@@ -115,7 +115,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job1")
-        .withMutex(m_mutexObject2));
+        .withMutex(m_mutex2));
 
     // SESSION 2 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
@@ -128,7 +128,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job2")
-        .withMutex(m_mutexObject2)
+        .withMutex(m_mutex2)
         .withLogOnError(false));
 
     // SESSION 2  (JOB-3)
@@ -139,14 +139,14 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc2.setBlocking(false);
 
-        m_jobManager.waitForPermitsAcquired(m_mutexObject2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
+        m_jobManager.waitForPermitsAcquired(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
 
         latch.countDownAndBlock();
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job3")
-        .withMutex(m_mutexObject2)
+        .withMutex(m_mutex2)
         .withLogOnError(false));
 
     // SESSION 2  (JOB-4)
@@ -159,7 +159,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job4")
-        .withMutex(m_mutexObject2));
+        .withMutex(m_mutex2));
 
     // =========
     // SESSION 3 (JOB-1)
@@ -173,7 +173,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex3_job1")
-        .withMutex(m_mutexObject3)
+        .withMutex(m_mutex3)
         .withLogOnError(false));
 
     assertTrue(latch.await());
@@ -376,13 +376,13 @@ public class JobFutureVisitTest {
     /**
      * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
      */
-    protected void waitForPermitsAcquired(Object mutexObject, int expectedPermitCount) throws InterruptedException {
+    protected void waitForPermitsAcquired(IMutex mutex, int expectedPermitCount) throws InterruptedException {
       long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
 
       // Wait until the other jobs tried to re-acquire the mutex.
-      while (m_mutexSemaphores.getPermitCount(mutexObject) != expectedPermitCount) {
+      while (mutex.getCompetitorCount() != expectedPermitCount) {
         if (System.currentTimeMillis() > deadline) {
-          fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, m_mutexSemaphores.getPermitCount(mutexObject)));
+          fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, mutex.getCompetitorCount()));
         }
         Thread.sleep(10);
       }

@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.ISession;
@@ -75,6 +76,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private static final Logger LOG = LoggerFactory.getLogger(AbstractClientSession.class);
 
   private final EventListenerList m_eventListeners;
+
+  private final IMutex m_modelJobMutex = Jobs.newMutex();
 
   // state
   private final Object m_stateLock;
@@ -637,6 +640,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public void removeListener(ISessionListener sessionListener) {
     m_eventListeners.remove(ISessionListener.class, sessionListener);
+  }
+
+  @Override
+  public IMutex getModelJobMutex() {
+    return m_modelJobMutex;
   }
 
   @Internal

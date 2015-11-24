@@ -463,7 +463,7 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleDelayedWithMutex() {
-    final Object mutex = new Object();
+    final IMutex mutex = Jobs.newMutex();
 
     IFuture<String> future1 = m_jobManager.schedule(new Callable<String>() {
 
@@ -493,7 +493,7 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleWithTimeoutWithMutex() {
-    final Object mutex = new Object();
+    final IMutex mutex = Jobs.newMutex();
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 

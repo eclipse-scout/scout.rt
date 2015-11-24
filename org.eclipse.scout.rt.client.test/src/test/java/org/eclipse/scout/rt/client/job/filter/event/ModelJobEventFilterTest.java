@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.job.filter.event;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.IFilter;
@@ -33,7 +34,10 @@ public class ModelJobEventFilterTest {
   @Test
   public void test() {
     IClientSession session1 = mock(IClientSession.class);
+    when(session1.getModelJobMutex()).thenReturn(Jobs.newMutex());
+
     IClientSession session2 = mock(IClientSession.class);
+    when(session2.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
     IFilter<JobEvent> filter = ModelJobEventFilter.INSTANCE;
 
@@ -69,7 +73,7 @@ public class ModelJobEventFilterTest {
     event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(ClientRunContexts.empty().withSession(session1, false))
-            .withMutex(new Object())));
+            .withMutex(Jobs.newMutex())));
     assertFalse(filter.accept(event));
 
     // not a model job (different session on ClientRunContext and mutex)
@@ -77,7 +81,7 @@ public class ModelJobEventFilterTest {
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(ClientRunContexts.empty()
                 .withSession(session1, false))
-            .withMutex(session2)));
+            .withMutex(session2.getModelJobMutex())));
     assertFalse(filter.accept(event));
 
     // not a model job (no session on ClientRunContext)
@@ -85,15 +89,14 @@ public class ModelJobEventFilterTest {
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(ClientRunContexts.empty()
                 .withSession(null, false))
-            .withMutex(session1)));
+            .withMutex(session1.getModelJobMutex())));
     assertFalse(filter.accept(event));
 
     // this is a model job (same session on ClientRunContext and mutex)
     event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty()
-                .withSession(session1, false))
-            .withMutex(session1)));
+            .withRunContext(ClientRunContexts.empty().withSession(session1, false))
+            .withMutex(session1.getModelJobMutex())));
     assertTrue(filter.accept(event));
   }
 }

@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
@@ -115,7 +116,7 @@ public class ThreadNameDecoratorTest {
   @Times(50)
   // This test is executed 50 times (regression)
   public void testThreadNameBlocking() throws Exception {
-    final Object mutexObject = new Object();
+    final IMutex mutex = Jobs.newMutex();
     final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("blocking-condition", true);
 
     final Holder<Thread> workerThreadJob1Holder = new Holder<>();
@@ -153,7 +154,7 @@ public class ThreadNameDecoratorTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName("job-1")
-        .withMutex(mutexObject));
+        .withMutex(mutex));
 
     // Job-2 (same mutex as job-1)
     IFuture<Boolean> future2 = Jobs.schedule(new Callable<Boolean>() {
@@ -194,7 +195,7 @@ public class ThreadNameDecoratorTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName("job-1")
-        .withMutex(mutexObject));
+        .withMutex(mutex));
 
     assertTrue(future2.awaitDoneAndGet());
     assertTrue(future1.awaitDoneAndGet());

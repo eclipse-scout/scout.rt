@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 
 /**
  * Filter which accepts all Futures that belong to the given mutex object.
@@ -21,14 +22,14 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  */
 public class MutexFutureFilter implements IFilter<IFuture<?>> {
 
-  private final Object m_mutexObject;
+  private final IMutex m_mutex;
 
-  public MutexFutureFilter(final Object mutexObject) {
-    m_mutexObject = mutexObject;
+  public MutexFutureFilter(final IMutex mutexObject) {
+    m_mutex = mutexObject;
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return CompareUtility.equals(m_mutexObject, future.getJobInput().getMutex());
+    return CompareUtility.equals(m_mutex, future.getJobInput().getMutex());
   }
 }

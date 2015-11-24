@@ -12,17 +12,19 @@ package org.eclipse.scout.rt.client.job.filter.event;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -32,42 +34,29 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
 public class ClientRunContextJobEventFilterTest {
 
-  @Mock
-  private IJobManager m_jobManager;
-
-  @Mock
   private IFuture<?> m_clientJobFuture;
 
-  @Mock
   private IFuture<?> m_modelJobFuture;
 
-  @Mock
-  private IFuture<?> m_jobFuture;
-
-  @Mock
   private IClientSession m_clientSession1;
 
-  @Mock
   private IClientSession m_clientSession2;
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
+    m_clientSession1 = mock(IClientSession.class);
+    when(m_clientSession1.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
-    JobInput clientJobInput = Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true));
-    when(m_clientJobFuture.getJobInput()).thenReturn(clientJobInput);
+    m_clientSession2 = mock(IClientSession.class);
+    when(m_clientSession2.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
-    JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true));
-    when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
+    m_clientJobFuture = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true)));
 
-    JobInput jobInput = Jobs.newInput().withRunContext(RunContexts.empty());
-    when(m_jobFuture.getJobInput()).thenReturn(jobInput);
+    m_modelJobFuture = ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)));
   }
 
   @Test
@@ -78,7 +67,7 @@ public class ClientRunContextJobEventFilterTest {
             JobEventType.ABOUT_TO_RUN,
             JobEventType.DONE)
         .toFilter()
-        .accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(m_clientJobFuture)));
+        .accept(new JobEvent(Jobs.getJobManager(), JobEventType.SCHEDULED).withFuture(m_clientJobFuture)));
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -86,7 +75,7 @@ public class ClientRunContextJobEventFilterTest {
             JobEventType.ABOUT_TO_RUN,
             JobEventType.DONE)
         .toFilter()
-        .accept(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture)));
+        .accept(new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture)));
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -94,7 +83,7 @@ public class ClientRunContextJobEventFilterTest {
             JobEventType.ABOUT_TO_RUN,
             JobEventType.DONE)
         .toFilter()
-        .accept(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(m_clientJobFuture)));
+        .accept(new JobEvent(Jobs.getJobManager(), JobEventType.DONE).withFuture(m_clientJobFuture)));
 
     assertFalse(
         Jobs.newEventFilterBuilder()
@@ -103,13 +92,16 @@ public class ClientRunContextJobEventFilterTest {
                 JobEventType.ABOUT_TO_RUN,
                 JobEventType.DONE)
             .toFilter()
-            .accept(new JobEvent(m_jobManager, JobEventType.SHUTDOWN).withFuture(m_clientJobFuture)));
+            .accept(new JobEvent(Jobs.getJobManager(), JobEventType.SHUTDOWN).withFuture(m_clientJobFuture)));
   }
 
   @Test
   public void testPeriodic() {
-    when(m_clientJobFuture.getSchedulingRule()).thenReturn(JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE);
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(m_clientJobFuture);
+    IFuture<Void> clientJobFuture = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true))
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.SCHEDULED).withFuture(clientJobFuture);
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -128,8 +120,9 @@ public class ClientRunContextJobEventFilterTest {
         .toFilter()
         .accept(clientEvent));
 
-    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(m_modelJobFuture);
-    when(m_modelJobFuture.getSchedulingRule()).thenReturn(JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE);
+    IFuture<Void> modelJobFuture = ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+    JobEvent modelEvent = new JobEvent(Jobs.getJobManager(), JobEventType.SCHEDULED).withFuture(modelJobFuture);
 
     assertTrue(ModelJobs.newEventFilterBuilder()
         .toFilter()
@@ -148,8 +141,8 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testSession() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(m_clientJobFuture);
-    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(m_modelJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.SCHEDULED).withFuture(m_clientJobFuture);
+    JobEvent modelEvent = new JobEvent(Jobs.getJobManager(), JobEventType.SCHEDULED).withFuture(m_modelJobFuture);
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -176,7 +169,7 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testShutdownEvent() {
-    JobEvent shutdownEvent = new JobEvent(m_jobManager, JobEventType.SHUTDOWN);
+    JobEvent shutdownEvent = new JobEvent(Jobs.getJobManager(), JobEventType.SHUTDOWN);
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -209,8 +202,8 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testCurrentSession() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
-    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    JobEvent modelEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
 
     ISession.CURRENT.set(m_clientSession1);
 
@@ -243,8 +236,8 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testNotCurrentSession() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
-    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    JobEvent modelEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
 
     ISession.CURRENT.set(m_clientSession1);
     assertFalse(Jobs.newEventFilterBuilder()
@@ -276,8 +269,8 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testFuture() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
-    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    JobEvent modelEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -304,7 +297,7 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testCurrentFuture() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
 
     IFuture.CURRENT.remove();
     assertFalse(Jobs.newEventFilterBuilder()
@@ -325,8 +318,8 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testNotCurrentFuture() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
-    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    JobEvent modelEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_modelJobFuture);
 
     IFuture.CURRENT.set(m_clientJobFuture);
     assertFalse(Jobs.newEventFilterBuilder()
@@ -370,11 +363,11 @@ public class ClientRunContextJobEventFilterTest {
 
   @Test
   public void testMutex() {
-    Object mutexObject1 = new Object();
-    Object mutexObject2 = new Object();
+    IMutex mutex1 = Jobs.newMutex();
+    IMutex mutex2 = Jobs.newMutex();
 
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
-    m_clientJobFuture.getJobInput().withMutex(mutexObject1);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    m_clientJobFuture.getJobInput().withMutex(mutex1);
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -389,17 +382,17 @@ public class ClientRunContextJobEventFilterTest {
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(clientEvent));
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(clientEvent));
 
-    clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
     m_clientJobFuture.getJobInput().withMutex(null);
 
     assertTrue(Jobs.newEventFilterBuilder()
@@ -415,20 +408,20 @@ public class ClientRunContextJobEventFilterTest {
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(clientEvent));
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(clientEvent));
   }
 
   @Test
   public void testCustomFilter() {
-    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
+    JobEvent clientEvent = new JobEvent(Jobs.getJobManager(), JobEventType.ABOUT_TO_RUN).withFuture(m_clientJobFuture);
 
     // False Filter
     assertFalse(Jobs.newEventFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new IFilter<JobEvent>() {

@@ -15,13 +15,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
+import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2
  * seconds that the Runnable is executed every 2 seconds. If an execution takes longer than the period, the subsequent
  * execution starts immediately.
- * <p/>
+ * <p>
  * This class is necessary because {@link ScheduledThreadPoolExecutor} is not applicable for {@link JobManager} due to
  * its fixed-size thread pool. That means, that once the <code>core-pool-size</code> is exceeded, the creation of
  * on-demand threads up to a <code>maximum-pool-size</code> would not be supported.
@@ -34,14 +35,12 @@ class FixedRateRunnable implements IRejectableRunnable {
 
   private final ExecutorService m_executor;
   private final DelayedExecutor m_delayedExecutor;
-  private final MutexSemaphores m_mutexSemaphores;
   private final JobFutureTask<?> m_futureTask;
   private final long m_periodNanos;
 
-  public FixedRateRunnable(final ExecutorService executor, final DelayedExecutor delayedExecutor, final MutexSemaphores mutexSemaphores, final JobFutureTask<?> futureTask, final long periodMillis) {
+  public FixedRateRunnable(final ExecutorService executor, final DelayedExecutor delayedExecutor, final JobFutureTask<?> futureTask, final long periodMillis) {
     m_executor = executor;
     m_delayedExecutor = delayedExecutor;
-    m_mutexSemaphores = mutexSemaphores;
     m_futureTask = futureTask;
     m_periodNanos = TimeUnit.MILLISECONDS.toNanos(periodMillis);
   }
@@ -55,12 +54,13 @@ class FixedRateRunnable implements IRejectableRunnable {
 
     final long startTimeNanos = System.nanoTime();
 
-    if (m_futureTask.getMutexObject() == null) {
+    final IMutex mutex = m_futureTask.getMutex();
+    if (mutex == null) {
       m_futureTask.run();
       scheduleNextExecution(startTimeNanos);
     }
     else {
-      m_mutexSemaphores.competeForMutex(m_futureTask, Position.TAIL, new IMutexAcquiredCallback() {
+      mutex.compete(m_futureTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
 
         @Override
         public void onMutexAcquired() {

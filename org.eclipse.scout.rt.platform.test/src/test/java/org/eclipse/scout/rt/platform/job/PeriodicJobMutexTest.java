@@ -21,50 +21,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class PeriodicJobMutexTest {
 
-  private P_JobManager m_jobManager;
-  private IBean<Object> m_jobManagerBean;
-
-  @Before
-  public void before() {
-    m_jobManager = new P_JobManager();
-    m_jobManagerBean = Platform.get().getBeanManager().registerBean(
-        new BeanMetaData(P_JobManager.class)
-            .withReplace(true)
-            .withInitialInstance(m_jobManager));
-  }
-
-  @After
-  public void after() {
-    Platform.get().getBeanManager().unregisterBean(m_jobManagerBean);
-  }
-
   @Test
   public void testAtFixedRate() {
     test(Jobs.newInput()
         .withPeriodicExecutionAtFixedRate(100, TimeUnit.MILLISECONDS)
-        .withMutex(new Object()));
+        .withMutex(Jobs.newMutex()));
   }
 
   @Test
   public void testWithFixedDelay() {
     test(Jobs.newInput()
         .withPeriodicExecutionWithFixedDelay(100, TimeUnit.MILLISECONDS)
-        .withMutex(new Object()));
+        .withMutex(Jobs.newMutex()));
   }
 
   /**
@@ -93,7 +69,8 @@ public class PeriodicJobMutexTest {
         protocol.add("begin");
 
         // This task should be mutex-owner
-        if (m_jobManager.getMutexSemaphores().isMutexOwner((JobFutureTask) IFuture.CURRENT.get())) {
+        JobFutureTask currentTask = (JobFutureTask) IFuture.CURRENT.get();
+        if (currentTask.isMutexOwner()) {
           protocol.add("mutex-owner");
         }
 
@@ -170,13 +147,5 @@ public class PeriodicJobMutexTest {
     expected.add("running-3");
 
     assertEquals(expected, protocol);
-  }
-
-  private class P_JobManager extends JobManager {
-
-    @Override
-    public MutexSemaphores getMutexSemaphores() {
-      return m_mutexSemaphores;
-    }
   }
 }

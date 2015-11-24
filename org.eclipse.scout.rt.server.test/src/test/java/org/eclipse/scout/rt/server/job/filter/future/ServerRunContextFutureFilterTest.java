@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
@@ -205,10 +206,10 @@ public class ServerRunContextFutureFilterTest {
 
   @Test
   public void testMutex() {
-    Object mutexObject1 = new Object();
-    Object mutexObject2 = new Object();
+    IMutex mutex1 = Jobs.newMutex();
+    IMutex mutex2 = Jobs.newMutex();
 
-    m_serverJobFuture.getJobInput().withMutex(mutexObject1);
+    m_serverJobFuture.getJobInput().withMutex(mutex1);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
         .toFilter()
@@ -222,13 +223,13 @@ public class ServerRunContextFutureFilterTest {
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(m_serverJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(m_serverJobFuture));
 
@@ -246,13 +247,13 @@ public class ServerRunContextFutureFilterTest {
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(m_serverJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(m_serverJobFuture));
   }

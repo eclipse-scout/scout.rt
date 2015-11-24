@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -292,11 +293,11 @@ public class ServerRunContextJobEventFilterTest {
 
   @Test
   public void testMutex() {
-    Object mutexObject1 = new Object();
-    Object mutexObject2 = new Object();
+    IMutex mutex1 = Jobs.newMutex();
+    IMutex mutex2 = Jobs.newMutex();
 
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN).withFuture(m_serverJobFuture);
-    m_serverJobFuture.getJobInput().withMutex(mutexObject1);
+    m_serverJobFuture.getJobInput().withMutex(mutex1);
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
         .toFilter()
@@ -310,13 +311,13 @@ public class ServerRunContextJobEventFilterTest {
 
     assertTrue(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(serverEvent));
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(serverEvent));
 
@@ -335,13 +336,13 @@ public class ServerRunContextJobEventFilterTest {
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(serverEvent));
 
     assertFalse(Jobs.newEventFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(serverEvent));
   }

@@ -200,4 +200,11 @@ public final class Jobs {
   public static JobEventFilterBuilder newEventFilterBuilder() {
     return BEANS.get(JobEventFilterBuilder.class);
   }
+
+  /**
+   * Creates a new mutex object to be used to run jobs in sequence among this mutex.
+   */
+  public static IMutex newMutex() {
+    return BEANS.get(IMutex.class);
+  }
 }

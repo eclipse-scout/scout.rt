@@ -46,8 +46,8 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphore.Position;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -70,7 +70,6 @@ public class JobManager implements IJobManager, IPlatformListener {
   private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
 
   protected final ExecutorService m_executor;
-  protected final MutexSemaphores m_mutexSemaphores;
   protected final FutureSet m_futures;
   protected final JobListeners m_listeners;
   private final DelayedExecutor m_delayedExecutor;
@@ -78,10 +77,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   public JobManager() {
     m_executor = Assertions.assertNotNull(createExecutor());
     m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", CONFIG.getPropertyValue(JobManagerDispatcherThreadCountProperty.class));
-
-    m_mutexSemaphores = BEANS.get(MutexSemaphores.class);
     m_listeners = BEANS.get(JobListeners.class);
-
     m_futures = BEANS.get(FutureSet.class);
     m_futures.init(this);
   }
@@ -101,10 +97,10 @@ public class JobManager implements IJobManager, IPlatformListener {
         scheduleDelayed(futureTask, input.getSchedulingDelay());
         break;
       case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
-        scheduleDelayed(new FixedRateRunnable(m_executor, m_delayedExecutor, m_mutexSemaphores, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        scheduleDelayed(new FixedRateRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
-        scheduleDelayed(new FixedDelayRunnable(m_executor, m_delayedExecutor, m_mutexSemaphores, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        scheduleDelayed(new FixedDelayRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       default:
         throw new UnsupportedOperationException("Unsupported scheduling rule");
@@ -142,9 +138,6 @@ public class JobManager implements IJobManager, IPlatformListener {
     }
     catch (final InterruptedException e) {
       // NOOP
-    }
-    finally {
-      m_mutexSemaphores.clear();
     }
 
     fireEvent(new JobEvent(this, JobEventType.SHUTDOWN));
@@ -193,10 +186,10 @@ public class JobManager implements IJobManager, IPlatformListener {
    * Executes the given runnable, and if being a mutually exclusive task, acquires the mutex first.
    */
   private void competeForMutexAndExecute(final IRejectableRunnable runnable) {
-    if (runnable instanceof JobFutureTask && ((JobFutureTask) runnable).getMutexObject() != null) {
+    if (runnable instanceof JobFutureTask && ((JobFutureTask) runnable).getMutex() != null) {
       final JobFutureTask<?> mutexTask = (JobFutureTask) runnable;
 
-      m_mutexSemaphores.competeForMutex(mutexTask, Position.TAIL, new IMutexAcquiredCallback() {
+      mutexTask.getMutex().compete(mutexTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
 
         @Override
         public void onMutexAcquired() {
@@ -311,11 +304,6 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Internal
-  protected MutexSemaphores getMutexSemaphores() {
-    return m_mutexSemaphores;
-  }
-
-  @Internal
   protected void registerFuture(final IFuture<?> future) {
     m_futures.add(future);
   }
@@ -323,21 +311,6 @@ public class JobManager implements IJobManager, IPlatformListener {
   @Internal
   protected void unregisterFuture(final IFuture<?> future) {
     m_futures.remove(future);
-  }
-
-  /**
-   * Passes the mutex to the next pending task, unless the given task is not a mutex task, or not the mutex owner.
-   */
-  @Internal
-  protected void passMutexIfMutexOwner(final JobFutureTask<?> task) {
-    if (task.getMutexObject() != null && task.isMutexOwner()) {
-      m_mutexSemaphores.passMutexToNextTask(task.getMutexObject(), task);
-    }
-  }
-
-  @Internal
-  protected boolean isMutexOwner(final JobFutureTask<?> task) {
-    return m_mutexSemaphores.isMutexOwner(task);
   }
 
   @Override

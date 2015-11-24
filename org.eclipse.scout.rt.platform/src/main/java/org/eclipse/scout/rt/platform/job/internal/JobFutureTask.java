@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -115,7 +116,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   public final void reject() {
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED).withFuture(this));
     cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
-    m_jobManager.passMutexIfMutexOwner(this);
+    releaseMutex();
   }
 
   /**
@@ -140,7 +141,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     }
     finally {
-      m_jobManager.passMutexIfMutexOwner(this);
+      releaseMutex();
     }
   }
 
@@ -164,15 +165,16 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   /**
    * @return the mutex object, or <code>null</code> if not being a mutual exclusive task.
    */
-  public Object getMutexObject() {
+  public IMutex getMutex() {
     return m_input.getMutex();
   }
 
   /**
-   * @return <code>true</code> if this task is a mutex task and currently owns the mutex.
+   * @return <code>true</code> if this task is a mutual exclusive task and currently owns the mutex.
    */
   public boolean isMutexOwner() {
-    return m_jobManager.isMutexOwner(this);
+    final IMutex mutex = getMutex();
+    return mutex != null && mutex.isMutexOwner(this);
   }
 
   @Override
@@ -358,7 +360,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // not running in a job.
     }
 
-    final Object currentMutex = currentFuture.getJobInput().getMutex();
+    final IMutex currentMutex = currentFuture.getJobInput().getMutex();
     if (currentMutex == null) {
       return; // current job is not running in mutual exclusive manner.
     }
@@ -367,7 +369,16 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // job already in 'done'-state.
     }
 
-    Assertions.assertFalse(currentMutex.equals(getMutexObject()), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex=%s]", currentMutex);
+    Assertions.assertNotSame(currentMutex, getMutex(), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex=%s]", currentMutex);
+  }
+
+  /**
+   * Releases the mutex if being a mutual exclusive task and currently the mutex owner.
+   */
+  protected void releaseMutex() {
+    if (isMutexOwner()) {
+      getMutex().release(this);
+    }
   }
 
   @Override

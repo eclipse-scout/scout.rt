@@ -12,58 +12,53 @@ package org.eclipse.scout.rt.client.job.filter.future;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
+import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
 public class ClientRunContextFutureFilterTest {
 
-  @Mock
   private IFuture<?> m_clientJobFuture;
-  @Mock
   private IFuture<?> m_modelJobFuture;
-  @Mock
-  private IFuture<?> m_jobFuture;
-  @Mock
   private IClientSession m_clientSession1;
-  @Mock
   private IClientSession m_clientSession2;
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
+    m_clientSession1 = mock(IClientSession.class);
+    when(m_clientSession1.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
-    JobInput clientJobInput = Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true));
-    when(m_clientJobFuture.getJobInput()).thenReturn(clientJobInput);
+    m_clientSession2 = mock(IClientSession.class);
+    when(m_clientSession2.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
-    JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true));
-    when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
-
-    JobInput jobInput = Jobs.newInput().withRunContext(RunContexts.empty());
-    when(m_jobFuture.getJobInput()).thenReturn(jobInput);
+    m_clientJobFuture = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true)));
+    m_modelJobFuture = ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)));
   }
 
   @Test
   public void testBlocked() {
-    when(m_clientJobFuture.isBlocked()).thenReturn(true);
+    ((JobFutureTask) m_clientJobFuture).setBlocked(true);
+
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
@@ -81,7 +76,7 @@ public class ClientRunContextFutureFilterTest {
         .toFilter()
         .accept(m_clientJobFuture));
 
-    when(m_modelJobFuture.isBlocked()).thenReturn(true);
+    ((JobFutureTask) m_modelJobFuture).setBlocked(true);
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .toFilter()
@@ -100,40 +95,43 @@ public class ClientRunContextFutureFilterTest {
 
   @Test
   public void testPeriodic() {
-    when(m_clientJobFuture.getSchedulingRule()).thenReturn(JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE);
+    IFuture<Void> clientJobFuture = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true))
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .accept(clientJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andArePeriodicExecuting()
         .toFilter()
-        .accept(m_clientJobFuture));
+        .accept(clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andAreSingleExecuting()
         .toFilter()
-        .accept(m_clientJobFuture));
+        .accept(clientJobFuture));
 
-    when(m_modelJobFuture.getSchedulingRule()).thenReturn(JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE);
+    IFuture<Void> modelJobFuture = ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .toFilter()
-        .accept(m_modelJobFuture));
+        .accept(modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andArePeriodicExecuting()
         .toFilter()
-        .accept(m_modelJobFuture));
+        .accept(modelJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andAreSingleExecuting()
         .toFilter()
-        .accept(m_modelJobFuture));
+        .accept(modelJobFuture));
   }
 
   @Test
@@ -355,10 +353,10 @@ public class ClientRunContextFutureFilterTest {
 
   @Test
   public void testMutex() {
-    Object mutexObject1 = new Object();
-    Object mutexObject2 = new Object();
+    IMutex mutex1 = Jobs.newMutex();
+    IMutex mutex2 = Jobs.newMutex();
 
-    m_clientJobFuture.getJobInput().withMutex(mutexObject1);
+    m_clientJobFuture.getJobInput().withMutex(mutex1);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
@@ -372,13 +370,13 @@ public class ClientRunContextFutureFilterTest {
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(m_clientJobFuture));
 
@@ -396,13 +394,13 @@ public class ClientRunContextFutureFilterTest {
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject1)
+        .andMatchMutex(mutex1)
         .toFilter()
         .accept(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andMatchMutex(mutexObject2)
+        .andMatchMutex(mutex2)
         .toFilter()
         .accept(m_clientJobFuture));
   }
