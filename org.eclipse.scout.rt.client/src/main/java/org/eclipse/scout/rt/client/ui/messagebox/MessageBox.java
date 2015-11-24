@@ -377,6 +377,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   protected void waitFor() {
     try {
+      IFuture.CURRENT.get().addExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
       m_blockingCondition.waitFor();
     }
     catch (ProcessingException e) {

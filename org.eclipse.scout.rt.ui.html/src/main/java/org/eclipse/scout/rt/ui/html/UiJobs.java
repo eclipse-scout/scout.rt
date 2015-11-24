@@ -57,7 +57,7 @@ public class UiJobs {
     try {
       timeout = !Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilterBuilder()
           .andMatch(new SessionFutureFilter(clientSession))
-          .andAreNotBlocked()
+          .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
           .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {
@@ -98,7 +98,7 @@ public class UiJobs {
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
           .andMatchFuture(future)
-          .andAreNotBlocked()
+          .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
           .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {

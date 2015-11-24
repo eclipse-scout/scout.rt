@@ -78,6 +78,38 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
  */
 public final class ModelJobs {
 
+  /**
+   * Execution hint to signal that a specific job (usually a model job) requires user interaction. This hint is usually
+   * set just before a blocking condition is entered ("waitFor()"). Threads that are waiting for the model job to be
+   * completed can then return to the UI before the job is actually done (which would never happen without the user
+   * interaction).
+   * <p>
+   * <b>Usage</b>
+   * <p>
+   * <i>Code that blocks, but requires user interaction to release the lock:</i><br>
+   *
+   * <pre>
+   * private void waitFor() {
+   *   IFuture.CURRENT.get().addExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
+   *   m_blockingCondition.waitFor();
+   * }
+   * </pre>
+   *
+   * <i>Code that waits for the model job, but should return to the UI when user interaction is required:</i><br>
+   *
+   * <pre>
+   *   ...
+   *   Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilterBuilder()
+   *      .andMatch(...) // any other conditions
+   *      .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
+   *      .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS)
+   *   ...
+   * </pre>
+   *
+   * @see {@link IJobManager#awaitDone(org.eclipse.scout.commons.filter.IFilter, long, java.util.concurrent.TimeUnit)}
+   */
+  public static final String EXECUTION_HINT_USER_INTERACTION_REQUIRED = "userInteractionRequired";
+
   private ModelJobs() {
   }
 

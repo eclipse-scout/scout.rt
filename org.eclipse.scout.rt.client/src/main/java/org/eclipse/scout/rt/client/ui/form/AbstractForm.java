@@ -978,6 +978,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void waitFor() {
+    IFuture.CURRENT.get().addExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
     m_blockingCondition.waitFor();
   }
 
