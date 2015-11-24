@@ -10,17 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.serverbridge;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.rt.client.IClientNode;
+import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
  * Bean decorator that executes bean method invocations in a server run context.<br>
@@ -62,17 +68,35 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     }
 
     // bridge to server scope
-    ServerRunContext bridgeRunContext = ServerRunContexts.copyCurrent();
+    TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
+    ServerRunContext bridgeRunContext = ServerRunContexts
+    	.copyCurrent()
+        .withTransactionalClientNotificationCollector(collector)
+        .withClientNodeId(IClientNode.ID);
     ISession currentSession = ISession.CURRENT.get();
     IServerSession bridgeSession = null;
     if (currentSession != null) {
       bridgeSession = BEANS.get(ServerSessionProviderWithCache.class).provide(bridgeRunContext, currentSession.getId());
     }
-    return bridgeRunContext.withSession(bridgeSession).call(new Callable<Object>() {
+    Object result = bridgeRunContext.withSession(bridgeSession).call(new Callable<Object>() {
       @Override
       public Object call() throws Exception {
-        return continueCall(context);
+        try {
+          return continueCall(context);
+        }
+        catch (Throwable t) {
+          ITransaction.CURRENT.get().addFailure(t);
+          throw t;
+        }
       }
     });
+
+    ClientNotificationDispatcher clientNotificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
+    List<ClientNotificationMessage> values = collector.values();
+    if (!values.isEmpty()) {
+      clientNotificationDispatcher.dispatchNotifications(values);
+    }
+
+    return result;
   }
 }

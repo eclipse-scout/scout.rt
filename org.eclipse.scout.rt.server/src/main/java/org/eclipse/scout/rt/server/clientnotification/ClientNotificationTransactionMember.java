@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -89,6 +88,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
    * called in a separate server job)
    */
   private boolean isPiggyBackPossible() {
-    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get() != null && IClientNodeId.CURRENT.get() != null;
+//    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get() != null && IClientNodeId.CURRENT.get() != null;
+    return TransactionalClientNotificationCollector.CURRENT.get() != null && IClientNodeId.CURRENT.get() != null;
   }
 }

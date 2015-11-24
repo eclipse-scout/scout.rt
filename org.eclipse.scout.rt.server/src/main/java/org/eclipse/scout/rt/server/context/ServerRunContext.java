@@ -270,7 +270,7 @@ public class ServerRunContext extends RunContext {
     super.fillCurrentValues();
     m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = UserAgent.CURRENT.get();
-    m_transactionalClientNotificationCollector = TransactionalClientNotificationCollector.CURRENT.get();
+    // m_transactionalClientNotificationCollector = TransactionalClientNotificationCollector.CURRENT.get(); // TODO
     m_clientNodeId = IClientNodeId.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
