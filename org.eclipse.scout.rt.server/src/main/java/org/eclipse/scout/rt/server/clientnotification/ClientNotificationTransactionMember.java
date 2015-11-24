@@ -20,10 +20,12 @@ import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
- * This transaction member is used to collect all transactional notifications issued during a transaction. On successful
- * commit, the notifications will be added to the {@link ServerRunContext#getTransactionalClientNotificationCollector()
- * )} to be included in the request's response (piggyback). That allows immediate processing of the transactional
- * notifications on client side.
+ * This transaction member is used to collect all transactional notifications issued during a transaction.
+ * <p>
+ * On successful commit, the notifications will be added to the
+ * {@link ServerRunContext#getTransactionalClientNotificationCollector() )} to be included in the request's response
+ * (piggyback). That allows immediate processing of the transactional notifications on client side.
+ * </p>
  */
 public class ClientNotificationTransactionMember extends AbstractTransactionMember {
 
@@ -65,22 +67,22 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
     m_notifications.clear();
   }
 
-  private void publish(List<ClientNotificationMessage> coalescedNotifications) {
-    if (isPiggyBackPossible()) {
-      preparePiggyBack(coalescedNotifications);
-      m_notificationRegistry.publish(coalescedNotifications, Assertions.assertNotNull(IClientNodeId.CURRENT.get(), "Missing 'client node id' on current calling context"));
+  private void publish(List<ClientNotificationMessage> notifications) {
+    if (isPiggyBackPossible() && preparePiggyBack(notifications)) {
+      m_notificationRegistry.publish(notifications, Assertions.assertNotNull(IClientNodeId.CURRENT.get(), "Missing 'client node id' on current calling context"));
     }
     else {
-      m_notificationRegistry.publish(coalescedNotifications);
+      m_notificationRegistry.publish(notifications);
     }
+
   }
 
   /**
    * Register client notifications of the current transaction in the collector to be included in the service response
    * (piggyback).
    */
-  private void preparePiggyBack(List<ClientNotificationMessage> notifications) {
-    TransactionalClientNotificationCollector.CURRENT.get().addAll(notifications);
+  private boolean preparePiggyBack(List<ClientNotificationMessage> notifications) {
+    return TransactionalClientNotificationCollector.CURRENT.get().addAll(notifications);
   }
 
   /**
@@ -88,7 +90,6 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
    * called in a separate server job)
    */
   private boolean isPiggyBackPossible() {
-//    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get() != null && IClientNodeId.CURRENT.get() != null;
-    return TransactionalClientNotificationCollector.CURRENT.get() != null && IClientNodeId.CURRENT.get() != null;
+    return IClientNodeId.CURRENT.get() != null && TransactionalClientNotificationCollector.CURRENT.get() != null;
   }
 }

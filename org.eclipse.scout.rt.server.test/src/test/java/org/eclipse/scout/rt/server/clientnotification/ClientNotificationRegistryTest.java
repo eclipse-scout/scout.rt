@@ -13,12 +13,9 @@ package org.eclipse.scout.rt.server.clientnotification;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -198,31 +195,34 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testTransactionalWithPiggyBack() throws Exception {
     try {
-      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(mock(HttpServletResponse.class));
-
       final String currentNode = TEST_NODE;
       final String otherNode = "Node2";
 
-      ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
+      TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
 
-        @Override
-        public void run() throws Exception {
-          ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-          reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
-          reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
+      ServerRunContexts.copyCurrent()
+          .withClientNodeId(currentNode)
+          .withTransactionalClientNotificationCollector(collector)
+          .run(new IRunnable() {
 
-          reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
-          commit();
-          //collected for request
-          List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().values();
-          assertSingleTestNotification(notifications);
-          //no notification for current node
-          List<ClientNotificationMessage> ownRegNotifications = consumeNoWait(reg, currentNode);
-          assertTrue(ownRegNotifications.isEmpty());
-          //notifications for other nodes
-          assertSingleTestNotification(consumeNoWait(reg, otherNode));
-        }
-      });
+            @Override
+            public void run() throws Exception {
+              ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+              reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
+              reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
+
+              reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
+              commit();
+              //collected for request
+              List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().values();
+              assertSingleTestNotification(notifications);
+              //no notification for current node
+              List<ClientNotificationMessage> ownRegNotifications = consumeNoWait(reg, currentNode);
+              assertTrue(ownRegNotifications.isEmpty());
+              //notifications for other nodes
+              assertSingleTestNotification(consumeNoWait(reg, otherNode));
+            }
+          });
 
     }
     finally {
@@ -231,15 +231,16 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
-   * If no response is available and the notification is processed within a transaction, it should only be on
-   * ServerRunContext.
+   * If the notifications are already consumed, piggy back is not possible
    */
   @Test
   public void testTransactionalNoPiggyBack() throws Exception {
     final String currentNode = TEST_NODE;
     final String otherNode = "Node2";
 
-    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
+    TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
+    collector.values();
+    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withTransactionalClientNotificationCollector(collector).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
