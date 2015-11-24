@@ -197,6 +197,7 @@ __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/DetailTableTreeFilter.js");
 __include("scout/desktop/NullDesktopNavigation.js");
+__include("scout/desktop/PopupBlockerHandler.js");
 __include("scout/desktop/PopupWindow.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");

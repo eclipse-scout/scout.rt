@@ -597,38 +597,11 @@ scout.Desktop.prototype._openUriInIFrame = function(uri) {
 };
 
 scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
-  var popup;
-  if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER) {
-    // Workaround for IE: When in "protected mode", window.open() returns null for external URLs, even when
-    // the popup was successfully opened! To check if a popup blocker is active, we first open an empty
-    // popup with no URL, which will return null when the popup was blocked. If the popup was successful,
-    // we change the location to the target URI.
-    popup = window.open('');
-    if (popup) {
-      popup.window.location.href = uri;
-    }
-  } else {
-    // Chrome returns undefined, FF null when popup is blocked
-    popup = window.open(uri);
-  }
+  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
+    popup = popupBlockerHandler.openWindow(uri);
 
   if (!popup) {
-    // Popup blocker detected
-    var $notification = this.$container.makeDiv('notification');
-    var $notificationContent = $notification
-      .appendDiv('notification-content notification-closable');
-    $notificationContent.appendDiv('close')
-      .on('click', function() {
-        this.removeNotification($notification);
-      }.bind(this));
-    $notificationContent.appendDiv('popup-blocked-title')
-      .text(this.session.text('ui.PopupBlockerDetected'));
-    $notificationContent.appendElement('<a href="' + scout.strings.encode(uri) + '" target="_blank">', 'popup-blocked-link')
-      .text(this.session.text('ui.OpenManually'))
-      .on('click', function() {
-        this.removeNotification($notification);
-      }.bind(this));
-    this.addNotification($notification);
+    popupBlockerHandler.showNotification(uri);
   }
 };
 
