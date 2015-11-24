@@ -114,6 +114,12 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
+  @Override
+  public ServerRunContext withIdentifier(String id) {
+    super.withIdentifier(id);
+    return this;
+  }
+
   /**
    * @see #withSession(IServerSession)
    */

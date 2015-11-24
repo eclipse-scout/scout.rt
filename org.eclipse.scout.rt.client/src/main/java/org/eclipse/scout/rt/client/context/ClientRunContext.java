@@ -91,6 +91,12 @@ public class ClientRunContext extends RunContext {
   }
 
   @Override
+  public ClientRunContext withIdentifier(String id) {
+    super.withIdentifier(id);
+    return this;
+  }
+
+  @Override
   public ClientRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

@@ -82,6 +82,12 @@ public class JaxWsServletRunContext extends ServletRunContext {
     return this;
   }
 
+  @Override
+  public JaxWsServletRunContext withIdentifier(String id) {
+    super.withIdentifier(id);
+    return this;
+  }
+
   /**
    * @see #withWebServiceContext(WebServiceContext)
    */

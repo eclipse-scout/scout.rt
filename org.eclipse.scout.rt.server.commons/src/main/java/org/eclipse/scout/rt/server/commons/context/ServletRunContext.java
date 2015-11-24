@@ -88,6 +88,12 @@ public class ServletRunContext extends RunContext {
     return this;
   }
 
+  @Override
+  public ServletRunContext withIdentifier(String id) {
+    super.withIdentifier(id);
+    return this;
+  }
+
   public HttpServletRequest getServletRequest() {
     return m_servletRequest;
   }

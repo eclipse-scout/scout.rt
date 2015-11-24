@@ -79,6 +79,12 @@ public class JmsRunContext extends RunContext {
     return this;
   }
 
+  @Override
+  public JmsRunContext withIdentifier(String id) {
+    super.withIdentifier(id);
+    return this;
+  }
+
   public Message getJmsMessage() {
     return m_jmsMessage;
   }

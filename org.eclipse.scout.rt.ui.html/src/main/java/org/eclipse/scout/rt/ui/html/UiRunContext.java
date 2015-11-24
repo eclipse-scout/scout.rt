@@ -83,6 +83,12 @@ public class UiRunContext extends RunContext {
     return this;
   }
 
+  @Override
+  public UiRunContext withIdentifier(String id) {
+    super.withIdentifier(id);
+    return this;
+  }
+
   /**
    * @see #withSession(IUiSession)
    */
