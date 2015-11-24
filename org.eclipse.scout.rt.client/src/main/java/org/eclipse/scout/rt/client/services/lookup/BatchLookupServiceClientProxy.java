@@ -15,13 +15,14 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
+import org.eclipse.scout.rt.shared.services.lookup.IServerBatchLookupService;
 
 @Order(4900)
 public class BatchLookupServiceClientProxy implements IBatchLookupService {
@@ -129,7 +130,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   }
 
   private IBatchLookupService getTargetService() {
-    return ServiceTunnelUtility.createProxy(IBatchLookupService.class);
+    return BEANS.get(IServerBatchLookupService.class);
   }
 
 }

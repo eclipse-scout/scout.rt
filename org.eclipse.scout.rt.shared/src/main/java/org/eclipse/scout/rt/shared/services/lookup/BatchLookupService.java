@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.annotations.Order;
  * @since 4.3.0 (Mars-M5)
  */
 @Order(5100)
-public class BatchLookupService implements IBatchLookupService {
+public class BatchLookupService implements IServerBatchLookupService {
 
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) {
