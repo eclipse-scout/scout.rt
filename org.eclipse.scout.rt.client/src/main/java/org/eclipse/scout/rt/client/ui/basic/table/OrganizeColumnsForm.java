@@ -759,6 +759,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisible(getOrganizedTable().getTableCustomizer() != null);
               getMenuByClass(ModifyCustomColumnMenu.class).setVisiblePermission(new UpdateCustomColumnPermission());
               getMenuByClass(ModifyCustomColumnMenu.class).setVisible(getOrganizedTable().getTableCustomizer() != null);
+
+              getWidthColumn().setVisible(!getOrganizedTable().isAutoResizeColumns());
             }
 
             protected void refreshMenus() {
@@ -1430,7 +1432,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     if (row != null && targetIndex >= 0) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
-    touch();
     updateColumnVisibilityAndOrder();
   }
 
@@ -1442,7 +1443,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     if (row != null && targetIndex < getColumnsTableField().getTable().getRowCount()) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
-    touch();
     updateColumnVisibilityAndOrder();
   }
 
