@@ -108,7 +108,7 @@ scout.HtmlComponent.prototype.revalidateLayout = function() {
  * Invalidates the component-tree up to the next validate root, but only if invalidateParents is set to true.
  */
 scout.HtmlComponent.prototype.invalidateLayoutTree = function(invalidateParents) {
-  if (scout.helpers.nvl(invalidateParents, true)) {
+  if (scout.nvl(invalidateParents, true)) {
     this.session.layoutValidator.invalidateTree(this); // will call invalidateLayout(), which sets this.valid = false
   } else {
     this.valid = false;

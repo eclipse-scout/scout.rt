@@ -149,7 +149,7 @@ scout.FormField.prototype._renderTooltipText = function() {
 };
 
 scout.FormField.prototype._renderVisible = function(visible) {
-  visible = scout.helpers.nvl(visible, this.visible);
+  visible = scout.nvl(visible, this.visible);
   this.$container.setVisible(visible);
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
@@ -245,7 +245,7 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
 };
 
 scout.FormField.prototype._renderEnabled = function(enabled) {
-  enabled = scout.helpers.nvl(enabled, this.enabled);
+  enabled = scout.nvl(enabled, this.enabled);
   this.$container.setEnabled(enabled);
   if (this.$field) {
     this.$field.setEnabled(enabled);
@@ -586,8 +586,8 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
  */
 scout.FormField.prototype.updateInnerAlignment = function(opts) {
   opts = opts || {};
-  var useHorizontalAlignment = scout.helpers.nvl(opts.useHorizontalAlignment, true);
-  var useVerticalAlignment = scout.helpers.nvl(opts.useVerticalAlignment, true);
+  var useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
+  var useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
   var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
 
   if ($fieldContainer) {

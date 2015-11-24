@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.DefaultFieldLoadingSupport = function(field, loadingIndicatorDelay) {
   this.field = field;
-  this.loadingIndicatorDelay = scout.helpers.nvl(loadingIndicatorDelay, 250); // ms
+  this.loadingIndicatorDelay = scout.nvl(loadingIndicatorDelay, 250); // ms
 
   this._loadingIndicatorTimeoutId;
 };

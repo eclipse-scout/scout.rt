@@ -99,6 +99,17 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.parent = parentCtor;
 };
 
+
+/**
+ * If 'value' is undefined or null, 'defaultValue' is returned. Otherwise, 'value' is returned.
+ */
+scout.nvl = function(value, defaultValue) {
+  if (value === undefined || value === null) {
+    return defaultValue;
+  }
+  return value;
+};
+
 /**
  * Creates a new object instance.<p>
  * Depending on the first parameter, either the object factory or the constructor function is used.
@@ -154,7 +165,7 @@ scout._createLocalObject = function(model) {
 scout._checkBrowserCompability = function(options) {
   var device = scout.device;
   $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
-  if (!scout.helpers.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
+  if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
     // No check requested or browser is supported
     return true;
   }
@@ -316,7 +327,7 @@ scout.reloadPage = function(options) {
 
   function reloadPageImpl() {
     // Hide everything (on entire page, not only $entryPoint)
-    if (scout.helpers.nvl(options.clearBody, true)) {
+    if (scout.nvl(options.clearBody, true)) {
       $('body').html('');
     }
 

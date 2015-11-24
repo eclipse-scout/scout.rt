@@ -598,7 +598,7 @@ scout.DateField.prototype._onDatePickerDateSelected = function(event) {
     this.updateTimestamp(this._newTimestampAsDate(event.date, this.timestampAsDate));
     // closeDatePicker is set to false when date-field is in touch-mode
     // since popup will be closed by the embedded date-field
-    if (scout.helpers.nvl(event.closeDatePicker, true)) {
+    if (scout.nvl(event.closeDatePicker, true)) {
       this._closeDatePicker();
     }
   }
@@ -749,7 +749,7 @@ scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServ
   if (timestamp !== this.timestamp || this.errorStatus) {
     this.timestamp = timestamp;
     this.timestampAsDate = timestampAsDate;
-    if (scout.helpers.nvl(syncToServer, true)) {
+    if (scout.nvl(syncToServer, true)) {
       this._syncToServer();
     }
   }

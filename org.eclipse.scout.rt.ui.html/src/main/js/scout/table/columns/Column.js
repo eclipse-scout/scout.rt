@@ -27,7 +27,7 @@ scout.Column.prototype.init = function(model) {
 
   // InitialWidth is only sent if it differs from width
   if (this.initialWidth === undefined) {
-    this.initialWidth = scout.helpers.nvl(this.width, 0);
+    this.initialWidth = scout.nvl(this.width, 0);
   }
 
   if (this.aggregationFunction) {
@@ -288,7 +288,7 @@ scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
   this.backgroundEffect = effect;
   this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
 
-  notifyServer = scout.helpers.nvl(notifyServer, true);
+  notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this.table._sendColumnBackgroundEffectChanged(this);
   }

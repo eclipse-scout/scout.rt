@@ -42,15 +42,15 @@ scout.Popup.prototype._init = function(options) {
     this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
   }
   this.$anchor = options.$anchor;
-  this.windowPaddingX = scout.helpers.nvl(options.windowPaddingX, 10);
-  this.windowPaddingY = scout.helpers.nvl(options.windowPaddingY, 5);
+  this.windowPaddingX = scout.nvl(options.windowPaddingX, 10);
+  this.windowPaddingY = scout.nvl(options.windowPaddingY, 5);
   this.openingDirectionX = options.openingDirectionX || 'right';
   this.openingDirectionY = options.openingDirectionY || 'down';
-  this.withFocusContext = scout.helpers.nvl(options.installFocusContext, true);
-  this.initialFocus = scout.helpers.nvl(options.initialFocus, function() {
+  this.withFocusContext = scout.nvl(options.installFocusContext, true);
+  this.initialFocus = scout.nvl(options.initialFocus, function() {
     return scout.focusRule.AUTO;
   });
-  this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
+  this.focusableContainer = scout.nvl(options.focusableContainer, false);
 };
 
 scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -271,7 +271,7 @@ scout.Popup.prototype.adjustLocation = function($container, location, switchIfNe
   var openingDirection, left, top,
     overlap = this.overlap($container, location);
 
-  switchIfNecessary = scout.helpers.nvl(switchIfNecessary, true);
+  switchIfNecessary = scout.nvl(switchIfNecessary, true);
   if (overlap.y > 0 && switchIfNecessary) {
     // switch opening direction
     openingDirection = 'up';

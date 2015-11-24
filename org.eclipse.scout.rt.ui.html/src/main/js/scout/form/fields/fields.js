@@ -30,9 +30,9 @@ scout.fields = {
   },
 
   initTouch: function(field, model) {
-    field.embedded = scout.helpers.nvl(model.embedded, false);
+    field.embedded = scout.nvl(model.embedded, false);
     // when 'touch' is not set explicitly, check the device
-    field.touch = scout.helpers.nvl(model.touch, scout.device.supportsTouch());
+    field.touch = scout.nvl(model.touch, scout.device.supportsTouch());
   },
 
   /**

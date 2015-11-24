@@ -19,7 +19,7 @@ scout.strings = {
       return text;
     }
     text = this.asString(text);
-    encodeHtml = scout.helpers.nvl(encodeHtml, true);
+    encodeHtml = scout.nvl(encodeHtml, true);
     if (encodeHtml) {
       text = scout.strings.encode(text);}
 
@@ -63,7 +63,7 @@ scout.strings = {
       var mnemonic = m[1];
       if (mnemonic) {
         // Unless disabled explicitly, check if mnemonic matches with a known key
-        if (scout.helpers.nvl(resolveKey, true) && !scout.keys[mnemonic.toUpperCase()]) {
+        if (scout.nvl(resolveKey, true) && !scout.keys[mnemonic.toUpperCase()]) {
           mnemonic = null;
         }
         return mnemonic;

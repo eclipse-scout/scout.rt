@@ -136,7 +136,7 @@ scout.TableControl.prototype._renderForm = function(form) {
 };
 
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
-  selected = scout.helpers.nvl(selected, this.selected);
+  selected = scout.nvl(selected, this.selected);
   closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
 
   this.$container.select(selected);

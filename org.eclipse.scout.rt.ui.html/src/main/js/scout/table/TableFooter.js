@@ -241,8 +241,8 @@ scout.TableFooter.prototype._renderInfoSelection = function(numRowsSelected, all
   var $info = this._$infoSelection;
   var numRows = this.table.rows.length;
 
-  numRowsSelected = scout.helpers.nvl(numRowsSelected, this.table.selectedRows.length);
-  all = scout.helpers.nvl(all, (numRows === numRowsSelected));
+  numRowsSelected = scout.nvl(numRowsSelected, this.table.selectedRows.length);
+  all = scout.nvl(all, (numRows === numRowsSelected));
 
   $info.empty();
   if (!this._compactStyle) {
@@ -373,7 +373,7 @@ scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipCla
 };
 
 scout.TableFooter.prototype.computeCountInfo = function(n) {
-  if (scout.helpers.nvl(n, 0) === 0) {
+  if (scout.nvl(n, 0) === 0) {
     if (this._compactStyle) {
       return this.session.text('ui.TableRowCount', 0);
     } else {

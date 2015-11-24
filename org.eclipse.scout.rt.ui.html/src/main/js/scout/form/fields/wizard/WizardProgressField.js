@@ -96,7 +96,7 @@ scout.WizardProgressField.prototype._syncActiveWizardStepIndex = function(active
   this.previousActiveWizardStepIndex = this.activeWizardStepIndex;
   // Ensure this.activeWizardStepIndex always has a value. If the server has no active step set (may
   // happen during transition between steps), we use -1 as dummy value
-  this.activeWizardStepIndex = scout.helpers.nvl(activeWizardStepIndex, -1);
+  this.activeWizardStepIndex = scout.nvl(activeWizardStepIndex, -1);
 };
 
 scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {

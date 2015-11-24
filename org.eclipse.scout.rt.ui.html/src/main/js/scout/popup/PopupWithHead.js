@@ -119,7 +119,7 @@ scout.PopupWithHead.prototype._position = function($container, switchIfNecessary
   }
   this._positionImpl();
 
-  switchIfNecessary = scout.helpers.nvl(switchIfNecessary, true);
+  switchIfNecessary = scout.nvl(switchIfNecessary, true);
   if (switchIfNecessary) {
     pos = $container.offset();
     overlap = this.overlap($container, {

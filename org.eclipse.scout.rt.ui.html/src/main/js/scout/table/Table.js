@@ -1194,7 +1194,7 @@ scout.Table.prototype._sendRowClicked = function($row, mouseButton, columnId) {
  *    for Smart- and DateFields.
  */
 scout.Table.prototype.prepareCellEdit = function(rowId, columnId, openFieldPopupOnCellEdit) {
-  this.openFieldPopupOnCellEdit = scout.helpers.nvl(openFieldPopupOnCellEdit, false);
+  this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
   this._sendPrepareCellEdit(rowId, columnId);
 };
 
@@ -1508,7 +1508,7 @@ scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
 
 scout.Table.prototype._removeAggregateRows = function(animate) {
   var deferreds = [];
-  animate = scout.helpers.nvl(animate, false);
+  animate = scout.nvl(animate, false);
   if (!animate) {
     this._aggregateRows.forEach(function(aggregateRow) {
       if (!aggregateRow.$aggregateRow) {
@@ -1550,7 +1550,7 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
 
 scout.Table.prototype._renderAggregateRows = function(animate) {
   var c, cell, r, column, row, contents, alignment, $cell, $aggregateRow, that = this;
-  animate = scout.helpers.nvl(animate, false);
+  animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
     if (aggregateRow.$aggregateRow) {
@@ -2758,7 +2758,7 @@ scout.Table.prototype._renderEmptyData = function(width) {
     if (!this.$emptyData) {
       this.$emptyData = this.$data.appendDiv().html('&nbsp;');
     }
-    var headerWidth = scout.helpers.nvl(width, this.header.$container[0].scrollWidth);
+    var headerWidth = scout.nvl(width, this.header.$container[0].scrollWidth);
     this.$emptyData
       .css('min-width', headerWidth)
       .css('max-width', headerWidth);

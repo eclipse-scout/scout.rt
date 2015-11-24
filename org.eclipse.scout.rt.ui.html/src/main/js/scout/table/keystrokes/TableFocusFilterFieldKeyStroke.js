@@ -65,7 +65,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype.handle = function(event) {
   if (this.field.session.focusManager.requestFocus($filterInput)) {
     $filterInput.focus();
 
-    var length = scout.helpers.nvl($filterInput.val(), '').length;
+    var length = scout.nvl($filterInput.val(), '').length;
     $filterInput[0].setSelectionRange(length, length);
   }
 };

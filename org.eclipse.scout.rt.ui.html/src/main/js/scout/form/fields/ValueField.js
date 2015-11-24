@@ -51,8 +51,8 @@ scout.ValueField.prototype._onFieldBlur = function() {
  */
 scout.ValueField.prototype.acceptInput = function(whileTyping) {
   whileTyping = !!whileTyping; // cast to boolean
-  var displayText = scout.helpers.nvl(this._readDisplayText(), ''),
-    oldDisplayText = scout.helpers.nvl(this.displayText, '');
+  var displayText = scout.nvl(this._readDisplayText(), ''),
+    oldDisplayText = scout.nvl(this.displayText, '');
 
   // send only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
@@ -62,7 +62,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
 };
 
 scout.ValueField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
-  var oldDisplayText = scout.helpers.nvl(this.displayText, '');
+  var oldDisplayText = scout.nvl(this.displayText, '');
   return displayText !== oldDisplayText;
 };
 

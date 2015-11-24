@@ -173,7 +173,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
 scout.ViewMenuTab.prototype._popupViewMenus = function() {
   var i, popupMenus = [];
   this.viewMenus.forEach(function(viewMenu) {
-    if (scout.helpers.nvl(viewMenu.visibleInMenu, true)) {
+    if (scout.nvl(viewMenu.visibleInMenu, true)) {
       popupMenus.push(viewMenu);
     }
   });

@@ -344,7 +344,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = null;
 
-  forceClose = scout.helpers.nvl(forceClose, false);
+  forceClose = scout.nvl(forceClose, false);
   var proposalChooserOpen = !!this.proposalChooser,
     searchText = this._readSearchText();
 
@@ -406,7 +406,7 @@ scout.SmartField.prototype._focusNextTabbable = function() {
 
 scout.SmartField.prototype._closeProposal = function(notifyServer) {
   if (this._popup.rendered) {
-    if (scout.helpers.nvl(notifyServer, true)) {
+    if (scout.nvl(notifyServer, true)) {
       this._sendCancelProposal();
     }
     this._popup.close();

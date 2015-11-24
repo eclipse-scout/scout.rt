@@ -50,7 +50,7 @@ scout.BoxButtons.prototype.addButton = function(opts) {
     .attr('tabindex', opts.tabIndex || '0')
     .addClass('button')
     .unfocusable()
-    .setEnabled(scout.helpers.nvl(opts.enabled, true));
+    .setEnabled(scout.nvl(opts.enabled, true));
 
   if (opts.onClick) {
     var onClick = opts.onClick;

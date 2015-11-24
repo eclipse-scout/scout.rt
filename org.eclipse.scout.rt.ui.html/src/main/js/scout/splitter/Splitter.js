@@ -24,7 +24,7 @@ scout.inherits(scout.Splitter, scout.Widget);
 scout.Splitter.prototype._init = function(options) {
   scout.BusyIndicator.parent.prototype._init.call(this, options);
 
-  this.splitHorizontal = scout.helpers.nvl(options.splitHorizontal, true);
+  this.splitHorizontal = scout.nvl(options.splitHorizontal, true);
   this.$anchor = options.$anchor;
   this._$root = options.$root;
   this._maxRatio = options.maxRatio;

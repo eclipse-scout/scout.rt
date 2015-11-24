@@ -134,7 +134,7 @@ scout.fonts = {
     }
 
     var onFinished = complete;
-    var timeout = scout.helpers.nvl(options.timeout, 30 * 1000); // default timeout is 30 sec
+    var timeout = scout.nvl(options.timeout, 30 * 1000); // default timeout is 30 sec
     var watchTimerId, timeoutTimerId;
     if (timeout && timeout >= 0) {
       // Add timeout

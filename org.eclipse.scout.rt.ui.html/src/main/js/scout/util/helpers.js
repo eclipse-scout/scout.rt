@@ -27,16 +27,6 @@ scout.helpers = {
     }
   },
 
-  /**
-   * If 'value' is undefined or null, 'defaultValue' is returned. Otherwise, 'value' is returned.
-   */
-  nvl: function(value, defaultValue) {
-    if (value === undefined || value === null) {
-      return defaultValue;
-    }
-    return value;
-  },
-
   isOneOf: function() {
     if (arguments && arguments.length >= 2) {
       var value = arguments[0];

@@ -61,7 +61,7 @@ scout.graphics = {
    * @param includeMargin when set to true, returned dimensions include margins of component
    */
   getSize: function($comp, includeMargin) {
-    includeMargin = scout.helpers.nvl(includeMargin, false);
+    includeMargin = scout.nvl(includeMargin, false);
     return new scout.Dimension(
       $comp.outerWidth(includeMargin),
       $comp.outerHeight(includeMargin));
@@ -200,7 +200,7 @@ scout.graphics = {
       attrs += ' data-modelclass=' + $comp.attr('data-modelclass');
     }
     if (attrs.length === 0) {
-      var html = scout.helpers.nvl($comp.html(), '');
+      var html = scout.nvl($comp.html(), '');
       if (html.length > 30) {
         html = html.substring(0, 30) + '...';
       }

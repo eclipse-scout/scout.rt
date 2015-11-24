@@ -838,7 +838,7 @@ scout.DateFormat.prototype.format = function(date, exactLength) {
   }
 
   var formatContext = this._createFormatContext(date);
-  formatContext.exactLength = scout.helpers.nvl(exactLength, false);
+  formatContext.exactLength = scout.nvl(exactLength, false);
   // Apply all formatter functions for this DateFormat to the pattern to replace the
   // different terms with the corresponding value from the given date.
   for (var i = 0; i < this._formatFunctions.length; i++) {
@@ -1015,8 +1015,8 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   // 2015 does not have 29 days and is "corrected" to March.)
   var result = new Date(0);
 
-  var validMonth = scout.helpers.nvl(dateInfo.month, startDate.getMonth());
-  var validYear = scout.helpers.nvl(dateInfo.year, startDate.getFullYear());
+  var validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
+  var validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
   // When user entered the day but not (yet) the month, adjust month if possible to propose a valid date
   if (dateInfo.day && !dateInfo.month) {
     // If day "31" does not exist in the proposed month, use the next month
@@ -1035,12 +1035,12 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   }
   result.setFullYear(validYear);
   result.setMonth(validMonth);
-  result.setDate(scout.helpers.nvl(dateInfo.day, startDate.getDate()));
+  result.setDate(scout.nvl(dateInfo.day, startDate.getDate()));
 
-  result.setHours(scout.helpers.nvl(dateInfo.hours, startDate.getHours()));
-  result.setMinutes(scout.helpers.nvl(dateInfo.minutes, startDate.getMinutes()));
-  result.setSeconds(scout.helpers.nvl(dateInfo.seconds, startDate.getSeconds()));
-  result.setMilliseconds(scout.helpers.nvl(dateInfo.milliseconds, startDate.getMilliseconds()));
+  result.setHours(scout.nvl(dateInfo.hours, startDate.getHours()));
+  result.setMinutes(scout.nvl(dateInfo.minutes, startDate.getMinutes()));
+  result.setSeconds(scout.nvl(dateInfo.seconds, startDate.getSeconds()));
+  result.setMilliseconds(scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds()));
 
   // Validate. A date is considered valid if the value from the dateInfo did
   // not change (JS date automatically converts illegal values, e.g. day 32 is

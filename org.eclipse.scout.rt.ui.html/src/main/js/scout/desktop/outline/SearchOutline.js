@@ -108,7 +108,7 @@ scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
 
 scout.SearchOutline.prototype._sendSearch = function() {
   this._send('search', {
-    query: scout.helpers.nvl(this.searchQuery, '')
+    query: scout.nvl(this.searchQuery, '')
   });
 };
 

@@ -59,7 +59,7 @@ scout.MobileDesktop.prototype.setOutlineContent = function(content, bringToFront
   var prefSize, $node,
     selectedNode = this.outline.selectedNodes[0];
 
-  bringToFront = scout.helpers.nvl(bringToFront, true);
+  bringToFront = scout.nvl(bringToFront, true);
   this.outline.menuBar.hiddenByUi = false;
   if (this._currentDetailForm) {
     this._currentDetailForm.remove();

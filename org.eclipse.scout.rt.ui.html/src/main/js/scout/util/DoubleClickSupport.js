@@ -39,8 +39,8 @@ scout.DoubleClickSupport = function(options) {
 
 scout.DoubleClickSupport.prototype.mousedown = function(event) {
   if (event && event.type === 'mousedown') {
-    var posX = scout.helpers.nvl(event.pageX, 0);
-    var posY = scout.helpers.nvl(event.pageY, 0);
+    var posX = scout.nvl(event.pageX, 0);
+    var posY = scout.nvl(event.pageY, 0);
     var timestamp = Date.now();
     var isDoubleClick = false;
     if (this._lastTimestamp !== undefined) {

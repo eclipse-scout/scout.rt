@@ -427,7 +427,7 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 /* communication with outline */
 
 scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
-  bringToFront = scout.helpers.nvl(bringToFront, true);
+  bringToFront = scout.nvl(bringToFront, true);
   if (this._outlineContent && this._outlineContent !== content) {
     this._outlineContent.remove();
     this._outlineContent = null;

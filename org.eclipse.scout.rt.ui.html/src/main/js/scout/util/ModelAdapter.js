@@ -54,7 +54,7 @@ scout.ModelAdapter.prototype._init = function(model) {
   this.id = model.id;
   this.objectType = model.objectType;
   this.remoteHandler = this.session.sendEvent.bind(this.session);
-  this._register = scout.helpers.nvl(model._register, true);
+  this._register = scout.nvl(model._register, true);
   if (this._register) {
     this.session.registerModelAdapter(this);
   }
@@ -534,12 +534,12 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
   if (!this.objectType && qualifier) {
     s += qualifier;
   } else {
-    s += scout.helpers.nvl(this.objectType, 'NO_TYPE');
+    s += scout.nvl(this.objectType, 'NO_TYPE');
     if (qualifier) {
       s += '@' + qualifier;
     }
   }
-  s += '[' + this.session.partId + '-' + scout.helpers.nvl(this.id, 'NO_ID') + ']';
+  s += '[' + this.session.partId + '-' + scout.nvl(this.id, 'NO_ID') + ']';
   return s.replace(/\s/g, '');
 };
 

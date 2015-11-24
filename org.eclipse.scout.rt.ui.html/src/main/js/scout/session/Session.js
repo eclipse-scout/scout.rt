@@ -53,10 +53,10 @@ scout.Session = function($entryPoint, options) {
   // Set members
   this.$entryPoint = $entryPoint;
   this.uiSessionId = options.uiSessionId;
-  this.partId = scout.helpers.nvl(options.portletPartId, 0);
+  this.partId = scout.nvl(options.portletPartId, 0);
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type);
-  this.suppressErrors = scout.helpers.nvl(options.suppressErrors, false);
+  this.suppressErrors = scout.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
@@ -76,7 +76,7 @@ scout.Session = function($entryPoint, options) {
   this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper(this);
-  this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.helpers.nvl(options.backgroundJobPollingEnabled, true));
+  this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.nvl(options.backgroundJobPollingEnabled, true));
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
   this.uiUseTaskbarLogo = options.uiUseTaskbarLogo;
@@ -334,7 +334,7 @@ scout.Session.prototype._sendRequest = function(request) {
 
 scout.Session.prototype.defaultAjaxOptions = function(request, async) {
   request = request || {};
-  async = scout.helpers.nvl(async, true);
+  async = scout.nvl(async, true);
   return {
     async: async,
     type: 'POST',
@@ -641,7 +641,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
       session: this,
       parent: this.desktop || new scout.NullWidget(),
       iconId: options.iconId,
-      severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
+      severity: scout.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
       header: options.header,
       body: options.body,
       hiddenText: options.hiddenText,

@@ -425,10 +425,10 @@ scout.dates = {
       newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
     }
     if (time) {
-      newDate.setHours(scout.helpers.nvl(time.getHours(), 0));
-      newDate.setMinutes(scout.helpers.nvl(time.getMinutes(), 0));
-      newDate.setSeconds(scout.helpers.nvl(time.getSeconds(), 0));
-      newDate.setMilliseconds(scout.helpers.nvl(time.getMilliseconds(), 0));
+      newDate.setHours(scout.nvl(time.getHours(), 0));
+      newDate.setMinutes(scout.nvl(time.getMinutes(), 0));
+      newDate.setSeconds(scout.nvl(time.getSeconds(), 0));
+      newDate.setMilliseconds(scout.nvl(time.getMilliseconds(), 0));
     }
     return newDate;
   },
@@ -459,7 +459,7 @@ scout.dates = {
    */
   trunc: function(date, createCopy) {
     if (date) {
-      if (scout.helpers.nvl(createCopy, true)) {
+      if (scout.nvl(createCopy, true)) {
         date = new Date(date.getTime());
       }
       date.setHours(0, 0, 0, 0); // clear time

@@ -497,7 +497,7 @@ scout.Tree.prototype._renderBreadcrumbEnabled = function() {
 };
 
 scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
-  animate = scout.helpers.nvl(animate, true);
+  animate = scout.nvl(animate, true);
 
   var $node = node.$node,
     expanded = node.expanded;
@@ -789,8 +789,8 @@ scout.Tree.prototype.collapseAll = function() {
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
-  var lazy = scout.helpers.nvl(opts.lazy, node.lazyExpandingEnabled);
-  var notifyServer = scout.helpers.nvl(opts.notifyServer, true);
+  var lazy = scout.nvl(opts.lazy, node.lazyExpandingEnabled);
+  var notifyServer = scout.nvl(opts.notifyServer, true);
 
   // Never do lazy expansion if it is disabled on the tree
   if (!this.lazyExpandingEnabled) {
@@ -833,7 +833,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   }
 
   // Render expansion
-  if (this.rendered && scout.helpers.nvl(opts.renderExpansion, true)) {
+  if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
     this._renderExpansion(node, null, opts.animateExpansion);
   }
 };
@@ -858,7 +858,7 @@ scout.Tree.prototype.selectNode = function(node, notifyServer, debounceSend) {
 
 scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
-  notifyServer = scout.helpers.nvl(notifyServer, true);
+  notifyServer = scout.nvl(notifyServer, true);
   if (scout.arrays.equalsIgnoreOrder(nodes, this.selectedNodes)) {
     return;
   }
@@ -934,7 +934,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
 };
 
 scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
-  for (var i = scout.helpers.nvl(startIndex, 0); i < nodes.length; i++) {
+  for (var i = scout.nvl(startIndex, 0); i < nodes.length; i++) {
     nodes[i].childNodeIndex = i;
   }
 };

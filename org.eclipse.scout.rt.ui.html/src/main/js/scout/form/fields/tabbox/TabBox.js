@@ -125,7 +125,7 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
     $.log.debug('(TabBox#_selectTab) tabItem=' + tabItem + ' tabIndex=' + tabIndex);
     var oldSelectedTab = this.selectedTab;
     this.selectedTab = tabIndex;
-    if (scout.helpers.nvl(notifyServer, true)) {
+    if (scout.nvl(notifyServer, true)) {
       this._send('selected', {
         tabIndex: tabIndex
       });

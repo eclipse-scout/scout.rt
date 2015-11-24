@@ -134,8 +134,8 @@ scout.Device.prototype.isWindowsTablet = function() {
  * unsupported, all others (e.g. unknown engines) are allowed by default.
  */
 scout.Device.prototype.isSupportedBrowser = function(browser, version) {
-  browser = scout.helpers.nvl(browser, this.browser);
-  version = scout.helpers.nvl(version, this.browserVersion);
+  browser = scout.nvl(browser, this.browser);
+  version = scout.nvl(version, this.browserVersion);
   var browsers = scout.Device.SupportedBrowsers;
   if ((browser === browsers.INTERNET_EXPLORER && version < 9) ||
     (browser === browsers.CHROME && version < 23) ||

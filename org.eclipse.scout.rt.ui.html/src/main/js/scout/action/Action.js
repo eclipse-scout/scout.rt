@@ -82,7 +82,7 @@ scout.Action.prototype._renderIconId = function() {
 };
 
 scout.Action.prototype._renderEnabled = function(enabled) {
-  enabled = scout.helpers.nvl(enabled, this.enabled);
+  enabled = scout.nvl(enabled, this.enabled);
   this.$container.setEnabled(enabled);
   this._updateTooltip();
 };

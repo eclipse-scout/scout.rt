@@ -64,7 +64,7 @@ scout.BrowserField.prototype._renderSandboxEnabled = function() {
 
 scout.BrowserField.prototype._renderSandboxPermissions = function() {
   if (this.sandboxEnabled) {
-    this.$field.attr('sandbox', scout.helpers.nvl(this.sandboxPermissions, ''));
+    this.$field.attr('sandbox', scout.nvl(this.sandboxPermissions, ''));
     if (scout.device.requiresIframeSecurityAttribute()) {
       this.$field.attr('security', 'restricted');
     }

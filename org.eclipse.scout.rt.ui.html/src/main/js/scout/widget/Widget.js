@@ -305,7 +305,7 @@ scout.Widget.prototype.trigger = function(type, event) {
  * for popup-window this function will return the body of the document in the popup window.
  */
 scout.Widget.prototype.entryPoint = function($element) {
-  $element = scout.helpers.nvl($element, this.$container);
+  $element = scout.nvl($element, this.$container);
   if (!$element.length) {
     throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
   }

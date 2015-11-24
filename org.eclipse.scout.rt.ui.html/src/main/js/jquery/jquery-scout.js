@@ -511,7 +511,7 @@
    */
   $.fn.cssWidthAnimated = function(oldWidth, newWidth, opts) {
     opts = opts || {};
-    opts.duration = scout.helpers.nvl(opts.duration, 300);
+    opts.duration = scout.nvl(opts.duration, 300);
 
     if (oldWidth === newWidth) {
       // No need to animate, make sure new width ist set
@@ -531,7 +531,7 @@
 
   $.fn.cssLeftAnimated = function(from, to, opts) {
     opts = opts || {};
-    opts.duration = scout.helpers.nvl(opts.duration, 300);
+    opts.duration = scout.nvl(opts.duration, 300);
 
     if (from === to) {
       // No need to animate, make sure new pos is set
@@ -552,7 +552,7 @@
 
   $.fn.cssTopAnimated = function(from, to, opts) {
     opts = opts || {};
-    opts.duration = scout.helpers.nvl(opts.duration, 300);
+    opts.duration = scout.nvl(opts.duration, 300);
 
     if (from === to) {
       // No need to animate, make sure new pos is set
@@ -767,7 +767,7 @@
       callback = duration;
       duration = undefined;
     }
-    duration = scout.helpers.nvl(duration, 150);
+    duration = scout.nvl(duration, 150);
     this.stop(true).fadeOut(duration, function() {
       $(this).remove();
       if (callback) {

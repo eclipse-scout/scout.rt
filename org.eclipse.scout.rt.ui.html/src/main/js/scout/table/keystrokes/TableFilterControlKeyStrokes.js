@@ -24,7 +24,7 @@ scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
   //TODO nbu check if keyStroke should be registered when no filter control is available.
   if ($input[0]) {
     $input.focus();
-    var length = scout.helpers.nvl($input.val(), '').length;
+    var length = scout.nvl($input.val(), '').length;
     $input[0].setSelectionRange(length, length);
   }
 };
