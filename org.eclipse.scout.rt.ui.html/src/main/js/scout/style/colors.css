@@ -139,6 +139,10 @@
 @column-background-effect-gradient2-start-background-color: @palette-green-1;
 @column-background-effect-gradient2-end-background-color: @palette-red-2;
 @column-background-effect-bar-chart-background-color: @palette-cyan-2;
+@command-button-border-color: @border-color;
+@command-button-active-color: @active-inverted-color;
+@command-button-active-border-color: @active-inverted-background-color;
+@command-button-active-background-color: @active-inverted-background-color;
 @default-button-active-background-color: @palette-blue-5;
 @default-button-background-color: @palette-blue-4;
 @default-button-color: @palette-white;
