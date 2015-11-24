@@ -16,6 +16,9 @@ scout.inherits(scout.WizardProgressFieldLayout, scout.FormFieldLayout);
 scout.WizardProgressFieldLayout.prototype.layout = function($container) {
   scout.WizardProgressFieldLayout.parent.prototype.layout.call(this, $container);
 
+  // Remember old scroll position, because setting the body width might change it
+  var oldScrollLeft = this.formField.$field.scrollLeft();
+
   // Explicitly set width of body to scrollWidth because container is scrollable. Otherwise,
   // the body would have the wrong size because it has "overflow: hidden" set.
   var $body = this.formField.$wizardStepsBody;
@@ -23,5 +26,8 @@ scout.WizardProgressFieldLayout.prototype.layout = function($container) {
   var bodyWidth = $body[0].scrollWidth;
   $body.width(bodyWidth);
 
+  // Ensure scrolling position did not change because of the width change (prevents flickering effect)
+  this.formField.$field.scrollLeft(oldScrollLeft);
+  // But also ensure the current step is visible
   this.formField.scrollToActiveStep();
 };
