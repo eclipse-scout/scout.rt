@@ -9,14 +9,14 @@ TAG=
 function usage {
   cat << EOF
 
-	${PRG} [-h] --git_username <EGerritUser> -r <RELEASE>
+	${PRG} [-h] --git_username <EGerritUser> --release <RELEASE> --tag <TAG>
 
 	-h                                - Usage info
 	-u | --git_username <EGerritUser> - Eclipse Gerrit Username of Commiter, SSH Key is used for authorisation
-	-u | --git_username <RELEASE>     - <RELEASE> name (Optional / Default: TEST_RELEASE)
+	-r | --release <RELEASE>          - <RELEASE> name (Optional / Default: TEST_RELEASE)
 	-t | --tag <TAG>                  - <TAG> name (Optional / Default: Project Version)
 
-	Example: ${PRG} -r NIGHTLY
+	Example: ${PRG} -u sleicht -r NIGHTLY
 
 EOF
 }
@@ -66,7 +66,7 @@ processError
 mvn -Prelease.checkin -Declipse_gerrit_username=$GIT_USERNAME -f org.eclipse.scout.rt $_MAVEN_OPTS
 processError
 
-mvn -Prelease.tag -Declipse_gerrit_username=$GIT_USERNAME -f org.eclipse.scout.rt $_MAVEN_OPTS
+mvn -Prelease.tag -Declipse_gerrit_username=$GIT_USERNAME -Dmaster_release_pushChanges=true -f org.eclipse.scout.rt $_MAVEN_OPTS
 processError
 
 git reset HEAD~1 --hard
