@@ -40,6 +40,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
   public static final String PROP_CLOSABLE = "closable";
+  public static final String PROP_CACHE_BOUNDS_KEY = "cacheBoundsKey";
   public static final String PROP_FORM_FIELD = "formField";
   public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
   public static final String PROP_INITIAL_FOCUS = "initialFocus";
@@ -132,6 +133,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     putProperty(json, PROP_CLOSABLE, isClosable());
+    putProperty(json, PROP_CACHE_BOUNDS_KEY, model.computeCacheBoundsKey());
     putAdapterIdProperty(json, PROP_ROOT_GROUP_BOX, model.getRootGroupBox());
     setInitialFocusProperty(json);
     putAdapterIdsProperty(json, "views", m_desktop.getViews(getModel()));

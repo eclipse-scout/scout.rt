@@ -92,12 +92,12 @@ scout.PopupWindow.prototype._onResize = function() {
 };
 
 scout.PopupWindow.storeWindowBounds = function(form, bounds) {
-  var storageKey = 'formBounds-' + form.classId;
+  var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
   window.localStorage[storageKey] = JSON.stringify(bounds);
 };
 
 scout.PopupWindow.readWindowBounds = function(form) {
-  var storageKey = 'formBounds-' + form.classId,
+  var storageKey = 'scout:formBounds:' + form.cacheBoundsKey,
     bounds = window.localStorage[storageKey];
   if (!bounds) {
     return null;
