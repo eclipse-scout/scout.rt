@@ -143,7 +143,7 @@ public class ServiceTunnelServlet extends HttpServlet {
             try {
               ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
               // Include transactional client notification in response (piggyback).
-              serviceResponse.setNotifications(transactionalClientNotificationCollector.values());
+              serviceResponse.setNotifications(transactionalClientNotificationCollector.consume());
               serializeServiceResponse(serviceResponse);
             }
             finally {

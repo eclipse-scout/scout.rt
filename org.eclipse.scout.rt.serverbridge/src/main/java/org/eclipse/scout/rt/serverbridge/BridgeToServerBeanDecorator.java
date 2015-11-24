@@ -70,7 +70,7 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     // bridge to server scope
     TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
     ServerRunContext bridgeRunContext = ServerRunContexts
-    	.copyCurrent()
+        .copyCurrent()
         .withTransactionalClientNotificationCollector(collector)
         .withClientNodeId(IClientNode.ID);
     ISession currentSession = ISession.CURRENT.get();
@@ -92,7 +92,7 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     });
 
     ClientNotificationDispatcher clientNotificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
-    List<ClientNotificationMessage> values = collector.values();
+    List<ClientNotificationMessage> values = collector.consume();
     if (!values.isEmpty()) {
       clientNotificationDispatcher.dispatchNotifications(values);
     }

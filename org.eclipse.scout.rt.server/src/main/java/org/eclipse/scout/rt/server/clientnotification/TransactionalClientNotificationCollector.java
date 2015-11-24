@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
@@ -33,20 +31,13 @@ public class TransactionalClientNotificationCollector {
   public static final ThreadLocal<TransactionalClientNotificationCollector> CURRENT = new ThreadLocal<>();
 
   private final List<ClientNotificationMessage> m_notifications = new ArrayList<>();
-  private final ReadWriteLock m_lock = new ReentrantReadWriteLock();
   private boolean m_active = true;
 
   /**
    * @return <code>true</code>, if the collector is active and it is possible to add notifications
    */
-  public boolean isActive() {
-    m_lock.readLock().lock();
-    try {
-      return m_active;
-    }
-    finally {
-      m_lock.readLock().unlock();
-    }
+  public synchronized boolean isActive() {
+    return m_active;
   }
 
   /**
@@ -55,17 +46,11 @@ public class TransactionalClientNotificationCollector {
    * @param messages
    * @return <code>true</code>, if the messages was added
    */
-  public boolean addAll(Collection<ClientNotificationMessage> messages) {
-    m_lock.readLock().lock();
-    try {
-      if (!isActive()) {
-        return false;
-      }
-      return m_notifications.addAll(messages);
+  public synchronized boolean addAll(Collection<ClientNotificationMessage> messages) {
+    if (!isActive()) {
+      return false;
     }
-    finally {
-      m_lock.readLock().unlock();
-    }
+    return m_notifications.addAll(messages);
   }
 
   /**
@@ -73,15 +58,10 @@ public class TransactionalClientNotificationCollector {
    *
    * @return the collected {@link ClientNotificationMessage}s
    */
-  public List<ClientNotificationMessage> values() {
-    m_lock.writeLock().lock();
-    try {
-      m_active = false;
-      return new ArrayList<>(m_notifications);
-    }
-    finally {
-      m_lock.writeLock().unlock();
-    }
-
+  public synchronized List<ClientNotificationMessage> consume() {
+    m_active = false;
+    List<ClientNotificationMessage> result = new ArrayList<>(m_notifications);
+    m_notifications.clear();
+    return result;
   }
 }

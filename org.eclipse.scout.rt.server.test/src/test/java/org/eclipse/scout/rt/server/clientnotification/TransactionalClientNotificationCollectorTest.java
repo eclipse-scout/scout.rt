@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.junit.Before;
@@ -37,7 +39,7 @@ public class TransactionalClientNotificationCollectorTest {
   @Test
   public void testNewClientNotificationCollector() {
     assertTrue(m_collector.isActive());
-    assertTrue(m_collector.values().isEmpty());
+    assertTrue(m_collector.consume().isEmpty());
   }
 
   /**
@@ -45,16 +47,16 @@ public class TransactionalClientNotificationCollectorTest {
    */
   @Test
   public void testNotActiveAnymoreAfterConsumed() {
-    m_collector.values();
+    m_collector.consume();
     assertFalse(m_collector.isActive());
   }
 
   @Test
   public void testAddAllOnlyExecutedIfActive() {
-    m_collector.values();
+    m_collector.consume();
     boolean added = m_collector.addAll(CollectionUtility.arrayList(Mockito.mock(ClientNotificationMessage.class)));
     assertFalse(added);
-    assertTrue(m_collector.values().isEmpty());
+    assertTrue(m_collector.consume().isEmpty());
   }
 
   @Test
@@ -62,8 +64,9 @@ public class TransactionalClientNotificationCollectorTest {
     ClientNotificationMessage mockMessage = Mockito.mock(ClientNotificationMessage.class);
     boolean added = m_collector.addAll(CollectionUtility.arrayList(mockMessage));
     assertTrue(added);
-    assertEquals(1, m_collector.values().size());
-    assertEquals(mockMessage, m_collector.values().get(0));
+    List<ClientNotificationMessage> res = m_collector.consume();
+    assertEquals(1, res.size());
+    assertEquals(mockMessage, res.get(0));
   }
 
 }

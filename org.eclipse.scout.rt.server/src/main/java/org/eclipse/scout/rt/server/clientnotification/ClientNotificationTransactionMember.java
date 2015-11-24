@@ -68,7 +68,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
   }
 
   private void publish(List<ClientNotificationMessage> notifications) {
-    if (isPiggyBackPossible() && preparePiggyBack(notifications)) {
+    if (tryPiggyBack(notifications)) {
       m_notificationRegistry.publish(notifications, Assertions.assertNotNull(IClientNodeId.CURRENT.get(), "Missing 'client node id' on current calling context"));
     }
     else {
@@ -81,15 +81,12 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
    * Register client notifications of the current transaction in the collector to be included in the service response
    * (piggyback).
    */
-  private boolean preparePiggyBack(List<ClientNotificationMessage> notifications) {
-    return TransactionalClientNotificationCollector.CURRENT.get().addAll(notifications);
+  private boolean tryPiggyBack(List<ClientNotificationMessage> notifications) {
+    TransactionalClientNotificationCollector collector = TransactionalClientNotificationCollector.CURRENT.get();
+    if (IClientNodeId.CURRENT.get() != null && collector != null) {
+      return collector.addAll(notifications);
+    }
+    return false;
   }
 
-  /**
-   * Piggyback of client notifications with the current request is only possible, if a response is still available (not
-   * called in a separate server job)
-   */
-  private boolean isPiggyBackPossible() {
-    return IClientNodeId.CURRENT.get() != null && TransactionalClientNotificationCollector.CURRENT.get() != null;
-  }
 }
