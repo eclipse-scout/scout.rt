@@ -109,8 +109,9 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
       .on('click', this._onHeaderItemClick.bind(this))
       .on('mousedown', this._onHeaderItemMousedown.bind(this));
   }
-  $header.toggleAttr('data-modelclass', !!column.modelClass, column.modelClass);
-  $header.toggleAttr('data-classid', !!column.classId, column.classId);
+
+  scout.inspector.applyInfo(column, $header);
+
   if (isFirstColumn) {
     $header.addClass('first');
   }

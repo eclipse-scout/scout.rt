@@ -27,8 +27,10 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -158,10 +160,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject json = super.treeNodeToJson(node);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
-    if (getUiSession().isInspectorHint()) {
-      putProperty(json, "modelClass", page.getClass().getName());
-      putProperty(json, "classId", page.classId());
-    }
+    BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
     return json;
   }
 
@@ -269,10 +268,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
     super.putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, virtualNode);
     putNodeType(jsonNode, node);
-    if (getUiSession().isInspectorHint()) {
-      IPage page = (IPage) node;
-      putProperty(jsonNode, "modelClass", page.getClass().getName());
-      putProperty(jsonNode, "classId", page.classId());
-    }
+    BEANS.get(InspectorInfo.class).put(getUiSession(), jsonNode, node);
   }
 }

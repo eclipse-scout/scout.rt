@@ -10,6 +10,15 @@
  ******************************************************************************/
 scout.helpers = {
 
+  /**
+   * Prepares the DOM for scout. This should be called once while initializing scout.
+   *
+   * This is used by main.js, login.js and logout.js.
+   *
+   * Currently it does the following:
+   * - Remove the <noscript> tag (obviously there is no need for it).
+   * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
+   */
   prepareDOM: function() {
     // Cleanup DOM
     $('noscript').remove();

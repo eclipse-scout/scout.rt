@@ -28,9 +28,7 @@ scout.WizardProgressField.prototype._render = function($parent) {
   });
 
   // If this field is the first field in a form's main box, mark the form as "wizard-container-form"
-  if (this.parent instanceof scout.GroupBox &&
-      this.parent.controls[0] === this &&
-      this.parent.parent instanceof scout.Form) {
+  if (this.parent instanceof scout.GroupBox && this.parent.controls[0] === this && this.parent.parent instanceof scout.Form) {
     var form = this.parent.parent;
     form.$container.addClass('wizard-container-form');
   }
@@ -73,6 +71,8 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       $step.addClass('last');
     }
     this._updateStepClasses($step);
+
+    scout.inspector.applyInfo(step, $step);
 
     // Content
     $content = $step.appendDiv('wizard-step-content');

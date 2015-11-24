@@ -33,6 +33,7 @@ __include("scout/util/FocusManager.js");
 __include("scout/util/FocusContext.js");
 __include("scout/util/focusUtils.js");
 __include("scout/util/focusRule.js");
+__include("scout/util/inspector.js");
 __include("scout/util/logging.js");
 __include("scout/util/mimeTypes.js");
 __include("scout/util/ModelAdapter.js");

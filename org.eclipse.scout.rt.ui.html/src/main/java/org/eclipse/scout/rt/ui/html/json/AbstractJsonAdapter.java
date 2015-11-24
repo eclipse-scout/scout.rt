@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -124,12 +124,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
-    if (getUiSession().isInspectorHint()) {
-      putProperty(json, "modelClass", getModel().getClass().getName());
-      if (getModel() instanceof ITypeWithClassId) {
-        putProperty(json, "classId", ((ITypeWithClassId) getModel()).classId());
-      }
-    }
+    BEANS.get(InspectorInfo.class).put(getUiSession(), json, getModel());
 
     // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
     // Note: The parent adapter is called "owner" in the UI, whereas "parent" refers to the "outer field".

@@ -69,8 +69,8 @@ scout.Desktop.prototype._render = function($parent) {
   this.$container
     .addClass('desktop')
     .toggleClass('has-navigation', hasNavigation);
-  this._renderUniqueId($parent);
-  this._renderModelClass($parent);
+
+  scout.inspector.applyInfo(this, $parent);
 
   this.navigation = hasNavigation ? new scout.DesktopNavigation(this) : scout.NullDesktopNavigation;
   this.navigation.render($parent);

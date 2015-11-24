@@ -16,8 +16,10 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -94,6 +96,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
     jsonStep.put("iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
     jsonStep.put("enabled", wizardStep.isEnabled());
     jsonStep.put("actionEnabled", wizardStep.isActionEnabled());
+    BEANS.get(InspectorInfo.class).put(getUiSession(), jsonStep, wizardStep);
     return jsonStep;
   }
 

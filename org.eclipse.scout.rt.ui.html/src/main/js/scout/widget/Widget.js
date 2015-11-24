@@ -70,8 +70,8 @@ scout.Widget.prototype.render = function($parent) {
 scout.Widget.prototype._renderInternal = function($parent) {
   this._render($parent);
   this._renderProperties();
-  this._renderModelClass();
-  this._renderClassId();
+
+  scout.inspector.applyInfo(this);
 };
 
 /**
@@ -90,20 +90,6 @@ scout.Widget.prototype._render = function($parent) {
  */
 scout.Widget.prototype._renderProperties = function() {
   // NOP
-};
-
-scout.Widget.prototype._renderModelClass = function($target) {
-  $target = $target || this.$container;
-  if ($target) {
-    $target.toggleAttr('data-modelclass', !!this.modelClass, this.modelClass);
-  }
-};
-
-scout.Widget.prototype._renderClassId = function($target) {
-  $target = $target || this.$container;
-  if ($target) {
-    $target.toggleAttr('data-classid', !!this.classId, this.classId);
-  }
 };
 
 /**

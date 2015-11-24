@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
+import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
@@ -78,10 +80,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
     json.put("headerTooltip", getColumn().getHeaderCell().getTooltipText());
-    if (getUiSession().isInspectorHint()) {
-      json.put("modelClass", getColumn().getClass().getName());
-      json.put("classId", getColumn().classId());
-    }
+    BEANS.get(InspectorInfo.class).put(getUiSession(), json, getColumn());
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, getColumn().isInitialAlwaysIncludeSortAtEnd());
