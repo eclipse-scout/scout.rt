@@ -11,7 +11,7 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
-  this.navigateUpInProgress = false; // see NavigateUpButton.js
+  this.navigateUpInProgress = false; // see NavigateUpMenu.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
@@ -185,7 +185,7 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
 
 scout.Outline.prototype._initDetailTable = function(node) {
   var menus = this._createOutlineNavigationButtons(node, node.detailTable.staticMenus),
-    button = this._getMenu(menus, scout.NavigateDownButton),
+    button = this._getMenu(menus, scout.NavigateDownMenu),
     that = this;
   node.detailTable.staticMenus = menus;
 
@@ -234,16 +234,16 @@ scout.Outline.prototype._decorateNode = function(node) {
 
 scout.Outline.prototype._createOutlineNavigationButtons = function(node, staticMenus) {
   var menus = scout.arrays.ensure(staticMenus);
-  if (!this._hasMenu(menus, scout.NavigateUpButton)) {
-    var upButton = scout.create('NavigateUpButton', {
+  if (!this._hasMenu(menus, scout.NavigateUpMenu)) {
+    var upButton = scout.create('NavigateUpMenu', {
       parent: this,
       outline: this,
       node: node
     });
     menus.push(upButton);
   }
-  if (!this._hasMenu(menus, scout.NavigateDownButton)) {
-    var downButton = scout.create('NavigateDownButton', {
+  if (!this._hasMenu(menus, scout.NavigateDownMenu)) {
+    var downButton = scout.create('NavigateDownMenu', {
       parent: this,
       outline: this,
       node: node
@@ -433,7 +433,7 @@ scout.Outline.prototype._isGroupingEnd = function(node) {
 /* event handling */
 
 scout.Outline.prototype._onDetailTableRowsSelected = function(event) {
-  var button = this._getMenu(event.detailTable.staticMenus, scout.NavigateDownButton);
+  var button = this._getMenu(event.detailTable.staticMenus, scout.NavigateDownMenu);
   button.updateEnabled();
 };
 

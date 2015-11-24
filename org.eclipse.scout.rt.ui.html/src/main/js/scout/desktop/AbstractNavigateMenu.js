@@ -14,8 +14,8 @@
  * the server which nodes have been selected. We do that for better user experience. In a first attempt
  * the whole navigation logic was on the server, which caused a lag and flickering in the UI.
  */
-scout.AbstractNavigateButton = function() {
-  scout.AbstractNavigateButton.parent.call(this);
+scout.AbstractNavigateMenu = function() {
+  scout.AbstractNavigateMenu.parent.call(this);
 
   this.node;
   this.outline;
@@ -30,21 +30,19 @@ scout.AbstractNavigateButton = function() {
    */
   this._additionalCssClass = '';
 };
-scout.inherits(scout.AbstractNavigateButton, scout.Menu);
+scout.inherits(scout.AbstractNavigateMenu, scout.Menu);
 
-scout.AbstractNavigateButton.prototype._init = function(options) {
-  scout.AbstractNavigateButton.parent.prototype._init.call(this, options);
+scout.AbstractNavigateMenu.prototype._init = function(options) {
+  scout.AbstractNavigateMenu.parent.prototype._init.call(this, options);
 
   this.node = options.node;
   this.outline = options.outline;
 };
 
-// FIXME AWE: re-name to *Menu
-
 /**
  * @override
  */
-scout.AbstractNavigateButton.prototype._render = function($parent) {
+scout.AbstractNavigateMenu.prototype._render = function($parent) {
   if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
   } else {
@@ -58,7 +56,7 @@ scout.AbstractNavigateButton.prototype._render = function($parent) {
     this.iconId = this._defaultIconId;
   }
   this.enabled = this._buttonEnabled();
-  scout.AbstractNavigateButton.parent.prototype._render.call(this, $parent);
+  scout.AbstractNavigateMenu.parent.prototype._render.call(this, $parent);
   this.$container.addClass('navigate-button small');
   this.$container.addClass(this._additionalCssClass);
   this.outline.keyStrokeContext.registerKeyStroke(this);
@@ -67,12 +65,12 @@ scout.AbstractNavigateButton.prototype._render = function($parent) {
 /**
  * @override Action.js
  */
-scout.AbstractNavigateButton.prototype._remove = function() {
-  scout.AbstractNavigateButton.parent.prototype._remove.call(this);
+scout.AbstractNavigateMenu.prototype._remove = function() {
+  scout.AbstractNavigateMenu.parent.prototype._remove.call(this);
   this.outline.keyStrokeContext.unregisterKeyStroke(this);
 };
 
-scout.AbstractNavigateButton.prototype._setDetailVisible = function() {
+scout.AbstractNavigateMenu.prototype._setDetailVisible = function() {
   var detailVisible = this._toggleDetail();
   $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
   this.node.detailFormVisibleByUi = detailVisible;
@@ -82,7 +80,7 @@ scout.AbstractNavigateButton.prototype._setDetailVisible = function() {
 /**
  * @override Menu.js
  */
-scout.AbstractNavigateButton.prototype.doAction = function(event) {
+scout.AbstractNavigateMenu.prototype.doAction = function(event) {
   if (!this.prepareDoAction(event)) {
     return false;
   }
@@ -93,7 +91,7 @@ scout.AbstractNavigateButton.prototype.doAction = function(event) {
 /**
  * Called when enabled state must be re-calculated and probably rendered.
  */
-scout.AbstractNavigateButton.prototype.updateEnabled = function() {
+scout.AbstractNavigateMenu.prototype.updateEnabled = function() {
   this.enabled = this._buttonEnabled();
   if (this.rendered) {
     this._renderEnabled();

@@ -291,9 +291,9 @@ __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
 // More misc. elements
-__include("scout/desktop/AbstractNavigateButton.js"); // requires Button.js
-__include("scout/desktop/NavigateDownButton.js");
-__include("scout/desktop/NavigateUpButton.js");
+__include("scout/desktop/AbstractNavigateMenu.js"); // requires Menu.js
+__include("scout/desktop/NavigateDownMenu.js");
+__include("scout/desktop/NavigateUpMenu.js");
 
 __include("scout/mobileObjectFactories.js");
 __include("scout/table/MobileTable.js");

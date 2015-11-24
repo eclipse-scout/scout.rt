@@ -8,32 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.NavigateDownButton = function(outline, node) {
-  scout.NavigateDownButton.parent.call(this, outline, node);
-  // FIXME AWE: remove texts ui.Show and ui.Back? still required?
+scout.NavigateDownMenu = function(outline, node) {
+  scout.NavigateDownMenu.parent.call(this, outline, node);
   this._defaultIconId = scout.icons.ANGLE_DOWN;
   this._defaultText = 'ui.Continue';
   this.iconId = this._defaultIconId;
   this.keyStroke = 'enter';
 };
-scout.inherits(scout.NavigateDownButton, scout.AbstractNavigateButton);
+scout.inherits(scout.NavigateDownMenu, scout.AbstractNavigateMenu);
 
-scout.NavigateDownButton.prototype._render = function($parent) {
-  scout.NavigateDownButton.parent.prototype._render.call(this, $parent);
+scout.NavigateDownMenu.prototype._render = function($parent) {
+  scout.NavigateDownMenu.parent.prototype._render.call(this, $parent);
   this.$container.addClass('down');
 };
 
-scout.NavigateDownButton.prototype._isDetail = function() {
+scout.NavigateDownMenu.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
   return !!(this.node.detailFormVisible && this.node.detailForm &&
     this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
 };
 
-scout.NavigateDownButton.prototype._toggleDetail = function() {
+scout.NavigateDownMenu.prototype._toggleDetail = function() {
   return false;
 };
 
-scout.NavigateDownButton.prototype._buttonEnabled = function() {
+scout.NavigateDownMenu.prototype._buttonEnabled = function() {
   if (this._isDetail()) {
     return true;
   }
@@ -50,7 +49,7 @@ scout.NavigateDownButton.prototype._buttonEnabled = function() {
   }
 };
 
-scout.NavigateDownButton.prototype._drill = function() {
+scout.NavigateDownMenu.prototype._drill = function() {
   var drillNode;
 
   if (this.node.detailTable) {

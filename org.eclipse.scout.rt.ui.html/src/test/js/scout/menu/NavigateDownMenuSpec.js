@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("NavigateDownButton", function() {
+describe('NavigateDownMenu', function() {
 
   var session, outline, menu, node = {};
 
@@ -19,18 +19,18 @@ describe("NavigateDownButton", function() {
       session: session,
       handleOutlineContent: function() {}
     };
-    var model = createSimpleModel('NavigateDownButton', session);
+    var model = createSimpleModel('NavigateDownMenu', session);
     model.outline = outline;
     model.node = node;
-    menu = new scout.NavigateDownButton();
+    menu = new scout.NavigateDownMenu();
     menu.init(model);
   });
 
-  it("_toggleDetail is always false", function() {
+  it('_toggleDetail is always false', function() {
     expect(menu._toggleDetail()).toBe(false);
   });
 
-  it("_isDetail returns true or false depending on the state of the detail-form and detail-table", function() {
+  it('_isDetail returns true or false depending on the state of the detail-form and detail-table', function() {
     // true when both detailForm and detailTable are visible
     node.detailForm = {};
     node.detailFormVisible = true;
@@ -62,14 +62,14 @@ describe("NavigateDownButton", function() {
     expect(menu._isDetail()).toBe(false);
   });
 
-  describe("_buttonEnabled", function() {
+  describe('_buttonEnabled', function() {
 
-    it("is disabled when node is a leaf", function() {
+    it('is disabled when node is a leaf', function() {
       node.leaf = true; // node is a leaf
       expect(menu._buttonEnabled()).toBe(false);
     });
 
-    it("is enabled when node is not a leaf and we're currently displaying the detail", function() {
+    it('is enabled when node is not a leaf and we\'re currently displaying the detail', function() {
       node.leaf = false; // node is not a leaf
       menu._isDetail = function() { // currently we're displaying the detail-form
         return true;
@@ -77,7 +77,7 @@ describe("NavigateDownButton", function() {
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it("is only enabled when detail-table has exactly one selected row", function() {
+    it('is only enabled when detail-table has exactly one selected row', function() {
       node.leaf = false; // node is not a leaf
       menu._isDetail = function() { // currently we're not displaying the detail-form
         return false;
@@ -94,7 +94,7 @@ describe("NavigateDownButton", function() {
     });
   });
 
-  it("_drill drills down to first selected row in the detail table", function() {
+  it('_drill drills down to first selected row in the detail table', function() {
     var drillNode = {};
     node.detailTable = {
       selectedRows: [{

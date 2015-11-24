@@ -42,14 +42,14 @@ scout.defaultObjectFactories = [{
     return new scout.OutlineViewButton();
   }
 }, {
-  objectType: 'NavigateDownButton',
+  objectType: 'NavigateDownMenu',
   create: function() {
-    return new scout.NavigateDownButton();
+    return new scout.NavigateDownMenu();
   }
 }, {
-  objectType: 'NavigateUpButton',
+  objectType: 'NavigateUpMenu',
   create: function() {
-    return new scout.NavigateUpButton();
+    return new scout.NavigateUpMenu();
   }
 }, {
   objectType: 'FormToolButton',
