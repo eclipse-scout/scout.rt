@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 export MAVEN_OPTS='-Xmx256m'
 
 # Parallel executions of maven modules and tests.

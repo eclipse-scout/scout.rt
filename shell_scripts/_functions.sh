@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
 # Below are the config options used by the script.
 PRG=$(basename "${0}")

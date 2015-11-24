@@ -1,8 +1,7 @@
 #!/bin/bash
+
 BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
-
-export MAVEN_OPTS="$MAVEN_OPTS -Xmx256m"
 
 echo ''
 echo ''
