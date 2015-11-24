@@ -21,6 +21,7 @@
 
   <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor.test</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <!-- Build Dependencies (Provided) -->

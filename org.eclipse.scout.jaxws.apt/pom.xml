@@ -21,6 +21,7 @@
 
   <artifactId>org.eclipse.scout.jaxws.apt</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <codemodel.plugin.version>1.0.2</codemodel.plugin.version>

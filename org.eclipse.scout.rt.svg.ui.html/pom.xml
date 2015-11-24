@@ -21,6 +21,7 @@
 
   <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>

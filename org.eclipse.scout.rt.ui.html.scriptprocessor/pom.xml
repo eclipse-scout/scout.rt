@@ -21,6 +21,7 @@
 
   <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <!-- Build Dependencies (Provided) -->
@@ -52,9 +53,6 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <!-- primarily for license header generation -->
-  <inceptionYear>2014</inceptionYear>
 
   <build>
     <plugins>
@@ -96,4 +94,7 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- primarily for license header generation -->
+  <inceptionYear>2014</inceptionYear>
 </project>

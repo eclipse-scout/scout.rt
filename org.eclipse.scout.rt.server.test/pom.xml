@@ -21,6 +21,7 @@
 
   <artifactId>org.eclipse.scout.rt.server.test</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <master_test_timeout>60</master_test_timeout>

@@ -23,6 +23,7 @@
 
   <artifactId>org.eclipse.scout.json</artifactId>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <!-- Test Dependencies -->

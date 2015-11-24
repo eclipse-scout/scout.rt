@@ -20,8 +20,11 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.serverbridge</artifactId>
+  <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
+    <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.client</artifactId>
