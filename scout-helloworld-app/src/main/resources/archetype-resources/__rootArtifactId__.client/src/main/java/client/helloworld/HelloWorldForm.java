@@ -27,7 +27,6 @@ import ${groupId}.shared.helloworld.IHelloWorldFormService;
 public class HelloWorldForm extends AbstractForm {
 
   public HelloWorldForm() {
-    super();
     setHandler(new ViewHandler());
   }
 

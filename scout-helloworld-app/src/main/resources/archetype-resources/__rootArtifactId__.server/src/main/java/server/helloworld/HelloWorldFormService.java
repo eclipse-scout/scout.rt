@@ -3,8 +3,6 @@
 #set( $symbol_escape = '\' )
 package ${groupId}.server.helloworld;
 
-import org.eclipse.scout.rt.server.Server;
-
 import ${groupId}.server.ServerSession;
 import ${groupId}.shared.helloworld.HelloWorldFormData;
 import ${groupId}.shared.helloworld.IHelloWorldFormService;
@@ -14,7 +12,6 @@ import ${groupId}.shared.helloworld.IHelloWorldFormService;
  *
  * @author ${userName}
  */
-@Server
 public class HelloWorldFormService implements IHelloWorldFormService {
 
   @Override
