@@ -190,14 +190,6 @@ button::-moz-focus-inner {
   border: 0;
 }
 
-/* hidden DIV used to measure string length in UI */
-#ScoutStringMeasurement {
-  position: absolute;
-  visibility: hidden;
-  height: auto;
-  width: auto;
-}
-
 .font-preloader {
   position: absolute;
   top: -999px;
