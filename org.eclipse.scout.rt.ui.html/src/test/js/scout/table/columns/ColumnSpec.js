@@ -167,6 +167,30 @@ describe("Column", function() {
     expect($cells0.eq(1).text()).toBe('hi');
   });
 
+  it("caches encoded text of a cell to improve performance", function() {
+    var model = helper.createModelFixture(3, 1);
+    model.rows[0].cells[0].text = '<b>hi</b>';
+    model.rows[0].cells[0].htmlEnabled = false;
+
+    var table = helper.createTable(model);
+    expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
+    expect(table.rows[0].cells[0].encodedText).toBeFalsy();
+
+    spyOn(scout.strings, "encode").and.callThrough();
+    table.render(session.$entryPoint);
+
+    expect(scout.strings.encode.calls.count()).toBe(6); // header and table cells
+    expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
+    expect(table.rows[0].cells[0].encodedText).toBe('&lt;b&gt;hi&lt;/b&gt;');
+    expect(table.rows[0].$row.find('.table-cell').eq(0).text()).toBe('<b>hi</b>');
+
+    // re render -> encode must not be called again
+    table.remove();
+    scout.strings.encode.calls.reset();
+    table.render(session.$entryPoint);
+    expect(scout.strings.encode.calls.count()).toBe(3); // only for header cells
+  });
+
   describe("multilineText", function() {
     it("replaces\n with br, but only if htmlEnabled is false", function() {
       var model = helper.createModelFixture(3, 2);

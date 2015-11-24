@@ -72,7 +72,11 @@ scout.Column.prototype.buildCellForRow = function(row) {
 scout.Column.prototype.buildCell = function(cell, row) {
   var text = cell.text || '';
   if (!cell.htmlEnabled) {
-    text = scout.strings.encode(text);
+    if (!cell.encodedText) {
+      // Encode text and cache it, encoding is expensive
+      cell.encodedText = scout.strings.encode(text);
+    }
+    text = cell.encodedText;
     if (this.table.multilineText) {
       text = scout.strings.nl2br(text, false);
     }

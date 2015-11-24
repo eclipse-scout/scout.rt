@@ -194,6 +194,28 @@ describe("scout.strings", function() {
       expect(scout.strings.encode(123)).toBe('123');
     });
 
+    it("does not try to encode empty strings", function() {
+      scout.strings.encodeElement = null;
+      spyOn(document, "createElement").and.callThrough();
+      expect(scout.strings.encode('')).toBe('');
+      expect(document.createElement).not.toHaveBeenCalled();
+
+      expect(scout.strings.encode('hi')).toBe('hi');
+      expect(document.createElement).toHaveBeenCalled();
+    });
+
+    it("caches the html element used for encoding", function() {
+      scout.strings.encodeElement = null;
+      spyOn(document, "createElement").and.callThrough();
+
+      expect(scout.strings.encode('hi')).toBe('hi');
+      expect(document.createElement).toHaveBeenCalled();
+
+      document.createElement.calls.reset();
+      expect(scout.strings.encode('there')).toBe('there');
+      expect(document.createElement).not.toHaveBeenCalled();
+    });
+
   });
 
   describe("join", function() {
@@ -279,13 +301,31 @@ describe("scout.strings", function() {
   });
 
   describe("plainText", function() {
-
     it("converts html to plain text", function() {
       var htmlText = '<b>hello</b>';
       expect(scout.strings.plainText(htmlText)).toBe('hello');
 
       htmlText = '<b>hello</b> world! <span class="xyz">Some more html...</span>';
       expect(scout.strings.plainText(htmlText)).toBe('hello world! Some more html...');
+    });
+
+    it("does not try to get plaintext of empty strings", function() {
+      scout.strings.plainTextElement = null;
+      spyOn(document, "createElement").and.callThrough();
+      expect(scout.strings.plainText('')).toBe('');
+      expect(document.createElement).not.toHaveBeenCalled();
+    });
+
+    it("caches the html element used for getting plain text", function() {
+      scout.strings.plainTextElement = null;
+      spyOn(document, "createElement").and.callThrough();
+
+      expect(scout.strings.plainText('hi')).toBe('hi');
+      expect(document.createElement).toHaveBeenCalled();
+
+      document.createElement.calls.reset();
+      expect(scout.strings.plainText('there')).toBe('there');
+      expect(document.createElement).not.toHaveBeenCalled();
     });
 
     it("considers upper and lower case tags", function() {

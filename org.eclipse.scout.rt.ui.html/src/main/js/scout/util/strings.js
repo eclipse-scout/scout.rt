@@ -146,12 +146,17 @@ scout.strings = {
    * Encodes the html of the given string.
    */
   encode: function(string) {
-    if (string === undefined || string === null) {
+    if (!string) {
       return string;
     }
-    var div = document.createElement('div'); // FIXME AWE: fragment here?
-    div.textContent = string;
-    return div.innerHTML;
+    var elem = scout.strings.encodeElement;
+    if (!elem) {
+      elem = window.document.createElement('div');
+      // cache it to prevent creating an element every time
+      scout.strings.encodeElement = elem;
+    }
+    elem.textContent = string;
+    return elem.innerHTML;
   },
 
   /**
@@ -160,7 +165,7 @@ scout.strings = {
    * A div for example always generates a new line, even if display style is not set to block.
    */
   plainText: function(text) {
-    if (text === undefined || text === null) {
+    if (!text) {
       return text;
     }
     // Regexp is used to replace the tags.
@@ -181,7 +186,12 @@ scout.strings = {
     text = text.replace(/[ ]+$/gm, '');
 
     // Replace character html entities (e.g. &nbsp;, &gt;, ...)
-    var textarea = document.createElement('textarea');
+    var textarea = scout.strings.plainTextElement;
+    if (!textarea) {
+      textarea = document.createElement('textarea');
+      // cache it to prevent creating an element every time
+      scout.strings.plainTextElement = textarea;
+    }
     textarea.innerHTML = text;
     return textarea.value;
   },
