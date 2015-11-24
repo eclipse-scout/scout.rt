@@ -175,7 +175,7 @@ scout.Column.prototype._cellStyle = function(cell) {
   }
 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-  style += scout.helpers.legacyStyle(cell);
+  style += scout.styles.legacyStyle(cell);
 
   if (this.backgroundEffect && cell.value !== undefined) {
     if (!this.backgroundEffectFunc) {

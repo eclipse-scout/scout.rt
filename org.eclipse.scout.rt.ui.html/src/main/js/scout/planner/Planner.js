@@ -628,7 +628,7 @@ scout.Planner.prototype._removeActivititesForResource = function(resource) {
 
 scout.Planner.prototype._buildActivityHtml = function(activity) {
   var i, level = 100 - Math.min(activity.level * 100, 100),
-    levelColor = scout.helpers.modelToCssColor(activity.levelColor),
+    levelColor = scout.styles.modelToCssColor(activity.levelColor),
     begin = activity.beginTime.valueOf(),
     end = activity.endTime.valueOf();
 

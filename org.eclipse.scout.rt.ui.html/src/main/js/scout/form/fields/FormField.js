@@ -258,27 +258,27 @@ scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
 };
 
 scout.FormField.prototype._renderFont = function() {
-  scout.helpers.legacyStyle(this, this.$field);
+  scout.styles.legacyStyle(this, this.$field);
 };
 
 scout.FormField.prototype._renderForegroundColor = function() {
-  scout.helpers.legacyStyle(this, this.$field);
+  scout.styles.legacyStyle(this, this.$field);
 };
 
 scout.FormField.prototype._renderBackgroundColor = function() {
-  scout.helpers.legacyStyle(this, this.$field);
+  scout.styles.legacyStyle(this, this.$field);
 };
 
 scout.FormField.prototype._renderLabelFont = function() {
-  scout.helpers.legacyStyle(this, this.$label, 'label');
+  scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
 scout.FormField.prototype._renderLabelForegroundColor = function() {
-  scout.helpers.legacyStyle(this, this.$label, 'label');
+  scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
 scout.FormField.prototype._renderLabelBackgroundColor = function() {
-  scout.helpers.legacyStyle(this, this.$label, 'label');
+  scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
 scout.FormField.prototype._renderGridData = function(gridData) {
