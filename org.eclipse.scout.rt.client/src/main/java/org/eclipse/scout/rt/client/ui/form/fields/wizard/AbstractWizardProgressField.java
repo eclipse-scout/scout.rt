@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wizard.IWizardProgressFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.wizard.WizardProgressFieldChains.WizardProgressFieldWizardStepActionChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.wizard.WizardProgressFieldChains.WizardProgressFieldStepActionChain;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
@@ -63,25 +63,25 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<IWizardStep<? extends IForm>> getWizardSteps() {
-    return (List<IWizardStep<? extends IForm>>) propertySupport.getProperty(PROP_WIZARD_STEPS);
+  public List<IWizardStep<? extends IForm>> getSteps() {
+    return (List<IWizardStep<? extends IForm>>) propertySupport.getProperty(PROP_STEPS);
   }
 
   @Override
-  public void setWizardSteps(List<IWizardStep<? extends IForm>> wizardSteps) {
+  public void setSteps(List<IWizardStep<? extends IForm>> steps) {
     // always fire event, even when only the _content_ of steps changes, not only the step list itself
-    propertySupport.setPropertyAlwaysFire(PROP_WIZARD_STEPS, wizardSteps);
+    propertySupport.setPropertyAlwaysFire(PROP_STEPS, steps);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public IWizardStep<? extends IForm> getActiveWizardStep() {
-    return (IWizardStep<? extends IForm>) propertySupport.getProperty(PROP_ACTIVE_WIZARD_STEP);
+  public IWizardStep<? extends IForm> getActiveStep() {
+    return (IWizardStep<? extends IForm>) propertySupport.getProperty(PROP_ACTIVE_STEP);
   }
 
   @Override
-  public void setActiveWizardStep(IWizardStep<? extends IForm> activeWizardStep) {
-    propertySupport.setProperty(PROP_ACTIVE_WIZARD_STEP, activeWizardStep);
+  public void setActiveStep(IWizardStep<? extends IForm> activeStep) {
+    propertySupport.setProperty(PROP_ACTIVE_STEP, activeStep);
   }
 
   @Override
@@ -118,8 +118,8 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
    */
   @Order(10.0)
   @ConfigOperation
-  protected void execWizardStepAction(int stepIndex) {
-    IWizardStep<? extends IForm> step = CollectionUtility.getElement(getWizardSteps(), stepIndex);
+  protected void execStepAction(int stepIndex) {
+    IWizardStep<? extends IForm> step = CollectionUtility.getElement(getSteps(), stepIndex);
     if (step == null) {
       throw new IllegalStateException("Invalid stepIndex: " + stepIndex);
     }
@@ -144,8 +144,8 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
 
   protected void handleWizardStateChanged(IWizard wizard) {
     if (wizard != null) {
-      setWizardSteps(wizard.getSteps());
-      setActiveWizardStep(wizard.getActiveStep());
+      setSteps(wizard.getSteps());
+      setActiveStep(wizard.getActiveStep());
     }
   }
 
@@ -157,11 +157,11 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
   private class P_UIFacade implements IWizardProgressFieldUIFacade {
 
     @Override
-    public void wizardStepActionFromUI(int stepIndex) {
+    public void stepActionFromUI(int stepIndex) {
       if (!isEnabled() || !isVisible()) {
         return;
       }
-      interceptWizardStepAction(stepIndex);
+      interceptStepAction(stepIndex);
     }
   }
 
@@ -178,10 +178,10 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     }
   }
 
-  protected void interceptWizardStepAction(int stepIndex) {
+  protected void interceptStepAction(int stepIndex) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    WizardProgressFieldWizardStepActionChain chain = new WizardProgressFieldWizardStepActionChain(extensions);
-    chain.execWizardStepIndex(stepIndex);
+    WizardProgressFieldStepActionChain chain = new WizardProgressFieldStepActionChain(extensions);
+    chain.execStepIndex(stepIndex);
   }
 
   protected static class LocalWizardProgressFieldExtension<OWNER extends AbstractWizardProgressField> extends LocalFormFieldExtension<OWNER> implements IWizardProgressFieldExtension<OWNER> {
@@ -191,8 +191,8 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     }
 
     @Override
-    public void execWizardStepAction(WizardProgressFieldWizardStepActionChain wizardProgressFieldWizardStepActionChain, int stepIndex) {
-      getOwner().execWizardStepAction(stepIndex);
+    public void execStepAction(WizardProgressFieldStepActionChain wizardProgressFieldStepActionChain, int stepIndex) {
+      getOwner().execStepAction(stepIndex);
     }
   }
 

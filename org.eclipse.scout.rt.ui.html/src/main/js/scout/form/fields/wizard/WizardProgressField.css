@@ -15,15 +15,15 @@
 @wizard-progress-separator-line-width: 1px;
 
 @wizard-progress-border-color: @border-color;
-@wizard-step-after-current-background-color: @palette-blue-0;
-@wizard-step-after-current-color: @wizard-step-default-color;
-@wizard-step-after-current-separator-color: @wizard-step-default-separator-color;
-@wizard-step-before-current-background-color: @palette-blue-0;
-@wizard-step-before-current-color: @wizard-step-default-color;
-@wizard-step-before-current-separator-color: @border-color;
-@wizard-step-current-background-color: @active-inverted-background-color;
-@wizard-step-current-color: @active-inverted-color;
-@wizard-step-current-separator-color: @wizard-step-default-separator-color;
+@wizard-step-after-active-background-color: @palette-blue-0;
+@wizard-step-after-active-color: @wizard-step-default-color;
+@wizard-step-after-active-separator-color: @wizard-step-default-separator-color;
+@wizard-step-before-active-background-color: @palette-blue-0;
+@wizard-step-before-active-color: @wizard-step-default-color;
+@wizard-step-before-active-separator-color: @border-color;
+@wizard-step-active-background-color: @active-inverted-background-color;
+@wizard-step-active-color: @active-inverted-color;
+@wizard-step-active-separator-color: @wizard-step-default-separator-color;
 @wizard-step-default-background-color: @control-background-color;
 @wizard-step-default-color: @control-color;
 @wizard-step-default-separator-color: @border-color;
@@ -148,23 +148,23 @@
     #scout.wizard-step-separator-color(@wizard-step-disabled-separator-color);
   }
   &:not(.disabled) {
-    &.current {
-      #scout.wizard-step-color(@wizard-step-current-color);
-      #scout.wizard-step-background-color(@wizard-step-current-background-color);
-      #scout.wizard-step-separator-color(@wizard-step-current-separator-color);
+    &.active {
+      #scout.wizard-step-color(@wizard-step-active-color);
+      #scout.wizard-step-background-color(@wizard-step-active-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-active-separator-color);
     }
-    &.left-of-current {
-      #scout.wizard-step-separator-color(@wizard-step-current-separator-color);
+    &.left-of-active {
+      #scout.wizard-step-separator-color(@wizard-step-active-separator-color);
     }
-    &.before-current {
-      #scout.wizard-step-color(@wizard-step-before-current-color);
-      #scout.wizard-step-background-color(@wizard-step-before-current-background-color);
-      #scout.wizard-step-separator-color(@wizard-step-before-current-separator-color);
+    &.before-active {
+      #scout.wizard-step-color(@wizard-step-before-active-color);
+      #scout.wizard-step-background-color(@wizard-step-before-active-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-before-active-separator-color);
     }
-    &.after-current {
-      #scout.wizard-step-color(@wizard-step-after-current-color);
-      #scout.wizard-step-background-color(@wizard-step-after-current-background-color);
-      #scout.wizard-step-separator-color(@wizard-step-after-current-separator-color);
+    &.after-active {
+      #scout.wizard-step-color(@wizard-step-after-active-color);
+      #scout.wizard-step-background-color(@wizard-step-after-active-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-after-active-separator-color);
     }
   }
 }

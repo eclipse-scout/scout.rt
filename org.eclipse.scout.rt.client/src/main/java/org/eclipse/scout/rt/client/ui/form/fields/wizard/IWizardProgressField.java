@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
  */
 public interface IWizardProgressField extends IFormField {
 
-  String PROP_WIZARD_STEPS = "wizardSteps";
-  String PROP_ACTIVE_WIZARD_STEP = "activeWizardStep";
+  String PROP_STEPS = "steps";
+  String PROP_ACTIVE_STEP = "activeStep";
 
   IWizardProgressFieldUIFacade getUIFacade();
 
@@ -38,11 +38,11 @@ public interface IWizardProgressField extends IFormField {
    */
   IWizard getWizard();
 
-  List<IWizardStep<? extends IForm>> getWizardSteps();
+  List<IWizardStep<? extends IForm>> getSteps();
 
-  void setWizardSteps(List<IWizardStep<? extends IForm>> wizardSteps);
+  void setSteps(List<IWizardStep<? extends IForm>> steps);
 
-  IWizardStep<? extends IForm> getActiveWizardStep();
+  IWizardStep<? extends IForm> getActiveStep();
 
-  void setActiveWizardStep(IWizardStep<? extends IForm> activeWizardStep);
+  void setActiveStep(IWizardStep<? extends IForm> activeStep);
 }

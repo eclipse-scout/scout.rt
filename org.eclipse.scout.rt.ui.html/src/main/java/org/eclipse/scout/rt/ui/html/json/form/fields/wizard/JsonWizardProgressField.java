@@ -28,9 +28,9 @@ import org.json.JSONObject;
 
 public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgressField> extends JsonFormField<WIZARD_PROGRESS_FIELD> {
 
-  private static final String PROP_ACTIVE_WIZARD_STEP_INDEX = "activeWizardStepIndex";
+  private static final String PROP_ACTIVE_STEP_INDEX = "activeStepIndex";
   // from UI
-  private static final String EVENT_DO_WIZARD_STEP_ACTION = "doWizardStepAction";
+  private static final String EVENT_DO_STEP_ACTION = "doStepAction";
 
   public JsonWizardProgressField(WIZARD_PROGRESS_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -44,10 +44,10 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
   @Override
   protected void initJsonProperties(WIZARD_PROGRESS_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_WIZARD_STEPS, model) {
+    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_STEPS, model) {
       @Override
       protected List<IWizardStep<? extends IForm>> modelValue() {
-        return getModel().getWizardSteps();
+        return getModel().getSteps();
       }
 
       @Override
@@ -65,10 +65,10 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
         return jsonSteps;
       }
     });
-    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_ACTIVE_WIZARD_STEP, model) {
+    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_ACTIVE_STEP, model) {
       @Override
       protected IWizardStep<? extends IForm> modelValue() {
-        return getModel().getActiveWizardStep();
+        return getModel().getActiveStep();
       }
 
       @Override
@@ -80,7 +80,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
 
       @Override
       public String jsonPropertyName() {
-        return PROP_ACTIVE_WIZARD_STEP_INDEX;
+        return PROP_ACTIVE_STEP_INDEX;
       }
     });
   }
@@ -109,16 +109,16 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_DO_WIZARD_STEP_ACTION.equals(event.getType())) {
-      handleUiDoWizardStepAction(event);
+    if (EVENT_DO_STEP_ACTION.equals(event.getType())) {
+      handleUiDoStepAction(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiDoWizardStepAction(JsonEvent event) {
+  protected void handleUiDoStepAction(JsonEvent event) {
     int targetStepIndex = event.getData().optInt("stepIndex", -1);
-    getModel().getUIFacade().wizardStepActionFromUI(targetStepIndex);
+    getModel().getUIFacade().stepActionFromUI(targetStepIndex);
   }
 }

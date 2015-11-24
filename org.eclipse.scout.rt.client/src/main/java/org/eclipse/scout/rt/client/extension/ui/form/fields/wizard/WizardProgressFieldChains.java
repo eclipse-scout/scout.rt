@@ -19,17 +19,17 @@ public final class WizardProgressFieldChains {
     }
   }
 
-  public static class WizardProgressFieldWizardStepActionChain extends AbstractWizardProgressChain {
+  public static class WizardProgressFieldStepActionChain extends AbstractWizardProgressChain {
 
-    public WizardProgressFieldWizardStepActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public WizardProgressFieldStepActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
-    public void execWizardStepIndex(final int stepIndex) {
+    public void execStepIndex(final int stepIndex) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IWizardProgressFieldExtension<? extends AbstractWizardProgressField> next) {
-          next.execWizardStepAction(WizardProgressFieldWizardStepActionChain.this, stepIndex);
+          next.execStepAction(WizardProgressFieldStepActionChain.this, stepIndex);
         }
       };
       callChain(methodInvocation);
