@@ -8,15 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.notification;
+package org.eclipse.scout.rt.client.clientnotification;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.slf4j.Logger;
@@ -25,16 +34,16 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements INotificationHandler<T>, IGlobalSessionListener {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractObservableNotificationHandler.class);
 
-  private final Map<ISession, EventListenerList> m_listeners = new WeakHashMap<>();
+  private final Map<IClientSession, EventListenerList> m_listeners = new WeakHashMap<>();
 
   /**
    * @param listener
    */
   public void addListener(INotificationListener<T> listener) {
-    addListener(ISession.CURRENT.get(), listener);
+    addListener(ClientSessionProvider.currentSession(), listener);
   }
 
-  public void addListener(ISession session, INotificationListener<T> listener) {
+  public void addListener(IClientSession session, INotificationListener<T> listener) {
     synchronized (m_listeners) {
       EventListenerList listeners = m_listeners.get(Assertions.assertNotNull(session));
       if (listeners == null) {
@@ -46,10 +55,10 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
   }
 
   public void removeListener(INotificationListener<T> listener) {
-    removeListener(ISession.CURRENT.get(), listener);
+    removeListener(ClientSessionProvider.currentSession(), listener);
   }
 
-  public void removeListener(ISession session, INotificationListener<T> listener) {
+  public void removeListener(IClientSession session, INotificationListener<T> listener) {
     synchronized (m_listeners) {
       EventListenerList listeners = m_listeners.get(Assertions.assertNotNull(session));
       if (listeners != null) {
@@ -66,19 +75,48 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     notifyListeners(notification);
   }
 
-  @SuppressWarnings("unchecked")
   protected void notifyListeners(T notification) {
-    ISession session = ISession.CURRENT.get();
+    IClientSession session = ClientSessionProvider.currentSession();
+    if (session == null) {
+      notifyListenersWithoutCurrentSession(notification);
+    }
+    else {
+      EventListenerList list;
+      synchronized (m_listeners) {
+        list = m_listeners.get(session);
+      }
+      notifyListenersWithCurrentSession(notification, session, list);
+    }
+  }
 
-    final INotificationListener<T>[] listeners;
+  protected void notifyListenersWithoutCurrentSession(final T notification) {
+    // create copy of m_listeners (EventListenerList is thread-safe)
+    Map<IClientSession, EventListenerList> listenerMap;
     synchronized (m_listeners) {
-      EventListenerList list = m_listeners.get(session);
-      if (list != null) {
-        listeners = list.getListeners(INotificationListener.class);
+      listenerMap = new HashMap<>(m_listeners);
+    }
+    for (Entry<IClientSession, EventListenerList> entry : listenerMap.entrySet()) {
+      final IClientSession session = entry.getKey();
+      final EventListenerList list = entry.getValue();
+      if (list != null && list.getListenerCount(INotificationListener.class) > 0) {
+        ModelJobs.schedule(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            notifyListenersWithCurrentSession(notification, session, list);
+          }
+        }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
       }
-      else {
-        return;
-      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void notifyListenersWithCurrentSession(T notification, IClientSession session, EventListenerList list) {
+    final INotificationListener<T>[] listeners;
+    if (list != null) {
+      listeners = list.getListeners(INotificationListener.class);
+    }
+    else {
+      return;
     }
 
     for (INotificationListener<T> l : listeners) {
@@ -107,7 +145,9 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
 
       for (INotificationListener<T> notificationListener : notificationListeners) {
         LOG.warn("Auto fallback removal of session listener due to stopped session. This must be done explicitly by the one that registered the listener: " + notificationListener);
-        removeListener(session, notificationListener);
+        if (session instanceof IClientSession) {
+          removeListener((IClientSession) session, notificationListener);
+        }
       }
     }
   }
