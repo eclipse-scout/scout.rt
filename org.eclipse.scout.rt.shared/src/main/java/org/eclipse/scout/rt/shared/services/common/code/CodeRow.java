@@ -24,8 +24,36 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   private long m_partitionId;
   private double m_order;
 
-  public CodeRow(Object[] cells) {
+  /**
+   * This constructor only works if you are using a subclass of CodeRow.
+   *
+   * @param cells
+   *          array containing the values
+   */
+  protected CodeRow(Object[] cells) {
     this(cells, cells.length - 1);
+  }
+
+  /**
+   * This constructor only works if you are using a subclass of CodeRow.
+   *
+   * @param cells
+   *          array containing the values
+   * @param maxColumnIndex
+   *          upper bound for column to be used
+   */
+  protected CodeRow(Object[] cells, int maxColumnIndex) {
+    this(cells, maxColumnIndex, null);
+  }
+
+  /**
+   * @param cells
+   *          array containing the values
+   * @param clazz
+   *          ID_TYPE of the Key
+   */
+  public CodeRow(Object[] cells, Class<? extends ID_TYPE> clazz) {
+    this(cells, cells.length - 1, clazz);
   }
 
   /**
@@ -45,16 +73,28 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
    * [11] Long enabled (0 or 1) <br>
    * [12] Long partitionId<br>
    * [13] Double order
+   * </p>
+   *
+   * @param cells
+   *          array containing the values
+   * @param maxColumnIndex
+   *          upper bound for column to be used
+   * @param clazz
+   *          ID_TYPE of the Key
    */
   @SuppressWarnings("unchecked")
-  public CodeRow(Object[] cells, int maxColumnIndex) {
+  public CodeRow(Object[] cells, int maxColumnIndex, Class<? extends ID_TYPE> clazz) {
     super(null, (String) null);
+    Class<? extends ID_TYPE> aClazz = clazz;
+    if (aClazz == null) {
+      aClazz = TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class);
+    }
     if (cells != null) {
       for (int index = 0; index < cells.length && index <= maxColumnIndex; index++) {
         if (cells[index] != null) {
           switch (index) {
             case 0: {
-              ID_TYPE key = (ID_TYPE) TypeCastUtility.castValue(cells[index], TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class));
+              ID_TYPE key = (ID_TYPE) TypeCastUtility.castValue(cells[index], aClazz);
               withKey(key);
               break;
             }
@@ -88,7 +128,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
               break;
             }
             case 8: {
-              ID_TYPE o = (ID_TYPE) TypeCastUtility.castValue(cells[index], TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class));
+              ID_TYPE o = (ID_TYPE) TypeCastUtility.castValue(cells[index], aClazz);
               if ((o instanceof Number) && ((Number) o).longValue() == 0) {
                 o = null;
               }

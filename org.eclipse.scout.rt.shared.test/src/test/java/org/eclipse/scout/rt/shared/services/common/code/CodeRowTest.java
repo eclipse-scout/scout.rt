@@ -23,6 +23,20 @@ import org.junit.Test;
  */
 public class CodeRowTest {
 
+  private static final long ONE = 1L;
+  private static final double ONE_D = 1.0;
+  private static final String EXT = "ext";
+  private static final String PARENT = "parent";
+  private static final String BACKGROUND = "background";
+  private static final String FOREGROUND = "foreground";
+  private static final String CSS_CLASS = "cssClass";
+  private static final String TEST_TOOLTIP = "testTooltip";
+  private static final String TEST_ICON = "testIcon";
+  private static final String TEXT = "text";
+  private static final String KEY = "key";
+  private Object[] OBJECT_ARRAY = new Object[]{KEY, TEXT, TEST_ICON, TEST_TOOLTIP, BACKGROUND, FOREGROUND,
+      "font", ONE, PARENT, EXT, ONE, ONE, ONE, ONE_D};
+
   /**
    * Tests initialization of a lookup row with null values
    */
@@ -52,26 +66,63 @@ public class CodeRowTest {
     AbstractTableRowData bean = new AbstractTableRowData() {
       private static final long serialVersionUID = 1L;
     };
-    ICodeRow<String> row = new CodeRow<>("key", "text")
-        .withIconId("testIcon")
-        .withTooltipText("testTooltip")
-        .withCssClass("cssClass")
-        .withForegroundColor("foreground")
-        .withBackgroundColor("background")
-        .withParentKey("parent")
+    ICodeRow<String> row = new CodeRow<>(KEY, TEXT)
+        .withIconId(TEST_ICON)
+        .withTooltipText(TEST_TOOLTIP)
+        .withCssClass(CSS_CLASS)
+        .withForegroundColor(FOREGROUND)
+        .withBackgroundColor(BACKGROUND)
+        .withParentKey(PARENT)
         .withAdditionalTableRowData(bean)
         .withActive(false)
         .withEnabled(false);
-    assertEquals("key", row.getKey());
-    assertEquals("text", row.getText());
-    assertEquals("testIcon", row.getIconId());
-    assertEquals("testTooltip", row.getTooltipText());
-    assertEquals("cssClass", row.getCssClass());
-    assertEquals("foreground", row.getForegroundColor());
-    assertEquals("background", row.getBackgroundColor());
-    assertEquals("parent", row.getParentKey());
+    assertEquals(KEY, row.getKey());
+    assertEquals(TEXT, row.getText());
+    assertEquals(TEST_ICON, row.getIconId());
+    assertEquals(TEST_TOOLTIP, row.getTooltipText());
+    assertEquals(CSS_CLASS, row.getCssClass());
+    assertEquals(FOREGROUND, row.getForegroundColor());
+    assertEquals(BACKGROUND, row.getBackgroundColor());
+    assertEquals(PARENT, row.getParentKey());
     assertEquals(bean, row.getAdditionalTableRowData());
     assertFalse(row.isActive());
     assertFalse(row.isEnabled());
   }
+
+  @Test
+  public void testCreateWithArray() throws Exception {
+    ICodeRow<String> row = new CodeRow<String>(OBJECT_ARRAY, String.class);
+    assertCodeRowCreatedWithObjectArray(row);
+
+  }
+
+  private void assertCodeRowCreatedWithObjectArray(ICodeRow<String> row) {
+    assertEquals(KEY, row.getKey());
+    assertEquals(TEXT, row.getText());
+    assertEquals(TEST_ICON, row.getIconId());
+    assertEquals(TEST_TOOLTIP, row.getTooltipText());
+    assertEquals(FOREGROUND, row.getForegroundColor());
+    assertEquals(BACKGROUND, row.getBackgroundColor());
+    assertTrue(row.isActive());
+    assertEquals(PARENT, row.getParentKey());
+    assertEquals(EXT, row.getExtKey());
+    assertEquals(ONE, row.getValue());
+    assertTrue(row.isEnabled());
+    assertEquals(ONE, row.getPartitionId());
+  }
+
+  @Test
+  public void testCreateWithSubType() throws Exception {
+    ICodeRow<String> row = new StringCodeRow(OBJECT_ARRAY);
+    assertCodeRowCreatedWithObjectArray(row);
+  }
+
+  private static class StringCodeRow extends CodeRow<String> {
+    private static final long serialVersionUID = 1L;
+
+    public StringCodeRow(Object[] cells) {
+      super(cells);
+    }
+  }
+
 }
