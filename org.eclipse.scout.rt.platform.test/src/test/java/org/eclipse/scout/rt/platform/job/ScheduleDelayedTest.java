@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -31,16 +32,16 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ScheduleDelayedTest {
 
-  private IJobManager m_jobManager;
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    m_jobManager.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
@@ -51,7 +52,7 @@ public class ScheduleDelayedTest {
     long tStartNano = System.nanoTime();
     long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
 
-    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -62,7 +63,7 @@ public class ScheduleDelayedTest {
         .withSchedulingDelay(delayNanos, TimeUnit.NANOSECONDS));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .toFilter(), 30, TimeUnit.SECONDS));
     assertEquals(1, protocol.size());

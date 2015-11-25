@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneCallback;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -121,13 +121,13 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
       }
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()))
-        .whenDone(new IDoneCallback<Void>() {
+        .whenDone(new IDoneHandler<Void>() {
 
           @Override
           public void onDone(DoneEvent<Void> event) {
             cond.setBlocking(false);
           }
-        });
+        }, null);
     cond.waitFor();
   }
 

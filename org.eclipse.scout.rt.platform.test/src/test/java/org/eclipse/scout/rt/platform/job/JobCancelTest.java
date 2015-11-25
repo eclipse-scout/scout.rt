@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,44 +27,32 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class JobCancelTest {
 
-  private JobManager m_jobManager;
-  private static ScheduledExecutorService s_executor;
-
-  @BeforeClass
-  public static void beforeClass() {
-    s_executor = Executors.newScheduledThreadPool(5);
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    s_executor.shutdown();
-  }
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    m_jobManager.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
@@ -76,7 +62,7 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -120,7 +106,7 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -163,7 +149,7 @@ public class JobCancelTest {
   public void testCancelBeforeRunning() throws Exception {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -171,11 +157,10 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(500, TimeUnit.MILLISECONDS));
+        .withSchedulingDelay(10, TimeUnit.SECONDS));
 
     // RUN THE TEST
     future.cancel(true);
-    Thread.sleep(TimeUnit.MILLISECONDS.toMillis(600)); // Wait some time so that the job could be scheduled (should not happen).
 
     // VERIFY
     assertTrue(future.isCancelled());
@@ -192,7 +177,7 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -203,7 +188,6 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingDelay(10, TimeUnit.MILLISECONDS)
         .withPeriodicExecutionAtFixedRate(10, TimeUnit.MILLISECONDS)
         .withLogOnError(false));
 
@@ -214,7 +198,6 @@ public class JobCancelTest {
     verifyLatch.countDown();
 
     // VERIFY
-    Thread.sleep(TimeUnit.SECONDS.toMillis(1)); // Wait some time so that the job could be rescheduled.  (should not happen).
     assertTrue(future.isCancelled());
     assertEquals(3, count.get());
 
@@ -228,7 +211,7 @@ public class JobCancelTest {
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -247,7 +230,7 @@ public class JobCancelTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -269,9 +252,9 @@ public class JobCancelTest {
     assertTrue(latch.await());
 
     // SHUTDOWN
-    m_jobManager.shutdown();
+    Jobs.getJobManager().shutdown();
 
-    IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -311,13 +294,13 @@ public class JobCancelTest {
 
     final AtomicReference<IFuture<?>> childFutureRef = new AtomicReference<>();
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
 
         //attach to child runmonitor -> nested cancel
-        IFuture<?> childFuture = m_jobManager.schedule(new IRunnable() {
+        IFuture<?> childFuture = Jobs.getJobManager().schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -383,12 +366,12 @@ public class JobCancelTest {
     final BlockingCountDownLatch job1DoneLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         //re-use runmonitor -> nested cancel
-        m_jobManager.schedule(new IRunnable() {
+        Jobs.getJobManager().schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -412,7 +395,7 @@ public class JobCancelTest {
             .withLogOnError(false));
 
         //does not re-use runmonitor -> no nested cancel
-        m_jobManager.schedule(new IRunnable() {
+        Jobs.getJobManager().schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -483,7 +466,7 @@ public class JobCancelTest {
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(4);
 
     // Job-1 (common-id) => CANCEL
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -502,7 +485,7 @@ public class JobCancelTest {
         .withLogOnError(false));
 
     // Job-2 (common-id) => CANCEL
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -521,12 +504,12 @@ public class JobCancelTest {
         .withLogOnError(false));
 
     // Job-3 (common-id) => CANCEL
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         // Job-3a (other name, same re-used runMonitor => CANCEL AS WELL)
-        m_jobManager.schedule(new IRunnable() {
+        Jobs.getJobManager().schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -545,7 +528,7 @@ public class JobCancelTest {
             .withLogOnError(false));
 
         // Job-3b (other name, other runMonitor => NO CANCEL)
-        m_jobManager.schedule(new IRunnable() {
+        Jobs.getJobManager().schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -576,7 +559,7 @@ public class JobCancelTest {
         .withMutex(null));
 
     // Job-4 (common-id, but not-null mutex)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -594,7 +577,7 @@ public class JobCancelTest {
         .withLogOnError(false));
 
     assertTrue(setupLatch.await());
-    m_jobManager.cancel(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
         .andMatchName(commonJobName)
         .andMatchMutex(null)
         .toFilter(), true);

@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.IDoneCallback;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
@@ -120,7 +120,7 @@ public class ClientNotificationDispatcher {
         m_notificationFutures.add(future);
       }
 
-      future.whenDone(new P_NotificationFutureCallback(future));
+      future.whenDone(new P_NotificationFutureCallback(future), null);
     }
   }
 
@@ -154,7 +154,7 @@ public class ClientNotificationDispatcher {
         m_notificationFutures.add(future);
       }
 
-      future.whenDone(new P_NotificationFutureCallback(future));
+      future.whenDone(new P_NotificationFutureCallback(future), null);
     }
   }
 
@@ -178,7 +178,7 @@ public class ClientNotificationDispatcher {
         .toFilter(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
 
-  private class P_NotificationFutureCallback implements IDoneCallback<Void> {
+  private class P_NotificationFutureCallback implements IDoneHandler<Void> {
     private IFuture<Void> m_future;
 
     public P_NotificationFutureCallback(IFuture<Void> furture) {

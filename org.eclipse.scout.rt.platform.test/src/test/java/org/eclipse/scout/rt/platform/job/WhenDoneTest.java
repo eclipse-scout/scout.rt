@@ -28,9 +28,10 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -40,16 +41,16 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class WhenDoneTest {
 
-  private IJobManager m_jobManager;
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    m_jobManager.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
@@ -69,7 +70,7 @@ public class WhenDoneTest {
         .withSchedulingDelay(1, TimeUnit.SECONDS));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<String>() {
+    future.whenDone(new IDoneHandler<String>() {
 
       @Override
       public void onDone(DoneEvent<String> event) {
@@ -83,7 +84,7 @@ public class WhenDoneTest {
         eventHolder.setValue(event);
         verifyLatch.countDown();
       }
-    });
+    }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
@@ -110,7 +111,7 @@ public class WhenDoneTest {
     future.awaitDoneAndGet();
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<String>() {
+    future.whenDone(new IDoneHandler<String>() {
 
       @Override
       public void onDone(DoneEvent<String> event) {
@@ -124,7 +125,7 @@ public class WhenDoneTest {
         eventHolder.setValue(event);
         verifyLatch.countDown();
       }
-    });
+    }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
@@ -152,7 +153,7 @@ public class WhenDoneTest {
         .withLogOnError(false));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<String>() {
+    future.whenDone(new IDoneHandler<String>() {
 
       @Override
       public void onDone(DoneEvent<String> event) {
@@ -166,7 +167,7 @@ public class WhenDoneTest {
         eventHolder.setValue(event);
         verifyLatch.countDown();
       }
-    });
+    }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
@@ -197,7 +198,7 @@ public class WhenDoneTest {
     }
     catch (ProcessingException e) {
       final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-      future.whenDone(new IDoneCallback<String>() {
+      future.whenDone(new IDoneHandler<String>() {
 
         @Override
         public void onDone(DoneEvent<String> event) {
@@ -211,7 +212,7 @@ public class WhenDoneTest {
           eventHolder.setValue(event);
           verifyLatch.countDown();
         }
-      });
+      }, RunContexts.copyCurrent());
 
       assertTrue(verifyLatch.await());
       assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
@@ -241,7 +242,7 @@ public class WhenDoneTest {
     future.cancel(true);
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<String>() {
+    future.whenDone(new IDoneHandler<String>() {
 
       @Override
       public void onDone(DoneEvent<String> event) {
@@ -255,7 +256,7 @@ public class WhenDoneTest {
         eventHolder.setValue(event);
         verifyLatch.countDown();
       }
-    });
+    }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("2", "done", "cancelled"), protocol);
@@ -296,14 +297,14 @@ public class WhenDoneTest {
     final AtomicBoolean onDone = new AtomicBoolean(false);
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<Void>() {
+    future.whenDone(new IDoneHandler<Void>() {
 
       @Override
       public void onDone(DoneEvent<Void> event) {
         onDone.set(true);
         verifyLatch.countDown();
       }
-    });
+    }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
     assertTrue(onDone.get());
@@ -329,7 +330,7 @@ public class WhenDoneTest {
     future.cancel(true);
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<String>() {
+    future.whenDone(new IDoneHandler<String>() {
 
       @Override
       public void onDone(DoneEvent<String> event) {
@@ -343,7 +344,7 @@ public class WhenDoneTest {
         eventHolder.setValue(event);
         verifyLatch.countDown();
       }
-    });
+    }, RunContexts.copyCurrent());
     verifyLatch.await();
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);

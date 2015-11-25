@@ -11,68 +11,46 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class FutureAwaitTest {
 
-  private static ExecutorService s_executor;
-  private IBean<Object> m_bean;
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, new JobManager()).withReplace(true).withOrder(-1));
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    Jobs.getJobManager().shutdown();
-    Platform.get().getBeanManager().unregisterBean(m_bean);
-  }
-
-  @BeforeClass
-  public static void beforeClass() {
-    s_executor = Executors.newFixedThreadPool(5);
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    s_executor.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test(timeout = 5000)
   public void testAwaitDone_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Thread> thread = new AtomicReference<>();
-    final AtomicReference<Throwable> error = new AtomicReference<>();
-    thread.set(Thread.currentThread());
 
-    // Test job
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
+    // Init
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -82,41 +60,30 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Run the test in a separate thread
+    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
 
       @Override
-      public void run() {
+      public void run() throws Exception {
+        Thread.currentThread().interrupt();
         try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          thread.get().interrupt();
-          setupLatch.unblock();
+          future.awaitDone();
+          fail();
         }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
+        catch (ProcessingException e) {
+          assertTrue(e.isInterruption());
         }
       }
-    });
-
-    // Run test and verify
-    try {
-      future.awaitDone();
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
-    }
-    assertNull(error.get());
+    }, Jobs.newInput());
+    assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testAwaitDone_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -127,69 +94,36 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
+    // Run the test and verify
+    future.cancel(false);
+    assertTrue(future.isCancelled());
+    future.awaitDone();
     try {
-      future.awaitDone();
-      assertTrue(future.isCancelled());
-    }
-    catch (ProcessingException e) {
+      future.awaitDoneAndGet();
       fail();
     }
-    assertNull(error.get());
+    catch (ProcessingException e) {
+      assertTrue(e.isCancellation());
+    }
   }
 
   @Test(timeout = 5000)
   public void testAwaitDone_ComputationFailed() throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        setupLatch.countDownAndBlock();
         throw computationException;
       }
     }, Jobs.newInput().withLogOnError(false));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
+    // Run the test and verify
     try {
       future.awaitDone();
     }
@@ -197,6 +131,7 @@ public class FutureAwaitTest {
       fail();
     }
 
+    // Run the test and verify
     try {
       future.awaitDoneAndGet();
       fail();
@@ -204,18 +139,14 @@ public class FutureAwaitTest {
     catch (ProcessingException e) {
       assertSame(computationException, e.getCause());
     }
-    assertNull(error.get());
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneWithTimeout_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Thread> thread = new AtomicReference<>();
-    final AtomicReference<Throwable> error = new AtomicReference<>();
-    thread.set(Thread.currentThread());
 
-    // Test job
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
+    // Init
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -225,41 +156,30 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Run the test in a separate thread
+    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
 
       @Override
-      public void run() {
+      public void run() throws Exception {
+        Thread.currentThread().interrupt();
         try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          thread.get().interrupt();
-          setupLatch.unblock();
+          future.awaitDone(10, TimeUnit.SECONDS);
+          fail();
         }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
+        catch (ProcessingException e) {
+          assertTrue(e.isInterruption());
         }
       }
-    });
-
-    // Run test and verify
-    try {
-      assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
-    }
-    assertNull(error.get());
+    }, Jobs.newInput());
+    assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneWithTimeout_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -270,41 +190,20 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
-    try {
-      assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
-      assertTrue(future.isCancelled());
-    }
-    catch (ProcessingException e) {
-      fail();
-    }
-    assertNull(error.get());
+    // Run the test and verify
+    future.cancel(false);
+    assertTrue(future.isCancelled());
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneWithTimeout_Timeout() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -315,66 +214,26 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
-    try {
-      assertFalse(future.awaitDone(0, TimeUnit.SECONDS));
-    }
-    catch (ProcessingException e) {
-      fail();
-    }
-    assertNull(error.get());
+    // Run the test and verify
+    assertFalse(future.awaitDone(5, TimeUnit.MILLISECONDS));
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneWithTimeout_ComputationFailed() throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        setupLatch.countDownAndBlock();
         throw computationException;
       }
     }, Jobs.newInput().withLogOnError(false));
-
-    // Test controller
-    s_executor.submit(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
 
     // Run test and verify
     try {
@@ -384,6 +243,7 @@ public class FutureAwaitTest {
       fail();
     }
 
+    // Run the test and verify
     try {
       future.awaitDoneAndGet();
       fail();
@@ -391,18 +251,14 @@ public class FutureAwaitTest {
     catch (ProcessingException e) {
       assertSame(computationException, e.getCause());
     }
-    assertNull(error.get());
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGet_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Thread> thread = new AtomicReference<>();
-    final AtomicReference<Throwable> error = new AtomicReference<>();
-    thread.set(Thread.currentThread());
 
-    // Test job
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
+    // Init
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -412,41 +268,30 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Run the test in a separate thread
+    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
 
       @Override
-      public void run() {
+      public void run() throws Exception {
+        Thread.currentThread().interrupt();
         try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          thread.get().interrupt();
-          setupLatch.unblock();
+          future.awaitDoneAndGet();
+          fail();
         }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
+        catch (ProcessingException e) {
+          assertTrue(e.isInterruption());
         }
       }
-    });
-
-    // Run test and verify
-    try {
-      future.awaitDoneAndGet();
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
-    }
-    assertNull(error.get());
+    }, Jobs.newInput());
+    assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGet_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -457,25 +302,11 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
+    // Run the test and verify
+    future.cancel(false);
     try {
       future.awaitDoneAndGet();
       fail();
@@ -484,43 +315,23 @@ public class FutureAwaitTest {
       assertTrue(e.isCancellation());
       assertTrue(future.isCancelled());
     }
-    assertNull(error.get());
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGet_ComputationFailed() throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        setupLatch.countDownAndBlock();
         throw computationException;
       }
     }, Jobs.newInput().withLogOnError(false));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
+    // Run the test and verify
     try {
       future.awaitDoneAndGet();
       fail();
@@ -528,62 +339,13 @@ public class FutureAwaitTest {
     catch (ProcessingException e) {
       assertSame(computationException, e.getCause());
     }
-    assertNull(error.get());
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGetWithTimeout_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Thread> thread = new AtomicReference<>();
-    final AtomicReference<Throwable> error = new AtomicReference<>();
-    thread.set(Thread.currentThread());
 
-    // Test job
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent()));
-
-    // Test controller
-    s_executor.submit(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          thread.get().interrupt();
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
-    try {
-      future.awaitDoneAndGet(10, TimeUnit.SECONDS);
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
-    }
-    assertNull(error.get());
-  }
-
-  @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_Cancelled() throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
-
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -594,25 +356,45 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Run the test in a separate thread
+    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
 
       @Override
-      public void run() {
+      public void run() throws Exception {
+        Thread.currentThread().interrupt();
         try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
+          future.awaitDoneAndGet(10, TimeUnit.SECONDS);
+          fail();
         }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
+        catch (ProcessingException e) {
+          assertTrue(e.isInterruption());
         }
       }
-    });
+    }, Jobs.newInput());
+    assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
+    setupLatch.unblock();
+  }
 
-    // Run test and verify
+  @Test(timeout = 5000)
+  public void testAwaitDoneAndGetWithTimeout_Cancelled() throws InterruptedException {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
+    // Init
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
+
+      @Override
+      public String call() throws Exception {
+        setupLatch.countDownAndBlock();
+        return "result";
+      }
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent()));
+
+    // Wait until ready
+    assertTrue(setupLatch.await());
+
+    // Run the test and verify
+    future.cancel(false);
     try {
       future.awaitDoneAndGet(10, TimeUnit.SECONDS);
       fail();
@@ -621,43 +403,24 @@ public class FutureAwaitTest {
       assertTrue(e.isCancellation());
       assertTrue(future.isCancelled());
     }
-    assertNull(error.get());
+
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGetWithTimeout_ComputationFailed() throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        setupLatch.countDownAndBlock();
         throw computationException;
       }
     }, Jobs.newInput().withLogOnError(false));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
+    // Run the test and verify
     try {
       future.awaitDoneAndGet(10, TimeUnit.SECONDS);
       fail();
@@ -665,15 +428,13 @@ public class FutureAwaitTest {
     catch (ProcessingException e) {
       assertSame(computationException, e.getCause());
     }
-    assertNull(error.get());
   }
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGetWithTimeout_Timeout() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -683,43 +444,25 @@ public class FutureAwaitTest {
       }
     }, Jobs.newInput().withLogOnError(false));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
+    // Run the test and verify
     try {
-      future.awaitDoneAndGet(0, TimeUnit.SECONDS);
+      future.awaitDoneAndGet(5, TimeUnit.MILLISECONDS);
       fail();
     }
     catch (ProcessingException e) {
       assertTrue(e.isTimeout());
     }
-    assertNull(error.get());
   }
 
   @Test(timeout = 5000)
   public void testJobManagerAwaitDone_Interrupted() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Thread> thread = new AtomicReference<>();
-    final AtomicReference<Throwable> error = new AtomicReference<>();
-    thread.set(Thread.currentThread());
 
-    // Test job
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
+    // Init
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -729,43 +472,32 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Run the test in a separate thread
+    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
 
       @Override
-      public void run() {
+      public void run() throws Exception {
+        Thread.currentThread().interrupt();
         try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          thread.get().interrupt();
-          setupLatch.unblock();
+          assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+              .andMatchFuture(future)
+              .toFilter(), 10, TimeUnit.SECONDS));
+          fail();
         }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
+        catch (ProcessingException e) {
+          assertTrue(e.isInterruption());
         }
       }
-    });
-
-    // Run test and verify
-    try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(future)
-          .toFilter(), 10, TimeUnit.SECONDS));
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
-    }
-    assertNull(error.get());
+    }, Jobs.newInput());
+    assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testJobManagerAwaitDone_Cancelled() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -776,43 +508,24 @@ public class FutureAwaitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
+    // Run the test and verify
+    future.cancel(false);
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 10, TimeUnit.SECONDS));
+    assertTrue(future.isCancelled());
 
-    // Run test and verify
-    try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(future)
-          .toFilter(), 10, TimeUnit.SECONDS));
-      assertTrue(future.isCancelled());
-    }
-    catch (ProcessingException e) {
-      fail();
-    }
-    assertNull(error.get());
+    setupLatch.unblock();
   }
 
   @Test(timeout = 5000)
   public void testJobManagerAwaitDone_Timeout() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
@@ -820,115 +533,58 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent()));
+    }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Wait until ready
+    assertTrue(setupLatch.await());
 
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          future.cancel(false);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
-    try {
-      assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(future)
-          .toFilter(), 1, TimeUnit.NANOSECONDS));
-    }
-    catch (ProcessingException e) {
-      fail();
-    }
-    assertNull(error.get());
+    // Run the test and verify
+    assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 1, TimeUnit.MILLISECONDS));
   }
 
   @Test(timeout = 5000)
   public void testJobManagerAwaitDone_ComputationFailed() throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final AtomicReference<Throwable> error = new AtomicReference<>();
     final RuntimeException computationException = new RuntimeException();
 
-    // Test job
+    // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        setupLatch.countDownAndBlock();
         throw computationException;
       }
     }, Jobs.newInput().withLogOnError(false));
 
-    // Test controller
-    s_executor.submit(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          assertTrue(setupLatch.await());
-          Thread.sleep(500);
-          setupLatch.unblock();
-        }
-        catch (Throwable e) {
-          error.set(e);
-          // NOOP
-        }
-      }
-    });
-
-    // Run test and verify
-    try {
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(future)
-          .toFilter(), 10, TimeUnit.SECONDS));
-    }
-    catch (ProcessingException e) {
-      fail();
-    }
-
-    assertNull(error.get());
+    // Run the test and verify
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
   public void testBlockingConditionWaitFor_Interrupted() throws InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
 
-    final AtomicReference<Thread> thread = new AtomicReference<>();
-    thread.set(Thread.currentThread());
-
-    // Test controller
-    s_executor.submit(new Runnable() {
+    // Run the test in a separate thread
+    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
 
       @Override
-      public void run() {
+      public void run() throws Exception {
+        Thread.currentThread().interrupt();
+
         try {
-          Thread.sleep(500);
-          thread.get().interrupt();
+          bc.waitFor();
+          fail();
         }
-        catch (Throwable e) {
-          // NOOP
+        catch (ProcessingException e) {
+          assertTrue(e.isInterruption());
         }
       }
-    });
+    }, Jobs.newInput());
 
-    // Run test and verify
-    try {
-      bc.waitFor();
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
-    }
+    assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -936,11 +592,6 @@ public class FutureAwaitTest {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
 
     // Run test and verify
-    try {
-      assertFalse(bc.waitFor(1, TimeUnit.NANOSECONDS));
-    }
-    catch (ProcessingException e) {
-      fail();
-    }
+    assertFalse(bc.waitFor(1, TimeUnit.NANOSECONDS));
   }
 }

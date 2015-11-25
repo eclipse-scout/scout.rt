@@ -118,13 +118,13 @@ public class RunMonitorJobTest {
 
   private void awaitFutureDone(IFuture<Void> future) throws InterruptedException {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneCallback<Void>() {
+    future.whenDone(new IDoneHandler<Void>() {
 
       @Override
       public void onDone(DoneEvent<Void> event) {
         latch.countDown();
       }
-    });
+    }, null);
     latch.await();
   }
 

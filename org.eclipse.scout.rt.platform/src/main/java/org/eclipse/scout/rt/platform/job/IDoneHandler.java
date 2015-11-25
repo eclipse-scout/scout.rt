@@ -11,18 +11,15 @@
 package org.eclipse.scout.rt.platform.job;
 
 /**
- * Callback to be notified once a job completes.
+ * Handler to be invoked upon transition into 'done' state, which is either due to cancellation, or upon completion.
  *
  * @since 5.1
  * @see IFuture#whenDone(IDoneCallback)
  */
-public interface IDoneCallback<RESULT> {
+public interface IDoneHandler<RESULT> {
 
   /**
-   * Method invoked once a job completes.
-   *
-   * @param event
-   *          event with completion information.
+   * Method invoked upon transition into 'done' state.
    */
   void onDone(DoneEvent<RESULT> event);
 }

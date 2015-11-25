@@ -21,9 +21,10 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -33,23 +34,23 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class JobManagerTest {
 
-  private IJobManager m_jobManager;
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    m_jobManager.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
   public void testVisit() throws Exception {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -59,7 +60,7 @@ public class JobManagerTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -69,7 +70,7 @@ public class JobManagerTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -83,7 +84,7 @@ public class JobManagerTest {
 
     // RUN THE TEST
     final Set<IFuture<?>> protocol = new HashSet<>();
-    m_jobManager.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
+    Jobs.getJobManager().visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -103,7 +104,7 @@ public class JobManagerTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(3);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -121,7 +122,7 @@ public class JobManagerTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -139,7 +140,7 @@ public class JobManagerTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -160,7 +161,7 @@ public class JobManagerTest {
     assertTrue(setupLatch.await());
 
     // RUN THE TEST
-    m_jobManager.shutdown();
+    Jobs.getJobManager().shutdown();
 
     // VERIFY
     assertTrue(verifyLatch.await());

@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.filter.OrFilter;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -175,37 +176,41 @@ public interface IFuture<RESULT> extends ICancellable {
   <ERROR extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, IThrowableTranslator<ERROR> throwableTranslator) throws ERROR;
 
   /**
-   * Registers the given <code>callback</code> to be notified once the Future enters 'done' state. That is once the
-   * associated job completes successfully or with an exception, or was cancelled. Thereby, the callback is invoked in
-   * any thread with no {@code RunContext} applied. If the job is already in 'done' state when the callback is
-   * registered, the callback is invoked immediately.
+   * Registers the given <code>callback</code> to be invoked once the Future enters 'done' state. That is once the
+   * associated job completes successfully or with an exception, or was cancelled. The callback is invoked immediately
+   * and in the calling thread, if being in 'done' state at the time of invocation. Otherwise, this method returns
+   * immediately, and the callback invoked upon transition into 'done' state.
    * <p>
    * The following code snippet illustrates its usage:
    *
    * <pre>
    * <code>
-   * Jobs.schedule(new IRunnable() {
+   * Jobs.schedule(new Callable&lt;String&gt;() {
    *
    *   &#064;Override
-   *   public void run() throws Exception {
+   *   public String call() throws Exception {
    *     // do some work
+   *     return ...;
    *   }
    * })<strong>
-   * .whenDone(new IDoneCallback&lt;Void&gt;() {
+   * .whenDone(new IDoneHandler&lt;String&gt;() {
    *
    *   &#064;Override
-   *   public void onDone(DoneEvent&lt;Void&gt; event) {
-   *     // invoked once the job completes
+   *   public void onDone(DoneEvent&lt;String&gt; event) {
+   *     // invoked once the job completes, or is cancelled.
    *   }
-   * })</strong>;
+   * }, RunContexts.copyCurrent())</strong>;
    * </code>
    * </pre>
    *
    * @param callback
-   *          callback to be notified once the Future enters 'done' state.
+   *          callback invoked upon transition into 'done' state.
+   * @param runContext
+   *          optional {@link RunContext} to invoke the handler on behalf, or <code>null</code> to not invoke on a
+   *          specific {@link RunContext}.
    * @return The future to support for method chaining.
    */
-  IFuture<RESULT> whenDone(IDoneCallback<RESULT> callback);
+  IFuture<RESULT> whenDone(IDoneHandler<RESULT> callback, RunContext runContext);
 
   /**
    * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener

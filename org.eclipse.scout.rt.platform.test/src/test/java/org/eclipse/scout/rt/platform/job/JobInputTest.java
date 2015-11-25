@@ -47,5 +47,4 @@ public class JobInputTest {
         .withRunContext(RunContexts.copyCurrent())
         .withName("ABC").getName());
   }
-
 }

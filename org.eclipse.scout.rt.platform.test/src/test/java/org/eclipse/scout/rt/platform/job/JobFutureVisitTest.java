@@ -12,12 +12,10 @@ package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IRunnable;
@@ -25,9 +23,10 @@ import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +36,8 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class JobFutureVisitTest {
 
-  private P_JobManager m_jobManager;
+  private IBean<IJobManager> m_jobManagerBean;
+
   private IMutex m_mutex1;
   private IMutex m_mutex2;
   private IMutex m_mutex3;
@@ -51,7 +51,7 @@ public class JobFutureVisitTest {
 
   @Before
   public void before() throws InterruptedException {
-    m_jobManager = new P_JobManager();
+    m_jobManagerBean = JobTestUtil.registerJobManager();
 
     m_mutex1 = Jobs.newMutex();
     m_mutex2 = Jobs.newMutex();
@@ -59,13 +59,13 @@ public class JobFutureVisitTest {
 
     // prepare the test-case
     protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
-    bc1 = m_jobManager.createBlockingCondition("BC1", true);
-    bc2 = m_jobManager.createBlockingCondition("BC2", true);
+    bc1 = Jobs.getJobManager().createBlockingCondition("BC1", true);
+    bc2 = Jobs.getJobManager().createBlockingCondition("BC2", true);
 
     latch = new BlockingCountDownLatch(3);
 
     // SESSION 1 (JOB-1)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -79,7 +79,7 @@ public class JobFutureVisitTest {
         .withLogOnError(false));
 
     // SESSION 1 (JOB-2)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -93,7 +93,7 @@ public class JobFutureVisitTest {
         .withLogOnError(false));
 
     // SESSION 1 (JOB-3)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -106,7 +106,7 @@ public class JobFutureVisitTest {
 
     // =========
     // SESSION 2 (JOB-1)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -118,7 +118,7 @@ public class JobFutureVisitTest {
         .withMutex(m_mutex2));
 
     // SESSION 2 (JOB-2)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -132,14 +132,14 @@ public class JobFutureVisitTest {
         .withLogOnError(false));
 
     // SESSION 2  (JOB-3)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc2.setBlocking(false);
 
-        m_jobManager.waitForPermitsAcquired(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
+        JobTestUtil.waitForMutexCompetitors(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
 
         latch.countDownAndBlock();
       }
@@ -150,7 +150,7 @@ public class JobFutureVisitTest {
         .withLogOnError(false));
 
     // SESSION 2  (JOB-4)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -163,7 +163,7 @@ public class JobFutureVisitTest {
 
     // =========
     // SESSION 3 (JOB-1)
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -181,7 +181,7 @@ public class JobFutureVisitTest {
 
   @After
   public void after() {
-    m_jobManager.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
@@ -202,7 +202,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitNullFilter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(null, new IVisitor<IFuture<?>>() {
+    Jobs.getJobManager().visit(null, new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -225,7 +225,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitAlwaysFilter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
+    Jobs.getJobManager().visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -248,7 +248,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitBlockedFilter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andAreBlocked()
         .toFilter(), new IVisitor<IFuture<?>>() {
 
@@ -273,7 +273,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitNotBlockedFilter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new NotFilter<>(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().visit(new NotFilter<>(Jobs.newFutureFilterBuilder()
         .andAreBlocked()
         .toFilter()), new IVisitor<IFuture<?>>() {
 
@@ -298,7 +298,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession1Filter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))
         .toFilter(), new IVisitor<IFuture<?>>() {
 
@@ -323,7 +323,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession2Filter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex2_.*"))
         .toFilter(), new IVisitor<IFuture<?>>() {
 
@@ -348,7 +348,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSessionFilterAndBlocked() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))
         .andAreBlocked()
         .toFilter()), new IVisitor<IFuture<?>>() {
@@ -369,23 +369,5 @@ public class JobFutureVisitTest {
 //    expected.add("mutex2_job4"); // waiting for execution
 //    expected.add("mutex3_job1"); // waiting on the latch
     assertEquals(expected, visitedFutures);
-  }
-
-  private class P_JobManager extends JobManager {
-
-    /**
-     * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
-     */
-    protected void waitForPermitsAcquired(IMutex mutex, int expectedPermitCount) throws InterruptedException {
-      long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
-
-      // Wait until the other jobs tried to re-acquire the mutex.
-      while (mutex.getCompetitorCount() != expectedPermitCount) {
-        if (System.currentTimeMillis() > deadline) {
-          fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, mutex.getCompetitorCount()));
-        }
-        Thread.sleep(10);
-      }
-    }
   }
 }

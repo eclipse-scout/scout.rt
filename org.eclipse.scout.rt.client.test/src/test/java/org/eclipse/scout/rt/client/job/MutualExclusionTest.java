@@ -39,7 +39,6 @@ import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
@@ -54,8 +53,8 @@ import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -70,8 +69,7 @@ public class MutualExclusionTest {
 
   private static ExecutorService s_executor;
 
-  private IJobManager m_jobManager;
-  private List<IBean<?>> m_beans;
+  private IBean<IJobManager> m_jobManagerBean;
 
   private IClientSession m_clientSession;
 
@@ -87,23 +85,19 @@ public class MutualExclusionTest {
 
   @Before
   public void before() {
+    m_jobManagerBean = JobTestUtil.registerJobManager();
+
     m_clientSession = mock(IClientSession.class);
     when(m_clientSession.getModelJobMutex()).thenReturn(Jobs.newMutex());
-
-    m_jobManager = new JobManager();
-    m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobManager.class)
-            .withInitialInstance(m_jobManager)
-            .withApplicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
-
     ISession.CURRENT.remove();
+
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   /**
@@ -147,7 +141,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
-    m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
+    Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
 
     assertEquals(CollectionUtility.hashSet(1, 2, 3), protocol);
     assertEquals(CollectionUtility.arrayList("model-thread-1", "model-thread-2", "model-thread-3"), modelThreadProtocol);
@@ -246,7 +240,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.arrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), protocol);
   }
 
@@ -283,7 +277,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.arrayList(1, 2, 3), protocol);
   }
 
@@ -302,7 +296,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("1: running");
 
-        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("1: idle [a]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -316,7 +310,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("1: afterAwait");
 
-        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("1: idle [b]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -334,7 +328,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("2: running");
 
-        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("2: idle [a]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -349,7 +343,7 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
         protocol.add("2: afterSignaling");
 
-        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("2: idle [b]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -364,7 +358,7 @@ public class MutualExclusionTest {
     // Wait until job1 completed.
     future1.awaitDoneAndGet(30, TimeUnit.SECONDS);
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("1: running");
@@ -386,7 +380,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionMultipleFlat() throws InterruptedException {
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
     runTestBlockingConditionMultipleFlat(BC);
@@ -398,7 +392,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionMultipleNested() throws InterruptedException {
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
     runTestBlockingCondition(BC);
@@ -413,7 +407,7 @@ public class MutualExclusionTest {
   @Test
   public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
@@ -464,8 +458,8 @@ public class MutualExclusionTest {
 
     // VERIFY
     verifyLatch.await();
-    assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertFalse(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS));
+    assertFalse(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+    assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS));
     assertEquals(Arrays.asList("running-1", "running-2", "interrupted-1", "non-model-thread-1"), protocol);
   }
 
@@ -480,7 +474,7 @@ public class MutualExclusionTest {
   @Test
   public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job1FinishLatch = new BlockingCountDownLatch(1);
@@ -534,7 +528,7 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
 
     assertTrue(latchJob2.await());
-    waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 3); // job-1 (interrupted, but re-acquire mutex task still pending), job32 (latch), job-3 (pending)
+    JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 3); // job-1 (interrupted, but re-acquire mutex task still pending), job32 (latch), job-3 (pending)
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("running-1");
@@ -564,7 +558,7 @@ public class MutualExclusionTest {
 
     assertFalse(future2.isCancelled());
     try {
-      future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
+      future2.awaitDoneAndGet(1, TimeUnit.NANOSECONDS);
       fail();
     }
     catch (ProcessingException e) {
@@ -573,7 +567,7 @@ public class MutualExclusionTest {
 
     assertFalse(future3.isCancelled());
     try {
-      future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
+      future3.awaitDoneAndGet(1, TimeUnit.NANOSECONDS);
       fail();
     }
     catch (ProcessingException e) {
@@ -582,20 +576,21 @@ public class MutualExclusionTest {
 
     // let job2 finish its work so that job1 can re-acquire the mutex.
     latchJob2.unblock();
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     expectedProtocol.add("done-2");
     expectedProtocol.add("done-3");
     assertEquals(expectedProtocol, protocol);
     try {
-      assertNull(future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
+      assertNull(future2.awaitDoneAndGet(1, TimeUnit.NANOSECONDS));
     }
     catch (ProcessingException e) {
+      e.printStackTrace();
       fail();
     }
 
     try {
-      assertNull(future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
+      assertNull(future3.awaitDoneAndGet(1, TimeUnit.NANOSECONDS));
     }
     catch (ProcessingException e) {
       fail();
@@ -608,24 +603,17 @@ public class MutualExclusionTest {
    */
   @Test
   public void testRejection() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
     final ExecutorService executorMock = mock(ExecutorService.class);
-
-    class TestJobManager extends JobManager {
+    m_jobManagerBean = JobTestUtil.registerJobManager(new JobManager() {
 
       @Override
       protected ExecutorService createExecutor() {
         return executorMock;
       }
-    }
+    });
 
-    final IJobManager jobManager = new TestJobManager();
-    m_beans.addAll(TestingUtility.registerBeans(
-        new BeanMetaData(IJobManager.class)
-            .withOrder(-1000)
-            .withInitialInstance(jobManager)
-            .withApplicationScoped(true)));
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     // Executor mock
     doAnswer(new Answer<Future>() {
@@ -649,19 +637,19 @@ public class MutualExclusionTest {
     }).when(executorMock).execute(any(Runnable.class));
 
     // Job-1
-    final IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         // Wait until all 3 jobs are scheduled.
-        waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 3);
+        JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 3);
 
         protocol.add("running-job-1");
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-1"));
 
     // Job-2
-    final IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -670,7 +658,7 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-2"));
 
     // Job-3
-    IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -678,9 +666,9 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-3"));
 
-    assertTrue(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
     assertEquals(Arrays.asList("running-job-1", "running-job-3"), protocol);
-    assertTrue(jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(future1.isCancelled());
     assertTrue(future2.isCancelled());
     assertFalse(future3.isCancelled());
@@ -694,24 +682,17 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockedJobs() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
     final ExecutorService executorMock = mock(ExecutorService.class);
-
-    class TestJobManager extends JobManager {
+    m_jobManagerBean = JobTestUtil.registerJobManager(new JobManager() {
 
       @Override
       protected ExecutorService createExecutor() {
         return executorMock;
       }
-    }
-    final TestJobManager jobManager = new TestJobManager();
+    });
 
-    m_beans.addAll(TestingUtility.registerBeans(
-        new BeanMetaData(IJobManager.class)
-            .withOrder(-1000)
-            .withInitialInstance(jobManager)
-            .withApplicationScoped(true)));
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     // Executor mock
     doAnswer(new Answer<Future>() {
@@ -736,15 +717,15 @@ public class MutualExclusionTest {
 
     final BlockingCountDownLatch job4RunningLatch = new BlockingCountDownLatch(1);
 
-    final IBlockingCondition BC = jobManager.createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
 
     // Job-1
-    IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         // Wait until all 5 jobs are scheduled.
-        waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 5);
+        JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 5);
 
         try {
           protocol.add("running-job-1 (a)");
@@ -762,7 +743,7 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
 
     // Job-2
-    IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -772,7 +753,7 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
 
     // Job-3
-    IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -781,14 +762,14 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
 
         // Wait until job-1 tried to re-acquire the mutex.
-        waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 4); // 4 = job1(re-acquiring), job3(owner), job4, job5
+        JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 4); // 4 = job1(re-acquiring), job3(owner), job4, job5
         protocol.add("running-job-3 (b)");
 
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
 
     // Job-4
-    IFuture<Void> future4 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future4 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -804,7 +785,7 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-4"));
 
     // Job-5
-    IFuture<Void> future5 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future5 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -813,8 +794,8 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-5"));
 
     assertTrue(job4RunningLatch.await());
-    assertFalse(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 and job-5 are pending
-    assertFalse(jobManager.isDone(new AlwaysFilter<IFuture<?>>())); // job-4 and job-5 are pending
+    assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 and job-5 are pending
+    assertFalse(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())); // job-4 and job-5 are pending
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("running-job-1 (a)");
@@ -842,13 +823,13 @@ public class MutualExclusionTest {
 
     // cancel job4
     future4.cancel(true);
-    assertTrue(jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     expectedProtocol.add("job-4 [interrupted]");
     expectedProtocol.add("running-job-5");
     assertEquals(expectedProtocol, protocol);
 
-    assertTrue(jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
 
     assertTrue(future4.isCancelled());
     assertTrue(future4.isDone());
@@ -919,7 +900,7 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
 
         // Wait until the other jobs tried to re-acquire the mutex.
-        waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 4);
+        JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 4);
 
         if (!future1.isBlocked()) {
           protocol.add("job-1-unblocked");
@@ -945,7 +926,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-5"));
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("job-1-beforeAwait");
@@ -1020,7 +1001,7 @@ public class MutualExclusionTest {
                 protocol.add("job-3-before-signaling");
                 BC.setBlocking(false);
 
-                waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 4); // Wait for the other jobs to have tried re-acquiring the mutex.
+                JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 4); // Wait for the other jobs to have tried re-acquiring the mutex.
 
                 protocol.add("job-3-after-signaling");
 
@@ -1045,7 +1026,7 @@ public class MutualExclusionTest {
         protocol.add("JOB-X-AFTERAWAIT");
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("job-1-running");
@@ -1071,7 +1052,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionNotBlocking() {
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", false);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", false);
     ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -1087,7 +1068,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
   }
 
   /**
@@ -1101,7 +1082,7 @@ public class MutualExclusionTest {
     final BlockingCountDownLatch unblockedLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch done = new BlockingCountDownLatch(1);
 
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", true);
 
     final UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
       @Override
@@ -1129,7 +1110,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
     runnable.throwOnError();
 
     List<String> expected = new ArrayList<>();
@@ -1150,7 +1131,7 @@ public class MutualExclusionTest {
   public void testReuseUnblockedBlockingCondition() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", true);
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -1162,12 +1143,12 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
-    waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 0); // Wait until job1 is blocked
+    JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 0); // Wait until job1 is blocked
     assertTrue(BC.isBlocking());
     protocol.add("2: setBlocking=false");
     BC.setBlocking(false);
     assertFalse(BC.isBlocking());
-    m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
+    Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -1180,7 +1161,7 @@ public class MutualExclusionTest {
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
         .awaitDoneAndGet();
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("1: beforeWaitFor");
@@ -1197,7 +1178,7 @@ public class MutualExclusionTest {
   public void testExpiredWhenReAcquiringMutex() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", true);
 
     IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
@@ -1208,17 +1189,17 @@ public class MutualExclusionTest {
 
           @Override
           public void run() throws Exception {
-            Thread.sleep(100);
+            protocol.add("2: running");
             BC.setBlocking(false);
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
         BC.waitFor();
-        protocol.add("2: running");
+        protocol.add("3: running");
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withExpirationTime(100, TimeUnit.MILLISECONDS));
 
     // Wait until entering blocking condition
-    waitForPermitsAcquired(m_clientSession.getModelJobMutex(), 0);
+    JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 0);
 
     // Expect the job to continue running.
     try {
@@ -1227,25 +1208,11 @@ public class MutualExclusionTest {
       List<String> expected = new ArrayList<>();
       expected.add("1: running");
       expected.add("2: running");
+      expected.add("3: running");
       assertEquals(expected, protocol);
     }
     catch (ProcessingException e) {
       fail();
-    }
-  }
-
-  /**
-   * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
-   */
-  public static void waitForPermitsAcquired(IMutex mutex, int expectedPermitCount) throws InterruptedException {
-    long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
-
-    // Wait until the other jobs tried to re-acquire the mutex.
-    while (mutex.getCompetitorCount() != expectedPermitCount) {
-      if (System.currentTimeMillis() > deadline) {
-        fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, mutex.getCompetitorCount()));
-      }
-      Thread.sleep(10);
     }
   }
 }

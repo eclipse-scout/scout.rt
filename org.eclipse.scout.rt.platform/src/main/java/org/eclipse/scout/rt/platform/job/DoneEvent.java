@@ -19,10 +19,10 @@ package org.eclipse.scout.rt.platform.job;
 public class DoneEvent<RESULT> {
 
   private final RESULT m_result;
-  private final Exception m_error;
+  private final Throwable m_error;
   private final boolean m_cancelled;
 
-  public DoneEvent(final RESULT result, final Exception error, final boolean cancelled) {
+  public DoneEvent(final RESULT result, final Throwable error, final boolean cancelled) {
     m_result = result;
     m_error = error;
     m_cancelled = cancelled;
@@ -39,7 +39,7 @@ public class DoneEvent<RESULT> {
    * @return error due to abnormal completion.
    * @see #isFailed()
    */
-  public Exception getError() {
+  public Throwable getError() {
     return m_error;
   }
 

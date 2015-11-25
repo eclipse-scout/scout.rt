@@ -14,17 +14,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -34,55 +38,53 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class AwaitDoneTest {
 
-  private IJobManager m_jobManager;
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    m_jobManager.shutdown();
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
   public void testAwaitAllDone() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        Thread.sleep(1000);
         protocol.add("run-1");
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
-    assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
   }
 
   @Test
   public void testAwaitFutureDone1() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    final IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        Thread.sleep(1000);
         protocol.add("run-1");
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
-    assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertTrue(m_jobManager.isDone(Jobs.newFutureFilterBuilder()
+    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter()));
   }
@@ -93,16 +95,15 @@ public class AwaitDoneTest {
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        Thread.sleep(1000);
         protocol.add("run-1");
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    m_jobManager.schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -113,33 +114,32 @@ public class AwaitDoneTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter(), 30, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isDone(Jobs.newFutureFilterBuilder()
+    assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter()));
-    assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertFalse(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
+    assertFalse(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+    assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
 
     latchJob2.countDown();
-    assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
     assertEquals(CollectionUtility.hashSet("run-1", "run-2"), protocol);
   }
 
   @Test
   public void testAwaitDoneOrBlocked() {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition bc = m_jobManager.createBlockingCondition("bc", true);
+    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("bc", true);
 
-    m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        Thread.sleep(1000);
         protocol.add("before-1");
         bc.waitFor();
         protocol.add("after-2");
@@ -148,9 +148,17 @@ public class AwaitDoneTest {
         .withRunContext(RunContexts.copyCurrent())
         .withLogOnError(false));
 
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+    assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 100, TimeUnit.MILLISECONDS));
+
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
         .andAreNotBlocked()
         .toFilter(), 10, TimeUnit.SECONDS));
+
+    assertEquals(Arrays.asList("before-1"), protocol);
+
   }
 
   /**
@@ -161,7 +169,7 @@ public class AwaitDoneTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -193,7 +201,7 @@ public class AwaitDoneTest {
             .withSchedulingDelay(1, TimeUnit.SECONDS));
 
         // start waiting for the job to complete or until cancelled
-        assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilterBuilder()
+        assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
             .andMatchFuture(future)
             .toFilter(), 5, TimeUnit.SECONDS));
       }

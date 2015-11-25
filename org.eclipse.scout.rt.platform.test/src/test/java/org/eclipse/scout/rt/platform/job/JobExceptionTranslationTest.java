@@ -16,31 +16,28 @@ import static org.junit.Assert.fail;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class JobExceptionTranslationTest {
 
-  private IBean<Object> m_bean;
+  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, new JobManager()).withReplace(true).withOrder(-1));
+    m_jobManagerBean = JobTestUtil.registerJobManager();
   }
 
   @After
   public void after() {
-    Jobs.getJobManager().shutdown();
-    Platform.get().getBeanManager().unregisterBean(m_bean);
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test

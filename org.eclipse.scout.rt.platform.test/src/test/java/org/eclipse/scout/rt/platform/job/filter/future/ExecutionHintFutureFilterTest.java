@@ -16,16 +16,40 @@ import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ExecutionHintFutureFilterTest {
+
+  private IBean<?> m_bean;
+
+  @Before
+  public void before() {
+    JobManager jobManager = new JobManager();
+    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, jobManager).withReplace(true).withOrder(-1));
+    Assertions.assertSame(jobManager, BEANS.get(IJobManager.class));
+  }
+
+  @After
+  public void after() {
+    Jobs.getJobManager().shutdown();
+    Platform.get().getBeanManager().unregisterBean(m_bean);
+  }
 
   @Test
   public void test() {

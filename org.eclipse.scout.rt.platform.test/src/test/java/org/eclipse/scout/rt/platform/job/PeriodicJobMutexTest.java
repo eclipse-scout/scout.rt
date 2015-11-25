@@ -21,24 +21,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class PeriodicJobMutexTest {
 
+  private IBean<IJobManager> m_jobManagerBean;
+
+  @Before
+  public void before() {
+    m_jobManagerBean = JobTestUtil.registerJobManager();
+  }
+
+  @After
+  public void after() {
+    JobTestUtil.unregisterJobManager(m_jobManagerBean);
+  }
+
   @Test
   public void testAtFixedRate() {
-    test(Jobs.newInput()
+    testInternal(Jobs.newInput()
         .withPeriodicExecutionAtFixedRate(100, TimeUnit.MILLISECONDS)
         .withMutex(Jobs.newMutex()));
   }
 
   @Test
   public void testWithFixedDelay() {
-    test(Jobs.newInput()
+    testInternal(Jobs.newInput()
         .withPeriodicExecutionWithFixedDelay(100, TimeUnit.MILLISECONDS)
         .withMutex(Jobs.newMutex()));
   }
@@ -46,12 +62,12 @@ public class PeriodicJobMutexTest {
   /**
    * This test schedules a job according to the given input.
    * <p>
-   * After 2 iterations, the periodic job is cancelled. While running, this job is checked to be mutex owner. Then,
+   * After 2 iterations, the periodic job is cancelled. While running, this job is checked to be the mutex owner. Then,
    * another job with the same mutex is scheduled and awaited for (timeout expected because mutual exclusion). And
    * finally, another job with the same mutex is scheduled, which is expected to be run after the timed out job. Both
    * that jobs are expected to be run right after one iterations completes.
    */
-  private void test(final JobInput periodicJobInput) {
+  private void testInternal(final JobInput periodicJobInput) {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final AtomicInteger rounds = new AtomicInteger(0);
@@ -108,9 +124,6 @@ public class PeriodicJobMutexTest {
           }
         }, Jobs.newInput()
             .withMutex(periodicJobInput.getMutex()));
-
-        // Wait some time
-        Thread.sleep(200);
 
         protocol.add("end");
       }

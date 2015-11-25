@@ -11,103 +11,216 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.IDoneCallback;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
- * This class listens for the Future's completion and notifies registered callbacks. This class has the semantic of a
- * <code>promise</code>, meaning that a callback is also notified if the Future is already in 'done' state.
+ * This promise represents a proxy for the future's final value, and allows to associate handlers to be notified
+ * asynchronously upon success or failure, or to wait for the future to complete.
+ * <p>
+ * Besides, the 'done' parking mechanism of Java {@link FutureTask} cannot be used by {@link JobManager}, because
+ * waiting threads are released before {@link FutureTask#done()} is invoked. That results in an inconsistent state,
+ * because bookkeeping and event firing is to be done prior releasing any waiting thread.
+ * <p>
+ * However, the semantic of 'done' remains the same, meaning that a {@link Future} is done once cancelled or completed.
  *
- * @since 5.1
+ * @since 5.2
  */
 class DonePromise<RESULT> {
 
-  private final ReadWriteLock m_lock;
+  private final Lock m_lock = new ReentrantLock();
+  private final Condition m_doneCondition = m_lock.newCondition();
 
-  private final IFuture<RESULT> m_future;
-  private final List<IDoneCallback<RESULT>> m_callbacks;
+  private final Future<RESULT> m_future;
+  private final List<PromiseHandler<RESULT>> m_handlers;
 
   private volatile DoneEvent<RESULT> m_doneEvent;
 
-  public DonePromise(final IFuture<RESULT> future) {
+  public DonePromise(final Future<RESULT> future) {
     m_future = future;
-    m_lock = new ReentrantReadWriteLock();
-    m_callbacks = new ArrayList<>();
+    m_handlers = new ArrayList<>();
   }
 
   /**
-   * Method invoked once the Future is in 'done'-state.
+   * Invoke to transition into 'done' state, which in turn notifies associated handlers and releases any waiting thread.
    */
-  void onDone() {
-    m_lock.writeLock().lock();
+  public void fulfill() {
+    m_lock.lock();
     try {
-      // Event creation
-      try {
-        m_doneEvent = new DoneEvent<>(m_future.awaitDoneAndGet(BEANS.get(ExceptionTranslator.class)), null, false);
-      }
-      catch (final Exception e) {
-        if (e instanceof CancellationException) {
-          m_doneEvent = new DoneEvent<>(null, null, true);
-        }
-        else {
-          m_doneEvent = new DoneEvent<>(null, e, false);
-        }
-      }
-      catch (final Throwable t) {
-        m_doneEvent = new DoneEvent<>(null, new Exception("Unexpected exception while querying the Future's result", t), m_future.isCancelled());
-      }
+      Assertions.assertNull(m_doneEvent, "Unexpected state: Promise already in 'done' state");
+      Assertions.assertTrue(isFutureDone(), "Unexpected state: Future not in 'done' state");
 
-      // Callback notification
-      final Iterator<IDoneCallback<RESULT>> iterator = m_callbacks.iterator();
-      while (iterator.hasNext()) {
-        final IDoneCallback<RESULT> callback = iterator.next();
-        iterator.remove();
+      m_doneEvent = DonePromise.newDoneEvent(m_future);
+      m_doneCondition.signalAll();
+    }
+    finally {
+      m_lock.unlock();
+    }
 
-        Jobs.schedule(new IRunnable() {
+    // Notify associated handlers.
+    for (final PromiseHandler<RESULT> handler : m_handlers) {
+      handler.handleAsync(m_doneEvent);
+    }
+    m_handlers.clear();
+  }
 
-          @Override
-          public void run() throws Exception {
-            callback.onDone(m_doneEvent);
-          }
-        }, Jobs.newInput().withName("Handling 'Future#whenDone' notification"));
+  /**
+   * Registers the given <code>callback</code> to be invoked once the Future enters 'done' state. The callback is
+   * invoked immediately and in the calling thread, if being in 'done' state at the time of invocation. Otherwise, this
+   * method returns immediately, and the callback invoked upon transition into 'done' state.
+   *
+   * @param handler
+   *          handler invoked upon transition into 'done' state.
+   * @param runContext
+   *          optional {@link RunContext} to invoke the handler on behalf, or <code>null</code> to not invoke on a
+   *          specific {@link RunContext}.
+   */
+  public void whenDone(final IDoneHandler<RESULT> handler, final RunContext runContext) {
+    m_lock.lock();
+    try {
+      if (m_doneEvent == null) {
+        m_handlers.add(new PromiseHandler<>(handler, runContext));
+        return;
       }
     }
     finally {
-      m_lock.writeLock().unlock();
+      m_lock.unlock();
+    }
+
+    // Notify the handler synchronously.
+    if (runContext == null) {
+      handler.onDone(m_doneEvent);
+    }
+    else {
+      runContext.run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          handler.onDone(m_doneEvent);
+        }
+      });
     }
   }
 
   /**
-   * Registers the given <code>callback</code> to be notified once the Future enters 'done' state. That is once the
-   * associated job completes successfully or with an exception, or was cancelled. Thereby, the callback is invoked in
-   * any thread with no {@code RunContext} set. If the job is already in 'done' state when the callback is registered,
-   * the callback is invoked immediately.
+   * Waits if necessary for the computation to complete, and then returns its result.
+   *
+   * @see Future#get()
    */
-  public void whenDone(final IDoneCallback<RESULT> callback) {
-    m_lock.readLock().lock();
+  public RESULT get() throws InterruptedException, ExecutionException {
+    m_lock.lockInterruptibly();
     try {
-      if (m_doneEvent != null) {
-        // Future is already in 'done' state.
-        callback.onDone(m_doneEvent);
-      }
-      else {
-        // Future not in 'done' state yet.
-        m_callbacks.add(callback);
+      while (!isFutureDone()) {
+        m_doneCondition.await();
       }
     }
     finally {
-      m_lock.readLock().unlock();
+      m_lock.unlock();
+    }
+
+    return DonePromise.retrieveFinalValue(m_future);
+  }
+
+  /**
+   * Waits if necessary for at most the given time for the computation to complete, and then returns its result, if
+   * available.
+   *
+   * @see Future#get(long, TimeUnit)
+   */
+  public RESULT get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout=%s]", timeout);
+
+    m_lock.lockInterruptibly();
+    try {
+      long nanos = unit.toNanos(timeout);
+      while (!isFutureDone() && nanos > 0L) {
+        nanos = m_doneCondition.awaitNanos(nanos);
+      }
+      if (nanos <= 0L) {
+        throw new TimeoutException(String.format("Waiting for the Future's final value timed out [timeout=%sms]", unit.toMillis(timeout)));
+      }
+    }
+    finally {
+      m_lock.unlock();
+    }
+
+    return DonePromise.retrieveFinalValue(m_future);
+  }
+
+  private boolean isFutureDone() {
+    return m_future.isDone();
+  }
+
+  // ==== Internal helper methods ==== //
+
+  /**
+   * Retrieves the given future's final value. This method expects the future to be in 'done' state.
+   */
+  private static <RESULT> RESULT retrieveFinalValue(final Future<RESULT> future) throws ExecutionException {
+    try {
+      return future.get(0, TimeUnit.NANOSECONDS);
+    }
+    catch (final TimeoutException | InterruptedException e) {
+      throw new IllegalStateException("Unexpected: future expected to be in 'done' state", e);
+    }
+  }
+
+  /**
+   * Creates the {@link DoneEvent} for the given future's final value. This method expects the future to be in 'done'
+   * state.
+   */
+  private static <RESULT> DoneEvent<RESULT> newDoneEvent(final Future<RESULT> future) {
+    try {
+      return new DoneEvent<>(retrieveFinalValue(future), null, false);
+    }
+    catch (final ExecutionException e) {
+      return new DoneEvent<>(null, e.getCause(), false);
+    }
+    catch (final CancellationException e) {
+      return new DoneEvent<>(null, null, true);
+    }
+  }
+
+  /**
+   * Handler associated with its {@link RunContext}.
+   */
+  private static class PromiseHandler<RESULT> {
+    private final RunContext m_runContext;
+    private final IDoneHandler<RESULT> m_callback;
+
+    public PromiseHandler(final IDoneHandler<RESULT> callback, final RunContext runContext) {
+      m_runContext = runContext;
+      m_callback = callback;
+    }
+
+    /**
+     * Notifies the handler asynchronously.
+     */
+    public void handleAsync(final DoneEvent<RESULT> doneEvent) {
+      Jobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          m_callback.onDone(doneEvent);
+        }
+      }, Jobs.newInput()
+          .withRunContext(m_runContext)
+          .withName("Notifying 'done-promise' callback"));
     }
   }
 }

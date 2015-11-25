@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneCallback;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
@@ -89,12 +89,12 @@ public class NotificationDispatcherTest {
       }
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()))
-        .whenDone(new IDoneCallback<Void>() {
+        .whenDone(new IDoneHandler<Void>() {
           @Override
           public void onDone(DoneEvent<Void> event) {
             cond.setBlocking(false);
           }
-        });
+        }, null);
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(0)).handleNotification(Mockito.any(INotificationGroup.class));
@@ -115,12 +115,12 @@ public class NotificationDispatcherTest {
       }
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()))
-        .whenDone(new IDoneCallback<Void>() {
+        .whenDone(new IDoneHandler<Void>() {
           @Override
           public void onDone(DoneEvent<Void> event) {
             cond.setBlocking(false);
           }
-        });
+        }, null);
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));

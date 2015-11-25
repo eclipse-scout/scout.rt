@@ -32,10 +32,11 @@ import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
-import org.eclipse.scout.rt.platform.job.IDoneCallback;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IMutex;
@@ -68,9 +69,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final JobInput m_input;
   protected final Long m_expirationDate;
 
-  protected volatile boolean m_blocked;
-  protected final DonePromise<RESULT> m_donePromise;
+  protected final DonePromise<RESULT> m_donePromise = new DonePromise<>(this);
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
+
+  protected volatile boolean m_blocked;
 
   protected Set<Object> m_executionHints = new HashSet<>();
 
@@ -87,7 +89,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_runMonitor = runMonitor;
     m_input = input;
 
-    m_donePromise = new DonePromise<>(this);
     m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
 
     m_jobManager.registerFuture(this);
@@ -103,11 +104,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   protected void done() {
+    // IMPORTANT: event must be sent before any waiting thread is released.
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(this));
+
     m_runMonitor.unregisterCancellable(this);
     m_jobManager.unregisterFuture(this);
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(this));
-    m_donePromise.onDone();
     m_listeners.clear();
+    m_donePromise.fulfill();
 
     // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
   }
@@ -272,7 +275,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     assertNotSameMutex();
 
     try {
-      return get();
+      return m_donePromise.get();
     }
     catch (final CancellationException e) {
       return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.getName())), throwableTranslator);
@@ -295,7 +298,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     assertNotSameMutex();
 
     try {
-      return get(timeout, unit);
+      return m_donePromise.get(timeout, unit);
     }
     catch (final CancellationException e) {
       return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.getName())), throwableTranslator);
@@ -312,8 +315,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public IFuture<RESULT> whenDone(final IDoneCallback<RESULT> callback) {
-    m_donePromise.whenDone(callback);
+  public IFuture<RESULT> whenDone(final IDoneHandler<RESULT> callback, final RunContext runContext) {
+    m_donePromise.whenDone(callback, runContext);
     return this;
   }
 
