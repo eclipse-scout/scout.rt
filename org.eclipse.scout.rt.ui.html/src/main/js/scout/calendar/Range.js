@@ -13,17 +13,16 @@ scout.Range = function(from, to) {
   this.to = to;
 };
 
-// FIXME AWE: (calendar) unit-test scout.Range
 scout.Range.prototype.equals = function(other) {
   if (other.from === undefined || other.to === undefined) {
     return false;
   }
-  var fromEquals = this._dateEquals(this.from, other.from);
-  var toEquals = this._dateEquals(this.to, other.to);
+  var fromEquals = scout.Range.dateEquals(this.from, other.from);
+  var toEquals = scout.Range.dateEquals(this.to, other.to);
   return fromEquals && toEquals;
 };
 
-scout.Range.prototype._dateEquals = function(a, b) {
+scout.Range.dateEquals = function(a, b) {
   if (a === null && b === null) {
     return true;
   }
