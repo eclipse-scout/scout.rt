@@ -1099,7 +1099,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   }
 
-  @Order(10000)
   public class DefaultTreeBoxTree extends AbstractTree {
 
     @Override

@@ -309,7 +309,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     BEANS.get(IBookmarkService.class).storeBookmarks();
   }
 
-  @Order(10)
   public class Tree extends AbstractTree {
 
     @Override
