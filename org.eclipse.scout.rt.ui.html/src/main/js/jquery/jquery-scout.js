@@ -513,15 +513,6 @@
     opts = opts || {};
     opts.duration = scout.nvl(opts.duration, 300);
 
-    if (oldWidth === newWidth) {
-      // No need to animate, make sure new width is set
-      this.cssWidth(newWidth);
-      if(opts.complete){
-        opts.complete.call();
-      }
-      return this;
-    }
-
     // Reset to old width first
     this.cssWidth(oldWidth);
 
@@ -529,21 +520,13 @@
     this.animate({
       width: newWidth
     }, opts);
+
     return this;
   };
 
   $.fn.cssHeightAnimated = function(oldHeight, newHeight, opts) {
     opts = opts || {};
     opts.duration = scout.nvl(opts.duration, 300);
-
-    if (oldHeight === newHeight) {
-      // No need to animate, make sure new height ist set
-      this.cssHeight(newHeight);
-      if(opts.complete){
-        opts.complete.call();
-      }
-      return this;
-    }
 
     // Reset to old height first
     this.cssHeight(oldHeight);
@@ -552,21 +535,13 @@
     this.animate({
       height: newHeight
     }, opts);
+
     return this;
   };
 
   $.fn.cssLeftAnimated = function(from, to, opts) {
     opts = opts || {};
     opts.duration = scout.nvl(opts.duration, 300);
-
-    if (from === to) {
-      // No need to animate, make sure new pos is set
-      this.cssLeft(to);
-      if(opts.complete){
-        opts.complete.call();
-      }
-      return this;
-    }
 
     // Reset to from first
     this.cssLeft(from);
@@ -583,15 +558,6 @@
     opts = opts || {};
     opts.duration = scout.nvl(opts.duration, 300);
 
-    if (from === to) {
-      // No need to animate, make sure new pos is set
-      this.cssTop(to);
-      if(opts.complete){
-        opts.complete.call();
-      }
-      return this;
-    }
-
     // Reset to from first
     this.cssTop(from);
 
@@ -599,43 +565,19 @@
     this.animate({
       top: to
     }, opts);
+
     return this;
   };
 
   $.fn.cssAnimated = function(fromVals, toVals, opts) {
     opts = opts || {};
     opts.duration = scout.nvl(opts.duration, 300);
-    var doAnimate = false,
-      cssPropsToAnimate = {};
-
-    for (var key in toVals) {
-      var objTo = toVals[key];
-      if (fromVals.hasOwnProperty(key)) {
-        var objFrom = fromVals[key];
-        if (objTo !== objFrom) {
-          cssPropsToAnimate[key] = objTo;
-          doAnimate = true;
-        }
-      } else {
-        cssPropsToAnimate[key] = objTo;
-        doAnimate = true;
-      }
-    }
-
-    if (!doAnimate) {
-      // No need to animate, make sure new pos is set
-      this.css(cssPropsToAnimate);
-      if(opts.complete){
-        opts.complete.call();
-      }
-      return this;
-    }
 
     // Reset to from first
     this.css(fromVals);
 
     // Then animate to new pos
-    this.animate(cssPropsToAnimate, opts);
+    this.animate(toVals, opts);
     return this;
   };
 

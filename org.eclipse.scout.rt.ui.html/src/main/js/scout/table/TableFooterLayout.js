@@ -87,7 +87,7 @@ scout.TableFooterLayout.prototype._setInfoItemsSize = function($infoItems, anima
       // Make sure complete function of already scheduled animation will be executed
       var existingComplete = $item.data('animationComplete');
       if (animated) {
-        $item.cssWidthAnimated($item.data('oldWidth'), $item.outerWidth(), {
+        $item.stop().cssWidthAnimated($item.data('oldWidth'), $item.outerWidth(), {
           complete: existingComplete
         });
         $item.removeData('oldWidth');
