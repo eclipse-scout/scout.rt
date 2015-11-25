@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -587,14 +588,15 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         }
 
         // mapping from TreeMenuType to TableMenuType
-        HashSet<IMenuType> newMenuTypes = new HashSet<IMenuType>();
-        for (IMenuType menuType : menu.getMenuTypes()) {
-          if (menuType == TreeMenuType.SingleSelection) {
-            newMenuTypes.add(TableMenuType.EmptySpace); // map tree context menu single selection to empty space for this page
+        menus.add(new OutlineMenuWrapper(menu, new IMenuTypeMapper() {
+          @Override
+          public IMenuType map(IMenuType menuType) {
+            if (menuType == TreeMenuType.SingleSelection) {
+              return TableMenuType.EmptySpace;
+            }
+            return menuType;
           }
-          newMenuTypes.add(menuType);
-        }
-        menus.add(new OutlineMenuWrapper(menu, newMenuTypes));
+        }));
       }
       if (!CollectionUtility.equalsCollection(menus, contextMenu.getChildActions())) {
         contextMenu.setChildActions(menus);

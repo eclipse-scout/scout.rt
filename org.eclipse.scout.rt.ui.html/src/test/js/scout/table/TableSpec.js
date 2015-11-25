@@ -1182,19 +1182,19 @@ describe("Table", function() {
     // context menu
     it("returns no menus for contextMenu if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, 'contextMenu');
       expect(menus).toEqual([]);
     });
 
     it("returns only single selection menus for contextMenu if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, 'contextMenu');
       expect(menus).toEqual([singleSelMenu]);
     });
 
     it("returns only multi selection menus for contextMenu if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, 'contextMenu');
       expect(menus).toEqual([multiSelMenu]);
     });
 
@@ -1204,34 +1204,34 @@ describe("Table", function() {
       });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, 'contextMenu');
       expect(menus).toEqual([singleSelMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenusForDestination(table.menus, 'contextMenu');
+      menus = table._filterMenus(table.menus, 'contextMenu');
       expect(menus).toEqual([multiSelMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenusForDestination(table.menus, 'contextMenu');
+      menus = table._filterMenus(table.menus, 'contextMenu');
       expect(menus).toEqual([]);
     });
 
     // menuBar
     it("returns only empty space menus if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, 'menuBar');
       expect(menus).toEqual([emptySpaceMenu]);
     });
 
     it("returns empty space and single selection menus if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, 'menuBar');
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu]);
     });
 
     it("returns empty space and multi selection menus if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, 'menuBar');
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu]);
     });
 
@@ -1241,15 +1241,15 @@ describe("Table", function() {
       });
       table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, 'menuBar');
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      menus = table._filterMenus(table.menus, 'menuBar');
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      menus = table._filterMenus(table.menus, 'menuBar');
       expect(menus).toEqual([emptySpaceMenu]);
     });
   });

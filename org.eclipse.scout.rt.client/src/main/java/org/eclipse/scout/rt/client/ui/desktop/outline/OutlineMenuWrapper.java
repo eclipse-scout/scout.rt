@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,7 +35,20 @@ public class OutlineMenuWrapper implements IMenu {
   private Set<IMenuType> m_menuTypes;
 
   /**
+   * maps a menuType of the wrapped menu to the menuType of the wrapperMenu
+   */
+  public interface IMenuTypeMapper {
+    IMenuType map(IMenuType menuType);
+  }
+
+  /**
    * API to ensure at least one menu type!
+   * <p>
+   * the provided menuTypes are used over the complete sub-hierarchy of the wrappedMenu
+   *
+   * @param wrappedMenu
+   * @param firstMenuType
+   * @param additionalTypes
    */
   public OutlineMenuWrapper(IMenu wrappedMenu, IMenuType firstMenuType, IMenuType... additionalTypes) {
     Set<IMenuType> menuTypeSet = CollectionUtility.hashSet(firstMenuType);
@@ -50,10 +64,40 @@ public class OutlineMenuWrapper implements IMenu {
     setup();
   }
 
+  /**
+   * @param wrappedMenu
+   * @param menuTypes
+   *          the provided menuTypes are used over the complete sub-hierarchy of the wrappedMenu
+   */
   public OutlineMenuWrapper(IMenu wrappedMenu, Set<? extends IMenuType> menuTypes) {
     m_wrappedMenu = wrappedMenu;
     m_menuTypes = CollectionUtility.hashSet(menuTypes);
     setup();
+  }
+
+  /**
+   * @param wrappedMenu
+   * @param mapper
+   *          the menuTypes of each menu in the sub-hierarchy are individually computed with this mapper
+   */
+  public OutlineMenuWrapper(IMenu wrappedMenu, IMenuTypeMapper mapper) {
+    m_wrappedMenu = wrappedMenu;
+    Set<IMenuType> originalTypes = wrappedMenu.getMenuTypes();
+    m_menuTypes = new HashSet<IMenuType>(originalTypes.size());
+    for (IMenuType menuType : originalTypes) {
+      m_menuTypes.add(mapper.map(menuType));
+    }
+    setup(mapper);
+  }
+
+  protected void setup(IMenuTypeMapper mapper) {
+    List<IMenu> childActions = m_wrappedMenu.getChildActions();
+    List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
+    // create child wrapper
+    for (IMenu m : childActions) {
+      wrappedChildActions.add(new OutlineMenuWrapper(m, mapper));
+    }
+    m_childMenus = wrappedChildActions;
   }
 
   protected void setup() {

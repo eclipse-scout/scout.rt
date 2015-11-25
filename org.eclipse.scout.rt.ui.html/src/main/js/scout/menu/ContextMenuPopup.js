@@ -22,7 +22,6 @@ scout.ContextMenuPopup.prototype._init = function(options) {
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
   this.menuItems = options.menuItems;
-  this.filterFunc = options.filterFunc;
   this.options = $.extend({
     cloneMenuItems: true
   }, options);

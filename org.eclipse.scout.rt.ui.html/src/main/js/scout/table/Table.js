@@ -41,6 +41,7 @@ scout.Table = function(model) {
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
+  this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -61,6 +62,7 @@ scout.Table.prototype._init = function(model) {
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
+  this._syncMenus(this.menus);
   this._calculateValuesForBackgroundEffect();
 };
 
@@ -289,7 +291,7 @@ scout.Table.prototype.onContextMenu = function(event) {
     var menuItems, popup;
     event.preventDefault();
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenusForDestination(this.menus, 'contextMenu', true);
+      menuItems = this._filterMenus(this.menus, 'contextMenu', true);
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
@@ -1132,7 +1134,7 @@ scout.Table.prototype._find$AppLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenusForDestination = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
   var allowedTypes = [];
   if (destination === 'menuBar') {
     allowedTypes = [ 'Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection' ];
@@ -1162,7 +1164,7 @@ scout.Table.prototype._renderMenus = function() {
 };
 
 scout.Table.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenusForDestination(this.menus, 'menuBar', false, true);
+  var menuItems = this._filterMenus(this.menus, 'menuBar', false, true);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };
@@ -2682,14 +2684,14 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
 };
 
 scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
-  this._addFilterFuncToMenus(newMenus);
+  this._injectFilterFuncToMenus(newMenus);
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
 };
 
-scout.Table.prototype._addFilterFuncToMenus = function(menus) {
+scout.Table.prototype._injectFilterFuncToMenus = function(menus) {
   menus.forEach(function(menu) {
-    menu.filterFunc = this._filterMenusForDestination.bind(this);
-    this._addFilterFuncToMenus(menu.childActions);
+    menu.filterFunc = this._filterMenusHandler;
+    this._injectFilterFuncToMenus(menu.childActions);
   }.bind(this));
 };
 
