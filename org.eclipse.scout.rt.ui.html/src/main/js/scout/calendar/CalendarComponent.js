@@ -20,13 +20,13 @@ scout.CalendarComponent = function() {
 };
 scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
 
-scout.CalendarComponent.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.CalendarComponent.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-  var entryPointFunc = function() {
-    return this.parent.$grid.entryPoint(); // TODO [dwi] solve issue that we do not have a $container here
-  }.bind(this);
-  keyStrokeContext.$bindTarget = entryPointFunc;
-  keyStrokeContext.$scopeTarget = entryPointFunc;
+/**
+ * Since we cannot configure any key-strokes on a calendar-component we must
+ * return null here, so no key-stroke will be installed in Widget.js.
+ * @override Widget.js
+ */
+scout.CalendarComponent.prototype._createKeyStrokeContext = function() {
+  return null;
 };
 
 /**
