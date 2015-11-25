@@ -54,14 +54,6 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
   this._renderMenuItems();
 };
 
-<<<<<<< Upstream, based on origin/releases/5.2.x
-scout.ContextMenuPopup.prototype._renderMenuItems = function() {
-  var menuClone, menus = this._getMenuItems();
-  if(this.menu && this.menu.filterFunc){
-    // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
-    menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ?   'menuBar': 'contextMenu');
-  }
-=======
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
   var duration = 300;
 
@@ -281,7 +273,10 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
   var menuClone;
   menus = menus ? menus : this._getMenuItems();
->>>>>>> 837a255 HtmlUI: subMenues with animations
+  if(this.menu && this.menu.filterFunc){
+    // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
+    menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ?   'menuBar': 'contextMenu');
+  }
   if (!menus || menus.length === 0) {
     return;
   }
