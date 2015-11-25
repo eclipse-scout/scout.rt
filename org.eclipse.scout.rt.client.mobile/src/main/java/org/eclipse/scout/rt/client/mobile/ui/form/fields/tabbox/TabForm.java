@@ -90,7 +90,6 @@ public class TabForm extends AbstractForm {
     startInternal(new FormHandler());
   }
 
-  @Order(20.0f)
   public class FormHandler extends AbstractFormHandler {
 
     @Override

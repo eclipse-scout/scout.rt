@@ -91,11 +91,9 @@ public class BookmarkFolderForm extends AbstractForm {
     }
   }
 
-  @Order(20f)
   public class NewHandler extends AbstractFormHandler {
   }
 
-  @Order(20f)
   public class ModifyHandler extends AbstractFormHandler {
   }
 }

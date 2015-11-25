@@ -167,7 +167,6 @@ public class ScoutInfoForm extends AbstractForm {
     }
   }
 
-  @Order(20.0f)
   public class ModifyHandler extends AbstractFormHandler {
 
     @Override

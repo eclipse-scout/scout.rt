@@ -241,11 +241,9 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
     }
   }
 
-  @Order(20f)
   public class ModifyHandler extends AbstractFormHandler {
   }
 
-  @Order(20f)
   public class NewHandler extends AbstractFormHandler {
     @Override
     protected void execPostLoad() {

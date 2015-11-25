@@ -136,7 +136,6 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
     startInternal(new FormHandler());
   }
 
-  @Order(10.0f)
   public class FormHandler extends AbstractFormHandler {
 
     @SuppressWarnings("unchecked")

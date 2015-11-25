@@ -170,7 +170,6 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
 
   }// end main box
 
-  @Order(20f)
   public class ModifyHandler extends AbstractFormHandler {
 
     @Override

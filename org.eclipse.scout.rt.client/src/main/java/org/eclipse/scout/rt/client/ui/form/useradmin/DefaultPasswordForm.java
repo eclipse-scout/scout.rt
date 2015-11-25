@@ -157,7 +157,6 @@ public class DefaultPasswordForm extends AbstractForm {
     }
   }
 
-  @Order(10.0)
   public class ResetHandler extends AbstractFormHandler {
 
     @Override
@@ -176,7 +175,6 @@ public class DefaultPasswordForm extends AbstractForm {
     }
   }
 
-  @Order(20.0)
   public class ChangeHandler extends AbstractFormHandler {
 
     @Override

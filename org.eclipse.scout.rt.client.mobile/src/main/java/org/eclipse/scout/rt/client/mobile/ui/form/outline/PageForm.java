@@ -509,7 +509,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     startInternalExclusive(new FormHandler());
   }
 
-  @Order(10.0f)
   public class FormHandler extends AbstractFormHandler {
 
     @Override

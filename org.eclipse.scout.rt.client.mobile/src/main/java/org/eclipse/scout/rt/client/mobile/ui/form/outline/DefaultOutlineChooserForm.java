@@ -176,7 +176,6 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
     }
   }
 
-  @Order(10.0)
   public class ViewHandler extends AbstractFormHandler {
 
     @Override

@@ -316,7 +316,6 @@ public class BookmarkViewForm extends AbstractForm {
     getUserBookmarkTreeField().populateTree();
   }
 
-  @Order(20f)
   public class ViewHandler extends AbstractFormHandler {
 
     private final INotificationListener<BookmarkChangedClientNotification> m_cncListener = new INotificationListener<BookmarkChangedClientNotification>() {
