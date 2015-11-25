@@ -26,13 +26,6 @@ import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendar extends IPropertyObserver, IContextMenuOwner {
 
-  // never change final constants (properties files might have references)
-  // these constants should correspond with those from the planner
-  int DISPLAY_MODE_DAY = 1;
-  int DISPLAY_MODE_WEEK = 2;
-  int DISPLAY_MODE_MONTH = 3;
-  int DISPLAY_MODE_WORKWEEK = 4;
-
   /**
    * type {@link Set<CalendarComponent>}
    */

@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.PlannerContextMenu;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.DateUtility;
@@ -130,13 +131,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Order(10)
   protected Set<Integer> getConfiguredAvailableDisplayModes() {
     return CollectionUtility.hashSet(
-        DISPLAY_MODE_INTRADAY,
-        DISPLAY_MODE_DAY,
-        DISPLAY_MODE_WEEK,
-        DISPLAY_MODE_MONTH,
-        DISPLAY_MODE_WORKWEEK,
-        DISPLAY_MODE_CALENDAR_WEEK,
-        DISPLAY_MODE_YEAR);
+        ICalendarDisplayMode.INTRADAY,
+        ICalendarDisplayMode.DAY,
+        ICalendarDisplayMode.WEEK,
+        ICalendarDisplayMode.MONTH,
+        ICalendarDisplayMode.WORK_WEEK,
+        ICalendarDisplayMode.CALENDAR_WEEK,
+        ICalendarDisplayMode.YEAR);
   }
 
   /**
@@ -188,7 +189,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Order(150)
   protected int getConfiguredDisplayMode() {
-    return DISPLAY_MODE_CALENDAR_WEEK;
+    return ICalendarDisplayMode.CALENDAR_WEEK;
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -205,31 +206,31 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     Calendar to = Calendar.getInstance();
     DateUtility.truncCalendar(to);
     switch (displayMode) {
-      case IPlanner.DISPLAY_MODE_INTRADAY:
-      case IPlanner.DISPLAY_MODE_DAY:
+      case ICalendarDisplayMode.INTRADAY:
+      case ICalendarDisplayMode.DAY:
         to.add(Calendar.DAY_OF_WEEK, 1);
         break;
-      case IPlanner.DISPLAY_MODE_WEEK:
+      case ICalendarDisplayMode.WEEK:
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.DAY_OF_WEEK, 7);
         break;
-      case IPlanner.DISPLAY_MODE_WORKWEEK:
+      case ICalendarDisplayMode.WORK_WEEK:
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.DAY_OF_WEEK, 5);
         break;
-      case IPlanner.DISPLAY_MODE_MONTH:
+      case ICalendarDisplayMode.MONTH:
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.MONTH, 2);
         break;
-      case IPlanner.DISPLAY_MODE_CALENDAR_WEEK:
+      case ICalendarDisplayMode.CALENDAR_WEEK:
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.MONTH, 9);
         break;
-      case IPlanner.DISPLAY_MODE_YEAR:
+      case ICalendarDisplayMode.YEAR:
         to.add(Calendar.YEAR, 2);
         break;
     }

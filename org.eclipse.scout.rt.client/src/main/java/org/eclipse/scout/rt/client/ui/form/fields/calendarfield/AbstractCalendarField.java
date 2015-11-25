@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalen
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
 
       // restore calendar settings
       ClientUIPreferences env = ClientUIPreferences.getInstance();
-      m_calendar.setDisplayMode(env.getCalendarDisplayMode(ICalendar.DISPLAY_MODE_MONTH));
+      m_calendar.setDisplayMode(env.getCalendarDisplayMode(ICalendarDisplayMode.MONTH));
       m_calendar.setDisplayCondensed(env.getCalendarDisplayCondensed(true));
       /*
        * add observer for: - selected date sync - persistence of calendar

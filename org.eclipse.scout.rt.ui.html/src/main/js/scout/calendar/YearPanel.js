@@ -128,11 +128,9 @@ scout.YearPanel.prototype._colorYear = function() {
   $('.year-day', this.$yearList).each(function() {
     $day = $(this);
     date = $day.data('date');
-
     if (!that._isDisplayModeDay() && date >= that.viewRange.from && date <= that.viewRange.to) {
       $day.addClass('year-range');
     }
-
     if (scout.dates.isSameDay(date, that.selectedDate)) {
       $day.addClass('year-range-day');
     }
@@ -195,27 +193,7 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
 };
 
 scout.YearPanel.prototype._isDisplayModeDay = function() {
-  return this.displayMode === scout.Planner.DisplayMode.DAY;
-};
-
-scout.YearPanel.prototype._isDisplayModeWeek = function() {
-  return this.displayMode === scout.Planner.DisplayMode.WEEK;
-};
-
-scout.YearPanel.prototype._isDisplayModeMonth = function() {
-  return this.displayMode === scout.Planner.DisplayMode.MONTH;
-};
-
-scout.YearPanel.prototype._isDisplayModeWork = function() {
-  return this.displayMode === scout.Planner.DisplayMode.WORK;
-};
-
-scout.YearPanel.prototype._isDisplayModeCalendarWeek = function() {
-  return this.displayMode === scout.Planner.DisplayMode.CALENDAR_WEEK;
-};
-
-scout.YearPanel.prototype._isDisplayModeYear = function() {
-  return this.displayMode === scout.Planner.DisplayMode.YEAR;
+  return this.displayMode === scout.Calendar.DisplayMode.DAY;
 };
 
 /* -- events ---------------------------------------- */
@@ -261,14 +239,12 @@ scout.YearPanel.prototype._onYearDayClick = function(event) {
 };
 
 scout.YearPanel.prototype._onYearHoverIn = function(event) {
-  // init vars
   var $day = $(event.target),
     date1 = $day.data('date'),
     year = date1.getFullYear(),
     month = date1.getMonth(),
     date = date1.getDate(),
     day = (date1.getDay() + 6) % 7,
-    that = this,
     startHover,
     endHover,
     $day2, date2;
@@ -277,10 +253,10 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
   if (this._isDisplayModeDay()) {
     startHover = new Date(year, month, date);
     endHover = new Date(year, month, date);
-  } else if (this._isDisplayModeWeek()) {
+  } else if (this.displayMode === scout.Calendar.DisplayMode.WEEK) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 6);
-  } else if (this._isDisplayModeWork()) {
+  } else if (this.displayMode === scout.Calendar.DisplayMode.WORK_WEEK) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 4);
 
@@ -288,10 +264,10 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     if (date1 > endHover) {
       date1 = endHover;
     }
-  } else if (this._isDisplayModeMonth()) {
+  } else if (this.displayMode === scout.Calendar.DisplayMode.MONTH) {
     startHover = new Date(year, month, 1);
     endHover = new Date(year, month + 1, 0);
-  } else if (this._isDisplayModeYear()) {
+  } else if (this.displayMode === scout.Calendar.DisplayMode.YEAR) {
     startHover = new Date(year, month, 1);
     endHover = startHover;
   } else {

@@ -60,8 +60,8 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_HEADER_VISIBLE = "headerVisible";
 
   /**
-   * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
-   * {@link #DISPLAY_MODE_WORKWEEK}
+   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
+   * {@link #WORK_WEEK}
    */
   String PROP_DISPLAY_MODE = "displayMode";
 
@@ -86,15 +86,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
    */
   String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
-
-  // these constants should correspond with those from the calendar
-  int DISPLAY_MODE_INTRADAY = 0;
-  int DISPLAY_MODE_DAY = 1;
-  int DISPLAY_MODE_WEEK = 2;
-  int DISPLAY_MODE_MONTH = 3;
-  int DISPLAY_MODE_WORKWEEK = 4;
-  int DISPLAY_MODE_CALENDAR_WEEK = 5;
-  int DISPLAY_MODE_YEAR = 6;
 
   int SELECTION_MODE_NONE = 0;
   int SELECTION_MODE_ACTIVITY = 1;
@@ -160,14 +151,14 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   void setLastHourOfDay(int i);
 
   /**
-   * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
-   * {@link #DISPLAY_MODE_WORKWEEK}
+   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
+   * {@link #WORK_WEEK}
    */
   int getDisplayMode();
 
   /**
-   * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
-   * {@link #DISPLAY_MODE_WORKWEEK}
+   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
+   * {@link #WORK_WEEK}
    */
   void setDisplayMode(int mode);
 

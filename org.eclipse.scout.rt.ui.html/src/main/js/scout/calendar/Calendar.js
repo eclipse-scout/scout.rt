@@ -53,11 +53,17 @@ scout.Calendar.prototype.init = function(model, session, register) {
   });
 };
 
+/**
+ * Enum providing display-modes for calender-like components like calendar and planner.
+ * @see ICalendarDisplayMode.java
+ */
 scout.Calendar.DisplayMode = {
   DAY: 1,
   WEEK: 2,
   MONTH: 3,
-  WORK: 4 // FIXME AWE: (calendar) rename to WORKWEEK
+  WORK_WEEK: 4,
+  CALENDAR_WEEK: 5,
+  YEAR: 6
 };
 
 /**
@@ -81,7 +87,7 @@ scout.Calendar.prototype._isMonth = function() {
 };
 
 scout.Calendar.prototype._isWork = function() {
-  return this.displayMode === scout.Calendar.DisplayMode.WORK;
+  return this.displayMode === scout.Calendar.DisplayMode.WORK_WEEK;
 };
 
 scout.Calendar.prototype._init = function(model) {
@@ -144,10 +150,10 @@ scout.Calendar.prototype._render = function($parent) {
 
   // ... and modes
   this.$commands = this.$header.appendDiv('calendar-commands');
-  this.$commands.appendDiv('calendar-mode-day calendar-mode first', this.session.text('ui.CalendarDay')).attr('data-mode', scout.Calendar.DisplayMode.DAY).click(this._onClickDisplayMode.bind(this));
-  this.$commands.appendDiv('calendar-mode-work calendar-mode', this.session.text('ui.CalendarWork')).attr('data-mode', scout.Calendar.DisplayMode.WORK).click(this._onClickDisplayMode.bind(this));
-  this.$commands.appendDiv('calendar-mode-week calendar-mode', this.session.text('ui.CalendarWeek')).attr('data-mode', scout.Calendar.DisplayMode.WEEK).click(this._onClickDisplayMode.bind(this));
-  this.$commands.appendDiv('calendar-mode-month calendar-mode last', this.session.text('ui.CalendarMonth')).attr('data-mode', scout.Calendar.DisplayMode.MONTH).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode first', this.session.text('ui.CalendarDay')).attr('data-mode', scout.Calendar.DisplayMode.DAY).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode', this.session.text('ui.CalendarWorkWeek')).attr('data-mode', scout.Calendar.DisplayMode.WORK_WEEK).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode', this.session.text('ui.CalendarWeek')).attr('data-mode', scout.Calendar.DisplayMode.WEEK).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode last', this.session.text('ui.CalendarMonth')).attr('data-mode', scout.Calendar.DisplayMode.MONTH).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('calendar-toggle-year').click(this._onClickYear.bind(this));
   this.$commands.appendDiv('calendar-toggle-list').click(this._onClickList.bind(this));
 

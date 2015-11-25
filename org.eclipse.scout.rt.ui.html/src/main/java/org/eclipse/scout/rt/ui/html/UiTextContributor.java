@@ -28,7 +28,7 @@ public class UiTextContributor implements IUiTextContributor {
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
         "ui.CalendarDay",
-        "ui.CalendarWork",
+        "ui.CalendarWorkWeek",
         "ui.CalendarWeek",
         "ui.CalendarCalendarWeek",
         "ui.CalendarMonth",

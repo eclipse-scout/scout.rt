@@ -137,12 +137,12 @@ scout.PlannerLayout.prototype._minWidth = function() {
   var $scale = this.planner.$scale,
     $scaleItems = $scale.find('.timeline-large').children('.scale-item'),
     numScaleItems = $scaleItems.length,
-    DISPLAY_MODE = scout.Planner.DisplayMode;
+    DISPLAY_MODE = scout.Calendar.DisplayMode;
 
   var scaleItemMinWidth = 0;
   if (this.planner.displayMode === DISPLAY_MODE.DAY) {
     scaleItemMinWidth = 52;
-  } else if ((this.planner.displayMode === DISPLAY_MODE.WORK) || (this.planner.displayMode === DISPLAY_MODE.WEEK)) {
+  } else if ((this.planner.displayMode === DISPLAY_MODE.WORK_WEEK) || (this.planner.displayMode === DISPLAY_MODE.WEEK)) {
     scaleItemMinWidth = 160;
   } else if (this.planner.displayMode === DISPLAY_MODE.MONTH) {
     scaleItemMinWidth = 450;
