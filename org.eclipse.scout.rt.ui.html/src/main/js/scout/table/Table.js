@@ -2039,6 +2039,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   // never fire clear selection because of notification thru select row
   this.clearSelection(true);
   this.selectedRows = rows;
+  notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
   }

@@ -26,20 +26,34 @@ scout.TableNavigationEndKeyStroke.prototype._acceptForNavigation = function(even
 
 scout.TableNavigationEndKeyStroke.prototype.handle = function(event) {
   var table = this.field,
-    $rows = table.$filteredRows(),
-    $selection = table.$selectedRows(),
+    rows = table.filteredRows(),
+    lastRow = scout.arrays.last(rows),
+    selectedRows = table.selectedRows,
+    newSelectedRows = [],
     lastActionRow = table.selectionHandler.lastActionRow,
-    deselect = false,
-    $newSelection;
+    lastActionRowIndex = -1;
 
-  if (event.shiftKey && ($selection.length > 0 || lastActionRow)) {
-    lastActionRow = lastActionRow || $selection.last().data('row');
-    deselect = !lastActionRow.$row.isSelected();
-    $newSelection = lastActionRow.$row.nextAll('.table-row:not(.invisible)');
+  if (event.shiftKey && selectedRows.length > 0) {
+    if (lastActionRow) {
+      lastActionRowIndex = rows.indexOf(lastActionRow);
+    }
+    // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+    if (lastActionRowIndex < 0) {
+      lastActionRow = scout.arrays.last(selectedRows);
+      lastActionRowIndex = rows.indexOf(lastActionRow);
+    }
+    newSelectedRows = rows.slice(lastActionRowIndex + 1, rows.length);
+
+    // add existing selection to new one, avoid duplicate rows
+    selectedRows.forEach(function(row) {
+      if (newSelectedRows.indexOf(row) < 0) {
+        newSelectedRows.push(row);
+      }
+    });
   } else {
-    $newSelection = $rows.last();
+    newSelectedRows = lastRow;
   }
-  table.selectionHandler.lastActionRow = $rows.last().data('row');
-
-  this._applyRowSelection(table, $selection, $newSelection, event.shiftKey, deselect, true);
+  table.selectionHandler.lastActionRow = lastRow;
+  table.selectRows(newSelectedRows);
+  table.scrollTo(lastRow);
 };
