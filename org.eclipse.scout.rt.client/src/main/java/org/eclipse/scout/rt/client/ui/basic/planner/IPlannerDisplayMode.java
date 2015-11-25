@@ -18,7 +18,10 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 
 public interface IPlannerDisplayMode extends ICalendarDisplayMode {
 
-  int INTRADAY = 0; // FIXME AWE: (Planner) check if used by projects, if not, remove as it is not supported by UI anymore
+  // TODO AWE: (Planner) check with BAP project if INTRADAY is still needed.
+  // If not delete the constant and also the get/setIntradayInterval methods
+  // on IPlanner.
+  int INTRADAY = 0;
   int CALENDAR_WEEK = 5;
   int YEAR = 6;
 

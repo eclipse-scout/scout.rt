@@ -41,8 +41,6 @@ scout.Table = function(model) {
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
-
-  this.attached = false; // Indicates whether this table is currently visible to the user.
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -184,7 +182,6 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
 };
 
 scout.Table.prototype._render = function($parent) {
-  this._$parent = $parent;
   this.$container = this._$parent.appendDiv('table');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
@@ -285,8 +282,6 @@ scout.Table.prototype._render = function($parent) {
       column = that._columnAtX(event.pageX);
     that.doRowAction($row.data('row'), column);
   }
-
-  this.attached = true;
 };
 
 scout.Table.prototype.onContextMenu = function(event) {
@@ -329,10 +324,9 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
-  //FIXME CGU do not delete header and footer!
+  // FIXME CGU do not delete header and footer!
   this.header = null;
   this.footer = null;
-  this.attached = false;
   this._removeAggregateRows();
   scout.Table.parent.prototype._remove.call(this);
 };
@@ -3084,45 +3078,23 @@ scout.Table.prototype.onModelAction = function(event) {
 };
 
 /**
- * === Method required for objects that act as 'outlineContent' ===
- *
- * Method invoked when this is a 'detailTable' and the outline content is displayed;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already attached.
+ * Method invoked when this is a 'detailTable' and the outline content is displayed.
+ * @override Widget.js
  */
-scout.Table.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
-    return;
-  }
-
+scout.Table.prototype._attach = function() {
   this._$parent.append(this.$container);
-
   var htmlParent = this.htmlComp.getParent();
   this.htmlComp.setSize(htmlParent.getSize());
-
   this.session.detachHelper.afterAttach(this.$container);
-
-  this.attached = true;
 };
 
 /**
- * === Method required for objects that act as 'outlineContent' ===
- *
  * Method invoked when this is a 'detailTable' and the outline content is not displayed anymore.
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already attached.
+ * @override Widget.js
  */
-scout.Table.prototype.detach = function() {
-  if (!this.attached || !this.rendered) {
-    return;
-  }
-
+scout.Table.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-
-  this.attached = false;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -42,8 +42,6 @@ scout.Scrollbar.prototype._init = function(options) {
 
 scout.Scrollbar.prototype._render = function($parent) {
   this._begin = 0;
-
-  this._$parent = $parent;
   this.$container = $parent.appendDiv('scrollbar')
     .addClass(this.axis + '-axis');
   this._$thumb = this.$container.appendDiv('scrollbar-thumb')
@@ -131,8 +129,7 @@ scout.Scrollbar.prototype._scrollTo = function(event) {
 
 scout.Scrollbar.prototype._remove = function() {
   // Uninstall listeners
-  var $parent = this._$parent;
-  $parent
+  this._$parent
     .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
     .off('scroll', this._onScrollHandler)
     .data('scrollbars').forEach(function(scrollbar) {

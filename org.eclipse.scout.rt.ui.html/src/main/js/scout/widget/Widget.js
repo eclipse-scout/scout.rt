@@ -13,6 +13,7 @@ scout.Widget = function() {
   this.children = [];
   this.initialized = false;
   this.rendered = false;
+  this.attached = false;
   this.destroyed = false;
   this.$container;
 };
@@ -63,14 +64,15 @@ scout.Widget.prototype.render = function($parent) {
   this._link();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendered = true;
+  this.attached = true;
   this._postRender();
 };
 
 // Currently only necessary for ModelAdapter
 scout.Widget.prototype._renderInternal = function($parent) {
+  this._$parent = $parent;
   this._render($parent);
   this._renderProperties();
-
   scout.inspector.applyInfo(this);
 };
 
@@ -112,6 +114,7 @@ scout.Widget.prototype.remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   this._remove();
   this.rendered = false;
+  this.attached = false;
   this._trigger('remove');
 };
 
@@ -311,6 +314,54 @@ scout.Widget.prototype.on = function(type, func) {
 
 scout.Widget.prototype.off = function(type, func) {
   this.events.off(type, func);
+};
+
+/**
+ * This method attaches the detached $container to the DOM.
+ */
+scout.Widget.prototype.attach = function() {
+  if (this.attached || !this.rendered) {
+    return;
+  }
+  this._attach();
+  this.children.forEach(function(child) {
+    child.attach();
+  });
+  this.attached = true;
+};
+
+/**
+ * Override this method to do something when Widget is attached again. Typically
+ * you will append this.$container to this._$parent. The default implementation does nothing.
+ */
+scout.Widget.prototype._attach = function() {
+  // NOP
+};
+
+/**
+ * This method calls detach() on all child-widgets. It is used to store some data
+ * before a DOM element is detached and propagate the detach "event" to all child-
+ * widgets, because when a DOM element is detached - child elements are not notified
+ */
+scout.Widget.prototype.detach = function() {
+  if (!this.attached || !this.rendered) {
+    return;
+  }
+  this.children.forEach(function(child) {
+    child.detach();
+  });
+  this._detach();
+  this.attached = false;
+};
+
+/**
+ * Override this method to do something when Widget is detached. Typically you
+ * will call this.$container.detach() here and use the DetachHelper to store
+ * additional state (focus, scrollbars) for the detached element. The default
+ * implementation does nothing.
+ */
+scout.Widget.prototype._detach = function() {
+  // NOP
 };
 
 scout.Widget.prototype.toString = function() {

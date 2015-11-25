@@ -20,7 +20,6 @@ scout.MessageBox = function() {
   this.$cancelButton;
   this._$closeButton;
   this.focusListener;
-  this.attached = false; // Indicates whether this message box is currently visible to the user.
 };
 scout.inherits(scout.MessageBox, scout.ModelAdapter);
 
@@ -53,8 +52,6 @@ scout.MessageBox.prototype._render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
   }
-  this._$parent = $parent;
-
   // Render modality glasspanes (must precede adding the message box to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
   this._glassPaneRenderer.renderGlassPanes();
@@ -113,8 +110,6 @@ scout.MessageBox.prototype._render = function($parent) {
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
   this.$container.addClassForAnimation('shown');
-
-  this.attached = true;
 };
 
 scout.MessageBox.prototype._postRender = function() {
@@ -124,8 +119,6 @@ scout.MessageBox.prototype._postRender = function() {
 scout.MessageBox.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);
-  this.attached = false;
-
   scout.MessageBox.parent.prototype._remove.call(this);
 };
 
@@ -200,39 +193,17 @@ scout.MessageBox.prototype.close = function() {
 };
 
 /**
- * === Method required for objects attached to a 'displayParent' ===
- *
- * Method invoked once the 'displayParent' is attached;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already attached.
+ * @override Widget.js
  */
-scout.MessageBox.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
-    return;
-  }
-
+scout.MessageBox.prototype._attach = function() {
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
-
-  this.attached = true;
 };
 
 /**
- * === Method required for objects attached to a 'displayParent' ===
- *
- * Method invoked once the 'displayParent' is detached;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already detached.
+ * @override Widget.js
  */
-scout.MessageBox.prototype.detach = function() {
-  if (!this.attached || !this.rendered) {
-    return;
-  }
-
+scout.MessageBox.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-
-  this.attached = false;
 };

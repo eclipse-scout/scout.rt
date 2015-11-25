@@ -17,9 +17,10 @@ scout.Form = function() {
   this.messageBoxController;
   this.fileChooserController;
   this._glassPaneRenderer;
-
-  this.attached = false; // Indicates whether this Form is currently visible to the user.
-  this.renderInitialFocusEnabled = true; // Indicates whether this form should render its initial focus.
+  /**
+   * Whether this form should render its initial focus
+   */
+  this.renderInitialFocusEnabled = true;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -53,13 +54,9 @@ scout.Form.prototype._renderProperties = function() {
 };
 
 scout.Form.prototype._render = function($parent) {
-  this._$parent = $parent;
-
   // Render modality glasspanes (must precede adding the form to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
-
   this._renderForm($parent);
-  this.attached = true;
 };
 
 scout.Form.prototype._renderForm = function($parent) {
@@ -227,8 +224,6 @@ scout.Form.prototype._remove = function() {
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._glassPaneRenderer.removeGlassPanes();
   this._uninstallFocusContext();
-  this.attached = false;
-
   scout.Form.parent.prototype._remove.call(this);
 };
 
@@ -263,21 +258,13 @@ scout.Form.prototype.onModelAction = function(event) {
 };
 
 /**
- * === Method required for objects that act as 'outlineContent', views or shells attached to a 'displayParent' ===
- *
  * Method invoked when:
  *  - this is a 'detailForm' and the outline content is displayed;
  *  - this is a 'view' and the view tab is selected;
  *  - this is a child 'dialog' or 'view' and its 'displayParent' is attached;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already attached.
+ * @override Widget.js
  */
-scout.Form.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
-    return;
-  }
-
+scout.Form.prototype._attach = function() {
   this._$parent.append(this.$container);
 
   // If the parent was resized while this view was detached, the view has a wrong size.
@@ -290,7 +277,6 @@ scout.Form.prototype.attach = function() {
   this.session.detachHelper.afterAttach(this.$container);
 
   // form is attached even if children are not yet
-  this.attached = true;
   if ((this.isView() || this.isDialog()) && this.session.desktop._outlineContent !== this) {
     //notify model this form is active
     this.session.desktop._setFormActivated(this);
@@ -303,21 +289,13 @@ scout.Form.prototype.attach = function() {
 };
 
 /**
- * === Method required for objects that act as 'outlineContent', views or shells attached to a 'displayParent' ===
- *
  * Method invoked when:
  *  - this is a 'detailForm' and the outline content is hidden;
  *  - this is a 'view' and the view tab is deselected;
  *  - this is a child 'dialog' or 'view' and its 'displayParent' is detached;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already detached.
+ * @override Widget.js
  */
-scout.Form.prototype.detach = function() {
-  if (!this.attached || !this.rendered) {
-    return;
-  }
-
+scout.Form.prototype._detach = function() {
   // Detach child dialogs, message boxes and file choosers, not views.
   this.formController.detachDialogs();
   this.messageBoxController.detach();
@@ -325,8 +303,6 @@ scout.Form.prototype.detach = function() {
 
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-
-  this.attached = false;
 };
 
 scout.Form.prototype.renderInitialFocus = function() {

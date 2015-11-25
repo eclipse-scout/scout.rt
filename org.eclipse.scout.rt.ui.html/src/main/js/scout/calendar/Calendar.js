@@ -122,8 +122,7 @@ scout.Calendar.prototype._syncViewRange = function(viewRange) {
 };
 
 scout.Calendar.prototype._render = function($parent) {
-  this._$parent = $parent;
-  this.$container = this._$parent.appendDiv('calendar');
+  this.$container = $parent.appendDiv('calendar');
 
   var layout = new scout.CalendarLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);

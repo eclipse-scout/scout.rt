@@ -12,13 +12,11 @@ scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
   this._files = [];
   this._glassPaneRenderer;
-  this.attached = false; // Indicates whether this file chooser is currently visible to the user.
 };
 scout.inherits(scout.FileChooser, scout.ModelAdapter);
 
 scout.FileChooser.prototype._init = function(model) {
   scout.FileChooser.parent.prototype._init.call(this, model);
-
   this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, true);
 };
 
@@ -40,13 +38,9 @@ scout.FileChooser.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.FileChooser.prototype._render = function($parent) {
-  this._$parent = $parent;
-
   // Render modality glasspanes (must precede adding the file chooser to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
-
   this.$container = $parent.appendDiv('file-chooser');
-
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
 
@@ -148,8 +142,6 @@ scout.FileChooser.prototype._render = function($parent) {
   boxButons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
-
-  this.attached = true;
 };
 
 scout.FileChooser.prototype._postRender = function() {
@@ -159,8 +151,6 @@ scout.FileChooser.prototype._postRender = function() {
 scout.FileChooser.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);
-  this.attached = false;
-
   scout.FileChooser.parent.prototype._remove.call(this);
 };
 
@@ -272,41 +262,19 @@ scout.FileChooser.prototype._onDrop = function(event) {
 };
 
 /**
- * === Method required for objects attached to a 'displayParent' ===
- *
- * Method invoked once the 'displayParent' is detached;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already attached.
+ * @override Widget.js
  */
-scout.FileChooser.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
-    return;
-  }
-
+scout.FileChooser.prototype._attach = function() {
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
-
-  this.attached = true;
 };
 
 /**
- * === Method required for objects attached to a 'displayParent' ===
- *
- * Method invoked once the 'displayParent' is attached;
- *
- *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *  This method has no effect if already detached.
+ * @override Widget.js
  */
-scout.FileChooser.prototype.detach = function() {
-  if (!this.attached || !this.rendered) {
-    return;
-  }
-
+scout.FileChooser.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-
-  this.attached = false;
 };
 
 /**
