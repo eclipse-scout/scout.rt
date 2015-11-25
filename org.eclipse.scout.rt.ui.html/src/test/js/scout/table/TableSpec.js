@@ -1114,10 +1114,52 @@ describe("Table", function() {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
+    it("context menu only shows sub-menus of matching type", function() {
+      var model = helper.createModelFixture(2, 2);
+      var table = helper.createTable(model);
+      table.selectedRows = [table.rows[0]];
+      table.render(session.$entryPoint);
+
+      var menuModelTop = helper.createMenuModel('topMenu'),
+      menuTop = helper.menuHelper.createMenu(menuModelTop),
+      menuModel1 = helper.createMenuModel('singleSelectionMenu'),
+      menu1 = helper.menuHelper.createMenu(menuModel1),
+      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
+      menu2 = helper.menuHelper.createMenu(menuModel2);
+      menu2.menuTypes = ['Table.MultiSelection'];
+      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+//      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
+//      menu3 = helper.menuHelper.createMenu(menuModel3);
+//      menu3.menuTypes = ['Table.EmptySpace'];
+
+      menuTop.childActions = [menu1, menu2
+      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+                              //, menu3
+                              ];
+      table.menus = [menuTop];
+      table._syncMenus([menuTop]);
+      var $row0 = table.$data.children('.table-row').eq(0);
+      $row0.triggerContextMenu();
+
+      sendQueuedAjaxCalls();
+
+      var $menu = helper.getDisplayingContextMenu(table);
+      expect($menu.find('.menu-item').length).toBe(1);
+      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
+
+      var $menuTop = $menu.find('.menu-item');
+      $menuTop.triggerClick();
+      sendQueuedAjaxCalls();
+      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
+      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
+      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+//      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
+    });
+
   });
 
   describe("_filterMenus", function() {
-    var singleSelMenu, multiSelMenu, bothSelMenu, table;
+    var singleSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
 
     beforeEach(function() {
       var model = helper.createModelFixture(2, 2);
@@ -1127,44 +1169,88 @@ describe("Table", function() {
       multiSelMenu = helper.menuHelper.createMenu({
         menuTypes: ['Table.MultiSelection']
       });
+      emptySpaceMenu = helper.menuHelper.createMenu({
+        menuTypes: ['Table.EmptySpace']
+      });
+      headerMenu = helper.menuHelper.createMenu({
+        menuTypes: ['Table.Header']
+      });
       table = helper.createTable(model);
-      table.menus = [singleSelMenu, multiSelMenu];
+      table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, headerMenu];
     });
 
-    it("returns no menus if no row is selected", function() {
+    // context menu
+    it("returns no menus for contextMenu if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
       expect(menus).toEqual([]);
     });
 
-    it("returns only single selection menus if one row is selected", function() {
+    it("returns only single selection menus for contextMenu if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
       expect(menus).toEqual([singleSelMenu]);
     });
 
-    it("returns only multi selection menus if multiple rows are selected", function() {
+    it("returns only multi selection menus for contextMenu if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
       expect(menus).toEqual([multiSelMenu]);
     });
 
-    it("returns menus with both types set if one or more rows are selected", function() {
+    it("returns menus with single- and multi selection set for contextMenu if one or more rows are selected", function() {
       bothSelMenu = helper.menuHelper.createMenu({
         menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
       });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      var menus = table._filterMenusForDestination(table.menus, 'contextMenu');
       expect(menus).toEqual([singleSelMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      menus = table._filterMenusForDestination(table.menus, 'contextMenu');
       expect(menus).toEqual([multiSelMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      menus = table._filterMenusForDestination(table.menus, 'contextMenu');
       expect(menus).toEqual([]);
+    });
+
+    // menuBar
+    it("returns only empty space menus if no row is selected", function() {
+      table.selectRows([]);
+      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      expect(menus).toEqual([emptySpaceMenu]);
+    });
+
+    it("returns empty space and single selection menus if one row is selected", function() {
+      table.selectRows(table.rows[0]);
+      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      expect(menus).toEqual([singleSelMenu, emptySpaceMenu]);
+    });
+
+    it("returns empty space and multi selection menus if multiple rows are selected", function() {
+      table.selectRows([table.rows[0], table.rows[1]]);
+      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      expect(menus).toEqual([multiSelMenu, emptySpaceMenu]);
+    });
+
+    it("returns menus with empty space, single- and multi selection set if one or more rows are selected", function() {
+      bothSelMenu = helper.menuHelper.createMenu({
+        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+      });
+      table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
+      table.selectRows(table.rows[0]);
+      var menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      expect(menus).toEqual([singleSelMenu, emptySpaceMenu, bothSelMenu]);
+
+      table.selectRows([table.rows[0], table.rows[1]]);
+      menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      expect(menus).toEqual([multiSelMenu, emptySpaceMenu, bothSelMenu]);
+
+      table.selectRows([]);
+      menus = table._filterMenusForDestination(table.menus, 'menuBar');
+      expect(menus).toEqual([emptySpaceMenu]);
     });
   });
 

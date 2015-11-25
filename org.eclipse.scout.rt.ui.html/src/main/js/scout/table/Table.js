@@ -294,7 +294,7 @@ scout.Table.prototype.onContextMenu = function(event) {
     var menuItems, popup;
     event.preventDefault();
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(['Table.SingleSelection', 'Table.MultiSelection'], true);
+      menuItems = this._filterMenusForDestination(this.menus, 'contextMenu', true);
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
@@ -1138,16 +1138,27 @@ scout.Table.prototype._find$AppLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function(allowedTypes, onlyVisible, enableDisableKeyStroke) {
-  allowedTypes = allowedTypes || [];
+scout.Table.prototype._filterMenusForDestination = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+  var allowedTypes = [];
+  if (destination === 'menuBar') {
+    allowedTypes = [ 'Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection' ];
+  }
+  else if (destination === 'contextMenu') {
+    allowedTypes = [ 'Table.SingleSelection', 'Table.MultiSelection' ];
+  }
+  else if (destination === 'header') {
+    allowedTypes = [ 'Table.Header' ];
+  }
+
   if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length !== 1) {
     scout.arrays.remove(allowedTypes, 'Table.SingleSelection');
   }
   if (allowedTypes.indexOf('Table.MultiSelection') > -1 && this.selectedRows.length <= 1) {
     scout.arrays.remove(allowedTypes, 'Table.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+  return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
 };
+
 
 scout.Table.prototype._renderMenus = function() {
   this._updateMenuBar();
@@ -1157,7 +1168,7 @@ scout.Table.prototype._renderMenus = function() {
 };
 
 scout.Table.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenus(['Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection'], false, true);
+  var menuItems = this._filterMenusForDestination(this.menus, 'menuBar', false, true);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };
@@ -2676,7 +2687,15 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
 };
 
 scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
+  this._addFilterFuncToMenus(newMenus);
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+};
+
+scout.Table.prototype._addFilterFuncToMenus = function(menus) {
+  menus.forEach(function(menu) {
+    menu.filterFunc = this._filterMenusForDestination.bind(this);
+    this._addFilterFuncToMenus(menu.childActions);
+  }.bind(this));
 };
 
 scout.Table.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {

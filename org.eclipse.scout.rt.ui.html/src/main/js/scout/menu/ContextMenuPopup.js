@@ -21,6 +21,7 @@ scout.ContextMenuPopup.prototype._init = function(options) {
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
   this.menuItems = options.menuItems;
+  this.filterFunc = options.filterFunc;
   this.options = $.extend({
     cloneMenuItems: true
   }, options);
@@ -45,6 +46,10 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
 
 scout.ContextMenuPopup.prototype._renderMenuItems = function() {
   var menuClone, menus = this._getMenuItems();
+  if(this.menu && this.menu.filterFunc){
+    // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
+    menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ?   'menuBar': 'contextMenu');
+  }
   if (!menus || menus.length === 0) {
     return;
   }
@@ -55,7 +60,8 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     }
     if (this.options.cloneMenuItems) {
       menu = menu.cloneAdapter({
-        parent: this
+        parent: this,
+        filterFunc: menu.filterFunc
       });
     } else {
       menu.setParent(this);
