@@ -8,25 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@wizard-progress-height: 60px;
+@wizard-progress-height: 52px;
 @wizard-progress-border-width: 1px;
 @wizard-progress-content-h-padding: 15px;
 @wizard-progress-separator-width: 10px;
 @wizard-progress-separator-line-width: 1px;
 
 @wizard-progress-border-color: @border-color;
+@wizard-step-active-background-color: @active-inverted-background-color;
+@wizard-step-active-color: @active-inverted-color;
+@wizard-step-active-separator-color: @wizard-step-default-separator-color;
 @wizard-step-after-active-background-color: @palette-blue-0;
 @wizard-step-after-active-color: @wizard-step-default-color;
 @wizard-step-after-active-separator-color: @wizard-step-default-separator-color;
 @wizard-step-before-active-background-color: @palette-blue-0;
 @wizard-step-before-active-color: @wizard-step-default-color;
 @wizard-step-before-active-separator-color: @border-color;
-@wizard-step-active-background-color: @active-inverted-background-color;
-@wizard-step-active-color: @active-inverted-color;
-@wizard-step-active-separator-color: @wizard-step-default-separator-color;
 @wizard-step-default-background-color: @control-background-color;
 @wizard-step-default-color: @control-color;
 @wizard-step-default-separator-color: @border-color;
+@wizard-step-disabled-active-background-color: @palette-gray-2;
+@wizard-step-disabled-active-color: @wizard-step-disabled-color;
+@wizard-step-disabled-active-separator-color: @wizard-step-disabled-separator-color;
 @wizard-step-disabled-background-color: @wizard-step-default-background-color;
 @wizard-step-disabled-color: @palette-gray-6;
 @wizard-step-disabled-separator-color: @wizard-step-default-separator-color;
@@ -146,6 +149,12 @@
     #scout.wizard-step-color(@wizard-step-disabled-color);
     #scout.wizard-step-background-color(@wizard-step-disabled-background-color);
     #scout.wizard-step-separator-color(@wizard-step-disabled-separator-color);
+
+    &.active {
+      #scout.wizard-step-color(@wizard-step-disabled-active-color);
+      #scout.wizard-step-background-color(@wizard-step-disabled-active-background-color);
+      #scout.wizard-step-separator-color(@wizard-step-disabled-active-separator-color);
+    }
   }
   &:not(.disabled) {
     &.active {
