@@ -14,7 +14,6 @@ scout.ContextMenuPopup = function() {
   // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
   this._headVisible = false;
   this.openAnimated = false;
-  this.$oldBodies = [];
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
