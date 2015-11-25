@@ -37,12 +37,12 @@ public class MultiColumnExtension extends AbstractTableExtension<OrigPageWithTab
     return getOwner().getColumnSet().getColumnByClass(FourthBigDecimalColumn.class);
   }
 
-  @Order(3000.0)
+  @Order(3000)
   public class ThirdLongColumn extends AbstractLongColumn {
 
   }
 
-  @Order(4000.0)
+  @Order(4000)
   public class FourthBigDecimalColumn extends AbstractBigDecimalColumn {
 
   }

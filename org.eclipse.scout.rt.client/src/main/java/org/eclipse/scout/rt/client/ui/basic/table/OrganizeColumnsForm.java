@@ -108,10 +108,10 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     return m_organizedTable;
   }
 
-  @Order(10.0)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
-    @Order(10.0)
+    @Order(10)
     public class GroupBox extends AbstractGroupBox {
 
       @Override
@@ -124,7 +124,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         return 5;
       }
 
-      @Order(5.0)
+      @Order(5)
       public class ProfilesBox extends AbstractGroupBox {
 
         @Override
@@ -147,7 +147,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           return false;
         }
 
-        @Order(10.0)
+        @Order(10)
         public class ProfilesTableField extends AbstractTableField<ProfilesTableField.Table> {
 
           @Override
@@ -290,7 +290,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               getMenuByClass(UpdateMenu.class).setEnabled(!isDefaultConfigSelected());
             }
 
-            @Order(10.0)
+            @Order(10)
             public class ConfigNameColumn extends AbstractStringColumn {
               @Override
               protected boolean getConfiguredEditable() {
@@ -335,7 +335,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(20.0)
+            @Order(20)
             public class ConfigTypeColumn extends AbstractColumn<ConfigType> {
               @Override
               protected boolean getConfiguredDisplayable() {
@@ -349,7 +349,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(10.0)
+            @Order(10)
             public class NewMenu extends AbstractMenu {
 
               @Override
@@ -383,7 +383,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(20.0)
+            @Order(20)
             public class ApplyMenu extends AbstractMenu {
 
               @Override
@@ -443,7 +443,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               return false;
             }
 
-            @Order(30.0)
+            @Order(30)
             public class UpdateMenu extends AbstractMenu {
 
               @Override
@@ -470,7 +470,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(40.0)
+            @Order(40)
             public class DeleteMenu extends AbstractMenu {
 
               @Override
@@ -501,7 +501,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(50.0)
+            @Order(50)
             public class RenameMenu extends AbstractMenu {
 
               @Override
@@ -531,7 +531,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         }
       }
 
-      @Order(10.0)
+      @Order(10)
       public class ColumnsGroupBox extends AbstractGroupBox {
 
         @Override
@@ -554,7 +554,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           return false;
         }
 
-        @Order(10.0)
+        @Order(10)
         public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
 
           @Override
@@ -838,7 +838,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               refreshMenus();
             }
 
-            @Order(10.0)
+            @Order(10)
             public class KeyColumn extends AbstractColumn<IColumn<?>> {
 
               @Override
@@ -852,7 +852,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(30.0)
+            @Order(30)
             public class TitleColumn extends AbstractStringColumn {
 
               @Override
@@ -867,7 +867,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(40.0)
+            @Order(40)
             public class GroupAndSortColumn extends AbstractStringColumn {
 
               @Override
@@ -877,7 +877,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(50.0)
+            @Order(50)
             public class FilterColumn extends AbstractStringColumn {
 
               @Override
@@ -892,7 +892,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(60.0)
+            @Order(60)
             public class CustomColumnColumn extends AbstractStringColumn {
 
               @Override
@@ -902,7 +902,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(70.0)
+            @Order(70)
             public class WidthColumn extends AbstractIntegerColumn {
 
               @Override
@@ -924,7 +924,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             // prevents the scrollbar from overlapping the WidthColumn
-            @Order(80.0)
+            @Order(80)
             public class BehindScrollbarColumn extends AbstractStringColumn {
 
               @Override
@@ -939,7 +939,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(10.0)
+            @Order(10)
             public class MoveUpMenu extends AbstractMenu {
 
               @Override
@@ -976,7 +976,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(20.0)
+            @Order(20)
             public class MoveDownMenu extends AbstractMenu {
 
               @Override
@@ -1015,11 +1015,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(30.0)
+            @Order(30)
             public class MenuSeparator3 extends AbstractMenuSeparator {
             }
 
-            @Order(40.0)
+            @Order(40)
             public class SortAscMenu extends AbstractMenu {
 
               @Override
@@ -1043,7 +1043,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(50.0)
+            @Order(50)
             public class SortDescMenu extends AbstractMenu {
 
               @Override
@@ -1067,7 +1067,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(60.0)
+            @Order(60)
             public class SortAscAdditionalMenu extends AbstractMenu {
 
               @Override
@@ -1091,7 +1091,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(70.0)
+            @Order(70)
             public class SortDescAdditionalMenu extends AbstractMenu {
 
               @Override
@@ -1115,11 +1115,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(80.0)
+            @Order(80)
             public class MenuSeparator1 extends AbstractMenuSeparator {
             }
 
-            @Order(90.0)
+            @Order(90)
             public class GroupMenu extends AbstractMenu {
 
               @Override
@@ -1143,7 +1143,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(100.0)
+            @Order(100)
             public class GroupAdditionalMenu extends AbstractMenu {
 
               @Override
@@ -1167,11 +1167,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(110.0)
+            @Order(110)
             public class MenuSeparator2 extends AbstractMenuSeparator {
             }
 
-            @Order(130.0)
+            @Order(130)
             public class AddCustomColumnEmptySpaceMenu extends AbstractMenu {
 
               @Override
@@ -1256,7 +1256,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(140.0)
+            @Order(140)
             public class RemoveMenu extends AbstractMenu {
 
               @Override
@@ -1291,7 +1291,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
             }
 
-            @Order(150.0)
+            @Order(150)
             public class ModifyCustomColumnMenu extends AbstractMenu {
 
               @Override
@@ -1321,7 +1321,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            @Order(160.0)
+            @Order(160)
             public class RemoveFilterMenu extends AbstractMenu {
 
               @Override
@@ -1354,7 +1354,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
     }
 
-    @Order(80.0)
+    @Order(80)
     public class CopyWidthsOfColumnsButton extends AbstractLinkButton {
 
       public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";

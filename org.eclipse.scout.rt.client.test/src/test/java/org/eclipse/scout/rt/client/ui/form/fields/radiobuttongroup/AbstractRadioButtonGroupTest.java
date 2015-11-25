@@ -213,7 +213,7 @@ public class AbstractRadioButtonGroupTest {
       return "RadioButtonGroup";
     }
 
-    @Order(10.0)
+    @Order(10)
     public class RadioButton1 extends AbstractRadioButton<Long> {
       @Override
       public Long getRadioValue() {
@@ -221,7 +221,7 @@ public class AbstractRadioButtonGroupTest {
       }
     }
 
-    @Order(15.0)
+    @Order(15)
     public class LabelField extends AbstractLabelField {
       @Override
       protected String getConfiguredLabel() {
@@ -229,7 +229,7 @@ public class AbstractRadioButtonGroupTest {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     public class RadioButton2 extends AbstractRadioButton<Long> {
       @Override
       public Long getRadioValue() {
@@ -237,7 +237,7 @@ public class AbstractRadioButtonGroupTest {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class RadioButton3 extends AbstractRadioButton<Long> {
       @Override
       public Long getRadioValue() {

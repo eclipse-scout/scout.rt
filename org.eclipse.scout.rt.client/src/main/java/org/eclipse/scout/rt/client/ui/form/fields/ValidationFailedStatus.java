@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @param invalid
  *          value type
  */
-@Order(20.0)
+@Order(20)
 public final class ValidationFailedStatus<VALUE> extends ScoutFieldStatus {
 
   private static final long serialVersionUID = 1L;

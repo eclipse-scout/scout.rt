@@ -136,7 +136,7 @@ public class OutlineTreeContextMenuTest {
 
     public class Table extends AbstractTable {
 
-      @Order(10.0)
+      @Order(10)
       public class PageWithTableEmptySpaceMenu extends AbstractMenu {
 
         @Override
@@ -151,7 +151,7 @@ public class OutlineTreeContextMenuTest {
 
       }
 
-      @Order(15.0)
+      @Order(15)
       public class PageWithTableEmptySpace2Menu extends AbstractMenu {
 
         @Override
@@ -166,7 +166,7 @@ public class OutlineTreeContextMenuTest {
 
       }
 
-      @Order(20.0)
+      @Order(20)
       public class PageWithTableRowMenu extends AbstractMenu {
         @Override
         protected String getConfiguredText() {

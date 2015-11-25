@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Maintain a menu per bookmark and its key stroke on the desktop
  */
-@Order(1f)
+@Order(1)
 public abstract class AbstractBookmarkMenu extends AbstractMenu {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractBookmarkMenu.class);
 
@@ -153,7 +153,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     setChildActions(newList);
   }
 
-  @Order(1f)
+  @Order(1)
   public class AddUserBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -171,7 +171,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
   }
 
-  @Order(2f)
+  @Order(2)
   public class AddGlobalBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -190,7 +190,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
   }
 
-  @Order(3f)
+  @Order(3)
   public class ManageBookmarksMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -204,14 +204,14 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
   }
 
-  @Order(4f)
+  @Order(4)
   public class StartBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
       return ScoutTexts.get("BookmarksStartPageMenu");
     }
 
-    @Order(1f)
+    @Order(1)
     public class ActivateStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -233,7 +233,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       }
     }
 
-    @Order(2f)
+    @Order(2)
     public class Separator1Menu extends AbstractMenu {
       @Override
       protected boolean getConfiguredSeparator() {
@@ -241,7 +241,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       }
     }
 
-    @Order(3f)
+    @Order(3)
     public class SetStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -256,7 +256,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       }
     }
 
-    @Order(4f)
+    @Order(4)
     public class DeleteStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -273,7 +273,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
   }
 
-  @Order(5f)
+  @Order(5)
   public class Separator1Menu extends AbstractMenuSeparator {
   }
 

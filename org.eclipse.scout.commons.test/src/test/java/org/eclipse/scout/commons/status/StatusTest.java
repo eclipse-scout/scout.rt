@@ -44,12 +44,12 @@ public class StatusTest {
     assertTrue(highPrioError.compareTo(new Status(IStatus.ERROR)) < 0);
   }
 
-  @Order(10.0)
+  @Order(10)
   class TestStatus extends Status {
     private static final long serialVersionUID = 1L;
   }
 
-  @Order(20.0)
+  @Order(20)
   class TestStatus2 extends Status {
     private static final long serialVersionUID = 1L;
   }

@@ -107,7 +107,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    *          </ul>
    */
   @ConfigOperation
-  @Order(50.0)
+  @Order(50)
   protected void execOwnerValueChanged(Object newOwnerValue) {
 
   }

@@ -167,7 +167,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
     public class Table extends AbstractTable {
 
-      @Order(10.0)
+      @Order(10)
       public class PageWithTableEmptySpaceMenu extends AbstractMenu {
 
         @Override
@@ -182,7 +182,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
       }
 
-      @Order(20.0)
+      @Order(20)
       public class PageWithTableRowMenu extends AbstractMenu {
 
         @Override
@@ -215,7 +215,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
     public class Table extends AbstractTable {
 
-      @Order(10.0)
+      @Order(10)
       public class SubPageWithTableEmptySpaceMenu extends AbstractMenu {
 
         @Override
@@ -230,7 +230,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
       }
 
-      @Order(20.0)
+      @Order(20)
       public class SubPageWithTableRowMenu extends AbstractMenu {
 
         @Override

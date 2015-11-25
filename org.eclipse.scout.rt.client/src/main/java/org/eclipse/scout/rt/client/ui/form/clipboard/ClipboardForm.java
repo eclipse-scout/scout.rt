@@ -104,7 +104,7 @@ public class ClipboardForm extends AbstractForm {
       return 1;
     }
 
-    @Order(10.0)
+    @Order(10)
     public class ClipboardLabel extends AbstractLabelField {
 
       @Override
@@ -133,7 +133,7 @@ public class ClipboardForm extends AbstractForm {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     public class ClipboardBox extends AbstractGroupBox {
 
       @Override
@@ -146,7 +146,7 @@ public class ClipboardForm extends AbstractForm {
         return 705;
       }
 
-      @Order(10.0)
+      @Order(10)
       public class ClipboardField extends AbstractClipboardField {
 
         @Override
@@ -177,11 +177,11 @@ public class ClipboardForm extends AbstractForm {
 
     }
 
-    @Order(30.0)
+    @Order(30)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(40.0)
+    @Order(40)
     public class CancelButton extends AbstractCancelButton {
     }
 
@@ -189,7 +189,7 @@ public class ClipboardForm extends AbstractForm {
      * Escape keyStroke is required in CopyHandler case, when form has no cancel-button but user should be able to close
      * form with ESC anyway.
      */
-    @Order(50.0)
+    @Order(50)
     public class EscapeKeyStroke extends AbstractKeyStroke {
 
       @Override

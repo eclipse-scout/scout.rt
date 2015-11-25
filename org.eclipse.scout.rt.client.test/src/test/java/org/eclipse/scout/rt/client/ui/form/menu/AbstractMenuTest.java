@@ -34,7 +34,7 @@ public class AbstractMenuTest {
 
   public class ImageField extends AbstractImageField {
 
-    @Order(10.0)
+    @Order(10)
     public class Menu1 extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -42,7 +42,7 @@ public class AbstractMenuTest {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     public abstract class MyAbstractMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -50,7 +50,7 @@ public class AbstractMenuTest {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class Menu2 extends AbstractMenu {
       @Override
       protected String getConfiguredText() {

@@ -29,11 +29,11 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
     return outlines;
   }
 
-  @Order(10.0)
+  @Order(10)
   public class DisplayableMenu extends AbstractMenu {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override
@@ -42,11 +42,11 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
     }
   }
 
-  @Order(30.0)
+  @Order(30)
   public class DisplayableFormToolButton extends AbstractFormToolButton {
   }
 
-  @Order(40.0)
+  @Order(40)
   public class NonDisplayableFormToolButton extends AbstractFormToolButton {
 
     @Override
@@ -55,7 +55,7 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
     }
   }
 
-  @Order(50.0)
+  @Order(50)
   public class DisplayableOutlineViewButton extends AbstractOutlineViewButton {
 
     public DisplayableOutlineViewButton() {
@@ -67,7 +67,7 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
     }
   }
 
-  @Order(60.0)
+  @Order(60)
   public class NonDisplayableOutlineViewButton extends AbstractOutlineViewButton {
 
     public NonDisplayableOutlineViewButton() {

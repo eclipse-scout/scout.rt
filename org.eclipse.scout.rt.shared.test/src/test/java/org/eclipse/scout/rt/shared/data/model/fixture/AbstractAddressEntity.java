@@ -23,7 +23,7 @@ public abstract class AbstractAddressEntity extends AbstractDataModelEntity {
     return "Address";
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class CityAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +38,7 @@ public abstract class AbstractAddressEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class ZipCodeAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 

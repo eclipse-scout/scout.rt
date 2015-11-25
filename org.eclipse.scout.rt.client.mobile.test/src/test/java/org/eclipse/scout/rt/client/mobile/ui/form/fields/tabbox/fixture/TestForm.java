@@ -76,40 +76,40 @@ public class TestForm extends AbstractForm {
     return getFieldByClass(Text3Field.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
-    @Order(10.0)
+    @Order(10)
     public class TabBox extends AbstractTabBox {
 
-      @Order(10.0)
+      @Order(10)
       public class SimpleGroupBox extends AbstractGroupBox {
 
-        @Order(10.0)
+        @Order(10)
         public class TextSimpleField extends AbstractStringField {
         }
 
       }
 
-      @Order(20.0)
+      @Order(20)
       public class TemplateGroupBox extends AbstractTemplateGroupBox {
       }
 
-      @Order(30.0)
+      @Order(30)
       public class TemplateExGroupBox extends AbstractTemplateGroupBox {
 
-        @Order(10.0)
+        @Order(10)
         public class Text3Field extends AbstractStringField {
         }
       }
 
     }
 
-    @Order(30.0)
+    @Order(30)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(40.0)
+    @Order(40)
     public class CancelButton extends AbstractCancelButton {
     }
   }

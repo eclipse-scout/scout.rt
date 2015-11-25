@@ -63,18 +63,18 @@ public class FormToStore extends AbstractForm {
     doIt(m_execStoredImplementation);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
-    @Order(30.0)
+    @Order(30)
     public class SaveButton extends AbstractSaveButton {
     }
 
-    @Order(40.0)
+    @Order(40)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(50.0)
+    @Order(50)
     public class CancelButton extends AbstractCancelButton {
     }
   }

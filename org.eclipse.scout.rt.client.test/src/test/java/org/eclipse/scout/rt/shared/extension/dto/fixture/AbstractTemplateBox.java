@@ -36,17 +36,17 @@ public abstract class AbstractTemplateBox extends AbstractGroupBox {
     return getFieldByClass(GroupBoxInTemplateField.class);
   }
 
-  @Order(1000.0)
+  @Order(1000)
   public class FirstStringInTemplateField extends AbstractStringField {
   }
 
-  @Order(2000.0)
+  @Order(2000)
   public class GroupBoxInTemplateField extends AbstractGroupBox {
-    @Order(1000.0)
+    @Order(1000)
     public class SecondStringInTemplateField extends AbstractStringField {
     }
 
-    @Order(2000.0)
+    @Order(2000)
     public class ThirdStringInTemplateField extends AbstractStringField {
     }
   }

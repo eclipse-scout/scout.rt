@@ -159,7 +159,7 @@ public class AbstractFormTest {
       super();
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MainBox extends AbstractGroupBox {
     }
   }
@@ -174,7 +174,7 @@ public class AbstractFormTest {
       return getFieldByClass(MainBox.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MainBox extends AbstractGroupBox {
 
       @Override
@@ -195,7 +195,7 @@ public class AbstractFormTest {
       return getFieldByClass(StringField.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     @InjectFieldTo(TestForm.MainBox.class)
     public class StringField extends AbstractStringField {
 
@@ -222,14 +222,14 @@ public class AbstractFormTest {
       super();
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MainBox extends AbstractGroupBox {
       @Override
       protected void execInitField() {
         getFieldByClass(EmbeddedField.class).setInnerForm(new TestFormWithClassId());
       }
 
-      @Order(10.0)
+      @Order(10)
       @ClassId(WRAPPER_FORM_FIELD_ID)
       public class EmbeddedField extends AbstractWrappedFormField<TestFormWithClassId> {
       }

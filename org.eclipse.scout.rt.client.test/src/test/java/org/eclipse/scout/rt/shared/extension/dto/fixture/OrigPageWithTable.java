@@ -30,11 +30,11 @@ public class OrigPageWithTable extends AbstractPageWithTable<Table> {
       return getColumnSet().getColumnByClass(FirstBigDecimalColumn.class);
     }
 
-    @Order(1000.0)
+    @Order(1000)
     public class FirstBigDecimalColumn extends AbstractBigDecimalColumn {
     }
 
-    @Order(2000.0)
+    @Order(2000)
     public class SecondSmartColumn extends AbstractSmartColumn<Long> {
     }
   }

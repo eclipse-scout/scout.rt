@@ -55,10 +55,10 @@ public class FileChooserFieldTest {
 
     @Order(10)
     public class MainBox extends AbstractGroupBox {
-      @Order(10.0)
+      @Order(10)
       public class FileChooserField extends AbstractFileChooserField {
 
-        @Order(10.0)
+        @Order(10)
         public class Menu1 extends AbstractMenu {
 
           @Override
@@ -73,7 +73,7 @@ public class FileChooserFieldTest {
 
         }
 
-        @Order(20.0)
+        @Order(20)
         public class Menu2 extends AbstractMenu {
 
           @Override

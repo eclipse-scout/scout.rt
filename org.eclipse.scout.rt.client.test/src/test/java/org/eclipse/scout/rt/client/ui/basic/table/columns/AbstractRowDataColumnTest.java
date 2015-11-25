@@ -79,11 +79,11 @@ public class AbstractRowDataColumnTest {
       return getColumnSet().getColumnByClass(RowDataColumn.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class StringTestColumn extends AbstractStringColumn {
     }
 
-    @Order(20.0)
+    @Order(20)
     public class RowDataColumn extends AbstractTestRowDataColumn<String> {
 
       @Override

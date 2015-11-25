@@ -250,7 +250,7 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
       return getColumnSet().getColumnByClass(TestNumberColumn.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class TestNumberColumn extends AbstractBigDecimalColumn {
     }
 

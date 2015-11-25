@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 public abstract class SmartfieldTestTemplate extends AbstractSmartField<Long> {
   static final String TEST_MENU_ID = "TEST_MENU_ID";
 
-  @Order(10.0)
+  @Order(10)
   @ClassId(TEST_MENU_ID)
   public class TestMenu extends AbstractMenu {
   }

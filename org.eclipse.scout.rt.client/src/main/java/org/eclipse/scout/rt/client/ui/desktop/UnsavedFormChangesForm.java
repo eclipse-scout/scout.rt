@@ -82,7 +82,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
     return CollectionUtility.arrayList(m_forms);
   }
 
-  @Order(10.0)
+  @Order(10)
   @ClassId("7c89cc91-2c09-472b-af3b-ee93b50caaad")
   public class MainBox extends AbstractGroupBox {
 
@@ -91,7 +91,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       return 2;
     }
 
-    @Order(10.0)
+    @Order(10)
     @ClassId("51908aa1-6409-44fd-9aeb-a92cec73baaa")
     public class UnsavedChangesBox extends AbstractGroupBox {
 
@@ -110,7 +110,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
         return 1;
       }
 
-      @Order(20.0)
+      @Order(20)
       @ClassId("84f2a9cf-bce5-4379-aede-11d07b21d3fb")
       public class OpenFormsField extends AbstractListBox<IForm> {
 
@@ -154,7 +154,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
         }
 
         public class Tree extends DefaultListBoxTable {
-          @Order(10.0)
+          @Order(10)
           public class CheckAllMenu extends AbstractMenu {
 
             @Override
@@ -173,7 +173,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
             }
           }
 
-          @Order(20.0)
+          @Order(20)
           public class UncheckAllMenu extends AbstractMenu {
 
             @Override
@@ -195,7 +195,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     @ClassId("caca3d68-b8cc-4cb0-a35c-5b8ccbcc3745")
     public class OkButton extends AbstractOkButton {
       @Override
@@ -204,7 +204,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     @ClassId("50c8526a-333f-4878-9876-b48f2b583d88")
     public class CancelButton extends AbstractCancelButton {
       @Override

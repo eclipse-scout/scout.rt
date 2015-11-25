@@ -195,7 +195,7 @@ public class MultiStatusTest {
     assertEquals(TestStatus.class.getSimpleName(), multiStatus.getMessage());
   }
 
-  @Order(10.0)
+  @Order(10)
   class TestStatus extends Status {
     private static final long serialVersionUID = 1L;
 
@@ -204,7 +204,7 @@ public class MultiStatusTest {
     }
   }
 
-  @Order(20.0)
+  @Order(20)
   class TestStatus2 extends Status {
     private static final long serialVersionUID = 1L;
 

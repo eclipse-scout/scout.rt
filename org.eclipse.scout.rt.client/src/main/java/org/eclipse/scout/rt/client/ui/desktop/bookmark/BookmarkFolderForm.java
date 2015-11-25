@@ -47,7 +47,7 @@ public class BookmarkFolderForm extends AbstractForm {
     return getFieldByClass(NameField.class);
   }
 
-  @Order(10f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -55,10 +55,10 @@ public class BookmarkFolderForm extends AbstractForm {
       return 1;
     }
 
-    @Order(10f)
+    @Order(10)
     public class GroupBox extends AbstractGroupBox {
 
-      @Order(10f)
+      @Order(10)
       public class NameField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
@@ -82,11 +82,11 @@ public class BookmarkFolderForm extends AbstractForm {
       }
     }
 
-    @Order(40f)
+    @Order(40)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(50f)
+    @Order(50)
     public class CancelButton extends AbstractCancelButton {
     }
   }

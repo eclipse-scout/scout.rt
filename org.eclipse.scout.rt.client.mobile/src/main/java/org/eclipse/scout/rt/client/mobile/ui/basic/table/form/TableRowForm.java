@@ -110,7 +110,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
     return new TableRowFormHeaderActionFetcher(this, getTable());
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
 public class TableWith3Cols extends AbstractTable {
 
-  @Order(10.0)
+  @Order(10)
   public class Col0Column extends AbstractStringColumn {
 
     @Override
@@ -25,7 +25,7 @@ public class TableWith3Cols extends AbstractTable {
     }
   }
 
-  @Order(20.0)
+  @Order(20)
   public class Col1Column extends AbstractStringColumn {
 
     @Override
@@ -34,7 +34,7 @@ public class TableWith3Cols extends AbstractTable {
     }
   }
 
-  @Order(30.0)
+  @Order(30)
   public class Col2Column extends AbstractStringColumn {
 
     @Override

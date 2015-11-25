@@ -78,7 +78,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
     return true;
   }
 
-  @Order(10.0)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -95,7 +95,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
       }
     }
 
-    @Order(10.0)
+    @Order(10)
     public class OutlinesTableField extends AbstractTableField<OutlinesTableField.Table> {
 
       @Override
@@ -108,7 +108,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
         return 2;
       }
 
-      @Order(10.0)
+      @Order(10)
       public class Table extends AbstractMobileTable {
 
         @Override
@@ -147,7 +147,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
           }
         }
 
-        @Order(10.0)
+        @Order(10)
         public class OutlineColumn extends AbstractColumn<IOutline> {
 
           @Override
@@ -156,7 +156,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
           }
         }
 
-        @Order(20.0)
+        @Order(20)
         public class LabelColumn extends AbstractStringColumn {
 
         }

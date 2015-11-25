@@ -27,11 +27,11 @@ public abstract class AbstractTemplateUsingOtherTemplateGroupBox extends Abstrac
     return getFieldByClass(UsingOtherTemplateBox.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class TextField extends AbstractStringField {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class UsingOtherTemplateBox extends AbstractTestGroupBox {
   }
 

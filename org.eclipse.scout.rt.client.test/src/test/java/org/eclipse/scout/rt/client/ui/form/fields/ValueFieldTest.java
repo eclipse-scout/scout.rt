@@ -255,10 +255,10 @@ public class ValueFieldTest {
       return getFieldByClass(BField.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       public class AField extends AbstractValueField<Integer> {
 
         @Override
@@ -272,7 +272,7 @@ public class ValueFieldTest {
         }
       }
 
-      @Order(20.0)
+      @Order(20)
       public class BField extends AbstractValueField<Integer> {
 
         @Override
@@ -318,7 +318,7 @@ public class ValueFieldTest {
     }
   }
 
-  @Order(10.0)
+  @Order(10)
   public class IncValidationField extends AbstractValueField<Integer> {
     @Override
     protected Integer execValidateValue(Integer rawValue) {

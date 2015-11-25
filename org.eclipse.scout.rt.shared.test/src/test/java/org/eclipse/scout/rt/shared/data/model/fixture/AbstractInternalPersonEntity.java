@@ -23,7 +23,7 @@ public abstract class AbstractInternalPersonEntity extends AbstractPersonEntity 
     return "Employee";
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class SalaryTypeAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +38,7 @@ public abstract class AbstractInternalPersonEntity extends AbstractPersonEntity 
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class PartTimeAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 

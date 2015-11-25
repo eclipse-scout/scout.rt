@@ -156,17 +156,17 @@ public class FormFieldTest {
     }
 
     public class MainBox extends AbstractGroupBox {
-      @Order(10.0)
+      @Order(10)
       public class TestFieldWithoutClassId extends AbstractFormField {
       }
 
-      @Order(20.0)
+      @Order(20)
       @ClassId(DUPLICATE_CLASS_ID + DUPLICATE_CLASS_ID)
       // must be a calculation, otherwise the SCOUT SDK reports a compile error
       public class TestFieldDuplicateClassId1 extends AbstractFormField {
       }
 
-      @Order(30.0)
+      @Order(30)
       @ClassId(DUPLICATE_CLASS_ID + DUPLICATE_CLASS_ID)
       public class TestFieldDuplicateClassId2 extends AbstractFormField {
       }
@@ -226,11 +226,11 @@ public class FormFieldTest {
 
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       public class GroupBox1 extends AbstractTemplateUsingOtherTemplateGroupBox {
       }
 
-      @Order(20.0)
+      @Order(20)
       public class GroupBox2 extends AbstractTemplateUsingOtherTemplateGroupBox {
       }
 
@@ -245,7 +245,7 @@ public class FormFieldTest {
 
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       @ClassId(TEST_GROUP_BOX_ID)
       public class SimpleGroupBox2 extends AbstractTestGroupBox {
       }

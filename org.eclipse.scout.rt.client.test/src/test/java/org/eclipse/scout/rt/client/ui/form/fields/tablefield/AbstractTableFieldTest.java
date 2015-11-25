@@ -119,7 +119,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       return getColumnSet().getColumnByClass(BigDecimalColumn.class);
     }
 
-    @Order(1.0)
+    @Order(1)
     public class IntegerColumn extends AbstractIntegerColumn {
 
       @Override
@@ -139,7 +139,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
 
     }
 
-    @Order(5.0)
+    @Order(5)
     public class LongColumn extends AbstractLongColumn {
 
       @Override
@@ -159,7 +159,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
 
     }
 
-    @Order(10.0)
+    @Order(10)
     public class String1Column extends AbstractStringColumn {
 
       @Override
@@ -178,7 +178,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     public class String2Column extends AbstractStringColumn {
 
       @Override
@@ -202,7 +202,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class String3Column extends AbstractStringColumn {
 
       @Override
@@ -226,7 +226,7 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class String4Column extends AbstractStringColumn {
 
       @Override

@@ -220,7 +220,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     return getColumnSet().getColumnByClass(RowMapColumn.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class RowMapColumn extends AbstractColumn<ITableRow> {
 
     @Override
@@ -230,7 +230,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   }
 
-  @Order(20.0)
+  @Order(20)
   public class ContentColumn extends AbstractRowSummaryColumn {
 
   }

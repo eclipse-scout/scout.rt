@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  *
  * @see AbstractValueField#parseValue(String)
  */
-@Order(10.0)
+@Order(10)
 public final class ParsingFailedStatus extends ScoutFieldStatus {
   private static final long serialVersionUID = 1L;
   private final String m_parseInputString;

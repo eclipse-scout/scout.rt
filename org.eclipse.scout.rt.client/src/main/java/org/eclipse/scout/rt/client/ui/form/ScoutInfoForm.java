@@ -125,13 +125,13 @@ public class ScoutInfoForm extends AbstractForm {
         HTML.cell(StringUtility.emptyIfNull(value)));
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
-    @Order(10.0f)
+    @Order(10)
     public class GroupBox extends AbstractGroupBox {
 
-      @Order(20.0f)
+      @Order(20)
       public class HtmlField extends AbstractHtmlField {
 
         @Override
@@ -161,7 +161,7 @@ public class ScoutInfoForm extends AbstractForm {
       }
     }
 
-    @Order(20.0f)
+    @Order(20)
     public class CloseButton extends AbstractCloseButton {
 
     }

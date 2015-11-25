@@ -136,7 +136,7 @@ public class ColumnMandatoryTest {
     /**
      * A mandatory column
      */
-    @Order(10.0)
+    @Order(10)
     public class MandatoryTestColumn extends AbstractStringColumn {
 
       @Override
@@ -153,7 +153,7 @@ public class ColumnMandatoryTest {
     /**
      * A non-mandatory column
      */
-    @Order(10.0)
+    @Order(10)
     public class NonMandatoryTestColumn extends AbstractStringColumn {
 
       @Override

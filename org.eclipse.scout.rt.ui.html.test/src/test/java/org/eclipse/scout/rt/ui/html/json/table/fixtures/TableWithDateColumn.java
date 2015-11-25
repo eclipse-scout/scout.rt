@@ -20,7 +20,7 @@ public class TableWithDateColumn extends AbstractTable {
     return getColumnSet().getColumnByClass(Column.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class Column extends AbstractDateColumn {
 
     @Override

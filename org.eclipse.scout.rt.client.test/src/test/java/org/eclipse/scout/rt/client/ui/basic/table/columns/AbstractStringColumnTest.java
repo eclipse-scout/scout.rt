@@ -68,7 +68,7 @@ public class AbstractStringColumnTest {
       return getColumnSet().getColumnByClass(TestStringColumn.class);
     }
 
-    @Order(70.0)
+    @Order(70)
     public class TestStringColumn extends AbstractStringColumn {
 
       @Override

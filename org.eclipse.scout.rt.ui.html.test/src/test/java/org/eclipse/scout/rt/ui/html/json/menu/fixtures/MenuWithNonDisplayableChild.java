@@ -15,11 +15,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 
 public class MenuWithNonDisplayableChild extends AbstractMenu {
 
-  @Order(10.0)
+  @Order(10)
   public class DisplayableMenu extends AbstractMenu {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override

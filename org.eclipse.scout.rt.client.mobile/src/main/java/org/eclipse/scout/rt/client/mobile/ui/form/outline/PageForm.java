@@ -430,7 +430,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     return false;
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -452,7 +452,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       super.injectFieldsInternal(fields);
     }
 
-    @Order(5.0f)
+    @Order(5)
     public class PageDetailFormField extends AbstractWrappedFormField<IForm> {
 
       @Override
@@ -472,10 +472,10 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     }
 
-    @Order(10.0f)
+    @Order(10)
     public class PageTableGroupBox extends AbstractGroupBox {
 
-      @Order(10.0f)
+      @Order(10)
       public class PageTableField extends AbstractMobileTableField<ITable> {
 
         @Override

@@ -28,7 +28,7 @@ public class TestFormWithTemplateSmartfield extends AbstractForm {
 
   public class MainBox extends AbstractGroupBox {
 
-    @Order(10.0)
+    @Order(10)
     @ClassId(TEST_SMARTFIELD_ID_1)
     public class SmartField1 extends SmartfieldTestTemplate {
       @Override
@@ -37,7 +37,7 @@ public class TestFormWithTemplateSmartfield extends AbstractForm {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     @ClassId(TEST_SMARTFIELD_ID_2)
     public class SmartField2 extends SmartfieldTestTemplate {
       @Override

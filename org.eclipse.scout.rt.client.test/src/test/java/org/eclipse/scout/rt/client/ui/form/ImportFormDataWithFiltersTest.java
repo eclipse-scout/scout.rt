@@ -124,13 +124,13 @@ public class ImportFormDataWithFiltersTest {
       return getFieldByClass(TestStringField.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       public class SubBox extends AbstractGroupBox {
 
-        @Order(20.0)
+        @Order(20)
         public class TestSubStringField extends AbstractStringField {
 
           @Override
@@ -141,7 +141,7 @@ public class ImportFormDataWithFiltersTest {
         }
       }
 
-      @Order(20.0)
+      @Order(20)
       public class TestStringField extends AbstractStringField {
       }
     }

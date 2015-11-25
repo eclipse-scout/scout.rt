@@ -154,7 +154,7 @@ public class AbstractDateColumnTest {
       return getColumnSet().getColumnByClass(TestDateColumn.class);
     }
 
-    @Order(70.0)
+    @Order(70)
     public class TestDateColumn extends AbstractDateColumn {
 
       @Override

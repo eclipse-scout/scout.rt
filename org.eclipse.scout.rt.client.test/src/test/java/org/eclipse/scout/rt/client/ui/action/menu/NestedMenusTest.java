@@ -46,7 +46,7 @@ public class NestedMenusTest {
     protected void execOpened() {
     }
 
-    @Order(10.0)
+    @Order(10)
     public class FileMenu extends AbstractMenu {
 
       @Override
@@ -54,7 +54,7 @@ public class NestedMenusTest {
         return TEXTS.get("FileMenu");
       }
 
-      @Order(100.0)
+      @Order(100)
       public class ExitMenu extends AbstractMenu {
 
         @Override
@@ -68,7 +68,7 @@ public class NestedMenusTest {
         }
       }
 
-      @Order(110.0)
+      @Order(110)
       public class DebugMenu extends AbstractMenu {
 
         @Override
@@ -82,7 +82,7 @@ public class NestedMenusTest {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     public class ToolsMenu extends AbstractMenu {
 
       @Override
@@ -91,7 +91,7 @@ public class NestedMenusTest {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class HelpMenu extends AbstractMenu {
 
       @Override
@@ -99,7 +99,7 @@ public class NestedMenusTest {
         return TEXTS.get("HelpMenu");
       }
 
-      @Order(10.0)
+      @Order(10)
       public class AboutMenu extends AbstractMenu {
 
         @Override

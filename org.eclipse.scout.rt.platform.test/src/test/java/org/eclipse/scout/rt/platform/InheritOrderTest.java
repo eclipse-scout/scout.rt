@@ -107,7 +107,7 @@ public class InheritOrderTest {
   }
 
   @Bean
-  @Order(11.0)
+  @Order(11)
   private static class OrigBean {
   }
 
@@ -116,11 +116,11 @@ public class InheritOrderTest {
   }
 
   @Replace
-  @Order(15.0)
+  @Order(15)
   private static class ReplacingBeanWithOwnOrder extends OrigBean {
   }
 
-  @Order(20.0)
+  @Order(20)
   private static class NotReplacingBean extends OrigBean {
   }
 
@@ -128,7 +128,7 @@ public class InheritOrderTest {
   private static class SecondLevelBean extends OrigBean {
   }
 
-  @Order(25.0)
+  @Order(25)
   private static class NotReplacingSecondLevelBean extends OrigBean {
   }
 

@@ -43,19 +43,19 @@ public abstract class AbstractTestGroupBox extends AbstractGroupBox {
   }
 
   @ClassId("1b67f4c4-1579-4875-a2c9-d62c7cd63508")
-  @Order(10.0)
+  @Order(10)
   public class Text1Field extends AbstractStringField {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class Text2Field extends AbstractStringField {
   }
 
-  @Order(30.0)
+  @Order(30)
   public class TestListBox extends AbstractListBox<String> {
   }
 
-  @Order(40.0)
+  @Order(40)
   public class InnerTestGroupBox extends AbstractInnerTestGroupBox {
 
   }
@@ -66,7 +66,7 @@ public abstract class AbstractTestGroupBox extends AbstractGroupBox {
       return getFieldByClass(InnerText1Field.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class InnerText1Field extends AbstractStringField {
 
     }

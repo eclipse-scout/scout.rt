@@ -116,7 +116,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
    * <p>
    * The default implementation resolves the step and then calls {@link IWizardStep#doAction()} on it.
    */
-  @Order(10.0)
+  @Order(10)
   @ConfigOperation
   protected void execStepAction(int stepIndex) {
     IWizardStep<? extends IForm> step = CollectionUtility.getElement(getSteps(), stepIndex);

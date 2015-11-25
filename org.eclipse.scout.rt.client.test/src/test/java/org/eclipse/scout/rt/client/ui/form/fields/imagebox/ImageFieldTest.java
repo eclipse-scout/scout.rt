@@ -55,10 +55,10 @@ public class ImageFieldTest {
 
     @Order(10)
     public class MainBox extends AbstractGroupBox {
-      @Order(10.0)
+      @Order(10)
       public class ImageField extends AbstractImageField {
 
-        @Order(10.0)
+        @Order(10)
         public class ImageFieldMenu extends AbstractMenu {
 
           @Override

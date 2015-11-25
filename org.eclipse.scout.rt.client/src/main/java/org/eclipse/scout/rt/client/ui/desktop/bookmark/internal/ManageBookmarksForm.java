@@ -85,7 +85,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     return getFieldByClass(GlobalBookmarkTreeField.class);
   }
 
-  @Order(10f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Order(11)
@@ -124,7 +124,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       }
     }
 
-    @Order(20f)
+    @Order(20)
     public class UserBox extends AbstractGroupBox {
       @Override
       protected String getConfiguredLabel() {
@@ -160,11 +160,11 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       }
     }// end group box
 
-    @Order(40f)
+    @Order(40)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(50f)
+    @Order(50)
     public class CancelButton extends AbstractCancelButton {
     }
 

@@ -153,7 +153,7 @@ public class TableRowFormTest {
       };
     }
 
-    @Order(10.0)
+    @Order(10)
     public class String1EditableColumn extends AbstractStringColumn {
       public String m_headerText;
 
@@ -180,7 +180,7 @@ public class TableRowFormTest {
       }
     }
 
-    @Order(20.0)
+    @Order(20)
     public class String2EditableColumn extends AbstractStringColumn {
 
       @Override
@@ -204,7 +204,7 @@ public class TableRowFormTest {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class String3NotEditableColumn extends AbstractStringColumn {
 
       @Override
@@ -223,7 +223,7 @@ public class TableRowFormTest {
       }
     }
 
-    @Order(40.0)
+    @Order(40)
     public class String4NotEditableWrapColumn extends AbstractStringColumn {
 
       @Override

@@ -83,7 +83,7 @@ class P_TestCompositeField extends AbstractCompositeField {
     return getFieldByClass(TextField.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class TextField extends AbstractStringField {
   }
 }

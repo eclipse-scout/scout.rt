@@ -37,7 +37,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     CustomDataModelExtension.injectEntities(this, entities);
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class LastNameAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 
@@ -52,7 +52,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class FirstNameAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 
@@ -67,7 +67,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class BirthdateAttribute extends AbstractDataModelAttribute {
     private static final long serialVersionUID = 1L;
 
@@ -82,7 +82,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class PrimaryAddressEntity extends AbstractAddressEntity {
     private static final long serialVersionUID = 1L;
 
@@ -97,7 +97,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class LegalAddressEntity extends AbstractAddressEntity {
     private static final long serialVersionUID = 1L;
 
@@ -107,7 +107,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class AccountManagerEntity extends AbstractPersonEntity {
 
     private static final long serialVersionUID = 1L;
@@ -123,7 +123,7 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
     }
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class CompanyEntity extends AbstractCompanyEntity {
     private static final long serialVersionUID = 1L;
 

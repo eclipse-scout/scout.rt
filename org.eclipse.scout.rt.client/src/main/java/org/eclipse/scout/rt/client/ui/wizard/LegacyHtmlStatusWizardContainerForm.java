@@ -126,7 +126,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     startInternal(new WizardHandler());
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -149,7 +149,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       return 2;
     }
 
-    @Order(20.0)
+    @Order(20)
     public class SplitBox extends AbstractSplitBox {
 
       @Override
@@ -162,7 +162,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
         return false;
       }
 
-      @Order(10.0)
+      @Order(10)
       public class ContentBox extends AbstractGroupBox {
 
         @Override
@@ -170,7 +170,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
           return false;
         }
 
-        @Order(10.0)
+        @Order(10)
         public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
 
           @Override
@@ -180,7 +180,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
         }
       }
 
-      @Order(20.0)
+      @Order(20)
       public class StatusBox extends AbstractGroupBox {
 
         @Override
@@ -199,7 +199,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
           // TODO BSH Inject info boxes and groups here
         }
 
-        @Order(20.0)
+        @Order(20)
         public class StatusField extends AbstractWizardStatusField {
 
           @Override
@@ -225,7 +225,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -244,7 +244,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
     }
 
-    @Order(40.0)
+    @Order(40)
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -263,7 +263,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
     }
 
-    @Order(50.0)
+    @Order(50)
     public class WizardFinishButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -282,7 +282,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
     }
 
-    @Order(60.0)
+    @Order(60)
     public class WizardCancelButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -306,7 +306,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
     }
 
-    @Order(70.0)
+    @Order(70)
     public class WizardSuspendButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -330,7 +330,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
     }
 
-    @Order(80.0)
+    @Order(80)
     public class WizardResetButton extends AbstractButton implements IWizardAction {
 
       @Override

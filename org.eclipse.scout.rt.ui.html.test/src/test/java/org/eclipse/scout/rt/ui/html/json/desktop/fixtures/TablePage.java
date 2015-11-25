@@ -37,7 +37,7 @@ public class TablePage extends AbstractPageWithTable<Table> {
     getTable().fill(m_numRows);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class Table extends org.eclipse.scout.rt.ui.html.json.table.fixtures.Table {
 
   }

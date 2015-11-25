@@ -151,16 +151,16 @@ public class TableWithIgnoredColumnsTest {
       return getColumnSet().getColumnByClass(CreateColumn.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class DefaultColumn extends AbstractStringColumn {
     }
 
-    @Order(20.0)
+    @Order(20)
     @ColumnData(SdkColumnCommand.CREATE)
     public class CreateColumn extends AbstractStringColumn {
     }
 
-    @Order(30.0)
+    @Order(30)
     @ColumnData(SdkColumnCommand.IGNORE)
     public class IgnoreColumn extends AbstractStringColumn {
     }

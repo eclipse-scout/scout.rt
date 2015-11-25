@@ -32,23 +32,23 @@ public abstract class AbstractTemplateGroupBox extends AbstractGroupBox {
     return getFieldByClass(Text2Field.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class Text1Field extends AbstractStringField {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class Text2Field extends AbstractStringField {
   }
 
-  @Order(30.0)
+  @Order(30)
   public class TabGroupBox extends AbstractTabBox {
 
-    @Order(10.0)
+    @Order(10)
     public class TabTemplateField extends AbstractTemplate3GroupBox {
     }
   }
 
-  @Order(40.0)
+  @Order(40)
   public class TemplateField extends AbstractTemplate2GroupBox {
   }
 

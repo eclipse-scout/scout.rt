@@ -104,10 +104,10 @@ public class FormWithTableFieldTest {
       startInternal(new NewHandler());
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       public class LoremField extends AbstractTableField<Table> {
 
         @Override
@@ -124,21 +124,21 @@ public class FormWithTableFieldTest {
             return getColumnSet().getColumnByClass(NameColumn.class);
           }
 
-          @Order(20.0)
+          @Order(20)
           public class NameColumn extends AbstractStringColumn {
           }
         }
       }
 
-      @Order(20.0)
+      @Order(20)
       public class OkButton extends AbstractOkButton {
       }
 
-      @Order(30.0)
+      @Order(30)
       public class CancelButton extends AbstractCancelButton {
       }
 
-      @Order(40.0)
+      @Order(40)
       public class LoremButton extends AbstractButton {
         @Override
         protected String getConfiguredLabel() {

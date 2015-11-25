@@ -51,7 +51,7 @@ public class AbstractBooleanColumnTest {
       return getColumnSet().getColumnByClass(TestBooleanColumn.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class TestBooleanColumn extends AbstractBooleanColumn {
     }
 

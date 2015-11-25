@@ -110,7 +110,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     startInternal(new WizardHandler());
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -133,11 +133,11 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       return 2;
     }
 
-    @Order(10.0)
+    @Order(10)
     public class WizardProgressField extends AbstractWizardProgressField {
     }
 
-    @Order(20.0)
+    @Order(20)
     public class ContentBox extends AbstractGroupBox {
 
       @Override
@@ -145,7 +145,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
         return false;
       }
 
-      @Order(10.0)
+      @Order(10)
       public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
 
         @Override
@@ -155,7 +155,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -169,7 +169,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
     }
 
-    @Order(40.0)
+    @Order(40)
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -188,7 +188,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
     }
 
-    @Order(50.0)
+    @Order(50)
     public class WizardFinishButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -207,7 +207,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
     }
 
-    @Order(60.0)
+    @Order(60)
     public class WizardCancelButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -226,7 +226,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
     }
 
-    @Order(70.0)
+    @Order(70)
     public class WizardSuspendButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -245,7 +245,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
     }
 
-    @Order(80.0)
+    @Order(80)
     public class WizardResetButton extends AbstractButton implements IWizardAction {
 
       @Override

@@ -116,7 +116,7 @@ public class ColumnEditableTest {
     /**
      * Editable test column
      */
-    @Order(10.0)
+    @Order(10)
     public class EditableTestColumn extends AbstractStringColumn {
 
       @Override
@@ -140,7 +140,7 @@ public class ColumnEditableTest {
     /**
      * A test column that where only the first row is editable.
      */
-    @Order(10.0)
+    @Order(10)
     public class DynamicEditableTestColumn extends AbstractStringColumn {
 
       @Override

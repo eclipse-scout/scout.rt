@@ -76,7 +76,7 @@ public class TableImportTest {
       return getColumnSet().getColumnByClass(DefaultColumn.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class DefaultColumn extends AbstractStringColumn {
 
       @Override

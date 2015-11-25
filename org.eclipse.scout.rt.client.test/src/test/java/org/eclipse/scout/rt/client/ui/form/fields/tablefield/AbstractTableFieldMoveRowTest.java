@@ -154,7 +154,7 @@ public class AbstractTableFieldMoveRowTest extends AbstractTableField<AbstractTa
       return getColumnSet().getColumnByClass(TestColumn.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class TestColumn extends AbstractStringColumn {
 
     }

@@ -22,7 +22,7 @@ public class CustomDataModel extends AbstractDataModel {
   public CustomDataModel() {
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class CompanyEntity extends AbstractCompanyEntity {
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +32,7 @@ public class CustomDataModel extends AbstractDataModel {
     }
   }
 
-  @Order(20.0f)
+  @Order(20)
   public class PersonEntity extends AbstractPersonEntity {
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class CustomDataModel extends AbstractDataModel {
     }
   }
 
-  @Order(130.0f)
+  @Order(130)
   public class InternalPersonEntity extends AbstractInternalPersonEntity {
     private static final long serialVersionUID = 1L;
 

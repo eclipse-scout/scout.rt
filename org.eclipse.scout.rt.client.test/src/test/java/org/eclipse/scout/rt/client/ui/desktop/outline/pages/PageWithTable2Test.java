@@ -104,11 +104,11 @@ public class PageWithTable2Test {
         return getColumnSet().getColumnByClass(IColumn.class);
       }
 
-      @Order(10.0)
+      @Order(10)
       public class IColumn extends AbstractIntegerColumn {
       }
 
-      @Order(20.0)
+      @Order(20)
       public class SColumn extends AbstractStringColumn {
       }
     }

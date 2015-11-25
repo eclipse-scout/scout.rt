@@ -70,21 +70,21 @@ class P_TestGroupBox extends AbstractGroupBox {
     return getFieldByClass(TestStringField.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class TestButton extends AbstractButton {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class InnerGroupBox extends AbstractGroupBox {
 
-    @Order(10.0)
+    @Order(10)
     public class TestStringField extends AbstractStringField {
     }
 
-    @Order(20.0)
+    @Order(20)
     public class InnerInnerGroupBox extends AbstractGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       public class TestIntegerField extends AbstractIntegerField {
       }
     }

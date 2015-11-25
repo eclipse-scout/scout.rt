@@ -85,10 +85,10 @@ public class TestForm extends AbstractForm {
     return getFieldByClass(G3Box.G4Box.Text2Field.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
-    @Order(10.0)
+    @Order(10)
     public class Text4Field extends AbstractStringField {
       @Override
       public String getFieldId() {
@@ -96,40 +96,40 @@ public class TestForm extends AbstractForm {
       }
     }
 
-    @Order(10.0)
+    @Order(10)
     public class Text1Field extends AbstractStringField {
     }
 
-    @Order(10.0)
+    @Order(10)
     public class G1Box extends AbstractTestGroupBox {
     }
 
-    @Order(20.0)
+    @Order(20)
     public class G2Box extends AbstractTestGroupBox {
 
-      @Order(10.0)
+      @Order(10)
       public class Text3Field extends AbstractStringField {
       }
     }
 
-    @Order(25.0)
+    @Order(25)
     public class G3Box extends AbstractGroupBox {
 
-      @Order(20.0)
+      @Order(20)
       public class G4Box extends AbstractGroupBox {
 
-        @Order(20.0)
+        @Order(20)
         public class Text2Field extends AbstractStringField {
         }
 
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(40.0)
+    @Order(40)
     public class CancelButton extends AbstractCancelButton {
     }
   }

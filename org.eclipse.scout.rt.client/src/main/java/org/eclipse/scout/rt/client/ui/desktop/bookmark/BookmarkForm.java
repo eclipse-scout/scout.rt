@@ -111,7 +111,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
     return getFieldByClass(SortOrderField.class);
   }
 
-  @Order(10f)
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
     @Override
     protected int getConfiguredGridColumnCount() {
@@ -232,11 +232,11 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       }
     }
 
-    @Order(40f)
+    @Order(40)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(50f)
+    @Order(50)
     public class CancelButton extends AbstractCancelButton {
     }
   }

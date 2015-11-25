@@ -625,19 +625,19 @@ public class ReplaceTableTest {
         return getColumnSet().getColumnByClass(ForthColumn.class);
       }
 
-      @Order(10.0)
+      @Order(10)
       public class FirstColumn extends AbstractLongColumn {
       }
 
-      @Order(20.0)
+      @Order(20)
       public class SecondColumn extends AbstractStringColumn {
       }
 
-      @Order(30.0)
+      @Order(30)
       public class ThirdColumn extends AbstractStringColumn {
       }
 
-      @Order(40.0)
+      @Order(40)
       public class ForthColumn extends AbstractStringColumn {
       }
     }
@@ -664,7 +664,7 @@ public class ReplaceTableTest {
       }
 
       @Replace
-      @Order(1.0)
+      @Order(1)
       // display at the first position
       public class SecondColumnEx extends SecondColumn {
       }
@@ -673,7 +673,7 @@ public class ReplaceTableTest {
       public class ThirdColumnEx extends ThirdColumn {
       }
 
-      @Order(60.0)
+      @Order(60)
       public class FifthColumn extends AbstractStringColumn {
       }
     }
@@ -698,7 +698,7 @@ public class ReplaceTableTest {
         return getColumnSet().getColumnByClass(ForthColumn.class);
       }
 
-      @Order(10.0)
+      @Order(10)
       public class FirstColumn extends AbstractLongColumn {
 
         @Override
@@ -707,15 +707,15 @@ public class ReplaceTableTest {
         }
       }
 
-      @Order(20.0)
+      @Order(20)
       public class SecondColumn extends AbstractStringColumn {
       }
 
-      @Order(30.0)
+      @Order(30)
       public class ThirdColumn extends AbstractStringColumn {
       }
 
-      @Order(40.0)
+      @Order(40)
       public class ForthColumn extends AbstractStringColumn {
       }
     }
@@ -732,7 +732,7 @@ public class ReplaceTableTest {
         return getColumnSet().getColumnByClass(FifthColumn.class);
       }
 
-      @Order(50.0)
+      @Order(50)
       public class FifthColumn extends AbstractStringColumn {
       }
     }
@@ -759,7 +759,7 @@ public class ReplaceTableTest {
       }
 
       @Replace
-      @Order(1.0)
+      @Order(1)
       public class SecondColumnEx extends SecondColumn {
       }
 
@@ -767,7 +767,7 @@ public class ReplaceTableTest {
       public class ThirdColumnEx extends ThirdColumn {
       }
 
-      @Order(60.0)
+      @Order(60)
       public class SixthColumn extends AbstractStringColumn {
       }
     }

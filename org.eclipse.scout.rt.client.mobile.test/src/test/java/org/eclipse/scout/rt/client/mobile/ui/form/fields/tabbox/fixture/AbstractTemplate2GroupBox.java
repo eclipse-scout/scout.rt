@@ -27,7 +27,7 @@ public abstract class AbstractTemplate2GroupBox extends AbstractGroupBox {
     return getFieldByClass(T2Text1Field.class);
   }
 
-  @Order(10.0)
+  @Order(10)
   public class T2Text1Field extends AbstractStringField {
   }
 

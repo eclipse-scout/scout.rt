@@ -146,7 +146,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     return false;
   }
 
-  @Order(10.0)
+  @Order(10)
   @ColumnData(SdkColumnCommand.IGNORE)
   public class KeyColumn extends AbstractColumn<ILookupRow<LOOKUP_KEY>> {
     @Override
@@ -170,7 +170,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     }
   }
 
-  @Order(20.0)
+  @Order(20)
   @ColumnData(SdkColumnCommand.IGNORE)
   public class TextColumn extends AbstractStringColumn {
 

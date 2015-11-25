@@ -672,7 +672,7 @@ public class TableFieldTest {
         return getColumnSet().getColumnByClass(StringColumn.class);
       }
 
-      @Order(10.0)
+      @Order(10)
       public class KeyColumn extends AbstractIntegerColumn {
 
         @Override
@@ -686,11 +686,11 @@ public class TableFieldTest {
         }
       }
 
-      @Order(20.0)
+      @Order(20)
       public class StringColumn extends AbstractStringColumn {
       }
 
-      @Order(30.0)
+      @Order(30)
       public class HiddenColumn extends AbstractBooleanColumn {
       }
     }

@@ -91,7 +91,7 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
       return 2;
     }
 
-    @Order(20.0)
+    @Order(20)
     public class Group01 extends AbstractGroupBox {
 
       @Override
@@ -100,7 +100,7 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
       }
     }
 
-    @Order(30.0)
+    @Order(30)
     public class Group02 extends AbstractGroupBox {
 
       @Override
@@ -120,7 +120,7 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
 
     }
 
-    @Order(40.0)
+    @Order(40)
     public class Group03 extends AbstractGroupBox {
 
       @Override
@@ -139,7 +139,7 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
       }
     }
 
-    @Order(50.0)
+    @Order(50)
     public class Group04 extends AbstractGroupBox {
 
       @Override
@@ -154,11 +154,11 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
 
     }
 
-    @Order(60.0)
+    @Order(60)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(70.0)
+    @Order(70)
     public class CancelButton extends AbstractCancelButton {
     }
   }

@@ -50,7 +50,7 @@ public class TableValidationTest {
       return getColumnSet().getColumnByClass(C1.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class C1 extends AbstractStringColumn {
 
       @Override

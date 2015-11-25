@@ -39,7 +39,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
     return ID;
   }
 
-  @Order(10.0)
+  @Order(10)
   public static class CustomerCode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;
@@ -56,7 +56,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
     }
   }
 
-  @Order(20.0)
+  @Order(20)
   public static class SupplierCode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;
@@ -73,7 +73,7 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
     }
   }
 
-  @Order(30.0)
+  @Order(30)
   public static class OtherCode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;

@@ -94,23 +94,23 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     @Order(10)
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0f)
+      @Order(10)
       public class MasterSlave1Box extends AbstractMasterSlaveBox {
       }
 
-      @Order(20.0f)
+      @Order(20)
       public class MasterSlave2Box extends AbstractMasterSlaveBox {
       }
 
-      @Order(30.0f)
+      @Order(30)
       public class MasterSlave3Box extends AbstractMasterSlaveBox {
       }
 
-      @Order(40.0f)
+      @Order(40)
       public class GroupBox1 extends AbstractInnerGroupBox {
       }
 
-      @Order(50.0f)
+      @Order(50)
       public class GroupBox2 extends AbstractInnerGroupBox {
       }
     }
@@ -131,11 +131,11 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
       return getFieldByClass(InnerMasterSlave2Box.class);
     }
 
-    @Order(10.0f)
+    @Order(10)
     public class InnerMasterSlave1Box extends AbstractMasterSlaveBox {
     }
 
-    @Order(20.0f)
+    @Order(20)
     public class InnerMasterSlave2Box extends AbstractMasterSlaveBox {
     }
   }
@@ -152,7 +152,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
       getFieldByClass(MasterField.class).setValue(System.currentTimeMillis());
     }
 
-    @Order(10.0f)
+    @Order(10)
     public class MasterField extends AbstractSmartField<Long> {
       @Override
       protected String getConfiguredLabel() {
@@ -160,7 +160,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
       }
     }
 
-    @Order(20.0f)
+    @Order(20)
     public class SlaveField extends AbstractStringField {
       @Override
       protected String getConfiguredLabel() {
@@ -199,7 +199,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     @Order(10)
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0f)
+      @Order(10)
       public class StringField extends AbstractStringField {
         @Override
         protected Class<? extends IValueField> getConfiguredMasterField() {

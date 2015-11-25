@@ -40,7 +40,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
     return ID;
   }
 
-  @Order(10.0)
+  @Order(10)
   public static class ACode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
     }
   }
 
-  @Order(20.0)
+  @Order(20)
   public static class BCode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;
@@ -74,7 +74,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
     }
   }
 
-  @Order(30.0)
+  @Order(30)
   public static class CCode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;
@@ -91,7 +91,7 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
     }
   }
 
-  @Order(40.0)
+  @Order(40)
   public static class DCode extends AbstractCode<Long> {
 
     private static final long serialVersionUID = 1L;

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
 public class TableWithNonDisplayableMenu extends AbstractTable {
 
-  @Order(10.0)
+  @Order(10)
   public class Col1Column extends AbstractStringColumn {
 
     @Override
@@ -33,11 +33,11 @@ public class TableWithNonDisplayableMenu extends AbstractTable {
     // don't add additional menus
   }
 
-  @Order(10.0)
+  @Order(10)
   public class DisplayableMenu extends AbstractMenu {
   }
 
-  @Order(20.0)
+  @Order(20)
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override

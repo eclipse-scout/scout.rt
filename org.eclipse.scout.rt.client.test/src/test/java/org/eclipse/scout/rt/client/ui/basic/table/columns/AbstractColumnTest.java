@@ -309,7 +309,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       return getColumnSet().getColumnByClass(ValidateTestColumn.class);
     }
 
-    @Order(70.0)
+    @Order(70)
     public class ValidateTestColumn extends AbstractStringColumn {
       private int m_decorateCount = 0;
 
@@ -350,11 +350,11 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       return getColumnSet().getColumnByClass(C2Column.class);
     }
 
-    @Order(70.0)
+    @Order(70)
     public class C1Column extends AbstractStringColumn {
     }
 
-    @Order(70.0)
+    @Order(70)
     public class C2Column extends AbstractStringColumn {
 
       @Override
@@ -372,7 +372,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       return getColumnSet().getColumnByClass(IntTestColumn.class);
     }
 
-    @Order(70.0)
+    @Order(70)
     public class IntTestColumn extends AbstractIntegerColumn {
 
       @Override

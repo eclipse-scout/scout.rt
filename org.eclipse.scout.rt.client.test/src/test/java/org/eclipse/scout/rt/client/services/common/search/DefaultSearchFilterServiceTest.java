@@ -267,7 +267,7 @@ public class DefaultSearchFilterServiceTest {
       return getFieldByClass(RadioButton1Button.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class RadioButton1Button extends AbstractRadioButton {
 
       @Override
@@ -291,7 +291,7 @@ public class DefaultSearchFilterServiceTest {
       return getFieldByClass(MyStringField.class);
     }
 
-    @Order(10.0)
+    @Order(10)
     public class MyStringField extends AbstractStringField {
     }
   }
@@ -304,7 +304,7 @@ public class DefaultSearchFilterServiceTest {
   }
 
   public class MyComposerField extends AbstractComposerField {
-    @Order(80.0f)
+    @Order(80)
     public class CarEntity extends AbstractDataModelEntity {
       private static final long serialVersionUID = 1L;
 
@@ -313,7 +313,7 @@ public class DefaultSearchFilterServiceTest {
         return "Auto";
       }
 
-      @Order(10.0f)
+      @Order(10)
       public class ColorAttribute extends AbstractDataModelAttribute {
         private static final long serialVersionUID = 1L;
 

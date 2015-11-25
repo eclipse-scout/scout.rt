@@ -88,7 +88,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
     return true;
   }
 
-  @Order(10.0f)
+  @Order(10)
   public class Table extends AbstractMobileTable {
 
     @Override
