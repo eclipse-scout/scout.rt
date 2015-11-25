@@ -84,9 +84,9 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
         try {
           return continueCall(context);
         }
-        catch (Throwable t) {
-          ITransaction.CURRENT.get().addFailure(t);
-          throw t;
+        catch (Exception e) {
+          ITransaction.CURRENT.get().addFailure(e);
+          throw e;
         }
       }
     });
