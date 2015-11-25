@@ -254,7 +254,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             getColumnsTableField().reloadTableData();
           }
 
-          @Order(10.0)
           public class Table extends AbstractTable {
 
             @Override
@@ -647,7 +646,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             enableDisableMenus();
           }
 
-          @Order(10.0)
           public class Table extends AbstractTable {
 
             @Override

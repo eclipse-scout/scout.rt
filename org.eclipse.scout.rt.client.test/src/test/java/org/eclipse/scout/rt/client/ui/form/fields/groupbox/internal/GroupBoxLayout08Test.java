@@ -138,7 +138,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
-      @Order(10)
       public class TableField01 extends AbstractTableField<TableField01.Table> {
         public class Table extends AbstractTable {
 
@@ -158,7 +157,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
-      @Order(10)
       public class TableField extends AbstractTableField<TableField.Table> {
         public class Table extends AbstractTable {
 
@@ -178,7 +176,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
-      @Order(10)
       public class TableField extends AbstractTableField<TableField.Table> {
         public class Table extends AbstractTable {
 
@@ -198,7 +195,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
-      @Order(10)
       public class TableField extends AbstractTableField<TableField.Table> {
         public class Table extends AbstractTable {
 
@@ -218,7 +214,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
-      @Order(10)
       public class TableField extends AbstractTableField<TableField.Table> {
         public class Table extends AbstractTable {
 
@@ -238,7 +233,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 1;
       }
 
-      @Order(10)
       public class TableField extends AbstractTableField<TableField.Table> {
         public class Table extends AbstractTable {
 
@@ -258,7 +252,6 @@ public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
-      @Order(10)
       public class TableField extends AbstractTableField<TableField.Table> {
         public class Table extends AbstractTable {
 

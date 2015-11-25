@@ -100,7 +100,6 @@ public class InternalTableRowTest {
   /**
    * A table with a test column where only the first row is editable.
    */
-  @Order(10.0)
   public class TestTable extends AbstractTable {
     @Order(10.0)
     public class TestColumn extends AbstractStringColumn {

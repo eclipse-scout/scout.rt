@@ -119,7 +119,6 @@ public class ColumnMandatoryTest {
   /**
    * A test table with two editable columns: Mandatory and Non-mandatory column
    */
-  @Order(10.0)
   public class MandatoryTestTable extends AbstractTable {
 
     public MandatoryTestTable() {

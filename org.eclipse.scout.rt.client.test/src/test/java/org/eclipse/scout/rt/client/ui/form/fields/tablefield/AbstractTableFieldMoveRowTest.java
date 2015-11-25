@@ -148,7 +148,6 @@ public class AbstractTableFieldMoveRowTest extends AbstractTableField<AbstractTa
   /*
    * table
    */
-  @Order(10.0)
   public class Table extends AbstractTable {
 
     public TestColumn getTestColumn() {

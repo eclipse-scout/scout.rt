@@ -416,7 +416,6 @@ public class ReplaceTableTest {
 
   public abstract static class AbstractTemplateTableField<TABLE extends AbstractTemplateTableField<TABLE>.Table> extends AbstractTableField<TABLE> {
 
-    @Order(10.0f)
     public class Table extends AbstractTable {
 
       @SuppressWarnings("unchecked")

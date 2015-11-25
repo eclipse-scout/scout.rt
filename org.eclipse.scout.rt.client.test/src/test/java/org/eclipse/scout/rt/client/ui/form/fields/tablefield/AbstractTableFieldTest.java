@@ -84,7 +84,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
   /**
    * table
    */
-  @Order(10.0)
   public class Table extends AbstractTable {
 
     @Override

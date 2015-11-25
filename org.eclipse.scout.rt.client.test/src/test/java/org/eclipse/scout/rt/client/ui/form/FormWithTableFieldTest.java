@@ -115,7 +115,6 @@ public class FormWithTableFieldTest {
           return 5;
         }
 
-        @Order(10.0)
         public class Table extends AbstractTable {
 
           /**

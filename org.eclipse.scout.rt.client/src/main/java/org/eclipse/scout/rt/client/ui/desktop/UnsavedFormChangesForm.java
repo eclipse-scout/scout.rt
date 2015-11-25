@@ -153,7 +153,6 @@ public class UnsavedFormChangesForm extends AbstractForm {
           return false;
         }
 
-        @Order(10.0)
         public class Tree extends DefaultListBoxTable {
           @Order(10.0)
           public class CheckAllMenu extends AbstractMenu {

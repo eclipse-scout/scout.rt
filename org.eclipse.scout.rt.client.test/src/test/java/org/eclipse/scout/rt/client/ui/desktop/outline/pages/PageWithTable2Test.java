@@ -94,7 +94,6 @@ public class PageWithTable2Test {
       importPageData(m_pageData);
     }
 
-    @Order(10.0)
     public class Table extends AbstractTable {
 
       public SColumn getSColumn() {

@@ -104,7 +104,6 @@ public class ColumnEditableTest {
   /**
    * A table with an editable test column
    */
-  @Order(10.0)
   public class EditableTestTable extends AbstractTable {
 
     /**
@@ -132,7 +131,6 @@ public class ColumnEditableTest {
   /**
    * A table with a test column where only the first row is editable.
    */
-  @Order(10.0)
   public class DynamicEditableTestTable extends AbstractTable {
 
     public DynamicEditableTestColumn getDynamicEditableTestColumn() {

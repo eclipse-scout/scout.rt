@@ -40,7 +40,6 @@ public class TableValidationTest {
   /**
    * A test table with two editable columns: Mandatory and Non-mandatory column
    */
-  @Order(10.0)
   public class TestTable extends AbstractTable {
 
     public TestTable() {

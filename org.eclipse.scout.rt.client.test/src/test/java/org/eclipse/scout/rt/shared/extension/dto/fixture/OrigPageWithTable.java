@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table
 
 @PageData(OrigPageWithTableData.class)
 public class OrigPageWithTable extends AbstractPageWithTable<Table> {
-  @Order(1000.0)
   public class Table extends AbstractTable {
 
     public SecondSmartColumn getSecondSmartColumn() {
