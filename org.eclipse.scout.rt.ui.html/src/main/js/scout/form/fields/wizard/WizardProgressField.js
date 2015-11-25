@@ -11,6 +11,8 @@
 scout.WizardProgressField = function() {
   scout.WizardProgressField.parent.call(this);
 
+  this.steps = [];
+
   // Used to determine direction of transition ("going backward" or "going forward")
   this.previousActiveStepIndex;
 
