@@ -183,6 +183,91 @@
 
   // === $.prototype extensions ===
 
+  /**
+   * @param element string. Example = &lt;input&gt;
+   * @param cssClass (optional) class attribute
+   * @param text (optional) adds a child text-node with given text (no HTML content)
+   */
+  $.fn.makeElement = function(element, cssClass, text) {
+    var myDocument = this.document(true);
+    if (myDocument === undefined || element === undefined) {
+      return new Error('missing arguments: document, element');
+    }
+    var $element = $(element, myDocument);
+    if (cssClass) {
+      $element.addClass(cssClass);
+    }
+    if (text) {
+      $element.text(text);
+    }
+    return $element;
+  };
+
+  $.fn.makeDiv = function(cssClass, htmlContent, id) {
+    var unselectable = scout.device.unselectableAttribute,
+      $div = this.makeElement('<div>', cssClass);
+
+    if (id !== undefined) {
+      $div.attr('id', id);
+    }
+    if (htmlContent) {
+      $div.html(htmlContent);
+    }
+    if (unselectable.key) {
+      $div.attr(unselectable.key, unselectable.value);
+    }
+    return $div;
+  };
+
+  $.fn.makeSpan = function(cssClass, text) {
+    return this.makeElement('<span>', cssClass, text);
+  };
+
+  /**
+   * @return HTML document reference (ownerDocument) of the HTML element.
+   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+   */
+  $.fn.document = function(domElement) {
+    var myDocument = this.length ? this[0].ownerDocument : null;
+    return domElement ? myDocument : $(myDocument);
+  };
+
+  /**
+   * @return HTML window reference (defaultView) of the HTML element
+   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+   */
+  $.fn.window = function(domElement) {
+    var myDocument = this.document(true),
+      myWindow = myDocument ? myDocument.defaultView : null;
+    return domElement ? myWindow : $(myWindow);
+  };
+
+  /**
+   * @return HTML document reference (ownerDocument) of the HTML element.
+   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+   */
+  $.fn.activeElement = function(domElement) {
+    var myDocument = this.document(true),
+      activeElement = myDocument ? myDocument.activeElement : null;
+    return domElement ? activeElement : $(activeElement);
+  };
+
+  /**
+   * @return the BODY element of the HTML document in which the current HTML element is placed.
+   */
+  $.fn.body = function() {
+    return $('body', this.document(true));
+  };
+
+  /**
+   * @return the closest DOM element that has the 'scout' class.
+   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+   */
+  $.fn.entryPoint = function(domElement) {
+    var $element = this.closest('.scout');
+    return domElement ? $element[0] : $element;
+  };
+
   // prepend - and return new div for chaining
   $.fn.prependDiv = function(cssClass, htmlContent, id) {
     return this.makeDiv(cssClass, htmlContent, id).prependTo(this);
@@ -217,6 +302,25 @@
 
   $.fn.appendTextNode = function(text) {
     return $(this.document(true).createTextNode(text)).appendTo(this);
+  };
+
+
+  $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
+    var myDocument = this.document(true);
+    if (myDocument === undefined || type === undefined) {
+      return new Error('missing arguments: document, type');
+    }
+    var $svg = $(myDocument.createElementNS('http://www.w3.org/2000/svg', type));
+    if (cssClass) {
+      $svg.attrSVG('class', cssClass);
+    }
+    if (htmlContent) {
+      $svg.html(htmlContent);
+    }
+    if (id !== undefined) {
+      $svg.attrSVG('id', id);
+    }
+    return $svg;
   };
 
   // append SVG
@@ -383,6 +487,12 @@
     // ----- Helper functions -----
 
     function getOrCreateIconElement($icon, newElement) {
+      // If element type does not match existing element, remove the existing element (e.g. when changing from font-icon to picture icon)
+      if ($icon && !$icon.is(newElement.replace(/[<>]/g, ''))) {
+        removeIconElement.call(this, $icon);
+        $icon = null;
+      }
+      // Create new element if necessary
       if (!$icon) {
         $icon = $(newElement);
         this.data('$icon', $icon);
@@ -900,8 +1010,6 @@
     }
   };
 
-  // ===== helpers for projects, may not necessarily be used by scout itself =====
-
   $.fn.appendAppLink = function(appLinkBean, func) {
     return this.appendSpan().appLink(appLinkBean, func);
   };
@@ -928,109 +1036,6 @@
    */
   $.fn.unfocusable = function() {
     return this.addClass('unfocusable');
-  };
-
-  /**
-   * @param element string. Example = &lt;input&gt;
-   * @param cssClass (optional) class attribute
-   * @param text (optional) adds a child text-node with given text (no HTML content)
-   */
-  $.fn.makeElement = function(element, cssClass, text) {
-    var myDocument = this.document(true);
-    if (myDocument === undefined || element === undefined) {
-      return new Error('missing arguments: document, element');
-    }
-    var $element = $(element, myDocument);
-    if (cssClass) {
-      $element.addClass(cssClass);
-    }
-    if (text) {
-      $element.text(text);
-    }
-    return $element;
-  };
-
-  $.fn.makeDiv = function(cssClass, htmlContent, id) {
-    var unselectable = scout.device.unselectableAttribute,
-      $div = this.makeElement('<div>', cssClass);
-
-    if (id !== undefined) {
-      $div.attr('id', id);
-    }
-    if (htmlContent) {
-      $div.html(htmlContent);
-    }
-    if (unselectable.key) {
-      $div.attr(unselectable.key, unselectable.value);
-    }
-    return $div;
-  };
-
-  $.fn.makeSpan = function(cssClass, text) {
-    return this.makeElement('<span>', cssClass, text);
-  };
-
-  $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
-    var myDocument = this.document(true);
-    if (myDocument === undefined || type === undefined) {
-      return new Error('missing arguments: document, type');
-    }
-    var $svg = $(myDocument.createElementNS('http://www.w3.org/2000/svg', type));
-    if (cssClass) {
-      $svg.attrSVG('class', cssClass);
-    }
-    if (htmlContent) {
-      $svg.html(htmlContent);
-    }
-    if (id !== undefined) {
-      $svg.attrSVG('id', id);
-    }
-    return $svg;
-  };
-
-  /**
-   * @return HTML document reference (ownerDocument) of the HTML element.
-   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
-   */
-  $.fn.document = function(domElement) {
-    var myDocument = this.length ? this[0].ownerDocument : null;
-    return domElement ? myDocument : $(myDocument);
-  };
-
-  /**
-   * @return HTML window reference (defaultView) of the HTML element
-   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
-   */
-  $.fn.window = function(domElement) {
-    var myDocument = this.document(true),
-      myWindow = myDocument ? myDocument.defaultView : null;
-    return domElement ? myWindow : $(myWindow);
-  };
-
-  /**
-   * @return HTML document reference (ownerDocument) of the HTML element.
-   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
-   */
-  $.fn.activeElement = function(domElement) {
-    var myDocument = this.document(true),
-      activeElement = myDocument ? myDocument.activeElement : null;
-    return domElement ? activeElement : $(activeElement);
-  };
-
-  /**
-   * @return the BODY element of the HTML document in which the current HTML element is placed.
-   */
-  $.fn.body = function() {
-    return $('body', this.document(true));
-  };
-
-  /**
-   * @return the closest DOM element that has the 'scout' class.
-   * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
-   */
-  $.fn.entryPoint = function(domElement) {
-    var $element = this.closest('.scout');
-    return domElement ? $element[0] : $element;
   };
 
   /**
@@ -1074,4 +1079,5 @@
 
     return ret;
   };
+
 }(jQuery));

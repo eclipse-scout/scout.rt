@@ -98,4 +98,55 @@ describe('scout-jquery', function() {
 
   });
 
+  describe('icon', function() {
+
+    it('is sets and removes icons', function() {
+      // Set and remove font icon
+      $e.icon();
+      expect($e.children().length).toBe(0);
+      expect($e.data('$icon')).toBeUndefined();
+      $e.icon('font:X');
+      expect($e.children().length).toBe(1);
+      expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
+      expect($e.data('$icon').hasClass('font-icon')).toBe(true);
+      expect($e.data('$icon').hasClass('icon')).toBe(true);
+      $e.icon(null);
+      expect($e.children().length).toBe(0);
+      expect($e.data('$icon')).toBeUndefined();
+
+      // Set and remove picture icon
+      $e.icon('hello');
+      expect($e.children().length).toBe(1);
+      expect($e.data('$icon')[0]).toBe($e.children('img')[0]);
+      expect($e.data('$icon').hasClass('font-icon')).toBe(false);
+      expect($e.data('$icon').hasClass('icon')).toBe(true);
+      $e.icon(null);
+      expect($e.children().length).toBe(0);
+      expect($e.data('$icon')).toBeUndefined();
+
+      // Set font icon, then change to picture icon, then back to font icon
+      $e.icon('font:X');
+      expect($e.children().length).toBe(1);
+      expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
+      expect($e.data('$icon').hasClass('font-icon')).toBe(true);
+      expect($e.data('$icon').hasClass('icon')).toBe(true);
+      $e.icon('hello');
+      expect($e.children().length).toBe(1);
+      expect($e.data('$icon')[0]).toBe($e.children('img')[0]);
+      expect($e.data('$icon').hasClass('font-icon')).toBe(false);
+      expect($e.data('$icon').hasClass('icon')).toBe(true);
+      $e.icon('font:X');
+      expect($e.children().length).toBe(1);
+      expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
+      expect($e.data('$icon').hasClass('font-icon')).toBe(true);
+      expect($e.data('$icon').hasClass('icon')).toBe(true);
+
+      // Reset
+      $e.icon();
+      expect($e.children().length).toBe(0);
+      expect($e.data('$icon')).toBeUndefined();
+    });
+
+  });
+
  });
