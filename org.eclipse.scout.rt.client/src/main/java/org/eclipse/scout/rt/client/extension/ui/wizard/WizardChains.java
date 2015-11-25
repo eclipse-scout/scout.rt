@@ -193,20 +193,20 @@ public final class WizardChains {
     }
   }
 
-  public static class WizardWizardStepActionChain extends AbstractWizardChain {
+  public static class WizardStepActionChain extends AbstractWizardChain {
 
-    public WizardWizardStepActionChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
+    public WizardStepActionChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
       super(extensions);
     }
 
-    public void execWizardStepAction(final IWizardStep<? extends IForm> wizardStep) {
+    public void execStepAction(final IWizardStep<? extends IForm> step) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
-          next.execWizardStepAction(WizardWizardStepActionChain.this, wizardStep);
+          next.execStepAction(WizardStepActionChain.this, step);
         }
       };
-      callChain(methodInvocation, wizardStep);
+      callChain(methodInvocation, step);
     }
   }
 

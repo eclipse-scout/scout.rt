@@ -46,8 +46,8 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPrevio
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
-import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardWizardStepActionChain;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -334,9 +334,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @ConfigOperation
   @Order(10)
-  protected void execWizardStepAction(IWizardStep<? extends IForm> wizardStep) {
-    int stepKindex = getStepKind(getActiveStep(), wizardStep);
-    activateStep(wizardStep, (stepKindex == IWizardStep.STEP_NEXT), (stepKindex == IWizardStep.STEP_PREVIOUS));
+  protected void execStepAction(IWizardStep<? extends IForm> step) {
+    int stepKind = getStepKind(getActiveStep(), step);
+    activateStep(step, (stepKind == IWizardStep.STEP_NEXT), (stepKind == IWizardStep.STEP_PREVIOUS));
   }
 
   protected final void interceptInitConfig() {
@@ -1067,9 +1067,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) {
+  public void doStepAction(IWizardStep<? extends IForm> step) {
     if (isOpen()) {
-      interceptWizardStepAction(wizardStep);
+      interceptStepAction(step);
     }
   }
 
@@ -1165,8 +1165,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
 
     @Override
-    public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) {
-      getOwner().execWizardStepAction(wizardStep);
+    public void execStepAction(WizardStepActionChain chain, IWizardStep<? extends IForm> step) {
+      getOwner().execStepAction(step);
     }
 
     @Override
@@ -1246,10 +1246,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     chain.execAppLinkAction(ref);
   }
 
-  protected final void interceptWizardStepAction(IWizardStep<? extends IForm> wizardStep) {
+  protected final void interceptStepAction(IWizardStep<? extends IForm> wizardStep) {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
-    WizardWizardStepActionChain chain = new WizardWizardStepActionChain(extensions);
-    chain.execWizardStepAction(wizardStep);
+    WizardStepActionChain chain = new WizardStepActionChain(extensions);
+    chain.execStepAction(wizardStep);
   }
 
   protected final void interceptPreviousStep() {

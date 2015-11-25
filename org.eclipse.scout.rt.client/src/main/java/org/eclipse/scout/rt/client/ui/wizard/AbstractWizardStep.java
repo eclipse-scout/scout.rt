@@ -248,7 +248,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @ConfigOperation
   protected void execAction() {
     if (getWizard() != null) {
-      getWizard().doWizardStepAction(this);
+      getWizard().doStepAction(this);
     }
   }
 

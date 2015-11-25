@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPrevio
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
-import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardWizardStepActionChain;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
@@ -88,8 +88,8 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   }
 
   @Override
-  public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) {
-    chain.execWizardStepAction(wizardStep);
+  public void execStepAction(WizardStepActionChain chain, IWizardStep<? extends IForm> step) {
+    chain.execStepAction(step);
   }
 
   @Override

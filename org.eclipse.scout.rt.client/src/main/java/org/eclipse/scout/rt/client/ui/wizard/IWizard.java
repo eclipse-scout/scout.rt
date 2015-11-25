@@ -70,7 +70,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void addWizardListener(WizardListener listener);
 
   void removeWizardListener(WizardListener listener);
-  
+
   String getTitle();
 
   void setTitle(String title);
@@ -88,7 +88,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void setChanging(boolean b);
 
   boolean isChanging();
-  
+
   /**
    * No more operations are possible on a closed wizard.
    */
@@ -288,7 +288,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   @Deprecated
   void doHyperlinkAction(URL url, String path, boolean local);
 
-  void doWizardStepAction(IWizardStep<? extends IForm> wizardStep);
+  void doStepAction(IWizardStep<? extends IForm> step);
 
   /**
    * The container form is created during initialization of the wizard. The container form cannot be changed later. The
