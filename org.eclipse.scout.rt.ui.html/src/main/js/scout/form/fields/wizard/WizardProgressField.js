@@ -66,10 +66,10 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       .appendDiv('wizard-step')
       .data('wizard-step', step);
     step.$step = $step;
-    if (step.enabled && step.actionEnabled) {
+    if (this.enabled && step.enabled && step.actionEnabled) {
       $step.addClass('action-enabled');
       $step.on('click', this._onStepClick.bind(this));
-    } else if (!step.enabled) {
+    } else if (!this.enabled || !step.enabled) {
       $step.addClass('disabled');
     }
     if (scout.strings.hasText(step.tooltipText)) {
