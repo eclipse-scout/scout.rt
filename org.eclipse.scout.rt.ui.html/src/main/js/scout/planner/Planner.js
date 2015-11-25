@@ -41,6 +41,17 @@ scout.Planner.Direction = {
   FORWARD: 1
 };
 
+/**
+ * Enum providing display-modes for planner (extends calendar).
+ * @see IPlannerDisplayMode.java
+ */
+scout.Planner.DisplayMode = $.extend({
+  INTRADAY: 0,
+  CALENDAR_WEEK: 5,
+  YEAR: 6
+}, scout.Calendar.DisplayMode);
+
+
 scout.Planner.SelectionMode = {
   NONE: 0,
   ACTIVITY: 1,
@@ -168,12 +179,12 @@ scout.Planner.prototype._onNextClick = function(event) {
 
 scout.Planner.prototype._navigateDate = function(direction) {
   var viewRange = new scout.Range(this.viewRange.from, this.viewRange.to),
-    displayMode = scout.Calendar.DisplayMode;
+    displayMode = scout.Planner.DisplayMode;
 
   if (this.displayMode === displayMode.DAY) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
-  } else if (this.displayMode === displayMode.WEEK || this.displayMode === displayMode.WORK_WEEK) {
+  } else if (scout.isOneOf(this.displayMode, displayMode.WEEK, displayMode.WORK_WEEK)) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
     viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
@@ -199,7 +210,7 @@ scout.Planner.prototype._onTodayClick = function(event) {
     month = today.getMonth(),
     date = today.getDate(),
     day = (today.getDay() + 6) % 7,
-    displayMode = scout.Calendar.DisplayMode;
+    displayMode = scout.Planner.DisplayMode;
 
   if (this.displayMode === displayMode.DAY) {
     today = new Date(year, month, day);
@@ -291,7 +302,7 @@ scout.Planner.prototype._renderRange = function() {
   var text,
     toDate = new Date(this.viewRange.to.valueOf() - 1),
     toText = this.session.text('ui.To'),
-    displayMode = scout.Calendar.DisplayMode;
+    displayMode = scout.Planner.DisplayMode;
 
   // find range text
   if (scout.dates.isSameDay(this.viewRange.from, toDate)) {
@@ -323,7 +334,7 @@ scout.Planner.prototype._renderScale = function() {
   var $timeline, $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width, newLargeGroup,
     first = true,
     that = this,
-    displayMode = scout.Calendar.DisplayMode;
+    displayMode = scout.Planner.DisplayMode;
 
   // empty scale
   this.$scale.empty();
@@ -363,7 +374,7 @@ scout.Planner.prototype._renderScale = function() {
       $divLarge.data('count', $divLarge.data('count') + 1);
       first = false;
     }
-  } else if ((this.displayMode === displayMode.WORK_WEEK) || (this.displayMode === displayMode.WEEK)) {
+  } else if (scout.isOneOf(this.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end

@@ -38,7 +38,7 @@ scout.PlannerHeader.prototype.setAvailableDisplayModes = function(displayModes) 
 };
 
 scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
-  var displayMode = scout.Calendar.DisplayMode;
+  var displayMode = scout.Planner.DisplayMode;
   this.$commands.empty();
 
   this.$commands.appendDiv('planner-today').on('click', this._onTodayClick.bind(this));

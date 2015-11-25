@@ -137,18 +137,18 @@ scout.PlannerLayout.prototype._minWidth = function() {
   var $scale = this.planner.$scale,
     $scaleItems = $scale.find('.timeline-large').children('.scale-item'),
     numScaleItems = $scaleItems.length,
-    DISPLAY_MODE = scout.Calendar.DisplayMode;
+    displayMode = scout.Planner.DisplayMode;
 
   var scaleItemMinWidth = 0;
-  if (this.planner.displayMode === DISPLAY_MODE.DAY) {
+  if (this.planner.displayMode === displayMode.DAY) {
     scaleItemMinWidth = 52;
-  } else if ((this.planner.displayMode === DISPLAY_MODE.WORK_WEEK) || (this.planner.displayMode === DISPLAY_MODE.WEEK)) {
+  } else if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
     scaleItemMinWidth = 160;
-  } else if (this.planner.displayMode === DISPLAY_MODE.MONTH) {
+  } else if (this.planner.displayMode === displayMode.MONTH) {
     scaleItemMinWidth = 450;
-  } else if (this.planner.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
+  } else if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
     scaleItemMinWidth = 85;
-  } else if (this.planner.displayMode === DISPLAY_MODE.YEAR) {
+  } else if (this.planner.displayMode === displayMode.YEAR) {
     scaleItemMinWidth = 550;
   }
 

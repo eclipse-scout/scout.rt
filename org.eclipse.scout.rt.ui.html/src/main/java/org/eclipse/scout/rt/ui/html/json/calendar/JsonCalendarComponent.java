@@ -34,9 +34,6 @@ public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent>
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put("item", new JsonCalendarItem(getModel().getItem()).toJson());
-    // FIXME AWE: (calendar) check if we can really remove the cell property. When we don't need it here
-    // we should clean-up the Scout model and remove the cell from the model completely.
-    // json.put("cell", new JsonCell(getModel().getCell()).toJson());
     json.put("fromDate", new JsonDate(getModel().getFromDate()).asJsonString());
     json.put("toDate", new JsonDate(getModel().getToDate()).asJsonString());
     if (getModel().getCoveredDays() != null) {

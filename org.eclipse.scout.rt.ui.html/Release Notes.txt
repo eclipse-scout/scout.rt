@@ -645,6 +645,10 @@ Removed display-hint IForm#DISPLAY_HINT_POPUP_DIALOG. Not supported anymore. Use
 popup-window instead.
 
 
+AWE 25.11.2015
+Moved display-mode constants from ICalender and IPlanner to separate interface classes 
+and let IPlannerDisplayMode extend ICalenderDisplayMode because they share some constants.
+
 ================================================================================================
 Known Bugs:
 ------------------------------------------------------------------------------------------------

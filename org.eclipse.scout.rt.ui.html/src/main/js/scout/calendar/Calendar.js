@@ -61,9 +61,7 @@ scout.Calendar.DisplayMode = {
   DAY: 1,
   WEEK: 2,
   MONTH: 3,
-  WORK_WEEK: 4,
-  CALENDAR_WEEK: 5,
-  YEAR: 6
+  WORK_WEEK: 4
 };
 
 /**
@@ -86,7 +84,7 @@ scout.Calendar.prototype._isMonth = function() {
   return this.displayMode === scout.Calendar.DisplayMode.MONTH;
 };
 
-scout.Calendar.prototype._isWork = function() {
+scout.Calendar.prototype._isWorkWeek = function() {
   return this.displayMode === scout.Calendar.DisplayMode.WORK_WEEK;
 };
 
@@ -273,7 +271,7 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
 
   if (this._isDay()) {
     return new Date(p.year, p.month, p.date + dayOperand);
-  } else if (this._isWeek() || this._isWork()) {
+  } else if (this._isWeek() || this._isWorkWeek()) {
     return new Date(p.year, p.month, p.date + weekOperand);
   } else if (this._isMonth()) {
     return new Date(p.year, p.month + monthOperand, p.date);
@@ -304,7 +302,7 @@ scout.Calendar.prototype._calcExactRange = function() {
   } else if (this._isMonth()) {
     from = new Date(p.year, p.month, 1);
     to = new Date(p.year, p.month + 1, 0);
-  } else if (this._isWork()) {
+  } else if (this._isWorkWeek()) {
     from = new Date(p.year, p.month, p.date - p.day);
     to = new Date(p.year, p.month, p.date - p.day + 4);
   } else {
@@ -357,7 +355,7 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
   if (oldDisplayMode !== displayMode) {
     this.displayMode = displayMode;
     this._yearPanel.setDisplayMode(displayMode);
-    if (this._isWork()) {
+    if (this._isWorkWeek()) {
       // change date if selectedDate is on a weekend
       p = this._dateParts(this.selectedDate, true);
       if (p.day > 4) {
@@ -520,7 +518,7 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   this.$grid.data('new-width', gridW);
 
   // layout week
-  if (this._isDay() || this._isWeek() || this._isWork()) {
+  if (this._isDay() || this._isWeek() || this._isWorkWeek()) {
     $('.calendar-week', this.$grid).data('new-height', 0);
     $selected.parent().data('new-height', gridH - headerH);
   } else {
@@ -533,7 +531,7 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       .data('new-width', 0);
     $('.calendar-day-name:nth-child(' + ($selected.index() + 1) + '), .calendar-day:nth-child(' + ($selected.index() + 1) + ')', this.$grid)
       .data('new-width', gridW - headerH);
-  } else if (this._isWork()) {
+  } else if (this._isWorkWeek()) {
     $('.calendar-day-name, .calendar-day', this.$grid)
       .data('new-width', 0);
     $('.calendar-day-name:nth-child(-n+6), .calendar-day:nth-child(-n+6)', this.$grid)
@@ -549,7 +547,7 @@ scout.Calendar.prototype.layoutSize = function(animate) {
 
   if (this._isDay()) {
     width /= 1;
-  } else if (this._isWork()) {
+  } else if (this._isWorkWeek()) {
     width /= 5;
   } else if (this._isWeek()) {
     width /= 7;
@@ -606,7 +604,7 @@ scout.Calendar.prototype.layoutLabel = function() {
   // set range text
   if (this._isDay()) {
     text = this._format(exFrom, 'd. MMMM yyyy');
-  } else if (this._isWork() || this._isWeek()) {
+  } else if (this._isWorkWeek() || this._isWeek()) {
     var toText = this.session.text('ui.To');
     if (exFrom.getMonth() === exTo.getMonth()) {
       text = scout.strings.join(' ', this._format(exFrom, 'd.'), toText, this._format(exTo, 'd. MMMM yyyy'));

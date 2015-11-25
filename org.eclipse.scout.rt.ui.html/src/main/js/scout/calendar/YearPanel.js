@@ -128,7 +128,8 @@ scout.YearPanel.prototype._colorYear = function() {
   $('.year-day', this.$yearList).each(function() {
     $day = $(this);
     date = $day.data('date');
-    if (!that._isDisplayModeDay() && date >= that.viewRange.from && date <= that.viewRange.to) {
+    if (that.displayMode !== scout.Calendar.DisplayMode.DAY &&
+        date >= that.viewRange.from && date <= that.viewRange.to) {
       $day.addClass('year-range');
     }
     if (scout.dates.isSameDay(date, that.selectedDate)) {
@@ -192,14 +193,14 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
   }
 };
 
-scout.YearPanel.prototype._isDisplayModeDay = function() {
-  return this.displayMode === scout.Calendar.DisplayMode.DAY;
-};
-
 /* -- events ---------------------------------------- */
 
 scout.YearPanel.prototype._onYearClick = function(event) {
-  var diff = $(event.target).data('year-diff'),
+  var
+    // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here 
+    // because YearPanel must work for calendar and planner.
+    displayMode = scout.Planner.DisplayMode,
+    diff = $(event.target).data('year-diff'),
     year = this.selectedDate.getFullYear(),
     month = this.selectedDate.getMonth(),
     date = this.selectedDate.getDate(),
@@ -210,14 +211,14 @@ scout.YearPanel.prototype._onYearClick = function(event) {
 
   if (this.alwaysSelectFirstDay) {
     // find date based on mode
-    if (this._isDisplayModeWeek() || this._isDisplayModeCalendarWeek() || this._isDisplayModeWork()) {
+    if (scout.isOneOf(this.displayMode, displayMode.WEEK, displayMode.WORK_WEEK, displayMode.CALENDAR_WEEK)) {
       oldWeek = scout.dates.weekInYear(this.selectedDate);
       newWeek = scout.dates.weekInYear(newDate);
       weekDiff = oldWeek - newWeek;
       // shift new selection that week in year does not change and the new selection is a monday.
       newDate = scout.dates.shift(newDate, 0, 0, weekDiff * 7);
       newDate = scout.dates.shiftToNextOrPrevMonday(newDate, 0);
-    } else if (this._isDisplayModeMonth() || this._isDisplayModeYear()) {
+    } else if (scout.isOneOf(this.displayMode, displayMode.MONTH, displayMode.YEAR)) {
       // set to first day of month
       newDate = new Date(year + diff, month, 1);
     }
@@ -250,7 +251,7 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     $day2, date2;
 
   // find hover based on mode
-  if (this._isDisplayModeDay()) {
+  if (this.displayMode === scout.Calendar.DisplayMode.DAY) {
     startHover = new Date(year, month, date);
     endHover = new Date(year, month, date);
   } else if (this.displayMode === scout.Calendar.DisplayMode.WEEK) {
@@ -267,7 +268,7 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
   } else if (this.displayMode === scout.Calendar.DisplayMode.MONTH) {
     startHover = new Date(year, month, 1);
     endHover = new Date(year, month + 1, 0);
-  } else if (this.displayMode === scout.Calendar.DisplayMode.YEAR) {
+  } else if (this.displayMode === scout.Planner.DisplayMode.YEAR) {
     startHover = new Date(year, month, 1);
     endHover = startHover;
   } else {

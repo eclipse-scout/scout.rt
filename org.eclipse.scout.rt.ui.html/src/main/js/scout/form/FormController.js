@@ -80,7 +80,7 @@ scout.FormController.prototype.render = function() {
 scout.FormController.prototype.activateForm = function(formAdapterId) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
 
-  // FIXME AWE: handle popupWindow
+  // FIXME AWE: (2nd screen) handle popupWindow?
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._activateView(form);
   } else {

@@ -32,8 +32,7 @@ scout.PopupWindow.prototype._onReady = function() {
     $myWindow = $(this.myWindow),
     $myDocument = $(myDocument);
 
-  // Try to rewrite URL via history API (to remove "popup-window.html?formId=12345" part)
-  // TODO AWE Check this
+  // TODO AWE: Try to rewrite URL via history API (to remove "popup-window.html?formId=12345" part)
   var history = this.myWindow.history;
   if (history && typeof history.pushState === 'function') {
     history.replaceState(history.state, this.myWindow.document.title, this.myWindow.opener.location.href);

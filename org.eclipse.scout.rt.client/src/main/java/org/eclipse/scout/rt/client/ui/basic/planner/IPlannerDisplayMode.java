@@ -8,17 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.calendar;
+package org.eclipse.scout.rt.client.ui.basic.planner;
+
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 
 /**
- * Interface providing display-modes for calendar.
+ * Interface providing display-modes for planner (extends calendar).
  */
-public interface ICalendarDisplayMode {
 
-  // never change final constants (properties files might have references)
-  // these constants should correspond with those from the planner
-  int DAY = 1;
-  int WEEK = 2;
-  int MONTH = 3;
-  int WORK_WEEK = 4;
+public interface IPlannerDisplayMode extends ICalendarDisplayMode {
+
+  int INTRADAY = 0; // FIXME AWE: (Planner) check if used by projects, if not, remove as it is not supported by UI anymore
+  int CALENDAR_WEEK = 5;
+  int YEAR = 6;
+
 }
