@@ -15,19 +15,19 @@ scout.strings = {
    * @param encodeHtml defaults to true
    */
   nl2br: function(text, encodeHtml) {
-    if (text === undefined || text === null || text === '') {
+    if (!text) {
       return text;
     }
     text = this.asString(text);
     encodeHtml = scout.nvl(encodeHtml, true);
     if (encodeHtml) {
-      text = scout.strings.encode(text);}
-
+      text = scout.strings.encode(text);
+    }
     return text.replace(/\n/g, '<br>').replace(/\r/g, '');
   },
 
   removeAmpersand: function(text) {
-    if (text === undefined || text === null || text === '') {
+    if (!text) {
       return text;
     }
     text = this.asString(text);
@@ -38,8 +38,8 @@ scout.strings = {
     return text;
   },
 
-  insertAt: function(text, insertText, position){
-    if (text === undefined || text === null || text === '') {
+  insertAt: function(text, insertText, position) {
+    if (!text) {
       return text;
     }
     text = this.asString(text);
@@ -51,8 +51,8 @@ scout.strings = {
   },
 
   getMnemonic: function(text, resolveKey) {
-    if (text === undefined || text === null) {
-      return text;
+    if (!text) {
+      return null;
     }
     text = this.asString(text);
     // Remove escaped & (they are not of concern)
@@ -76,6 +76,9 @@ scout.strings = {
    * @returns true if the given string contains any non-space characters
    */
   hasText: function(text) {
+    if (text === undefined || text === null) {
+      return false;
+    }
     text = this.asString(text);
     if (typeof text !== 'string' || text.length === 0) {
       return false;
@@ -111,7 +114,10 @@ scout.strings = {
       return false;
     }
     if (startString.length === 0) {
-      return true;
+      return true; // every string starts with the empty string
+    }
+    if (fullString.length === 0) {
+      return false; // empty string cannot start with non-empty string
     }
     fullString = this.asString(fullString);
     startString = this.asString(startString);
@@ -123,7 +129,10 @@ scout.strings = {
       return false;
     }
     if (endString.length === 0) {
-      return true;
+      return true; // every string ends with the empty string
+    }
+    if (fullString.length === 0) {
+      return false; // empty string cannot end with non-empty string
     }
     fullString = this.asString(fullString);
     endString = this.asString(endString);
@@ -134,13 +143,16 @@ scout.strings = {
    * Returns the number of occurrences of 'separator' in 'string'
    */
   count: function(string, separator) {
-    if (string === undefined || string === null || separator === undefined || separator === null) {
+    if (!string || separator === undefined || separator === null) {
       return 0;
     }
     string = this.asString(string);
     separator = this.asString(separator);
     return string.split(separator).length - 1;
   },
+
+  // Cache used by scout.strings.encode(). Also referenced in stringsSpec.js.
+  _encodeElement: null,
 
   /**
    * Encodes the html of the given string.
@@ -149,11 +161,11 @@ scout.strings = {
     if (!string) {
       return string;
     }
-    var elem = scout.strings.encodeElement;
+    var elem = scout.strings._encodeElement;
     if (!elem) {
       elem = window.document.createElement('div');
       // cache it to prevent creating an element every time
-      scout.strings.encodeElement = elem;
+      scout.strings._encodeElement = elem;
     }
     elem.textContent = string;
     return elem.innerHTML;
@@ -168,6 +180,8 @@ scout.strings = {
     if (!text) {
       return text;
     }
+    text = this.asString(text);
+
     // Regexp is used to replace the tags.
     // It is not possible to use jquery's text() function or to create a html element and use textContent, because the new lines get omitted.
     // Node.innerText would preserve the new lines but it is not supported by firefox

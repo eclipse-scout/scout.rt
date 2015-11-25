@@ -55,7 +55,7 @@ describe("scout.strings", function() {
   describe("getMnemonic", function() {
 
     it("can extract mnemonics", function() {
-      expect(scout.strings.getMnemonic()).toBe(undefined);
+      expect(scout.strings.getMnemonic()).toBe(null);
       expect(scout.strings.getMnemonic(null)).toBe(null);
       expect(scout.strings.getMnemonic('')).toBe(null);
       expect(scout.strings.getMnemonic(' ')).toBe(null);
@@ -195,7 +195,7 @@ describe("scout.strings", function() {
     });
 
     it("does not try to encode empty strings", function() {
-      scout.strings.encodeElement = null;
+      scout.strings._encodeElement = null;
       spyOn(document, "createElement").and.callThrough();
       expect(scout.strings.encode('')).toBe('');
       expect(document.createElement).not.toHaveBeenCalled();
@@ -205,7 +205,7 @@ describe("scout.strings", function() {
     });
 
     it("caches the html element used for encoding", function() {
-      scout.strings.encodeElement = null;
+      scout.strings._encodeElement = null;
       spyOn(document, "createElement").and.callThrough();
 
       expect(scout.strings.encode('hi')).toBe('hi');
