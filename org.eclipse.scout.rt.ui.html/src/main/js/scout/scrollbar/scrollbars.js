@@ -129,7 +129,7 @@ scout.scrollbars = {
         scrollbars.push(scrollbar);
 
         scrollOptions.axis = 'x';
-        options.mouseWheelNeedsShift = true;
+        scrollOptions.mouseWheelNeedsShift = true;
         scrollbar = scout.create(scout.Scrollbar, scrollOptions);
         scrollbars.push(scrollbar);
       } else {
