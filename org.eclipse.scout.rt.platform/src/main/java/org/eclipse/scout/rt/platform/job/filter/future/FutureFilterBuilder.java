@@ -187,15 +187,15 @@ public class FutureFilterBuilder {
   /**
    * To match all jobs which are tagged with the given execution hint.
    */
-  public FutureFilterBuilder andMatchExecutionHint(final Object executionHint) {
-    andMatch(new ExecutionHintFutureFilter(executionHint));
+  public FutureFilterBuilder andMatchExecutionHint(final String hint) {
+    andMatch(new ExecutionHintFutureFilter(hint));
     return this;
   }
 
   /**
    * To match all jobs which are not tagged with the given execution hint.
    */
-  public FutureFilterBuilder andMatchNotExecutionHint(final Object hint) {
+  public FutureFilterBuilder andMatchNotExecutionHint(final String hint) {
     andMatchNot(new ExecutionHintFutureFilter(hint));
     return this;
   }

@@ -193,7 +193,7 @@ public class JobEventFilterBuilder {
   /**
    * To match all events related to jobs tagged with the given execution hint.
    */
-  public JobEventFilterBuilder andMatchExecutionHint(final Object hint) {
+  public JobEventFilterBuilder andMatchExecutionHint(final String hint) {
     andMatch(new FutureFilterWrapperJobEventFilter(new ExecutionHintFutureFilter(hint)));
     return this;
   }
@@ -201,7 +201,7 @@ public class JobEventFilterBuilder {
   /**
    * To match all events related to jobs not tagged with the given execution hint.
    */
-  public JobEventFilterBuilder andMatchNotExecutionHint(final Object hint) {
+  public JobEventFilterBuilder andMatchNotExecutionHint(final String hint) {
     andMatchNot(new FutureFilterWrapperJobEventFilter(new ExecutionHintFutureFilter(hint)));
     return this;
   }

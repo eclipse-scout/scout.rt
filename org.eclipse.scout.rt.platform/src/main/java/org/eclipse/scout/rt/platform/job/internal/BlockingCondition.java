@@ -98,15 +98,15 @@ public class BlockingCondition implements IBlockingCondition {
   }
 
   @Override
-  public void waitFor() {
-    waitFor(-1L, TimeUnit.MILLISECONDS);
+  public void waitFor(final String... executionHints) {
+    waitFor(-1L, TimeUnit.MILLISECONDS, executionHints);
   }
 
   @Override
-  public boolean waitFor(final long timeout, final TimeUnit unit) {
+  public boolean waitFor(final long timeout, final TimeUnit unit, final String... executionHints) {
     final JobFutureTask<?> currentTask = (JobFutureTask<?>) IFuture.CURRENT.get();
     if (currentTask != null) {
-      return blockManagedThread(currentTask, timeout, unit);
+      return blockManagedThread(currentTask, timeout, unit, executionHints);
     }
     else {
       return blockArbitraryThread(timeout, unit);
@@ -121,13 +121,21 @@ public class BlockingCondition implements IBlockingCondition {
    * @throws ProcessingException
    *           if the waiting thread was interrupted.
    */
-  protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit) {
+  protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit, final String... executionHints) {
     final IMutex mutex = jobTask.getMutex();
+    final Set<String> associatedExecutionHints = new HashSet<>();
 
     m_lock.lock();
     try {
       if (!m_blocking) {
         return true;
+      }
+
+      // Associate the current IFuture with execution hints.
+      for (final String executionHint : executionHints) {
+        if (jobTask.addExecutionHint(executionHint)) {
+          associatedExecutionHints.add(executionHint);
+        }
       }
 
       registerAndMarkAsBlocked(jobTask);
@@ -166,8 +174,12 @@ public class BlockingCondition implements IBlockingCondition {
       return false;
     }
     finally {
-      // Note: If released gracefully, the job's blocking-state is unset by the releaser.
+      // Restore to the previous execution hints.
+      for (final String executionHint : associatedExecutionHints) {
+        jobTask.removeExecutionHint(executionHint);
+      }
 
+      // Note: If released gracefully, the job's blocking-state is unset by the releaser.
       m_lock.unlock();
       m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.UNBLOCKED)
           .withFuture(jobTask)

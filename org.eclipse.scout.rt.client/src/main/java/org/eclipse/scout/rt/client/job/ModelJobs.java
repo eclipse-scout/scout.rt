@@ -90,8 +90,7 @@ public final class ModelJobs {
    *
    * <pre>
    * private void waitFor() {
-   *   IFuture.CURRENT.get().addExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
-   *   m_blockingCondition.waitFor();
+   *   m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
    * }
    * </pre>
    *

@@ -74,7 +74,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected volatile boolean m_blocked;
 
-  protected Set<Object> m_executionHints = new HashSet<>();
+  protected Set<String> m_executionHints = new HashSet<>();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final InvocationChain<RESULT> invocationChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
@@ -186,20 +186,28 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public void addExecutionHint(final Object executionHint) {
-    m_executionHints.add(executionHint);
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+  public boolean addExecutionHint(final String hint) {
+    try {
+      return m_executionHints.add(hint);
+    }
+    finally {
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+    }
   }
 
   @Override
-  public void removeExecutionHint(final Object executionHint) {
-    m_executionHints.remove(executionHint);
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+  public boolean removeExecutionHint(final String hint) {
+    try {
+      return m_executionHints.remove(hint);
+    }
+    finally {
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+    }
   }
 
   @Override
-  public boolean containsExecutionHint(final Object executionHint) {
-    return m_executionHints.contains(executionHint);
+  public boolean containsExecutionHint(final String hint) {
+    return m_executionHints.contains(hint);
   }
 
   /**

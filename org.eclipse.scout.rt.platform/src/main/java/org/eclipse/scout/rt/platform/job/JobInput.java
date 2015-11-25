@@ -62,7 +62,7 @@ public class JobInput {
   protected long m_periodicDelay;
   protected int m_schedulingRule = SCHEDULING_RULE_SINGLE_EXECUTION;
 
-  protected Set<Object> m_executionHints = new HashSet<>();
+  protected Set<String> m_executionHints = new HashSet<>();
 
   public String getName() {
     return m_name;
@@ -241,7 +241,7 @@ public class JobInput {
     return this;
   }
 
-  public Set<Object> getExecutionHints() {
+  public Set<String> getExecutionHints() {
     return m_executionHints;
   }
 
@@ -249,7 +249,7 @@ public class JobInput {
    * Associates the job with an execution hint, which can be evaluated by filters like when listening to job lifecycle
    * events, or when waiting for job completion, or by the job manager.
    */
-  public JobInput withExecutionHint(final Object hint) {
+  public JobInput withExecutionHint(final String hint) {
     m_executionHints.add(hint);
     return this;
   }

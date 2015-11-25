@@ -110,8 +110,8 @@ public class UiJobs {
       throw new UiException("Timeout elapsed while waiting for a job to complete [job=%s, timeout=%ss, future=%s]", new TimeoutException(), callable.getClass().getName(), TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT), future);
     }
 
-    // Return immediately if the job is not done yet, e.g. because waiting for a blocking condition to fall.
-    if (!future.isDone()) {
+    // Return immediately if the jobs requires user interaction.
+    if (future.containsExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)) {
       return null;
     }
 

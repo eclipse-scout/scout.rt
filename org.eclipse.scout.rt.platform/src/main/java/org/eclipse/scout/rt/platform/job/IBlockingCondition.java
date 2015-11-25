@@ -42,6 +42,9 @@ public interface IBlockingCondition {
    * <strong>If this method returns with an exception, and if this is a mutually exclusive job, the current thread is
    * not synchronized with the mutex anymore and should terminate its work.</strong>
    *
+   * @param executionHints
+   *          optional execution hints to be associated with the current {@link IFuture} for the time of blocking the
+   *          current thread; has no effect if not running in a job.
    * @throws ProcessingException
    *           <ul>
    *           <li>if this thread was interrupted while waiting for this condition to fall; see
@@ -49,7 +52,7 @@ public interface IBlockingCondition {
    *           <li>if being a mutually exclusive job and the mutex could not be acquired anew upon unblocking</li>
    *           </ul>
    */
-  void waitFor();
+  void waitFor(String... executionHints);
 
   /**
    * Blocks the calling thread until the <i>blocking-state</i> of this blocking condition is changed to
@@ -64,6 +67,9 @@ public interface IBlockingCondition {
    *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
+   * @param executionHints
+   *          optional execution hints to be associated with the current {@link IFuture} for the time of blocking the
+   *          current thread; has no effect if not running in a job.
    * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
    * @throws ProcessingException
    *           <ul>
@@ -72,7 +78,7 @@ public interface IBlockingCondition {
    *           <li>if being a mutually exclusive job and the mutex could not be acquired anew upon unblocking</li>
    *           </ul>
    */
-  boolean waitFor(long timeout, TimeUnit unit);
+  boolean waitFor(long timeout, TimeUnit unit, String... executionHints);
 
   /**
    * @return the name of this blocking condition.

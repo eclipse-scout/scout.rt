@@ -252,16 +252,25 @@ public interface IFuture<RESULT> extends ICancellable {
   /**
    * Associates this {@link IFuture} with an execution hint, which can be evaluated by filters like when listening to
    * job lifecycle events, or when waiting for job completion, or by the job manager.
+   *
+   * @param hint
+   *          the hint to be associated with this {@link IFuture}.
+   * @return <code>true</code> if this {@link IFuture} did not already contain the specified hint, or <code>false</code>
+   *         otherwise.
    */
-  void addExecutionHint(Object hint);
+  boolean addExecutionHint(String hint);
 
   /**
    * Removes an execution hint from this {@link IFuture}. Has no effect if not associated yet.
+   *
+   * @param hint
+   *          the hint to be removed from this {@link IFuture}.
+   * @return <code>true</code> if this {@link IFuture} contained the specified hint, or <code>false</code> otherwise.
    */
-  void removeExecutionHint(Object hint);
+  boolean removeExecutionHint(String hint);
 
   /**
    * Returns, whether the given 'execution hint' is associated with this {@link IFuture}.
    */
-  boolean containsExecutionHint(Object hint);
+  boolean containsExecutionHint(String hint);
 }

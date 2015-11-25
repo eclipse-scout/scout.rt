@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  */
 public class ExecutionHintFutureFilter implements IFilter<IFuture<?>> {
 
-  private final Object m_hint;
+  private final String m_hint;
 
-  public ExecutionHintFutureFilter(final Object hint) {
+  public ExecutionHintFutureFilter(final String hint) {
     m_hint = hint;
   }
 
