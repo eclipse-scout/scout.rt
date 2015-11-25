@@ -159,6 +159,9 @@ scout.Popup.prototype._remove = function() {
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
+  if(this.openAnimated){
+    this.$container.stop();
+  }
   // remove all clean-up handlers
   this._detachCloseHandler();
   scout.Popup.parent.prototype._remove.call(this);

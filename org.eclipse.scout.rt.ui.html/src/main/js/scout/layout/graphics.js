@@ -62,10 +62,10 @@ scout.graphics = {
       marginHeight = 0,
       scrollWidth = $comp[0] ?  $comp[0].scrollWidth : 0,
       scrollHeight = $comp[0]? $comp[0].scrollHeight : 0 ;
-    includeMargin = scout.helpers.nvl(includeMargin, false);
+    includeMargin = scout.nvl(includeMargin, false);
     if (includeMargin) {
-      marginHeight += parseFloat(scout.helpers.nvl($comp.css('margin-top'),0)) + parseFloat(scout.helpers.nvl($comp.css('margin-bottom'),0));
-      marginWidth += parseFloat(scout.helpers.nvl($comp.css('margin-left'),0)) + parseFloat(scout.helpers.nvl($comp.css('margin-right'),0));
+      marginHeight += parseFloat(scout.nvl($comp.css('margin-top'),0)) + parseFloat(scout.nvl($comp.css('margin-bottom'),0));
+      marginWidth += parseFloat(scout.nvl($comp.css('margin-left'),0)) + parseFloat(scout.nvl($comp.css('margin-right'),0));
     }
     return new scout.Dimension(
       scrollWidth + marginWidth + parseFloat($comp.css("border-left-width")) + parseFloat($comp.css("border-right-width")),

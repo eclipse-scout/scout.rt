@@ -27,7 +27,7 @@ scout.PopupWithHead.prototype._createLayout = function() {
 scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);
   this.$parent = $parent;
-  this.$parent.getWindow(true).on('resize', this.resizeHandler);
+  this.$parent.window().on('resize', this.resizeHandler);
 
   this.$body = this._$createNewBody();
   if (this._headVisible) {
@@ -36,7 +36,7 @@ scout.PopupWithHead.prototype._render = function($parent) {
 };
 
 scout.PopupWithHead.prototype.onResize = function() {
-  this.$parent.getWindow(true).off('resize', this.resizeHandler);
+  this.$parent.window().off('resize', this.resizeHandler);
   this.close();
 };
 

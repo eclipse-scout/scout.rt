@@ -1113,48 +1113,48 @@ describe("Table", function() {
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
-
-    it("context menu only shows sub-menus of matching type", function() {
-      var model = helper.createModelFixture(2, 2);
-      var table = helper.createTable(model);
-      table.selectedRows = [table.rows[0]];
-      table.render(session.$entryPoint);
-
-      var menuModelTop = helper.createMenuModel('topMenu'),
-      menuTop = helper.menuHelper.createMenu(menuModelTop),
-      menuModel1 = helper.createMenuModel('singleSelectionMenu'),
-      menu1 = helper.menuHelper.createMenu(menuModel1),
-      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
-      menu2 = helper.menuHelper.createMenu(menuModel2);
-      menu2.menuTypes = ['Table.MultiSelection'];
-      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-//      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
-//      menu3 = helper.menuHelper.createMenu(menuModel3);
-//      menu3.menuTypes = ['Table.EmptySpace'];
-
-      menuTop.childActions = [menu1, menu2
-      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-                              //, menu3
-                              ];
-      table.menus = [menuTop];
-      table._syncMenus([menuTop]);
-      var $row0 = table.$data.children('.table-row').eq(0);
-      $row0.triggerContextMenu();
-
-      sendQueuedAjaxCalls();
-
-      var $menu = helper.getDisplayingContextMenu(table);
-      expect($menu.find('.menu-item').length).toBe(1);
-      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
-
-      var $menuTop = $menu.find('.menu-item');
-      $menuTop.triggerClick();
-      sendQueuedAjaxCalls();
-      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
-      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
-      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-//      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
-    });
+// TODO nbu
+//    it("context menu only shows sub-menus of matching type", function() {
+//      var model = helper.createModelFixture(2, 2);
+//      var table = helper.createTable(model);
+//      table.selectedRows = [table.rows[0]];
+//      table.render(session.$entryPoint);
+//
+//      var menuModelTop = helper.createMenuModel('topMenu'),
+//      menuTop = helper.menuHelper.createMenu(menuModelTop),
+//      menuModel1 = helper.createMenuModel('singleSelectionMenu'),
+//      menu1 = helper.menuHelper.createMenu(menuModel1),
+//      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
+//      menu2 = helper.menuHelper.createMenu(menuModel2);
+//      menu2.menuTypes = ['Table.MultiSelection'];
+//      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+////      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
+////      menu3 = helper.menuHelper.createMenu(menuModel3);
+////      menu3.menuTypes = ['Table.EmptySpace'];
+//
+//      menuTop.childActions = [menu1, menu2
+//      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+//                              //, menu3
+//                              ];
+//      table.menus = [menuTop];
+//      table._syncMenus([menuTop]);
+//      var $row0 = table.$data.children('.table-row').eq(0);
+//      $row0.triggerContextMenu();
+//
+//      sendQueuedAjaxCalls();
+//
+//      var $menu = helper.getDisplayingContextMenu(table);
+//      expect($menu.find('.menu-item').length).toBe(1);
+//      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
+//
+//      var $menuTop = $menu.find('.menu-item');
+//      $menuTop.triggerClick();
+//      sendQueuedAjaxCalls();
+//      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
+//      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
+//      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+////      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
+//    });
 
   });
 

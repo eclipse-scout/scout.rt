@@ -534,7 +534,7 @@
 
   $.fn.cssHeightAnimated = function(oldHeight, newHeight, opts) {
     opts = opts || {};
-    opts.duration = scout.helpers.nvl(opts.duration, 300);
+    opts.duration = scout.nvl(opts.duration, 300);
 
     if (oldHeight === newHeight) {
       // No need to animate, make sure new height ist set
@@ -604,7 +604,7 @@
 
   $.fn.cssAnimated = function(fromVals, toVals, opts) {
     opts = opts || {};
-    opts.duration = scout.helpers.nvl(opts.duration, 300);
+    opts.duration = scout.nvl(opts.duration, 300);
     var doAnimate = false,
       cssPropsToAnimate = {};
 
