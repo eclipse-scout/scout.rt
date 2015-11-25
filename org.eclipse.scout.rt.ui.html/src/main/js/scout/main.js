@@ -66,7 +66,7 @@ scout._init = function(options) {
   }
 
   scout.polyfills.install(window);
-  scout.helpers.prepareDOM();
+  scout.prepareDOM();
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor(document);
 
@@ -108,6 +108,20 @@ scout.nvl = function(value, defaultValue) {
     return defaultValue;
   }
   return value;
+};
+
+scout.isOneOf = function() {
+  if (arguments && arguments.length >= 2) {
+    var value = arguments[0];
+    var argsToCheck;
+    if (arguments.length === 2 && Array.isArray(arguments[1])) {
+      argsToCheck = arguments[1];
+    } else {
+      argsToCheck = Array.prototype.slice.call(arguments, 1);
+    }
+    return argsToCheck.indexOf(value) !== -1;
+  }
+  return false;
 };
 
 /**
@@ -160,6 +174,32 @@ scout._createLocalObject = function(model) {
   model._register = false;
   var session = model.session || model.parent.session;
   return session.objectFactory.create(model);
+};
+
+/**
+ * Prepares the DOM for scout. This should be called once while initializing scout.
+ *
+ * This is used by main.js, login.js and logout.js.
+ *
+ * Currently it does the following:
+ * - Remove the <noscript> tag (obviously there is no need for it).
+ * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
+ */
+scout.prepareDOM = function() {
+  // Cleanup DOM
+  $('noscript').remove();
+
+  // Prevent "Do you want to translate this page?" in Google Chrome
+  if (scout.device.browser === scout.Device.SupportedBrowsers.CHROME) {
+    var metaNoTranslate = '<meta name="google" content="notranslate" />';
+    var $title = $('head > title');
+    if ($title.length === 0) {
+      // Add to end of head
+      $('head').append(metaNoTranslate);
+    } else {
+      $title.after(metaNoTranslate);
+    }
+  }
 };
 
 scout._checkBrowserCompability = function(options) {

@@ -70,7 +70,7 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   // Use case: - outline tree with a detail form that contains a tree;
   //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
   keyStrokeContext.registerStopPropagationInterceptor(function(event) {
-    if (!event.ctrlKey && !event.altKey && scout.helpers.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
+    if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
       event.stopPropagation();
       event.preventDefault();
     }

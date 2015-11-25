@@ -144,7 +144,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           }));
           contentCount++;
         });
-      } else if (scout.helpers.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
+      } else if (scout.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
         filesArgument.push(item.getAsFile());
         contentCount++;
       }
@@ -227,7 +227,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
                 encData = window.atob(srcArray[1]),
                 byteNumbers = new Array(encData.length);
 
-              if (scout.helpers.isOneOf(srcDataMatch[1], [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
+              if (scout.isOneOf(srcDataMatch[1], [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
                 for (var i = 0; i < encData.length; i++) {
                   byteNumbers[i] = encData.charCodeAt(i);
                 }

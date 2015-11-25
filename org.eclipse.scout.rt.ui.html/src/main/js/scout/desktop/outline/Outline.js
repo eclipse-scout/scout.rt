@@ -366,7 +366,7 @@ scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
     node.detailForm = null;
   }
 
-  if (this.session.desktop.outline !== this || !scout.helpers.isOneOf(node, this.selectedNodes)) {
+  if (this.session.desktop.outline !== this || !scout.isOneOf(node, this.selectedNodes)) {
     return;
   }
 

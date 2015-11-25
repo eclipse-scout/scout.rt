@@ -27,7 +27,6 @@ __include("scout/util/DoubleClickSupport.js");
 __include("scout/util/dragAndDrop.js");
 __include("scout/util/EventSupport.js");
 __include("scout/util/fonts.js");
-__include("scout/util/helpers.js");
 __include("scout/util/icons.js");
 __include("scout/util/FocusManager.js");
 __include("scout/util/FocusContext.js");

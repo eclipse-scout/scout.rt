@@ -52,7 +52,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         labelWidth = scout.graphics.prefSize(formField.$label, true).width;
       }
     }
-    if (scout.helpers.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+    if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
       scout.graphics.setBounds(formField.$label, top, left, labelWidth, this.rowHeight);
       left += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {

@@ -57,7 +57,7 @@ scout.login = {
 
     this.$user.focus();
 
-    scout.helpers.prepareDOM();
+    scout.prepareDOM();
 
     // ----- Helper functions -----
 

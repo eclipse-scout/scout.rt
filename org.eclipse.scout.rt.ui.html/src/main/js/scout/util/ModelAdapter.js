@@ -66,7 +66,7 @@ scout.ModelAdapter.prototype._init = function(model) {
     if (this._modelProperties.indexOf(propertyName) === -1) {
       this._modelProperties.push(propertyName);
     }
-    if (scout.helpers.isOneOf(propertyName, 'id', 'session', 'objectType')) {
+    if (scout.isOneOf(propertyName, 'id', 'session', 'objectType')) {
       return; // Ignore (already set manually above)
     }
     if (isAdapterProp && value) {

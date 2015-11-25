@@ -33,7 +33,7 @@ scout.logout = {
       .on('click', loginAgain)
       .appendTo($buttonBar);
 
-    scout.helpers.prepareDOM();
+    scout.prepareDOM();
 
     // ----- Helper functions -----
 

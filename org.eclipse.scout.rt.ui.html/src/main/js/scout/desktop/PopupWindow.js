@@ -41,7 +41,7 @@ scout.PopupWindow.prototype._onReady = function() {
 
   // Install polyfills on new window
   scout.polyfills.install(this.myWindow);
-  scout.helpers.prepareDOM();
+  scout.prepareDOM();
 
   this.$container = $('.scout', myDocument);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);

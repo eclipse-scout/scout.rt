@@ -656,7 +656,7 @@ scout.DateFormat = function(locale, pattern) {
         // Special case! When regexp did not match, check if input + '0' would make a
         // valid minutes value. If yes, predict this value.
         if (parseContext.analyze) {
-          if (scout.helpers.isOneOf(parseContext.inputString, '0', '1', '2', '3', '4', '5')) {
+          if (scout.isOneOf(parseContext.inputString, '0', '1', '2', '3', '4', '5')) {
             var tenMinutes = parseContext.inputString + '0';
             parseContext.dateInfo.minutes = Number(tenMinutes);
             parseContext.matchInfo.minutes = tenMinutes;
@@ -1022,7 +1022,7 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
     // If day "31" does not exist in the proposed month, use the next month
     if (dateInfo.day === 31) {
       var monthsWithThirthyOneDays = [0, 2, 4, 6, 7, 9, 11];
-      if (!scout.helpers.isOneOf(validMonth, monthsWithThirthyOneDays)) {
+      if (!scout.isOneOf(validMonth, monthsWithThirthyOneDays)) {
         validMonth = validMonth + 1;
       }
     }

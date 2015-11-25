@@ -44,6 +44,24 @@ describe('main', function() {
 
   });
 
+  describe("isOneOf", function() {
+
+    it("can check if value is one of multiple values", function() {
+      expect(scout.isOneOf()).toBe(false);
+      expect(scout.isOneOf('test')).toBe(false);
+      expect(scout.isOneOf('test', 'bla')).toBe(false);
+      expect(scout.isOneOf('test', {test: 'test'})).toBe(false);
+      expect(scout.isOneOf('test', 'bla', 123, {test: 'test'})).toBe(false);
+      expect(scout.isOneOf('test', 'bla', 123, {test: 'test'}, 'test', true)).toBe(true);
+      expect(scout.isOneOf('test', 'bla', 123, {test: 'test'}, ['test'], true)).toBe(false);
+      expect(scout.isOneOf('test', 'bla', 123, {test: 'test'}, 'Test', true)).toBe(false);
+      expect(scout.isOneOf('test', ['bla', 123, {test: 'test'}, 'test', true])).toBe(true);
+      expect(scout.isOneOf(123, '123', 123.00000000000001, -123)).toBe(false);
+      expect(scout.isOneOf(-123, '123', 123.00000000000001, -123)).toBe(true);
+    });
+
+  });
+
   describe('create', function() {
 
     it('accepts string, object or functions as first argument', function() {

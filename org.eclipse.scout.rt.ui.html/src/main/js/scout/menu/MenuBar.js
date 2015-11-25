@@ -270,7 +270,7 @@ scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
 };
 
 scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
-  return scout.helpers.isOneOf(scout.keys.ENTER, keyStroke.which) &&
+  return scout.isOneOf(scout.keys.ENTER, keyStroke.which) &&
     !keyStroke.ctrl &&
     !keyStroke.alt &&
     !keyStroke.shift;

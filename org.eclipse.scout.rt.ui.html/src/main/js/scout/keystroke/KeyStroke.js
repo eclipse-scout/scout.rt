@@ -127,7 +127,7 @@ scout.KeyStroke.prototype._accept = function(event) {
   return this._acceptModifer(this.ctrl, event.ctrlKey) &&
     this._acceptModifer(this.alt, event.altKey) &&
     this._acceptModifer(this.shift, event.shiftKey) &&
-    scout.helpers.isOneOf(event.which, this.which);
+    scout.isOneOf(event.which, this.which);
 };
 
 scout.KeyStroke.prototype._acceptModifer = function(modifier, eventModifier) {

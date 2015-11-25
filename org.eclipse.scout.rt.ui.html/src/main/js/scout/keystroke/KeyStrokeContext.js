@@ -79,7 +79,7 @@ scout.KeyStrokeContext.prototype._applyPropagationFlags = function(event) {
   var modifierBitMask = scout.keyStrokeModifier.toModifierBitMask(event);
   var keys = this._stopPropagationKeys[modifierBitMask];
 
-  if (keys && scout.helpers.isOneOf(event.which, keys)) {
+  if (keys && scout.isOneOf(event.which, keys)) {
     event.stopPropagation();
   }
 

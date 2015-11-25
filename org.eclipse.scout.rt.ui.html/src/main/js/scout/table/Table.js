@@ -135,7 +135,7 @@ scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
   //           - shift + '↑-event'/'↓-event' are not consumed by a single selection table, and would propagate otherwise;
   //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
   keyStrokeContext.registerStopPropagationInterceptor(function(event) {
-    if (!event.ctrlKey && !event.altKey && scout.helpers.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
+    if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
       event.stopPropagation();
       event.preventDefault();
     }
