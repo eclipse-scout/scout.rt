@@ -78,7 +78,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -1920,19 +1919,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
       catch (RuntimeException t) {
         LOG.error("extension " + ext, t);
-      }
-    }
-
-    // gather tool button forms
-    // TODO ASA maybe obsolete
-    for (IToolButton toolButton : getToolButtons()) {
-      if (toolButton instanceof AbstractFormToolButton) {
-        AbstractFormToolButton<?> formToolButton = (AbstractFormToolButton<?>) toolButton;
-        IForm form = formToolButton.getForm();
-        if (form != null) {
-          showedForms.add(form);
-          formToolButton.setForm(null);
-        }
       }
     }
 

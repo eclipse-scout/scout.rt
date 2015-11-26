@@ -2096,12 +2096,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return getRootGroupBox().isEmpty();
   }
 
-  @Override
-  public void dispose() {
-    // TODO ASA remove delegation, only use disposeForm?
-    disposeFormInternal();
-  }
-
   /**
    * do not use or override this internal method
    */

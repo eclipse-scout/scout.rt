@@ -1557,7 +1557,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         getOrganizedTable().getTableCustomizer().setSerializedData(tableCustomizerData);
       }
       if (getOrganizedTable().getReloadHandler() != null) {
-        // FIXME ASA discuss
         getOrganizedTable().resetColumnConfiguration();
         getOrganizedTable().getReloadHandler().reload();
       }

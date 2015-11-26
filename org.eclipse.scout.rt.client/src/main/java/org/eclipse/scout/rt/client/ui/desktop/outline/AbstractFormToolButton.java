@@ -142,7 +142,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     super.disposeInternal();
     FORM form = getForm();
     if (form != null) {
-      form.dispose();
+      form.doClose();
     }
   }
 
