@@ -1215,42 +1215,46 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 if (getOrganizedTable().getTableCustomizer() != null) {
                   ArrayList<String> existingColumns = new ArrayList<String>();
                   for (IColumn c : getOrganizedTable().getColumns()) {
-                    existingColumns.add(c.getColumnId());
+                    if (c.isVisible()) {
+                      existingColumns.add(c.getColumnId());
+                    }
                   }
                   getOrganizedTable().getTableCustomizer().addColumn();
+                  moveNewColumnsBeforeSelection(existingColumns);
+                }
+              }
+            }
 
-                  // find target row (selected row or first row)
-                  ITableRow targetOrderRow = getColumnsTableField().getTable().getSelectedRow();
-                  if (targetOrderRow == null && getColumnsTableField().getTable().getRowCount() > 0) {
-                    targetOrderRow = getColumnsTableField().getTable().getRow(0);
-                  }
-                  if (targetOrderRow == null) {
-                    return;
-                  }
-
-                  // find new row
-                  getColumnsTableField().reloadTableData();
-                  for (ITableRow newColumnRow : getColumnsTableField().getTable().getRows()) {
-                    if (!existingColumns.contains(getColumnsTableField().getTable().getKeyColumn().getValue(newColumnRow).getColumnId())) {
-                      // move new column
-                      try {
-                        getColumnsTableField().getTable().setTableChanging(true);
-                        if (newColumnRow.getRowIndex() < targetOrderRow.getRowIndex()) {
-                          moveDown(newColumnRow, targetOrderRow.getRowIndex());
-                        }
-                        else {
-                          moveUp(newColumnRow, targetOrderRow.getRowIndex());
-                        }
-                        updateColumnVisibilityAndOrder();
-
-                        // select new row
-                        getColumnsTableField().getTable().selectRow(newColumnRow);
-                      }
-                      finally {
-                        getColumnsTableField().getTable().setTableChanging(false);
-                      }
-                      break;
+            public void moveNewColumnsBeforeSelection(ArrayList<String> existingColumns) {
+              ITableRow insertBeforeThisRow = getColumnsTableField().getTable().getSelectedRow();
+              if (insertBeforeThisRow == null && getColumnsTableField().getTable().getRowCount() > 0) {
+                insertBeforeThisRow = getColumnsTableField().getTable().getRow(0);
+              }
+              getColumnsTableField().reloadTableData();
+              if (insertBeforeThisRow == null) {
+                return;
+              }
+              int insertBeforeRowIndex = insertBeforeThisRow.getRowIndex();
+              // find new rows
+              for (ITableRow columnRow : getColumnsTableField().getTable().getRows()) {
+                if (!existingColumns.contains(getColumnsTableField().getTable().getKeyColumn().getValue(columnRow).getColumnId())) {
+                  // move new column
+                  try {
+                    getColumnsTableField().getTable().setTableChanging(true);
+                    if (columnRow.getRowIndex() < insertBeforeRowIndex) {
+                      moveDown(columnRow, insertBeforeRowIndex);
                     }
+                    else {
+                      moveUp(columnRow, insertBeforeRowIndex);
+                    }
+                    ++insertBeforeRowIndex;
+                    updateColumnVisibilityAndOrder();
+
+                    // select new row
+                    getColumnsTableField().getTable().selectRow(columnRow);
+                  }
+                  finally {
+                    getColumnsTableField().getTable().setTableChanging(false);
                   }
                 }
               }
