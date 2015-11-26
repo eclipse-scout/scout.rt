@@ -46,6 +46,9 @@
     <module>../org.eclipse.scout.rt.server.jms</module>
     <module>../org.eclipse.scout.rt.server.jaxws</module>
     <module>../org.eclipse.scout.rt.server.jaxws.test</module>
+    <module>../org.eclipse.scout.rt.server.jdbc</module>
+    <module>../org.eclipse.scout.rt.server.jdbc.test</module>
+
     <module>../org.eclipse.scout.jaxws.apt</module>
 
     <module>../org.eclipse.scout.rt.client</module>
@@ -198,9 +201,22 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.jdbc</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.jdbc.test</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
         <version>5.2.0-SNAPSHOT</version>
       </dependency>
+
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.test</artifactId>

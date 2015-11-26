@@ -18,8 +18,6 @@ import java.security.Permissions;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.ServiceOperationInvoker;
-import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
-import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.ping.PingService;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -60,7 +58,6 @@ public class RemoteServiceAccessTest {
     assertNonAccessible(bo, IMockProcessService.class, IMockProcessService.class.getMethod("interna3"), MockProcessService2Sub.class);
     //
     assertAccessible(bo, IPingService.class, IPingService.class.getMethod("ping", String.class), PingService.class);
-    assertNonAccessible(bo, ISqlService.class, ISqlService.class.getMethod("commit"), AbstractSqlService.class);
 
     assertNonAccessible(bo, IMockChildProcessService.class, IMockChildProcessService.class.getMethod("interna1"), MockChildProcessService.class);
   }

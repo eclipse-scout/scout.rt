@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 
 /**
  * Represents a transaction which multiple transaction members can participate for consistent commit or rollback.
