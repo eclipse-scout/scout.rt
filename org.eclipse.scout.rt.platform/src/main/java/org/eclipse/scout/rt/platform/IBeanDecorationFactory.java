@@ -17,14 +17,14 @@ import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
  * <p>
  * Knows how to decorate an object instance of a {@link IBean} wrapped with a runtime context (multiple decorators)
  * <p>
- * 
+ *
  * @see IBeanDecorator
  * @since 5.1
  */
 @Bean
 public interface IBeanDecorationFactory {
   /**
-   * @return the decorated instance
+   * @return the decorated instance, may be <code>null</code>, if no decoration is needed
    */
   <T> IBeanDecorator<T> decorate(IBean<T> bean, Class<? extends T> queryType);
 }
