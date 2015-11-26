@@ -22,15 +22,15 @@ scout.TableToggleRowKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TableToggleRowKeyStroke.parent.prototype._accept.call(this, event);
   return accepted &&
     this.field.checkable &&
-    this.field.$selectedRows().length;
+    this.field.selectedRows.length;
 };
 
 scout.TableToggleRowKeyStroke.prototype.handle = function(event) {
-  var $selection = this.field.$selectedRows();
+  var table = this.field,
+    selection = table.selectedRows;
 
-  var checked = !$selection.first().data('row').checked;
-  var table = this.field;
-  $selection.each(function() {
-    table.checkRow($(this).data('row'), checked);
+  var checked = selection[0].checked;
+  selection.forEach(function(row) {
+    table.checkRow(row, !checked);
   });
 };

@@ -299,4 +299,90 @@ describe("TableKeyStrokes", function() {
     });
 
   });
+
+  describe("space", function() {
+
+    it("does nothing if no rows are selected", function() {
+      var model = helper.createModelFixture(2, 4);
+      model.checkable = true;
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.checkRow(rows[2], true);
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.SPACE);
+      expect(rows[0].checked).toBe(false);
+      expect(rows[1].checked).toBe(false);
+      expect(rows[2].checked).toBe(true);
+      expect(rows[3].checked).toBe(false);
+    });
+
+    it("checks the selected rows if first row is unchecked", function() {
+      var model = helper.createModelFixture(2, 4);
+      model.checkable = true;
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
+
+      table.$data.triggerKeyDown(scout.keys.SPACE);
+      expect(rows[0].checked).toBe(false);
+      expect(rows[1].checked).toBe(true);
+      expect(rows[2].checked).toBe(true);
+      expect(rows[3].checked).toBe(false);
+    });
+
+    it("does not modify already checked rows when checking", function() {
+      var model = helper.createModelFixture(2, 4);
+      model.checkable = true;
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      table.checkRow(rows[2], true);
+      helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
+
+      table.$data.triggerKeyDown(scout.keys.SPACE);
+      expect(rows[0].checked).toBe(false);
+      expect(rows[1].checked).toBe(true);
+      expect(rows[2].checked).toBe(true);
+      expect(rows[3].checked).toBe(false);
+    });
+
+    it("unchecks the selected rows if first row is checked", function() {
+      var model = helper.createModelFixture(2, 4);
+      model.checkable = true;
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      table.checkRow(rows[0], true);
+      table.checkRow(rows[1], true);
+      table.checkRow(rows[2], true);
+      table.checkRow(rows[3], true);
+      helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
+
+      table.$data.triggerKeyDown(scout.keys.SPACE);
+      expect(rows[0].checked).toBe(true);
+      expect(rows[1].checked).toBe(false);
+      expect(rows[2].checked).toBe(false);
+      expect(rows[3].checked).toBe(true);
+    });
+
+    it("does not modify already unchecked rows when unchecking", function() {
+      var model = helper.createModelFixture(2, 4);
+      model.checkable = true;
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      table.checkRow(rows[1], true);
+      table.checkRow(rows[2], false);
+      helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
+
+      table.$data.triggerKeyDown(scout.keys.SPACE);
+      expect(rows[0].checked).toBe(false);
+      expect(rows[1].checked).toBe(false);
+      expect(rows[2].checked).toBe(false);
+      expect(rows[3].checked).toBe(false);
+    });
+
+  });
 });
