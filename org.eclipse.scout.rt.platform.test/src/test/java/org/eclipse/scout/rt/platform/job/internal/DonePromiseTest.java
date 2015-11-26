@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -50,10 +49,10 @@ public class DonePromiseTest {
     // Latch to wait until done-handling is done
     final BlockingCountDownLatch doneLatch = new BlockingCountDownLatch(3);
 
-    final Future<String> future = mock(Future.class);
+    final JobFutureTask<String> future = mock(JobFutureTask.class);
     when(future.isDone()).thenReturn(false);
 
-    final DonePromise<String> promise = new DonePromise<>(future);
+    final DonePromise<String> promise = new DonePromise<>(future, mock(JobManager.class));
 
     // Schedule job-1
     Jobs.schedule(new IRunnable() {

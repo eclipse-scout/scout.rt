@@ -69,7 +69,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final JobInput m_input;
   protected final Long m_expirationDate;
 
-  protected final DonePromise<RESULT> m_donePromise = new DonePromise<>(this);
+  protected final DonePromise<RESULT> m_donePromise;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
   protected volatile boolean m_blocked;
@@ -88,6 +88,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
     m_input = input;
+    m_donePromise = new DonePromise<>(this, jobManager);
 
     m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
 
@@ -104,13 +105,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   protected void done() {
-    // IMPORTANT: event must be sent before any waiting thread is released.
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(this));
-
+    m_donePromise.fulfill();
     m_runMonitor.unregisterCancellable(this);
     m_jobManager.unregisterFuture(this);
     m_listeners.clear();
-    m_donePromise.fulfill();
 
     // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
   }
@@ -347,8 +345,12 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     };
   }
 
-  List<JobListenerWithFilter> getListeners() {
+  protected List<JobListenerWithFilter> getListeners() {
     return m_listeners;
+  }
+
+  protected DonePromise<RESULT> getDonePromise() {
+    return m_donePromise;
   }
 
   private <ERROR extends Throwable> RESULT throwElseReturnNull(final Throwable t, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {

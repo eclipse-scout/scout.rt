@@ -47,7 +47,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 @Bean
 public class FutureSet {
 
-  private final Set<IFuture<?>> m_futures;
+  private final Set<JobFutureTask<?>> m_futures;
 
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
@@ -95,7 +95,7 @@ public class FutureSet {
     m_listenerRegistration.dispose();
 
     // Clear and cancel all futures.
-    final List<IFuture<?>> runningFutures;
+    final List<JobFutureTask<?>> runningFutures;
     m_writeLock.lock();
     try {
       runningFutures = copyFutures();
@@ -106,7 +106,7 @@ public class FutureSet {
       m_writeLock.unlock();
     }
 
-    for (final IFuture<?> runningFuture : runningFutures) {
+    for (final JobFutureTask<?> runningFuture : runningFutures) {
       runningFuture.cancel(true);
     }
   }
@@ -114,7 +114,7 @@ public class FutureSet {
   /**
    * Adds the given Future to this {@link FutureSet}.
    */
-  public void add(final IFuture<?> future) {
+  public void add(final JobFutureTask<?> future) {
     m_writeLock.lock();
     try {
       m_futures.add(future);
@@ -128,7 +128,7 @@ public class FutureSet {
   /**
    * Removes the given Future from this {@link FutureSet}.
    */
-  public void remove(final IFuture<?> future) {
+  public void remove(final JobFutureTask<?> future) {
     m_writeLock.lock();
     try {
       m_futures.remove(future);
@@ -140,19 +140,22 @@ public class FutureSet {
   }
 
   /**
-   * Checks whether all Futures accepted by the given Filter are in 'done-state'.
-   * <p/>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.
+   * Returns <code>true</code>, if all Futures which are accepted by the given filter match the specified matcher.
    *
    * @param filter
-   *          filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all contained
-   *          Futures are checked, which is the same as using {@link AlwaysFilter}.
-   * @return <code>true</code> if all Futures matching the given Filter are in 'done-state'.
+   *          to limit the Futures to be matched by the matcher. If <code>null</code>, all contained Futures are
+   *          checked, which is the same as using {@link AlwaysFilter}.
+   * @param matcher
+   *          to match the filtered Futures.
+   * @return <code>true</code> if all Futures accepted by the specified Filter are successfully matched.
    */
-  public boolean isDone(final IFilter<IFuture<?>> filter) {
-    for (final IFuture<?> future : copyFutures()) {
-      if (!future.isDone() && (filter == null || filter.accept(future))) {
+  public boolean matchesAll(final IFilter<IFuture<?>> filter, IFilter<JobFutureTask<?>> matcher) {
+    for (final JobFutureTask<?> future : copyFutures()) {
+      if (filter != null && !filter.accept(future)) {
+        continue;
+      }
+
+      if (!matcher.accept(future)) {
         return false;
       }
     }
@@ -162,7 +165,7 @@ public class FutureSet {
   /**
    * Blocks the calling thread until all Futures accepted by the given Filter are in 'done-state', or the given timeout
    * elapses.
-   * <p/>
+   * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}.<br/>
    * e.g. <code>new AndFilter(new ClientSessionFutureFilter(...), new NotFilter(new BlockedFutureFilter()));</code>
@@ -185,7 +188,7 @@ public class FutureSet {
     m_writeLock.lockInterruptibly();
     try {
       long nanos = unit.toNanos(timeout);
-      while (!isDone(filter) && nanos > 0L) {
+      while (!matchesAll(filter, DonePromise.DONE_EVENT_FIRED_MATCHER) && nanos > 0L) {
         nanos = m_changedCondition.awaitNanos(nanos);
       }
       return (nanos > 0L);
@@ -197,7 +200,7 @@ public class FutureSet {
 
   /**
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
-   * <p/>
+   * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}.
    *
@@ -208,7 +211,7 @@ public class FutureSet {
    *          called for each Futures that passed the filter.
    */
   public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
-    for (final IFuture<?> future : copyFutures()) {
+    for (final JobFutureTask<?> future : copyFutures()) {
       if (future.isDone() || (filter != null && !filter.accept(future))) {
         continue;
       }
@@ -220,7 +223,7 @@ public class FutureSet {
 
   /**
    * Cancels all Futures which are accepted by the given Filter.
-   * <p/>
+   * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}.
    *
@@ -247,7 +250,7 @@ public class FutureSet {
     return Collections.singleton(Boolean.TRUE).equals(success);
   }
 
-  protected List<IFuture<?>> copyFutures() {
+  protected List<JobFutureTask<?>> copyFutures() {
     m_readLock.lock();
     try {
       return new ArrayList<>(m_futures); // performance hint: creating an ArrayList has much better performance than creating a HashSet.

@@ -24,10 +24,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
  * This promise represents a proxy for the future's final value, and allows to associate handlers to be notified
@@ -46,25 +49,32 @@ class DonePromise<RESULT> {
   private final Lock m_lock = new ReentrantLock();
   private final Condition m_doneCondition = m_lock.newCondition();
 
-  private final Future<RESULT> m_future;
+  private final JobFutureTask<RESULT> m_future;
+  private final JobManager m_jobManager;
   private final List<PromiseHandler<RESULT>> m_handlers;
 
   private volatile DoneEvent<RESULT> m_doneEvent;
 
-  public DonePromise(final Future<RESULT> future) {
+  public DonePromise(final JobFutureTask<RESULT> future, final JobManager jobManager) {
     m_future = future;
+    m_jobManager = jobManager;
     m_handlers = new ArrayList<>();
   }
 
   /**
-   * Invoke to transition into 'done' state, which in turn notifies associated handlers and releases any waiting thread.
+   * Invoke to transition into 'done' state, which in turn fires the 'done' event, notifies registered handlers, and
+   * releases any waiting threads.
    */
   public void fulfill() {
+    Assertions.assertTrue(m_future.isDone(), "Unexpected state: Future not in 'done' state");
+    Assertions.assertNull(m_doneEvent, "Unexpected state: Promise already in 'done' state");
+
+    // IMPORTANT: event must be sent before any waiting thread is released.
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(m_future));
+
+    // Release any thread waiting for a future to become 'done'.
     m_lock.lock();
     try {
-      Assertions.assertNull(m_doneEvent, "Unexpected state: Promise already in 'done' state");
-      Assertions.assertTrue(isFutureDone(), "Unexpected state: Future not in 'done' state");
-
       m_doneEvent = DonePromise.newDoneEvent(m_future);
       m_doneCondition.signalAll();
     }
@@ -72,7 +82,7 @@ class DonePromise<RESULT> {
       m_lock.unlock();
     }
 
-    // Notify associated handlers.
+    // Notify registered handlers.
     for (final PromiseHandler<RESULT> handler : m_handlers) {
       handler.handleAsync(m_doneEvent);
     }
@@ -93,7 +103,7 @@ class DonePromise<RESULT> {
   public void whenDone(final IDoneHandler<RESULT> handler, final RunContext runContext) {
     m_lock.lock();
     try {
-      if (m_doneEvent == null) {
+      if (!isDoneEventFired()) {
         m_handlers.add(new PromiseHandler<>(handler, runContext));
         return;
       }
@@ -125,7 +135,7 @@ class DonePromise<RESULT> {
   public RESULT get() throws InterruptedException, ExecutionException {
     m_lock.lockInterruptibly();
     try {
-      while (!isFutureDone()) {
+      while (!isDoneEventFired()) {
         m_doneCondition.await();
       }
     }
@@ -148,7 +158,7 @@ class DonePromise<RESULT> {
     m_lock.lockInterruptibly();
     try {
       long nanos = unit.toNanos(timeout);
-      while (!isFutureDone() && nanos > 0L) {
+      while (!isDoneEventFired() && nanos > 0L) {
         nanos = m_doneCondition.awaitNanos(nanos);
       }
       if (nanos <= 0L) {
@@ -162,11 +172,14 @@ class DonePromise<RESULT> {
     return DonePromise.retrieveFinalValue(m_future);
   }
 
-  private boolean isFutureDone() {
-    return m_future.isDone();
-  }
-
   // ==== Internal helper methods ==== //
+
+  /**
+   * Returns <code>true</code>, if the future is in 'done' state, and upon firing 'done'.
+   */
+  private boolean isDoneEventFired() {
+    return m_doneEvent != null;
+  }
 
   /**
    * Retrieves the given future's final value. This method expects the future to be in 'done' state.
@@ -223,4 +236,28 @@ class DonePromise<RESULT> {
           .withName("Notifying 'done-promise' callback"));
     }
   }
+
+  // ==== Matchers ==== //
+
+  /**
+   * Matches futures in 'done' state.
+   */
+  static final IFilter<JobFutureTask<?>> FUTURE_DONE_MATCHER = new IFilter<JobFutureTask<?>>() {
+
+    @Override
+    public boolean accept(final JobFutureTask<?> future) {
+      return future.isDone();
+    }
+  };
+
+  /**
+   * Matches futures in 'done' state and with the 'done' event fired.
+   */
+  static final IFilter<JobFutureTask<?>> DONE_EVENT_FIRED_MATCHER = new IFilter<JobFutureTask<?>>() {
+
+    @Override
+    public boolean accept(final JobFutureTask<?> future) {
+      return future.getDonePromise().isDoneEventFired();
+    }
+  };
 }

@@ -65,7 +65,7 @@ public class JobTestUtil {
       if (System.currentTimeMillis() > deadline) {
         fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedCompetitorCount, mutex.getCompetitorCount()));
       }
-      Thread.sleep(10);
+      Thread.yield();
     }
   }
 }

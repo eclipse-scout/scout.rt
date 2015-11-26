@@ -26,10 +26,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -239,7 +242,7 @@ public class MutexTest {
    * acquire the mutex (hold by task1), it is cancelled hard (interrupted=true). That causes task2 no longer to wait for
    * the mutex, meaning that when task1 releases the mutex, task2 does not become the mutex owner.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = 5_000)
   public void testAcquisition5() throws InterruptedException {
     final IMutex mutex = m_task1.getJobInput().getMutex();
 
@@ -254,19 +257,27 @@ public class MutexTest {
     assertEquals(1, mutex.getCompetitorCount());
 
     // Task2 tries to acquire the mutex, and blocks until acquired
+    final BlockingCountDownLatch interruptedLatch = new BlockingCountDownLatch(1);
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        mutex.acquire(m_task2, QueuePosition.TAIL);
+        try {
+          mutex.acquire(m_task2, QueuePosition.TAIL);
+        }
+        catch (ProcessingException e) {
+          interruptedLatch.countDown();
+        }
       }
-    }, Jobs.newInput());
-    assertFalse(future.awaitDone(1, TimeUnit.SECONDS));
+    }, Jobs.newInput().withLogOnError(false));
+
+    JobTestUtil.waitForMutexCompetitors(mutex, 2);
     assertTrue(mutex.isMutexOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 
     future.cancel(true);
 
+    assertTrue(interruptedLatch.await());
     assertTrue(mutex.isMutexOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 

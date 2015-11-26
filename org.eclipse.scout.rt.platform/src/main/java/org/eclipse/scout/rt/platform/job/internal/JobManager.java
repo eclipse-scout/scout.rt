@@ -111,7 +111,7 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   @Override
   public boolean isDone(final IFilter<IFuture<?>> filter) {
-    return m_futures.isDone(filter);
+    return m_futures.matchesAll(filter, DonePromise.FUTURE_DONE_MATCHER);
   }
 
   @Override
@@ -304,12 +304,12 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Internal
-  protected void registerFuture(final IFuture<?> future) {
+  protected void registerFuture(final JobFutureTask<?> future) {
     m_futures.add(future);
   }
 
   @Internal
-  protected void unregisterFuture(final IFuture<?> future) {
+  protected void unregisterFuture(final JobFutureTask<?> future) {
     m_futures.remove(future);
   }
 
