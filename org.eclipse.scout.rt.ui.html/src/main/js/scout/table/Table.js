@@ -3082,20 +3082,26 @@ scout.Table.prototype.onModelAction = function(event) {
  * Method invoked when this is a 'detailTable' and the outline content is displayed.
  * @override Widget.js
  */
-scout.Table.prototype._attach = function() {
-  this._$parent.append(this.$container);
-  var htmlParent = this.htmlComp.getParent();
-  this.htmlComp.setSize(htmlParent.getSize());
-  this.session.detachHelper.afterAttach(this.$container);
+scout.Table.prototype._attach = function(event) {
+  if (event.target === this) {
+    this._$parent.append(this.$container);
+    var htmlParent = this.htmlComp.getParent();
+    this.htmlComp.setSize(htmlParent.getSize());
+    this.session.detachHelper.afterAttach(this.$container);
+    scout.Table.parent.prototype._attach.call(this, event);
+  }
 };
 
 /**
  * Method invoked when this is a 'detailTable' and the outline content is not displayed anymore.
  * @override Widget.js
  */
-scout.Table.prototype._detach = function() {
-  this.session.detachHelper.beforeDetach(this.$container);
-  this.$container.detach();
+scout.Table.prototype._detach = function(event) {
+  if (event.target === this) {
+    this.session.detachHelper.beforeDetach(this.$container);
+    this.$container.detach();
+    scout.Table.parent.prototype._detach.call(this, event);
+  }
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

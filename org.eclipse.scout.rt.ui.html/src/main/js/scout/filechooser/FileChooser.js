@@ -264,17 +264,19 @@ scout.FileChooser.prototype._onDrop = function(event) {
 /**
  * @override Widget.js
  */
-scout.FileChooser.prototype._attach = function() {
+scout.FileChooser.prototype._attach = function(event) {
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
+  scout.FileChooser.parent.prototype._attach.call(this, event);
 };
 
 /**
  * @override Widget.js
  */
-scout.FileChooser.prototype._detach = function() {
+scout.FileChooser.prototype._detach = function(event) {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
+  scout.FileChooser.parent.prototype._detach.call(this, event);
 };
 
 /**

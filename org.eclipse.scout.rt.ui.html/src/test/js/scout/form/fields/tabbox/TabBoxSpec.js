@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global FormSpecHelper */
-describe("TabBox", function() {
+describe('TabBox', function() {
   var session;
   var helper;
 
@@ -36,7 +36,7 @@ describe("TabBox", function() {
     return createAdapter(model, session, tabItems);
   }
 
-  describe("render", function() {
+  describe('render', function() {
     var field;
 
     beforeEach(function() {
@@ -44,19 +44,13 @@ describe("TabBox", function() {
       field = createTabBox([groupBox]);
     });
 
-    it("does NOT call layout for the selected tab on initialization", function() {
+    it('does NOT call layout for the selected tab on initialization', function() {
       spyOn(session.layoutValidator, 'invalidateTree').and.callThrough();
       field.render(session.$entryPoint);
       expect(session.layoutValidator.invalidateTree).not.toHaveBeenCalled();
     });
 
-    it("must clear cache when render is called anew", function() {
-      field._$tabContentCache = ['foo'];
-      field.render(session.$entryPoint);
-      expect(field._$tabContentCache.length).toBe(0);
-    });
-
-    it("must not create LogicalGridData for tab items", function() {
+    it('must not create LogicalGridData for tab items', function() {
       field.render(session.$entryPoint);
       // See TabItem.js for the reason for this spec
       expect(field.tabItems[0].htmlComp.layoutData).toBe(null);

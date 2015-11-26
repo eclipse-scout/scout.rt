@@ -18,9 +18,6 @@ scout.TabBox = function() {
   this.selectedTab;
   this._$tabArea;
   this._$tabContent;
-
-  // Contains detached tab-content, stored in order to be appended later
-  this._$tabContentCache = [];
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
@@ -37,7 +34,6 @@ scout.TabBox.prototype._init = function(model) {
 };
 
 scout.TabBox.prototype._render = function($parent) {
-  this._$tabContentCache = []; // clear cache when tab-box is rendered anew
   this.addContainer($parent, 'tab-box', new scout.TabBoxLayout(this));
 
   this._$tabArea = this.$container
@@ -71,7 +67,6 @@ scout.TabBox.prototype._remove = function() {
   scout.TabBox.parent.prototype._remove.call(this);
   this._removeTabs();
   this._removeTabContent();
-  this._$tabContentCache = [];
   if (this.menuBar) {
     this.menuBar.remove();
   }
@@ -131,26 +126,19 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
       });
     }
 
-    this.tabItems[oldSelectedTab].setTabActive(false);
-    this.tabItems[this.selectedTab].setTabActive(true);
+    var oldSelectedTabItem = this.tabItems[oldSelectedTab],
+      selectedTabItem = this.tabItems[this.selectedTab];
+
+    oldSelectedTabItem.setTabActive(false);
+    selectedTabItem.setTabActive(true);
 
     if (this.rendered) {
       // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
-      if (!this.tabItems[this.selectedTab]._tabRendered) {
+      if (!selectedTabItem._tabRendered) {
         scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
       }
-
-      this.tabItems[this.selectedTab].focusTab();
-
-      var $tabContent = this._$tabContent.children().first();
-      if ($tabContent.length > 0) {
-        this.session.detachHelper.beforeDetach($tabContent, {
-          storeFocus: false
-        });
-        $tabContent.detach();
-        this._$tabContentCache[oldSelectedTab] = $tabContent;
-      }
-
+      selectedTabItem.focusTab();
+      oldSelectedTabItem.detach();
       this._renderTabContent();
     }
   }
@@ -169,7 +157,6 @@ scout.TabBox.prototype._onKeyDown = function(event) {
 
   event.preventDefault();
   event.stopPropagation();
-
   tabIndex = this._getNextVisibleTabIndexForKeyStroke(this.selectedTab, event.which);
 
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
@@ -181,15 +168,16 @@ scout.TabBox.prototype._onKeyDown = function(event) {
 };
 
 scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualIndex, keyStroke) {
-  var modifier = keyStroke === scout.keys.LEFT ? -1 : 1;
-  var endFunc = function(i) {
-    if (keyStroke === scout.keys.LEFT) {
-      return i >= 0;
-    }
-    return i < this.tabItems.length;
-  }.bind(this);
-  for (var i = actualIndex + modifier; endFunc(i); i = i + modifier) {
-    var tabItem = this.tabItems[i];
+  var i, tabItem,
+    modifier = keyStroke === scout.keys.LEFT ? -1 : 1,
+    endFunc = function(i) {
+      if (keyStroke === scout.keys.LEFT) {
+        return i >= 0;
+      }
+      return i < this.tabItems.length;
+    }.bind(this);
+  for (i = actualIndex + modifier; endFunc(i); i = i + modifier) {
+    tabItem = this.tabItems[i];
     if (tabItem.visible) {
       return i;
     }
@@ -197,21 +185,18 @@ scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualInde
   return actualIndex;
 };
 
-scout.TabBox.prototype._renderTabContent = function($tabContent) {
+scout.TabBox.prototype._renderTabContent = function() {
   // add new tab-content (use from cache or render)
-  var $cachedTabContent = this._$tabContentCache[this.selectedTab];
-  if ($cachedTabContent) {
-    $cachedTabContent.appendTo(this._$tabContent);
-    this.session.detachHelper.afterAttach($cachedTabContent);
+  var selectedTabItem = this.tabItems[this.selectedTab];
+  if (selectedTabItem.rendered && !selectedTabItem.attached) {
+    selectedTabItem.attach();
   } else {
-    this.tabItems[this.selectedTab].render(this._$tabContent);
-
-    /* in Swing there's some complicated logic dealing with borders and labels
-     * that determines whether the first group-box in a tab-box has a title or not.
-     * I decided to simply this and always set the title of the first group-box
-     * to invisible.
-     */
-    this.tabItems[this.selectedTab]._renderLabelVisible(false);
+    // in Swing there's some complicated logic dealing with borders and labels
+    // that determines whether the first group-box in a tab-box has a title or not.
+    // I decided to simply this and always set the title of the first group-box
+    // to invisible.
+    selectedTabItem.render(this._$tabContent);
+    selectedTabItem._renderLabelVisible(false);
   }
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
@@ -229,8 +214,18 @@ scout.TabBox.prototype.updateMenuBar = function() {
 };
 
 /**
- * @override CompositeField
+ * @override CompositeField.js
  */
 scout.TabBox.prototype.getFields = function() {
   return this.tabItems;
 };
+
+/**
+ * @override Widget.js
+ */
+scout.TabBox.prototype._attachChildren = function(event) {
+  // All tab-items are children of the tab-box. But we don't want to attach _all_ tab-items
+  // but only the currently selected tab-item.
+  this.tabItems[this.selectedTab].attach(event);
+};
+

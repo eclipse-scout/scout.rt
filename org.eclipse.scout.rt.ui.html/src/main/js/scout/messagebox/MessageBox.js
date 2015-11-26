@@ -195,15 +195,17 @@ scout.MessageBox.prototype.close = function() {
 /**
  * @override Widget.js
  */
-scout.MessageBox.prototype._attach = function() {
+scout.MessageBox.prototype._attach = function(event) {
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
+  scout.MessageBox.parent.prototype._attach.call(this, event);
 };
 
 /**
  * @override Widget.js
  */
-scout.MessageBox.prototype._detach = function() {
+scout.MessageBox.prototype._detach = function(event) {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
+  scout.MessageBox.parent.prototype._detach.call(this, event);
 };

@@ -95,6 +95,9 @@ scout.DetachHelper.prototype._storeTooltips = function($container) {
 
 scout.DetachHelper.prototype._restoreTooltips = function($container) {
   var tooltips = $container.data('tooltips');
+  if (!tooltips) {
+    return;
+  }
   tooltips.forEach(function(tooltip) {
     tooltip.render(tooltip.$parent);
   });

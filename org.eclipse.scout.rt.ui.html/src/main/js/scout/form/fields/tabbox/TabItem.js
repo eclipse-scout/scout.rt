@@ -131,3 +131,29 @@ scout.TabItem.prototype._updateTab = function() {
   this.$tabContainer.setVisible(this.visible);
   this.$tabContainer.textOrNbsp(scout.strings.removeAmpersand(this.label));
 };
+
+/**
+ * @override Widgets.js
+ */
+scout.TabItem.prototype._detach = function(event) {
+  if (event.target === this) {
+    this.session.detachHelper.beforeDetach(this.$container, {
+      storeFocus: false
+    });
+    this.$container.detach();
+    this.attached = false;
+  }
+};
+
+/**
+ * @override Widgets.js
+ */
+scout.TabItem.prototype._attach = function(event) {
+  if (event.target === this) {
+    this._$parent.append(this.$container);
+    this.session.detachHelper.afterAttach(this.$container);
+    this.attached = true;
+  }
+};
+
+

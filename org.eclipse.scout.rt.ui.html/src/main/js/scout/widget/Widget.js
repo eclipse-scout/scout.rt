@@ -319,23 +319,29 @@ scout.Widget.prototype.off = function(type, func) {
 /**
  * This method attaches the detached $container to the DOM.
  */
-scout.Widget.prototype.attach = function() {
+scout.Widget.prototype.attach = function(event) {
   if (this.attached || !this.rendered) {
     return;
   }
-  this._attach();
+  event = event || {target: this};
+  this._attach(event);
   this.children.forEach(function(child) {
-    child.attach();
+    child.attach(event);
   });
-  this.attached = true;
 };
 
 /**
  * Override this method to do something when Widget is attached again. Typically
- * you will append this.$container to this._$parent. The default implementation does nothing.
+ * you will append this.$container to this._$parent. The default implementation
+ * sets this.attached to true.
+ *
+ * @param the event.target property is used to decide if a Widget must attach
+ *   its $container. When the parent of the Widget already attaches, the Widget
+ *   itself must _not_ attach its own $container. That's why we should only
+ *   attach when event.target is === this.
  */
-scout.Widget.prototype._attach = function() {
-  // NOP
+scout.Widget.prototype._attach = function(event) {
+  this.attached = true;
 };
 
 /**
@@ -343,25 +349,30 @@ scout.Widget.prototype._attach = function() {
  * before a DOM element is detached and propagate the detach "event" to all child-
  * widgets, because when a DOM element is detached - child elements are not notified
  */
-scout.Widget.prototype.detach = function() {
+scout.Widget.prototype.detach = function(event) {
   if (!this.attached || !this.rendered) {
     return;
   }
+  event = event || {target: this};
   this.children.forEach(function(child) {
-    child.detach();
+    child.detach(event);
   });
-  this._detach();
-  this.attached = false;
+  this._detach(event);
 };
 
 /**
  * Override this method to do something when Widget is detached. Typically you
  * will call this.$container.detach() here and use the DetachHelper to store
  * additional state (focus, scrollbars) for the detached element. The default
- * implementation does nothing.
+ * implementation sets this.attached to false.
+ *
+ * @param the event.target property is used to decide if a Widget must detach
+ *   its $container. When the parent of the Widget already detaches, the Widget
+ *   itself must _not_ detach its own $container. That's why we should only
+ *   detach when event.target is === this.
  */
-scout.Widget.prototype._detach = function() {
-  // NOP
+scout.Widget.prototype._detach = function(event) {
+  this.attached = false;
 };
 
 scout.Widget.prototype.toString = function() {
