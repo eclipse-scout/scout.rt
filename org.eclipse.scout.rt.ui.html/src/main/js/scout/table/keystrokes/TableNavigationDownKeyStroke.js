@@ -19,10 +19,6 @@ scout.TableNavigationDownKeyStroke = function(table) {
 };
 scout.inherits(scout.TableNavigationDownKeyStroke, scout.AbstractTableNavigationKeyStroke);
 
-scout.TableNavigationDownKeyStroke.prototype._acceptForNavigation = function(event) {
-  return scout.TableNavigationDownKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-};
-
 scout.TableNavigationDownKeyStroke.prototype.handle = function(event) {
   var table = this.field,
     $rows = table.$filteredRows(),

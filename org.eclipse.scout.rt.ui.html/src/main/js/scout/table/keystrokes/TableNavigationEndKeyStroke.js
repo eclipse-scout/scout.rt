@@ -19,11 +19,6 @@ scout.TableNavigationEndKeyStroke = function(table) {
 };
 scout.inherits(scout.TableNavigationEndKeyStroke, scout.AbstractTableNavigationKeyStroke);
 
-scout.TableNavigationEndKeyStroke.prototype._acceptForNavigation = function(event) {
-  var accepted = scout.TableNavigationEndKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted;
-};
-
 scout.TableNavigationEndKeyStroke.prototype.handle = function(event) {
   var table = this.field,
     rows = table.filteredRows(),

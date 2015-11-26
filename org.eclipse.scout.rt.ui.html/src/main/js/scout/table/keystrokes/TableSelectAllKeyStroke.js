@@ -20,15 +20,10 @@ scout.TableSelectAllKeyStroke = function(table) {
 };
 scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);
 
-scout.TableSelectAllKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TableSelectAllKeyStroke.parent.prototype._accept.call(this, event);
-  return accepted ;
-};
-
 scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
-  if(this.field.filteredRows().length===this.field.selectedRows.length){
+  if (this.field.filteredRows().length === this.field.selectedRows.length) {
     this.field.clearSelection();
-  }else{
+  } else {
     this.field.selectAll();
   }
 };

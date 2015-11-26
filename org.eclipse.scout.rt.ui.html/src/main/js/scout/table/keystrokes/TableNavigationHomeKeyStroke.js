@@ -19,11 +19,6 @@ scout.TableNavigationHomeKeyStroke = function(table) {
 };
 scout.inherits(scout.TableNavigationHomeKeyStroke, scout.AbstractTableNavigationKeyStroke);
 
-scout.TableNavigationHomeKeyStroke.prototype._acceptForNavigation = function(event) {
-  var accepted = scout.TableNavigationHomeKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted;
-};
-
 scout.TableNavigationHomeKeyStroke.prototype.handle = function(event) {
   var table = this.field,
     rows = table.filteredRows(),
