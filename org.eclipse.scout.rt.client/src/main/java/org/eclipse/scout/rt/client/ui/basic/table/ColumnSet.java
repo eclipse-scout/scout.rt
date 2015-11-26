@@ -143,7 +143,7 @@ public class ColumnSet {
         }
         c.setWidth(c.getInitialWidth());
         c.setVisibleColumnIndexHint(viewIndex);
-        prefs.removeTableColumnPreferences(c);
+        prefs.removeAllTableColumnPreferences(c, null, true);
         //next
         viewIndex++;
       }

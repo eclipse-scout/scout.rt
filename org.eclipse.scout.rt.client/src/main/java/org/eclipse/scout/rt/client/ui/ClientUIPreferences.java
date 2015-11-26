@@ -399,40 +399,6 @@ public class ClientUIPreferences {
     renameEntry(createColumnConfigKey(col, oldConfigName, TABLE_COLUMN_BACKGROUND_EFFECT), createColumnConfigKey(col, newConfigName, TABLE_COLUMN_BACKGROUND_EFFECT));
   }
 
-  public void removeTableColumnPreferences(IColumn col, String configName) {
-    if (m_prefs == null) {
-      return;
-    }
-
-    String key = createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE);
-    m_prefs.remove(key);
-
-    key = getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_GROUPED);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT);
-    m_prefs.remove(key);
-
-    key = createColumnConfigKey(col, configName, TABLE_COLUMN_BACKGROUND_EFFECT);
-    m_prefs.remove(key);
-
-  }
-
   protected String createColumnConfigKey(IColumn col, String configName, String propertyKey) {
     StringBuilder sb = new StringBuilder();
     if (!StringUtility.isNullOrEmpty(configName)) {
@@ -464,82 +430,29 @@ public class ClientUIPreferences {
     flush();
   }
 
-  public void removeTableColumnPreferences(IColumn col) {
-    removeTableColumnPreferences(col, true, true, true, true);
-  }
-
-  public void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths) {
-    removeTableColumnPreferences(col, visibility, order, sorting, widths, true, null);
-  }
-
-  protected void removeAllTableColumnPreferences(IColumn col, boolean flush, String configName) {
-    if (col != null && m_prefs != null) {
-      removeTableColumnViliblePref(col, configName);
-      removeTableColumnOrderPref(col, configName);
-      removeTableColumnSortingPref(col, configName);
-      removeTableColumnWidthPref(col, configName);
-
-      if (flush) {
-        flush();
-      }
+  public void removeAllTableColumnPreferences(IColumn col, String configName, boolean flush) {
+    if (m_prefs == null) {
+      return;
     }
-  }
-
-  protected void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths, boolean flush, String configName) {
-    if (col != null && m_prefs != null) {
-      if (visibility) {
-        removeTableColumnViliblePref(col, configName);
-      }
-      if (order) {
-        removeTableColumnOrderPref(col, configName);
-      }
-      if (sorting) {
-        removeTableColumnSortingPref(col, configName);
-      }
-      if (widths) {
-        removeTableColumnWidthPref(col, configName);
-      }
-
-      if (flush) {
-        flush();
-      }
-    }
-  }
-
-  protected void removeTableColumnWidthPref(IColumn col, String configName) {
-    m_prefs.remove(getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH));
-  }
-
-  protected void removeTableColumnSortingPref(IColumn col, String configName) {
+    // visible
+    m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE));
+    // order
+    m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX));
+    // sorting
     m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_INDEX));
     m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_ASC));
     m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_GROUPED));
     m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_AGGR_FUNCTION));
     m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_SORT_EXPLICIT));
-  }
+    // width
+    m_prefs.remove(getUserAgentPrefix() + createColumnConfigKey(col, configName, TABLE_COLUMN_WIDTH));
+    // background effect
+    m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_BACKGROUND_EFFECT));
 
-  protected void removeTableColumnOrderPref(IColumn col, String configName) {
-    m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX));
-  }
-
-  protected void removeTableColumnViliblePref(IColumn col, String configName) {
-    m_prefs.remove(createColumnConfigKey(col, configName, TABLE_COLUMN_VISIBLE));
-  }
-
-  public void removeAllTableColumnPreferences(ITable table, boolean visibility, boolean order, boolean sorting, boolean widths) {
-    removeAllTableColumnPreferences(table, visibility, order, sorting, widths, null);
-  }
-
-  public void removeAllTableColumnPreferences(ITable table, boolean visibility, boolean order, boolean sorting, boolean widths, String configName) {
-    if (table == null) {
-      return;
+    if (flush) {
+      flush();
     }
 
-    for (IColumn<?> col : table.getColumns()) {
-      removeTableColumnPreferences(col, visibility, order, sorting, widths, false, configName);
-    }
-
-    flush();
   }
 
   public void removeAllTableColumnPreferences(ITable table, String configName) {
@@ -548,7 +461,7 @@ public class ClientUIPreferences {
     }
     for (IColumn col : table.getColumns()) {
       if (col.isDisplayable()) {
-        removeTableColumnPreferences(col, configName);
+        removeAllTableColumnPreferences(col, configName, false);
       }
     }
     flush();

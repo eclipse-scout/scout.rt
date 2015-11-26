@@ -45,8 +45,8 @@ public class ColumnVisibilityTest {
     m_prefCol1 = prefTable.getTest1Column();
     m_prefCol2 = prefTable.getTest2Column();
     m_uiPrefs = ClientUIPreferences.getInstance();
-    m_uiPrefs.removeTableColumnPreferences(m_prefCol1);
-    m_uiPrefs.removeTableColumnPreferences(m_prefCol2);
+    m_uiPrefs.removeAllTableColumnPreferences(m_prefCol1, null, true);
+    m_uiPrefs.removeAllTableColumnPreferences(m_prefCol2, null, true);
   }
 
   /**

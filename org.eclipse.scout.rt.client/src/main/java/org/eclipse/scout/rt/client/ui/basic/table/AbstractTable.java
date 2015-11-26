@@ -3478,6 +3478,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void resetColumns() {
     resetColumns(true, true, true, true);
+    // FIXME ASA maybe refactor resetColumns(boolean, boolean, boolean, boolean) and include
     for (IColumn<?> col : getColumns()) {
       if (col instanceof INumberColumn) {
         ((INumberColumn) col).setBackgroundEffect(((INumberColumn) col).getInitialBackgroundEffect());
@@ -3500,8 +3501,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void resetColumnsInternal(boolean visibility, boolean order, boolean sorting, boolean widths) {
-    ClientUIPreferences env = ClientUIPreferences.getInstance();
-    env.removeAllTableColumnPreferences(this, visibility, order, sorting, widths);
 
     //Visibilities
     if (visibility) {
