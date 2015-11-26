@@ -239,6 +239,63 @@ describe("TableKeyStrokes", function() {
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[5]]);
       });
 
+      it("considers last action row as start row for new selection", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[1], rows[2], rows[4]]);
+        table.selectionHandler.lastActionRow = rows[4];
+
+        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[4]]);
+      });
+
+      it("uses first row of selection as last action row if last action row is not visible anymore", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
+        table.selectionHandler.lastActionRow = rows[4];
+
+        table.addFilter({
+          createKey: function() {
+            return 1;
+          },
+          accept: function($row) {
+            return $row.data('row') !== rows[4];
+          }
+        });
+        table.filter();
+
+        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        helper.assertSelection(table, [rows[0], rows[1], rows[3]]);
+      });
+
+      it("does nothing if first row is already selected", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[0]]);
+
+        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        helper.assertSelection(table, [rows[0]]);
+      });
+
+      it("does not add same rows to selectedRows twice", function() {
+        var model = helper.createModelFixture(2, 3);
+        var table = helper.createTable(model);
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
+        table.selectionHandler.lastActionRow = rows[2];
+
+        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
+      });
+
     });
 
   });
