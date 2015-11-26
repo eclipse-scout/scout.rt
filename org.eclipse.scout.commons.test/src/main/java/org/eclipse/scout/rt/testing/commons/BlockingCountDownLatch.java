@@ -79,6 +79,7 @@ public final class BlockingCountDownLatch {
         if (!m_zeroCountCondition.awaitUntil(deadline)) {
           return false; // timeout expired
         }
+        checkInterrupted();
       }
       return true;
     }
@@ -146,6 +147,7 @@ public final class BlockingCountDownLatch {
         if (!m_unblockCondition.awaitUntil(deadline)) {
           return false; // timeout expired
         }
+        checkInterrupted();
       }
       return true;
     }
@@ -169,5 +171,64 @@ public final class BlockingCountDownLatch {
    */
   private Date calculateDeadline(long time, TimeUnit unit) {
     return new Date(System.currentTimeMillis() + unit.toMillis(time));
+  }
+
+  /**
+   * Throws an {@link InterruptedException} if the current thread is interrupted.
+   * <p>
+   * That is because a thread's interruption is asynchronous, meaning that once a thread (a) interrupts another threads
+   * (b), and in turn thread (a) unblocks the condition which thread (b) is waiting for, it is not ensured that thread
+   * (b) exists with an {@link InterruptedException}. However, many tests expect exactly that behavior.
+   * <p>
+   * Example of reproducer:
+   *
+   * <pre>
+   * &#64;Test
+   * &#64;Times(100)
+   * public void test() throws InterruptedException {
+   *   final AtomicBoolean interrupted = new AtomicBoolean();
+   *
+   *   final AtomicBoolean readyFlag = new AtomicBoolean(false);
+   *   final CountDownLatch finishedLatch = new CountDownLatch(1);
+   *
+   *   Future<?> future = Executors.newFixedThreadPool(1).submit(new Runnable() {
+   *
+   *     &#64;Override
+   *     public void run() {
+   *       try {
+   *         synchronized (readyFlag) {
+   *           readyFlag.set(true);
+   *           readyFlag.wait();
+   *         }
+   *       }
+   *       catch (InterruptedException e) {
+   *         interrupted.set(true);
+   *       }
+   *       finally {
+   *         finishedLatch.countDown();
+   *       }
+   *     }
+   *   });
+   *
+   *   // Wait until the task is waiting for the condition to fall
+   *   while (!readyFlag.get()) {
+   *     Thread.yield();
+   *   }
+   *
+   *   // Cancel the task and notify immediately
+   *   synchronized (readyFlag) {
+   *     future.cancel(true);
+   *     readyFlag.notify();
+   *   }
+   *
+   *   finishedLatch.await();
+   *   assertTrue(interrupted.get());
+   * }
+   * </pre>
+   */
+  private static void checkInterrupted() throws InterruptedException {
+    if (Thread.currentThread().isInterrupted()) {
+      throw new InterruptedException();
+    }
   }
 }
