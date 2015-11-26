@@ -18,21 +18,7 @@ scout.ButtonLayout = function(button) {
 scout.inherits(scout.ButtonLayout, scout.FormFieldLayout);
 
 scout.ButtonLayout.prototype.naturalSize = function() {
-  var fieldSize = scout.graphics.prefSize(this.button.$field, true),
-    iconSize = new scout.Dimension(0, 0);
-
-  if (this.button.iconId) {
-    // FIXME AWE: (button) read size from image dynamically
-    // maybe add event-handler when IMG is loaded and invalidate layout
-    iconSize = new scout.Dimension(16, 16);
-    if (this.button.label) {
-      iconSize.width += 8; // add gap between text and icon
-    }
-  }
-
-  var prefSize = fieldSize;
-  prefSize.width += iconSize.width;
-  prefSize.height = Math.max(prefSize.height, iconSize.height);
+  var prefSize = scout.graphics.prefSize(this.button.$field, true);
 
   // Workaround for IE/Safari: The element's actual width is a fractional value in these browsers
   // (e.g. 60.4), but jQuery always rounds them to the nearest integer (e.g. 60). This is not

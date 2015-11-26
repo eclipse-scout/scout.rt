@@ -198,7 +198,13 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function() {
-  this._$label.textOrNbsp(scout.strings.removeAmpersand(this.label));
+  var label = scout.strings.removeAmpersand(this.label);
+  if (this.iconId) {
+    // If there is an icon, we don't need to ensure &nbsp; for empty strings
+    this._$label.text(label);
+  } else {
+    this._$label.textOrNbsp(label);
+  }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
 };
@@ -208,12 +214,31 @@ scout.Button.prototype._renderLabel = function() {
  */
 scout.Button.prototype._renderIconId = function() {
   this.$field.icon(this.iconId);
-  if (this.iconId) {
-    var $icon = this.$field.data('$icon');
+  var $icon = this.$field.data('$icon');
+  if ($icon) {
     $icon.toggleClass('with-label', !!this.label);
+    // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.
+    // We add a listener to revalidate the button layout after this has happened. The 'loading' and
+    // 'broken' classes ensure the incomplete icon is not taking any space.
+    $icon.removeClass('loading broken');
+    if ($icon.is('img')) {
+      $icon.addClass('loading');
+      $icon
+        .off('load error')
+        .on('load', updateButtonLayoutAfterImageLoaded.bind(this, true))
+        .on('error', updateButtonLayoutAfterImageLoaded.bind(this, false));
+    }
   }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
+
+  // ----- Helper functions -----
+
+  function updateButtonLayoutAfterImageLoaded(success) {
+    $icon.removeClass('loading');
+    $icon.toggleClass('broken', !success);
+    this.htmlComp.revalidateLayoutTree();
+  }
 };
 
 scout.Button.prototype._syncKeyStroke = function(keyStroke) {

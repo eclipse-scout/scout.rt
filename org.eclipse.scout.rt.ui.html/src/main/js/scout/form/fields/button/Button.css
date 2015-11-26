@@ -79,18 +79,27 @@
    .button-sub-menu-icon;
   }
 
+  & > .icon {
+
+    &.with-label {
+      margin-right: 8px;
+    }
+
+    &.loading,
+    &.broken {
+      .hidden();
+    }
+  }
+
   & > .font-icon {
     color: @button-font-icon-color;
   }
 }
 
+/* TODO BSH Remove this */
 button > img {
   vertical-align: middle;
   margin-bottom: 1px;
-
-  &.with-label {
-    margin-right: 8px;
-  }
 }
 
 .form-field.button > .field,
@@ -109,6 +118,23 @@ button > img {
 
   &:focus :not(:disabled) {
     color: @hover-color;
+  }
+
+  /* FIXME BSH Remove copy/paste from .button! */
+  & > .icon {
+
+    &.with-label {
+      margin-right: 8px;
+    }
+
+    &.loading,
+    &.broken {
+      .hidden();
+    }
+  }
+
+  & > .font-icon {
+    color: @button-font-icon-color;
   }
 }
 
