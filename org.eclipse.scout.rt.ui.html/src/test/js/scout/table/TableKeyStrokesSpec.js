@@ -45,21 +45,154 @@ describe("TableKeyStrokes", function() {
       helper.assertSelection(table, [table.rows[0]]);
     });
 
+    it("selects the last row if no row is selected yet", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [table.rows[4]]);
+    });
+
+    it("selects the second last row if all rows are selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+      table.selectAll();
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [table.rows[3]]);
+    });
+
+    it("does nothing if first row already is selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      var rows = table.rows;
+
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[0], rows[1]]);
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [rows[0], rows[1]]);
+    });
+
+    it("if first row already is selected but is not the last action row, the row above the last action row gets selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      var rows = table.rows;
+
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[0], rows[1], rows[2]]);
+
+      table.selectionHandler.lastActionRow = rows[2];
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [rows[1]]);
+    });
+
+    it("if there is a last action row, selects the row above last last action row", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[2], rows[4]]);
+
+      table.selectionHandler.lastActionRow = rows[4];
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [rows[3]]);
+    });
+
+    it("selects the row above the last action row even if the row above already is selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
+
+      table.selectionHandler.lastActionRow = rows[4];
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [rows[3]]);
+    });
+
+    it("uses last row of selection as last action row if last action row is not visible anymore", function() {
+      var model = helper.createModelFixture(2, 6);
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
+      table.selectionHandler.lastActionRow = rows[4];
+
+      table.addFilter({
+        createKey: function() {
+          return 1;
+        },
+        accept: function($row) {
+          return $row.data('row') !== rows[4];
+        }
+      });
+      table.filter();
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [rows[0]]);
+    });
+
     describe(" + shift", function() {
 
       it("adds the row above to the selection", function() {
         var model = helper.createModelFixture(2, 5);
         var table = helper.createTable(model);
-        var row2 = table.rows[2];
+        var rows = table.rows;
         table.render(session.$entryPoint);
-        helper.selectRowsAndAssert(table, [row2]);
+        helper.selectRowsAndAssert(table, [rows[2]]);
 
         table.$data.triggerKeyDown(scout.keys.UP, 'shift');
-        helper.assertSelection(table, [row2, table.rows[1]]);
+        helper.assertSelection(table, [rows[1], rows[2]]);
         table.$data.triggerKeyDown(scout.keys.UP, 'shift');
-        helper.assertSelection(table, [row2, table.rows[1], table.rows[0]]);
+        helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
         table.$data.triggerKeyDown(scout.keys.UP, 'shift');
-        helper.assertSelection(table, [row2, table.rows[1], table.rows[0]]);
+        helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
+      });
+
+      it("removes the row above from the selection if the last action row is the last row of the selection", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
+
+        table.selectionHandler.lastActionRow = rows[4];
+
+        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        helper.assertSelection(table, [rows[2], rows[3]]);
+        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        helper.assertSelection(table, [rows[2]]);
+        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        helper.assertSelection(table, [rows[1], rows[2]]);
+      });
+
+      it("if the row above the last action row is not selected, adds the row above to the selection", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[2], rows[5]]);
+
+        table.selectionHandler.lastActionRow = rows[5];
+
+        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        helper.assertSelection(table, [rows[2], rows[4], rows[5]]);
+        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
+        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        helper.assertSelection(table, [rows[1], rows[2], rows[3], rows[4], rows[5]]);
       });
 
     });
@@ -83,21 +216,138 @@ describe("TableKeyStrokes", function() {
       helper.assertSelection(table, [table.rows[4]]);
     });
 
+    it("selects the first row if no row is selected yet", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [table.rows[0]]);
+    });
+
+    it("selects the second row if all rows are selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+      table.selectAll();
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [table.rows[1]]);
+    });
+
+    it("does nothing if last row already is selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      var rows = table.rows;
+
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[3], rows[4]]);
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [rows[3], rows[4]]);
+    });
+
+    it("if there is a last action row, selects the row below the last action row", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[2], rows[4]]);
+
+      table.selectionHandler.lastActionRow = rows[2];
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [rows[3]]);
+    });
+
+    it("selects the row below the last action row even if the row below already is selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
+
+      table.selectionHandler.lastActionRow = rows[2];
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [rows[3]]);
+    });
+
+    it("uses last row of selection as last action row if last action row is not visible anymore", function() {
+      var model = helper.createModelFixture(2, 6);
+      var table = helper.createTable(model);
+      var rows = table.rows;
+      table.render(session.$entryPoint);
+      helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
+      table.selectionHandler.lastActionRow = rows[1];
+
+      table.addFilter({
+        createKey: function() {
+          return 1;
+        },
+        accept: function($row) {
+          return $row.data('row') !== rows[1];
+        }
+      });
+      table.filter();
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [rows[5]]);
+    });
+
     describe(" + shift", function() {
 
       it("adds the row below to the selection", function() {
         var model = helper.createModelFixture(2, 5);
         var table = helper.createTable(model);
-        var row2 = table.rows[2];
+        var rows = table.rows;
         table.render(session.$entryPoint);
-        helper.selectRowsAndAssert(table, [row2]);
+        helper.selectRowsAndAssert(table, [rows[2]]);
 
         table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
-        helper.assertSelection(table, [row2, table.rows[3]]);
+        helper.assertSelection(table, [rows[2], rows[3]]);
         table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
-        helper.assertSelection(table, [row2, table.rows[3], table.rows[4]]);
+        helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
         table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
-        helper.assertSelection(table, [row2, table.rows[3], table.rows[4]]);
+        helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
+      });
+
+      it("removes the row below from the selection if the last action row is the first row of the selection", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
+
+        table.selectionHandler.lastActionRow = rows[2];
+
+        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        helper.assertSelection(table, [rows[3], rows[4]]);
+        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        helper.assertSelection(table, [rows[4]]);
+        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        helper.assertSelection(table, [rows[4], rows[5]]);
+      });
+
+      it("if the row below the last action row is not selected, adds the row below to the selection", function() {
+        var model = helper.createModelFixture(2, 6);
+        var table = helper.createTable(model);
+
+        var rows = table.rows;
+        table.render(session.$entryPoint);
+        helper.selectRowsAndAssert(table, [rows[2], rows[5]]);
+
+        table.selectionHandler.lastActionRow = rows[2];
+
+        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        helper.assertSelection(table, [rows[2], rows[3], rows[5]]);
+        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
       });
 
     });

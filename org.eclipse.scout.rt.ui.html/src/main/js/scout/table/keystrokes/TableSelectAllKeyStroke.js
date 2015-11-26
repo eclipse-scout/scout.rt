@@ -21,9 +21,11 @@ scout.TableSelectAllKeyStroke = function(table) {
 scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);
 
 scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
-  if (this.field.filteredRows().length === this.field.selectedRows.length) {
-    this.field.clearSelection();
+  var table = this.field;
+  if (table.filteredRows().length === this.field.selectedRows.length) {
+    table.clearSelection();
   } else {
-    this.field.selectAll();
+    table.selectAll();
   }
+  table.selectionHandler.lastActionRow = null;
 };

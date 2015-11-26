@@ -92,18 +92,37 @@ scout.AbstractTableNavigationKeyStroke.prototype._applyRowSelection = function(t
   table.scrollTo(directionDown ? scout.arrays.last(rows) : scout.arrays.first(rows));
 };
 
-scout.AbstractTableNavigationKeyStroke.prototype._calculateLastActionRowUp = function(lastActionRow, deselect) {
-  var $prev = lastActionRow.$row.prevAll('.table-row:not(.invisible):first');
-  if ($prev.prev().isSelected() && !deselect) {
-    return this._calculateLastActionRowUp($prev.data('row'), deselect);
+/**
+ * Searches for the last selected row, starting from rowIndex. Expects row at rowIndex to be selected.
+ */
+scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = function(table, rowIndex) {
+  var rows = table.filteredRows();
+  if (rowIndex === 0) {
+    return rows[rowIndex];
   }
-  return $prev.length > 0 ? $prev.data('row') : lastActionRow;
+  return scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
+    var previousRow = rows[i - 1];
+    if (!previousRow) {
+      return false;
+    }
+    return !table.isRowSelected(previousRow);
+  });
 };
 
-scout.AbstractTableNavigationKeyStroke.prototype._calculateLastActionRowDown = function(lastActionRow, deselect) {
-  var $next = lastActionRow.$row.nextAll('.table-row:not(.invisible):first');
-  if ($next.next().isSelected() && !deselect) {
-    return this._calculateLastActionRowDown($next.data('row'), deselect);
+
+/**
+ * Searches for the last selected row, starting from rowIndex. Expects row at rowIndex to be selected.
+ */
+scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = function(table, rowIndex) {
+  var rows = table.filteredRows();
+  if (rowIndex === rows.length - 1) {
+    return rows[rowIndex];
   }
-  return $next.length > 0 ? $next.data('row') : lastActionRow;
+  return scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
+    var nextRow = rows[i + 1];
+    if (!nextRow) {
+      return false;
+    }
+    return !table.isRowSelected(nextRow);
+  });
 };

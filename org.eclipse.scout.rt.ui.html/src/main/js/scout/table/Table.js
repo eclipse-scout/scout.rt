@@ -2073,6 +2073,10 @@ scout.Table.prototype.deselectRows = function(rows, notifyServer) {
   }
 };
 
+scout.Table.prototype.isRowSelected = function(row) {
+  return this.selectedRows.indexOf(row) > -1;
+};
+
 scout.Table.prototype.$selectedRows = function() {
   if (!this.$data) {
     return $();

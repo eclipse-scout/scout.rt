@@ -38,13 +38,7 @@ scout.TableNavigationHomeKeyStroke.prototype.handle = function(event) {
       lastActionRowIndex = rows.indexOf(lastActionRow);
     }
     newSelectedRows = rows.slice(0, lastActionRowIndex);
-
-    // add existing selection to new one, avoid duplicate rows
-    selectedRows.forEach(function(row) {
-      if (newSelectedRows.indexOf(row) < 0) {
-        newSelectedRows.push(row);
-      }
-    });
+    newSelectedRows = scout.arrays.union(newSelectedRows, selectedRows);
   } else {
     newSelectedRows = firstRow;
   }

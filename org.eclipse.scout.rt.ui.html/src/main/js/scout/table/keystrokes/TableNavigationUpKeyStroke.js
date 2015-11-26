@@ -21,21 +21,53 @@ scout.inherits(scout.TableNavigationUpKeyStroke, scout.AbstractTableNavigationKe
 
 scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
   var table = this.field,
-    $rows = table.$filteredRows(),
-    $selection = table.$selectedRows(),
+    rows = table.filteredRows(),
+    selectedRows = table.selectedRows,
     lastActionRow = table.selectionHandler.lastActionRow,
-    deselect = false,
-    $newSelection;
+    lastActionRowIndex = -1,
+    newActionRowIndex = -1,
+    newSelectedRows, newActionRow;
 
-  if ($selection.length > 0 || lastActionRow) {
-    lastActionRow = lastActionRow || $selection.first().data('row');
-    deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.prevAll('.table-row:not(.invisible):first').isSelected();
-    $newSelection = deselect ? lastActionRow.$row : lastActionRow.$row.prevAll('.table-row:not(.invisible):first');
-    table.selectionHandler.lastActionRow = this._calculateLastActionRowUp(lastActionRow, deselect);
-  } else {
-    $newSelection = $rows.last();
-    table.selectionHandler.lastActionRow = $newSelection.data('row');
+  if (lastActionRow) {
+    lastActionRowIndex = rows.indexOf(lastActionRow);
   }
 
-  this._applyRowSelection(table, $selection, $newSelection, event.shiftKey, deselect, false);
+  if (selectedRows.length > 0 || lastActionRowIndex > -1) {
+    // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+    if (lastActionRowIndex < 0) {
+      if (rows.length === selectedRows.length){
+        lastActionRow = scout.arrays.last(rows);
+      } else {
+        lastActionRow = scout.arrays.first(selectedRows);
+      }
+      lastActionRowIndex = rows.indexOf(lastActionRow);
+    }
+    if (lastActionRowIndex ===  0) {
+      return;
+    }
+
+    newActionRowIndex = lastActionRowIndex - 1;
+    newActionRow = rows[newActionRowIndex];
+    newSelectedRows = [newActionRow];
+
+    if (event.shiftKey) {
+      if (table.isRowSelected(newActionRow)) {
+        // if new action row already is selected, remove last action row from selection
+        // use case: rows 2,3,4 are selected, last action row is 4. User presses shift-up -> rows 2,3 need to be the new selection
+        newSelectedRows = [];
+        scout.arrays.pushAll(newSelectedRows, selectedRows);
+        scout.arrays.remove(newSelectedRows, lastActionRow);
+      } else {
+        newSelectedRows = scout.arrays.union(newSelectedRows, selectedRows);
+        newActionRow = this._findLastSelectedRowBefore(table, newActionRowIndex);
+      }
+    }
+  } else {
+    newSelectedRows = [scout.arrays.last(rows)];
+    newActionRow = newSelectedRows[0];
+  }
+
+  table.selectionHandler.lastActionRow = newActionRow;
+  table.selectRows(newSelectedRows, true, true);
+  table.scrollTo(newActionRow);
 };

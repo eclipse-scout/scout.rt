@@ -15,7 +15,7 @@ describe("scout.arrays", function() {
     it("checks whether array has correct length and initial values", function() {
       var i, arr = scout.arrays.init(5, 'foo');
       expect(arr.length).toBe(5);
-      for (i=0; i<arr.length; i++) {
+      for (i = 0; i < arr.length; i++) {
         expect(arr[i]).toBe('foo');
       }
     });
@@ -64,9 +64,9 @@ describe("scout.arrays", function() {
 
       arr = ['a', 'b', undefined, 'c', undefined, 'd'];
       expect(scout.arrays.remove(arr, 'a')).toBe(true);
-      expect(arr).toEqual(['b', undefined, 'c', undefined, 'd' ]);
+      expect(arr).toEqual(['b', undefined, 'c', undefined, 'd']);
       expect(scout.arrays.remove(arr)).toBe(true);
-      expect(arr).toEqual(['b', 'c', undefined, 'd' ]);
+      expect(arr).toEqual(['b', 'c', undefined, 'd']);
     });
 
   });
@@ -104,7 +104,7 @@ describe("scout.arrays", function() {
   describe("replace", function() {
 
     it("replaces elements", function() {
-      var arr = [ 'a', 'b', 'c', 'd' ];
+      var arr = ['a', 'b', 'c', 'd'];
 
       scout.arrays.replace(arr, 'c', 'x');
       expect(arr).toEqual(['a', 'b', 'x', 'd']);
@@ -114,68 +114,114 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("union", function() {
+
+    it("merges two arrays", function() {
+      var arr1 = ['a', 'b', 'c'];
+      var arr2 = ['d', 'e', 'f'];
+
+      expect(scout.arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+    });
+
+    it("merges two arrays and removes duplicates", function() {
+      var arr1 = ['a', 'b', 'c'];
+      var arr2 = ['d', 'a', 'e'];
+
+      expect(scout.arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e']);
+    });
+
+    it("also works with floats", function() {
+      var arr1 = [1.5, 2];
+      var arr2 = [1.5, 30];
+
+      expect(scout.arrays.union(arr1, arr2)).toEqual([1.5, 2, 30]);
+    });
+
+    it("if the arrays contain objects instead of primitives, it uses their id to check for equality", function() {
+      var obj1 = {
+        id: '1'
+      };
+      var obj2 = {
+        id: '2'
+      };
+      var obj3 = {
+        id: '3'
+      };
+      var arr1 = [obj1, obj2];
+      var arr2 = [obj2, obj3, obj1];
+
+      expect(scout.arrays.union(arr1, arr2)).toEqual([obj1, obj2, obj3]);
+    });
+
+    it("does not fail if arr1 or arr2 are not defined", function() {
+      expect(scout.arrays.union(null, ['d', 'e', 'f'])).toEqual(['d', 'e', 'f']);
+      expect(scout.arrays.union(['d', 'e', 'f'], null)).toEqual(['d', 'e', 'f']);
+      expect(scout.arrays.union(null, null)).toEqual([]);
+    });
+  });
+
   describe("equals", function() {
 
     it("checks whether two arrays contain the same elements in the same order", function() {
-      var arr1 = ['a','b','c'];
-      var arr2 = ['a','b','c'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      var arr1 = ['a', 'b', 'c'];
+      var arr2 = ['a', 'b', 'c'];
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
 
-      arr1 = ['a','b','c'];
-      arr2 = ['b','a','b'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      arr1 = ['a', 'b', 'c'];
+      arr2 = ['b', 'a', 'b'];
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
 
-      arr1 = ['a','b','c'];
-      arr2 = ['a','b'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      arr1 = ['a', 'b', 'c'];
+      arr2 = ['a', 'b'];
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
 
-      arr1 = ['a','b'];
-      arr2 = ['a','b', 'c'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      arr1 = ['a', 'b'];
+      arr2 = ['a', 'b', 'c'];
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = ['a'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = ['b'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
     });
 
     it("considers emtpy and same arrays", function() {
       var arr1 = [];
-      var arr2 = ['b','a','b'];
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      var arr2 = ['b', 'a', 'b'];
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = [];
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = [];
       arr2 = [];
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = arr1;
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
     });
 
     it("returns true if one array is undefined/null and the other empty", function() {
       var arr1 = [];
       var arr2;
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = undefined;
-      expect(scout.arrays.equals(arr1,arr2)).toBeFalsy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = null;
       arr2 = [];
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = null;
       arr2 = null;
-      expect(scout.arrays.equals(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
     });
 
   });
@@ -183,61 +229,61 @@ describe("scout.arrays", function() {
   describe("equalsIgnoreOrder", function() {
 
     it("checks whether two arrays contain the same elements without considering the order", function() {
-      var arr1 = ['a','b','c'];
-      var arr2 = ['b','a','b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      var arr1 = ['a', 'b', 'c'];
+      var arr2 = ['b', 'a', 'b'];
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
-      arr1 = ['a','b','c'];
-      arr2 = ['a','b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeFalsy();
+      arr1 = ['a', 'b', 'c'];
+      arr2 = ['a', 'b'];
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
-      arr1 = ['a','b'];
-      arr2 = ['a','b', 'c'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeFalsy();
+      arr1 = ['a', 'b'];
+      arr2 = ['a', 'b', 'c'];
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = ['a'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = ['b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeFalsy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
     });
 
     it("considers emtpy and same arrays", function() {
       var arr1 = [];
-      var arr2 = ['b','a','b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeFalsy();
+      var arr2 = ['b', 'a', 'b'];
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = [];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeFalsy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = [];
       arr2 = [];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = arr1;
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
     });
 
     it("returns true if one array is undefined/null and the other empty", function() {
       var arr1 = [];
       var arr2;
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = undefined;
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeFalsy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = null;
       arr2 = [];
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = null;
       arr2 = null;
-      expect(scout.arrays.equalsIgnoreOrder(arr1,arr2)).toBeTruthy();
+      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
     });
 
   });
@@ -377,7 +423,11 @@ describe("scout.arrays", function() {
     it("finds first array element", function() {
       expect(scout.arrays.first()).toBe(undefined);
       expect(scout.arrays.first('test')).toBe('test');
-      expect(scout.arrays.first({x: 'y'})).toEqual({x: 'y'});
+      expect(scout.arrays.first({
+        x: 'y'
+      })).toEqual({
+        x: 'y'
+      });
       expect(scout.arrays.first([])).toBe(undefined);
       expect(scout.arrays.first([undefined])).toBe(undefined);
       expect(scout.arrays.first(['a', 'b', 'c'])).toBe('a');
@@ -392,7 +442,11 @@ describe("scout.arrays", function() {
     it("finds last array element", function() {
       expect(scout.arrays.last()).toBe(undefined);
       expect(scout.arrays.last('test')).toBe('test');
-      expect(scout.arrays.last({x: 'y'})).toEqual({x: 'y'});
+      expect(scout.arrays.last({
+        x: 'y'
+      })).toEqual({
+        x: 'y'
+      });
       expect(scout.arrays.last([])).toBe(undefined);
       expect(scout.arrays.last([undefined])).toBe(undefined);
       expect(scout.arrays.last(['a', 'b', 'c'])).toBe('c');

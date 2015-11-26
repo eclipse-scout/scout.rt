@@ -120,6 +120,39 @@ scout.arrays = {
     arr.push.apply(arr, arr2);
   },
 
+  /**
+   * Merges the two given arrays and removes duplicate entries in O(n).
+   * If the arrays contain objects instead of primitives, it uses their id to check for equality.
+   */
+  union: function(array1, array2) {
+    var result = [],
+      map = {};
+
+    array1 = this.ensure(array1);
+    array2 = this.ensure(array2);
+
+    array1.forEach(function(entry) {
+      var key = entry;
+      if (typeof entry === 'object') {
+        key = entry.id;
+      }
+      map[key] = entry;
+      result.push(entry);
+    });
+
+    array2.forEach(function(entry) {
+      var key = entry;
+      if (typeof entry === 'object') {
+        key = entry.id;
+      }
+      if (!(key in map)) {
+        result.push(entry);
+      }
+    });
+
+    return result;
+  },
+
   equalsIgnoreOrder: function(arr, arr2) {
     if (arr === arr2) {
       return true;
@@ -202,7 +235,7 @@ scout.arrays = {
     }
     for (var i = startIndex; i < arr.length; i++) {
       var element = arr[i];
-      if (predicate(element)) {
+      if (predicate(element, i)) {
         return element;
       }
     }
@@ -214,7 +247,7 @@ scout.arrays = {
     }
     for (var i = startIndex; i >= 0; i--) {
       var element = arr[i];
-      if (predicate(element)) {
+      if (predicate(element, i)) {
         return element;
       }
     }
