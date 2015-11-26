@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui;
-
-import org.eclipse.scout.commons.dnd.ImageTransferObject;
-import org.eclipse.scout.commons.dnd.JavaTransferObject;
-import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
-import org.eclipse.scout.commons.dnd.TextTransferObject;
+package org.eclipse.scout.rt.client.ui.dnd;
 
 /**
  * <h3>IDNDSupport</h3>

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.dnd;
+package org.eclipse.scout.rt.client.ui.dnd;
 
 /**
  * This is the super class of a transfer object model, normally this type is not used directly but any subtype of it.

@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 

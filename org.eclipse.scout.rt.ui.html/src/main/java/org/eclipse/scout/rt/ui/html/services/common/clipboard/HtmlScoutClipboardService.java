@@ -14,12 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eclipse.scout.commons.dnd.TextTransferObject;
-import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
+import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 
 public class HtmlScoutClipboardService implements IClipboardService {

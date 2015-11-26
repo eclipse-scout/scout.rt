@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
-import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
 public interface IStringFieldUIFacade extends IBasicFieldUIFacade {

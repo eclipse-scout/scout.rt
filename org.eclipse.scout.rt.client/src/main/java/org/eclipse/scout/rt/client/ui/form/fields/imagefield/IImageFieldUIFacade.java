@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
-import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 
 /**

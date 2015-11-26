@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.dnd;
+package org.eclipse.scout.rt.client.ui.dnd;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

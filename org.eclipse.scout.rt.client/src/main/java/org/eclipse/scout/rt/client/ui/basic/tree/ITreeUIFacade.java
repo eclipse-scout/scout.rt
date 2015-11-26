@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.MouseButton;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 
 public interface ITreeUIFacade {
 

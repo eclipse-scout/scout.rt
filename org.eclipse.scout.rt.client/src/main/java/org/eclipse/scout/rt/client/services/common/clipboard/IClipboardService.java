@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.services.common.clipboard;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.resource.MimeType;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**

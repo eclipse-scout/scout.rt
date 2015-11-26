@@ -8,25 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.dnd;
+package org.eclipse.scout.rt.client.ui.dnd;
 
 /**
  * @since Build 202
  */
 
-public class TextTransferObject extends TransferObject {
-  private String m_plainText;
+public class ImageTransferObject extends TransferObject {
+  private Object m_img;
 
-  public TextTransferObject(String plainText) {
-    m_plainText = plainText;
+  public ImageTransferObject(Object img) {
+    m_img = img;
   }
 
-  public String getPlainText() {
-    return m_plainText;
+  public Object getImage() {
+    return m_img;
   }
 
   @Override
   public String toString() {
-    return "TextTransferObject[text=" + m_plainText + "]";
+    return "ImageTransferObject[image=" + m_img + "]";
   }
 }

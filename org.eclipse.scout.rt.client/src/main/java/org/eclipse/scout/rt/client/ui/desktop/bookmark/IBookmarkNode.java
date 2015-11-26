@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
-import org.eclipse.scout.commons.dnd.JavaTransferObject;
+import org.eclipse.scout.rt.client.ui.dnd.JavaTransferObject;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 

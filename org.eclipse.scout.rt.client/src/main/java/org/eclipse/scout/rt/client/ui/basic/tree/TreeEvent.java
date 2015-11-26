@@ -19,9 +19,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
