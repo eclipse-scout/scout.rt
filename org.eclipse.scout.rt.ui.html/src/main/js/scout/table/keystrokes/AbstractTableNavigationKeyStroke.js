@@ -35,38 +35,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  return this._acceptForNavigation(event);
-};
-
-/**
- * Returns whether to accept the given event for navigation.
- */
-scout.AbstractTableNavigationKeyStroke.prototype._acceptForNavigation = function(event) {
   return true;
-};
-
-/**
- * Returns whether the very last row is selected.
- */
-scout.AbstractTableNavigationKeyStroke.prototype._isLastRowSelected = function() {
-  var $selectedRows = this.field.$selectedRows();
-  if (!$selectedRows.length) {
-    return false;
-  }
-
-  return $selectedRows.last().is(this.field.$filteredRows().last());
-};
-
-/**
- * Returns whether the very first row is selected.
- */
-scout.AbstractTableNavigationKeyStroke.prototype._isFirstRowSelected = function() {
-  var $selectedRows = this.field.$selectedRows();
-  if (!$selectedRows.length) {
-    return false;
-  }
-
-  return $selectedRows.first().is(this.field.$filteredRows().first());
 };
 
 /**

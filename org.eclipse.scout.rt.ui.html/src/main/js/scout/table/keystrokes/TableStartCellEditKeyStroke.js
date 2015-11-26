@@ -26,12 +26,12 @@ scout.TableStartCellEditKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var $selectedRows = this.field.$selectedRows();
-  if (!$selectedRows.length) {
+  var selectedRows = this.field.selectedRows;
+  if (!selectedRows.length) {
     return false;
   }
 
-  var position = this.field.nextEditableCellPosForRow(0, $selectedRows.first().data('row'));
+  var position = this.field.nextEditableCellPosForRow(0, selectedRows[0]);
   if (position) {
     event._editPosition = position;
     return true;
