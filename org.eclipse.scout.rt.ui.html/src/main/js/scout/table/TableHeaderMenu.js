@@ -81,6 +81,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Filtering
+  // FIXME AWE: (filter) rename existing filters to histogram (as in old scout versions)
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
     this.filter = scout.create('ColumnUserFilter', {
@@ -92,6 +93,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // always recalculate available values to make sure new/updated/deleted rows are considered
   this.filter.calculate();
   this._renderFilterGroup();
+
+  // FIXME AWE: (filter) free-text or from/to fields
+  this._renderFilterField();
 
   // name all label elements
   $('.table-header-menu-group-text', this.$container).each(function(i, elem) {
@@ -429,6 +433,20 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
   scout.scrollbars.install(this.$filteringContainer, {
     parent: this
   });
+};
+
+scout.TableHeaderMenu.prototype._renderFilterField = function() {
+  this.$filteringField = this.$container.appendDiv('table-header-menu-filter-field');
+  this.$filteringField.appendDiv('table-header-menu-group-text')
+    .data('label', this.session.text('ui.FilterText'));
+
+  var freeTextField = scout.create('StringField', {
+    parent: this,
+    session: this.session,
+    labelVisible: false,
+    statusVisible: false
+  });
+  freeTextField.render(this.$filteringField);
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {

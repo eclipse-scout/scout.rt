@@ -232,6 +232,10 @@
   padding: 10px 0px 7px 10px;
 }
 
+.table-header-menu-filter-field {
+  padding: 10px 0px 7px 10px;
+}
+
 .table-header-menu-filter-container {
   position: relative;
   overflow:hidden;
