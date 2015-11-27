@@ -8,62 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* This class is used for menu items styling */
 
-@menu-item-margin-right: 14px;
 @menu-item-height: 39px;
 
-/* Mixins */
-.menu-icon {
-  display: inline-block;
-  font-size: 18px;
-  color: @icon-color;
-  vertical-align: -3px;
-}
-
-.sub-menu-icon {
-  display: inline-block;
-  position: relative;
-  left: 0px;
-  top: 3px;
-  #scout.font-icon();
-  line-height: 18px;
-  font-size: 18px;
-  padding-left: 10px;
-  content: @icon-angle-down;
-}
-
-/* Styles */
-
-.menu-separator {
-  width: 1px;
-  height: 30px;
-  margin: 6px 19px 3px 19px - @menu-item-margin-right;
-  background-color: @border-color;
-}
-
 .menu-item {
-  height: @menu-item-height;
-  line-height: @menu-item-height;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
   white-space: nowrap;
   cursor: pointer;
-  display: inline-block;
+
+  #scout.vertical-align-helper-before();
 
   & > .key-box {
     bottom: -3px;
-  }
-
-  & > .font-icon {
-    .menu-icon;
-    font-size: 18px;
-    height: @logical-grid-height;
-    line-height: @logical-grid-height - 4px;
-    /* Prepare for focus border: */
-    border: 1px solid transparent;
-    margin-left: -2px;
-    margin-right: -2px;
-    padding-left: 2px;
-    padding-right: 2px;
   }
 
   &:not(.disabled):hover {
@@ -75,153 +33,69 @@
     cursor: default;
   }
 
-  &:not(.last) {
-    margin-right: @menu-item-margin-right;
-  }
-
   &:focus {
     outline: none;
     color: @hover-color;
   }
 
+  &.menu-textandicon > .icon {
+    padding-right: 5px;
+  }
+
   /* Draw border for icon only items */
-  &:not(.menu-textandicon):focus::before {
-    #scout.focus-border();
+  &:not(.menu-textandicon):focus::after {
+    #scout.button-focus();
+  }
+
+  & > .icon,
+  & > .text,
+  & > .submenu-icon {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    line-height: normal;
+    height: auto;
+  }
+
+  & > .text {
+    /* Make element inline to inherit text-decoration property */
+    display: inline;
+    /* SUPER HACK! */
+    padding-top: 1px;
+    padding-bottom: 1px;
+  }
+
+  & > .icon {
+
+    &.font-icon {
+      #scout.menu-icon();
+      top: -1px;
+      color: @menubar-item-color;
+    }
+
+    &:not(.font-icon) {
+      /* Move "a bit" towards the top, because the icon would not look centered with the text's baseline otherwise. */
+      top: -1px;
+    }
+
+    &.with-label {
+      margin-right: 8px;
+    }
+  }
+
+  & > .submenu-icon {
+    padding-left: 8px;
+
+    &::before {
+      #scout.sub-menu-icon();
+    }
+  }
+
+  &.menu-textandicon > .font-icon {
+    font-size: 16px;
   }
 
   &.menu-open {
     color: @active-color;
-  }
-
-  &.has-submenu::after {
-   .sub-menu-icon;
-  }
-
-  &.selected:not(.menu-button) {
-    background-color: @item-selection-background-color;
-    border-color: @item-selection-border-color;
-  }
-
-  &.right-aligned {
-    float: right;
-  }
-}
-
-.menu-textandicon > .icon {
-  padding-right: 5px;
-}
-
-/* FIXME AWE: reduce copy/paste --> Button.css */
-/* FIXME CGU move to menubar.css */
-.menubar-item.menu-button {
-  padding: 0 @button-padding;
-  text-align: center;
-  position: relative;
-  height: 30px;
-  color: @menubar-button-color;
-  background-color: @menubar-button-background-color;
-  border-radius: @border-radius;
-  border: 1px solid @menubar-button-border-color;
-  cursor: pointer;
-  height: @menubar-height;
-  line-height: @menubar-height;
-  min-width: 110px;
-
-  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
-  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
-  /* cut off. We should find a better solution for this. */
-  white-space: nowrap;
-
-  &:not(.disabled):not(.default-menu):hover {
-    color: @button-hover-color;
-
-    & > .font-icon {
-      color:@button-hover-color;
-    }
-  }
-
-  &:not(.disabled):active {
-    color: @button-active-color;
-    background-color: @menubar-button-active-background-color;
-
-    & > .font-icon {
-      color: @button-active-color;
-    }
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus::before {
-    #scout.button-focus();
-  }
-
-  & > .font-icon {
-    color: @menubar-button-font-icon-color;
-  }
-
-  &.default-menu:not(.disabled) {
-    #scout.font-text-normal(@font-weight-bold);
-    background-color: @default-button-background-color;
-    /* same color border is necessary to align the text with text from buttons with a real border */
-    border-color: @default-button-background-color;
-    color: @default-button-color;
-
-    &:focus {
-      color: @default-button-color;
-    }
-
-    &:hover {
-      background-color: @default-button-hover-background-color;
-    }
-
-    &:active {
-      background-color: @default-button-active-background-color;
-      border-color: @default-button-active-background-color;
-    }
-
-    & > .font-icon {
-      font-weight: normal;
-      color: @icon-inverted-color;
-    }
-  }
-
-  &.disabled {
-    background-color: @menubar-button-disabled-background-color;
-    border-color: @menubar-button-disabled-border-color;
-    color: @menubar-button-disabled-color;
-    cursor: default;
-
-    & > .font-icon {
-      color: @menubar-button-font-icon-disabled-color;
-    }
-  }
-
-  &.selected {
-    border-style: inset;
-    border-right-color: @border-color;
-    border-bottom-color: @border-color;
-  }
-
-  &.has-submenu::after {
-    .button-sub-menu-icon;
-  }
-
-  &:not(.last) {
-    margin-right: @menu-item-margin-right;
-  }
-
-  &.small-gap {
-    margin-right: 6px;
-  }
-
-  &.small {
-    min-width: 53px;
-
-    & > .font-icon {
-      font-size: 18px;
-      vertical-align: baseline;
-    }
   }
 }

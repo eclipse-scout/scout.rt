@@ -42,8 +42,9 @@ scout.TableHeader.prototype._render = function($parent) {
   if (!this.enabled) {
     this.menuBar.hiddenByUi = true;
   }
-  this.menuBar.render(this.$container);
-  this._$menuBar = this.menuBar.$container;
+  // Required to make "height: 100%" rule work
+  this.$menuBarContainer = this.$container.appendDiv('menubar-container');
+  this.menuBar.render(this.$menuBarContainer);
   this._$window = this.$container.window();
   this._$body = this.$container.body();
 
@@ -174,7 +175,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     columnWidth = column.width,
     marginLeft = '',
     marginRight = '',
-    menuBarWidth = (this._$menuBar.isVisible() ? this._$menuBar.outerWidth() : 0),
+    menuBarWidth = (this.menuBar.visible ? this.$menuBarContainer.outerWidth(true) : 0),
     isFirstColumn = this.table.columns.indexOf(column) === 0,
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
 
@@ -182,8 +183,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     marginLeft = this.table.rowBorderLeftWidth;
   } else if (isLastColumn) {
     marginRight = this.table.rowBorderRightWidth;
-    remainingHeaderSpace = Math.max(this.$container.width() - this.table.rowWidth, 0);
-    remainingHeaderSpace = this.$container.width() - this.table.rowWidth;
+    remainingHeaderSpace = this.$container.width() - this.table.rowWidth + scout.graphics.getInsets(this.table.$data).right;
     $headerResize = $header.next('.table-header-resize');
 
     if (remainingHeaderSpace < menuBarWidth) {
@@ -198,6 +198,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
       this.$filler.cssWidth(origColumnWidth - columnWidth);
     }
   }
+
   $header
     .css('min-width', columnWidth)
     .css('max-width', columnWidth)
@@ -212,7 +213,7 @@ scout.TableHeader.prototype._reconcileScrollPos = function() {
 
   this.resizeHeaderItem(lastColumn);
   this.$container.scrollLeft(scrollLeft);
-  this._$menuBar.cssRight(-1 * scrollLeft);
+  this.$menuBarContainer.cssRight(-1 * scrollLeft);
 };
 
 scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
@@ -625,9 +626,9 @@ scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
 };
 
 scout.TableHeader.prototype._onTableDataScroll = function() {
-  scout.scrollbars.fix(this._$menuBar);
+  scout.scrollbars.fix(this.$menuBarContainer);
   this._reconcileScrollPos();
-  this._fixTimeout = scout.scrollbars.unfix(this._$menuBar, this._fixTimeout);
+  this._fixTimeout = scout.scrollbars.unfix(this.$menuBarContainer, this._fixTimeout);
 };
 
 scout.TableHeader.prototype._onTableAddRemoveFilter = function(event) {

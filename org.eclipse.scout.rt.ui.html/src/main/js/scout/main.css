@@ -157,8 +157,98 @@ input {
 }
 
 button {
-  padding: @button-padding;
+  padding: @button-padding-y @button-padding-x;
   margin: 0; /* reset user agent style, e.g. on safari */
+}
+
+.button {
+  position: relative;
+  color: @button-color;
+  background-color: @button-background-color;
+  border: 1px solid @button-border-color;
+  border-radius: @border-radius;
+  cursor: pointer;
+  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
+  /* cut off. We should find a better solution for this. */
+  white-space: nowrap;
+  padding: @button-padding-y @button-padding-x;
+  /* Note: no vertical align helper here! this is very dependent on the content of the button */
+  /* (only text or other DOM nodes), therefore it has to be added manually when desired. */
+
+  &:hover {
+    color: @button-hover-color;
+  }
+
+  &:focus {
+    outline: none;
+
+    &::before {
+      #scout.button-focus();
+    }
+  }
+
+  &:not(.disabled):active {
+    color: @button-active-color;
+    background-color: @button-active-background-color;
+
+    & > .font-icon {
+      color: @button-active-color;
+    }
+  }
+
+  &:disabled {
+    background-color: @button-disabled-background-color;
+    border-color: @button-disabled-border-color;
+    color: @button-disabled-color;
+    cursor: default;
+
+    & > .font-icon {
+      color: @button-font-icon-disabled-color;
+    }
+  }
+
+  & > .button-label,
+  & > .submenu-icon,
+  & > .icon {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  & > .button-label {
+    margin-top: 1px; /* SUPER HACK */
+  }
+
+  & > .icon {
+    /* Padding only relevant for icons larger than the container */
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    &.with-label {
+      margin-right: 8px;
+    }
+
+    &.loading,
+    &.broken {
+      .hidden();
+    }
+
+    &.font-icon {
+      color: @button-font-icon-color;
+    }
+
+    &:not(.font-icon) {
+      max-height: 100%;
+    }
+  }
+
+  & > .submenu-icon {
+    padding-left: 8px;
+
+    &::before {
+      #scout.sub-menu-icon();
+    }
+  }
 }
 
 textarea {
@@ -258,7 +348,6 @@ a,
 
   &:focus {
     outline-color: @applink-color;
-    text-decoration: none;
   }
 }
 
@@ -309,9 +398,13 @@ a,
   background-repeat: no-repeat;
   padding-top: 140px;
 
-  & > .button {
+  & > .button-bar {
     padding-top: 32px;
     text-align: center;
+
+    & > .button {
+      padding: 7px @button-padding-x;
+    }
   }
 
   &.small {

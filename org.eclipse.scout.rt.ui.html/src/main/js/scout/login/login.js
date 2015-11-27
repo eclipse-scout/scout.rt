@@ -45,15 +45,12 @@ scout.login = {
       .attr('type', 'password')
       .placeholder(texts.get('ui.Password'))
       .appendTo(this.$container);
-    $buttonDiv = $('<div>')
-      .attr('id', 'login-button')
-      .addClass('button')
-      .appendTo(this.$container);
     this.$button = $('<button>')
-      .addClass('default')
+      .attr('id', 'login-button')
       .attr('type', 'submit')
+      .addClass('button default')
       .text(texts.get('ui.Login'))
-      .appendTo($buttonDiv);
+      .appendTo(this.$container);
 
     this.$user.focus();
 

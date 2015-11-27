@@ -48,7 +48,7 @@ scout.BoxButtons.prototype.addButton = function(opts) {
   var $button = this._$parent.appendDiv()
     .text(scout.strings.removeAmpersand(opts.text))
     .attr('tabindex', opts.tabIndex || '0')
-    .addClass('button')
+    .addClass('box-button')
     .unfocusable()
     .setEnabled(scout.nvl(opts.enabled, true));
 

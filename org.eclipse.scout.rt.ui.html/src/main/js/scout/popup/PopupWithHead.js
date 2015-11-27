@@ -57,7 +57,7 @@ scout.PopupWithHead.prototype.rerenderHead = function() {
 scout.PopupWithHead.prototype._renderHead = function() {
   this.$deco = this.$container.makeDiv('popup-deco');
   this.$head = this.$container
-    .makeDiv('popup-head')
+    .makeDiv('popup-head menu-item')
     .on('mousedown', '', this._onHeadMouseDown.bind(this));
   this.$container
     .prepend(this.$head)
@@ -167,9 +167,6 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
     headTop = 0,
     decoTop = 0;
 
-  if (this.$headBlueprint.hasClass('right-aligned')) {
-    openingDirectionX = 'left';
-  }
   openingDirectionX = openingDirectionX || this.openingDirectionX;
   openingDirectionY = openingDirectionY || this.openingDirectionY;
   this.$container.removeClass('up down left right');
@@ -179,8 +176,9 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
 
   // Make sure the elements inside the header have the same style as to blueprint (menu)
   // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint
-  this.$head.copyCss(this.$headBlueprint, 'line-height');
+  //this.$head.copyCss(this.$headBlueprint, 'line-height');
   this.$head.copyCssIfGreater(this.$headBlueprint, 'padding');
+  this.$head.height(this.$headBlueprint.height());
 
   $blueprintChildren = this.$headBlueprint.children();
   this.$head.children().each(function(i) {
@@ -191,6 +189,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
 
   headSize = scout.graphics.getSize(this.$head, true);
   bodySize = scout.graphics.getSize(this.$body, true);
+  bodySize.width = Math.max(bodySize.width, headSize.width);
   bodyWidth = bodySize.width;
 
   pos = this.$headBlueprint.offset();
@@ -210,7 +209,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
     this.$container.cssMarginTop(headSize.height);
   }
 
-  $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
+  $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left=' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
   this.$head.cssTop(headTop);
   this.$body.cssTop(bodyTop);
@@ -227,7 +226,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
     this.$deco.cssLeft(widthDiff + this.$head.cssBorderLeftWidth())
       .width(headSize.width - this.$head.cssBorderWidthX() + subPixelCorr);
   } else {
-    left -= headInsets.left;
+    left = left - headInsets.left + menuInsets.left;
     this.$head.cssLeft(0);
     this.$deco.cssLeft(1)
       .width(headSize.width - 2);
@@ -236,4 +235,8 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   this.openingDirectionX = openingDirectionX;
   this.openingDirectionY = openingDirectionY;
   this.setLocation(new scout.Point(left, top));
+
+  // Explicitly write the (rounded, by jQuery) sizes to the elements to prevent rounding issues
+  scout.graphics.setSize(this.$head, headSize);
+  scout.graphics.setSize(this.$body, bodySize);
 };

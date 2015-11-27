@@ -27,7 +27,7 @@ scout.TableLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (menuBar.$container.isVisible()) {
+  if (menuBar.visible) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     height += menuBarSize.height;
@@ -41,6 +41,8 @@ scout.TableLayout.prototype.layout = function($container) {
   if (header) {
     height += scout.graphics.getSize(header.$container).height;
   }
+  var dataMargins = scout.graphics.getMargins($data);
+  height += dataMargins.top + dataMargins.bottom;
   $data.css('height', 'calc(100% - ' + height + 'px)');
 
   if (this.table.autoResizeColumns) {

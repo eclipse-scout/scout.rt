@@ -236,7 +236,7 @@ scout.Desktop.prototype._renderToolMenus = function() {
   }.bind(this));
 
   if (this.actions.length) {
-    this.actions[0].$container.addClass('last');
+    this.actions[this.actions.length - 1].$container.addClass('last');
   }
 };
 
@@ -274,12 +274,11 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
   this._$taskBar = $parent.appendDiv('desktop-taskbar');
   var htmlTabbar = new scout.HtmlComponent(this._$taskBar, this.session);
   htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
+  this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
+  this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
   if (this.session.uiUseTaskbarLogo) {
     this._$taskBarLogo = this._$taskBar.appendDiv('taskbar-logo');
   }
-  this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
-  this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
-
   this._installKeyStrokeContextForDesktopTaskBar();
 };
 

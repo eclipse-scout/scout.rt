@@ -50,6 +50,11 @@ scout.Menu.prototype._render = function($parent) {
   this.$container.unfocusable();
 };
 
+scout.Menu.prototype._remove = function() {
+  scout.Menu.parent.prototype._remove.call(this);
+  this.$submenuIcon = null;
+};
+
 scout.Menu.prototype._renderSeparator = function($parent) {
   this.$container = $parent.appendDiv('menu-separator');
 };
@@ -66,15 +71,13 @@ scout.Menu.prototype._renderItem = function($parent) {
     .on('contextmenu', mouseEventHandler)
     .on('click', mouseEventHandler);
   if (this.childActions.length > 0 && this.text) {
-    this.$container.addClass('has-submenu');
+    this.$submenuIcon = this.$container.appendSpan('submenu-icon');
   }
 
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
-  if (!this.overflow) {
-    if (scout.Action.ActionStyle.BUTTON === this.actionStyle) {
-      this.$container.addClass('menu-button');
-    }
+  if (scout.Action.ActionStyle.BUTTON === this.actionStyle && !this.overflow) {
+    this.$container.addClass('menu-button');
   }
 };
 
@@ -157,6 +160,10 @@ scout.Menu.prototype._doActionTogglesPopup = function() {
 
 scout.Menu.prototype._renderText = function(text) {
   scout.Menu.parent.prototype._renderText.call(this, text);
+  // Ensure submenu-icon is the last element in the DOM
+  if (this.$submenuIcon) {
+    this.$submenuIcon.appendTo(this.$container);
+  }
   this._updateIconAndTextStyle();
 };
 
@@ -170,8 +177,8 @@ scout.Menu.prototype.isTabTarget = function() {
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-  this.$container.toggleClass('menu-textandicon', !!textAndIcon);
+  var hasTextAndIcon = !!(scout.strings.hasText(this.text) && this.iconId);
+  this.$container.toggleClass('menu-textandicon', hasTextAndIcon);
 };
 
 scout.Menu.prototype._closePopup = function() {

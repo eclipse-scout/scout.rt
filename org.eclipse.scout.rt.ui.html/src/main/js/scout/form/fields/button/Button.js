@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Button = function() {
   scout.Button.parent.call(this);
-  this._$label;
+  this.$buttonLabel;
   this._addAdapterProperties('menus');
 
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
@@ -64,23 +64,25 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
  * Container and field are the same thing.
  */
 scout.Button.prototype._render = function($parent) {
-  var cssClass, $button;
+  var $button;
   if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
-    /* Render as link-button/ menu-item.
-     * This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
-     * Probably it would be more reasonable to change the configuration (which would lead to additional
-     * effort required to change an existing application).
-     */
-    $button = $parent.makeDiv('menu-item');
+    // Render as link-button/ menu-item.
+    // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
+    // Probably it would be more reasonable to change the configuration (which would lead to additional
+    // effort required to change an existing application).
+    $button = $parent.makeDiv('menu-item')
+      .addClass('link');
     $button.setTabbable(this.enabled);
-    cssClass = 'link-button';
   } else {
     // render as button
-    $button = $parent.makeElement('<button>');
-    cssClass = 'button';
+    $button = $parent.makeElement('<button>')
+      .addClass('button');
   }
-  this._$label = $button.appendSpan('button-label');
-  this.addContainer($parent, cssClass, new scout.ButtonLayout(this));
+  this.$buttonLabel = $button.appendSpan('button-label');
+  if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
+    this.$buttonLabel.addClass('text');
+  }
+  this.addContainer($parent, 'button-field', new scout.ButtonLayout(this));
   this.addField($button);
   // FIXME CGU: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
@@ -97,7 +99,7 @@ scout.Button.prototype._render = function($parent) {
       this.keyStrokeContext.registerKeyStroke(menu);
     }, this);
     if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-      $button.addClass('has-submenu');
+      this.$submenuIcon = $button.appendSpan('submenu-icon');
     }
   }
   $button.unfocusable();
@@ -107,6 +109,7 @@ scout.Button.prototype._render = function($parent) {
 scout.Button.prototype._remove = function() {
   scout.Button.parent.prototype._remove.call(this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
+  this.$submenuIcon = null;
 };
 
 /**
@@ -141,9 +144,12 @@ scout.Button.prototype.togglePopup = function() {
 };
 
 scout.Button.prototype._openPopup = function() {
-  var popup = scout.create(scout.MenuBarPopup, {
+  // FIXME BSH Improve this
+  var popup = scout.create(scout.ContextMenuPopup, {
     parent: this,
-    menu: this
+    menuItems: this.menus,
+    cloneMenuItems: false,
+    $anchor: this.$field
   });
   popup.open();
   return popup;
@@ -201,9 +207,9 @@ scout.Button.prototype._renderLabel = function() {
   var label = scout.strings.removeAmpersand(this.label);
   if (this.iconId) {
     // If there is an icon, we don't need to ensure &nbsp; for empty strings
-    this._$label.text(label);
+    this.$buttonLabel.text(label);
   } else {
-    this._$label.textOrNbsp(label);
+    this.$buttonLabel.textOrNbsp(label);
   }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();

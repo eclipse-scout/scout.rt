@@ -63,5 +63,4 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   }
   this._copyCssClassToHead('unfocusable');
   this._copyCssClassToHead('button');
-  this._copyCssClassToHead('has-submenu');
 };

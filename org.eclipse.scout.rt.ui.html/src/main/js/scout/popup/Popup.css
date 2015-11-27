@@ -19,7 +19,6 @@
 
 .popup-head {
   position: absolute;
-  line-height: @menu-item-height;
   padding: 0 13px;
   white-space: nowrap;
   background-color: @palette-white;
@@ -40,16 +39,19 @@
     #scout.drop-shadow(@y: -6px;);
   }
 
-  &.has-submenu::after {
-    .sub-menu-icon;
-    #scout.transform(rotate(180deg));
-    padding-right: 10px;
-    padding-left: 0;
-    top: 5px;
+  /* Enable submenu FIXME BSH We should not need to copy/paste this! */
+  & > .submenu-icon {
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: 8px;
+
+    &::before {
+      #scout.sub-menu-icon();
+    }
   }
 
   & > .font-icon {
-    .menu-icon;
+    #scout.menu-icon();
     color: @active-color;
   }
 
@@ -72,17 +74,17 @@
   background-color: @palette-white;
 
   & > .menu-item.context-menu-item-first {
-    border-top: 1px solid transparent; //@border-color;
+    border-top: 1px solid transparent;
+  }
+
+  & > .menu-item.context-menu-item-last {
+    border-bottom: 1px solid transparent;
   }
 
   & > .menu-item.expanded:after {
     #scout.transform(rotate(180deg));
     padding-left: 0px;
     padding-right: 10px;
-  }
-
-  & > .menu-item.context-menu-item-last {
-    border-bottom: 1px solid transparent; //@border-color;
   }
 
   & > .menu-item > .key-box {
@@ -93,7 +95,6 @@
     #scout.drop-shadow();
 
     .popup-head ~ & > .menu-item.context-menu-item-first {
-      border-top: 1px solid transparent;
 
       &.selected {
         border-color: @item-selection-border-color;
@@ -105,7 +106,6 @@
     #scout.drop-shadow(@y: -6px;);
 
     .popup-head ~ & > .menu-item.context-menu-item-last {
-      border-bottom: 1px solid transparent;
 
       &.selected {
         border-color: @item-selection-border-color;
@@ -115,13 +115,15 @@
 
   & > .menu-item {
     border-top: solid 1px @border-color;
-    line-height: @menu-item-height - 1px; /* subtract border-top */
     display: block;
     width: 100%;
     padding-left: 15px;
+    padding-right: 15px;
 
     &.selected {
       border-top: 1px solid @item-selection-border-color;
+      border-color: @item-selection-border-color;
+      background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;
     }
 
@@ -141,4 +143,8 @@
       text-decoration: none;
     }
   }
+}
+
+.context-menu > .menu-item {
+  height: @menu-item-height;
 }

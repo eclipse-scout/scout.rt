@@ -24,7 +24,7 @@ scout.scrollbars = {
   _scrollableOptions:{},
 
   getScrollables: function(session) {
-    return this._$scrollables[session];
+    return this._$scrollables[session] || [];
   },
 
   pushScrollable: function(session, $container) {

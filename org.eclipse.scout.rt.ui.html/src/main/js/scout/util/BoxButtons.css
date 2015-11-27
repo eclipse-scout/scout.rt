@@ -14,7 +14,7 @@
     border-bottom: 1px solid @boxbutton-border-color;
   }
 
-  & > .button {
+  & > .box-button {
     position: relative;
     padding: 12px;
     background-color: @boxbutton-background-color;
@@ -26,46 +26,46 @@
     vertical-align: bottom;
   }
 
-  & > .button.disabled {
+  & > .box-button.disabled {
     cursor: default;
     color: @palette-gray-6;
   }
 
-  & > .button:not(.disabled):active {
+  & > .box-button:not(.disabled):active {
     background-color: @boxbutton-active-background-color;
   }
 
-  & > .button:first-child {
+  & > .box-button:first-child {
     border-bottom-left-radius: @border-radius;
   }
 
-  & > .button:last-child {
+  & > .box-button:last-child {
     border-bottom-right-radius: @border-radius;
   }
 
-  & > .button:first-child ~ .button {
+  & > .box-button:first-child ~ .box-button {
     border-left-width: 0px;
   }
 
-  & > .button:focus {
+  & > .box-button:focus {
     outline: none;
   }
 
-  & > .button:focus::before {
+  & > .box-button:focus::before {
     #scout.focus-border();
     #scout.overlay(2px, 2px, -4px, -4px);
     z-index: 1;
   }
 
-  & > .button:first-child:focus::before {
+  & > .box-button:first-child:focus::before {
     border-bottom-left-radius: @border-radius;
   }
 
-  & > .button:last-child:focus::before {
+  & > .box-button:last-child:focus::before {
     border-bottom-right-radius: @border-radius;
   }
 
-  .severity-error & > .button:focus::before {
+  .severity-error & > .box-button:focus::before {
     border-color: @error-border-color;
     #scout.glow(@error-glow-color);
   }

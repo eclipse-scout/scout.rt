@@ -23,48 +23,26 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   this._destroyEllipsis();
   this._menuBar.rebuildItemsInternal();
 
-  var ellipsisSize, leftEnd = 0,
-    rightEnd, overflown,
-    oldOverflow = $container.css('overflow');
-
-  // we cannot set overflow in MenuBar.css because overflow:hidden would cut off the
-  // focus border on the left-most button in the menu-bar. That's why we must reset
-  // the overflow-property after we've checked if the menu-bar is over-sized.
+  // Temporarily add "overflow: hidden" to measure the available size. (The overflow
+  // is not hidden in the CSS, otherwise the focus border could get cut off.)
+  var oldStyle = $container.attr('style');
   $container.css('overflow', 'hidden');
-  rightEnd = $container[0].clientWidth;
+  $container.css('display', 'inline-block'); // override "display: table"
+  var availableWidth = $container.width();
+  $container.attrOrRemove('style', oldStyle);
 
-  // 1st find the left-most position of all right-aligned items
-  // see: special comment for negative margins in Menu.css
-  this._menuBar.menuItems.forEach(function(menuItem) {
-    if (!menuItem.visible) {
-      return;
-    }
-    var itemBounds = scout.graphics.bounds(menuItem.$container, true, true),
-      tmpX;
-    if (menuItem.rightAligned) {
-      tmpX = itemBounds.x;
-      if (tmpX < rightEnd) {
-        rightEnd = tmpX;
-      }
-    } else {
-      tmpX = itemBounds.x + itemBounds.width;
-      if (tmpX > leftEnd) {
-        leftEnd = tmpX;
-      }
-    }
-  });
+  var leftWidth = this._menuBar.$left.width();
+  var rightWidth = this._menuBar.$right.width();
 
-  // 1 instead of 0 is used to tolerate rounding issues, browsers return a rounded width instead of the precise one
-  overflown = leftEnd - rightEnd >= 1;
-  $container.css('overflow', oldOverflow);
-
-  if (overflown) {
-    var menuItemsCopy = [];
-
+  if (leftWidth + rightWidth <= availableWidth) {
+    // ok, no ellisis required
+    this._menuBar.visibleMenuItems = this._menuBar.menuItems;
+  } else {
     // create ellipsis menu
-    this._createAndRenderEllipsis($container);
-    ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
-    rightEnd -= ellipsisSize.width;
+    this._createAndRenderEllipsis(this._menuBar.$left);
+    var ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
+
+    var remainingLeftWidth = Math.min(availableWidth - rightWidth, leftWidth);
 
     // right-aligned menus are never put into the overflow ellipsis-menu
     // or in other words: they're not responsive.
@@ -75,31 +53,38 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     // icon, with a short text would still be in the menu-bar. Which would
     // be confusing, as it would look like we've changed the order of the
     // menu-items.
-    var overflowNextItems = false;
+    var menuItemsCopy = [];
+    var overflown = false;
+    var previousMenuItem = null;
     this._menuBar.menuItems.forEach(function(menuItem) {
       if (menuItem.rightAligned) {
         // Always add right-aligned menus
         menuItemsCopy.push(menuItem);
       } else {
-        var itemBounds = scout.graphics.bounds(menuItem.$container, true, true),
-          rightOuterX = itemBounds.x + itemBounds.width;
-        if (overflowNextItems || rightOuterX > rightEnd) {
-          menuItem.remove();
-          menuItem.overflow = true;
-          this._ellipsis.childActions.push(menuItem);
-          overflowNextItems = true;
+        var itemSize = scout.graphics.getSize(menuItem.$container, true);
+        remainingLeftWidth -= itemSize.width;
+        if (overflown || remainingLeftWidth < 0) {
+          // Menu does not fit -> add to ellipsis menu
+          if (!overflown) {
+            overflown = true;
+            // Check if ellipsis menu fits, otherwise the previous menu has to be removed as well
+            if (previousMenuItem && remainingLeftWidth + itemSize.width - ellipsisSize.width < 0) {
+              this._removeMenuItem(previousMenuItem);
+            }
+          }
+          this._removeMenuItem(menuItem);
         } else {
-          // Only add left-aligned menu items when they're visible
+          // Menu fits, add to normal menu list
           menuItemsCopy.push(menuItem);
         }
+        previousMenuItem = menuItem;
       }
     }, this);
 
     this._addEllipsisToMenuItems(menuItemsCopy);
     this._menuBar.visibleMenuItems = menuItemsCopy;
-  } else {
-    this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   }
+
   this._menuBar.visibleMenuItems.forEach(function(menuItem) {
     // Make sure open popups are at the correct position after layouting
     if (menuItem.popup) {
@@ -108,21 +93,24 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   });
 };
 
-/**
- * Add the ellipsis menu to the menu-items list. Order matters because we do not sort
- * menu-items again.
- */
-scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItemsCopy) {
-  var i, menuItem, insertItemAt = 0;
-  for (i = 0; i < menuItemsCopy.length; i++) {
-    menuItem = menuItemsCopy[i];
+scout.MenuBarLayout.prototype._removeMenuItem = function(menuItem) {
+  menuItem.remove();
+  menuItem.overflow = true;
+  this._ellipsis.childActions.push(menuItem);
+};
+
+scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItems) {
+  // Add the ellipsis menu to the menu-items list. Order matters because we do not sort
+  // menu-items again.
+  var insertItemAt = 0;
+  menuItems.some(function(menuItem, i) {
     if (menuItem.rightAligned) {
-      break;
-    } else {
-      insertItemAt = i + 1;
+      return true; // break
     }
-  }
-  scout.arrays.insert(menuItemsCopy, this._ellipsis, insertItemAt);
+    insertItemAt = i + 1;
+    return false; // keep looking
+  });
+  scout.arrays.insert(menuItems, this._ellipsis, insertItemAt);
 };
 
 scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {

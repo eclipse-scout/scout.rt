@@ -26,9 +26,10 @@ scout.logout = {
       .html(scout.strings.nl2br(texts.get('ui.LogoutSuccessful')))
       .appendTo($('body'));
     var $buttonBar = $('<div>')
-      .addClass('button')
+      .addClass('button-bar')
       .appendTo($box);
     $('<button>')
+      .addClass('button')
       .text(texts.get('ui.LoginAgain'))
       .on('click', loginAgain)
       .appendTo($buttonBar);

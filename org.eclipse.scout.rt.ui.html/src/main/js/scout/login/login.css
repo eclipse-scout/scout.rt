@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 #login-box {
-  & input,
-  & button {
+  & > input,
+  & > .button {
     width: 100%;
     height: 45px;
     margin: 15px 0;
@@ -19,25 +19,25 @@
 }
 
 #login-button {
-  padding-top: 0;
+  background-color: @default-button-background-color;
+  color: @default-button-color;
+  border-width: 0;
 
-  & > button {
-    background-color: @default-button-background-color;
-    color: @default-button-color;
-    border-width: 0;
+  &:active {
+    background-color: @default-button-active-background-color;
+  }
 
-    &:not(.disabled):active {
-      background-color: @default-button-active-background-color;
+  &.login-error {
+    background-color: @palette-red-4;
+
+    /* Also change color of focus glow */
+    &:focus::before {
+      border-color: @palette-red-4;
+      #scout.glow(@palette-red-4);
     }
 
-    &.login-error {
-      background-color: @palette-red-4;
-
-      /* Also change color of focus glow */
-      &:focus::before {
-        border-color: @palette-red-4;
-        #scout.glow(@palette-red-4);
-      }
+    &:active {
+      background-color: darken(@palette-red-4, 5%);
     }
   }
 }

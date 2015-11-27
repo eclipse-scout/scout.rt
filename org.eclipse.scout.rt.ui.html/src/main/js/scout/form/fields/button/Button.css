@@ -8,141 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* Mixins */
-
-.button-sub-menu-icon {
-  display: inline-block;
-  position: relative;
-  left: 0px;
-  top: 3px;
-  margin-top: -5px;
-  #scout.font-icon();
-  line-height: 18px;
-  font-size: 18px;
-  padding-left: 10px;
-  content: @icon-angle-down;
-}
-
-/* Styles */
-
-.button > button {
-  position: relative;
-  color: @button-color;
-  background-color: @button-background-color;
-  border: 1px solid @button-border-color;
-  border-radius: @border-radius;
-  cursor: pointer;
-  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
-  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
-  /* cut off. We should find a better solution for this. */
-  white-space: nowrap;
-
-  &:hover {
-    color: @button-hover-color;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus::before {
-    #scout.button-focus();
-  }
-
-  &:not(.disabled):active {
-    color: @button-active-color;
-    background-color: @button-active-background-color;
-
-    & > .font-icon {
-      color: @button-active-color;
-    }
-  }
-
-  &:disabled {
-    background-color: @button-disabled-background-color;
-    border-color: @button-disabled-border-color;
-    color: @button-disabled-color;
-    cursor: default;
-
-    & > .font-icon {
-      color: @button-font-icon-disabled-color;
-    }
-  }
+.button-field > .button {
+  #scout.vertical-align-helper-after();
 
   &.selected {
     border-style: inset;
     border-right-color: @border-color;
     border-bottom-color: @border-color;
   }
-
-  &.has-submenu::after {
-   .button-sub-menu-icon;
-  }
-
-  & > .icon {
-
-    &.with-label {
-      margin-right: 8px;
-    }
-
-    &.loading,
-    &.broken {
-      .hidden();
-    }
-  }
-
-  & > .font-icon {
-    color: @button-font-icon-color;
-  }
 }
 
-/* TODO BSH Remove this */
-button > img {
-  vertical-align: middle;
-  margin-bottom: 1px;
-}
-
-.form-field.button > .field,
-.form-field.link-button > .field {
+.button-field > .field {
   margin-left: @mandatory-indicator-width;
 }
 
-.form-field.link-button > .menu-item {
-  line-height: normal; /* override line-height of .menu-item */
-  padding-top: @borderless-field-padding-y;
+.button-field > .link {
   /* add a transparent border to align text with normal buttons which also have a border */
-  border-top: 1px solid transparent;
+  border: 1px solid transparent;
 
-  /* Link buttons in a form must have an underline, but link buttons in the menu-bar shouldn't */
-  text-decoration: underline;
-
-  &:focus :not(:disabled) {
-    color: @hover-color;
-  }
-
-  /* FIXME BSH Remove copy/paste from .button! */
-  & > .icon {
-
-    &.with-label {
-      margin-right: 8px;
-    }
-
-    &.loading,
-    &.broken {
-      .hidden();
-    }
-  }
-
-  & > .font-icon {
-    color: @button-font-icon-color;
+  &.menu-item > .icon:not(.font-icon) {
+    /* override hack in Menu.css */
+    top: 0;
   }
 }
 
-.table .button > .key-box {
-  top: 8px;
-}
-
-.button > .key-box {
+.button-field > .key-box {
   position: absolute;
-  top: 8px;
+  top: 4px;
 }

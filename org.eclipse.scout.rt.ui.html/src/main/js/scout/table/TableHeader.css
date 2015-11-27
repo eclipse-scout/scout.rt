@@ -22,28 +22,33 @@
   border-bottom: 1px solid @border-color;
 }
 
-.table-header > .menubar {
+.table-header > .menubar-container {
   position: absolute;
   right: 0;
   top: 0;
-  padding-right: 0px;
+  padding-right: 6px;
   padding-left: 6px;
-  background-color: @table-header-background-color;
-  width: auto;
-  border: none;
+  /* Do not use transparent color here, because otherwise header items would be visible behind */
+  background-color: inherit;
   z-index: 1;
   height: 100%;
 
-  & > .menu-item {
-    height: auto;
-    line-height: normal;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    margin-right: 5px;
+  & > .menubar {
+    height: 100%;
+    background-color: transparent;
+    border: none;
 
-    & > .font-icon {
+    & > .menu-item {
       height: auto;
       line-height: normal;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      margin-right: 5px;
+
+      & > .font-icon {
+        height: auto;
+        line-height: normal;
+      }
     }
   }
 }
@@ -54,11 +59,14 @@
   #scout.font-text-normal(@font-weight-bold);
   padding: @table-header-padding-y @table-header-padding-right @table-header-padding-y @table-header-padding-left;
   #scout.overflow-ellipsis-nowrap();
-  /* Vertical align is necessary for 2 things:
-    1. Alignment in case of multiline headers.
-    2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */
+  /* Vertical align is necessary for 2 things: */
+  /* 1. Alignment in case of multiline headers. */
+  /* 2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */
   vertical-align: bottom;
   cursor: pointer;
+  /* Transparent border required for .selected state */
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
 
   &.disabled {
     cursor: default;
@@ -75,7 +83,7 @@
   &.last.halign-left,
   &.last.halign-center,
   &.last.halign-right {
-    padding-right: @scrollbar-size + (@scrollbar-side-margin * 2);
+    padding-right: @scrollbar-size + (@scrollbar-side-margin * 2) - 1px; /* -1px because of border-right */
   }
 
   &.halign-right {
@@ -122,8 +130,8 @@
   }
 
   &.selected {
-    border-left: 1px solid @border-color;
-    border-right: 1px solid @border-color;
+    border-left-color: @border-color;
+    border-right-color: @border-color;
     background-color: @table-header-menu-background-color;
     color: @active-color;
     z-index: 1;
@@ -196,7 +204,7 @@
   }
 
   .table-header-item.selected + &.table-header-resize {
-    background-color: inherit;
+    visibility: hidden;
   }
 }
 

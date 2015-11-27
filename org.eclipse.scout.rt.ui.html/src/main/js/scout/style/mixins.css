@@ -253,12 +253,46 @@
     font-size: @font-size-large;
   }
 
-  .font-icon {
+  .font-icon() {
     font-family: scoutIcons, @font-default-family;
     font-weight: @font-weight-normal;
     speak: none;
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Invisible pseudo element that enables vertical-align if container has height set */
+  .vertical-align-helper() {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+  }
+
+  .vertical-align-helper-before() {
+    &::before {
+      #scout.vertical-align-helper();
+    }
+  }
+
+  .vertical-align-helper-after() {
+    &::after {
+      #scout.vertical-align-helper();
+    }
+  }
+
+  /* TODO BSH Check if required! */
+  .menu-icon() {
+    display: inline-block;
+    font-size: 18px;
+    color: @icon-color;
+  }
+
+  /* TODO BSH Check if required! */
+  .sub-menu-icon() {
+    content: @icon-angle-down;
+    #scout.font-icon();
+    font-size: 18px;
   }
 }

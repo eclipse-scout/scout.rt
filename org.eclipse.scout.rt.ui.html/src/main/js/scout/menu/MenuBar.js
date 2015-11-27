@@ -20,6 +20,7 @@ scout.MenuBar = function() {
   this.menuItems = []; // list of menuItems (ordered, may contain additional UI separators, some menus may not be rendered)
   this._orderedMenuItems = null; // Object containing "left" and "right" menus
   this._defaultMenu = null;
+  this.visible = false;
 
   /**
    * This array is === menuItems when menu-bar is not over-sized.
@@ -64,10 +65,13 @@ scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
  */
 scout.MenuBar.prototype._render = function($parent) {
   // Visibility may change when updateItems() function is called, see updateVisibility().
+  this.visible = (this.menuItems.length > 0);
   this.$container = $parent.makeDiv('menubar')
     .attr('id', 'MenuBar-' + scout.createUniqueId())
     .toggleClass('main-menubar', this.size === 'large')
-    .setVisible(this.menuItems.length > 0);
+    .setVisible(this.visible);
+  this.$left = this.$container.appendDiv('menubox left');
+  this.$right = this.$container.appendDiv('menubox right');
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
@@ -100,6 +104,7 @@ scout.MenuBar.prototype._remove = function() {
   this.menuItems = [];
   this._orderedMenuItems = null;
   this.visibleMenuItems = [];
+  this.visible = false;
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
@@ -169,11 +174,8 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   // especially important for menu items with open popups to position them correctly
   this.updateVisibility();
 
-  // Important: "right" items are rendered first! This is a fix for Firefox issue with
-  // float:right. In Firefox elements with float:right must come first in the HTML order
-  // of elements. Otherwise a strange layout bug occurs.
-  this._renderMenuItems(this._orderedMenuItems.right, true);
   this._renderMenuItems(this._orderedMenuItems.left, false);
+  this._renderMenuItems(this._orderedMenuItems.right, true);
   this.updateDefaultMenu();
   var lastVisibleItem = this._lastVisibleItemRight || this._lastVisibleItemLeft;
   if (lastVisibleItem) {
@@ -228,14 +230,14 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
-  var oldVisible = this.htmlComp.isVisible(),
-    visible = !this.hiddenByUi && this.menuItems.some(function(m) {
-      return m.visible;
-    });
+  var oldVisible = this.visible;
+  this.visible = !this.hiddenByUi && this.menuItems.some(function(m) {
+    return m.visible;
+  });
 
   // Update visibility, layout
-  if (visible !== oldVisible) {
-    this.$container.setVisible(visible);
+  if (this.visible !== oldVisible) {
+    this.$container.setVisible(this.visible);
     this.htmlComp.invalidateLayoutTree();
   }
 };
@@ -277,11 +279,6 @@ scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
 };
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
-  // Reverse the list if alignment is right to preserve the visible order specified by the
-  // Scout model (in HTML, elements with 'float: right' are displayed in reverse order)
-  if (right) {
-    menuItems.reverse();
-  }
   var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
   menuItems.forEach(function(item) {
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
@@ -291,13 +288,12 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
       this.tabbableMenu = undefined;
     }
     item.tooltipPosition = tooltipPosition;
-    item.render(this.$container);
+    item.render(right ? this.$right : this.$left);
     item.$container.addClass('menubar-item');
     if (right) {
       // Mark as right-aligned
       item.rightAligned = true;
-      item.$container.addClass('right-aligned');
-      if (item.visible && !this._lastVisibleItemRight) {
+      if (item.visible) {
         this._lastVisibleItemRight = item;
       }
     } else {
