@@ -13,8 +13,7 @@ scout.TableNavigationUpKeyStroke = function(table) {
   this.which = [scout.keys.UP];
   this.renderingHints.text = '↑';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var viewport = this._viewportInfo(table);
-    return viewport.selection ? viewport.$rowBeforeSelection : viewport.$firstRow;
+    return this.$firstRowBeforeSelection();
   }.bind(this);
 };
 scout.inherits(scout.TableNavigationUpKeyStroke, scout.AbstractTableNavigationKeyStroke);
@@ -32,7 +31,7 @@ scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
     lastActionRowIndex = rows.indexOf(lastActionRow);
   }
 
-  if (selectedRows.length > 0 || lastActionRowIndex > -1) {
+  if (rows.length > 1 && (selectedRows.length > 0 || lastActionRowIndex > -1)) {
     // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
     if (lastActionRowIndex < 0) {
       if (rows.length === selectedRows.length){

@@ -13,8 +13,10 @@ scout.TableNavigationHomeKeyStroke = function(table) {
   this.which = [scout.keys.HOME];
   this.renderingHints.text = 'Home';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var viewport = this._viewportInfo(table);
-    return viewport.selection ? viewport.$rowBeforeSelection : viewport.$firstRow;
+    var viewport = this._viewportInfo();
+    if (viewport.firstRow) {
+      return viewport.firstRow.$row;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TableNavigationHomeKeyStroke, scout.AbstractTableNavigationKeyStroke);

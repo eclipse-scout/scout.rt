@@ -313,15 +313,8 @@ scout.scrollbars = {
     if (!$scrollable || $scrollable.length === 0) {
       return true;
     }
-    var inViewY, inViewX,
-      scrollableOffsetBounds = scout.graphics.offsetBounds($scrollable);
-
-    inViewY = location.y >= scrollableOffsetBounds.y &&
-      location.y < scrollableOffsetBounds.y + scrollableOffsetBounds.height;
-    inViewX = location.x >= scrollableOffsetBounds.x &&
-      location.x < scrollableOffsetBounds.x + scrollableOffsetBounds.width;
-
-    return inViewY && inViewX;
+    var scrollableOffsetBounds = scout.graphics.offsetBounds($scrollable);
+    return scrollableOffsetBounds.contains(location.x, location.y);
   },
 
   /**

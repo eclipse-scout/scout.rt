@@ -1928,6 +1928,16 @@ scout.Table.prototype.scrollTo = function(row) {
   scout.scrollbars.scrollTo(this.$data, row.$row);
 };
 
+scout.Table.prototype.scrollPageUp = function() {
+  var newScrollTop = Math.max(0, this.$data[0].scrollTop - this.$data.height());
+  scout.scrollbars.scrollTop(this.$data, newScrollTop);
+};
+
+scout.Table.prototype.scrollPageDown = function() {
+  var newScrollTop = Math.min(this.$data[0].scrollHeight, this.$data[0].scrollTop + this.$data.height());
+  scout.scrollbars.scrollTop(this.$data, newScrollTop);
+};
+
 scout.Table.prototype.revealSelection = function() {
   if (this.selectedRows.length > 0) {
     this.scrollTo(this.selectedRows[0]);

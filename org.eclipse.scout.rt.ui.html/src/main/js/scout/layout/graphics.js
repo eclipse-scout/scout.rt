@@ -60,12 +60,12 @@ scout.graphics = {
   getScrollSizes: function($comp, includeMargin) {
     var marginWidth = 0,
       marginHeight = 0,
-      scrollWidth = $comp[0] ?  $comp[0].scrollWidth : 0,
-      scrollHeight = $comp[0]? $comp[0].scrollHeight : 0 ;
+      scrollWidth = $comp[0] ? $comp[0].scrollWidth : 0,
+      scrollHeight = $comp[0] ? $comp[0].scrollHeight : 0;
     includeMargin = scout.nvl(includeMargin, false);
     if (includeMargin) {
-      marginHeight += parseFloat(scout.nvl($comp.css('margin-top'),0)) + parseFloat(scout.nvl($comp.css('margin-bottom'),0));
-      marginWidth += parseFloat(scout.nvl($comp.css('margin-left'),0)) + parseFloat(scout.nvl($comp.css('margin-right'),0));
+      marginHeight += parseFloat(scout.nvl($comp.css('margin-top'), 0)) + parseFloat(scout.nvl($comp.css('margin-bottom'), 0));
+      marginWidth += parseFloat(scout.nvl($comp.css('margin-left'), 0)) + parseFloat(scout.nvl($comp.css('margin-right'), 0));
     }
     return new scout.Dimension(
       scrollWidth + marginWidth + parseFloat($comp.css("border-left-width")) + parseFloat($comp.css("border-right-width")),
@@ -306,6 +306,18 @@ scout.Rectangle.prototype.equals = function(o) {
 
 scout.Rectangle.prototype.toString = function() {
   return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
+};
+
+scout.Rectangle.prototype.contains = function(x, y) {
+  return y >= this.y && y < this.y + this.height && x >= this.x && x < this.x + this.width;
+};
+
+scout.Rectangle.prototype.subtract = function(insets) {
+  return new scout.Rectangle(
+    this.x + insets.left,
+    this.y + insets.top,
+    this.width - insets.right,
+    this.height - insets.bottom);
 };
 
 scout.Rectangle.prototype.union = function(r) {

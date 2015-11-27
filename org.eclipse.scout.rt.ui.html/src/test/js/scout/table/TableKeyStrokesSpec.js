@@ -66,6 +66,22 @@ describe("TableKeyStrokes", function() {
       helper.assertSelection(table, [table.rows[3]]);
     });
 
+    it("selects the only row if there is only one", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [table.rows[0]]);
+
+      table.clearSelection();
+      table.selectionHandler.lastActionRow = table.rows[0];
+
+      table.$data.triggerKeyDown(scout.keys.UP);
+      helper.assertSelection(table, [table.rows[0]]);
+    });
+
     it("does nothing if first row already is selected", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
@@ -235,6 +251,22 @@ describe("TableKeyStrokes", function() {
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
       helper.assertSelection(table, [table.rows[1]]);
+    });
+
+    it("selects the only row if there is only one", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [table.rows[0]]);
+
+      table.clearSelection();
+      table.selectionHandler.lastActionRow = table.rows[0];
+
+      table.$data.triggerKeyDown(scout.keys.DOWN);
+      helper.assertSelection(table, [table.rows[0]]);
     });
 
     it("does nothing if last row already is selected", function() {
@@ -632,6 +664,46 @@ describe("TableKeyStrokes", function() {
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);
       expect(rows[3].checked).toBe(false);
+    });
+
+  });
+
+  describe("page up", function() {
+
+    it("selects the only row if there is only one", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.PAGE_UP);
+      helper.assertSelection(table, [table.rows[0]]);
+
+      table.clearSelection();
+      table.selectionHandler.lastActionRow = table.rows[0];
+
+      table.$data.triggerKeyDown(scout.keys.PAGE_UP);
+      helper.assertSelection(table, [table.rows[0]]);
+    });
+
+  });
+
+  describe("page down", function() {
+
+    it("selects the only row if there is only one", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+
+      table.render(session.$entryPoint);
+
+      table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
+      helper.assertSelection(table, [table.rows[0]]);
+
+      table.clearSelection();
+      table.selectionHandler.lastActionRow = table.rows[0];
+
+      table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
+      helper.assertSelection(table, [table.rows[0]]);
     });
 
   });

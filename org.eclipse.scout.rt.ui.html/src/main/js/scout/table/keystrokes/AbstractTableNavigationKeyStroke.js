@@ -39,61 +39,62 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
 };
 
 /**
- * Returns viewport sensitive information about rows visible to the user.
- *
- * FIXME: [nbu] is not viewport sensitive yet.
+ * Returns viewport sensitive information containing the first and last visible row in the viewport.
  */
-scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function(table) {
-  var viewport = {};
+scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
+  var x, y, viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
+    table = this.field,
+    document = table.$data.document(true),
+    viewport = {},
+    rows = table.filteredRows();
 
-  if (!table.$filteredRows().length) {
+  if (rows.length === 0) {
     return viewport;
   }
 
-  var $rows = table.$filteredRows(),
-    $selectedRows = table.$selectedRows();
+  viewportBounds = scout.graphics.offsetBounds(table.$data);
+  dataInsets = scout.graphics.getInsets(table.$data);
+  dataMarginTop = table.$data.cssMarginTop();
+  viewportBounds = viewportBounds.subtract(dataInsets);
 
-  viewport.$firstRow = $rows.first();
-  viewport.$lastRow = $rows.last();
-
-  if (!$selectedRows.length) {
-    return viewport;
+  // if data has a negative margin, adjust viewport otherwise a selected first row will never be in the viewport
+  if (dataMarginTop < 0) {
+    viewportBounds.y -= Math.abs(dataMarginTop);
+    viewportBounds.height += Math.abs(dataMarginTop);
   }
 
-  viewport.selection = true;
+  // get first element at the top of the viewport
+  x = viewportBounds.x + 1;
+  y = viewportBounds.y + 1;
 
-  if (!$selectedRows.first().is(viewport.firstRow)) {
-    viewport.$rowBeforeSelection = table.$prevFilteredRow($selectedRows.first(), false);
-  }
-  if (!$selectedRows.last().is(viewport.$lastRow)) {
-    viewport.$rowAfterSelection = table.$nextFilteredRow($selectedRows.last(), false);
-  }
+  firstRow = this._findFirstRowInViewport(table, viewportBounds);
+  lastRow = this._findLastRowInViewport(table, rows.indexOf(firstRow), viewportBounds);
 
+  viewport.firstRow = firstRow;
+  viewport.lastRow = lastRow;
   return viewport;
 };
 
-scout.AbstractTableNavigationKeyStroke.prototype._applyRowSelection = function(table, $oldSelection, $newSelection, shiftKey, deselect, directionDown) {
-  if (!$newSelection || !$newSelection.length) {
+scout.AbstractTableNavigationKeyStroke.prototype.$firstRowAfterSelection = function() {
+  var $selectedRows = this.field.$selectedRows();
+  if (!$selectedRows.length) {
     return;
   }
 
-  if (shiftKey) {
-    $newSelection = (deselect ? $oldSelection.not($newSelection) : $oldSelection.add($newSelection));
+  return this.field.$nextFilteredRow($selectedRows.last(), false);
+};
+
+scout.AbstractTableNavigationKeyStroke.prototype.$firstRowBeforeSelection = function() {
+  var $selectedRows = this.field.$selectedRows();
+  if (!$selectedRows.length) {
+    return;
   }
 
-  var rows = [];
-  $newSelection.each(function() {
-    rows.push($(this).data('row'));
-  });
-
-  table.selectRows(rows, true, true);
-
-  // scroll selection into view (if not visible)
-  table.scrollTo(directionDown ? scout.arrays.last(rows) : scout.arrays.first(rows));
+  return this.field.$prevFilteredRow($selectedRows.first(), false);
 };
 
 /**
- * Searches for the last selected row, starting from rowIndex. Expects row at rowIndex to be selected.
+ * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = function(table, rowIndex) {
   var rows = table.filteredRows();
@@ -109,9 +110,8 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = fu
   });
 };
 
-
 /**
- * Searches for the last selected row, starting from rowIndex. Expects row at rowIndex to be selected.
+ * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = function(table, rowIndex) {
   var rows = table.filteredRows();
@@ -124,5 +124,34 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
       return false;
     }
     return !table.isRowSelected(nextRow);
+  });
+};
+
+scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = function(table, viewportBounds) {
+  var rows = table.filteredRows();
+  return scout.arrays.find(rows, function(row, i) {
+    var $row = row.$row,
+      rowOffset = $row.offset();
+
+    // If the row is fully visible in the viewport -> break and return the row
+    return viewportBounds.contains(rowOffset.left, rowOffset.top);
+  });
+};
+
+scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = function(table, startRowIndex, viewportBounds) {
+  var rows = table.filteredRows();
+  if (startRowIndex === rows.length - 1) {
+    return rows[startRowIndex];
+  }
+  return scout.arrays.findFromNext(rows, startRowIndex, function(row, i) {
+    var nextRow = rows[i + 1];
+    if (!nextRow) {
+      // If next row is not available (row is the last row) -> break and return current row
+      return true;
+    }
+    var $nextRow = nextRow.$row;
+    var nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
+    // If the next row is not fully visible in the viewport -> break and return current row
+    return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height);
   });
 };

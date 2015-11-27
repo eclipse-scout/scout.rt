@@ -13,8 +13,10 @@ scout.TableNavigationEndKeyStroke = function(table) {
   this.which = [scout.keys.END];
   this.renderingHints.text = 'End';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var viewport = this._viewportInfo(table);
-    return viewport.selection ? viewport.$rowAfterSelection : viewport.$firstRow;
+    var viewport = this._viewportInfo();
+    if (viewport.lastRow) {
+      return viewport.lastRow.$row;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TableNavigationEndKeyStroke, scout.AbstractTableNavigationKeyStroke);

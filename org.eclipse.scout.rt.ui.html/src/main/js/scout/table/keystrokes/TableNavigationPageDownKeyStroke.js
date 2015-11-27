@@ -13,53 +13,51 @@ scout.TableNavigationPageDownKeyStroke = function(table) {
   this.which = [scout.keys.PAGE_DOWN];
   this.renderingHints.text = 'PgDn';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var viewport = this._viewportInfo(table);
-    return viewport.selection ? viewport.$rowAfterSelection : viewport.$firstRow;
+    var viewport = this._viewportInfo();
+    if (viewport.lastRow) {
+      return viewport.lastRow.$row;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TableNavigationPageDownKeyStroke, scout.AbstractTableNavigationKeyStroke);
 
 scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
   var table = this.field,
-    $rows = table.$filteredRows(),
-    $selection = table.$selectedRows(),
+    viewport = this._viewportInfo(),
+    rows = table.filteredRows(),
+    selectedRows = table.selectedRows,
+    lastSelectedRow = scout.arrays.last(selectedRows),
     lastActionRow = table.selectionHandler.lastActionRow,
-    deselect = false,
-    $newSelection;
+    lastActionRowIndex = -1,
+    newSelectedRows;
 
-  if ($selection.length > 0 || lastActionRow) {
-    lastActionRow = lastActionRow || $selection.last().data('row');
-    var $next = table.$nextFilteredRows(lastActionRow.$row);
-    if (event.shiftKey) {
-      if ($next.length > 10) {
-        var $potentialSelectionDown = $next.slice(0, 10);
-        deselect = $potentialSelectionDown.not('.selected').length === 0;
-        $newSelection = $next.slice(0, 10);
-        if (deselect) {
-          $newSelection = $next.slice(0, 9);
-          $newSelection = $newSelection.add(lastActionRow.$row);
-        } else {
-          $newSelection = $potentialSelectionDown;
-        }
-        table.selectionHandler.lastActionRow = $potentialSelectionDown.last().data('row');
-      } else {
-        deselect = $next.not('.selected').length === 0;
-        if (!deselect) {
-          $newSelection = $next;
-          table.selectionHandler.lastActionRow = $newSelection.last().data('row');
-        }
-      }
-    } else if ($next.length > 10) {
-      $newSelection = $next.eq(10);
-      table.selectionHandler.lastActionRow = $newSelection.last().data('row');
-    } else {
-      $newSelection = $rows.last();
-      table.selectionHandler.lastActionRow = $newSelection.last().data('row');
-    }
-  } else {
-    $newSelection = $rows.first();
-    table.selectionHandler.lastActionRow = $newSelection.last().data('row');
+  if (!viewport.lastRow) {
+    return;
   }
 
-  this._applyRowSelection(table, $selection, $newSelection, event.shiftKey, deselect, true);
+  if (lastActionRow) {
+    lastActionRowIndex = rows.indexOf(lastActionRow);
+  }
+  // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+  if (lastActionRowIndex < 0) {
+    lastActionRow = lastSelectedRow;
+    lastActionRowIndex = rows.indexOf(lastActionRow);
+  }
+
+  // If last row in viewport already is selected -> scroll a page down
+  // Don't do it if multiple rows are selected and user only presses page down without shift
+  if (selectedRows.length > 0 && lastActionRow === viewport.lastRow && !(selectedRows.length > 1 && !event.shiftKey)) {
+    table.scrollPageDown();
+    viewport = this._viewportInfo();
+  }
+
+  if (event.shiftKey && selectedRows.length > 0) {
+    newSelectedRows = rows.slice(lastActionRowIndex + 1, rows.indexOf(viewport.lastRow) + 1);
+    newSelectedRows = scout.arrays.union(selectedRows, newSelectedRows);
+  } else {
+    newSelectedRows = [viewport.lastRow];
+  }
+
+  table.selectionHandler.lastActionRow = viewport.lastRow;
+  table.selectRows(newSelectedRows, true, true);
 };
