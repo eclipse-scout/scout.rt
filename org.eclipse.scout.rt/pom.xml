@@ -475,6 +475,15 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <!-- DO build an empty jar -->
+              <skipIfEmpty>false</skipIfEmpty>
+              <forceCreation>true</forceCreation>
+            </configuration>
+          </plugin>
+          <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
             <version>1.6.6</version>
