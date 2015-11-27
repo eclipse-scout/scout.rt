@@ -302,6 +302,7 @@ scout.Table.prototype.onContextMenu = function(event) {
         popup = scout.create(scout.ContextMenuPopup, {
           parent: this,
           menuItems: menuItems,
+          filterFunc: this._filterMenusHandler,
           location: {
             x: event.pageX,
             y: event.pageY

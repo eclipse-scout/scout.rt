@@ -22,6 +22,7 @@ scout.ContextMenuPopup.prototype._init = function(options) {
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
   this.menuItems = options.menuItems;
+  this.filterFunc = options.filterFunc;
   this.options = $.extend({
     cloneMenuItems: true
   }, options);
@@ -271,9 +272,14 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
   var menuClone;
   menus = menus ? menus : this._getMenuItems();
+  // TODO ASA,NBU where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
   if(this.menu && this.menu.filterFunc){
     // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
     menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ?   'menuBar': 'contextMenu');
+  }
+  if(this.filterFunc) {
+    // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
+    menus = this.filterFunc(menus, this instanceof scout.MenuBarPopup ?   'menuBar': 'contextMenu');
   }
   if (!menus || menus.length === 0) {
     return;
