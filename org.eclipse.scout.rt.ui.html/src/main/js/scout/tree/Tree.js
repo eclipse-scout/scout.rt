@@ -27,6 +27,7 @@ scout.Tree = function() {
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
   this.lazyExpandingEnabled = true;
+  this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -41,6 +42,7 @@ scout.Tree.prototype._init = function(model) {
   this.menuBar.bottom();
   this._syncBreadcrumbEnabled('', this.breadcrumbEnabled);
   this._syncKeyStrokes(this.keyStrokes);
+  this._syncMenus(this.menus);
 };
 
 /**
@@ -78,7 +80,15 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.Tree.prototype._syncMenus = function(newMenus, oldMenus) {
+  this._injectFilterFuncToMenus(newMenus);
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+};
+
+scout.Tree.prototype._injectFilterFuncToMenus = function(menus) {
+  menus.forEach(function(menu) {
+    menu.filterFunc = this._filterMenusHandler;
+    this._injectFilterFuncToMenus(menu.childActions);
+  }.bind(this));
 };
 
 scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
@@ -415,19 +425,30 @@ scout.Tree.prototype._renderNodeFilterAccepted = function(node) {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'], false, true);
+  var menuItems = this._filterMenus(this.menus, 'menuBar', false, true);
   this.menuBar.updateItems(menuItems);
 };
 
-scout.Tree.prototype._filterMenus = function(allowedTypes, onlyVisible, enableDisableKeyStroke) {
-  allowedTypes = allowedTypes || [];
+scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+  var allowedTypes = [];
+
+  if (destination === 'menuBar') {
+    allowedTypes = [ 'Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection' ];
+  }
+  else if (destination === 'contextMenu') {
+    allowedTypes = [ 'Tree.SingleSelection', 'Tree.MultiSelection' ];
+  }
+  else if (destination === 'contextMenuEmptySpace') {
+    allowedTypes = [ 'Tree.EmptySpace' ];
+  }
+
   if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodes.length !== 1) {
     scout.arrays.remove(allowedTypes, 'Tree.SingleSelection');
   }
   if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodes.length <= 1) {
     scout.arrays.remove(allowedTypes, 'Tree.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+  return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
 };
 
 scout.Tree.prototype._renderEnabled = function() {
@@ -1203,11 +1224,11 @@ scout.Tree.prototype._sendBreadCrumbEnabled = function() {
   });
 };
 
-scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
+scout.Tree.prototype._showContextMenu = function(event, destination) {
   event.preventDefault();
   event.stopPropagation();
-  var func = function func(event, allowedTypes) {
-    var filteredMenus = this._filterMenus(allowedTypes, true),
+  var func = function func(event, destination) {
+    var filteredMenus = this._filterMenus(this.menus, destination, true),
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
@@ -1224,7 +1245,7 @@ scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
     popup.open();
   }.bind(this);
 
-  scout.menus.showContextMenuWithWait(this.session, func, event, allowedTypes);
+  scout.menus.showContextMenuWithWait(this.session, func, event, destination);
 };
 
 scout.Tree.prototype._onNodeMouseDown = function(event) {
@@ -1589,9 +1610,9 @@ scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
 
 scout.Tree.prototype._onContextMenu = function(event) {
   if (this.$data.is(event.target)) {
-    this._showContextMenu(event, ['Tree.EmptySpace']);
+    this._showContextMenu(event, 'contextMenuEmptySpace');
   } else {
-    this._showContextMenu(event, ['Tree.SingleSelection', 'Tree.MultiSelection']);
+    this._showContextMenu(event, 'contextMenu');
   }
 };
 
