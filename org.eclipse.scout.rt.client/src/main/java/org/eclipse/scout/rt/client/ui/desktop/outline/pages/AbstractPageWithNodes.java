@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithN
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNodesChains.PageWithNodesCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -43,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -288,7 +290,15 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
         IPageWithNodes pageWithNodes = (IPageWithNodes) node;
         List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.SingleSelection), false));
         for (IMenu m : menus) {
-          pageMenus.add(new OutlineMenuWrapper(m, TableMenuType.SingleSelection));
+          pageMenus.add(new OutlineMenuWrapper(m, new IMenuTypeMapper() {
+            @Override
+            public IMenuType map(IMenuType menuType) {
+              if (menuType == TreeMenuType.SingleSelection) {
+                return TableMenuType.SingleSelection;
+              }
+              return menuType;
+            }
+          }));
         }
       }
     }
@@ -311,7 +321,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       if (menu instanceof OutlineMenuWrapper) {
         ((OutlineMenuWrapper) menu).getWrappedMenu().setInheritAccessibility(false);
       }
-      menus.add(new OutlineMenuWrapper(menu, menu.getMenuTypes()));
+      menus.add(new OutlineMenuWrapper(menu));
     }
     if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
       mainBoxContextMenu.setChildActions(menus);

@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.Ou
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -43,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -607,7 +610,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   protected void addMenusOfActivePageToContextMenu(IPage<?> activePage) {
     List<IMenu> wrappedMenus = new ArrayList<IMenu>();
     for (IMenu m : computeInheritedMenusOfPage(activePage)) {
-      wrappedMenus.add(new OutlineMenuWrapper(m, TreeMenuType.SingleSelection));
+      wrappedMenus.add(new OutlineMenuWrapper(m, new IMenuTypeMapper() {
+        @Override
+        public IMenuType map(IMenuType menuType) {
+          if (menuType == TableMenuType.EmptySpace || menuType == TableMenuType.SingleSelection) {
+            return TreeMenuType.SingleSelection;
+          }
+          return menuType;
+        }
+      }));
     }
     m_inheritedMenusOfPage = wrappedMenus;
     getContextMenu().addChildActions(m_inheritedMenusOfPage);

@@ -160,7 +160,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> treeNodes);
 
   /**
-   * The default implementation returns the single selection menus from the parent table page.
+   * The default implementation returns the single selection menus from the parent table page's table.
    * <p>
    * If this behavior is not desired return an empty list instead.
    *

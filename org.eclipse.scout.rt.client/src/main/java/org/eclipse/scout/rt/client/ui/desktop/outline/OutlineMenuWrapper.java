@@ -33,6 +33,12 @@ public class OutlineMenuWrapper implements IMenu {
   private boolean m_localEnabled = true;
   private boolean m_localEnabledInheritAccessibility = true;
   private Set<IMenuType> m_menuTypes;
+  public final static IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
+    @Override
+    public IMenuType map(IMenuType menuType) {
+      return menuType;
+    }
+  };
 
   /**
    * maps a menuType of the wrapped menu to the menuType of the wrapperMenu
@@ -42,43 +48,20 @@ public class OutlineMenuWrapper implements IMenu {
   }
 
   /**
-   * API to ensure at least one menu type!
-   * <p>
-   * the provided menuTypes are used over the complete sub-hierarchy of the wrappedMenu
+   * Constructs a wrapper for a menu where the menuType of the menu and of each menu in the sub-hierarchy is the same as
+   * in the original
    *
    * @param wrappedMenu
-   * @param firstMenuType
-   * @param additionalTypes
    */
-  public OutlineMenuWrapper(IMenu wrappedMenu, IMenuType firstMenuType, IMenuType... additionalTypes) {
-    Set<IMenuType> menuTypeSet = CollectionUtility.hashSet(firstMenuType);
-    if (additionalTypes != null) {
-      for (IMenuType t : additionalTypes) {
-        if (t != null) {
-          menuTypeSet.add(t);
-        }
-      }
-    }
-    m_wrappedMenu = wrappedMenu;
-    m_menuTypes = menuTypeSet;
-    setup();
-  }
-
-  /**
-   * @param wrappedMenu
-   * @param menuTypes
-   *          the provided menuTypes are used over the complete sub-hierarchy of the wrappedMenu
-   */
-  public OutlineMenuWrapper(IMenu wrappedMenu, Set<? extends IMenuType> menuTypes) {
-    m_wrappedMenu = wrappedMenu;
-    m_menuTypes = CollectionUtility.hashSet(menuTypes);
-    setup();
+  public OutlineMenuWrapper(IMenu wrappedMenu) {
+    this(wrappedMenu, AUTO_MENU_TYPE_MAPPER);
   }
 
   /**
    * @param wrappedMenu
    * @param mapper
-   *          the menuTypes of each menu in the sub-hierarchy are individually computed with this mapper
+   *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
+   *          mapper
    */
   public OutlineMenuWrapper(IMenu wrappedMenu, IMenuTypeMapper mapper) {
     m_wrappedMenu = wrappedMenu;
@@ -96,16 +79,6 @@ public class OutlineMenuWrapper implements IMenu {
     // create child wrapper
     for (IMenu m : childActions) {
       wrappedChildActions.add(new OutlineMenuWrapper(m, mapper));
-    }
-    m_childMenus = wrappedChildActions;
-  }
-
-  protected void setup() {
-    List<IMenu> childActions = m_wrappedMenu.getChildActions();
-    List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
-    // create child wrapper
-    for (IMenu m : childActions) {
-      wrappedChildActions.add(new OutlineMenuWrapper(m, getMenuTypes()));
     }
     m_childMenus = wrappedChildActions;
   }
