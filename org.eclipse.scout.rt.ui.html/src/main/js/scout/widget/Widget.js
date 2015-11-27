@@ -325,9 +325,11 @@ scout.Widget.prototype.attach = function(event) {
   }
   event = event || {target: this};
   this._attach(event);
-  this.children.forEach(function(child) {
-    child.attach(event);
-  });
+  if (this.attached) {
+    this.children.forEach(function(child) {
+      child.attach(event);
+    });
+  }
 };
 
 /**
