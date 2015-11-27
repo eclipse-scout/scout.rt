@@ -130,6 +130,14 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
 
+  public interface IResetColumnsOption {
+    String VISIBILITY = "visibility";
+    String ORDER = "order";
+    String SORTING = "sorting";
+    String WIDTHS = "widths";
+    String BACKGROUND_EFFECTS = "backgroundEffects";
+  }
+
   private boolean m_initialized;
   private final OptimisticLock m_initLock;
   private ColumnSet m_columnSet;
@@ -3457,53 +3465,57 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void resetColumnVisibilities() {
-    resetColumns(true, false, false, false);
+    resetColumns(CollectionUtility.hashSet(IResetColumnsOption.VISIBILITY));
   }
 
   @Override
   public void resetColumnOrder() {
-    resetColumns(false, true, false, false);
+    resetColumns(CollectionUtility.hashSet(IResetColumnsOption.ORDER));
   }
 
   @Override
   public void resetColumnSortOrder() {
-    resetColumns(false, false, true, false);
+    resetColumns(CollectionUtility.hashSet(IResetColumnsOption.SORTING));
   }
 
   @Override
   public void resetColumnWidths() {
-    resetColumns(false, false, false, true);
+    resetColumns(CollectionUtility.hashSet(IResetColumnsOption.WIDTHS));
+  }
+
+  @Override
+  public void resetColumnBackgroundEffects() {
+    resetColumns(CollectionUtility.hashSet(IResetColumnsOption.BACKGROUND_EFFECTS));
   }
 
   @Override
   public void resetColumns() {
-    resetColumns(true, true, true, true);
-    // FIXME ASA maybe refactor resetColumns(boolean, boolean, boolean, boolean) and include
-    for (IColumn<?> col : getColumns()) {
-      if (col instanceof INumberColumn) {
-        ((INumberColumn) col).setBackgroundEffect(((INumberColumn) col).getInitialBackgroundEffect());
-      }
-    }
+    resetColumns(CollectionUtility.hashSet(
+        IResetColumnsOption.VISIBILITY,
+        IResetColumnsOption.ORDER,
+        IResetColumnsOption.SORTING,
+        IResetColumnsOption.WIDTHS,
+        IResetColumnsOption.BACKGROUND_EFFECTS));
   }
 
-  protected void resetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) {
+  protected void resetColumns(Set<String> options) {
     try {
       setTableChanging(true);
-      if (sorting) {
+      // TODO ASA move to internal?
+      if (options.contains(IResetColumnsOption.SORTING)) {
         m_sortValid = false;
       }
-      resetColumnsInternal(visibility, order, sorting, widths);
-      interceptResetColumns(visibility, order, sorting, widths);
+      resetColumnsInternal(options);
+      interceptResetColumns(options);
     }
     finally {
       setTableChanging(false);
     }
   }
 
-  private void resetColumnsInternal(boolean visibility, boolean order, boolean sorting, boolean widths) {
+  private void resetColumnsInternal(Set<String> options) {
 
-    //Visibilities
-    if (visibility) {
+    if (options.contains(IResetColumnsOption.VISIBILITY)) {
       ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
       for (IColumn<?> col : getColumnSet().getAllColumnsInUserOrder()) {
         if (col.isDisplayable()) {
@@ -3515,8 +3527,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(list);
     }
-    //Order
-    if (order) {
+
+    if (options.contains(IResetColumnsOption.ORDER)) {
       TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
       int index = 0;
       for (IColumn<?> col : getColumns()) {
@@ -3527,15 +3539,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(orderMap.values());
     }
-    //Sorting & Grouping
-    if (sorting) {
+
+    if (options.contains(IResetColumnsOption.SORTING)) {
       getColumnSet().resetSortingAndGrouping();
     }
-    //Widths
-    if (widths) {
+
+    if (options.contains(IResetColumnsOption.WIDTHS)) {
       for (IColumn<?> col : getColumns()) {
         if (col.isDisplayable()) {
           col.setWidth(col.getInitialWidth());
+        }
+      }
+    }
+
+    if (options.contains(IResetColumnsOption.BACKGROUND_EFFECTS)) {
+      for (IColumn<?> col : getColumns()) {
+        if (col instanceof INumberColumn) {
+          ((INumberColumn) col).setBackgroundEffect(((INumberColumn) col).getInitialBackgroundEffect());
         }
       }
     }
@@ -3785,18 +3805,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @param visibility
-   *          {@code true} if the visibility is reset.
-   * @param order
-   *          {@code true} if the order is reset.
-   * @param sorting
-   *          {@code true} if the sorting is reset.
-   * @param widths
-   *          {@code true} if the column widths are reset.
+   * @param options
+   *          Set of constants of {@link IResetColumnsOption}
    */
   @ConfigOperation
   @Order(90)
-  protected void execResetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) {
+  protected void execResetColumns(Set<String> options) {
   }
 
   /**
@@ -4754,8 +4768,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths) {
-      getOwner().execResetColumns(visibility, order, sorting, widths);
+    public void execResetColumns(TableResetColumnsChain chain, Set<String> options) {
+      getOwner().execResetColumns(options);
     }
 
     @Override
@@ -4834,10 +4848,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     chain.execInitTable();
   }
 
-  protected final void interceptResetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) {
+  protected final void interceptResetColumns(Set<String> options) {
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableResetColumnsChain chain = new TableResetColumnsChain(extensions);
-    chain.execResetColumns(visibility, order, sorting, widths);
+    chain.execResetColumns(options);
   }
 
   protected final void interceptDecorateCell(Cell view, ITableRow row, IColumn<?> col) {

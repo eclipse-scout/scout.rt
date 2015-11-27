@@ -900,6 +900,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void resetColumnWidths();
 
   /**
+   * initialize column background effects
+   */
+  void resetColumnBackgroundEffects();
+
+  /**
    * initialize column order
    */
   void resetColumnOrder();

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.table;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
@@ -49,7 +50,7 @@ public interface ITableExtension<TABLE extends AbstractTable> extends IExtension
 
   void execInitTable(TableInitTableChain chain);
 
-  void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths);
+  void execResetColumns(TableResetColumnsChain chain, Set<String> options);
 
   void execDecorateCell(TableDecorateCellChain chain, Cell view, ITableRow row, IColumn<?> col);
 

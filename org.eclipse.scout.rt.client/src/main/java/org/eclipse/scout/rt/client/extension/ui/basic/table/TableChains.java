@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.table;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -116,14 +117,14 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execResetColumns(final boolean visibility, final boolean order, final boolean sorting, final boolean widths) {
+    public void execResetColumns(final Set<String> options) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITableExtension<? extends AbstractTable> next) {
-          next.execResetColumns(TableResetColumnsChain.this, visibility, order, sorting, widths);
+          next.execResetColumns(TableResetColumnsChain.this, options);
         }
       };
-      callChain(methodInvocation, visibility, order, sorting, widths);
+      callChain(methodInvocation, options);
     }
   }
 
