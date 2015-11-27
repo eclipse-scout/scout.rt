@@ -444,9 +444,13 @@ scout.TableHeaderMenu.prototype._renderFilterField = function() {
     parent: this,
     session: this.session,
     labelVisible: false,
-    statusVisible: false
+    statusVisible: false,
+    maxLength: 100
   });
   freeTextField.render(this.$filteringField);
+  //FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
+  freeTextField.$mandatory.remove();
+  freeTextField.$mandatory = null;
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {

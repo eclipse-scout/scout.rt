@@ -40,11 +40,16 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   popupSize = popupSize
     .subtract(htmlComp.getInsets())
     .subtract(scout.graphics.getInsets(this.popup.$filtering));
-  filteringContainerHeight = popupSize.height - otherGroupsHeight;
+  filteringContainerHeight = popupSize.height - otherGroupsHeight - 26 - 39; // FIXME AWE: (filter) read height of filter field (30)
 
   // If there are only some filter items make container smaller, otherwise use given height
   filteringContainerHeight = Math.min(filteringContainerHeight, filteringContainerScrollHeight);
   $filteringContainer.cssHeight(filteringContainerHeight);
 
   scout.scrollbars.update($filteringContainer);
+
+  // Layout filter fields
+  var fieldHtmlComp = scout.HtmlComponent.get(this.popup.$filteringField.find('.form-field'));
+  fieldHtmlComp.setSize(new scout.Dimension(popupSize.width - 10, 26)); // FIXME AWE: (filter) dynamic layout for field
+
 };

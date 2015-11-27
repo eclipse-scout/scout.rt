@@ -87,12 +87,15 @@ scout.StringField.prototype._renderProperties = function() {
 scout.StringField.prototype._renderMaxLength = function(maxLength0) {
   var maxLength = maxLength0 || this.maxLength;
   if (this.$field[0].maxLength) {
-    this.$field[0].maxLength = maxLength;
+    if (maxLength) { // 0, undefined, null (zero maxlength makes no sense since you could not enter anything)
+      this.$field.attr('maxlength', maxLength);
+    } else {
+      this.$field.removeAttr('maxlength');
+    }
   } else {
-    this.$field.on("keyup paste", function(e) {
+    this.$field.on('keyup paste', function(e) {
       setTimeout(function() {
         var currLength = this.$field.val().length;
-
         if (currLength > this.maxLength) {
           this.$field.val(this.$field.val().slice(0, this.maxLength));
         }

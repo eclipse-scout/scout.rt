@@ -104,7 +104,8 @@
     "StringField": {
       "inputMasked": false,
       "multilineText": false,
-      "updateDisplayTextOnModify": false
+      "updateDisplayTextOnModify": false,
+      "maxLength": 4000
     },
     "DateField": {
       "hasDate": true,

@@ -88,6 +88,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.remove",
         "ui.add",
         "ui.FilterBy",
+        "ui.FilterText",
         "ui.Up",
         "ui.Continue",
         "ui.Ignore",
