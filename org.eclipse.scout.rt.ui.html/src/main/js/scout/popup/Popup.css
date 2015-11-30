@@ -81,10 +81,9 @@
     border-bottom: 1px solid transparent;
   }
 
-  & > .menu-item.expanded:after {
+  & > .menu-item.expanded > .submenu-icon::before {
+    display: inline-block;
     #scout.transform(rotate(180deg));
-    padding-left: 0px;
-    padding-right: 10px;
   }
 
   & > .menu-item > .key-box {
