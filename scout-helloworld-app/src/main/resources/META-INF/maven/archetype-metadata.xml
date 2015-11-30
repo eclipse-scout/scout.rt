@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="org.eclipse.scout.hello.world"
-    xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="org.eclipse.scout.hello.world" xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <requiredProperties>
     <requiredProperty key="javaVersion">
       <defaultValue>1.8</defaultValue>
@@ -9,24 +7,24 @@
     <requiredProperty key="displayName">
       <defaultValue>My Application</defaultValue>
     </requiredProperty>
-	<requiredProperty key="scoutAuthPublicKey">
+    <requiredProperty key="scoutAuthPublicKey">
       <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
     </requiredProperty>
-	<requiredProperty key="scoutAuthPrivateKey">
+    <requiredProperty key="scoutAuthPrivateKey">
       <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
     </requiredProperty>
-	<requiredProperty key="scoutAuthPublicKeyDev">
+    <requiredProperty key="scoutAuthPublicKeyDev">
       <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
     </requiredProperty>
-	<requiredProperty key="scoutAuthPrivateKeyDev">
+    <requiredProperty key="scoutAuthPrivateKeyDev">
       <defaultValue>TODO (use org.eclipse.scout.commons.SecurityUtility.generateKeyPair())</defaultValue>
     </requiredProperty>
-	<requiredProperty key="userName">
+    <requiredProperty key="userName">
       <defaultValue>Scout Robot</defaultValue>
     </requiredProperty>
   </requiredProperties>
   <modules>
-    <module id="parent" dir="__rootArtifactId__.parent" name="parent">
+    <module id="parent" dir="__rootArtifactId__" name="parent">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
@@ -50,7 +48,7 @@
             <include>**/*.properties</include>
           </includes>
         </fileSet>
-		<fileSet filtered="true" encoding="UTF-8">
+        <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
             <include>**/*.xml</include>
@@ -119,7 +117,7 @@
             <include>**/*.png</include>
           </includes>
         </fileSet>
-		<fileSet encoding="UTF-8">
+        <fileSet encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
             <include>**/*.xml</include>
@@ -156,7 +154,7 @@
         </fileSet>
       </fileSets>
     </module>
-	<module id="server.app.dev" dir="__rootArtifactId__.server.app.dev" name="server.app.dev">
+    <module id="server.app.dev" dir="__rootArtifactId__.server.app.dev" name="server.app.dev">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -165,7 +163,7 @@
             <include>**/*.properties</include>
           </includes>
         </fileSet>
-		<fileSet filtered="true" encoding="UTF-8">
+        <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
           <includes>
             <include>**/*.launch</include>
@@ -197,7 +195,7 @@
             <include>**/*.html</include>
           </includes>
         </fileSet>
-		<fileSet encoding="UTF-8">
+        <fileSet encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
             <include>**/*.ico</include>
@@ -223,7 +221,7 @@
         </fileSet>
       </fileSets>
     </module>
-	<module id="ui.html.app.dev" dir="__rootArtifactId__.ui.html.app.dev" name="ui.html.app.dev">
+    <module id="ui.html.app.dev" dir="__rootArtifactId__.ui.html.app.dev" name="ui.html.app.dev">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -232,7 +230,7 @@
             <include>**/*.properties</include>
           </includes>
         </fileSet>
-		<fileSet filtered="true" encoding="UTF-8">
+        <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
           <includes>
             <include>**/*.launch</include>

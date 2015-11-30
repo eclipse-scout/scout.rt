@@ -11,7 +11,7 @@
   </parent>
 
   <groupId>${groupId}</groupId>
-  <artifactId>${groupId}.parent</artifactId>
+  <artifactId>${groupId}</artifactId>
   <version>${version}</version>
   <packaging>pom</packaging>
 
