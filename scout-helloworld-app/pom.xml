@@ -108,14 +108,6 @@
 
   <repositories>
     <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>eclipse.release</id>
-      <name>eclipse-release-repo</name>
-      <url>https://repo.eclipse.org/content/groups/releases/</url>
-    </repository>
-    <repository>
       <snapshots></snapshots>
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
@@ -124,14 +116,6 @@
   </repositories>
 
   <pluginRepositories>
-    <pluginRepository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>eclipse.release</id>
-      <name>eclipse-release-repo</name>
-      <url>https://repo.eclipse.org/content/groups/releases/</url>
-    </pluginRepository>
     <pluginRepository>
       <snapshots></snapshots>
       <id>eclipse.snapshot</id>
