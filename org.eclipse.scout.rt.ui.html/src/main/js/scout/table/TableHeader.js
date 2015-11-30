@@ -123,7 +123,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
 
   scout.tooltips.install($header, {
     parent: this,
-    text: this._headerItemTooltip.bind(this),
+    text: this._headerItemTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
     native: !scout.device.isCustomEllipsisTooltipPossible()
@@ -241,7 +241,7 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
   });
 };
 
-scout.TableHeader.prototype._headerItemTooltip = function($col) {
+scout.TableHeader.prototype._headerItemTooltipText = function($col) {
   var column = $col.data('column');
   if (column && scout.strings.hasText(column.headerTooltip)) {
     return column.headerTooltip;

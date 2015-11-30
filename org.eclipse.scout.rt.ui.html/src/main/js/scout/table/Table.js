@@ -421,7 +421,7 @@ scout.Table.prototype._installCellTooltipSupport = function() {
   scout.tooltips.install(this.$data, {
     parent: this,
     selector: '.table-cell',
-    text: this._cellTooltip.bind(this),
+    text: this._cellTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
     native: !scout.device.isCustomEllipsisTooltipPossible()
@@ -432,7 +432,7 @@ scout.Table.prototype._uninstallCellTooltipSupport = function() {
   scout.tooltips.uninstall(this.$data);
 };
 
-scout.Table.prototype._cellTooltip = function($cell) {
+scout.Table.prototype._cellTooltipText = function($cell) {
   var cell, tooltipText,
     $row = $cell.parent(),
     cellIndex = $cell.index(),

@@ -167,6 +167,7 @@ scout.Tree.prototype._render = function($parent) {
     parent: this,
     axis: 'y'
   });
+  this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
 
   // add drag and drop support
@@ -199,6 +200,7 @@ scout.Tree.prototype._remove = function() {
     delete node.$node;
   });
   scout.scrollbars.uninstall(this.$data, this.session);
+  this._uninstallNodeTooltipSupport();
   scout.Tree.parent.prototype._remove.call(this);
 };
 
@@ -348,10 +350,6 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   scout.styles.legacyStyle(node, $node);
 
-  if (scout.strings.hasText(node.tooltipText)) {
-    $node.attr('title', node.tooltipText);
-  }
-
   // apply node filter
   if (this._applyFiltersForNode(node)) {
     var newInvisibleNodes = [];
@@ -365,7 +363,6 @@ scout.Tree.prototype._decorateNode = function(node) {
   this.dragAndDropHandler.install($node);
   // TODO BSH More attributes...
   // iconId
-  // tooltipText
 
   // If parent node is marked as 'lazy', check if any hidden child nodes remain.
   if (node.parentNode && node.parentNode.$node.hasClass('lazy')) {
@@ -755,6 +752,32 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
           .toggleClass('children-checked', false);
       }
     }
+  }
+};
+
+
+scout.Tree.prototype._installNodeTooltipSupport = function() {
+  scout.tooltips.install(this.$data, {
+    parent: this,
+    selector: '.tree-node',
+    text: this._nodeTooltipText.bind(this),
+    arrowPosition: 50,
+    arrowPositionUnit: '%',
+    native: !scout.device.isCustomEllipsisTooltipPossible()
+  });
+};
+
+scout.Tree.prototype._uninstallNodeTooltipSupport = function() {
+  scout.tooltips.uninstall(this.$data);
+};
+
+scout.Tree.prototype._nodeTooltipText = function($node) {
+  var node = $node.data('node');
+
+  if (node.tooltipText) {
+    return node.tooltipText;
+  } else if ($node.isContentTruncated()) {
+    return $node.text();
   }
 };
 
