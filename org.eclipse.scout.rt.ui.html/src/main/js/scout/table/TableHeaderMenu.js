@@ -29,6 +29,10 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.tableHeader = options.tableHeader;
   this.table = this.tableHeader.table;
   this.$headerItem = this.$anchor;
+
+  this._tableFilterHandler = this._onTableFilterChanged.bind(this);
+  this.table.on('addFilter', this._tableFilterHandler);
+  this.table.on('removeFilter', this._tableFilterHandler);
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -120,6 +124,8 @@ scout.TableHeaderMenu.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$filteringContainer, this.session);
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
+  this.table.off('addFilter', this._tableFilterHandler);
+  this.table.off('removeFilter', this._tableFilterHandler);
   scout.TableHeaderMenu.parent.prototype._remove.call(this);
 };
 
@@ -418,8 +424,9 @@ scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
 
 scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
   this.$filtering = this.$columnFilters.appendDiv('table-header-menu-group-filter');
-  this.$filtering.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.FilterBy'));
+  this.$filterGroupTitle = this.$filtering
+    .appendDiv('table-header-menu-group-text')
+    .data('label', this._filterByText());
 
   this.$filteringContainer = this.$filtering.appendDiv('table-header-menu-filter-container');
   this.filter.availableValues.forEach(function(availableValue, index, arr) {
@@ -439,6 +446,15 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
   scout.scrollbars.install(this.$filteringContainer, {
     parent: this
   });
+};
+
+scout.TableHeaderMenu.prototype._filterByText = function() {
+  var text = this.session.text('ui.FilterBy'),
+    numSelected = this.filter.selectedValues.length;
+  if (numSelected > 0) {
+    text += ' (' + numSelected + ')';
+  }
+  return text;
 };
 
 scout.TableHeaderMenu.prototype._renderFilterField = function() {
@@ -558,6 +574,10 @@ scout.TableHeaderMenu.prototype._onFilterClick = function(event) {
 
   // callback to table
   this.table.filter();
+};
+
+scout.TableHeaderMenu.prototype._onTableFilterChanged = function() {
+  this.$filterGroupTitle.text(this._filterByText());
 };
 
 scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
