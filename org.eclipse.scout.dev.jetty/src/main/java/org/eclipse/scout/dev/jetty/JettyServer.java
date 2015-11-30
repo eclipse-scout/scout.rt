@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.commons.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ public class JettyServer {
   private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
+  public static final String WEB_APP_CONTEXT_PATH = "scout.jetty.webapp.contextpath";
   public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.server.services.common.clustersync.ClusterSynchronizationService.createNodeId()
 
   public static void main(String[] args) throws Exception {
@@ -64,17 +66,27 @@ public class JettyServer {
       }
     }
 
-    WebAppContext webApp = createWebApp(webappFolder);
+    String contextPath = "/";
+    String contextPathConfig = System.getProperty(WEB_APP_CONTEXT_PATH);
+    if (contextPathConfig != null && StringUtility.hasText(contextPathConfig)) {
+      if (!contextPathConfig.startsWith("/")) {
+        contextPathConfig = "/" + contextPathConfig;
+      }
+      contextPath = contextPathConfig;
+    }
+
+    WebAppContext webApp = createWebApp(webappFolder, contextPath);
     Server server = new Server(port);
     server.setHandler(webApp);
     server.start();
   }
 
-  protected WebAppContext createWebApp(File webappDir) throws Exception {
+  protected WebAppContext createWebApp(File webappDir, String contextPath) throws Exception {
     String resourceBase = webappDir.getAbsolutePath();
     WebAppContext webAppContext = new P_WebAppContext();
     webAppContext.setThrowUnavailableOnStartupException(true);
-    webAppContext.setContextPath("/");
+
+    webAppContext.setContextPath(contextPath);
     webAppContext.setResourceBase(resourceBase);
     webAppContext.setParentLoaderPriority(true);
     LOG.info("Starting Jetty with resourceBase=" + resourceBase);
