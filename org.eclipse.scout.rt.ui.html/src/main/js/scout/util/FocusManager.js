@@ -50,7 +50,7 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
 
 scout.FocusManager.prototype._handleIEEvent = function(event) {
   var $element = $(event.target);
-  if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && $element.is('div')) {
+  if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER && $element.is('div')) {
     var $elementToFocus = $element.closest('div[tabindex]');
     if ($elementToFocus) {
       this.requestFocus($elementToFocus.get(0));

@@ -18,7 +18,7 @@ scout.Device = function(userAgent) {
   this.features = {};
   this.system = scout.Device.System.UNKNOWN;
   this.type = scout.Device.Type.DESKTOP;
-  this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
+  this.browser = scout.Device.Browser.UNKNOWN;
   this.browserVersion = 0;
   this.scrollbarWidth;
 
@@ -45,7 +45,7 @@ scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE = {
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
-scout.Device.SupportedBrowsers = {
+scout.Device.Browser = {
   UNKNOWN: 'Unknown',
   FIREFOX: 'Firefox',
   CHROME: 'Chrome',
@@ -112,6 +112,15 @@ scout.Device.prototype.hasOnScreenKeyboard = function() {
   }.bind(this));
 };
 
+/**
+ * Safari shows a tooltip if ellipsis are displayed due to text truncation. This is fine but, unfortunately, it cannot be prevented.
+ * Because showing two tooltips at the same time (native and custom) is bad, the custom tooltip cannot be displayed.
+ * @returns {Boolean}
+ */
+scout.Device.prototype.isCustomEllipsisTooltipPossible = function() {
+  return this.browser !== scout.Device.Browser.SAFARI;
+};
+
 scout.Device.prototype.isIos = function() {
   return scout.Device.System.IOS === this.system;
 };
@@ -125,7 +134,7 @@ scout.Device.prototype.isAndroid = function() {
  * the scrollbar width is 0 pixel. In desktop mode the scrollbar width is > 0 pixel.
  */
 scout.Device.prototype.isWindowsTablet = function() {
-  return scout.Device.SupportedBrowsers.EDGE === this.browser && this.scrollbarWidth === 0;
+  return scout.Device.Browser.EDGE === this.browser && this.scrollbarWidth === 0;
 };
 
 /**
@@ -136,7 +145,7 @@ scout.Device.prototype.isWindowsTablet = function() {
 scout.Device.prototype.isSupportedBrowser = function(browser, version) {
   browser = scout.nvl(browser, this.browser);
   version = scout.nvl(version, this.browserVersion);
-  var browsers = scout.Device.SupportedBrowsers;
+  var browsers = scout.Device.Browser;
   if ((browser === browsers.INTERNET_EXPLORER && version < 9) ||
     (browser === browsers.CHROME && version < 23) ||
     (browser === browsers.FIREFOX && version < 21) ||
@@ -178,17 +187,17 @@ scout.Device.prototype._detectType = function(userAgent) {
 
 scout.Device.prototype._parseBrowser = function(userAgent) {
   if (userAgent.indexOf('Firefox') > -1) {
-    this.browser = scout.Device.SupportedBrowsers.FIREFOX;
+    this.browser = scout.Device.Browser.FIREFOX;
   } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
-    this.browser = scout.Device.SupportedBrowsers.INTERNET_EXPLORER;
+    this.browser = scout.Device.Browser.INTERNET_EXPLORER;
   } else if (userAgent.indexOf('Edge') > -1) {
     // must check for Edge before we do other checks, because the Edge user-agent string
     // also contains matches for Chrome and Webkit.
-    this.browser = scout.Device.SupportedBrowsers.EDGE;
+    this.browser = scout.Device.Browser.EDGE;
   } else if (userAgent.indexOf('Chrome') > -1) {
-    this.browser = scout.Device.SupportedBrowsers.CHROME;
+    this.browser = scout.Device.Browser.CHROME;
   } else if (userAgent.indexOf('Safari') > -1) {
-    this.browser = scout.Device.SupportedBrowsers.SAFARI;
+    this.browser = scout.Device.Browser.SAFARI;
   }
 };
 
@@ -241,7 +250,7 @@ scout.Device.prototype.supportsInternationalization = function() {
  * support this behavior and require the resource to be opened in a new window with <code>window.open</code>.
  */
 scout.Device.prototype.supportsDownloadInSameWindow = function() {
-  return scout.Device.SupportedBrowsers.FIREFOX !== this.browser;
+  return scout.Device.Browser.FIREFOX !== this.browser;
 };
 
 scout.Device.prototype.hasPrettyScrollbars = function() {
@@ -251,7 +260,7 @@ scout.Device.prototype.hasPrettyScrollbars = function() {
 };
 
 scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
-  return scout.Device.SupportedBrowsers.FIREFOX !== this.browser;
+  return scout.Device.Browser.FIREFOX !== this.browser;
 };
 
 scout.Device.prototype.supportsCssProperty = function(property) {
@@ -354,7 +363,7 @@ scout.Device.prototype.requiresIframeSecurityAttribute = function() {
  * - 21.1.3 match: 21.1
  */
 scout.Device.prototype._parseBrowserVersion = function(userAgent) {
-  var versionRegex, browsers = scout.Device.SupportedBrowsers;
+  var versionRegex, browsers = scout.Device.Browser;
   if (this.browser === browsers.INTERNET_EXPLORER) {
     // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
     // additionally in new version the version-number after Trident/ is not the browser-version

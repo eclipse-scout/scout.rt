@@ -99,6 +99,16 @@ scout.Table.prototype._initColumns = function() {
   this._syncHeadAndTailSortColumns();
 };
 
+scout.Table.prototype._initCells = function(row) {
+  this.columns.forEach(function(column) {
+    if (!column.guiOnly) {
+      var cell = row.cells[column.index];
+      cell = column.initCell(cell);
+      row.cells[column.index] = cell;
+    }
+  });
+};
+
 /**
  * @override ModelAdapter.js
  */
@@ -202,6 +212,7 @@ scout.Table.prototype._render = function($parent) {
     parent: this,
     axis: 'both'
   });
+  this._installCellTooltipSupport();
   this.menuBar.render(this.$container);
 
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
@@ -330,6 +341,7 @@ scout.Table.prototype._remove = function() {
   this.header = null;
   this.footer = null;
   this._removeAggregateRows();
+  this._uninstallCellTooltipSupport();
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -377,16 +389,6 @@ scout.Table.prototype._renderTableStatus = function() {
   this.trigger('statusChanged');
 };
 
-scout.Table.prototype._initCells = function(row) {
-  this.columns.forEach(function(column) {
-    if (!column.guiOnly) {
-      var cell = row.cells[column.index];
-      cell = column.initCell(cell);
-      row.cells[column.index] = cell;
-    }
-  });
-};
-
 scout.Table.prototype._isFooterVisible = function() {
   return this.tableStatusVisible || this._hasVisibleTableControls();
 };
@@ -413,6 +415,39 @@ scout.Table.prototype._createFooter = function() {
     parent: this,
     table: this
   });
+};
+
+scout.Table.prototype._installCellTooltipSupport = function() {
+  scout.tooltips.install(this.$data, {
+    parent: this,
+    selector: '.table-cell',
+    text: this._cellTooltip.bind(this),
+    arrowPosition: 50,
+    arrowPositionUnit: '%',
+    native: !scout.device.isCustomEllipsisTooltipPossible()
+  });
+};
+
+scout.Table.prototype._uninstallCellTooltipSupport = function() {
+  scout.tooltips.uninstall(this.$data);
+};
+
+scout.Table.prototype._cellTooltip = function($cell) {
+  var cell, tooltipText,
+    $row = $cell.parent(),
+    cellIndex = $cell.index(),
+    row = $row.data('row');
+
+  if (row) {
+    cell = this.cellByCellIndex(cellIndex, row);
+    tooltipText = cell.tooltipText;
+  }
+
+  if (tooltipText) {
+    return tooltipText;
+  } else if ($cell.isContentTruncated()) {
+    return $cell.text();
+  }
 };
 
 scout.Table.prototype.reload = function() {

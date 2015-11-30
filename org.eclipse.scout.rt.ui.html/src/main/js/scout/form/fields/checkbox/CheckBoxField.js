@@ -38,16 +38,16 @@ scout.CheckBoxField.prototype._render = function($parent) {
     .appendDiv('label')
     .on('mousedown', this._onMouseDown.bind(this));
 
-  scout.tooltips.install(this.$checkBoxLabel, {
-    parent: this,
-    tooltipText: function($label) {
-      if ($label.isContentTruncated()) {
-        return $label.text();
-      }
-    }
+  scout.tooltips.installForEllipsis(this.$checkBoxLabel, {
+    parent: this
   });
 
   this.addStatus();
+};
+
+scout.CheckBoxField.prototype._remove = function($parent) {
+  scout.tooltips.uninstall(this.$checkBoxLabel);
+  scout.CheckBoxField.parent.prototype._remove.call(this);
 };
 
 scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {

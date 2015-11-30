@@ -85,9 +85,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
   var icon = this._icon(iconId, !!text) || '';
   var cssClass = this._cellCssClass(cell);
   var style = this._cellStyle(cell);
-  var tooltipText = cell.tooltipText || '';
-  var tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
-
+ 
   if (cell.errorStatus) {
     row.hasError = true;
   }
@@ -102,7 +100,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
   }
 
   var cellHtml = '';
-  cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute.string + '>';
+  cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + scout.device.unselectableAttribute.string + '>';
   if (scout.device.tableAdditionalDivRequired) {
     cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ) + 'px; ' + '">';
     // same calculation in scout.Table.prototype.resizeColumn

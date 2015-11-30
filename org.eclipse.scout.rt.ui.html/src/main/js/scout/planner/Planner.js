@@ -132,7 +132,7 @@ scout.Planner.prototype._render = function($parent) {
   scout.tooltips.install(this.$grid, {
     parent: this,
     selector: '.planner-activity',
-    tooltipText: function($comp) {
+    text: function($comp) {
       if (this._activityById($comp.attr('data-id'))) {
         return this._activityById($comp.attr('data-id')).tooltipText;
       } else {

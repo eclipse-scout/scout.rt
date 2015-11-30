@@ -190,7 +190,7 @@ scout.prepareDOM = function() {
   $('noscript').remove();
 
   // Prevent "Do you want to translate this page?" in Google Chrome
-  if (scout.device.browser === scout.Device.SupportedBrowsers.CHROME) {
+  if (scout.device.browser === scout.Device.Browser.CHROME) {
     var metaNoTranslate = '<meta name="google" content="notranslate" />';
     var $title = $('head > title');
     if ($title.length === 0) {

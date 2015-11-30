@@ -22,6 +22,22 @@ scout.tooltips = {
   },
 
   /**
+   * Convenient function to install tooltip support for ellipsis only.
+   */
+  installForEllipsis: function($comp, options) {
+    var defaultOptions = {
+      text: function($label) {
+        if ($label.isContentTruncated()) {
+          return $label.text();
+        }
+      },
+      native: !scout.device.isCustomEllipsisTooltipPossible()
+    };
+    options = $.extend({}, defaultOptions, options);
+    this.install($comp, options);
+  },
+
+  /**
    * Finds every tooltip whose $anchor belongs to $context.
    */
   find: function($context) {
@@ -43,7 +59,8 @@ scout.TooltipSupport = function(options) {
   var defaultOptions = {
     selector: null,
     delay: 350,
-    tooltipText: undefined
+    text: undefined,
+    native: false
   };
   options = $.extend({}, defaultOptions, options);
   this._options = options;
@@ -73,8 +90,14 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
 
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
   var $comp = $(event.currentTarget);
-  clearTimeout(this._tooltipTimeoutId);
-  this._tooltipTimeoutId = setTimeout(this._showTooltip.bind(this, $comp), this._options.delay);
+
+  if (this._options.native) {
+    var text = this._text($comp);
+    $comp.attr('title', text);
+  } else {
+    clearTimeout(this._tooltipTimeoutId);
+    this._tooltipTimeoutId = setTimeout(this._showTooltip.bind(this, $comp), this._options.delay);
+  }
 };
 
 scout.TooltipSupport.prototype._onMouseLeave = function(event) {
@@ -89,16 +112,16 @@ scout.TooltipSupport.prototype._removeTooltip = function() {
   }
 };
 
-scout.TooltipSupport.prototype._showTooltip = function($comp) {
-  var text, tooltipTextData = this._options.tooltipText ||
-    $comp.data('tooltipText') ||
-    this._options.text;
-  if ($.isFunction(tooltipTextData)) {
-    text = tooltipTextData($comp);
-  } else if (tooltipTextData) {
-    text = tooltipTextData;
+scout.TooltipSupport.prototype._text = function($comp) {
+  var text = this._options.text || $comp.data('tooltipText');
+  if ($.isFunction(text)) {
+    text = text($comp);
   }
+  return text;
+};
 
+scout.TooltipSupport.prototype._showTooltip = function($comp) {
+  var text = this._text($comp);
   if (!text) {
     return; // treat undefined and no text as no tooltip
   }
@@ -108,10 +131,10 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
     this._tooltip.setText(text);
   } else {
     // create new tooltip
-    var options = $.extend({
+    var options = $.extend({}, this._options, {
       $anchor: $comp,
       text: text
-    }, this._options);
+    });
     this._tooltip = scout.create(scout.Tooltip, options);
     this._tooltip.render();
   }

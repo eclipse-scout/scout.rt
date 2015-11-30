@@ -4,7 +4,7 @@ scout.PopupBlockerHandler = function(session) {
 
 scout.PopupBlockerHandler.prototype.openWindow = function(uri, target, windowSpecs) {
   var popup;
-  if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER) {
+  if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER) {
     // Workaround for IE: When in "protected mode", window.open() returns null for external URLs, even when
     // the popup was successfully opened! To check if a popup blocker is active, we first open an empty
     // popup with no URL, which will return null when the popup was blocked. If the popup was successful,

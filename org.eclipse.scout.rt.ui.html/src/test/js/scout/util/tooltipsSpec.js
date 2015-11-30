@@ -42,7 +42,7 @@ describe("scout.tooltips", function() {
     scout.tooltips.install(formField.$container, {
       parent: new scout.NullWidget(),
       session: session,
-      tooltipText: 'Test1'
+      text: 'Test1'
     });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
     scout.tooltips.uninstall(formField.$container);
@@ -53,7 +53,7 @@ describe("scout.tooltips", function() {
     scout.tooltips.install(formField.$container, {
       parent: new scout.NullWidget(),
       session: session,
-      tooltipText: 'Test2',
+      text: 'Test2',
       delay: 0
     });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
@@ -82,7 +82,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipText: '',
+        text: '',
         delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
@@ -101,7 +101,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipText: function() {
+        text: function() {
           return 'Test3';
         },
         delay: 0
@@ -124,7 +124,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipText: function() {
+        text: function() {
           return undefined;
         },
         delay: 0
@@ -189,7 +189,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipText: 'Test6',
+        text: 'Test6',
         delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
@@ -211,7 +211,7 @@ describe("scout.tooltips", function() {
       scout.tooltips.install(formField.$container, {
         parent: new scout.NullWidget(),
         session: session,
-        tooltipText: function() {
+        text: function() {
           return (formField.$container.is(arguments[0]) && arguments.length == 1) ? 'Test8' : 'InvalidArguments';
         },
         delay: 0

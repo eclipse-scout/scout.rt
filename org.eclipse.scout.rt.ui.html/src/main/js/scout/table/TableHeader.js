@@ -123,9 +123,10 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
 
   scout.tooltips.install($header, {
     parent: this,
-    tooltipText: this._headerItemTooltip.bind(this),
+    text: this._headerItemTooltip.bind(this),
     arrowPosition: 50,
-    arrowPositionUnit: '%'
+    arrowPositionUnit: '%',
+    native: !scout.device.isCustomEllipsisTooltipPossible()
   });
 
   this._decorateHeader(column);
