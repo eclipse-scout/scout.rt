@@ -150,9 +150,9 @@ scout.YearPanel.prototype._scrollYear = function() {
   if (!$month[0]) {
     return;
   }
-  top = $month[0].offsetTop,
-    halfMonth = $month.outerHeight() / 2,
-    halfYear = $year.outerHeight() / 2;
+  top = $month[0].offsetTop;
+  halfMonth = $month.outerHeight() / 2;
+  halfYear = $year.outerHeight() / 2;
 
   this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
 };
@@ -197,7 +197,7 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
 
 scout.YearPanel.prototype._onYearClick = function(event) {
   var
-    // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here 
+    // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
     // because YearPanel must work for calendar and planner.
     displayMode = scout.Planner.DisplayMode,
     diff = $(event.target).data('year-diff'),

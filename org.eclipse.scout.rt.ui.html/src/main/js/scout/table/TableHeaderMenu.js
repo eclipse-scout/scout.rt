@@ -448,7 +448,7 @@ scout.TableHeaderMenu.prototype._renderFilterField = function() {
     maxLength: 100
   });
   freeTextField.render(this.$filteringField);
-  //FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
+  // FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
   freeTextField.$mandatory.remove();
   freeTextField.$mandatory = null;
 };
