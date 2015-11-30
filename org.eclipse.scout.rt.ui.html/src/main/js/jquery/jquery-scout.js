@@ -1063,21 +1063,10 @@
   };
 
   /**
-   * Check if content is truncated, e.g. detects if an ellipsis is added to text
-   * (and is displayed instead of text itself).
+   * Checks if content is truncated.
    */
   $.fn.isContentTruncated = function() {
-    var $clone = this
-      .clone()
-      .css('display', 'inline')
-      .css('width', 'auto')
-      .css('visibility', 'hidden')
-      .appendTo('body');
-
-    var ret = $clone.width() > this.width();
-    $clone.remove();
-
-    return ret;
+    return this[0].scrollWidth > this[0].clientWidth;
   };
 
 }(jQuery));
