@@ -13,7 +13,7 @@
 scout.AggregateTableControl = function() {
   scout.AggregateTableControl.parent.call(this);
   this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
-  this._tableRowsDrawnHandler = this._onTableRowsDrawn.bind(this);
+  this._tableRowsChangedHandler = this._onTableRowsChanged.bind(this);
   this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
@@ -51,7 +51,9 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this._reconcileScrollPos();
 
   this.table.$data.on('scroll', this._tableDataScrollHandler);
-  this.table.on('rowsDrawn', this._tableRowsDrawnHandler);
+  this.table.on('rowsInserted', this._tableRowsChangedHandler);
+  this.table.on('rowsDeleted', this._tableRowsChangedHandler);
+  this.table.on('allRowsDeleted', this._tableRowsChangedHandler);
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
@@ -62,7 +64,9 @@ scout.AggregateTableControl.prototype._removeContent = function() {
   this.$contentContainer.remove();
 
   this.table.$data.off('scroll', this._tableDataScrollHandler);
-  this.table.off('rowsDrawn', this._tableRowsDrawnHandler);
+  this.table.off('rowsInserted', this._tableRowsChangedHandler);
+  this.table.off('rowsDeleted', this._tableRowsChangedHandler);
+  this.table.off('allRowsDeleted', this._tableRowsChangedHandler);
   this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
@@ -205,7 +209,7 @@ scout.AggregateTableControl.prototype._onTableDataScroll = function() {
   this._reconcileScrollPos();
 };
 
-scout.AggregateTableControl.prototype._onTableRowsDrawn = function(event) {
+scout.AggregateTableControl.prototype._onTableRowsChanged = function(event) {
   this._aggregate();
   this._rerenderAggregate();
 };

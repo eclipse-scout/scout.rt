@@ -978,7 +978,6 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     this._installRows($rows);
 
     // notify
-    this._triggerRowsDrawn($rows);
     this._triggerRowsSelected();
 
     if (this.scrollToSelection) {
@@ -1009,7 +1008,6 @@ scout.Table.prototype._removeRows = function($rows) {
   $rows = $rows || this.$rows(true);
   $rows.remove();
   this._renderEmptyData();
-  this._triggerRowsDrawn($rows);
 };
 
 /**
@@ -1766,6 +1764,7 @@ scout.Table.prototype._insertRows = function(rows) {
 
     this._renderRows(rows);
   }
+  this._triggerRowsInserted(rows);
 };
 
 scout.Table.prototype._deleteRow = function(row) {
@@ -1808,6 +1807,7 @@ scout.Table.prototype._deleteRows = function(rows) {
   }
   this._group();
   this._updateBackgroundEffect();
+  this._triggerRowsDeleted(rows);
   if (invalidate) {
     this.invalidateLayoutTree();
   }
@@ -1912,6 +1912,7 @@ scout.Table.prototype._deleteAllRows = function() {
     this._removeRows();
     this.invalidateLayoutTree();
   }
+  this._triggerAllRowsDeleted();
 };
 
 scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
@@ -2555,12 +2556,22 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
   });
 };
 
-scout.Table.prototype._triggerRowsDrawn = function($rows) {
-  var type = 'rowsDrawn';
+scout.Table.prototype._triggerRowsInserted = function(rows) {
   var event = {
-    $rows: $rows
+    rows: rows
   };
-  this.trigger(type, event);
+  this.trigger('rowsInserted', event);
+};
+
+scout.Table.prototype._triggerRowsDeleted = function(rows) {
+  var event = {
+    rows: rows
+  };
+  this.trigger('rowsDeleted', event);
+};
+
+scout.Table.prototype._triggerAllRowsDeleted = function() {
+  this.trigger('allRowsDeleted');
 };
 
 scout.Table.prototype._triggerRowsSelected = function() {
@@ -2571,12 +2582,11 @@ scout.Table.prototype._triggerRowsSelected = function() {
     allSelected = this.selectedRows.length === rowCount;
   }
 
-  var type = 'rowsSelected';
   var event = {
     rows: this.selectedRows,
     allSelected: allSelected
   };
-  this.trigger(type, event);
+  this.trigger('rowsSelected', event);
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
@@ -2599,7 +2609,6 @@ scout.Table.prototype._triggerColumnResized = function(column) {
   var event = {
     column: column
   };
-
   this.trigger('columnResized', event);
 };
 
@@ -2610,7 +2619,6 @@ scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dra
     newPos: newPos,
     dragged: dragged
   };
-
   this.trigger('columnMoved', event);
 };
 
@@ -2618,7 +2626,6 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
   var event = {
     column: column.id
   };
-
   this.trigger('aggregationFunctionChanged', event);
 };
 

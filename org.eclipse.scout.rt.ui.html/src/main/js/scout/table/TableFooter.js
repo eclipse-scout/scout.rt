@@ -11,7 +11,7 @@
 scout.TableFooter = function() {
   scout.TableFooter.parent.call(this);
 
-  this._tableRowsDrawnHandler = this._onTableRowsDrawn.bind(this);
+  this._tableRowsChangedHandler = this._onTableRowsChanged.bind(this);
   this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
   this._tableAddFilterHandler = this._onTableAddFilter.bind(this);
   this._tableRemoveFilterHandler = this._onTableRemoveFilter.bind(this);
@@ -94,7 +94,9 @@ scout.TableFooter.prototype._render = function($parent) {
   this._renderInfo();
   this._updateInfoVisibility();
 
-  this.table.on('rowsDrawn', this._tableRowsDrawnHandler);
+  this.table.on('rowsInserted', this._tableRowsChangedHandler);
+  this.table.on('rowsDeleted', this._tableRowsChangedHandler);
+  this.table.on('allRowsDeleted', this._tableRowsChangedHandler);
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.on('addFilter', this._tableAddFilterHandler);
   this.table.on('removeFilter', this._tableRemoveFilterHandler);
@@ -108,7 +110,9 @@ scout.TableFooter.prototype._remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   this._hideTableStatusTooltip();
 
-  this.table.off('rowsDrawn', this._tableRowsDrawnHandler);
+  this.table.off('rowsInserted', this._tableRowsChangedHandler);
+  this.table.off('rowsDeleted', this._tableRowsChangedHandler);
+  this.table.off('allRowsDeleted', this._tableRowsChangedHandler);
   this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.off('addFilter', this._tableAddFilterHandler);
   this.table.off('removeFilter', this._tableRemoveFilterHandler);
@@ -553,7 +557,7 @@ scout.TableFooter.prototype._onInfoSelectionClick = function() {
   }
 };
 
-scout.TableFooter.prototype._onTableRowsDrawn = function(event) {
+scout.TableFooter.prototype._onTableRowsChanged = function(event) {
   this._renderInfoLoad();
 };
 
