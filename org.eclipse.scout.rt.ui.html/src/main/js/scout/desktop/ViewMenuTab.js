@@ -18,15 +18,15 @@ scout.ViewMenuTab = function(viewMenus, session) {
   this.session = session;
 
   this.$container;
-  this.$title;
-  this.$menuButton;
+  this.$arrowIcon; // small "arrow down" icon at the right side of the icon
 
   this.outlineViewButton = null;
   this.selected = false;
-  this.text;
   this.iconId;
   this._inBackground = false;
   this._breadcrumbEnabled = false;
+
+  this.defaultIconId = scout.icons.OUTLINE;
 
   this._update();
 };
@@ -46,13 +46,8 @@ scout.ViewMenuTab.prototype._update = function() {
   }
   this.outlineViewButton = ovb;
 
-  if (this.outlineViewButton) {
-    this.text = this.outlineViewButton.text;
-    this.iconId = this.outlineViewButton.getIconId();
-  } else {
-    this.text = this.session.text('ui.Outlines');
-    this.iconId = scout.icons.OUTLINE;
-  }
+  // Use iconId from outline view button (defaultIconId as fallback)
+  this.iconId = (this.outlineViewButton && this.outlineViewButton.iconId) || this.defaultIconId;
 };
 
 scout.ViewMenuTab.prototype.render = function($parent) {
@@ -62,34 +57,20 @@ scout.ViewMenuTab.prototype.render = function($parent) {
     .data('tooltipText', function() {
       return this.text;
     }.bind(this));
-  this.$title = this.$container
-    .appendSpan('view-button-tab-title has-menu')
-    .icon(this.iconId);
-  this.$menuButton = this.$container
-    .appendSpan('view-menu-button')
+  this.$arrowIcon = this.$container
+    .appendSpan('arrow-icon')
     .on('mousedown', this.togglePopup.bind(this));
   this._renderProperties();
 };
 
 scout.ViewMenuTab.prototype._renderProperties = function() {
-  this._renderText();
   this._renderIconId();
   this._renderSelected();
 };
 
-scout.ViewMenuTab.prototype._renderText = function() {
-  if (this._breadcrumbEnabled || this.selected) {
-    this.$title.css('display', 'none'); // reset to CSS default ('none')
-  } else {
-    this.$title.css('display', 'inline-block');
-    this.$title.text(this.selected ? this.text : '');
-  }
-  this._updateMenuButtonVisibility();
-};
-
 scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
-  this._updateMenuButtonVisibility();
+  this._updateArrowIconVisibility();
   if (this.selected && !this._breadcrumbEnabled) {
     scout.tooltips.uninstall(this.$container);
   } else {
@@ -105,8 +86,8 @@ scout.ViewMenuTab.prototype._renderIconId = function() {
   this.$container.icon(this.iconId);
 };
 
-scout.ViewMenuTab.prototype._updateMenuButtonVisibility = function() {
-  this.$menuButton.setVisible(this.selected && !this._inBackground);
+scout.ViewMenuTab.prototype._updateArrowIconVisibility = function() {
+  this.$arrowIcon.toggleClass('hidden', !this.selected || this._inBackground);
 };
 
 /**
@@ -191,10 +172,9 @@ scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {
   }
 
   if (ovb) {
-    this.selected = true;
-    this.text = ovb.text;
-    this.iconId = ovb.getIconId();
     this.outlineViewButton = ovb;
+    this.iconId = ovb.iconId || this.defaultIconId;
+    this.selected = true;
   } else {
     this.selected = false;
   }
@@ -214,6 +194,5 @@ scout.ViewMenuTab.prototype.bringToFront = function() {
 
 scout.ViewMenuTab.prototype.setBreadcrumbEnabled = function(enabled) {
   this._breadcrumbEnabled = enabled;
-  this._renderText();
   this._renderSelected();
 };

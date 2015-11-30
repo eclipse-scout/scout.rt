@@ -8,7 +8,98 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.view-button-menu {
+.view-button-tab {
+  display: inline-block;
+  height: @view-buttons-height;
+  background-color: @view-button-tab-background-color;
+  color: @view-button-tab-color;
+  border-right: solid 1px @border-color;
+  white-space: nowrap;
+  min-width: 60px;
+  position: relative;
+  text-align: center;
+  #scout.vertical-align-helper-before();
+
+  & > .key-box {
+    bottom: 4px;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    &:not(.selected) > .font-icon {
+      color: @hover-color;
+    }
+  }
+
+  &.selected {
+    background-color: @view-button-tab-active-background-color;
+    color: @view-button-tab-active-color;
+
+    &.last {
+      border-right-color: transparent;
+    }
+  }
+
+  &.view-menu-popup-head {
+    background-color: @active-inverted-color;
+    color: @active-color;
+  }
+
+  & > .icon {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    font-size: 20px;
+  }
+
+  & > .arrow-icon {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    background-color: inherit;
+
+    height: 0;
+    width: 0;
+    left: -8px;
+    bottom: -3px;
+
+    /* background */
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 15px;
+      height: 14px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: inherit;
+    }
+
+    /* icon */
+    &::after {
+      #scout.font-icon();
+      font-size: 17px;
+      content: @icon-angle-down;
+      position: absolute;
+      top: -2px;
+      left: 2px;
+    }
+
+    &.menu-open::after {
+      content: @icon-angle-up;
+    }
+  }
+}
+
+.view-menu-popup-body {
+  background-color: @view-menu-popup-background-color;
+  border-right: solid 1px @border-color;
+  border-top: solid 1px @border-color;
+  overflow: hidden;
+}
+
+.view-menu-item {
   padding: 0px 15px 0px 15px;
   line-height: @desktop-taskbar-height - 1px;
   border-top: solid 1px @border-color;
@@ -16,6 +107,7 @@
   color: @text-color;
   font-size: 16px;
   #scout.overflow-ellipsis-nowrap();
+  position: relative;
 
   &:first-child {
     border-top-color: transparent;
@@ -36,7 +128,7 @@
     border-color: @item-selection-border-color;
   }
 
-  &.selected + .view-button-menu {
+  &.selected + .view-menu-item {
     border-top-color: @item-selection-border-color;
   }
 
@@ -47,91 +139,8 @@
   &:last-child {
     border-bottom: 1px solid @border-color;
   }
-}
-
-.view-button-tab {
-  display: inline-block;
-  height: @view-buttons-height;
-  padding: 10px;
-  background-color: @view-button-tab-background-color;
-  color: @view-button-tab-color;
-  border-right: solid 1px @border-color;
-  white-space: nowrap;
-  min-width: 60px;
-  position: relative;
-  vertical-align: top;
-  text-align: center;
 
   & > .key-box {
     bottom: 4px;
   }
-
-  &:hover {
-    cursor: pointer;
-
-    &:not(.selected) > .font-icon {
-      color: @hover-color;
-    }
-  }
-
-  &.selected {
-    background-color: @view-button-tab-active-background-color;
-    color: @view-button-tab-active-color;
-
-    & > .view-button-tab-title {
-      display: inline-block;
-       /* subtract icon-width and gap */
-      width: calc(~'100%' - 20px);
-      margin-left: 8px;
-
-      &.has-menu {
-        /* subtract icon-width and gap and menu-button width and gap */
-        width: calc(~'100%' - 48px);
-      }
-    }
-
-    &.last {
-      border-right-color: transparent;
-    }
-  }
-
-
-  & > .icon {
-    display: inline-block;
-    font-size: 20px;
-    padding-top: 3px;
-  }
-}
-
-.view-button-tab-title {
-  display: none;
-  vertical-align: text-bottom;
-  #scout.font-text-large();
-  #scout.overflow-ellipsis-nowrap();
-}
-
-.view-menu-button {
-  display: inline-block;
-  margin-left: 8px;
-
-  &::before {
-    #scout.font-icon();
-    font-size: 17px;
-    content: @icon-angle-down;
-  }
-
-  &.menu-open::before {
-    content: @icon-angle-up;
-  }
-
-  &:hover {
-    color: @palette-orange-3;
-  }
-}
-
-.view-menu-popup-body {
-  background-color: @view-menu-popup-background-color;
-  border-right: solid 1px @border-color;
-  border-top: solid 1px @border-color;
-  overflow: hidden;
 }

@@ -41,7 +41,7 @@ scout.ViewMenuPopup.MAX_MENU_WIDTH = 300;
 scout.ViewMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.ViewMenuPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
 
-  scout.menuNavigationKeyStrokes.registerKeyStrokes(keyStrokeContext, this, 'view-button-menu');
+  scout.menuNavigationKeyStrokes.registerKeyStrokes(keyStrokeContext, this, 'view-menu-item');
 };
 
 scout.ViewMenuPopup.prototype._render = function($parent) {
@@ -62,9 +62,8 @@ scout.ViewMenuPopup.prototype._renderHead = function() {
 
   this._copyCssClassToHead('view-button-tab');
   this._copyCssClassToHead('unfocusable');
-  this.$head.removeClass('popup-head');
-  this.$head.css('background-color', 'white');
-  this.$head.css('color', '#006c86');
+  this.$head.removeClass('popup-head menu-item');
+  this.$head.addClass('view-menu-popup-head');
 };
 
 /**
@@ -79,13 +78,7 @@ scout.ViewMenuPopup.prototype._modifyBody = function() {
  * @override PopupWithHead.js
  */
 scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
-  var $icon = this.$head.find('.icon'),
-    $viewMenuButton = this.$head.find('.view-menu-button');
-
-  $icon.css('font-size', 20);
-  $icon.css('display', 'inline-block');
-
-  $viewMenuButton.addClass('menu-open');
+  this.$head.find('.arrow-icon').addClass('menu-open');
 };
 
 scout.ViewMenuPopup.prototype.position = function() {

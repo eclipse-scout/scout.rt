@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
-  this.$title;
   this._breadcrumbEnabled = false;
 };
 scout.inherits(scout.ViewButton, scout.Action);
@@ -32,15 +31,13 @@ scout.ViewButton.prototype._isTab = function() {
 };
 
 scout.ViewButton.prototype._renderAsMenuItem = function($parent) {
-  this.$container = $parent.appendDiv('view-button-menu')
+  this.$container = $parent.appendDiv('view-menu-item')
     .on('click', this._onMouseEvent.bind(this));
 };
 
 scout.ViewButton.prototype._renderAsTab = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .on('mousedown', this._onMouseEvent.bind(this));
-
-  this.$title = this.$container.appendSpan('view-button-tab-title');
 };
 
 /**
@@ -50,8 +47,6 @@ scout.ViewButton.prototype._renderText = function() {
   this._updateTooltip();
   if (this._isMenu()) {
     scout.ViewButton.parent.prototype._renderText.call(this);
-  } else {
-    this.$title.css('display', this._breadcrumbEnabled || this._isTab() ? 'none' : '');
   }
 };
 
@@ -61,18 +56,8 @@ scout.ViewButton.prototype._renderText = function() {
  */
 scout.ViewButton.prototype._renderIconId = function() {
   if (this._isTab()) {
-    this.$container.icon(this.getIconId(this.iconId));
+    this.$container.icon(this.iconId);
   }
-};
-
-/**
- * Returns a default-icon when no icon is set.
- */
-scout.ViewButton.prototype.getIconId = function(iconId) {
-  if (arguments.length === 0) {
-    iconId = this.iconId;
-  }
-  return iconId;
 };
 
 scout.ViewButton.prototype.last = function() {

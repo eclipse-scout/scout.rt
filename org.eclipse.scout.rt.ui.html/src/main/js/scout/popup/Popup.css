@@ -47,6 +47,9 @@
 
     &::before {
       #scout.sub-menu-icon();
+      content: @icon-angle-up;
+      display: inline-block;
+      margin-top: -1px; /* optically center */
     }
   }
 
