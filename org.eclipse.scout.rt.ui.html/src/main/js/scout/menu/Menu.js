@@ -116,12 +116,21 @@ scout.Menu.prototype._removeSubMenuItems = function(parentMenu) {
   }
 };
 
-scout.Menu.prototype._renderSubMenuItems = function(parentMenu, actions) {
+scout.Menu.prototype._renderSubMenuItems = function(parentMenu, menus) {
+
+  // TODO ASA,NBU where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
+  if (this.filterFunc) {
+    // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
+    menus = this.filterFunc(menus, this.parent instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
+  } else if (this.cloneOf && this.cloneOf.filterFunc) {
+    menus = this.cloneOf.filterFunc(menus, this.parent instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
+  }
+
   this.subMenuExpanded = true;
   if (this.parent instanceof scout.ContextMenuPopup) {
-    this.parent.renderSubMenuItems(parentMenu, actions, true);
+    this.parent.renderSubMenuItems(parentMenu, menus, true);
   } else if (this.parent instanceof scout.Menu) {
-    this.parent._renderSubMenuItems(parentMenu, actions);
+    this.parent._renderSubMenuItems(parentMenu, menus);
   }
 };
 

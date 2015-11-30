@@ -291,7 +291,7 @@ scout.Table.prototype.onContextMenu = function(event) {
     var menuItems, popup;
     event.preventDefault();
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, 'contextMenu', true);
+      menuItems = this._filterMenus(this.menus, 'contextMenu', true); //TODO nbu move to menu ->filterFunc
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
@@ -302,7 +302,6 @@ scout.Table.prototype.onContextMenu = function(event) {
         popup = scout.create(scout.ContextMenuPopup, {
           parent: this,
           menuItems: menuItems,
-          filterFunc: this._filterMenusHandler,
           location: {
             x: event.pageX,
             y: event.pageY
@@ -1138,13 +1137,11 @@ scout.Table.prototype._find$AppLink = function(event) {
 scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
   var allowedTypes = [];
   if (destination === 'menuBar') {
-    allowedTypes = [ 'Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection' ];
-  }
-  else if (destination === 'contextMenu') {
-    allowedTypes = [ 'Table.SingleSelection', 'Table.MultiSelection' ];
-  }
-  else if (destination === 'header') {
-    allowedTypes = [ 'Table.Header' ];
+    allowedTypes = ['Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection'];
+  } else if (destination === 'contextMenu') {
+    allowedTypes = ['Table.SingleSelection', 'Table.MultiSelection'];
+  } else if (destination === 'header') {
+    allowedTypes = ['Table.Header'];
   }
 
   if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length !== 1) {
@@ -1155,7 +1152,6 @@ scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, e
   }
   return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
 };
-
 
 scout.Table.prototype._renderMenus = function() {
   this._updateMenuBar();
@@ -2487,8 +2483,8 @@ scout.Table.prototype._sendColumnMoved = function(column, index) {
 
 scout.Table.prototype._sendColumnBackgroundEffectChanged = function(column) {
   var data = {
-    columnId : column.id,
-    backgroundEffect : column.backgroundEffect
+    columnId: column.id,
+    backgroundEffect: column.backgroundEffect
   };
   this._send('columnBackgroundEffectChanged', data);
 };
@@ -3012,7 +3008,7 @@ scout.Table.prototype._onScrollToSelection = function() {
 
 scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
   var columnId, column, effect;
-  event.eventParts.forEach(function(eventPart){
+  event.eventParts.forEach(function(eventPart) {
     columnId = eventPart.columnId;
     column = this.columnById(columnId);
     column.setBackgroundEffect(eventPart.backgroundEffect, false);
@@ -3021,8 +3017,8 @@ scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
 
 scout.Table.prototype._onRequestFocusInCell = function(event) {
   var row = this.rowById(event.rowId),
-      column = this.columnById(event.columnId),
-      cell = this.cell(column, row);
+    column = this.columnById(event.columnId),
+    cell = this.cell(column, row);
   if (this.enabled && row.enabled && cell.editable) {
     this.prepareCellEdit(event.rowId, event.columnId, true);
   }

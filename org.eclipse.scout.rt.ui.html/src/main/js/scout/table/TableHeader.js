@@ -115,8 +115,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
 
   if (isFirstColumn) {
     $header.addClass('first');
-  }
-  else if (isLastColumn) {
+  } else if (isLastColumn) {
     $header.addClass('last');
   }
 
@@ -346,7 +345,7 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
 };
 
 scout.TableHeader.prototype.updateMenuBar = function() {
-  var menuItems = this.table._filterMenus(this.table.menus, 'header');
+  var menuItems = this.table._filterMenus(this.table.menus, 'header'); //TODO nbu move to menu->filterFunc
   this.menuBar.updateItems(menuItems);
 };
 

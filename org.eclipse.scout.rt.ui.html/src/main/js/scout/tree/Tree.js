@@ -433,13 +433,11 @@ scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, en
   var allowedTypes = [];
 
   if (destination === 'menuBar') {
-    allowedTypes = [ 'Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection' ];
-  }
-  else if (destination === 'contextMenu') {
-    allowedTypes = [ 'Tree.SingleSelection', 'Tree.MultiSelection' ];
-  }
-  else if (destination === 'contextMenuEmptySpace') {
-    allowedTypes = [ 'Tree.EmptySpace' ];
+    allowedTypes = ['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'];
+  } else if (destination === 'contextMenu') {
+    allowedTypes = ['Tree.SingleSelection', 'Tree.MultiSelection'];
+  } else if (destination === 'contextMenuEmptySpace') {
+    allowedTypes = ['Tree.EmptySpace'];
   }
 
   if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodes.length !== 1) {
@@ -482,7 +480,7 @@ scout.Tree.prototype._renderCheckable = function() {
   var isNodeRendered = function(node) {
     return !!node.$node;
   };
-  var updateCheckableStateRec = function (node) {
+  var updateCheckableStateRec = function(node) {
     var $node = node.$node;
     var $control = $node.children('.tree-node-control');
     var $checkbox = $node.children('.tree-node-checkbox');
@@ -1228,7 +1226,7 @@ scout.Tree.prototype._showContextMenu = function(event, destination) {
   event.preventDefault();
   event.stopPropagation();
   var func = function func(event, destination) {
-    var filteredMenus = this._filterMenus(this.menus, destination, true),
+    var filteredMenus = this._filterMenus(this.menus, destination, true), //TODO nbu move to menu->filterFunc
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
@@ -1610,7 +1608,7 @@ scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
 
 scout.Tree.prototype._onContextMenu = function(event) {
   if (this.$data.is(event.target)) {
-    this._showContextMenu(event, 'contextMenuEmptySpace');
+    this._showContextMenu(event, 'c ontextMenuEmptySpace');
   } else {
     this._showContextMenu(event, 'contextMenu');
   }
