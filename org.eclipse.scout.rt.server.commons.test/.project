@@ -24,32 +24,32 @@
 		<link>
 			<name>.settings/de.loskutov.anyedit.AnyEditTools.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/de.loskutov.anyedit.AnyEditTools.prefs</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/de.loskutov.anyedit.AnyEditTools.prefs</locationURI>
 		</link>
 		<link>
 			<name>.settings/org.eclipse.core.resources.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/org.eclipse.core.resources.prefs</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.core.resources.prefs</locationURI>
 		</link>
 		<link>
 			<name>.settings/org.eclipse.core.runtime.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/org.eclipse.core.runtime.prefs</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.core.runtime.prefs</locationURI>
 		</link>
 		<link>
 			<name>.settings/org.eclipse.jdt.core.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/org.eclipse.jdt.core.prefs</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.jdt.core.prefs</locationURI>
 		</link>
 		<link>
 			<name>.settings/org.eclipse.jdt.ui.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/org.eclipse.jdt.ui.prefs</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.jdt.ui.prefs</locationURI>
 		</link>
 		<link>
 			<name>.settings/org.eclipse.m2e.core.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/org.eclipse.m2e.core.prefs</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.m2e.core.prefs</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

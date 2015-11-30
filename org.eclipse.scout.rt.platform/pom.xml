@@ -26,12 +26,26 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.commons</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jandex</artifactId>
+    </dependency>
+        <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

@@ -31,8 +31,6 @@
   </prerequisites>
 
   <modules>
-    <module>../org.eclipse.scout.commons</module>
-    <module>../org.eclipse.scout.commons.test</module>
     <module>../org.eclipse.scout.json</module>
     <module>../org.eclipse.scout.rt.platform</module>
     <module>../org.eclipse.scout.rt.platform.test</module>
@@ -129,17 +127,6 @@
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>batik-swing</artifactId>
         <version>1.7</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.commons</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.commons.test</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
