@@ -422,7 +422,7 @@ scout.Planner.prototype._renderScale = function() {
         .data('date-from', new Date(loop.valueOf()));
 
       if (loop.getDate() % 2 === 1) {
-        $divSmall.addClass('invisible');
+        $divSmall.addClass('label-invisible');
       }
 
       loop = scout.dates.shift(loop, 0, 0, 1);

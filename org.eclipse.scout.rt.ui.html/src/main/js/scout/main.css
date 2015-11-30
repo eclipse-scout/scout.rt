@@ -88,12 +88,16 @@ body {
   }
 }
 
+/* Add this class to temporary remove an element from the document flow. */
+/* !important is used to override any specific "display" values (because this */
+/* call would in most cases be less specific than the element's rules). */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
+/* Add this class to temporary hide (but not remove from flow) an element. Similar to "hidden". */
 .invisible {
-  visibility: hidden;
+  visibility: hidden !important;
 }
 
 *, *::before, *::after {

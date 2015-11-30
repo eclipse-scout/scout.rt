@@ -60,10 +60,10 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 scout.DesktopViewTab.prototype._render = function($parent) {
   var position = this.viewTabController.viewTabs().indexOf(this);
   if (position === 0) {
-    this.$container = $parent.prependDiv('desktop-view-tab').addClass('hidden');
+    this.$container = $parent.prependDiv('desktop-view-tab');
   } else if (position > 0) {
     var previousTab = this.viewTabController.viewTabs()[position - 1];
-    this.$container = previousTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
+    this.$container = previousTab.$container.afterDiv('desktop-view-tab');
 
   }
   this._mouseListener = this._onMouseDown.bind(this);

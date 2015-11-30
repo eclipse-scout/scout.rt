@@ -58,10 +58,6 @@
     border-right-color: transparent;
   }
 
-  &.hidden {
-    display: none;
-  }
-
   &.disabled {
     color: @disabled-color;
   }

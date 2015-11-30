@@ -24,11 +24,6 @@
         background-color: @hover-color;
       }
 
-      /* used when only one field is visible */
-      &.hidden {
-        display: none;
-      }
-
       /* | */
       &.x-axis {
         height: 100%;

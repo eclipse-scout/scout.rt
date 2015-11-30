@@ -40,8 +40,9 @@ scout.BusyIndicator.prototype._render = function($parent) {
     $glassPane.addClass('busy');
   });
 
-  // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout)
-  this.$container = $parent.appendDiv('busyindicator hidden');
+  // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
+  // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
+  this.$container = $parent.appendDiv('busyindicator invisible');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
@@ -73,7 +74,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
 
   // Show busy box with a delay of 2.5 seconds.
   this._busyIndicatorTimeoutId = setTimeout(function() {
-    this.$container.removeClass('hidden').addClassForAnimation('shown');
+    this.$container.removeClass('invisible').addClassForAnimation('shown');
     // Validate first focusable element
     // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
     this.session.focusManager.validateFocus();

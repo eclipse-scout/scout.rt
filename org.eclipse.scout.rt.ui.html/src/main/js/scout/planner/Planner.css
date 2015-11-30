@@ -62,10 +62,9 @@
       background-color: @item-selection-background-color;
     }
 
-    &.invisible {
+    &.label-invisible {
       color: transparent;
     }
-
   }
 
   & > .timeline {

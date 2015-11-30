@@ -122,10 +122,6 @@
         background-color: @outline-group-background-color;
       }
 
-      &.hidden {
-        display: none;
-      }
-
       &.selected {
         background-color: @outline-selection-background-color;
         color: @outline-selection-color;

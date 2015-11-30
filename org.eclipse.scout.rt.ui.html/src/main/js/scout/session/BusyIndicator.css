@@ -27,10 +27,6 @@
     left: 0;
   }
 
-  &.hidden {
-    visibility: hidden;
-  }
-
   &.shown {
     #scout.animation-name(fadeIn);
     #scout.animation-duration(0.5s);
