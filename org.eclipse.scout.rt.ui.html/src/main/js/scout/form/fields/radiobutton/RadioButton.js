@@ -19,6 +19,15 @@ scout.RadioButton.prototype._render = function($parent) {
     .attr('value', this.radioValue)
     .on('mousedown', this._mouseDown.bind(this)));
   this.addStatus();
+
+  scout.tooltips.installForEllipsis(this.$field, {
+    parent: this
+  });
+};
+
+scout.RadioButton.prototype._remove = function($parent) {
+  scout.tooltips.uninstall(this.$field);
+  scout.RadioButton.parent.prototype._remove.call(this);
 };
 
 scout.RadioButton.prototype._mouseDown = function() {
