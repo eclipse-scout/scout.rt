@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.services.common.code;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.verify;
@@ -22,10 +23,12 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
+import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheEntryFilter;
+import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheKey;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
@@ -46,9 +49,15 @@ public class CodeServiceTest {
   @BeanMock
   private ClientNotificationRegistry m_clientNotificationReg;
 
+  @Test
+  public void testCodeTypeRemoteAccess() {
+    Object codetype = BEANS.get(IRemoteCacheService.class).get(CodeService.class.getName(), new CodeTypeCacheKey(SomeCodeType.class));
+    assertNotNull(codetype);
+    assertEquals(BEANS.get(SomeCodeType.class), codetype);
+  }
+
   /**
    * Tests that a client notification is created when reloading a code type {@link CodeService#reloadCodeType}
-   *
    */
   @Test
   public void testReloadCodeType() {

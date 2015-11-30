@@ -25,8 +25,6 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConcurrentExpiringMap;
 import org.eclipse.scout.commons.ConcurrentExpiringMap.ExpiringElement;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 
@@ -73,7 +71,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
     // before publish cache as bean, initialize all instances
     initializeCacheInstances();
-    registerCacheBean(cache);
     return cache;
   }
 
@@ -156,11 +153,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
     for (ICache<K, V> cache : m_cacheInstances) {
       BeanInstanceUtil.initializeInstance(cache);
     }
-  }
-
-  protected void registerCacheBean(ICache<K, V> cache) {
-    BeanMetaData beanData = new BeanMetaData(ICache.class, cache);
-    BEANS.getBeanManager().registerBean(beanData);
   }
 
   @Override

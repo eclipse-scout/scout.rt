@@ -17,11 +17,23 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.cache.CacheBuilder;
 import org.eclipse.scout.rt.shared.cache.ICache;
+import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 
 /**
  * @since 5.2
  */
 public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
+
+  @Override
+  public ICache<K, V> build() {
+    ICache<K, V> cache = super.build();
+    register(cache);
+    return cache;
+  }
+
+  protected void register(ICache<K, V> cache) {
+    BEANS.get(IRemoteCacheService.class).register(cache.getCacheId(), cache);
+  }
 
   @Override
   protected Map<K, V> createCacheMap() {
