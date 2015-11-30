@@ -197,6 +197,7 @@
 @table-header-menu-cmd-active-border-color: @active-inverted-background-color;
 @table-header-menu-cmd-active-color: @active-inverted-color;
 @table-header-menu-cmd-border-color: @border-color;
+@table-header-menu-link-color: @palette-blue-4;
 @table-info-color: @text-color;
 @table-info-error-color: @error-color;
 @table-info-error-hover-color: @palette-red-4;

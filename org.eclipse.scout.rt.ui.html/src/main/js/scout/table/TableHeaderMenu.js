@@ -17,11 +17,23 @@ scout.TableHeaderMenu = function() {
   this.openAnimated = true;
   this.$columnActions;
   this.$columnFilters;
+  this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.ALL;
 
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChanged', this._onLocationChanged.bind(this));
 };
 scout.inherits(scout.TableHeaderMenu, scout.Popup);
+
+scout.TableHeaderMenu.SelectionMode = {
+  ALL: {
+    selectAll: true,
+    text: 'ui.SelectAllFilter'
+  },
+  NONE: {
+    selectAll: false,
+    text: 'ui.SelectNoneFilter'
+  }
+};
 
 scout.TableHeaderMenu.prototype._init = function(options) {
   scout.TableHeaderMenu.parent.prototype._init.call(this, options);
@@ -424,6 +436,15 @@ scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
 
 scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
   this.$filtering = this.$columnFilters.appendDiv('table-header-menu-group-filter');
+
+  this.$filterGroupActions = this.$filtering
+    .appendDiv('table-header-menu-group-actions');
+
+  this.$filterSelectionMode = this.$filterGroupActions
+    .appendDiv('table-header-menu-toggle-selection')
+    .text(this.session.text(this.filterSelectionMode.text))
+    .on('click', this._toggleFilterSelectionMode.bind(this));
+
   this.$filterGroupTitle = this.$filtering
     .appendDiv('table-header-menu-group-text')
     .data('label', this._filterByText());
@@ -455,6 +476,37 @@ scout.TableHeaderMenu.prototype._filterByText = function() {
     text += ' (' + numSelected + ')';
   }
   return text;
+};
+
+scout.TableHeaderMenu.prototype._toggleFilterSelectionMode = function() {
+  var selectionMode = scout.TableHeaderMenu.SelectionMode;
+  var selectAll = this.filterSelectionMode.selectAll;
+  this.filter.selectedValues = [];
+  if (this.filterSelectionMode === selectionMode.ALL) {
+    this.filterSelectionMode = selectionMode.NONE;
+    this.filter.availableValues.forEach(function(filterValue) {
+      this.filter.selectedValues.push(filterValue.key);
+    }, this);
+  } else {
+    this.filterSelectionMode = selectionMode.ALL;
+  }
+  this.$filtering.find('.table-header-menu-filter').select(selectAll);
+  this._updateTableFilters();
+  this._updateGroupFilterActions();
+};
+
+scout.TableHeaderMenu.prototype._updateTableFilters = function() {
+  if (this.filter.selectedValues.length > 0) {
+    this.table.addFilter(this.filter);
+  } else {
+    this.table.removeFilterByKey(this.column.id);
+  }
+  // callback to table
+  this.table.filter();
+};
+
+scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
+  this.$filterSelectionMode.text(this.session.text(this.filterSelectionMode.text));
 };
 
 scout.TableHeaderMenu.prototype._renderFilterField = function() {
@@ -566,18 +618,20 @@ scout.TableHeaderMenu.prototype._onFilterClick = function(event) {
     this.filter.selectedValues.push($(elem).data('key'));
   }.bind(this));
 
-  if (this.filter.selectedValues.length > 0) {
-    this.table.addFilter(this.filter);
-  } else {
-    this.table.removeFilterByKey(this.column.id);
-  }
-
-  // callback to table
-  this.table.filter();
+  this._updateTableFilters();
 };
 
 scout.TableHeaderMenu.prototype._onTableFilterChanged = function() {
   this.$filterGroupTitle.text(this._filterByText());
+
+  // When no filter value is selected, we change the selection mode to ALL
+  // since it makes no sense to choose NONE when no value is currently selected
+  if (this.filter.selectedValues.length === 0) {
+    this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.ALL;
+  } else {
+    this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.NONE;
+  }
+  this._updateGroupFilterActions();
 };
 
 scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {

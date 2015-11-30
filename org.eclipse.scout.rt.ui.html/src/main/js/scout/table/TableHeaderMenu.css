@@ -305,3 +305,16 @@
     border-bottom-color: @table-header-menu-cmd-active-border-color;
   }
 }
+
+.table-header-menu-group-actions {
+  display: inline;
+  float: right;
+  line-height: 22px;
+  margin-right: 10px;
+}
+
+.table-header-menu-toggle-selection {
+  cursor: pointer;
+  color: @table-header-menu-link-color;
+  display: inline;
+}
