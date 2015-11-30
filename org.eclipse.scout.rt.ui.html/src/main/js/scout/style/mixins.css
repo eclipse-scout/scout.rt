@@ -69,7 +69,7 @@
   }
 
   .placeholder() {
-    opacity: @text-field-placeholder-opacity;
+    color: @text-field-placeholder-color;
   }
   .placeholder-disabled() {
     color: @disabled-color;

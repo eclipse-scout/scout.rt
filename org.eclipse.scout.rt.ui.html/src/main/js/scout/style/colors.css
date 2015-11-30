@@ -207,7 +207,7 @@
 @text-field-icon-color: @palette-gray-6;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;
-@text-field-placeholder-opacity: 1;
+@text-field-placeholder-color: @palette-gray-6;
 @tooltip-background-color: @palette-gray-3;
 @tooltip-border-color: @palette-gray-6;
 @tooltip-color: text-color;
