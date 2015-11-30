@@ -15,6 +15,9 @@ scout.TableHeaderMenu = function() {
   this.table;
   this.$headerItem;
   this.openAnimated = true;
+  this.$columnActions;
+  this.$columnFilters;
+
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChanged', this._onLocationChanged.bind(this));
 };
@@ -41,6 +44,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   $headerItem.select(true);
 
   this.$container = $parent.appendDiv('table-header-menu');
+  this.$columnActions = this.$container.appendDiv('table-header-menu-actions');
+  this.$columnFilters = this.$container.appendDiv('table-header-menu-filters');
+
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.$whiter = this.$container.appendDiv('table-header-menu-whiter');
@@ -122,7 +128,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     column = this.column,
     pos = table.columns.indexOf(column);
 
-  this.$moving = this.$container.appendDiv('table-header-menu-group');
+  this.$moving = this.$columnActions.appendDiv('table-header-menu-group');
   this.$moving.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Move'));
 
@@ -166,7 +172,7 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     column = this.column,
     that = this;
 
-  this.$sorting = this.$container.appendDiv('table-header-menu-group');
+  this.$sorting = this.$columnActions.appendDiv('table-header-menu-group');
   this.$sorting.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ColumnSorting'));
 
@@ -258,7 +264,7 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     column = this.column,
     groupCount = this._groupColumnCount();
 
-  this.$grouping = this.$container.appendDiv('table-header-menu-group');
+  this.$grouping = this.$columnActions.appendDiv('table-header-menu-group');
   this.$grouping.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Grouping'));
 
@@ -323,7 +329,7 @@ scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
 scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   var table = this.table,
     column = this.column;
-  this.$aggregation = this.$container.appendDiv('table-header-menu-group');
+  this.$aggregation = this.$columnActions.appendDiv('table-header-menu-group');
   this.$aggregation.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Aggregation'));
 
@@ -367,7 +373,7 @@ scout.TableHeaderMenu.prototype._renderSelectedAggregation = function() {
 scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   var table = this.table,
     column = this.column;
-  this.$coloring = this.$container.appendDiv('table-header-menu-group');
+  this.$coloring = this.$columnActions.appendDiv('table-header-menu-group');
   this.$coloring.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Coloring'));
 
@@ -411,7 +417,7 @@ scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
 };
 
 scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
-  this.$filtering = this.$container.appendDiv('table-header-menu-group-filter');
+  this.$filtering = this.$columnFilters.appendDiv('table-header-menu-group-filter');
   this.$filtering.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterBy'));
 
@@ -436,7 +442,7 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
 };
 
 scout.TableHeaderMenu.prototype._renderFilterField = function() {
-  this.$filteringField = this.$container.appendDiv('table-header-menu-filter-field');
+  this.$filteringField = this.$columnFilters.appendDiv('table-header-menu-filter-field');
   this.$filteringField.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterText'));
 
@@ -448,6 +454,7 @@ scout.TableHeaderMenu.prototype._renderFilterField = function() {
     maxLength: 100
   });
   freeTextField.render(this.$filteringField);
+
   // FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
   freeTextField.$mandatory.remove();
   freeTextField.$mandatory = null;

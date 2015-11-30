@@ -10,7 +10,7 @@
  ******************************************************************************/
 .table-header-menu {
   position: absolute;
-  width: 225px;
+  width: 447px;
   background-color: @table-header-menu-background-color;
   padding-bottom: 5px;
   border: 1px solid @border-color;
@@ -26,6 +26,18 @@
   &.up {
     #scout.drop-shadow(@y: -3px);
   }
+}
+
+.table-header-menu-actions {
+  display: inline-block;
+}
+
+.table-header-menu-filters {
+  display: inline-block;
+  vertical-align: top;
+  height: 100%;
+  width: 222px;
+  border-left: solid 1px @border-color;
 }
 
 .table-header-menu-whiter {
@@ -229,16 +241,20 @@
 }
 
 .table-header-menu-group-filter {
-  padding: 10px 0px 7px 10px;
+  padding: 10px 0 0 10px;
 }
 
 .table-header-menu-filter-field {
-  padding: 10px 0px 7px 10px;
+  padding: 10px 10px 0 10px;
+
+  & > .form-field {
+    position: relative;
+  }
 }
 
 .table-header-menu-filter-container {
   position: relative;
-  overflow:hidden;
+  overflow: hidden;
   max-height: 226px;
   padding: 0;
 }

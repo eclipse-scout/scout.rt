@@ -14,42 +14,44 @@ scout.TableHeaderMenuLayout = function(popup) {
 };
 scout.inherits(scout.TableHeaderMenuLayout, scout.PopupLayout);
 
+/**
+ * Don't use scout.HtmlEnvironment.formRowHeight here intentionally (field looks to large)
+ * Now it has the same height as the buttons in the left column.
+ */
+scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT = 29;
+
 scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   scout.TableHeaderMenuLayout.parent.prototype.layout.call(this, $container);
-  var htmlComp = this.popup.htmlComp,
-    popupSize = htmlComp.getSize(),
-    $filteringContainer = this.popup.$filteringContainer,
-    otherGroupsHeight = 0,
-    filteringContainerHeight = 0,
-    filteringContainerScrollHeight = $filteringContainer.get(0).scrollHeight,
-    groups = [
-      this.popup.$moving,
-      this.popup.$sorting,
-      this.popup.$grouping,
-      this.popup.$coloring
-    ];
 
-  // Get size of other groups
-  groups.forEach(function($group) {
-    if ($group) {
-      otherGroupsHeight += $group.outerHeight(true);
-    }
-  });
-  otherGroupsHeight += this.popup.$filtering.find('.table-header-menu-group-text').outerHeight(true);
+  // FIXME AWE: (filter) cleanup naming / properties for filtering DIVs
+  var
+    $columnFilters = this.popup.$columnFilters,
+    columnFiltersSize = scout.graphics.getSize($columnFilters),
+    $groupedFilterValues = this.popup.$filteringContainer,
+    $groupedFilterValuesContainer = this.popup.$filtering,
+    groupedFilterValuesContainerHeight,
+    groupedFilterValuesContainerScrollHeight = $columnFilters.get(0).scrollHeight,
+    groupedFilterValuesInsets = scout.graphics.getInsets($groupedFilterValuesContainer),
+    groupedFilterValuesTitleSize = scout.graphics.getSize($groupedFilterValuesContainer.find('.table-header-menu-group-text')),
+    $filterFieldContainer = this.popup.$columnFilters.find('.table-header-menu-filter-field'),
+    filterFieldContainerInsets = scout.graphics.getInsets($filterFieldContainer),
+    filterFieldContainerSize,
+    filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldContainer.find('.form-field'));
 
-  popupSize = popupSize
-    .subtract(htmlComp.getInsets())
-    .subtract(scout.graphics.getInsets(this.popup.$filtering));
-  filteringContainerHeight = popupSize.height - otherGroupsHeight - 26 - 39; // FIXME AWE: (filter) read height of filter field (30)
+  // Layout filter field(s)
+  filterFieldHtmlComp.setSize(new scout.Dimension(columnFiltersSize.width - filterFieldContainerInsets.horizontal(), scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT));
+  filterFieldContainerSize = scout.graphics.getSize($filterFieldContainer, true);
+
+  // Layout grouped filter values list
+  columnFiltersSize = columnFiltersSize
+    .subtract(scout.graphics.getInsets($columnFilters));
+  groupedFilterValuesContainerHeight = columnFiltersSize.height - filterFieldContainerSize.height;
 
   // If there are only some filter items make container smaller, otherwise use given height
-  filteringContainerHeight = Math.min(filteringContainerHeight, filteringContainerScrollHeight);
-  $filteringContainer.cssHeight(filteringContainerHeight);
+  groupedFilterValuesContainerHeight = Math.min(groupedFilterValuesContainerHeight, groupedFilterValuesContainerScrollHeight);
+  $groupedFilterValuesContainer.cssHeight(groupedFilterValuesContainerHeight);
 
-  scout.scrollbars.update($filteringContainer);
-
-  // Layout filter fields
-  var fieldHtmlComp = scout.HtmlComponent.get(this.popup.$filteringField.find('.form-field'));
-  fieldHtmlComp.setSize(new scout.Dimension(popupSize.width - 10, 26)); // FIXME AWE: (filter) dynamic layout for field
-
+  // Layout scrollable list
+  $groupedFilterValues.cssHeight(groupedFilterValuesContainerHeight - groupedFilterValuesInsets.vertical() - groupedFilterValuesTitleSize.height);
+  scout.scrollbars.update($groupedFilterValues);
 };
