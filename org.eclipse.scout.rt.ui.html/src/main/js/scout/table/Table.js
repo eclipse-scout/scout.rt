@@ -266,7 +266,7 @@ scout.Table.prototype._render = function($parent) {
 
   this._calculateRowBorderWidth();
   this._updateRowWidth();
-  this._renderRows();
+  this._renderViewRangeForRowIndex(0);
 
   //----- inline methods: --------
 
@@ -372,6 +372,8 @@ scout.Table.prototype._remove = function() {
   this.footer = null;
   this._removeAggregateRows();
   this._uninstallCellTooltipSupport();
+  this.firstRenderedRowIndex = -1;
+  this.lastRenderedRowIndex = -1;
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -606,19 +608,18 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
 
 scout.Table.prototype._renderRowOrderChanges = function() {
   var $row, oldTop, i, rowWasInserted, animate,
-    that = this,
     $rows = this.$rows(),
     $sortedRows = $();
 
   // store old position
-  if ($rows.length < that._animationRowLimit) {
-    $rows.each(function() {
-      $row = $(this);
+  if ($rows.length < this._animationRowLimit) {
+    $rows.each(function(index, elem) {
+      $row = $(elem);
 
       //Prevent the order animation for newly inserted rows (to not confuse the user)
       rowWasInserted = false;
-      for (var i in that._insertedRows) {
-        if (that._insertedRows[i].id === $row.data('row').id) {
+      for (var i in this._insertedRows) {
+        if (this._insertedRows[i].id === $row.data('row').id) {
           rowWasInserted = true;
           break;
         }
@@ -628,12 +629,14 @@ scout.Table.prototype._renderRowOrderChanges = function() {
         animate = true;
         $row.data('old-top', $row.offset().top);
       }
-    });
+    }.bind(this));
   }
 
   for (i = 0; i < this.rows.length; i++) {
     $row = this.rows[i].$row;
-    $sortedRows.push($row[0]);
+    if ($row) {
+      $sortedRows.push($row[0]);
+    }
   }
 
   // change order in dom
@@ -641,17 +644,17 @@ scout.Table.prototype._renderRowOrderChanges = function() {
 
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
-    $rows.each(function() {
-      $row = $(this);
+    $rows.each(function(index, elem) {
+      $row = $(elem);
       oldTop = $row.data('old-top');
       if (oldTop !== undefined) {
         $row.css('top', oldTop - $row.offset().top).animate({
           top: 0
         }, {
-          progress: that._triggerRowOrderChanged.bind(that, $row.data('row'), true)
+          progress: this._triggerRowOrderChanged.bind(this, $row.data('row'), true)
         });
       }
-    });
+    }.bind(this));
   }
 
   this.renderSelection();
@@ -990,9 +993,11 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
 
   prepend = scout.nvl(prepend, false);
   fromIndex = scout.nvl(fromIndex, 0);
-  toIndex = scout.nvl(toIndex, Math.min(rows.length, this._blockLoadThreshold) - 1);
-  fromRow = this.rows[fromIndex],
-    toRow = this.rows[toIndex];
+  fromIndex = Math.max(fromIndex, 0);
+  toIndex = scout.nvl(toIndex, Math.min(rows.length, fromIndex + this._blockLoadThreshold) - 1);
+  toIndex = Math.min(toIndex, rows.length - 1);
+  fromRow = this.rows[fromIndex];
+  toRow = this.rows[toIndex];
   if (this.firstRenderedRowIndex === -1 || fromIndex < this.firstRenderedRowIndex) {
     this.firstRenderedRowIndex = fromIndex;
   }
@@ -1044,15 +1049,22 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
   this._group();
   this._renderAggregateRows();
   this._renderBackgroundEffect();
-  $.log.trace(numRowsRendered + ' rows rendered from ' + fromIndex + ' to ' + toIndex + '. FirstRenderedRowIndex: ' + this.firstRenderedRowIndex + '. LastRenderedRowIndex: ' + this.lastRenderedRowIndex);
+  if ($.log.isTraceEnabled()) {
+    $.log.trace(numRowsRendered + ' new rows rendered from ' + fromIndex + ' to ' + toIndex + '.');
+    $.log.trace(this._rowsRenderedInfo());
+  }
   return height;
 };
 
 scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
-  var numRowsRemoved = 0,
-    height = 0,
-    fromRow = this.rows[fromIndex],
-    toRow = this.rows[toIndex];
+  var fromRow, toRow,
+    numRowsRemoved = 0,
+    height = 0;
+
+  fromIndex = Math.max(fromIndex, 0);
+  fromRow = this.rows[fromIndex],
+  toIndex = Math.min(toIndex, this.rows.length - 1);
+  toRow = this.rows[toIndex];
 
   // calculate block height
   height = toRow.$row.offset().top + toRow.$row.outerHeight(true) - fromRow.$row.offset().top;
@@ -1079,7 +1091,10 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
       this.lastRenderedRowIndex = fromIndex - 1;
     }
   }
-  $.log.trace(numRowsRemoved + ' rows removed from ' + fromIndex + ' to ' + toIndex + '. FirstRenderedRowIndex: ' + this.firstRenderedRowIndex + '. LastRenderedRowIndex: ' + this.lastRenderedRowIndex);
+  if ($.log.isTraceEnabled()) {
+    $.log.trace(numRowsRemoved + ' rows removed from ' + fromIndex + ' to ' + toIndex + '.');
+    $.log.trace(this._rowsRenderedInfo());
+  }
   return height;
 };
 
@@ -1986,7 +2001,8 @@ scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
 
 scout.Table.prototype.scrollTo = function(row) {
   if (!row.$row) {
-    this._renderRows(this.rows, this.rows.indexOf(row) - 10); //XXX
+    var rowIndex = this.rows.indexOf(row);
+    this._renderViewRangeForRowIndex(rowIndex);
   }
   scout.scrollbars.scrollTo(this.$data, row.$row);
 };
@@ -2923,93 +2939,50 @@ scout.Table.prototype._onDataScroll = function() {
     return;
   }
 
-  var rowsRendered = this._ensureBottomRowsVisible();
-  if (!rowsRendered) {
-    this._ensureTopRowsVisible();
-  }
+  var scrollTop = this.$data[0].scrollTop,
+    maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight,
+    pos = scrollTop / maxScrollTop,
+    rowIndex = Math.min(Math.floor(pos * this.rows.length), this.rows.length - 1);
+
+  this._renderViewRangeForRowIndex(rowIndex);
 };
 
-scout.Table.prototype._ensureBottomRowsVisible = function() {
-  var inView, fromIndex, toIndex, removedRowsHeight, renderedRowsHeight;
-  var lastRenderedRow = this.rows[this.lastRenderedRowIndex];
-  var lastRenderedRowOffset = lastRenderedRow.$row.offset();
-  var renderedRowsCount = this.lastRenderedRowIndex - this.firstRenderedRowIndex + 1;
-  var dataOffsetBounds = scout.graphics.offsetBounds(this.$data);
-
-  inView = lastRenderedRowOffset.top < dataOffsetBounds.y + dataOffsetBounds.height;
-  if (!inView || this.lastRenderedRowIndex === this.rows.length - 1) {
-    return;
+scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
+  var viewRange = {};
+  if (rowIndex < this.firstRenderedRowIndex || this.firstRenderedRowIndex === -1) {
+    viewRange.from = rowIndex;
+    viewRange.to = rowIndex + 2 * this._blockLoadThreshold - 1;
+  } else if (rowIndex > this.lastRenderedRowIndex) {
+    viewRange.from = rowIndex - 2 * this._blockLoadThreshold + 1;
+    viewRange.to = rowIndex;
   }
-
-  toIndex = Math.min(this.lastRenderedRowIndex + this._blockLoadThreshold, this.rows.length - 1);
-  fromIndex = toIndex - (2 * this._blockLoadThreshold - 1);
-  if (renderedRowsCount === 2 * this._blockLoadThreshold) {
-    if (this.firstRenderedRowIndex !== fromIndex) {
-      removedRowsHeight = this._removeRowsFromTo(this.firstRenderedRowIndex, fromIndex - 1);
-    }
-  }
-  renderedRowsHeight = this._renderRows(this.rows, this.lastRenderedRowIndex + 1, toIndex);
-
-  if (removedRowsHeight) {
-    if (!this.$fillBefore) {
-      this.$fillBefore = this.$data.prependDiv('table-data-fill');
-    }
-    removedRowsHeight += this.$fillBefore.outerHeight();
-    this.$fillBefore.cssHeight(removedRowsHeight);
-    $.log.trace('FillBefore height: ' + removedRowsHeight);
-  }
-  if (renderedRowsHeight) {
-    if (this.$fillAfter) {
-      renderedRowsHeight = this.$fillAfter.outerHeight() - renderedRowsHeight;
-      this.$fillAfter.cssHeight(renderedRowsHeight);
-      $.log.trace('FillAfter height: ' + renderedRowsHeight);
-    }
-
-    // When scrolling fast newly inserted rows may already be out of view -> add next block if necessary
-    this._ensureBottomRowsVisible();
-    return true;
-  }
+  this._renderViewRange(viewRange);
 };
 
-scout.Table.prototype._ensureTopRowsVisible = function() {
-  var inView, fromIndex, toIndex, removedRowsHeight, renderedRowsHeight;
-  var renderedRowsCount = this.lastRenderedRowIndex - this.firstRenderedRowIndex + 1;
-  fromIndex = Math.max(this.firstRenderedRowIndex - this._blockLoadThreshold, 0);
-  toIndex = fromIndex + (2 * this._blockLoadThreshold - 1);
-  var firstRenderedRow = this.rows[this.firstRenderedRowIndex];
-  var firstRenderedRowOffset = firstRenderedRow.$row.offset();
-  var dataOffsetBounds = scout.graphics.offsetBounds(this.$data);
-  inView = firstRenderedRowOffset.top > dataOffsetBounds.y;
-  if (!inView || this.firstRenderedRowIndex === 0) {
-    return;
-  }
+/**
+ * Renders the rows visible in the viewport and removes the other rows
+ */
+scout.Table.prototype._renderViewRange = function(viewRange) {
+  var from = viewRange.from,
+    to = viewRange.to;
 
-  if (renderedRowsCount === 2 * this._blockLoadThreshold) {
-    if (this.firstRenderedRowIndex !== fromIndex) {
-      removedRowsHeight = this._removeRowsFromTo(toIndex + 1, this.lastRenderedRowIndex);
+  if (viewRange.from > this.firstRenderedRowIndex) {
+    if (this.firstRenderedRowIndex !== -1) {
+      this._removeRowsFromTo(this.firstRenderedRowIndex, Math.min(viewRange.from, this.lastRenderedRowIndex));
     }
+    if (this.lastRenderedRowIndex > from) {
+      from = this.lastRenderedRowIndex + 1;
+    }
+    this._renderRows(this.rows, from, viewRange.to);
   }
-  renderedRowsHeight = this._renderRows(this.rows, fromIndex, this.firstRenderedRowIndex - 1, true);
-
-  if (removedRowsHeight) {
-    if (!this.$fillAfter) {
-      this.$fillAfter = this.$data.appendDiv('table-data-fill');
+  if (viewRange.to < this.lastRenderedRowIndex) {
+    if (this.firstRenderedRowIndex !== -1) {
+      this._removeRowsFromTo(Math.max(viewRange.to, this.firstRenderedRowIndex), this.lastRenderedRowIndex);
     }
-    removedRowsHeight += this.$fillAfter.outerHeight();
-    this.$fillAfter.cssHeight(removedRowsHeight);
-    $.log.trace('FillAfter height: ' + removedRowsHeight);
-  }
-  if (renderedRowsHeight) {
-    if (this.$fillBefore) {
-      renderedRowsHeight = this.$fillBefore.outerHeight() - renderedRowsHeight;
-      this.$fillBefore.cssHeight(renderedRowsHeight);
-      $.log.trace('FillBefore height: ' + renderedRowsHeight);
+    if (this.firstRenderedRowIndex !== -1 && this.firstRenderedRowIndex < to) {
+      to = this.firstRenderedRowIndex - 1;
     }
-
-    // When scrolling fast newly inserted rows may already be out of view -> add next block if necessary
-    // FIXME CGU this is slow for large tables when clicking at the end, maybe we should calculate the rows which probably are at that position and render those
-    this._ensureTopRowsVisible();
-    return true;
+    this._renderRows(this.rows, viewRange.from, to);
   }
 };
 

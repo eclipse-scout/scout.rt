@@ -197,17 +197,12 @@ scout.TableFooter.prototype._renderInfo = function() {
 };
 
 scout.TableFooter.prototype._renderInfoLoad = function() {
-  var numRenderedRows, renderedRowsRange, loadedText,
-    $info = this._$infoLoad,
+  var $info = this._$infoLoad,
     numRows = this.table.rows.length;
 
-  numRenderedRows = this.table.$rows().length;
-  renderedRowsRange = '(' + this.table.firstRenderedRowIndex + '-' + this.table.lastRenderedRowIndex + ')';
   $info.empty();
   if (!this._compactStyle) {
-    loadedText = this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows));
-    loadedText += ', ' + this.computeCountInfo(numRenderedRows) + ' gezeichnet '+ renderedRowsRange;
-    $info.appendSpan().text(loadedText);
+    $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
   } else {
