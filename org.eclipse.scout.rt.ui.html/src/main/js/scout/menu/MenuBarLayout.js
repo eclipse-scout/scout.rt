@@ -57,6 +57,9 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     var overflown = false;
     var previousMenuItem = null;
     this._menuBar.menuItems.forEach(function(menuItem) {
+      if (!menuItem.visible) {
+        return;
+      }
       if (menuItem.rightAligned) {
         // Always add right-aligned menus
         menuItemsCopy.push(menuItem);
