@@ -19,7 +19,7 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
   // Clear any pending loading function
   clearTimeout(this._loadingIndicatorTimeoutId);
 
-  if (!this.field) {
+  if (!this.field || !this.field.rendered) {
     return;
   }
 
@@ -27,10 +27,12 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
     // --- 1. not loading -> loading ---
 
     var renderLoading = function() {
-      // Hide field content
-      this.field.$container.addClass('loading');
-      // Create loading indicator
-      this._$loadingIndicator = this.field.$container.appendDiv('loading-indicator');
+      if (this.field.rendered) {
+        // Hide field content
+        this.field.$container.addClass('loading');
+        // Create loading indicator
+        this._$loadingIndicator = this.field.$container.appendDiv('loading-indicator');
+      }
     }.bind(this);
 
     if (this.loadingIndicatorDelay) {
@@ -45,9 +47,11 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
     // Remove loading indicator
     this._$loadingIndicator.fadeOutAndRemove(function() {
       this._$loadingIndicator = null;
-      // Show field's content (layout if necessary)
-      this.field.$container.removeClass('loading');
-      this.field.invalidateLayoutTree();
+      if (this.field.rendered) {
+        // Show field's content (layout if necessary)
+        this.field.$container.removeClass('loading');
+        this.field.invalidateLayoutTree();
+      }
     }.bind(this));
   }
 };
