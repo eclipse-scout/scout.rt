@@ -57,7 +57,7 @@ public class UiJobs {
     try {
       timeout = !Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilterBuilder()
           .andMatch(new SessionFutureFilter(clientSession))
-          .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
+          .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
           .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {
@@ -98,7 +98,7 @@ public class UiJobs {
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
           .andMatchFuture(future)
-          .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
+          .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
           .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (RuntimeException e) {
@@ -111,7 +111,7 @@ public class UiJobs {
     }
 
     // Return immediately if the jobs requires user interaction.
-    if (future.containsExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)) {
+    if (future.containsExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)) {
       return null;
     }
 

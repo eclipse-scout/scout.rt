@@ -962,7 +962,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
-    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
+    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 
   @Override

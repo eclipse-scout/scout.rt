@@ -79,10 +79,10 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 public final class ModelJobs {
 
   /**
-   * Execution hint to signal that a specific job (usually a model job) requires user interaction. This hint is usually
-   * set just before a blocking condition is entered ("waitFor()"). Threads that are waiting for the model job to be
-   * completed can then return to the UI before the job is actually done (which would never happen without the user
-   * interaction).
+   * Execution hint to signal that a model job requires interaction from UI, typically by a user like closing a message
+   * box. This hint is usually set just before a blocking condition is entered ("waitFor()"). Threads that are waiting
+   * for the model job to be completed can then return to the UI before the job is actually done (which would never
+   * happen without the user interaction).
    * <p>
    * <b>Usage</b>
    * <p>
@@ -90,7 +90,7 @@ public final class ModelJobs {
    *
    * <pre>
    * private void waitFor() {
-   *   m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED);
+   *   m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
    * }
    * </pre>
    *
@@ -100,14 +100,14 @@ public final class ModelJobs {
    *   ...
    *   Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilterBuilder()
    *      .andMatch(...) // any other conditions
-   *      .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
+   *      .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
    *      .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS)
    *   ...
    * </pre>
    *
    * @see {@link IJobManager#awaitDone(org.eclipse.scout.commons.filter.IFilter, long, java.util.concurrent.TimeUnit)}
    */
-  public static final String EXECUTION_HINT_USER_INTERACTION_REQUIRED = "userInteractionRequired";
+  public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "uiInteractionRequired";
 
   private ModelJobs() {
   }

@@ -694,7 +694,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     // Cancel all running model jobs for the requested session (interrupt if necessary)
     Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(getClientSession()))
-        .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_USER_INTERACTION_REQUIRED)
+        .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), true);
   }
 
