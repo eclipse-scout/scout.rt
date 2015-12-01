@@ -126,7 +126,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
     text: this._headerItemTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    native: !scout.device.isCustomEllipsisTooltipPossible()
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
   });
 
   this._decorateHeader(column);

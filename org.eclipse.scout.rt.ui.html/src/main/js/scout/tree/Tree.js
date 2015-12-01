@@ -763,7 +763,7 @@ scout.Tree.prototype._installNodeTooltipSupport = function() {
     text: this._nodeTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    native: !scout.device.isCustomEllipsisTooltipPossible()
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
   });
 };
 

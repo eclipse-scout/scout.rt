@@ -31,7 +31,7 @@ scout.tooltips = {
           return $label.text();
         }
       },
-      native: !scout.device.isCustomEllipsisTooltipPossible()
+      nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
     };
     options = $.extend({}, defaultOptions, options);
     this.install($comp, options);
@@ -60,7 +60,7 @@ scout.TooltipSupport = function(options) {
     selector: null,
     delay: 350,
     text: undefined,
-    native: false
+    nativeTooltip: false
   };
   options = $.extend({}, defaultOptions, options);
   this._options = options;
@@ -91,7 +91,7 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
   var $comp = $(event.currentTarget);
 
-  if (this._options.native) {
+  if (this._options.nativeTooltip) {
     var text = this._text($comp);
     $comp.attr('title', text);
   } else {

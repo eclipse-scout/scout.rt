@@ -424,7 +424,7 @@ scout.Table.prototype._installCellTooltipSupport = function() {
     text: this._cellTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    native: !scout.device.isCustomEllipsisTooltipPossible()
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
   });
 };
 
