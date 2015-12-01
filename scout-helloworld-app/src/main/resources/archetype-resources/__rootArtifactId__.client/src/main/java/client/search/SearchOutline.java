@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${groupId}.client.search;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractSearchOutline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration>
 
-  <contextListener class="org.eclipse.scout.commons.logger.AutoRegisteringJulLevelChangePropagator" />
+  <contextListener class="org.eclipse.scout.rt.platform.logger.AutoRegisteringJulLevelChangePropagator" />
 
   <variable name="mdcPattern" scope="context" value="httpSessionId: '%X{http.session.id}', majorPrincipal: '%X{subject.principal.name}'" />
   <variable name="mdcPatternWithoutEmptyValues" scope="context" value="%replace(${mdcPattern}){'[a-zA-Z0-9]+: \\'\\'(, )?', ''}" />

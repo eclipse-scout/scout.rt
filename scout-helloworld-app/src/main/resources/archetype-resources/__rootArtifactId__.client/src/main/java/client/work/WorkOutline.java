@@ -5,7 +5,7 @@ package ${groupId}.client.work;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.TEXTS;
