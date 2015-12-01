@@ -16,34 +16,36 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
- * Use this adapter to work with <code>xsd:date</code>s in the default timezone of the Java Virtual Machine. Depending
+ * Use this adapter to work with <code>xsd:time</code>s in the default timezone of the Java Virtual Machine. Depending
  * on the JVM installation, the timezone may differ: 'GMT+-XX:XX'. Unlike {@link DefaultTimezoneDateTimeAdapter}, this
- * adapter truncates hours, minutes, seconds and milliseconds.
+ * adapter sets year, month and day to the epoch, which is defined as 1970-01-01 in UTC.
  * <p>
- * Whenever possible, use {@link UtcDateAdapter} or {@link CalendarDateAdapter} instead.
+ * Whenever possible, use {@link UtcTimeAdapter} or {@link CalendarTimeAdapter} instead.
  * <p>
  * Fore more information, see {@link DefaultTimezoneDateTimeAdapter}.
  */
-public class DefaultTimezoneDateAdapter extends DefaultTimezoneDateTimeAdapter {
+public class DefaultTimezoneTimeAdapter extends DefaultTimezoneDateTimeAdapter {
 
   @Override
   protected void beforeMarshall(final XMLGregorianCalendar jvmLocalTime) {
-    // Unset temporal information (hour, minute, second, millisecond)
-    jvmLocalTime.setTime(
-        DatatypeConstants.FIELD_UNDEFINED, // hour
-        DatatypeConstants.FIELD_UNDEFINED, // minute
-        DatatypeConstants.FIELD_UNDEFINED, // second
-        DatatypeConstants.FIELD_UNDEFINED); // millisecond
+    // Unset date information (year, month, day)
+    jvmLocalTime.setYear(DatatypeConstants.FIELD_UNDEFINED);
+    jvmLocalTime.setMonth(DatatypeConstants.FIELD_UNDEFINED);
+    jvmLocalTime.setDay(DatatypeConstants.FIELD_UNDEFINED);
   }
 
   @Override
   protected void beforeUnmarshall(final Calendar jvmLocalTime) {
-    // Unset temporal information (hour, minute, second, millisecond)
-    final int year = jvmLocalTime.get(Calendar.YEAR);
-    final int dayOfYear = jvmLocalTime.get(Calendar.DAY_OF_YEAR);
+    // Unset date information (year, month, day)
+    final int hourOfDay = jvmLocalTime.get(Calendar.HOUR_OF_DAY);
+    final int minute = jvmLocalTime.get(Calendar.MINUTE);
+    final int second = jvmLocalTime.get(Calendar.SECOND);
+    final int millisecond = jvmLocalTime.get(Calendar.MILLISECOND);
 
     jvmLocalTime.clear();
-    jvmLocalTime.set(Calendar.YEAR, year);
-    jvmLocalTime.set(Calendar.DAY_OF_YEAR, dayOfYear);
+    jvmLocalTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+    jvmLocalTime.set(Calendar.MINUTE, minute);
+    jvmLocalTime.set(Calendar.SECOND, second);
+    jvmLocalTime.set(Calendar.MILLISECOND, millisecond);
   }
 }

@@ -16,17 +16,17 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
- * Use this adapter to work with UTC <code>xsd:date</code>s. A UTC date is also known as 'zulu' date, and has
- * 'GMT+-00:00'. Unlike {@link UtcDateTimeAdapter}, this adapter truncates hours, minutes, seconds and milliseconds.
+ * Use this adapter to work with {@link Calendar} <code>xsd:date</code>s without loosing timezone information. Unlike
+ * {@link CalendarDateTimeAdapter}, this adapter truncates hours, minutes, seconds and milliseconds.
  * <p>
- * Fore more information, see {@link UtcDateTimeAdapter}.
+ * Fore more information, see {@link CalendarDateTimeAdapter}.
  */
-public class UtcDateAdapter extends UtcDateTimeAdapter {
+public final class CalendarDateAdapter extends CalendarDateTimeAdapter {
 
   @Override
-  protected void beforeMarshall(final XMLGregorianCalendar zuluTime) {
+  protected void beforeMarshall(final XMLGregorianCalendar calendar) {
     // Unset temporal information (hour, minute, second, millisecond)
-    zuluTime.setTime(
+    calendar.setTime(
         DatatypeConstants.FIELD_UNDEFINED, // hour
         DatatypeConstants.FIELD_UNDEFINED, // minute
         DatatypeConstants.FIELD_UNDEFINED, // second
@@ -34,13 +34,13 @@ public class UtcDateAdapter extends UtcDateTimeAdapter {
   }
 
   @Override
-  protected void beforeUnmarshall(final Calendar zuluTime) {
+  protected void beforeUnmarshall(final Calendar calendar) {
     // Unset temporal information (hour, minute, second, millisecond)
-    final int year = zuluTime.get(Calendar.YEAR);
-    final int dayOfYear = zuluTime.get(Calendar.DAY_OF_YEAR);
+    final int year = calendar.get(Calendar.YEAR);
+    final int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-    zuluTime.clear();
-    zuluTime.set(Calendar.YEAR, year);
-    zuluTime.set(Calendar.DAY_OF_YEAR, dayOfYear);
+    calendar.clear();
+    calendar.set(Calendar.YEAR, year);
+    calendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
   }
 }
