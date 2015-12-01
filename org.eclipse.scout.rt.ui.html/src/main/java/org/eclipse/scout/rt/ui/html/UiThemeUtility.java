@@ -58,15 +58,11 @@ public class UiThemeUtility {
    * send ?theme=default to set the theme to null (which is means Scout loads the default-theme).
    */
   public static String getTheme(HttpServletRequest req) {
-    HttpSession session = req.getSession(false);
-    String theme = null;
-    String themeFromSession = null;
+    HttpSession session = req.getSession();
 
     // 1st - try to find the theme hint in the session attributes
-    if (session != null) {
-      themeFromSession = (String) session.getAttribute(THEME_SESSION_ATTRIBUTE);
-      theme = themeFromSession;
-    }
+    String themeFromSession = (String) session.getAttribute(THEME_SESSION_ATTRIBUTE);
+    String theme = themeFromSession;
 
     // 2nd - check if theme is requested by cookie
     if (theme == null) {

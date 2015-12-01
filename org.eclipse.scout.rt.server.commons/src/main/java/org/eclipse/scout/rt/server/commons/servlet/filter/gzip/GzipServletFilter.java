@@ -131,7 +131,7 @@ public class GzipServletFilter implements Filter {
     return -1;
   }
 
-  private boolean isCompressHint(HttpServletRequest req) {
+  protected boolean isCompressHint(HttpServletRequest req) {
     boolean defaultValue = !Platform.get().inDevelopmentMode();
     HttpSession session = req.getSession(false);
     if (session == null) {
