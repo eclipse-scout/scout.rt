@@ -10,10 +10,10 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.tile;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.AbstractChart;
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.AbstractChartField;

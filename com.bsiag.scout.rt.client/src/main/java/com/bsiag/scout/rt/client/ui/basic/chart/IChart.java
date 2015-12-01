@@ -10,8 +10,8 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 
