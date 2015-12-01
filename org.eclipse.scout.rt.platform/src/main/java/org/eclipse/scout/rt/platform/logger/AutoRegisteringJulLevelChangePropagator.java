@@ -21,14 +21,14 @@ import ch.qos.logback.classic.jul.LevelChangePropagator;
  * <b>Registration</b>: Add the following line to your logback.xml configuration file.
  *
  * <pre>
- * &lt;contextListener class="org.eclipse.scout.commons.logger.logback.AutoRegisteringJulLevelChangePropagator"/&gt;
+ * &lt;contextListener class="org.eclipse.scout.rt.platform.logger.logback.AutoRegisteringJulLevelChangePropagator"/&gt;
  * </pre>
  *
  * The optional nested element <em>removeRootHandlers</em> controls whether handlers are removed from the root logger.
  * Its default value is <code>true</code>.
  *
  * <pre>
- * &lt;contextListener class="org.eclipse.scout.commons.logger.logback.AutoRegisteringJulLevelChangePropagator"&gt;
+ * &lt;contextListener class="org.eclipse.scout.rt.platform.logger.logback.AutoRegisteringJulLevelChangePropagator"&gt;
  *   &lt;removeRootHandlers&gt;false&lt;/removeRootHandlers&gt;
  * &lt;/contextListener&gt;
  * </pre>
