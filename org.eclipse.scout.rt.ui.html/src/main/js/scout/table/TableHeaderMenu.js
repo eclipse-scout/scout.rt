@@ -16,20 +16,20 @@ scout.TableHeaderMenu = function() {
   this.$headerItem;
   this.$columnActions;
   this.$columnFilters;
-  this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.ALL;
+  this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
 
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChanged', this._onLocationChanged.bind(this));
 };
 scout.inherits(scout.TableHeaderMenu, scout.Popup);
 
-scout.TableHeaderMenu.SelectionMode = {
+scout.TableHeaderMenu.CheckedMode = {
   ALL: {
-    selectAll: true,
+    checkAll: true,
     text: 'ui.SelectAllFilter'
   },
   NONE: {
-    selectAll: false,
+    checkAll: false,
     text: 'ui.SelectNoneFilter'
   }
 };
@@ -44,6 +44,8 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this._tableFilterHandler = this._onTableFilterChanged.bind(this);
   this.table.on('addFilter', this._tableFilterHandler);
   this.table.on('removeFilter', this._tableFilterHandler);
+
+  this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -102,7 +104,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Filtering
-  // FIXME AWE: (filter) rename existing filters to histogram (as in old scout versions)
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
     this.filter = scout.create('ColumnUserFilter', {
@@ -132,7 +133,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 };
 
 scout.TableHeaderMenu.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$filteringContainer, this.session);
+  this.filterTable.off('rowsChecked', this._filterTableCheckedRowsHandler);
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
   this.table.off('addFilter', this._tableFilterHandler);
@@ -436,36 +437,44 @@ scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
 scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
   this.$filtering = this.$columnFilters.appendDiv('table-header-menu-group-filter');
 
-  this.$filterGroupActions = this.$filtering
-    .appendDiv('table-header-menu-group-actions');
+  this.$filterActions = this.$filtering
+    .appendDiv('table-header-menu-filter-actions');
 
-  this.$filterSelectionMode = this.$filterGroupActions
-    .appendDiv('table-header-menu-toggle-selection')
-    .text(this.session.text(this.filterSelectionMode.text))
-    .on('click', this._toggleFilterSelectionMode.bind(this));
+  this.$filterToggleChecked = this.$filterActions
+    .appendDiv('table-header-menu-filter-toggle-checked')
+    .text(this.session.text(this.filterCheckedMode.text))
+    .on('click', this._toggleFiltersChecked.bind(this));
 
   this.$filterGroupTitle = this.$filtering
     .appendDiv('table-header-menu-group-text')
     .data('label', this._filterByText());
 
-  this.$filteringContainer = this.$filtering.appendDiv('table-header-menu-filter-container');
-  this.filter.availableValues.forEach(function(availableValue, index, arr) {
-    var $filteringItem = this.$filteringContainer.appendDiv('table-header-menu-filter').text(availableValue.text)
-      .data('key', availableValue.key)
-      .on('click', this._onFilterClick.bind(this));
-
-    if (this.filter.selectedValues.indexOf(availableValue.key) > -1) {
-      $filteringItem.select(true);
-    }
-    if (index === arr.length - 1) {
-      // mark last element
-      $filteringItem.addClass('last');
-    }
-  }, this);
-
-  scout.scrollbars.install(this.$filteringContainer, {
-    parent: this
+  this.filterTable = scout.create('Table', {
+    parent: this,
+    headerVisible: false,
+    autoResizeColumns: true,
+    checkable: true,
+    columns: [scout.create('Column', {
+      index: 0,
+      text: 'filter-value', // text is not visible since header is not visible
+      session: this.session
+    })]
   });
+  this.filterTable.on('rowsChecked', this._filterTableCheckedRowsHandler);
+
+  var tableRow, tableRows = [];
+  this.filter.availableValues.forEach(function(filterValue) {
+    tableRow = {
+      cells: [filterValue.text],
+      checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,
+      dataMap: {
+        filterValue: filterValue
+      }
+    };
+    tableRows.push(tableRow);
+  }, this);
+  this.filterTable._insertRows(tableRows);
+  this.filterTable.render(this.$filtering);
 };
 
 scout.TableHeaderMenu.prototype._filterByText = function() {
@@ -477,19 +486,19 @@ scout.TableHeaderMenu.prototype._filterByText = function() {
   return text;
 };
 
-scout.TableHeaderMenu.prototype._toggleFilterSelectionMode = function() {
-  var selectionMode = scout.TableHeaderMenu.SelectionMode;
-  var selectAll = this.filterSelectionMode.selectAll;
+scout.TableHeaderMenu.prototype._toggleFiltersChecked = function() {
+  var checkedMode = scout.TableHeaderMenu.CheckedMode;
+  var checkAll = this.filterCheckedMode.checkAll;
   this.filter.selectedValues = [];
-  if (this.filterSelectionMode === selectionMode.ALL) {
-    this.filterSelectionMode = selectionMode.NONE;
+  if (this.filterCheckedMode === checkedMode.ALL) {
+    this.filterCheckedMode = checkedMode.NONE;
     this.filter.availableValues.forEach(function(filterValue) {
       this.filter.selectedValues.push(filterValue.key);
     }, this);
   } else {
-    this.filterSelectionMode = selectionMode.ALL;
+    this.filterCheckedMode = checkedMode.ALL;
   }
-  this.$filtering.find('.table-header-menu-filter').select(selectAll);
+  this.filterTable.checkAll(checkAll);
   this._updateTableFilters();
   this._updateGroupFilterActions();
 };
@@ -505,7 +514,7 @@ scout.TableHeaderMenu.prototype._updateTableFilters = function() {
 };
 
 scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
-  this.$filterSelectionMode.text(this.session.text(this.filterSelectionMode.text));
+  this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
 };
 
 scout.TableHeaderMenu.prototype._renderFilterField = function() {
@@ -544,15 +553,12 @@ scout.TableHeaderMenu.prototype._sortColumnCount = function() {
 };
 
 scout.TableHeaderMenu.prototype._groupColumnCount = function() {
-  var groupCount = 0,
-    i;
-
+  var i, groupCount = 0;
   for (i = 0; i < this.table.columns.length; i++) {
     if (this.table.columns[i].grouped) {
       groupCount++;
     }
   }
-
   return groupCount;
 };
 
@@ -607,16 +613,13 @@ scout.TableHeaderMenu.prototype._onAnchorScroll = function(event) {
   this.position();
 };
 
-scout.TableHeaderMenu.prototype._onFilterClick = function(event) {
-  var $clicked = $(event.currentTarget);
-  $clicked.select(!$clicked.isSelected());
-
-  // find selected values
+scout.TableHeaderMenu.prototype._onFilterTableCheckedRows = function(event) {
   this.filter.selectedValues = [];
-  this.$filtering.find('.selected').each(function(i, elem) {
-    this.filter.selectedValues.push($(elem).data('key'));
-  }.bind(this));
-
+  this.filterTable.rows.forEach(function(row) {
+    if (row.checked) {
+      this.filter.selectedValues.push(row.dataMap.filterValue.key);
+    }
+  }, this);
   this._updateTableFilters();
 };
 
@@ -626,9 +629,9 @@ scout.TableHeaderMenu.prototype._onTableFilterChanged = function() {
   // When no filter value is selected, we change the selection mode to ALL
   // since it makes no sense to choose NONE when no value is currently selected
   if (this.filter.selectedValues.length === 0) {
-    this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.ALL;
+    this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
   } else {
-    this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.NONE;
+    this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.NONE;
   }
   this._updateGroupFilterActions();
 };

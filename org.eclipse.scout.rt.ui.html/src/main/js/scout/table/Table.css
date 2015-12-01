@@ -40,6 +40,7 @@
 .table-data {
   position: relative;
   overflow: hidden;
+  width: 100%;
 
   /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
   /* - To make height calculation correct, this margin has to be subtracted again */

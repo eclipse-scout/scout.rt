@@ -481,7 +481,7 @@ scout.Table.prototype.toggleSelection = function() {
 };
 
 scout.Table.prototype.selectAll = function() {
-  //TODO nbu async? only select visible rows and then others.
+  // TODO NBU: async? only select visible rows and then others.
   if (!this.multiSelect) {
     return; // not possible
   }
@@ -492,6 +492,20 @@ scout.Table.prototype.selectAll = function() {
   }, this);
   this._sendRowsPending = true;
   this.notifyRowSelectionFinished();
+};
+
+scout.Table.prototype.checkAll = function(check) {
+  check = scout.nvl(check, true);
+  // FIXME AWE: (filter) ask CG.U - send check/uncheckAll event to server instead of events for single rows?
+  // currently it doesnt matter because filter table is UI only and does not send anything to the server
+  var rows = this.filteredRows();
+  rows.forEach(function(row) {
+    this.checkRow(row, check);
+  }, this);
+};
+
+scout.Table.prototype.uncheckAll = function() {
+  this.checkAll(false);
 };
 
 scout.Table.prototype.updateScrollbars = function() {
@@ -1755,6 +1769,7 @@ scout.Table.prototype.checkRow = function(row, checked) {
   if (this.rendered) {
     this._renderRowChecked(row);
   }
+  this._triggerRowsChecked();
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
@@ -2624,6 +2639,10 @@ scout.Table.prototype._triggerRowsSelected = function() {
   this.trigger('rowsSelected', event);
 };
 
+scout.Table.prototype._triggerRowsChecked = function() {
+  this.trigger('rowsChecked');
+};
+
 scout.Table.prototype._triggerRowsFiltered = function() {
   this.trigger('rowsFiltered');
 };
@@ -2928,6 +2947,7 @@ scout.Table.prototype._onRowsChecked = function(rows) {
     if (this.rendered) {
       this._renderRowChecked(row);
     }
+    this._triggerRowsChecked();
   }
 };
 

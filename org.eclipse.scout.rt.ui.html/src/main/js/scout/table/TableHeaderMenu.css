@@ -259,12 +259,6 @@
   padding: 0;
 }
 
-.table-header-menu-filter-container > .scrollbar {
-  right: 14px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
 .table-header-menu-filter {
   position:relative;
   width: 200px;
@@ -306,14 +300,14 @@
   }
 }
 
-.table-header-menu-group-actions {
+.table-header-menu-filter-actions {
   display: inline;
   float: right;
   line-height: 22px;
   margin-right: 10px;
 }
 
-.table-header-menu-toggle-selection {
+.table-header-menu-filter-toggle-checked {
   cursor: pointer;
   color: @table-header-menu-link-color;
   display: inline;
