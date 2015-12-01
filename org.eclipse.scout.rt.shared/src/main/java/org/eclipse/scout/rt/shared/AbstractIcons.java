@@ -31,9 +31,11 @@ public abstract class AbstractIcons implements Serializable {
    */
   public static final String ApplicationLogo = "application_logo_large";
 
+  /* default font icons (sans-serif, arial) */
   public static final String TableSortAsc = "font:\u2191";
   public static final String TableSortDesc = "font:\u2193";
 
+  /* custom icons */
   public static final String ExclamationMark = "font:\uE001";
   public static final String Info = "font:\uE002";
   public static final String Calendar = "font:\uE003";
@@ -49,11 +51,11 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Star = "font:\uE032";
   public static final String Person = "font:\uE034";
   public static final String VerticalDots = "font:\uE040";
-  public static final String List = "font:\uE041";
   public static final String Search = "font:\uE042";
   public static final String Folder = "font:\uE043";
+  public static final String Sum = "font:\ue025";
 
-  public static final String ListThick = "font:\uF00B";
+  /* awesome font icons */
   public static final String Remove = "font:\uF00D";
   public static final String RotateRight = "font:\uF01E";
   public static final String Pencil = "font:\uF040";
@@ -66,7 +68,9 @@ public abstract class AbstractIcons implements Serializable {
   public static final String ChevronDown = "font:\uF078";
   public static final String Square = "font:\uF0C8";
   public static final String Menu = "font:\uF0C9";
+  public static final String List = "font:\uF0CA";
   public static final String ListNumbered = "font:\uF0CB";
+  public static final String ListThick = "font:\uF00B";
   public static final String CaretDown = "font:\uF0D7";
   public static final String CaretUp = "font:\uF0D8";
   public static final String CaretLeft = "font:\uF0D9";
@@ -86,5 +90,5 @@ public abstract class AbstractIcons implements Serializable {
   public static final String LongArrowUp = "font:\uF176";
   public static final String LongArrowLeft = "font:\uF177";
   public static final String LongArrowRight = "font:\uF178";
-  public static final String Sum = "font:\ue025";
+
 }

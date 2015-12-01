@@ -37,12 +37,10 @@
 @icon-star: '\E032';
 @icon-person: '\E034';
 @icon-ellipsis-v: '\E040';
-@icon-list-ul: '\E041 ';
 @icon-search: '\E042';
 @icon-folder: '\E043';
 
 /* scoutIcons: awesome icons */
-@icon-th-list: '\F00B';
 @icon-remove: '\F00D'; /* close */
 @icon-rotate-right: '\F01E'; /* repeat */
 @icon-pencil: '\F040';
@@ -54,7 +52,9 @@
 @icon-chevron-down: '\F078';
 @icon-square: '\F0C8';
 @icon-menu: '\F0C9'; /* bars */
+@icon-list-ul: '\F0CA';
 @icon-list-ol: '\F0CB';
+@icon-th-list: '\F00B';
 @icon-caret-down: '\F0D7';
 @icon-caret-up: '\F0D8';
 @icon-caret-left: '\F0D9';
