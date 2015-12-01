@@ -76,13 +76,16 @@ scout.Popup.prototype.open = function($parent, event) {
   this._triggerPopupOpenEvent();
 };
 
-scout.Popup.prototype._uninstallAllChildScrollbars = function(){
+scout.Popup.prototype._uninstallAllChildScrollbars = function() {
   var $scrollables = scout.scrollbars.getScrollables(this.session),
-  handledScrollables = [];
-  $scrollables.forEach(function($scrollable){
-    if(this.$container.has($scrollable).length>0){
+    handledScrollables = [];
+  $scrollables.forEach(function($scrollable) {
+    if (this.$container.has($scrollable).length > 0) {
       var options = scout.scrollbars.getScrollableOptions($scrollable);
-      handledScrollables.push({$scrollable: $scrollable, options: options});
+      handledScrollables.push({
+        $scrollable: $scrollable,
+        options: options
+      });
       scout.scrollbars.uninstall($scrollable, this.session);
     }
 
@@ -117,18 +120,30 @@ scout.Popup.prototype._open = function($parent, event) {
         });
       }.bind(this)
     }).css('overflow', 'visible');
+    this.$body.cssHeightAnimated(popupSize.height - 40, popupSize.height, {
+      progress: function() {
+        this.revalidateLayout();
+        this.position();
+      }.bind(this),
+      duration: 100,
+      complete: function() {
+        this.animating = false;
+        this.animationPrepare = false;
+        this.trigger('popupOpened', {
+          popup: this
+        });
+      }.bind(this)
+    });
   }
 
-
-
   this.events.on('popupOpened', function() {
-      handledScrollables.forEach(function(scrollable){
-        if(scrollable.options){
-          scrollable.options.forEach(function(options){
-            scout.scrollbars.install(scrollable.$scrollable, options);
-          }.bind(this));
-        }
-      }.bind(this));
+    handledScrollables.forEach(function(scrollable) {
+      if (scrollable.options) {
+        scrollable.options.forEach(function(options) {
+          scout.scrollbars.install(scrollable.$scrollable, options);
+        }.bind(this));
+      }
+    }.bind(this));
   }.bind(this));
 };
 
@@ -159,7 +174,7 @@ scout.Popup.prototype._remove = function() {
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
-  if(this.openAnimated){
+  if (this.openAnimated) {
     this.$container.stop();
   }
   // remove all clean-up handlers

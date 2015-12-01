@@ -76,6 +76,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
   this.revalidateLayout();
   this.position();
 
+
   parentMenu.$subMenuBody.css('display', displayBackup);
   var position;
   position = parentMenu.$placeHolder.position();
@@ -90,9 +91,11 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     var targetBounds = this.htmlComp.getBounds();
     var targetSize = this.htmlComp.getSize();
     this.$body.css('box-shadow', 'none');
-
-    //set container to element
-    parentMenu.$subMenuBody.cssTop();
+    this.htmlComp.setBounds(actualBounds);
+    if (this.openingDirectionY !== 'up') {
+      //set container to element
+      parentMenu.$subMenuBody.cssTop();
+    }
     //move new body to top of popup.
     parentMenu.$subMenuBody.cssHeightAnimated(actualSize.height, parentMenu.$container.cssHeight(), {
       duration: duration,
@@ -102,11 +105,6 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     var endTopposition = position.top - this.$body.cssHeight(),
       startTopposition = 0 - actualSize.height,
       topMargin = 0;
-    if (this.openingDirectionY === 'up') {
-      if (actualSize.height < targetSize.height) {
-        startTopposition = targetSize.height - actualSize.height + topMargin + startTopposition;
-      }
-    }
 
     parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
       duration: duration,
@@ -130,7 +128,8 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
 
     this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
       duration: duration,
-      progress: this.revalidateLayout.bind(this),
+      progress:
+        this.revalidateLayout.bind(this),
       queue: false
     });
 
@@ -139,12 +138,6 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
         duration: duration,
         queue: false
       });
-      if (this.openingDirectionY === 'up') {
-        this.$body.cssTopAnimated(targetSize.height - actualSize.height + topMargin, topMargin, {
-          duration: duration,
-          queue: false
-        });
-      }
     }
   }
 };
@@ -238,12 +231,25 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
         duration: duration,
         queue: false
       });
-      if (this.openingDirectionY === 'up') {
-        parentMenu.parentMenu.$subMenuBody.cssTopAnimated(targetSize.height - actualSize.height + topMargin, topMargin, {
-          duration: duration,
-          queue: false
-        });
-      }
+      this.$container.cssHeight(actualSize.height, targetSize.height, {
+        duration: duration,
+        queue: false
+      });
+    }
+    if (this.openingDirectionY === 'up') {
+      this.$container.cssTopAnimated(actualBounds.y, targetBounds.y, {
+        duration: duration,
+        queue: false
+      }).css('overflow','visible');
+      //ajust top of head and deco
+      this.$head.cssTopAnimated(actualSize.height, targetSize.height, {
+        duration: duration,
+        queue: false
+      });
+      this.$deco.cssTopAnimated(actualSize.height-1, targetSize.height-1, {
+        duration: duration,
+        queue: false
+      });
     }
   } else {
     if (!initialSubMenuRendering) {

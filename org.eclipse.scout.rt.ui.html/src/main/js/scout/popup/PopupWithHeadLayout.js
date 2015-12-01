@@ -90,7 +90,7 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
     prefSize = scout.graphics.getSize(this.popup.$body, true);
   }
 
-  if (this._headVisible) {
+  if (this.popup._headVisible) {
     var headSize = scout.graphics.getSize(this.popup.$head, true);
     prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
   }

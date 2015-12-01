@@ -200,13 +200,14 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
 
   if (openingDirectionY === 'up') {
     top -= bodySize.height;
-    bodyTop -= headSize.height;
     headTop = bodyTop + bodySize.height;
     decoTop = headTop - 1; // -1 is body border (the purpose of deco is to hide the body border)
     this.$container.cssMarginBottom(headSize.height);
+    this.$container.css('margin-top', '');
   } else if (openingDirectionY === 'down') {
     headTop -= headSize.height;
     this.$container.cssMarginTop(headSize.height);
+    this.$container.css('margin-bottom', '');
   }
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left=' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +

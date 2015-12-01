@@ -572,6 +572,8 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
 
   cloneAdapter = scout.create(cloneModel);
 
+  //TODO nbu clone uiProperties
+
   // #2 - create child adapters, use cloneAdapter as parent
   this._adapterProperties.forEach(function(propertyName) {
     if (cloneModel.hasOwnProperty(propertyName)) {

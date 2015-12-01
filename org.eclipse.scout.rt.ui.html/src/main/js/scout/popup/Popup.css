@@ -91,6 +91,7 @@
 
   & > .menu-item > .key-box {
     bottom: auto;
+    top: 0px;
   }
 
   &.down  {
