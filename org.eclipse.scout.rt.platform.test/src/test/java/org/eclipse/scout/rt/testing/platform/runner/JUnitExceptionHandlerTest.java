@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.testing.platform.runner;
 
 import static org.junit.Assert.fail;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

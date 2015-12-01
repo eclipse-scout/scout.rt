@@ -21,12 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.ConcurrentExpiringMap.ExpiringElement;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap.ExpiringElement;
 
 /**
  * @since 5.2

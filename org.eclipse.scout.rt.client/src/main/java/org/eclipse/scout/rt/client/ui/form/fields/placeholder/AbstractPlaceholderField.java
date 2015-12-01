@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.placeholder;
 
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.placeholder.IPlaceholderFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("1c651d5d-f327-4c60-8bf4-4a4714bc22cc")
 public abstract class AbstractPlaceholderField extends AbstractFormField implements IPlaceholderField {

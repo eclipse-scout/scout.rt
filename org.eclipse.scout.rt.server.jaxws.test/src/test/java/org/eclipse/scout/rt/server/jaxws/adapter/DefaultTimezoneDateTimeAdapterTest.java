@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -18,8 +18,8 @@ import java.util.LinkedHashMap;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BeanCreationException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

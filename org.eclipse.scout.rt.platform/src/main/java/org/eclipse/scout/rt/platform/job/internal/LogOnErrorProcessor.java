@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.chain.IInvocationDecorator;
-import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.JobInput;
 

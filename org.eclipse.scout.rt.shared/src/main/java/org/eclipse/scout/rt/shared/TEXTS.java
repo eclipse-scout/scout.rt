@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.Locale;
 
-import org.eclipse.scout.commons.nls.NlsUtility;
+import org.eclipse.scout.rt.platform.nls.NlsUtility;
 
 public class TEXTS {
 

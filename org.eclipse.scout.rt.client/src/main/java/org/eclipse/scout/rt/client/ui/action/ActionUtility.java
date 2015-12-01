@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public final class ActionUtility {
 

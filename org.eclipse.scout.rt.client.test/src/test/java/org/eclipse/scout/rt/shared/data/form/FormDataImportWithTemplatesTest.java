@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.fixture.TestFormData;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

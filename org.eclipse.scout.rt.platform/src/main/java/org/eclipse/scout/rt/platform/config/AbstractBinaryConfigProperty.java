@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public abstract class AbstractBinaryConfigProperty extends AbstractConfigProperty<byte[]> {
 

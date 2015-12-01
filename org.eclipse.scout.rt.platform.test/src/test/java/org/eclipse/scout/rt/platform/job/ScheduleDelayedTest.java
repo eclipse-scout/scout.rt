@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;

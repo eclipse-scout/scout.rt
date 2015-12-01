@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;

@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**

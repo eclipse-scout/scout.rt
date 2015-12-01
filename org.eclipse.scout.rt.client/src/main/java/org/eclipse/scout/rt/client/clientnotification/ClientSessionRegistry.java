@@ -20,15 +20,15 @@ import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;

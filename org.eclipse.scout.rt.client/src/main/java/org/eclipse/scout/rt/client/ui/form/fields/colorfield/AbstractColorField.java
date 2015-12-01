@@ -13,15 +13,15 @@ package org.eclipse.scout.rt.client.ui.form.fields.colorfield;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.ColorUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.colorfield.IColorFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.ColorUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public abstract class AbstractColorField extends AbstractBasicField<String> implements IColorField {

@@ -14,11 +14,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.html.HTML;
-import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;

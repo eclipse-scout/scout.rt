@@ -17,10 +17,10 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.xml.ws.handler.MessageContext;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.

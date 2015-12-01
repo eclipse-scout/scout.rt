@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.context;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 

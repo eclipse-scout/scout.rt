@@ -20,13 +20,13 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.util.DateUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.client.runner.statement;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.junit.runners.model.Statement;
 
 /**

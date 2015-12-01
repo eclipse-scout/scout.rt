@@ -12,10 +12,6 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerDiscardChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerFinallyChain;
@@ -23,6 +19,10 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandl
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerPostLoadChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerStoreChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerValidateChain;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.IFormHandlerExtension;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

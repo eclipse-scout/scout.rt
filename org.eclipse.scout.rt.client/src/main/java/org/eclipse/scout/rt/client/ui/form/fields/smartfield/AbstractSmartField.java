@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ISmartFieldExtension;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
- * import org.eclipse.scout.commons.annotations.ClassId; A content assist field allowing only values out of the lookup
+ * import org.eclipse.scout.rt.platform.classid.ClassId; A content assist field allowing only values out of the lookup
  * row set.
  *
  * @param <VALUE>

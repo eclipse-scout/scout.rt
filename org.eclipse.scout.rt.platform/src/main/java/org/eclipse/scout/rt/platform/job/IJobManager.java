@@ -13,18 +13,18 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.CollectorVisitor;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.IVisitor;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.commons.filter.OrFilter;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.filter.AndFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.NotFilter;
+import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
+import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
 /**
  * Job manager to run tasks in parallel.

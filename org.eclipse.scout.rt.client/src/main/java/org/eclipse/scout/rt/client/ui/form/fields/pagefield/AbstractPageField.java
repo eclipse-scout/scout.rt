@@ -14,9 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.PageFieldChains.PageFieldPageChangedChain;
@@ -33,6 +30,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**

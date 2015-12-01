@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -32,6 +29,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 
 public class PrintApplicationAction extends AbstractAction {
 

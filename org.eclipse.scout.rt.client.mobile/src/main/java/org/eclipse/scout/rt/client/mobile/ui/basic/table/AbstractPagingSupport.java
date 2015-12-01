@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * @since 3.9.0

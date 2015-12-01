@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 /**
  * @since 3.9.0

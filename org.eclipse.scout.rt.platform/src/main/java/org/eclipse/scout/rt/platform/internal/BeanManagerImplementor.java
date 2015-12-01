@@ -20,19 +20,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.exception.InitializationException;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class BeanManagerImplementor implements IBeanManager {
   private final ReentrantReadWriteLock m_lock;

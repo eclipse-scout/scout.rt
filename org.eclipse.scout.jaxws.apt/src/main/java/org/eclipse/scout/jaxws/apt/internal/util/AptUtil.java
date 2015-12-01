@@ -20,7 +20,7 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JCodeModel;

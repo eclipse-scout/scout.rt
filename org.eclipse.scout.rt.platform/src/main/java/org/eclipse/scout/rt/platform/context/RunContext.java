@@ -20,23 +20,22 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Callables;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.IAdaptable;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.ThreadLocalProcessor;
-import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
-import org.eclipse.scout.rt.platform.logging.PrinicpalContextValueProvider;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.IAdaptable;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.concurrent.Callables;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * A context typically represents a "snapshot" of the current calling state and is always associated with a

@@ -15,13 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -38,7 +31,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal.TabBoxGrid;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

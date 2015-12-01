@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumnTest.TestTable.TestStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.junit.Test;
 import org.mockito.Mockito;
 

@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Property observer fires property "values" of data type Map<String,Object>

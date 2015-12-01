@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
-import org.eclipse.scout.commons.index.IndexedStore;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.index.AbstractMultiValueIndex;
+import org.eclipse.scout.rt.platform.index.IndexedStore;
 
 /**
  * {@link IndexedStore} for {@link IFileChooser} objects.

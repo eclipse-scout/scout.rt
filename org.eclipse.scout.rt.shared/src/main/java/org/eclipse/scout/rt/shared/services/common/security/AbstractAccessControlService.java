@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;

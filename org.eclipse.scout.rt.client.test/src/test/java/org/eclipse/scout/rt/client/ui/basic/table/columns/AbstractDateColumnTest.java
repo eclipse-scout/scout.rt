@@ -18,14 +18,14 @@ import static org.mockito.Mockito.mock;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumnTest.TestTable.TestDateColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

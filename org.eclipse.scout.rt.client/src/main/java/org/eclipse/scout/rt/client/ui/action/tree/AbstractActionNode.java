@@ -15,18 +15,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.IActionNodeExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.OrderedComparator;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 

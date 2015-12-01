@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.jboss.jandex.IndexView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

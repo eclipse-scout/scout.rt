@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.jdbc.builder;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.builder.FormDataStatementBuilder.AttributeStrategy;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;

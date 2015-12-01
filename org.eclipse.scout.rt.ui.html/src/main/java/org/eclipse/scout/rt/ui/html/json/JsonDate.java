@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.StaticDate;
 
 /**

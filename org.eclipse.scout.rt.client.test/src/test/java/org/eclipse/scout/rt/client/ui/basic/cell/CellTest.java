@@ -20,11 +20,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.MultiStatus;
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.MultiStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -311,7 +311,7 @@ public class CellTest {
 
   /**
    * When creating a cell. The errorstatus should not be set.
-   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.status.IStatus)}
+   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
    */
   @Test
   public void testInitialErrorStatus() {
@@ -320,7 +320,7 @@ public class CellTest {
   }
 
   /**
-   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.status.IStatus)}
+   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
    */
   @Test
   public void testSetErrorStatus() {
@@ -331,7 +331,7 @@ public class CellTest {
 
   /**
    * When creating a cell. The errorstatus should not be set.
-   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.status.IStatus)}
+   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
    */
   @Test
   public void testClearErrorStatus() {
@@ -343,7 +343,7 @@ public class CellTest {
 
   /**
    * When creating a cell. The errorstatus should not be set.
-   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.status.IStatus)}
+   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
    */
   @Test
   public void testIconCellSetErrorStatus() {
@@ -360,7 +360,7 @@ public class CellTest {
   }
 
   /**
-   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.status.IStatus)}
+   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
    */
   @Test
   public void testAddRemoveMultistatus() {

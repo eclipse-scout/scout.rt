@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the

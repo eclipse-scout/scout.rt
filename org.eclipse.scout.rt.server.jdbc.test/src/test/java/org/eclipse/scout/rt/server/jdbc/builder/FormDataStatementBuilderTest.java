@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;

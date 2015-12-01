@@ -24,10 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

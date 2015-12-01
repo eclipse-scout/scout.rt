@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.client.extension.ui.action.tree.fixture;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 public class TestMenus {
 

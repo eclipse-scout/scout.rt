@@ -22,7 +22,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;

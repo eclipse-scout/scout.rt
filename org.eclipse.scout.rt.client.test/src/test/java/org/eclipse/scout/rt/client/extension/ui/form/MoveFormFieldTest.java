@@ -17,9 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.MoveFieldsTestForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.MoveFieldsTestForm.MainBox.TopBox.SubBox.StringField;
@@ -42,6 +39,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.To
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsageForm;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

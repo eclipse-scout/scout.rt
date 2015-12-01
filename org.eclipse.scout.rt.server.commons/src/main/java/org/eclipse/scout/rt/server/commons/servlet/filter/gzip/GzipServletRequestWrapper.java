@@ -21,7 +21,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.BufferedServletInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

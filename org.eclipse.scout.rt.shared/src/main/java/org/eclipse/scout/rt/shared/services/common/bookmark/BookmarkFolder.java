@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 public class BookmarkFolder implements Serializable, Cloneable {
   private static final long serialVersionUID = 1L;

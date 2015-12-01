@@ -16,15 +16,15 @@ import static org.junit.Assert.assertSame;
 
 import java.util.Iterator;
 
-import org.eclipse.scout.commons.ThreadLocalProcessor;
-import org.eclipse.scout.commons.chain.IChainable;
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.chain.IChainable;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;

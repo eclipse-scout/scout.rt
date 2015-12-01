@@ -14,7 +14,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.holders.ITableBeanHolder;
+import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 

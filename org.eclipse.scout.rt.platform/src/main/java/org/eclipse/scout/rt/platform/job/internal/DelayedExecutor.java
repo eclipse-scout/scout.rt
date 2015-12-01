@@ -18,9 +18,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

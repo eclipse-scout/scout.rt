@@ -15,8 +15,8 @@ import java.security.Permission;
 import java.security.Permissions;
 import java.util.Date;
 
-import org.eclipse.scout.commons.UTCDate;
-import org.eclipse.scout.commons.serialization.IObjectReplacer;
+import org.eclipse.scout.rt.platform.serialization.IObjectReplacer;
+import org.eclipse.scout.rt.platform.util.date.UTCDate;
 
 /**
  * Object replacer that supports the following cases

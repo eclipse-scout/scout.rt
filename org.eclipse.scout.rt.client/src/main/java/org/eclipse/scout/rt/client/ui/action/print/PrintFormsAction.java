@@ -17,9 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
@@ -33,6 +30,9 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

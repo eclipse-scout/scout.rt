@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.action.keystroke;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * This class parses and normalizes a Scout keystroke. A Scout keystroke is built from modifiers and a key. The

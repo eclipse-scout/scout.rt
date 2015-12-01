@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;

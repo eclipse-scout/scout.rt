@@ -18,8 +18,6 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -29,6 +27,8 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class DesktopEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;

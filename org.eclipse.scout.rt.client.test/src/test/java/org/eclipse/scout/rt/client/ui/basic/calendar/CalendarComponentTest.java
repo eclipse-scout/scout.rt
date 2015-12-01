@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.scout.rt.platform.util.DateUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.junit.Assert;

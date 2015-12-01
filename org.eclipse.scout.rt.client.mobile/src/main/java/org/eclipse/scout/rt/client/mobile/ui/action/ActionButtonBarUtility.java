@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.IMobileAction;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.AutoLeafPageWithNodes;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -23,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * @since 3.9.0

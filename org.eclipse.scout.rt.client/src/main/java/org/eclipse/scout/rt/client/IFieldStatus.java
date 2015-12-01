@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * Status used in client model

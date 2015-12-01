@@ -16,13 +16,13 @@ import java.util.Map;
 import javax.jms.Message;
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ThreadLocalProcessor;
-import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
  * The <code>JmsRunContext</code> facilitates propagation of the <i>JMS Java Message Service</i> state. This context is

@@ -15,11 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public class TableRow implements ITableRow {

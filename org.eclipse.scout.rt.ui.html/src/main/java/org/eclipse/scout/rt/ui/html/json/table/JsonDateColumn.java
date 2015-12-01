@@ -16,10 +16,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.json.JSONObject;

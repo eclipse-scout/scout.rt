@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 
 public final class ScoutAssert {
 

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.Range;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.json.JSONObject;
 
 public class JsonDateRange implements IJsonObject {

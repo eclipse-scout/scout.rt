@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.transaction;
 
-import org.eclipse.scout.commons.ICancellable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 
 /**
  * Represents a transaction which multiple transaction members can participate for consistent commit or rollback.

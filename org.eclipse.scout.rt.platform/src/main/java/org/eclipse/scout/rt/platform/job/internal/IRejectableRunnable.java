@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 
 /**
  * Runnable to be given to the executor, and which is notified if being rejected by the executor. This may occur when

@@ -15,11 +15,11 @@ import java.security.Permission;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

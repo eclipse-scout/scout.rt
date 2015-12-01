@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.IClipboardField;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;

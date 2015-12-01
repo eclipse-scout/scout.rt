@@ -17,9 +17,9 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONObject;
 import org.slf4j.Logger;

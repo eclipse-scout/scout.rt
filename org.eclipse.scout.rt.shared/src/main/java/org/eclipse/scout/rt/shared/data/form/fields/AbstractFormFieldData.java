@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;

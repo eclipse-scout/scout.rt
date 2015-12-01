@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
 

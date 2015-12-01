@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.batik.util.SVGConstants;
-import org.eclipse.scout.commons.XmlUtility;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;

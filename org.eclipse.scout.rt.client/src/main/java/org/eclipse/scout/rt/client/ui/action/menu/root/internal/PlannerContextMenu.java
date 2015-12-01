@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
-import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
@@ -21,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 
 /**
  * The invisible root menu node of any activity map. (internal usage only)

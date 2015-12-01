@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.HolderToRowMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.RowToHolderMapper;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 
 public class TableRowMapper {
   private ITableRow m_row;

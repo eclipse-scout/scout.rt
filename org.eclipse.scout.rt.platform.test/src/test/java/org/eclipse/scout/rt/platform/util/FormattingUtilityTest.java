@@ -18,7 +18,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

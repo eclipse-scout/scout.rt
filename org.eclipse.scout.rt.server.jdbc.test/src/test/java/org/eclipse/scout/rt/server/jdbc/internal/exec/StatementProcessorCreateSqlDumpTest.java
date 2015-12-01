@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;

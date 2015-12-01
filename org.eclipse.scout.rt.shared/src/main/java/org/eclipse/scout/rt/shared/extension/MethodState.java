@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.extension;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class MethodState {
 

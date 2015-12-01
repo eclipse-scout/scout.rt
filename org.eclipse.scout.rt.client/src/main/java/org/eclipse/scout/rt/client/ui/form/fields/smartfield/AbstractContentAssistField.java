@@ -15,21 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
@@ -52,9 +37,23 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -68,7 +67,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * This class is not thought to directly subclass. Use {@link AbstractSmartField} or {@link AbstractProposalField}
  * instead.
  */
-@ScoutSdkIgnore
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
   /**

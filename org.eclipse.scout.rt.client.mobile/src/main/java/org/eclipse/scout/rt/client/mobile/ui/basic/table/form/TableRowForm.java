@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields.ColumnFieldBuilder;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
@@ -33,7 +31,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * Form which displays a {@link ITableRow} as fields. Only the fields belonging to editable columns are enabled.

@@ -14,8 +14,6 @@ import java.util.Date;
 import java.util.WeakHashMap;
 import java.util.zip.CRC32;
 
-import org.eclipse.scout.commons.beans.FastBeanInfo;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -27,6 +25,8 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
+import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

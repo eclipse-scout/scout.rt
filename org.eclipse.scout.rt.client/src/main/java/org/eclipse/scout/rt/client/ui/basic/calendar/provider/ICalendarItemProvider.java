@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendarItemProvider extends IPropertyObserver {

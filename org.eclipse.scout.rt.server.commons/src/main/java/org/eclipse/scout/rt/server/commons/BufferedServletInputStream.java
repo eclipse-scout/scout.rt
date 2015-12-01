@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 import javax.servlet.ServletInputStream;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 
 public class BufferedServletInputStream extends ServletInputStream {
 

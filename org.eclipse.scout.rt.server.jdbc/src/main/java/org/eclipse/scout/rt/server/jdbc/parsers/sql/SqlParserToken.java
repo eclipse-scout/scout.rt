@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.jdbc.parsers.sql;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 final class SqlParserToken {
 

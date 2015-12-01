@@ -16,9 +16,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

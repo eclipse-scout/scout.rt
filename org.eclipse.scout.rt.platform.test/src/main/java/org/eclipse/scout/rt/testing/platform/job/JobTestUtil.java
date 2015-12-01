@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -23,6 +22,7 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Helper class to run job related JUnit tests.

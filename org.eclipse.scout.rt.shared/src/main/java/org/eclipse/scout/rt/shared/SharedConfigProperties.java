@@ -14,14 +14,14 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.ConfigUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 
 public final class SharedConfigProperties {

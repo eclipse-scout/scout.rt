@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.client.services.lookup;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;

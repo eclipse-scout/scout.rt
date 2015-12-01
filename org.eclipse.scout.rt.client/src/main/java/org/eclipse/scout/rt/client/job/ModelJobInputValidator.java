@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Validator for {@link JobInput} used for model jobs.

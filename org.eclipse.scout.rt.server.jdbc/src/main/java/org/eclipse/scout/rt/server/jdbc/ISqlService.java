@@ -16,8 +16,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;

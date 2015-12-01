@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 @Bean

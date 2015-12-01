@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.WeakEventListener;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

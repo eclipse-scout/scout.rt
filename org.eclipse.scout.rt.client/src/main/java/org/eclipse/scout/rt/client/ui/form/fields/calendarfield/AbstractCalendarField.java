@@ -15,18 +15,18 @@ import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalendarFieldExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

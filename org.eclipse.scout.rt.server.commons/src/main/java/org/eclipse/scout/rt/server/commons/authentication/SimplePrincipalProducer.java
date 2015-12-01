@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.authentication;
 
-import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 
 /**
  * Producer for {@link SimplePrincipal} objects to represent authenticated users.

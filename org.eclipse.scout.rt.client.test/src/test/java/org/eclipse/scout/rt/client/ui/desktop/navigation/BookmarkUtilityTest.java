@@ -5,9 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.junit.Test;
 import org.slf4j.Logger;

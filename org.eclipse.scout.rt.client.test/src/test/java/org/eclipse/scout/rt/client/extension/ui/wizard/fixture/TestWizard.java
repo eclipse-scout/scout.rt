@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep;
+import org.eclipse.scout.rt.platform.Order;
 
 public class TestWizard extends AbstractWizard {
 

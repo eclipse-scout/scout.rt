@@ -21,16 +21,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IVisitor;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerInitialFutureSetCapacityProperty;
+import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.filter.AndFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.NotFilter;
+import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -38,6 +36,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
 /**
  * Thread-safe implementation of a {@link Set} to contain {@link IFuture}s.

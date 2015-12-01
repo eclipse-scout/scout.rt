@@ -16,12 +16,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.BooleanUtility;
-import org.eclipse.scout.commons.HTMLUtility;
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -32,7 +26,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.html.HTMLUtility;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * @since 3.9.0

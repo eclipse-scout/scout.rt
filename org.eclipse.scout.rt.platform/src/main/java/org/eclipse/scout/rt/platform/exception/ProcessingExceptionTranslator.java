@@ -20,12 +20,10 @@ import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Used to translate {@link Throwable}s into {@link ProcessingException}s. Thereby, wrapper exceptions like

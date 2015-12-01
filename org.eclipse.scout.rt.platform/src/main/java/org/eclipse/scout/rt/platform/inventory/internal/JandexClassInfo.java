@@ -14,9 +14,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.slf4j.Logger;

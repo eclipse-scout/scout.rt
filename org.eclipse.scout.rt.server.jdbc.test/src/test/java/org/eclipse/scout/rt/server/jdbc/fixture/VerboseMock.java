@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.fixture;
 
-import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 
 public class VerboseMock {
   private final StringBuffer m_protocol;

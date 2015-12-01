@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationUtility;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
@@ -28,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOutlineChooserForm {

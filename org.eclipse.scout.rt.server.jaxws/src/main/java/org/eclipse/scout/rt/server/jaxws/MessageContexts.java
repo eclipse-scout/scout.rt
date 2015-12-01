@@ -21,8 +21,8 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
  * Utility methods to work with JAX-WS {@link MessageContext}.

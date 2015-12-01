@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

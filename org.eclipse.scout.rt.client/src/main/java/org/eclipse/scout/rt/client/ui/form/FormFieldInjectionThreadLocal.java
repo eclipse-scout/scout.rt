@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * Thread local used to inject form fields using the {@link InjectFieldTo} and {@link Replace} annotations.

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.junit.Test;
 

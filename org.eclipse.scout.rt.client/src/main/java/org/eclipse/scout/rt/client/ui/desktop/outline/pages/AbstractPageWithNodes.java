@@ -13,13 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
@@ -47,7 +40,14 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * A page containing a list of "menu" entries<br>

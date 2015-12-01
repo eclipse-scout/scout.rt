@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.FirstStringField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.FirstUseOfTemplateBox;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox;

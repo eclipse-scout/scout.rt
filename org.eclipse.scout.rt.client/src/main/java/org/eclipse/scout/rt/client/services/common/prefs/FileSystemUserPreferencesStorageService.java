@@ -24,11 +24,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ConfigUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientConfigProperties.UserAreaProperty;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.prefs.AbstractUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.slf4j.Logger;

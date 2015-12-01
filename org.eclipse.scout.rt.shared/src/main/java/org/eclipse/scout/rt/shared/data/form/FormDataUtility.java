@@ -12,8 +12,7 @@ package org.eclipse.scout.rt.shared.data.form;
 
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Data;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 /**
@@ -48,20 +47,6 @@ public final class FormDataUtility {
       return BUTTON_SUFFIX_PATTERN.matcher(s).replaceAll("");
     }
     return s;
-  }
-
-  public static Class<?> getDataAnnotationValue(Class<?> clazz) {
-    while (clazz != null && !Object.class.equals(clazz)) {
-      Data annotation = clazz.getAnnotation(Data.class);
-      if (annotation != null) {
-        Class<?> value = annotation.value();
-        if (value != null && !Object.class.equals(value)) {
-          return value;
-        }
-      }
-      clazz = clazz.getSuperclass();
-    }
-    return null;
   }
 
   public static String getFieldDataId(AbstractFormFieldData fieldData) {

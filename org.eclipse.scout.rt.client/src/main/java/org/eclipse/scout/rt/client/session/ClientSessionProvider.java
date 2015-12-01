@@ -15,9 +15,6 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.IClientSessionRegistry;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -25,6 +22,9 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**

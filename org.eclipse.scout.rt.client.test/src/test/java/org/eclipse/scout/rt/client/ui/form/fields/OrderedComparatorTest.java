@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;

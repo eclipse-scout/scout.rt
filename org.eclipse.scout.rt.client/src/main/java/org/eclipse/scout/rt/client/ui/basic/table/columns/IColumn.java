@@ -14,10 +14,6 @@ import java.security.Permission;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -27,6 +23,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 

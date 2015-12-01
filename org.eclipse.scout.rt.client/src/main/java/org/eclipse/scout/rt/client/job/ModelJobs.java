@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.job;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.filter.event.ModelJobEventFilter;
@@ -27,6 +25,8 @@ import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Helper class to schedule jobs that run on behalf of a {@link ClientRunContext} and are executed in sequence among the
@@ -105,7 +105,7 @@ public final class ModelJobs {
    *   ...
    * </pre>
    *
-   * @see {@link IJobManager#awaitDone(org.eclipse.scout.commons.filter.IFilter, long, java.util.concurrent.TimeUnit)}
+   * @see {@link IJobManager#awaitDone(org.eclipse.scout.rt.platform.filter.IFilter, long, java.util.concurrent.TimeUnit)}
    */
   public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "uiInteractionRequired";
 

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -27,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;

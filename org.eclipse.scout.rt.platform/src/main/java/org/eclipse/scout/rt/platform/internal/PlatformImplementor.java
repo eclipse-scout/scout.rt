@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
@@ -30,11 +28,13 @@ import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

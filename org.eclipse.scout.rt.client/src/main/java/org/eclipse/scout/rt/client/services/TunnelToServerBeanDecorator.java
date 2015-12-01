@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.services;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

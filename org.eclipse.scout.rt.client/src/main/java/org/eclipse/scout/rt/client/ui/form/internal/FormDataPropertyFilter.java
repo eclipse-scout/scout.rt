@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.internal;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.beans.IPropertyFilter;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
-import org.eclipse.scout.commons.UTCDate;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.platform.util.date.UTCDate;
 
 /**
  * Date field with override on {@link IValueField#getHolderType()} to {@link UTCDate}

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
 
 public abstract class AbstractPersonTable extends AbstractTable {
 

@@ -17,7 +17,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 
 /**

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -20,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonTest.TestForm.MainBox.PushButton1;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

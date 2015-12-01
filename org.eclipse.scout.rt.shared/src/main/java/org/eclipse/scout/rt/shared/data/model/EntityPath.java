@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.data.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * This path represents the forward path from the data model root to an entity

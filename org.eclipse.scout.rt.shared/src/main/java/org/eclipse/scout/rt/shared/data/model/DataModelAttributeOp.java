@@ -14,8 +14,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public final class DataModelAttributeOp implements DataModelConstants {

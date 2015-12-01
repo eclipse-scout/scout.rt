@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
  * A buffer for table events ({@link TableEvent}) with coalesce functionality:

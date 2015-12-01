@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -26,6 +24,8 @@ import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.ContentBox.WrappedWizardForm;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.StatusBox;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.StatusBox.StatusField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardCancelButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardFinishButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardNextStepButton;

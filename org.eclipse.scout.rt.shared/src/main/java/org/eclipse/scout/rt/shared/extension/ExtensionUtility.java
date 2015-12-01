@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IOrdered;
 
 public final class ExtensionUtility {
 

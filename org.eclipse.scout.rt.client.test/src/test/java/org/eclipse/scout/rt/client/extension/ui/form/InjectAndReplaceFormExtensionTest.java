@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.BottomDetailBox;
@@ -30,6 +29,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormStringField
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormStringFieldExtension;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

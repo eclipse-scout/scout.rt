@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.BottomBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.BottomBox.StreetField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox;
@@ -22,6 +21,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.To
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 
 public class OrigForm extends AbstractForm {
 

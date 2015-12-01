@@ -1,8 +1,8 @@
 package org.eclipse.scout.rt.shared.data.form.fields.tablefield;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.beans.IPropertyFilter;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 /**
  * Property filter class used by {@link BeanUtility} that accepts all column properties available on an

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.notification;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Reduce the list to the last element

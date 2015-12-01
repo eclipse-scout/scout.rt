@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.jdbc.internal.exec;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.ITableHolder;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;

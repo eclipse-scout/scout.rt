@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.services.text;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 
 @Order(5025)

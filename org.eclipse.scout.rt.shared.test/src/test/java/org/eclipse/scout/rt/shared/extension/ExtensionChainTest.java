@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.extension.fixture.ITestingExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.LocalTestingExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.OtherTestingExtension;

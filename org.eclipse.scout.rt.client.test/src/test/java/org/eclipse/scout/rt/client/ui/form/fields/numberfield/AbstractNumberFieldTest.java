@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Before;

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.json.JSONArray;
 import org.json.JSONObject;

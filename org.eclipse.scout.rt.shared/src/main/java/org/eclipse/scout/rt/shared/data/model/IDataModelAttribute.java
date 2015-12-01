@@ -14,8 +14,8 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;

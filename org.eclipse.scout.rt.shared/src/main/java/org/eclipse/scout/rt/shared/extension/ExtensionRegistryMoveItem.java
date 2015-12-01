@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.ClassIdentifier;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 
 public class ExtensionRegistryMoveItem extends AbstractExtensionRegistryItem {
 

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("74551d0d-a923-49e9-aaeb-a212d77e460d")

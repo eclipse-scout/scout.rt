@@ -14,8 +14,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 
 public class TablePageState extends AbstractPageState implements Serializable, Cloneable {
   private static final long serialVersionUID = 1L;

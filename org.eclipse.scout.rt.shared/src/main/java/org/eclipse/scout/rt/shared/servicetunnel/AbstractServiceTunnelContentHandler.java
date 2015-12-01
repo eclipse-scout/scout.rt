@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelRequestProperty;
 
 abstract class AbstractServiceTunnelContentHandler implements IServiceTunnelContentHandler {

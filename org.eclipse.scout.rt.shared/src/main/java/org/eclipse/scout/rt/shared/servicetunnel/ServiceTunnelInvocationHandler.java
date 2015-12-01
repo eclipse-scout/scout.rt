@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

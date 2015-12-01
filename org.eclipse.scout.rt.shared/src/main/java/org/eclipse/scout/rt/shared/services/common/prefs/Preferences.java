@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;

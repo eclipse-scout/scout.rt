@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.FormFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.Order;
 
 /**
  * Group box which represents a {@link ITabBox} and contains a {@link TabBoxTableField} to represent the tab items.

@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.server.jdbc.IStatementCache;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.slf4j.Logger;

@@ -16,12 +16,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * Bean descriptor holding meta data for an {@link IBean} creation.<br>

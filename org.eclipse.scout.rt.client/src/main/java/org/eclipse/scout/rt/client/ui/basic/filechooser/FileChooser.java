@@ -13,10 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.filechooser;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -25,6 +21,10 @@ import org.eclipse.scout.rt.client.ui.form.DisplayParentResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 
 public class FileChooser implements IFileChooser {
 

@@ -15,11 +15,6 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ThreadLocalProcessor;
-import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -27,8 +22,13 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;

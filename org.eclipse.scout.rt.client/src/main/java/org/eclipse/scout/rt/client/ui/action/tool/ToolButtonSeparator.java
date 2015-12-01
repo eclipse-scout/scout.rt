@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.tool;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 
 public class ToolButtonSeparator extends AbstractToolButton {
 

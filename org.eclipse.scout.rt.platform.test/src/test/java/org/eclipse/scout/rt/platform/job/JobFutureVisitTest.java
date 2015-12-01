@@ -18,13 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.IVisitor;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.filter.AndFilter;
+import org.eclipse.scout.rt.platform.filter.NotFilter;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.visitor.IVisitor;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

@@ -9,7 +9,7 @@ import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Principal representing a {@link HttpServletRequest#getRemoteUser()}.

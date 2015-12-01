@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

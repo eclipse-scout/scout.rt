@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyObserver implements IProposalChooser<T, LOOKUP_KEY> {

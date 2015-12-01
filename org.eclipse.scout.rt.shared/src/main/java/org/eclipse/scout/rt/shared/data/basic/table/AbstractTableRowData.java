@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.holders.ITableBeanRowHolder;
+import org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder;
 import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 
 /**

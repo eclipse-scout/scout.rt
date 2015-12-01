@@ -18,12 +18,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

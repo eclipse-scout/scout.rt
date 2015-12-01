@@ -23,13 +23,13 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;

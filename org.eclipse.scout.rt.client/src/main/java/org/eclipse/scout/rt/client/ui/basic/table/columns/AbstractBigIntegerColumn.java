@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.math.BigInteger;
 
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBigIntegerColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * Column holding {@link BigInteger}

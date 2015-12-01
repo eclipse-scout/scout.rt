@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.data.model.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsageForm.MainBox.TemplateUsageBox;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.platform.Order;
 
 public class SingleTemplateUsageForm extends AbstractForm {
 

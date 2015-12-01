@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
 /**

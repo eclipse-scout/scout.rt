@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.rt.platform.IOrdered;
 
 /**
  * Marker interface used for moving an ordered object to its root. The semantics of root is context specific (e.g. the

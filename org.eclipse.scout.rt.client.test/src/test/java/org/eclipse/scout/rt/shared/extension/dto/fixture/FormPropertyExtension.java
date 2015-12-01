@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
-import org.eclipse.scout.commons.annotations.Data;
-import org.eclipse.scout.commons.annotations.Extends;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
+import org.eclipse.scout.rt.platform.extension.Extends;
 
 @Extends(OrigForm.class)
 @Data(PropertyExtensionData.class)

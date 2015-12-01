@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class BatchLookupCall implements Serializable {
   private static final long serialVersionUID = 0L;

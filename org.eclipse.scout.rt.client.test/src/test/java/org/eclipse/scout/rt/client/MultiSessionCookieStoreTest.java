@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 import org.junit.After;

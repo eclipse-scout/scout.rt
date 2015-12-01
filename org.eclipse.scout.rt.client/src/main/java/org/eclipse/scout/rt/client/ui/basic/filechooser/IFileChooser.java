@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 public interface IFileChooser {
 

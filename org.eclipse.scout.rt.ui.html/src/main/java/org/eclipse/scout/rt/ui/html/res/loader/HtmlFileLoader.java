@@ -18,9 +18,9 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;

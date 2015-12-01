@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 
 /**
  * Template GroupBox with a StringField and a nested groupbox using another template

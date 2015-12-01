@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.clipboardfield;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 /**
  * Clipboard field to catch arbitrary clipboard paste events.

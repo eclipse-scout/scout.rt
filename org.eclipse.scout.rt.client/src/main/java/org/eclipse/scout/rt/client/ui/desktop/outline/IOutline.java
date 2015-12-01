@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.security.Permission;
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -25,6 +23,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 
 public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayParent {
 

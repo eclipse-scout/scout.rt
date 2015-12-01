@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 import org.slf4j.Logger;

@@ -18,9 +18,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.server.IServerSession;
 
 /**

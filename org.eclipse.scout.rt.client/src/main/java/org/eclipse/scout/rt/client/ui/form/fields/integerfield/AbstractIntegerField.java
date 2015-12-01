@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.integerfield;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.integerfield.IIntegerFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("4418100d-db7c-40e7-84b4-29df65534671")
 public abstract class AbstractIntegerField extends AbstractNumberField<Integer> implements IIntegerField {

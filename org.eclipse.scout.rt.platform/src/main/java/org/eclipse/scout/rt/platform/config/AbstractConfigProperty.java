@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigProperty<DATA_TYPE> {

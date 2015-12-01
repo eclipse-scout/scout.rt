@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 
 /**
  * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application. See Bug

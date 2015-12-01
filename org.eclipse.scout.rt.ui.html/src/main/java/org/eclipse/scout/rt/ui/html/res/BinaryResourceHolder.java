@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 /**
  * Wrapper used by {@link IBinaryResourceProvider} to hold a binary resource and some additional data.

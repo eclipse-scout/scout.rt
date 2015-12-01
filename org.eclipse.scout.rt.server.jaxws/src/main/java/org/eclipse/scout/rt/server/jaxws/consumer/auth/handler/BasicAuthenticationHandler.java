@@ -20,9 +20,9 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.consumer.InvocationContext;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;

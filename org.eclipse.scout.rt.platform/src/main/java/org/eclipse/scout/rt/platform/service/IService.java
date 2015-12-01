@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 
 /**
  * Marker interface to automatically declare beans as {@link ApplicationScoped} services.<br>

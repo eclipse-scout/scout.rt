@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;

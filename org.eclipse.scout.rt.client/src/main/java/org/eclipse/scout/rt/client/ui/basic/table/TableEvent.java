@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

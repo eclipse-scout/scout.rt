@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.IAdaptable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.IAdaptable;
 
 /**
  * Interface to model a cache. In case of a cache miss, the functional interface

@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.OrderedComparator;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.platform.OrderedComparator;
+import org.eclipse.scout.rt.platform.holders.Holder;
 
 public final class CompositeFieldUtility {
 

@@ -18,12 +18,12 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDebugReceiverEmailProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDefaultFromEmailProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpHostProperty;

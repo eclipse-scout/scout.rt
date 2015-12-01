@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**

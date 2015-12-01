@@ -26,9 +26,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.authentication.SecureHttpServletRequestWrapper;
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController;
 

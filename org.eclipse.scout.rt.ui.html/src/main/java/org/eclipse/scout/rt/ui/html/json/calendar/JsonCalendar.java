@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
@@ -23,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;

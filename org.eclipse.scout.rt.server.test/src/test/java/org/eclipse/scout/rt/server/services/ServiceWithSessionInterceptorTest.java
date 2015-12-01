@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

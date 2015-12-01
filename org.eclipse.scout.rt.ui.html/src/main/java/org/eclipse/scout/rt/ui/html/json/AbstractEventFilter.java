@@ -14,7 +14,7 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractEventFilter<EVENT extends EventObject, CONDITION> {
 

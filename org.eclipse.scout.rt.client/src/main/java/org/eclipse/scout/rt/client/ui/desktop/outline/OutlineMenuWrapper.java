@@ -18,13 +18,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class OutlineMenuWrapper implements IMenu {
 

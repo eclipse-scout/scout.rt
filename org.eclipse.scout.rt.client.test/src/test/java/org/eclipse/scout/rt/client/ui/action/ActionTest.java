@@ -19,10 +19,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionDisposeChain;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -36,6 +32,10 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.holders.IntegerHolder;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

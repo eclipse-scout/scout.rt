@@ -15,10 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -33,7 +29,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 
 /**
  * A table optimized for mobile devices which wraps another table.

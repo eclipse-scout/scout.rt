@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.admin.html.widget.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class VirtualRow extends HtmlComponent {
   private List<String> m_cells;

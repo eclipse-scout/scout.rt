@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.action;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 
 public class DisplayableActionFilter<T extends IAction> implements IFilter<T> {
 

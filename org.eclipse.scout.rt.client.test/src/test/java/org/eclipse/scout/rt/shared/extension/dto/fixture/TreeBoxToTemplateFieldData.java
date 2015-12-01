@@ -14,7 +14,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.commons.annotations.Extends;
+import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 /**

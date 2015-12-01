@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.json.JSONObject;
 import org.junit.Test;
 

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.basic.planner;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisplayModeChangedChain;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.Plan
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
 public interface IPlannerExtension<RI, AI, OWNER extends AbstractPlanner<RI, AI>> extends IExtension<OWNER> {

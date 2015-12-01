@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * Instances of this interface are used with FormFieldInjectionThreadLocal to define a context within form fields are

@@ -14,9 +14,9 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 

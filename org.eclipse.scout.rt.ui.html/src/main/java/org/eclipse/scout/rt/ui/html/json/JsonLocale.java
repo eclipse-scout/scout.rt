@@ -20,8 +20,8 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
+import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;

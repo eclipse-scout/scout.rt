@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -24,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 
 /**
  * This class provides functionality to proxy an object to apply the given {@link ModelContext} to the calling

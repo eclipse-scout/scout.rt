@@ -20,12 +20,12 @@ import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Store;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapHostProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapMailboxProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPasswordProperty;

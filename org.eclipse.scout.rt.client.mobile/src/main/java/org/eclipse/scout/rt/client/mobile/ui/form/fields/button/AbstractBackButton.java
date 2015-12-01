@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 3.9.0

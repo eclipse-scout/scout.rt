@@ -22,13 +22,13 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 

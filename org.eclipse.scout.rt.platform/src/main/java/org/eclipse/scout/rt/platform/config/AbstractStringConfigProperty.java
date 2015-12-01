@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public abstract class AbstractStringConfigProperty extends AbstractConfigProperty<String> {
 

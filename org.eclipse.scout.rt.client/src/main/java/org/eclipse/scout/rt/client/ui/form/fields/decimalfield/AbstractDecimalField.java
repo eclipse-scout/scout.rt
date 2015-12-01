@@ -15,14 +15,14 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.decimalfield.IDecimalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
 @ClassId("f4ec575e-f572-418d-a49c-3d0811ea7540")

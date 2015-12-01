@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.junit.Assert;
 import org.junit.Test;
 

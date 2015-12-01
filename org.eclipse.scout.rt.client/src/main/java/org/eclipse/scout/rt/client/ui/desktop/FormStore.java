@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
-import org.eclipse.scout.commons.index.IndexedStore;
 import org.eclipse.scout.rt.client.extension.ui.desktop.AbstractDisplayParentViewIndex;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -22,6 +19,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.index.AbstractMultiValueIndex;
+import org.eclipse.scout.rt.platform.index.IndexedStore;
 
 /**
  * {@link IndexedStore} for {@link IForm} objects.

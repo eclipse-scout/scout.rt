@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.data.form.fields.treefield;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 public abstract class AbstractTreeFieldData extends AbstractFormFieldData {

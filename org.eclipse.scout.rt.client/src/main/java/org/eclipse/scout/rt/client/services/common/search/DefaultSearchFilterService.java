@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.search;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -28,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 

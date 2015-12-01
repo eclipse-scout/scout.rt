@@ -25,10 +25,10 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.soap.MTOM;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication.NullAuthenticationMethod;

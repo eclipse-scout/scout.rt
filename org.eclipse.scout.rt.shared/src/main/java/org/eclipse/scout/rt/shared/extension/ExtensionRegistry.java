@@ -24,14 +24,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.extension.Extends;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

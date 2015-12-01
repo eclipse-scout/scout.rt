@@ -16,11 +16,11 @@ import java.lang.reflect.Modifier;
 import java.util.EventObject;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.IPageField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Form lifecycle for observing form "open" event attach to IDesktop and listen for FORM_ADDED

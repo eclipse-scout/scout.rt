@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.BeanProducer;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**

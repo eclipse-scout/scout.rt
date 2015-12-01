@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.serverbridge;
 
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.ClientBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 

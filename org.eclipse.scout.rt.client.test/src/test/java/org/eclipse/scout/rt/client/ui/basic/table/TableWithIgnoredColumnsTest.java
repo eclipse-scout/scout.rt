@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.annotations.ColumnData;
-import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.client.dto.ColumnData;
+import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.perf;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.service.IService;
 
 public interface IPerformanceAnalyzerService extends IService, IPropertyObserver {

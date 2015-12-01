@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.Order;
 
 public class DesktopWithNonDisplayableActions extends AbstractDesktop {
 

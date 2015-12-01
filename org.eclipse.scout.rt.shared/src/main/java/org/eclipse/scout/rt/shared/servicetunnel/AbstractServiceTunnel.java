@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

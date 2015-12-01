@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;

@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -30,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
 public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, IContextMenuOwner {

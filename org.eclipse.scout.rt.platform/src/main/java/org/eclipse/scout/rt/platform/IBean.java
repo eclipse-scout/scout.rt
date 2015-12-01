@@ -13,9 +13,7 @@ package org.eclipse.scout.rt.platform;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 
 /**
  * This is the registration for one bean in the {@link IBeanManager}.

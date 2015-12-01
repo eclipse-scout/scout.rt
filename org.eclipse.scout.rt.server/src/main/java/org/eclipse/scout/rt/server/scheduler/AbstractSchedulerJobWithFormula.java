@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import java.text.ParseException;
 
-import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.server.scheduler.internal.FormulaParser;
 import org.eclipse.scout.rt.server.scheduler.internal.SchedulingFormula;
 

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 
 public class JsonAdapterPropertyConfigBuilder {
 

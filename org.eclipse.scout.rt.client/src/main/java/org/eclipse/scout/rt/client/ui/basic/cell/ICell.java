@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
-import org.eclipse.scout.commons.status.IMultiStatus;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public interface ICell {

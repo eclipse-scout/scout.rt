@@ -12,9 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * Manages all {@link IBean}s in a Scout application.<br>

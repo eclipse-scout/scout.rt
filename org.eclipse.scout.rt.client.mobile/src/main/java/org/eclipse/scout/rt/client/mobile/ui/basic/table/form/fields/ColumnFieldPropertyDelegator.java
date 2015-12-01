@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyDelegator;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * @since 3.9.0

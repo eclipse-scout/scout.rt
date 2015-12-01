@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.messagebox;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.html.IHtmlContent;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * Interface for message box.<br/>

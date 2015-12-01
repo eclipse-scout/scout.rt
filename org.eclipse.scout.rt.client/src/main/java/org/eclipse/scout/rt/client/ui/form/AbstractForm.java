@@ -36,36 +36,13 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.PreferredValue;
-import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.beans.IPropertyFilter;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.html.HTML;
-import org.eclipse.scout.commons.html.IHtmlContent;
-import org.eclipse.scout.commons.html.IHtmlListElement;
-import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.dto.DtoUtility;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCloseTimerChain;
@@ -117,16 +94,39 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
+import org.eclipse.scout.rt.platform.html.IHtmlListElement;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.PreferredValue;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -986,7 +986,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return;
     }
     for (IExtension<?> ex : ((IExtensibleObject) o).getAllExtensions()) {
-      Class<?> dto = FormDataUtility.getDataAnnotationValue(ex.getClass());
+      Class<?> dto = DtoUtility.getDataAnnotationValue(ex.getClass());
       if (dto != null && !Object.class.equals(dto)) {
         Object propertyTarget = target.getContribution(dto);
         Map<String, Object> fieldProperties = BeanUtility.getProperties(ex, AbstractFormField.class, new FormDataPropertyFilter());
@@ -1120,7 +1120,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (owner instanceof IExtensibleObject) {
       IExtensibleObject exOwner = (IExtensibleObject) owner;
       for (IExtension<?> ex : exOwner.getAllExtensions()) {
-        Class<?> dto = FormDataUtility.getDataAnnotationValue(ex.getClass());
+        Class<?> dto = DtoUtility.getDataAnnotationValue(ex.getClass());
         if (extToSearch.getClass().equals(dto)) {
           return ex;
         }

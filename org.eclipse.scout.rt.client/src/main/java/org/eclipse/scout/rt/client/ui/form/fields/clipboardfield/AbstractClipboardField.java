@@ -13,16 +13,16 @@ package org.eclipse.scout.rt.client.ui.form.fields.clipboardfield;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.clipboardfield.IClipboardFieldExtension;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**

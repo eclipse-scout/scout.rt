@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
-import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;

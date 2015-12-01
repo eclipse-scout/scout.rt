@@ -30,14 +30,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.rt.platform.util.csv.CsvHelper;
-import org.eclipse.scout.rt.platform.util.csv.IDataConsumer;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.csv.CsvSettings;
 import org.eclipse.scout.rt.server.jdbc.ISelectStreamHandler;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
+import org.eclipse.scout.rt.shared.csv.CsvHelper;
+import org.eclipse.scout.rt.shared.csv.IDataConsumer;
 
 public class CsvSqlAdapter {
 

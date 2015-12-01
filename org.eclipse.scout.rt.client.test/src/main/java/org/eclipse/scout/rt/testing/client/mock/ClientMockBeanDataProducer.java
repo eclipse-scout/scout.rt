@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.client.mock;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.testing.platform.mock.IBeanAnnotationMetaDataProducer;
 import org.eclipse.scout.rt.testing.platform.mock.MockBeanInstanceProducer;

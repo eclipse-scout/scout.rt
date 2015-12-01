@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.ClearTableSelectionFormCloseListener;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabBoxTableField.Table;
@@ -26,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**

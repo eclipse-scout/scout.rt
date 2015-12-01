@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.net.URL;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 
 /**

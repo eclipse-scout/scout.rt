@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.internal;
 
-import org.eclipse.scout.commons.holders.HolderUtility;
-import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.holders.HolderUtility;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 
 public abstract class AbstractHolderArgumentVisitor {
 

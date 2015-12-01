@@ -16,8 +16,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter;
 import org.junit.Test;

@@ -19,9 +19,9 @@ import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

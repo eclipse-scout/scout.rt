@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.ITableBeanHolder;
-import org.eclipse.scout.commons.holders.ITableHolder;
-import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.commons.holders.TableBeanHolderFilter;
-import org.eclipse.scout.commons.holders.TableHolderFilter;
+import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
+import org.eclipse.scout.rt.platform.holders.ITableHolder;
+import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
+import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.fixture.ContainerBean;
 import org.eclipse.scout.rt.server.jdbc.fixture.FormDataWithArray;

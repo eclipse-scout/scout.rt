@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.jdbc.internal.exec;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.holders.HolderUtility;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.HolderUtility;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;

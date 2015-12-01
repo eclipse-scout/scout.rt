@@ -20,10 +20,10 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceUtility;

@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fixture;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box.Text3Field;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G3Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G3Box.G4Box;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.Text1Field;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.Text4Field;

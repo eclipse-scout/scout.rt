@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.ui;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

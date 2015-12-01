@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermission;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;

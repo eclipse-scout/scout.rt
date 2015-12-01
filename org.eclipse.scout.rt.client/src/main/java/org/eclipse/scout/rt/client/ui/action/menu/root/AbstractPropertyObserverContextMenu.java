@@ -14,8 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 public abstract class AbstractPropertyObserverContextMenu<T extends IPropertyObserver> extends AbstractContextMenu {
 

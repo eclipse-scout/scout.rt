@@ -31,13 +31,13 @@ import javax.xml.ws.handler.HandlerResolver;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.PortInfo;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
  * Factory for new Port objects to interact with a webservice endpoint.

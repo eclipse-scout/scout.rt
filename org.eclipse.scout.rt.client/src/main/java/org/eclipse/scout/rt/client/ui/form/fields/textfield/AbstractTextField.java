@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.textfield;
 
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.textfield.ITextFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Convenience subclass for {@link AbstractStringField} due to popular usage of the word "textField" instead of

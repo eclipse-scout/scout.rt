@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.ui.html.json.basic.planner;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class PlannerEventFilterCondition {
 

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.svg.ui.html;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.svg.client.svgfield.ISvgField;
 import org.eclipse.scout.rt.svg.ui.html.svgfield.JsonSvgField;
 import org.eclipse.scout.rt.ui.html.IUiSession;

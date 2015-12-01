@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fixtures;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField.MainBox.StringField;
 
 public class FormWithOneField extends AbstractForm {

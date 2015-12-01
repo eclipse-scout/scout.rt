@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.cache;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.cache.BasicCache;
 import org.eclipse.scout.rt.shared.cache.CacheBuilder;
 import org.eclipse.scout.rt.shared.cache.ICache;

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.ws.Service;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.PortCacheEntry;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;

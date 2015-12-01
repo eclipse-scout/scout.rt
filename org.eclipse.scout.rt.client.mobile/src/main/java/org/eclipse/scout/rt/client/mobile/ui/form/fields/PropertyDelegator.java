@@ -15,8 +15,8 @@ import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 public class PropertyDelegator<SENDER extends IPropertyObserver, RECEIVER extends IPropertyObserver> {
   private P_PropertyChangeListener m_propertyChangeListener;

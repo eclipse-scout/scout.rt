@@ -12,8 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;

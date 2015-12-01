@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.DescriptionField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.FolderField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.KeyStrokeField;
@@ -26,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;

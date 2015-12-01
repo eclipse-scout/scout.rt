@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.server.jdbc;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;

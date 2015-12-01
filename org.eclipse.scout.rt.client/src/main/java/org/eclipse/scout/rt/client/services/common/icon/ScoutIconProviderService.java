@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.services.common.icon;
 
 import java.net.URL;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 
 @Order(5500)
 public class ScoutIconProviderService extends AbstractIconProviderService {

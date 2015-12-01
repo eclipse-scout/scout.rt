@@ -14,10 +14,10 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayCalendarItemParser;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;

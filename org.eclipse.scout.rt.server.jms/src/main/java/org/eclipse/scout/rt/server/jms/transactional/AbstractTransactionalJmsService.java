@@ -14,8 +14,8 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jms.AbstractJmsService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 

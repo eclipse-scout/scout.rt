@@ -16,13 +16,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.HexUtility;
-import org.eclipse.scout.commons.HexUtility.HexOutputStream;
-import org.eclipse.scout.commons.SecurityUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.HexUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.HexUtility.HexOutputStream;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLiveProperty;

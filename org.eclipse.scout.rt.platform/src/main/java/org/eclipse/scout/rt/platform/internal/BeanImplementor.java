@@ -14,11 +14,11 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class BeanImplementor<T> implements IBean<T> {
   private final Class<? extends T> m_beanClazz;

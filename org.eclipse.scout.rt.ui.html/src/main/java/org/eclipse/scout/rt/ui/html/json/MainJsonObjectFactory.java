@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

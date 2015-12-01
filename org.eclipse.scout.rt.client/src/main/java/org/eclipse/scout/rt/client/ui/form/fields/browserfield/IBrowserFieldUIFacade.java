@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 public interface IBrowserFieldUIFacade {
 

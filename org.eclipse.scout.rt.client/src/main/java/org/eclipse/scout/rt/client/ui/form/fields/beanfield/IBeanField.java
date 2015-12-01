@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.beanfield;
 
-import org.eclipse.scout.commons.html.AppLink;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.platform.html.AppLink;
 
 /**
  * Bean fields may be used if a bean should be visualized. There is no default visualization, you have to provide the

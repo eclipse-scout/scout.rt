@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
-import org.eclipse.scout.commons.holders.IBeanArrayHolder;
+import org.eclipse.scout.rt.platform.holders.IBeanArrayHolder;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;

@@ -21,12 +21,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

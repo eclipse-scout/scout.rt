@@ -18,10 +18,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.ws.Service;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * LRU-Cache for webservice Ports to be reused across multiple webservice calls. This cache improves performance because

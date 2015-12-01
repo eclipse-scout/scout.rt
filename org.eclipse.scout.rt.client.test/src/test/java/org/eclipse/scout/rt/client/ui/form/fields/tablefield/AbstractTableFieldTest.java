@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Before;

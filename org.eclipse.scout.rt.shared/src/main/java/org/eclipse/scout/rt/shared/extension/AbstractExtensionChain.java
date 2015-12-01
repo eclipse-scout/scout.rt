@@ -16,7 +16,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * The abstract class of all extension delegations from extendible methods.

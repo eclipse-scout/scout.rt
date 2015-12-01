@@ -14,13 +14,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
  * A <code>JobInput</code> contains information about a job like its name with execution instructions for the job

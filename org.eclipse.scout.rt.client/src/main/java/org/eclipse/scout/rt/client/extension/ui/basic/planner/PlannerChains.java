@@ -3,10 +3,10 @@ package org.eclipse.scout.rt.client.extension.ui.basic.planner;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class PlannerChains {

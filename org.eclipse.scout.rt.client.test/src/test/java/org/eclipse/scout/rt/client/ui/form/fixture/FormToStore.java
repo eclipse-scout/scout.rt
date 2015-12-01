@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fixture;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -24,6 +22,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MainBox.SaveButton;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 
 /**
  * Fixture form {@link AbstractForm} with different implementation of {@link AbstractFormHandler#execStore()} defined in
@@ -45,14 +45,14 @@ public class FormToStore extends AbstractForm {
   }
 
   /**
-   * @throws org.eclipse.scout.commons.exception.ProcessingException
+   * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
    */
   public FormToStore() {
     super();
   }
 
   /**
-   * @throws org.eclipse.scout.commons.exception.ProcessingException
+   * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
    */
   public void startModify() {
     startInternal(new ModifyHandler());

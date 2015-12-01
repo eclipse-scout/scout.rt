@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
-import org.eclipse.scout.commons.index.AbstractSingleValueIndex;
-import org.eclipse.scout.commons.index.IndexedStore;
+import org.eclipse.scout.rt.platform.index.AbstractMultiValueIndex;
+import org.eclipse.scout.rt.platform.index.AbstractSingleValueIndex;
+import org.eclipse.scout.rt.platform.index.IndexedStore;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

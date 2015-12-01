@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * Asynchronous LookupCall fetcher.<br>

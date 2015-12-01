@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.commons.cache;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
 
 /**
  * This cache store service is for Scout Applications with "sticky sessions": A client always connects to the same node.

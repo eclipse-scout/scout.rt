@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
-import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 
 public class RowToHolderMapper<T> {
   private ITableRow m_row;

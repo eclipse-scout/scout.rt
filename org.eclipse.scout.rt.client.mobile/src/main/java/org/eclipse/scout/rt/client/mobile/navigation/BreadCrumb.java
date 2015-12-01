@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.mobile.navigation;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * @since 3.9.0

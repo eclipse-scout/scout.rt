@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultipleExtGroupBoxExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.SpecialStringField;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm;

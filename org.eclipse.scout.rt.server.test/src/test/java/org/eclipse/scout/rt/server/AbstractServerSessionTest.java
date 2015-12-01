@@ -16,8 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;

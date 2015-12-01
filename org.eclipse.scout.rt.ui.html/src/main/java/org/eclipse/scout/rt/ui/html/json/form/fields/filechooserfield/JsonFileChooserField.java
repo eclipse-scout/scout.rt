@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;

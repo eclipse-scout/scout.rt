@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.After;

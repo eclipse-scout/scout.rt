@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 

@@ -14,12 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * This class manages downloadable items. Each item has a TTL, after that time the item is removed automatically. When

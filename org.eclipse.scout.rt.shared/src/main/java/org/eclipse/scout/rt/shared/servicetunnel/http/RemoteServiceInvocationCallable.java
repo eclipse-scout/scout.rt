@@ -18,12 +18,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;

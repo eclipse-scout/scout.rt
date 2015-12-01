@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -42,6 +39,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**

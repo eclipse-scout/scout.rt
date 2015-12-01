@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserEvent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;

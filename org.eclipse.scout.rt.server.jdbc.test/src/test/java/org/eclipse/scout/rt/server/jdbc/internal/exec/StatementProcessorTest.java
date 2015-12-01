@@ -14,9 +14,9 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.holders.IntegerHolder;
-import org.eclipse.scout.commons.holders.LongHolder;
-import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.holders.IntegerHolder;
+import org.eclipse.scout.rt.platform.holders.LongHolder;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;

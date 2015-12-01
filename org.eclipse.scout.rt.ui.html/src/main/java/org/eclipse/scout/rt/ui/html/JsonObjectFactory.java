@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -76,6 +75,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;

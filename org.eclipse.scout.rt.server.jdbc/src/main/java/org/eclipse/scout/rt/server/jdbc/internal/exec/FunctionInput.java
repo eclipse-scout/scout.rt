@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;

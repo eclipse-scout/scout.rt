@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.internal;
 
 import java.security.Permission;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.DeleteGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;

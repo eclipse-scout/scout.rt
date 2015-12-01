@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.filter;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 

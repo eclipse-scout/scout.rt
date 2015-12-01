@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

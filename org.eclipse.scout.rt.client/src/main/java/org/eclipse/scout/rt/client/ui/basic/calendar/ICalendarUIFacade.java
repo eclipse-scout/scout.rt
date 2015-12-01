@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.Range;
+import org.eclipse.scout.rt.platform.util.Range;
 
 public interface ICalendarUIFacade {
 

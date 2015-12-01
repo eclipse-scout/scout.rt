@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.server.context;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.chain.IInvocationDecorator;
-import org.eclipse.scout.commons.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;

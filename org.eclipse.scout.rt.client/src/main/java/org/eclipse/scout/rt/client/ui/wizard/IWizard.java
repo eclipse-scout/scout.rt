@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.net.URL;
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCapable {
 

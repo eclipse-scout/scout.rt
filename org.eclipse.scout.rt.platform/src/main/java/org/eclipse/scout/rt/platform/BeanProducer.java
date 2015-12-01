@@ -18,7 +18,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify a {@link IBeanInstanceProducer} to create the instance of the annotated {@link Bean} class.
+ * TODO JGU remove Specify a {@link IBeanInstanceProducer} to create the instance of the annotated {@link Bean} class.
  */
 @Inherited
 @Documented

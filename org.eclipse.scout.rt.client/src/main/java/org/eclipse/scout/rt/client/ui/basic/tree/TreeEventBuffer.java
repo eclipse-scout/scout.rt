@@ -17,9 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
  * A buffer for tree events ({@link TreeEvent}s) with coalesce functionality:

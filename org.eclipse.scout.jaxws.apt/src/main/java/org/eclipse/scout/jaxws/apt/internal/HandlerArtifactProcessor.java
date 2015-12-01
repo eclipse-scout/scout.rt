@@ -28,11 +28,11 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
-import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.jaxws.apt.JaxWsAnnotationProcessor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor.HandlerDescriptor;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.Logger;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerProxy;

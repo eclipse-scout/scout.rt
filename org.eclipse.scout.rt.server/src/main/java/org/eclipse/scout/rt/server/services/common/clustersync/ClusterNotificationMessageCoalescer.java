@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.notification.NotificationCoalescer;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 

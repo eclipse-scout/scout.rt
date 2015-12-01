@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.platform.util.TriState;
 
 /**
  * The filter accepts all active rows and in addition all checked rows

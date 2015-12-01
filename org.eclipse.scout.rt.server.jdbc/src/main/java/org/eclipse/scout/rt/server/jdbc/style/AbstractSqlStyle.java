@@ -30,10 +30,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

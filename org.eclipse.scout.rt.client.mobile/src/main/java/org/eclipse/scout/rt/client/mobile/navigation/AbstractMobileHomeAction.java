@@ -1,10 +1,10 @@
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 @Order(20)
 public abstract class AbstractMobileHomeAction extends AbstractMenu {

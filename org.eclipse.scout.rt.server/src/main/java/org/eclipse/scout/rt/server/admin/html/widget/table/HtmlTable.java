@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 
 public class HtmlTable extends HtmlComponent {

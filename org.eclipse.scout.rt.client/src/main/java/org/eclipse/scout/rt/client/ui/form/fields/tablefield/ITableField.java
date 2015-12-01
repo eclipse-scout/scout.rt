@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 public interface ITableField<T extends ITable> extends IFormField {
 

@@ -24,12 +24,12 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;

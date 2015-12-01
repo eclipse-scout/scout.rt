@@ -17,8 +17,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 
 public final class FormattingUtility {
   private FormattingUtility() {

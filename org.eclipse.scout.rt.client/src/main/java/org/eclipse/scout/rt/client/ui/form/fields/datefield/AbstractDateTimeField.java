@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
-import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * convenience subclass of {@link AbstractDateField} with hasDate=true and hasTime=true

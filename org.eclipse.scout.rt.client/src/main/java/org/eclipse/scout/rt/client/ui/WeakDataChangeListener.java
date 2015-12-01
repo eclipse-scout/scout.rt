@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import org.eclipse.scout.commons.WeakEventListener;
+import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 /**
  * see {@link DataChangeListener}

@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

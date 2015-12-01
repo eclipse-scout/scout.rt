@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the

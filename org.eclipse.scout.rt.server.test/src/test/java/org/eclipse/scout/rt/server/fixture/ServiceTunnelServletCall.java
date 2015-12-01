@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.fixture;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;

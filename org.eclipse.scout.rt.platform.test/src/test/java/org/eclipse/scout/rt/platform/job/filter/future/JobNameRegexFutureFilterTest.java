@@ -16,10 +16,10 @@ import static org.mockito.Mockito.mock;
 
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

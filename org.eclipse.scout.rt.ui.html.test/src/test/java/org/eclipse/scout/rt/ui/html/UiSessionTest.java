@@ -20,7 +20,6 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 
-import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.util.TestUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 
 /**
  * Basic interface for all user fields where user inputs a value

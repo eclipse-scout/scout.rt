@@ -2,10 +2,10 @@ package org.eclipse.scout.rt.client;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;

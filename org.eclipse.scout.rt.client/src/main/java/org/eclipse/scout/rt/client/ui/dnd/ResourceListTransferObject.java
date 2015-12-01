@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.dnd;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class ResourceListTransferObject extends TransferObject {
   private List<BinaryResource> m_resources;

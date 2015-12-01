@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
 @Extends(MainBox.class)

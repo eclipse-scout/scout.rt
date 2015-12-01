@@ -22,9 +22,9 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPException;
 
-import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;

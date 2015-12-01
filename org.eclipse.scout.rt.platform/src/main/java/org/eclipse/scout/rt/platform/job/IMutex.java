@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.internal.IMutexAcquiredCallback;
 
 /**

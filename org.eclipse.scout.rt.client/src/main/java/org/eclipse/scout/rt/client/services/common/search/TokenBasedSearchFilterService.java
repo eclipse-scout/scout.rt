@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.search;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -18,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.TokenBasedComposerStatementBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.AndNodeToken;

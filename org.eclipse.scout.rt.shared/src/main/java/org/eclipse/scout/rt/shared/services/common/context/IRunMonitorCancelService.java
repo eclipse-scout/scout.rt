@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.context;
 
-import org.eclipse.scout.commons.ICancellable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**

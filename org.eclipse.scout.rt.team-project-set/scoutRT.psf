@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705155466_3" label="scout.rt" name="scout.rt">
-<item elementID="=org.eclipse.scout.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.platform" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.platform.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

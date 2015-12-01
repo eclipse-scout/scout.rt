@@ -25,9 +25,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

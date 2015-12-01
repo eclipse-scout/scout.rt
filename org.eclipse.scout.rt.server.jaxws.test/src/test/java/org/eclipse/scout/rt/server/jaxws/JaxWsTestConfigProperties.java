@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws;
 
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsRISpecifics;
 

@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.server.jdbc.builder;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.StringUtility.ITagProcessor;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility.ITagProcessor;
 import org.eclipse.scout.rt.server.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

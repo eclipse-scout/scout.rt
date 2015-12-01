@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferencesStorageService;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 public final class ClientConfigProperties {
   private ClientConfigProperties() {

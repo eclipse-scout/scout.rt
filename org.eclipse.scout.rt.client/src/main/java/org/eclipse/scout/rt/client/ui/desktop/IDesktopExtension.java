@@ -13,10 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -27,6 +23,10 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * A desktop extension can contribute to a core {@link IDesktop} and react on desktop state changes using the

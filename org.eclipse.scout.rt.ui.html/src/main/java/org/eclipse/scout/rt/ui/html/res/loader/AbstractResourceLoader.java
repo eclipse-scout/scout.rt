@@ -15,8 +15,8 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 

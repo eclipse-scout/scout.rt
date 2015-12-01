@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.junit.runners.model.Statement;
 
 /**

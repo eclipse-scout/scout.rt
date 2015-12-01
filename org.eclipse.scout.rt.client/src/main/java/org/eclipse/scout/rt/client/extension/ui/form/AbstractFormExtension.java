@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCloseTimerChain;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormStoredChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;

@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -27,6 +25,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;

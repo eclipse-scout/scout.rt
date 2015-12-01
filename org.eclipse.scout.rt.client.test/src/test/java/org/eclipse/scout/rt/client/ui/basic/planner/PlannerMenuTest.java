@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.PlannerMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.fixture.OwnerValueCapturingMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

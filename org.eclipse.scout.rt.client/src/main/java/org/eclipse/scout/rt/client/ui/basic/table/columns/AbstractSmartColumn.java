@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ISmartColumnExtension;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 @ClassId("c333e52d-4678-41b3-8307-01d473864d2e")
 public abstract class AbstractSmartColumn<VALUE> extends AbstractMixedSmartColumn<VALUE, VALUE> implements ISmartColumn<VALUE> {

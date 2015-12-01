@@ -20,9 +20,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.eclipse.scout.commons.beans.FastBeanInfo;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

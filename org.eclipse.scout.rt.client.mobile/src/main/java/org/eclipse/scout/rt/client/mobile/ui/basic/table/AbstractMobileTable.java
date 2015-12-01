@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
@@ -22,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * @since 3.9.0

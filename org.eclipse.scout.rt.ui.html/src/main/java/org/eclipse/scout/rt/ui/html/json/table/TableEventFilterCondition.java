@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TableEventFilterCondition {
 

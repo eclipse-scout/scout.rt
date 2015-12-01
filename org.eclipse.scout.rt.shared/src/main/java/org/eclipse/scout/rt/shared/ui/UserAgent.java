@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.shared.ui;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ConfigUtility;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Holds information about the kind of user interface used on the client side like {@link IUiLayer} and

@@ -13,11 +13,9 @@ package org.eclipse.scout.rt.client.ui.form.clipboard;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.resource.MimeType;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -31,6 +29,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboardField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 @FormData(sdkCommand = SdkCommand.IGNORE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)

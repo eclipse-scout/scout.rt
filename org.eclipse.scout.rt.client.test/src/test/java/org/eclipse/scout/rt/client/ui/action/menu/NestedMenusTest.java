@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.NestedMenusTest.P_Desktop.HelpMenu.AboutMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;

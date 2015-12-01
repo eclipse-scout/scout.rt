@@ -14,13 +14,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.MoveDescriptor;

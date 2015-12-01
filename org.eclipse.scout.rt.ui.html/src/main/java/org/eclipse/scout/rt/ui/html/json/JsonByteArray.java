@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
 
 public class JsonByteArray implements IJsonObject {
   private byte[] m_bytes;

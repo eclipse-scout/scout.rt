@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
 import java.security.Principal;
 
-import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.platform.holders.Holder;
 
 /**
  * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the

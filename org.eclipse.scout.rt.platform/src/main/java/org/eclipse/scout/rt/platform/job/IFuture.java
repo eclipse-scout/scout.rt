@@ -13,17 +13,17 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ICancellable;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.filter.AndFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.NotFilter;
+import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 
 /**
  * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's

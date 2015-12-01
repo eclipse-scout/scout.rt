@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;

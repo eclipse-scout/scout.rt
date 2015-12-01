@@ -15,9 +15,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.DateUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
 public class CalendarAppointment extends AbstractCalendarItem implements ICalendarAppointment, Serializable {
   private static final long serialVersionUID = 1L;

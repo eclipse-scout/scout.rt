@@ -14,15 +14,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox.InnerTestGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G1Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.scout.commons.StoppableThread;
+import org.eclipse.scout.rt.platform.util.concurrent.StoppableThread;
 import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
 import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 import org.slf4j.Logger;

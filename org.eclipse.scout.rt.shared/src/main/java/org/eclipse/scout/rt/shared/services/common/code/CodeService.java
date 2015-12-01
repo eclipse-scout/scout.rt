@@ -23,13 +23,13 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheBuilder;

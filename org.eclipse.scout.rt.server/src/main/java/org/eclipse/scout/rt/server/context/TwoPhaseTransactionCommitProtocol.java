@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
-import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.groupbox.GroupBoxPropertyDelegator;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -20,6 +18,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 public class TabForm extends AbstractForm {
   private IGroupBox m_tabGroupBox;

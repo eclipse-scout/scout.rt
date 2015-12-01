@@ -16,13 +16,13 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.ActivateBookmarkKeyStroke;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.pwd;
 
-import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**

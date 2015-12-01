@@ -17,17 +17,17 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

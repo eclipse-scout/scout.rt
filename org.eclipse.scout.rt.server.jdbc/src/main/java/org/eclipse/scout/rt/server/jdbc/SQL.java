@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 /**

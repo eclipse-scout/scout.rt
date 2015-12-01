@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.shared.extension.service.common.code;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.services.common.code.AbstractCodeTypeExtension;

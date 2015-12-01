@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.testing.platform.mock.BeanAnnotations;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.junit.runners.model.Statement;

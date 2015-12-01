@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.scout.commons.IAdaptable;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.IAdaptable;
 
 /**
  * Responsible for notifying all job listeners about job lifecycle events.

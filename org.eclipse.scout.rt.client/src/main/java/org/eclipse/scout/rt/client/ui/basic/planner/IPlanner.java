@@ -14,13 +14,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.util.Range;
 
 /**
  * The activity map is a specialized model which contains a set of {@link Activity}s that are grouped by resource.

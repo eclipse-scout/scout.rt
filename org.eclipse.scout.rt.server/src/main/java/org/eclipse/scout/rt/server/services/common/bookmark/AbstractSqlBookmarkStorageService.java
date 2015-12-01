@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.server.services.common.bookmark;
 
 import java.io.IOException;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
 import org.slf4j.Logger;

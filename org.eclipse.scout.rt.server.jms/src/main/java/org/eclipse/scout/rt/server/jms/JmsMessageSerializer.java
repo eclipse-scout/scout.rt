@@ -17,9 +17,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

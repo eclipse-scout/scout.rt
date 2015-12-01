@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * The invisible root menu node of any table. (internal usage only)

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.view;
 
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.action.view.IViewButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 
 public abstract class AbstractViewButton extends AbstractAction implements IViewButton {
 

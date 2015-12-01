@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 public class TableWithoutMenus extends AbstractTable {
 

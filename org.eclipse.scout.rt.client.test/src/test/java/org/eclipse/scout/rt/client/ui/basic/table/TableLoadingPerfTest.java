@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
 import org.junit.Test;
 
 /**

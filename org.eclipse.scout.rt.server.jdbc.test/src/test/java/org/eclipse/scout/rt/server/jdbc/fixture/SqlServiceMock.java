@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.jdbc.fixture;
 
 import java.sql.Connection;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.server.jdbc.internal.exec.PreparedStatementCache;

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.data.form.fields.tablefield;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.holders.ITableHolder;
+import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 public abstract class AbstractTableFieldData extends AbstractFormFieldData implements ITableHolder {

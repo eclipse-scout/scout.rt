@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.prefs;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**

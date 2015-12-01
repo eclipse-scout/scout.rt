@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.json.JSONObject;
 

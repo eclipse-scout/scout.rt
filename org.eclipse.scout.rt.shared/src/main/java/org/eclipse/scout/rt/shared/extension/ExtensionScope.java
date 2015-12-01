@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * An extension scope helps filtering extensions, contributions and model move operations for a particular context. It

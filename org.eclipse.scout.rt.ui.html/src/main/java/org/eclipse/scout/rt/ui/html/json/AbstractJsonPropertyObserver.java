@@ -15,7 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 import org.slf4j.Logger;

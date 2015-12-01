@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
-import org.eclipse.scout.rt.platform.util.DateUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarTask;

@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -33,6 +30,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterMana
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;

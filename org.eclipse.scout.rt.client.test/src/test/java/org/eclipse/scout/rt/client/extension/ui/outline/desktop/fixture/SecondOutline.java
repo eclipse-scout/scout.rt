@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.platform.Order;
 
 @Order(20)
 public class SecondOutline extends AbstractOutline {

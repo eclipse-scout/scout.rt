@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEventBuffer;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
  * A buffer for outline events ({@link OutlineEvent}s and {@link TreeEvent}s)

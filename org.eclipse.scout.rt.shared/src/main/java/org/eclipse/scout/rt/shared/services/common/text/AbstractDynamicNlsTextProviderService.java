@@ -15,7 +15,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.nls.DynamicNls;
+import org.eclipse.scout.rt.platform.nls.DynamicNls;
 
 public abstract class AbstractDynamicNlsTextProviderService implements ITextProviderService {
 

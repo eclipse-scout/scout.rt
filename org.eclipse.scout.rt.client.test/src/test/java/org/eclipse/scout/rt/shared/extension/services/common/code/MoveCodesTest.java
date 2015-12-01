@@ -15,9 +15,9 @@ import static org.junit.Assert.assertSame;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;

@@ -3,8 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;

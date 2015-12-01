@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;

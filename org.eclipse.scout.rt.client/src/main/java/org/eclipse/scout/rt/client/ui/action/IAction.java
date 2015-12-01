@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.ui.action;
 
 import java.security.Permission;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},

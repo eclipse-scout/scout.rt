@@ -19,9 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;

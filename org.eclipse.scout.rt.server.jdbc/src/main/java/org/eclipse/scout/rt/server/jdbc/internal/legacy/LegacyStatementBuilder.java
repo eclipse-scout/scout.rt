@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.jdbc.internal.legacy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 

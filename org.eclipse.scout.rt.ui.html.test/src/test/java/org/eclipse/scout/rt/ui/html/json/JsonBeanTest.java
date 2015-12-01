@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.annotations.IgnoreProperty;
-import org.eclipse.scout.commons.annotations.IgnoreProperty.Context;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
+import org.eclipse.scout.rt.platform.annotations.IgnoreProperty.Context;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

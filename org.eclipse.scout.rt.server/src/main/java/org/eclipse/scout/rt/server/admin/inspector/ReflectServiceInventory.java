@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 
 /**
  * Convenience for use with {@link IInventoryProvider}

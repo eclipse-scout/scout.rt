@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.platform.context;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.chain.IInvocationInterceptor;
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.chain.InvocationChain.Chain;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.chain.IInvocationInterceptor;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.InvocationChain.Chain;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 
 /**

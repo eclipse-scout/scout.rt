@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.serverbridge;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.RegisterTunnelToServerPlatformListener;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.AnnotationFactory;
 
 /**

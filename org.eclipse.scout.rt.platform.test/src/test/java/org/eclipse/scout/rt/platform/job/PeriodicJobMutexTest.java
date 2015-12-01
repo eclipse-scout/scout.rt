@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;

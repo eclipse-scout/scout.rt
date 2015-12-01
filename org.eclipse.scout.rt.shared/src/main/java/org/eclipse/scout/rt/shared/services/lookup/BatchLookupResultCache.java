@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

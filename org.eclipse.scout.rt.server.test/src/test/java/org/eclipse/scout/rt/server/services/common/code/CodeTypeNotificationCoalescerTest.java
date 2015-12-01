@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;

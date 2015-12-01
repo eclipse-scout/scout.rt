@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 
-import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> implements IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
@@ -28,7 +28,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
 
   /**
    * @param listener
-   * @see org.eclipse.scout.commons.beans.BasicPropertySupport#addPropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#addPropertyChangeListener(java.beans.PropertyChangeListener)
    */
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -37,7 +37,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
 
   /**
    * @param listener
-   * @see org.eclipse.scout.commons.beans.BasicPropertySupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
    */
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -47,7 +47,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
   /**
    * @param propertyName
    * @param listener
-   * @see org.eclipse.scout.commons.beans.BasicPropertySupport#addPropertyChangeListener(java.lang.String,
+   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   @Override
@@ -58,7 +58,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
   /**
    * @param propertyName
    * @param listener
-   * @see org.eclipse.scout.commons.beans.BasicPropertySupport#removePropertyChangeListener(java.lang.String,
+   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   @Override

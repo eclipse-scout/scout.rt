@@ -12,14 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IMixedSmartColumnExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.MixedSmartColumnChains.MixedSmartColumnConvertKeyToValueChain;
@@ -30,6 +22,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartF
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;

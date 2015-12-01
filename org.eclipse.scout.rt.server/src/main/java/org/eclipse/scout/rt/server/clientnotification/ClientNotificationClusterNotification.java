@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 public class ClientNotificationClusterNotification implements Serializable {

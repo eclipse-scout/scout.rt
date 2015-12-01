@@ -16,12 +16,12 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

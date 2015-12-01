@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.fixture;
 
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.extension.Extends;
 
 @Order(12)
 @Extends(AbstractPersonTable.class)

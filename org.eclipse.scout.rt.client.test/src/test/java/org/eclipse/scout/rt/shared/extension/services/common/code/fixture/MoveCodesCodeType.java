@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.services.common.code.fixture;
 
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric;
 

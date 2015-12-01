@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.parsers.BindModel;
 import org.eclipse.scout.rt.server.jdbc.parsers.BindParser;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.AndExpr;

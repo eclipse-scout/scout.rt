@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 

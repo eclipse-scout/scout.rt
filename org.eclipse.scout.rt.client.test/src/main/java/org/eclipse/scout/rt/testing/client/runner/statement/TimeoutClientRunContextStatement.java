@@ -2,12 +2,12 @@ package org.eclipse.scout.rt.testing.client.runner.statement;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;

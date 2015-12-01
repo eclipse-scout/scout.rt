@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.shared.cache;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 /**
  * All caches should be build through this builder. After building a cache, <b>do not</b> surround it with another

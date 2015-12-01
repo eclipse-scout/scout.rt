@@ -15,9 +15,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

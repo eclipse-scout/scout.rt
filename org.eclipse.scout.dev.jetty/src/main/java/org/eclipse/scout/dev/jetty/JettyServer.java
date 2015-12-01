@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

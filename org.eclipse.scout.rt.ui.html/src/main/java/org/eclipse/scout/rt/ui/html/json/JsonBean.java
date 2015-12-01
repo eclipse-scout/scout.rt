@@ -17,10 +17,10 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.IgnoreProperty;
-import org.eclipse.scout.commons.annotations.IgnoreProperty.Context;
-import org.eclipse.scout.commons.beans.FastBeanInfo;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
+import org.eclipse.scout.rt.platform.annotations.IgnoreProperty.Context;
+import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

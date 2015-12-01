@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.chain.IInvocationDecorator;
-import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto;
 
-import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBoxData.SecondStringInTemplate;

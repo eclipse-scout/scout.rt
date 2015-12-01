@@ -14,12 +14,12 @@ import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

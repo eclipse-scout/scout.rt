@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.commons.annotations.Data;
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
 @Data(SingleFormExtensionData.class)

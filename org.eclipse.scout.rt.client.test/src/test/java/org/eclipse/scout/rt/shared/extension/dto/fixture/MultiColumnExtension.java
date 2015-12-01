@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
-import org.eclipse.scout.commons.annotations.Data;
-import org.eclipse.scout.commons.annotations.Extends;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table;
 
 @Data(MultiColumnExtensionData.class)

@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.ui.html.json.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TreeEventFilterCondition {
 

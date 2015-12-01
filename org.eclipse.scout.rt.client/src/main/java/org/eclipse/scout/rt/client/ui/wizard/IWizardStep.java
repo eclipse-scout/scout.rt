@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
 

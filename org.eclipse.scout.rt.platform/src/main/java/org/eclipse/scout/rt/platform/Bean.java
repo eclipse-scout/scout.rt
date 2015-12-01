@@ -7,9 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
-
 /**
  * All classes marked with this annotation (or an annotation that has this annotation) are automatically registered in
  * the scout {@link IBeanManager}

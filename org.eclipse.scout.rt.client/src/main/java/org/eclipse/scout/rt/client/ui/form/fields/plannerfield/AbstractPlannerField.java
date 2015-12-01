@@ -13,12 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -31,6 +25,12 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("9520b5cc-221e-4d0f-8cc3-5c4a1ba06b77")
 public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<P> {

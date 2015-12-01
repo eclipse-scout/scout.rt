@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.testenvironment;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * {@link IClientSession} for Client Test Environment

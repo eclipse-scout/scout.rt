@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModelExtension;
 import org.eclipse.scout.rt.shared.test.ResourceBase;

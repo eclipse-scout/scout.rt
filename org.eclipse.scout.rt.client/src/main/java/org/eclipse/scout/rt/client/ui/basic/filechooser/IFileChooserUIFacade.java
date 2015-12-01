@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 public interface IFileChooserUIFacade {
 

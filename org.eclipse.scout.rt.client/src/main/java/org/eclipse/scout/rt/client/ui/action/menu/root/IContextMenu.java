@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 /**
  * This is an invisible root menu container. Subclasses of this interface are used of form fields as an invisible root

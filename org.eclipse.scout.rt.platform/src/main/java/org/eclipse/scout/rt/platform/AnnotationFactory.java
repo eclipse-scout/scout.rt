@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.platform;
 
 import java.lang.annotation.Annotation;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
-
 public final class AnnotationFactory {
 
   private static final ApplicationScoped APPLICATION_SCOPED = new ApplicationScoped() {

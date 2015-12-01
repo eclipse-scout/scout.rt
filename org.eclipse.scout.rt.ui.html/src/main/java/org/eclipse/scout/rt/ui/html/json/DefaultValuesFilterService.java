@@ -16,12 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.FileUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

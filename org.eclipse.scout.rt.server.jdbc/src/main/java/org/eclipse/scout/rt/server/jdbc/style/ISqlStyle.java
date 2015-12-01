@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
 
 /**

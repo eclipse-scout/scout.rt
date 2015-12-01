@@ -20,10 +20,10 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.BooleanUtility;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.shared.SharedConfigProperties;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.PermissionLevelCheckCacheTimeToLiveProperty;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;

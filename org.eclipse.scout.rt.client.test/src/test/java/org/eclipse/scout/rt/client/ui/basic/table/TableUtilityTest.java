@@ -18,7 +18,6 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractTimeColumn;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;

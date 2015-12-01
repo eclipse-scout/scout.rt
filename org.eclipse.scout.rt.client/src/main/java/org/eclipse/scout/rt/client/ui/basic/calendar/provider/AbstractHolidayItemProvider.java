@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.client.ui.basic.calendar.provider;
 import java.util.Date;
 import java.util.Set;
 
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;

@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ColumnUserFilterState extends AbstractUserFilterState implements IUserFilterState {

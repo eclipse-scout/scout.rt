@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.util.TriState;
 
 /**
  * The filter accepts all active rows and in addition all checked rows

@@ -17,19 +17,19 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Iterator;
 
-import org.eclipse.scout.commons.ThreadLocalProcessor;
-import org.eclipse.scout.commons.chain.IChainable;
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.security.SubjectProcessor;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.chain.IChainable;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;

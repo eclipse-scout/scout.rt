@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
-import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 public class Scheduler extends AbstractScheduler implements IScheduler {

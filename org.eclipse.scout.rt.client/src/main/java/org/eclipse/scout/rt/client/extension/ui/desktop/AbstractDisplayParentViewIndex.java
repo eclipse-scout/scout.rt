@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.index.IIndex;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.index.IIndex;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Represents an index for which multiple elements can result in the very same index value.

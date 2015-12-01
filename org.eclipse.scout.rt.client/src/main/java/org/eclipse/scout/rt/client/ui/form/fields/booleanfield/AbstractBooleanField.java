@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
-import org.eclipse.scout.commons.BooleanUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.booleanfield.IBooleanFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("3f14b55f-b49b-428a-92c4-05745d6d48c4")

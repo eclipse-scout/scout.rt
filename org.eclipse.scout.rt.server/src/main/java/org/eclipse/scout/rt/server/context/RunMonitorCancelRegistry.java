@@ -14,9 +14,9 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**

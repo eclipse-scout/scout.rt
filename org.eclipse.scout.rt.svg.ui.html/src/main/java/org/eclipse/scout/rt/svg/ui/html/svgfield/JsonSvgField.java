@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.svg.client.SVGUtility;
 import org.eclipse.scout.rt.svg.client.svgfield.ISvgField;
 import org.eclipse.scout.rt.ui.html.IUiSession;

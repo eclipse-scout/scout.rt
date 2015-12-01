@@ -30,10 +30,10 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

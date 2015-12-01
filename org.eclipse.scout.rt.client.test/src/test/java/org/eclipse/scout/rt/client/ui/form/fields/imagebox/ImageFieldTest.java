@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -10,6 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.ImageFieldTest.TestForm.MainBox.ImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.AbstractImageField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.services.common.bookmark;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.notification.ICoalescer;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClientNotification;
 

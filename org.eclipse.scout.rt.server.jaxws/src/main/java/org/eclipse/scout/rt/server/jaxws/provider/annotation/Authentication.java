@@ -17,7 +17,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;

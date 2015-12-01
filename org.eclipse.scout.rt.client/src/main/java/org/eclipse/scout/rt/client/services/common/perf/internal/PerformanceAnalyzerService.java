@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.services.common.perf.internal;
 
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
+import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

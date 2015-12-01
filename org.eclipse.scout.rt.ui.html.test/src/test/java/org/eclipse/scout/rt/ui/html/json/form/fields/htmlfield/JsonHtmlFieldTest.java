@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.json.JSONException;
 import org.json.JSONObject;

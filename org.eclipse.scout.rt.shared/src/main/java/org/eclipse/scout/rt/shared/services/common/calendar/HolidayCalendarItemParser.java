@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.XmlUtility;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;

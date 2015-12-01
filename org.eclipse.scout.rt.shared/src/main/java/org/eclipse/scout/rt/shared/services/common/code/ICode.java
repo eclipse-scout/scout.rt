@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public interface ICode<T> extends ITypeWithClassId, IOrdered {

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

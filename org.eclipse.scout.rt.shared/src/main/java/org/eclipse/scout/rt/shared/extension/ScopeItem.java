@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.ClassIdentifier;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 
 /**
  * A scope item represents a part of a {@link ClassIdentifier}, where a part is starting from a particular index and

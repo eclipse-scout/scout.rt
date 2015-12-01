@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.platform.util.TriState;
 
 public interface IGroupBox extends ICompositeField, IContextMenuOwner {
 

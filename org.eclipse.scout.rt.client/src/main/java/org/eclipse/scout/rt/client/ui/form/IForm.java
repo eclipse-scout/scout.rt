@@ -14,10 +14,6 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.ITypeWithSettableClassId;
-import org.eclipse.scout.commons.beans.IPropertyFilter;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -32,6 +28,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
+import org.eclipse.scout.rt.platform.classid.ITypeWithSettableClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.w3c.dom.Document;
@@ -300,7 +300,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *          a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
    *          a filter that can be used to specify which form fields should be imported
-   * @see IPropertyFilter#accept(org.eclipse.scout.commons.beans.FastPropertyDescriptor)
+   * @see IPropertyFilter#accept(org.eclipse.scout.rt.platform.beans.FastPropertyDescriptor)
    * @see IFormFieldFilter#accept(IFormField)
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter);

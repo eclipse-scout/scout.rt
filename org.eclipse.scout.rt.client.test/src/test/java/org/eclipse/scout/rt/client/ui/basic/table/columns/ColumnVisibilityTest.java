@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test1Column;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test2Column;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

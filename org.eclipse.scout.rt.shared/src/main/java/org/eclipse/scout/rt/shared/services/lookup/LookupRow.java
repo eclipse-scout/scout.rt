@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;

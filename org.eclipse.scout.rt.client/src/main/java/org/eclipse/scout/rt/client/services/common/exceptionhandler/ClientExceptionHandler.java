@@ -12,17 +12,17 @@ package org.eclipse.scout.rt.client.services.common.exceptionhandler;
 
 import java.util.concurrent.Semaphore;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

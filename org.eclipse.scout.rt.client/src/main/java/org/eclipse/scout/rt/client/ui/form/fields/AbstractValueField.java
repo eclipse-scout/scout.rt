@@ -14,26 +14,9 @@ import java.io.IOException;
 import java.util.EventListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
@@ -48,7 +31,23 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ValueFieldContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -56,7 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-@ScoutSdkIgnore
 @ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
 public abstract class AbstractValueField<VALUE> extends AbstractFormField implements IValueField<VALUE> {

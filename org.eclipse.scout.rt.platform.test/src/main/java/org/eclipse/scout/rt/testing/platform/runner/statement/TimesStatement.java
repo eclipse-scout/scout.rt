@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.junit.runners.model.Statement;
 

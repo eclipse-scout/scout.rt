@@ -12,11 +12,8 @@ package org.eclipse.scout.rt.platform.exception;
 
 import java.util.concurrent.CancellationException;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

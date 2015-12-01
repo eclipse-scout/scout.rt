@@ -17,9 +17,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;

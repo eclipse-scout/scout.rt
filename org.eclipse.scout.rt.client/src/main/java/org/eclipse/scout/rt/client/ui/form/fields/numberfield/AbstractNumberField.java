@@ -17,15 +17,6 @@ import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.numberfield.INumberFieldExtension;
@@ -34,8 +25,17 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")

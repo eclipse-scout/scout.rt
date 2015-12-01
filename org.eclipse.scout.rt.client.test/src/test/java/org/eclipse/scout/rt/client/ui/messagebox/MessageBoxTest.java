@@ -15,10 +15,10 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import java.io.Serializable;
 import java.util.List;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;

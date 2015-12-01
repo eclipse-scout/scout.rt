@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;

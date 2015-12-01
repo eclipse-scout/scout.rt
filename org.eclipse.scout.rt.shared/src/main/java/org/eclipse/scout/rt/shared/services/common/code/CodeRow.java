@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;

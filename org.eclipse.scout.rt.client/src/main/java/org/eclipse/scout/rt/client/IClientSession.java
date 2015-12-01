@@ -15,10 +15,10 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;

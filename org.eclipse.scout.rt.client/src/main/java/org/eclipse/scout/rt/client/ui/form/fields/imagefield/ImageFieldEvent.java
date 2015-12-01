@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 
 public class ImageFieldEvent extends EventObject implements IModelEvent {

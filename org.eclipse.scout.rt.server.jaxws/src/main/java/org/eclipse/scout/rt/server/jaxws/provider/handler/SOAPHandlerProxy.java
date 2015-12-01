@@ -16,7 +16,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler;
 
 /**

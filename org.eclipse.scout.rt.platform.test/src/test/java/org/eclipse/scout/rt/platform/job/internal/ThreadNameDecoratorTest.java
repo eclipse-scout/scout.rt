@@ -20,14 +20,14 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.chain.InvocationChain;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;

@@ -32,10 +32,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.FileUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * file path with / as delimiter

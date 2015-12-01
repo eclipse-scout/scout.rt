@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler.internal.visitor;
 
-import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.scheduler.TickSignal;
 
 public class DefaultEvalVisitor implements IEvalVisitor {

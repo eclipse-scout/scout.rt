@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Helper class to schedule jobs that optionally run on behalf of a {@link RunContext}. This class is for convenience

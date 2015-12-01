@@ -12,8 +12,7 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -26,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -72,7 +72,7 @@ public class FormWithTableFieldTest {
   public class TableForm extends AbstractForm {
 
     /**
-     * @throws org.eclipse.scout.commons.exception.ProcessingException
+     * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
      */
     public TableForm() {
       super();
@@ -91,14 +91,14 @@ public class FormWithTableFieldTest {
     }
 
     /**
-     * @throws org.eclipse.scout.commons.exception.ProcessingException
+     * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
      */
     public void startModify() {
       startInternal(new ModifyHandler());
     }
 
     /**
-     * @throws org.eclipse.scout.commons.exception.ProcessingException
+     * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
      */
     public void startNew() {
       startInternal(new NewHandler());

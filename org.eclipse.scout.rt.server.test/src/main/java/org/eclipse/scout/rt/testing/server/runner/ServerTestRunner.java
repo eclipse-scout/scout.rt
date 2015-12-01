@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.ReflectionUtility;
+import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

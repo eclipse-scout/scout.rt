@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.io.Serializable;
 import java.util.List;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.util.TriState;
 
 @Bean
 public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {

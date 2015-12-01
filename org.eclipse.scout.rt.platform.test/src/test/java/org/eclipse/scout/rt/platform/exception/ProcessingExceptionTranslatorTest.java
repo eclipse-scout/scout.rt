@@ -25,12 +25,11 @@ import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

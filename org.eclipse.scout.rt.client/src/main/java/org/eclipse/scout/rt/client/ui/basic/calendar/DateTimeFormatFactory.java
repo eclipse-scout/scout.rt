@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.DateFormatProvider;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 
 public class DateTimeFormatFactory {
 

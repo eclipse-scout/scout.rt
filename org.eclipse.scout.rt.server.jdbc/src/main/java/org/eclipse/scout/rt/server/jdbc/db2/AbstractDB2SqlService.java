@@ -7,8 +7,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.db2;
 
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 

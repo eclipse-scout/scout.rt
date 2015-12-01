@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.services.common.smtp;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.commons.mail.MailUtility;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.shared.mail.MailUtility;
 
 /**
  * <h3>ISMTPService</h3> The service to send messages over the smtp protocol. <br>
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.service.IService;
  * service.sendMessage(message);
  * </pre>
  *
- * @see org.eclipse.scout.commons.mail.MailUtility
+ * @see org.eclipse.scout.rt.shared.mail.MailUtility
  */
 public interface ISMTPService extends IService {
 

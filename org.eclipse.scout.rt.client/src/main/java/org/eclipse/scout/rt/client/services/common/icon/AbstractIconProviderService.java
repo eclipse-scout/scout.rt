@@ -14,8 +14,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

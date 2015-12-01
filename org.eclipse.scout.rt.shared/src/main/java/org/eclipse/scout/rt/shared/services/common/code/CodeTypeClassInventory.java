@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.filter.BeanClassFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.FilteredClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;

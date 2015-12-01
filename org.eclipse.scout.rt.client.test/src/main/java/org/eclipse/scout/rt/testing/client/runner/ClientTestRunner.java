@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.testing.client.runner;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClearClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;

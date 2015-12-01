@@ -12,10 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonExtension;
@@ -24,7 +20,11 @@ import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.

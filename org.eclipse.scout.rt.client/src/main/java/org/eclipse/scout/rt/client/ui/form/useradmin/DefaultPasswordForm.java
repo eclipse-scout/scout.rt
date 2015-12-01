@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.useradmin;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -24,6 +22,8 @@ import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.RepeatPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.OkButton;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 

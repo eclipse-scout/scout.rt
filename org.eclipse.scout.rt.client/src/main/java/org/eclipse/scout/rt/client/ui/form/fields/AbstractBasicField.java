@@ -12,23 +12,21 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains.BasicFieldExecChangedDisplayTextChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
  * Implementation for {@link IBasicField}. Handle properties and event methods that deals with basic fields.
  *
  * @since 3.10.0-M3
  */
-@ScoutSdkIgnore
 @ClassId("d5a72dd8-cb1c-4dea-a568-90d77e65854e")
 public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE> implements IBasicField<VALUE> {
 

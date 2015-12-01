@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 
 /**
  * Property to represent a {@link Subject}.

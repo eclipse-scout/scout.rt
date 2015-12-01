@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
@@ -50,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * @since 3.9.0

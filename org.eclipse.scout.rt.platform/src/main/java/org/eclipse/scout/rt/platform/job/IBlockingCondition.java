@@ -2,7 +2,7 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * Use this object to put the current thread into waiting mode until this condition falls. If getting blocked and the

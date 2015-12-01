@@ -20,8 +20,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Use this adapter to work with UTC <code>xsd:dateTime</code>s. A UTC time is also known as 'zulu' time, and has

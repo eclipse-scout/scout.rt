@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.json.JSONObject;
 
 public class JsonStatus implements IJsonObject {

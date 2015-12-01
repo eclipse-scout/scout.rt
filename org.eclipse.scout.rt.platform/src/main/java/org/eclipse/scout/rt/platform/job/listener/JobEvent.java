@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.platform.job.listener;
 
 import java.util.EventObject;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
  * Event that is fired upon job lifecycle events.

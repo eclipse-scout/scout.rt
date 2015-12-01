@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import java.beans.PropertyChangeEvent;
 import java.util.Date;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.status.IMultiStatus;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;

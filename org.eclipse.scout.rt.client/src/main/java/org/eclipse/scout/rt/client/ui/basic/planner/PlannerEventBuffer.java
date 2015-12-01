@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * A buffer for planner events ({@link PlannerEvent}) with coalesce functionality:

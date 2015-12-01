@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 

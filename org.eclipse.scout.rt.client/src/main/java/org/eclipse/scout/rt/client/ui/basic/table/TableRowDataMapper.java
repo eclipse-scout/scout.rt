@@ -17,18 +17,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.ColumnData;
-import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.beans.IPropertyFilter;
+import org.eclipse.scout.rt.client.dto.ColumnData;
+import org.eclipse.scout.rt.client.dto.DtoUtility;
+import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
-import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -193,11 +193,11 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   }
 
   protected Object getDataContainer(IColumn column, AbstractTableRowData rowData) {
-    Class<?> dtoClass = FormDataUtility.getDataAnnotationValue(column.getClass());
+    Class<?> dtoClass = DtoUtility.getDataAnnotationValue(column.getClass());
     if (dtoClass == null) {
       Class<?> declaringClass = column.getClass().getDeclaringClass();
       if (declaringClass != null && IExtension.class.isAssignableFrom(declaringClass)) {
-        dtoClass = FormDataUtility.getDataAnnotationValue(declaringClass);
+        dtoClass = DtoUtility.getDataAnnotationValue(declaringClass);
       }
     }
     if (dtoClass == null || rowData.getClass().equals(dtoClass)) {

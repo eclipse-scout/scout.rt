@@ -17,8 +17,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 
-import org.eclipse.scout.commons.holders.LongHolder;
-import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.holders.LongHolder;
+import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.jdbc.fixture.VerboseMock;

@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.rt.platform.OrderedComparator;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.AbstractMoveModelObjectHandler;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 

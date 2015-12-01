@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.labelfield;
 
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.labelfield.ILabelFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("7e531d93-ad27-4316-9529-7766059b3886")
 public abstract class AbstractLabelField extends AbstractValueField<String> implements ILabelField {

@@ -18,7 +18,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 
 public class GzipServletResponseWrapper extends HttpServletResponseWrapper {

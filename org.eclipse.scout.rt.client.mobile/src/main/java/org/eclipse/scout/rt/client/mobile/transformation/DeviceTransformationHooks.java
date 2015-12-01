@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 /**
  * <b>Warn: The hook concept is experimental and may be removed without notice.</b>

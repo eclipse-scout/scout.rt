@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.PageWithTable2Test.SimpleTablePage.Table;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.PageWithTable2Test.SimpleTablePageData.SimpleTablePageRowData;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;

@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONArray;
 

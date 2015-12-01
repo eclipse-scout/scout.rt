@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -23,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * @since 3.9.0

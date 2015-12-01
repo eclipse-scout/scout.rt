@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage.Table;
 

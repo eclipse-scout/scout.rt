@@ -1,8 +1,8 @@
 package org.eclipse.scout.rt.shared.logging;
 
-import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor;
-import org.eclipse.scout.commons.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.MDC;
 

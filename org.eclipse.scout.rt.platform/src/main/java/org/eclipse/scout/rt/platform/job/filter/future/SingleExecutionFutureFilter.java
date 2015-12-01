@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 

@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -22,6 +20,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.VirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * For performance optimizations, child pages are only loaded when needed. Until then they are virtualized using

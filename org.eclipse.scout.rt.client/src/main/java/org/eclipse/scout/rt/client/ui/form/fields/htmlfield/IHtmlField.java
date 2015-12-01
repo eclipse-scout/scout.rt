@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 /**
  * With a html field it is possible to display custom html content.

@@ -22,7 +22,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

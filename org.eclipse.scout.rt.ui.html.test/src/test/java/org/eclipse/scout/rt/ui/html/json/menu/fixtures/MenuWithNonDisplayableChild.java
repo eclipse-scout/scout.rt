@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.menu.fixtures;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.platform.Order;
 
 public class MenuWithNonDisplayableChild extends AbstractMenu {
 

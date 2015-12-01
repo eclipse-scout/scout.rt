@@ -23,9 +23,9 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 
 /**
  * This class is not thread safe

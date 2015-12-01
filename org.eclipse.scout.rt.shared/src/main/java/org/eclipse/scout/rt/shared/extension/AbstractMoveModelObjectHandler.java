@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ClassIdentifier;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * The top level list is expected to be sorted by the caller.

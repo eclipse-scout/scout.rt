@@ -20,8 +20,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Use this adapter to work with <code>xsd:dateTime</code>s in the default timezone of the Java Virtual Machine.

@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;

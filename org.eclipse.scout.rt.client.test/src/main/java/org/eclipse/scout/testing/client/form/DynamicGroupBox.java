@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client.form;
 
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * Dynamic group box to build an ad-hoc application for testing

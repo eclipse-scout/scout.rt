@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.BottomDetailBox.BottomDetailBoxField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
 
 public class ExtendedForm extends OrigForm {
 

@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 /**
  * This model represents a separate "website" inside the application.

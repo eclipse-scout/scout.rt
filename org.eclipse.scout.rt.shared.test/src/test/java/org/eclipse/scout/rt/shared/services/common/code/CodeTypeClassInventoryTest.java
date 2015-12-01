@@ -15,10 +15,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.BeanClassFilter;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.IgnoredCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType1;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType2;

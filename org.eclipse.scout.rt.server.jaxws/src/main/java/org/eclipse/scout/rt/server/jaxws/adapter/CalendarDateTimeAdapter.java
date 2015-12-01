@@ -18,8 +18,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Adapter to convert a <code>xsd:dateTime</code> to a {@link Calendar} and vice versa. For both directions, the

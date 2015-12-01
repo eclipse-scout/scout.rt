@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout01Test.MainBox.Field01;
@@ -20,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayo
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout01Test.MainBox.Field03;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout01Test.MainBox.Field04;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

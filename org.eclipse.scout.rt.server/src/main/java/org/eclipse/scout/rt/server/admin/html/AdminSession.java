@@ -20,8 +20,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.view.TopView;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;

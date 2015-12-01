@@ -17,13 +17,13 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Iterator;
 
-import org.eclipse.scout.commons.ThreadLocalProcessor;
-import org.eclipse.scout.commons.chain.IChainable;
-import org.eclipse.scout.commons.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.IChainable;
+import org.eclipse.scout.rt.platform.chain.InvocationChain;
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

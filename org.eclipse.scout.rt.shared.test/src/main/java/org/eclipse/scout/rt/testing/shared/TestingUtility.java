@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.mockito.Mockito;

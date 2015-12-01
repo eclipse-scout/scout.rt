@@ -15,12 +15,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.filter.AndFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;

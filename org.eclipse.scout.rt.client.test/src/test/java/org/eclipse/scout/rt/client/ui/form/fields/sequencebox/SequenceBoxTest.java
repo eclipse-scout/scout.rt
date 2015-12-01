@@ -19,8 +19,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -32,7 +30,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerFi
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.EndField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.StartField;
-import org.eclipse.scout.rt.platform.util.DateUtility;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

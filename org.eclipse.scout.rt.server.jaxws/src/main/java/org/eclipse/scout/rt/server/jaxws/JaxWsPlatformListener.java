@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.slf4j.Logger;

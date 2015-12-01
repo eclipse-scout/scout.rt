@@ -16,8 +16,8 @@ import java.util.Calendar;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;

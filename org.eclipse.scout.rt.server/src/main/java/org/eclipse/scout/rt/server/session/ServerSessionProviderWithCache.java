@@ -15,13 +15,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;

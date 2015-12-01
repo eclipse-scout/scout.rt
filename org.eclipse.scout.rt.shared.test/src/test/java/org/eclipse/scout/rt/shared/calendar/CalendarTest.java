@@ -19,9 +19,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.eclipse.scout.commons.UTCDate;
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.util.date.UTCDate;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer;
 import org.junit.After;
 import org.junit.Before;

@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.testing.platform.runner;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,12 +17,12 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.FinalValue;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 
 /**
  * default implementation used to wrap around an interface using a java proxy {@link InvocationHandler}

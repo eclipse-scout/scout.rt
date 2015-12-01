@@ -17,9 +17,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

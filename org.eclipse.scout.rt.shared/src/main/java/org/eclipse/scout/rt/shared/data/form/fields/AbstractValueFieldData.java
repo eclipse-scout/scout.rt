@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData implements IHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;

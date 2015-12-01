@@ -21,11 +21,11 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService;
 import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiConnectionFactory;
 import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiInitialContextFactory;

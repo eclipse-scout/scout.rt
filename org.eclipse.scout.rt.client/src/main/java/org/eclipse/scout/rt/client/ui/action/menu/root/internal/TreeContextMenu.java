@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -27,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
   private Set<? extends ITreeNode> m_currentSelection;

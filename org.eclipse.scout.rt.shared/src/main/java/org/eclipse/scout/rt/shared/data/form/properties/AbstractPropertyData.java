@@ -15,8 +15,8 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializable {
 

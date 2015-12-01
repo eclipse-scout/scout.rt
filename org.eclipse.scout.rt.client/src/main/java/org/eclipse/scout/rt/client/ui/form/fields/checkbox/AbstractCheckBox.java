@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.checkbox;
 
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.checkbox.ICheckBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Convenience subclass for {@link AbstractBooleanField} due to popular usage of the word "checkBox" instead of

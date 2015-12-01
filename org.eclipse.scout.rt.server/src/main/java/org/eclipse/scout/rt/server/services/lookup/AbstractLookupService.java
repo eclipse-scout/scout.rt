@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.services.lookup;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.MatrixUtility;
-import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.rt.platform.util.MatrixUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;

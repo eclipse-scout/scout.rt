@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

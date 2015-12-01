@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.StringUtility.ITagProcessor;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility.ITagProcessor;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.server.jdbc.internal.legacy.LegacyStatementBuilder;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;

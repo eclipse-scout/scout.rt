@@ -13,11 +13,9 @@ package org.eclipse.scout.rt.platform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * The static accessor to the {@link IBeanManager}

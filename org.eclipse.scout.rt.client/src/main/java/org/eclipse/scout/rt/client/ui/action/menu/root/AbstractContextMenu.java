@@ -16,9 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.root.IContextMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -27,6 +24,9 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 
 public abstract class AbstractContextMenu extends AbstractMenu implements IContextMenu {
 

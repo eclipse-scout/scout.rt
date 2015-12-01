@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 
 public class DisplayableOutlineFilter<T extends IOutline> implements IFilter<T> {
 

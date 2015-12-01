@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 
 /**
  * The events are kept in history for at most n milliseconds using a {@link ConcurrentExpiringMap}

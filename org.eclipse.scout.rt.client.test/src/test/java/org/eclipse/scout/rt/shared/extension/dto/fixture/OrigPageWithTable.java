@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.PageData;
+import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table;
 
 @PageData(OrigPageWithTableData.class)

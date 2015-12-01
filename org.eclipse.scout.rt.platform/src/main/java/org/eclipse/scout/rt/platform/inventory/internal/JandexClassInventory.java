@@ -14,9 +14,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;

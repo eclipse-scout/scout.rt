@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.Assert;
 import org.junit.Test;

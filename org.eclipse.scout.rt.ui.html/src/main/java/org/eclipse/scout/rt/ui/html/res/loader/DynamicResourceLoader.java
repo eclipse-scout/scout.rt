@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;

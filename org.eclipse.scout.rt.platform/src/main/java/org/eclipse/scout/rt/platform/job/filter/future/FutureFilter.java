@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.IAdaptable;
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.IAdaptable;
 
 /**
  * Filter which accepts all of the given Futures.

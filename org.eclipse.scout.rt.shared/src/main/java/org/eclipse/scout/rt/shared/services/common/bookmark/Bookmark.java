@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.CRC32;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,11 +17,8 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Random;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

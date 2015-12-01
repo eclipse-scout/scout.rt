@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 

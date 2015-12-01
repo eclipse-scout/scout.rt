@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.services.extension;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -55,6 +54,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.extension.AbstractContainerValidationService;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 

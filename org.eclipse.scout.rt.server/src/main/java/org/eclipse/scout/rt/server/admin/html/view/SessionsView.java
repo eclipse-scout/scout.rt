@@ -17,7 +17,7 @@ import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;

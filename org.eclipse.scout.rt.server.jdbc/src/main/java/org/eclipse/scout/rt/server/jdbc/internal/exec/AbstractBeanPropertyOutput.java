@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;

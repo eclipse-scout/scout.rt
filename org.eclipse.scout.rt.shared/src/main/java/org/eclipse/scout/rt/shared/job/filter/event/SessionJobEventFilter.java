@@ -1,9 +1,9 @@
 package org.eclipse.scout.rt.shared.job.filter.event;
 
-import org.eclipse.scout.commons.IAdaptable;
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.FutureFilterWrapperJobEventFilter;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.IAdaptable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 

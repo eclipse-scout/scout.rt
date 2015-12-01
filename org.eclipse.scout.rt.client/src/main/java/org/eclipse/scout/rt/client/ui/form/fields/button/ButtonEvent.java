@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class ButtonEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;

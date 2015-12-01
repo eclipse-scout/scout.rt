@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MoveFormFieldStackOverflowForm.MainBox.BottomBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MoveFormFieldStackOverflowForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MoveFormFieldStackOverflowForm.MainBox.TopBox.ListBox;
@@ -19,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 
 public class MoveFormFieldStackOverflowForm extends AbstractForm {
 

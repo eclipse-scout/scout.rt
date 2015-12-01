@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**

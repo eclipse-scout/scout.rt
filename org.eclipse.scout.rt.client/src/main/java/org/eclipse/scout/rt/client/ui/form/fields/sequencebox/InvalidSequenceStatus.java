@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
+import org.eclipse.scout.rt.platform.Order;
 
 /**
  * Marker subclass so we know inside

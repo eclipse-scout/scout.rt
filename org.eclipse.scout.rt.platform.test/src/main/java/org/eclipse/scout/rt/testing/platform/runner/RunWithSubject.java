@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 
 /**
  * Annotation to execute test-methods under a particular user. This is used in conjunction with

@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.commons.Range;
+import org.eclipse.scout.rt.platform.util.Range;
 
 public interface IPlannerUIFacade<RI, AI> {
 

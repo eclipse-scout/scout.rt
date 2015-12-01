@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.fixture;
 
-import org.eclipse.scout.commons.holders.TableBeanHolderFilter;
-import org.eclipse.scout.commons.holders.TableHolderFilter;
+import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
+import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 
 public class ContainerBean {
   private TableFieldData m_tableFieldData;

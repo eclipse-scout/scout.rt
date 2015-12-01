@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
 public class JettyServerTest {

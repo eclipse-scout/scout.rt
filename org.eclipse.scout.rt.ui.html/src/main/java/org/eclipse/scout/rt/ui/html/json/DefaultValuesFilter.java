@@ -19,10 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

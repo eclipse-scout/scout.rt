@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.platform.context;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.junit.Test;
 
 public class RunContextExceptionTranslationTest {

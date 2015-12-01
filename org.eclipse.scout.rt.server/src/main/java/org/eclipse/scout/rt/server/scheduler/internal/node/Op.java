@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler.internal.node;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.IEvalVisitor;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.IFormatVisitor;
 

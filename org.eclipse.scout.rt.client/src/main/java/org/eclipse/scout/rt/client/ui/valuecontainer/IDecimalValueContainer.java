@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.valuecontainer;
 
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 
 /**
  * common interface for decimal fields and decimal columns

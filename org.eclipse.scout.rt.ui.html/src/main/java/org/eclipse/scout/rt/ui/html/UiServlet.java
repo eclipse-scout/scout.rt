@@ -21,10 +21,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.junit.Before;
 import org.junit.Test;

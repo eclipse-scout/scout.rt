@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.messagebox;
 
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 
 /**
  * Filter to accept file choosers attached to a specific {@link IDisplayParent}.

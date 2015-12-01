@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.HolderUtility;
-import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.holders.HolderUtility;
+import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.internal.AbstractHolderArgumentVisitor;
 
 @ApplicationScoped

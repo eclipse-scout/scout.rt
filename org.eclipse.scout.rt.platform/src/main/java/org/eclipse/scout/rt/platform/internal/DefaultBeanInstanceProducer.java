@@ -14,11 +14,11 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.rt.platform.BeanCreationException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 
 public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
 

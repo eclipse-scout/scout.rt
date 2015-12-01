@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.P_TestGroupBox.InnerGroupBox.InnerInnerGroupBox;
@@ -21,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.P_TestGroupBox.InnerG
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.P_TestGroupBox.InnerGroupBox.TestStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;

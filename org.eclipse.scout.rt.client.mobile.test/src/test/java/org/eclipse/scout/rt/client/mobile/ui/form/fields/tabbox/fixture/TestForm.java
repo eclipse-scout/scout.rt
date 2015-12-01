@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture;
 
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.TabBox;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
+import org.eclipse.scout.rt.platform.Order;
 
 @FormData(value = TestFormData.class, sdkCommand = SdkCommand.CREATE)
 public class TestForm extends AbstractForm {

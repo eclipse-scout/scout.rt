@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Map to associate properties with the current context.

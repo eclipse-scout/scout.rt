@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 

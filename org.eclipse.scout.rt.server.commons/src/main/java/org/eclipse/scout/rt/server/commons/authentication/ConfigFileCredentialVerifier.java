@@ -21,16 +21,16 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.SecurityUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

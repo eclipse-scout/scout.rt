@@ -19,13 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.DefaultFormFieldInjection;
@@ -37,6 +30,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {

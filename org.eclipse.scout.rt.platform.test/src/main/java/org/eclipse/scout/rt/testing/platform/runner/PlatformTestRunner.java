@@ -14,9 +14,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;

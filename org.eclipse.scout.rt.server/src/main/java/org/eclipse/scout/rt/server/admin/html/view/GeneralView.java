@@ -18,11 +18,11 @@ import java.util.Iterator;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
+import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;

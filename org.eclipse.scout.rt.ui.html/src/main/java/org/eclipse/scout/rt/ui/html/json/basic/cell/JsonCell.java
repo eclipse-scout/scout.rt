@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;

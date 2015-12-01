@@ -19,8 +19,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
  * A registry for beans implementing an interface with one generic parameter type B&ltT&gt that allows querying beans

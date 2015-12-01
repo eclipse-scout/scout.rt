@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.IFieldStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 
 /**
  * Status type for form fields with additional property "iconId"

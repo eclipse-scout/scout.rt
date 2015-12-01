@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.jdbc.parsers.sql;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.junit.Test;
 
 /**

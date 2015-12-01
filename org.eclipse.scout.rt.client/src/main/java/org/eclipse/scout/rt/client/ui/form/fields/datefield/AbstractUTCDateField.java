@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.util.Date;
 
-import org.eclipse.scout.commons.UTCDate;
-import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IUTCDateFieldExtension;
+import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.date.UTCDate;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
 
 /**

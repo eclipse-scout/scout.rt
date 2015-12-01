@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.client.mobile.ui.form;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractFormActionFetcher implements IActionFetcher {
   private IForm m_form;

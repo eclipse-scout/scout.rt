@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.io.Serializable;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
  * Key class used for the cache in the {@link ICodeService} implementation.

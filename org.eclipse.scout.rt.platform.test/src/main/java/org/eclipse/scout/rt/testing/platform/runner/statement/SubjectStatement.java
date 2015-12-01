@@ -15,8 +15,8 @@ import java.security.PrivilegedExceptionAction;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.runners.model.Statement;
 
