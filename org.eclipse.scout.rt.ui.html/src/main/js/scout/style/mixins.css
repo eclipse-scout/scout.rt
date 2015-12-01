@@ -282,17 +282,16 @@
     }
   }
 
-  /* TODO BSH Check if required! */
   .menu-icon() {
     display: inline-block;
-    font-size: 18px;
-    color: @icon-color;
-  }
-
-  /* TODO BSH Check if required! */
-  .sub-menu-icon() {
-    content: @icon-angle-down;
     #scout.font-icon();
     font-size: 18px;
+  }
+
+  .sub-menu-icon(@icon: @icon-angle-down) {
+    display: inline-block;
+    #scout.font-icon();
+    font-size: 18px;
+    content: @icon;
   }
 }

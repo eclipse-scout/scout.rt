@@ -46,9 +46,7 @@
     padding-left: 8px;
 
     &::before {
-      #scout.sub-menu-icon();
-      content: @icon-angle-up;
-      display: inline-block;
+      #scout.sub-menu-icon(@icon-angle-up);
       margin-top: -1px; /* optically center */
     }
   }
@@ -60,7 +58,6 @@
 
   &.in-main-menubar > .font-icon {
     font-size: 22px;
-    display: inline-block;
   }
 }
 

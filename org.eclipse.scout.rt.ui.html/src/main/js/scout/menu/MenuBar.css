@@ -72,11 +72,14 @@
     }
 
     & > .menu-item {
-      color: @menubar-item-color;
       /* All menu items need the same height to correctly position the key-boxes. A minimal height is */
       /* required to be able to calculate a reasonable preferred size. */
       min-height: 25px;
       height: 100%;
+
+      &:not(.disabled) {
+        color: @menubar-item-color;
+      }
 
       &:focus:not(.disabled):not(.menu-button) {
         text-decoration: underline;
