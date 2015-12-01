@@ -262,6 +262,13 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  .sub-menu-icon(@icon: @icon-angle-down) {
+    display: inline-block;
+    #scout.font-icon();
+    font-size: 18px;
+    content: @icon;
+  }
+
   /* Invisible pseudo element that enables vertical-align if container has height set */
   .vertical-align-helper() {
     content: '';
@@ -280,18 +287,5 @@
     &::after {
       #scout.vertical-align-helper();
     }
-  }
-
-  .menu-icon() {
-    display: inline-block;
-    #scout.font-icon();
-    font-size: 18px;
-  }
-
-  .sub-menu-icon(@icon: @icon-angle-down) {
-    display: inline-block;
-    #scout.font-icon();
-    font-size: 18px;
-    content: @icon;
   }
 }

@@ -52,7 +52,7 @@
   }
 
   & > .font-icon {
-    #scout.menu-icon();
+    font-size: 18px;
     color: @active-color;
   }
 
