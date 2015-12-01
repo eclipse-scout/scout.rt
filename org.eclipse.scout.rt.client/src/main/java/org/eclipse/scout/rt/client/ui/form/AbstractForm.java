@@ -2969,7 +2969,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withSchedulingDelay(0, TimeUnit.SECONDS)
         .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
-        .withLogOnError(false)
+        .withExceptionHandling(null, false)
         .withName("Close timer"));
   }
 

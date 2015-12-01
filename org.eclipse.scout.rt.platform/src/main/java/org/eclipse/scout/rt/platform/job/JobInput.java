@@ -55,12 +55,14 @@ public class JobInput {
   protected String m_name;
   protected IMutex m_mutex;
   protected long m_expirationTime = INFINITE_EXPIRATION;
-  protected boolean m_logOnError = true;
   protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
   protected long m_schedulingDelay;
   protected long m_periodicDelay;
   protected int m_schedulingRule = SCHEDULING_RULE_SINGLE_EXECUTION;
+
+  protected Class<? extends ExceptionHandler> m_exceptionHandler = ExceptionHandler.class;
+  protected boolean m_swallowException = false;
 
   protected Set<String> m_executionHints = new HashSet<>();
 
@@ -215,17 +217,33 @@ public class JobInput {
     return this;
   }
 
-  public boolean isLogOnError() {
-    return m_logOnError;
+  public Class<? extends ExceptionHandler> getExceptionHandler() {
+    return m_exceptionHandler;
+  }
+
+  public boolean isSwallowException() {
+    return m_swallowException;
   }
 
   /**
-   * Instruments the job manager to log uncaught exceptions on behalf of the installed {@link ExceptionHandler}. This
-   * behavior is enabled by default, but might be disabled, if the caller handles exceptions himself by waiting for the
-   * job to complete.
+   * Controls the handling of uncaught exceptions.
+   * <p>
+   * By default, an uncaught exception is handled by {@link ExceptionHandler} bean and then propagated to the submitter,
+   * unless the submitter is not waiting for the job to complete via {@link IFuture#awaitDoneAndGet()}.
+   * <p>
+   * If running a periodic job with <code>swallowException=true</code>, the job will continue periodic execution upon an
+   * uncaught exception. If set to <code>false</code>, the execution would exit.
+   *
+   * @param exceptionHandler
+   *          optional handler to handle an uncaught exception, or <code>null</code> to not handle the exception. By
+   *          default, {@link ExceptionHandler} bean is used.
+   * @param swallowException
+   *          <code>true</code> to swallow an uncaught exception, meaning that the exception is not propagated to the
+   *          submitter. By default, exceptions are not swallowed and propagated to the submitter.
    */
-  public JobInput withLogOnError(final boolean logOnError) {
-    m_logOnError = logOnError;
+  public JobInput withExceptionHandling(final Class<? extends ExceptionHandler> exceptionHandler, final boolean swallowException) {
+    m_exceptionHandler = exceptionHandler;
+    m_swallowException = swallowException;
     return this;
   }
 
@@ -269,7 +287,8 @@ public class JobInput {
     builder.attr("name", m_name);
     builder.ref("mutex", m_mutex);
     builder.attr("expirationTime", m_expirationTime);
-    builder.attr("logOnError", m_logOnError);
+    builder.attr("exceptionHandler", m_exceptionHandler);
+    builder.attr("swallowException", m_swallowException);
     builder.attr("threadName", m_threadName);
     builder.attr("schedulingRule", m_schedulingRule);
     builder.attr("schedulingDelay", m_schedulingDelay);
@@ -288,7 +307,8 @@ public class JobInput {
     copy.m_name = m_name;
     copy.m_mutex = m_mutex;
     copy.m_expirationTime = m_expirationTime;
-    copy.m_logOnError = m_logOnError;
+    copy.m_exceptionHandler = m_exceptionHandler;
+    copy.m_swallowException = m_swallowException;
     copy.m_threadName = m_threadName;
     copy.m_runContext = (m_runContext != null ? m_runContext.copy() : null);
     copy.m_schedulingDelay = m_schedulingDelay;

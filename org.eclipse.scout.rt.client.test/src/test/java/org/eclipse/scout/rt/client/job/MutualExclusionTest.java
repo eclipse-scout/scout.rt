@@ -320,7 +320,9 @@ public class MutualExclusionTest {
           protocol.add("1: modelThread [b]");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-1")
+        .withExceptionHandling(null, false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -353,7 +355,9 @@ public class MutualExclusionTest {
           protocol.add("2: modelThread [b]");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-2")
+        .withExceptionHandling(null, false));
 
     // Wait until job1 completed.
     future1.awaitDoneAndGet(30, TimeUnit.SECONDS);
@@ -441,7 +445,8 @@ public class MutualExclusionTest {
         protocol.add("running-2");
         setupLatch.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExceptionHandling(null, false));
     ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -502,7 +507,9 @@ public class MutualExclusionTest {
         protocol.add("done-1");
         job1FinishLatch.countDown();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-1")
+        .withExceptionHandling(null, false));
 
     final IFuture<Void> future2 = ModelJobs.schedule(new IRunnable() {
 
@@ -517,7 +524,9 @@ public class MutualExclusionTest {
         latchJob2.countDownAndBlock();
         protocol.add("done-2");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-2")
+        .withExceptionHandling(null, false));
 
     final IFuture<Void> future3 = ModelJobs.schedule(new IRunnable() {
 
@@ -525,7 +534,9 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("done-3");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-3")
+        .withExceptionHandling(null, false));
 
     assertTrue(latchJob2.await());
     JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 3); // job-1 (interrupted, but re-acquire mutex task still pending), job32 (latch), job-3 (pending)
@@ -740,7 +751,9 @@ public class MutualExclusionTest {
           protocol.add("running-job-1 (e) [model-thread]");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-1")
+        .withExceptionHandling(null, false));
 
     // Job-2
     IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
@@ -750,7 +763,9 @@ public class MutualExclusionTest {
         protocol.add("running-job-2");
       }
 
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-2")
+        .withExceptionHandling(null, false));
 
     // Job-3
     IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
@@ -766,7 +781,9 @@ public class MutualExclusionTest {
         protocol.add("running-job-3 (b)");
 
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-3")
+        .withExceptionHandling(null, false));
 
     // Job-4
     IFuture<Void> future4 = Jobs.getJobManager().schedule(new IRunnable() {
@@ -782,7 +799,9 @@ public class MutualExclusionTest {
           protocol.add("job-4 [interrupted]");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-4"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-4")
+        .withExceptionHandling(null, false));
 
     // Job-5
     IFuture<Void> future5 = Jobs.getJobManager().schedule(new IRunnable() {
@@ -791,7 +810,9 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("running-job-5");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-5"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("job-5")
+        .withExceptionHandling(null, false));
 
     assertTrue(job4RunningLatch.await());
     assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 and job-5 are pending
@@ -1196,7 +1217,9 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("3: running");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withExpirationTime(100, TimeUnit.MILLISECONDS));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExceptionHandling(null, false)
+        .withExpirationTime(100, TimeUnit.MILLISECONDS));
 
     // Wait until entering blocking condition
     JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 0);

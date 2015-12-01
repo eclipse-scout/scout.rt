@@ -121,7 +121,8 @@ public class FutureAwaitTest {
       public String call() throws Exception {
         throw computationException;
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Run the test and verify
     try {
@@ -233,7 +234,8 @@ public class FutureAwaitTest {
       public String call() throws Exception {
         throw computationException;
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Run test and verify
     try {
@@ -329,7 +331,8 @@ public class FutureAwaitTest {
       public String call() throws Exception {
         throw computationException;
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Run the test and verify
     try {
@@ -418,7 +421,8 @@ public class FutureAwaitTest {
       public String call() throws Exception {
         throw computationException;
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Run the test and verify
     try {
@@ -442,7 +446,8 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Wait until ready
     assertTrue(setupLatch.await());
@@ -555,7 +560,8 @@ public class FutureAwaitTest {
       public String call() throws Exception {
         throw computationException;
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Run the test and verify
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

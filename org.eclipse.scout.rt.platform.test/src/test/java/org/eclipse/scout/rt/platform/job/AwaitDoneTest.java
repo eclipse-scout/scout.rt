@@ -112,7 +112,7 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
@@ -146,7 +146,7 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)

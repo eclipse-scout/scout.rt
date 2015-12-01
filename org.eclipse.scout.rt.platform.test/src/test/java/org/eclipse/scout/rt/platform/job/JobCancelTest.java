@@ -129,7 +129,7 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(setupLatch.await());
 
@@ -189,7 +189,7 @@ public class JobCancelTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withPeriodicExecutionAtFixedRate(10, TimeUnit.MILLISECONDS)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(setupLatch.await());
 
@@ -228,7 +228,7 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -247,7 +247,7 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(latch.await());
 
@@ -271,7 +271,7 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // VERIFY
     assertEquals(CollectionUtility.hashSet("running-1", "running-2", "interrupted-1", "interrupted-2", "done-1", "done-2"), protocol);
@@ -322,7 +322,7 @@ public class JobCancelTest {
         }, Jobs.newInput()
             .withRunContext(RunContexts.copyCurrent())
             .withName("job-2")
-            .withLogOnError(false));
+            .withExceptionHandling(null, false));
         childFutureRef.set(childFuture);
 
         try {
@@ -392,7 +392,7 @@ public class JobCancelTest {
         }, Jobs.newInput()
             .withRunContext(RunContexts.copyCurrent())
             .withName("job-2")
-            .withLogOnError(false));
+            .withExceptionHandling(null, false));
 
         //does not re-use runmonitor -> no nested cancel
         Jobs.getJobManager().schedule(new IRunnable() {
@@ -416,7 +416,7 @@ public class JobCancelTest {
         }, Jobs.newInput()
             .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
             .withName("job-3")
-            .withLogOnError(false));
+            .withExceptionHandling(null, false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -482,7 +482,7 @@ public class JobCancelTest {
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
         .withMutex(null)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // Job-2 (common-id) => CANCEL
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -501,7 +501,7 @@ public class JobCancelTest {
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
         .withMutex(null)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // Job-3 (common-id) => CANCEL
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -525,7 +525,7 @@ public class JobCancelTest {
             .withRunContext(RunContexts.copyCurrent())
             .withName("otherName")
             .withMutex(null)
-            .withLogOnError(false));
+            .withExceptionHandling(null, false));
 
         // Job-3b (other name, other runMonitor => NO CANCEL)
         Jobs.getJobManager().schedule(new IRunnable() {
@@ -543,7 +543,7 @@ public class JobCancelTest {
             .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
             .withName("otherName")
             .withMutex(null)
-            .withLogOnError(false));
+            .withExceptionHandling(null, false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -574,7 +574,7 @@ public class JobCancelTest {
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
         .withMutex(Jobs.newMutex())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(setupLatch.await());
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()

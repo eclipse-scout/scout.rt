@@ -150,7 +150,7 @@ public class WhenDoneTest {
       }
     }, Jobs.newInput()
         .withSchedulingDelay(1, TimeUnit.SECONDS)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneHandler<String>() {
@@ -191,7 +191,7 @@ public class WhenDoneTest {
         throw error;
       }
     }, Jobs.newInput()
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
     try {
       future.awaitDoneAndGet();
       fail("exception expected");

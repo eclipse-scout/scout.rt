@@ -71,7 +71,7 @@ public class ClientSessionProvider {
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
             .withSession(clientSession, true))
             .withName("Starting ClientSession [sessionId=%s]", sessionId)
-            .withLogOnError(false))
+            .withExceptionHandling(null, true))
             .awaitDoneAndGet();
 
         return clientSession;

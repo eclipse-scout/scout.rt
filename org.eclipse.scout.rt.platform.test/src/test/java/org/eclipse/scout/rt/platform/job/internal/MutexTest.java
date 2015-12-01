@@ -269,7 +269,8 @@ public class MutexTest {
           interruptedLatch.countDown();
         }
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     JobTestUtil.waitForMutexCompetitors(mutex, 2);
     assertTrue(mutex.isMutexOwner(m_task1));

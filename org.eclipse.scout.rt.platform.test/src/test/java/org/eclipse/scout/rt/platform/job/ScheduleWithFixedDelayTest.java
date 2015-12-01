@@ -20,10 +20,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
+import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +41,9 @@ public class ScheduleWithFixedDelayTest {
   @Before
   public void before() {
     m_jobManagerBean = JobTestUtil.registerJobManager();
+
+    // Unregister JUnit exception handler
+    BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
   }
 
   @After
@@ -116,7 +122,7 @@ public class ScheduleWithFixedDelayTest {
         .withRunContext(RunContexts.empty())
         .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
         .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // verify
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -163,7 +169,7 @@ public class ScheduleWithFixedDelayTest {
         .withRunContext(RunContexts.empty())
         .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
         .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // verify
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -210,7 +216,7 @@ public class ScheduleWithFixedDelayTest {
         .withRunContext(RunContexts.empty())
         .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
         .withPeriodicExecutionWithFixedDelay(delayNanos, TimeUnit.NANOSECONDS)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // verify
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -226,5 +232,70 @@ public class ScheduleWithFixedDelayTest {
         fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
+  }
+
+  @Test
+  public void testSwallowException() {
+    final AtomicInteger counter = new AtomicInteger();
+    Jobs.getJobManager().schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (counter.incrementAndGet() == 2) {
+          RunMonitor.CURRENT.get().cancel(false);
+        }
+        else {
+          throw new Exception();
+        }
+      }
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.NANOSECONDS)
+        .withExceptionHandling(null, true/* swallow */ ))
+        .awaitDone();
+    assertEquals(2, counter.get());
+  }
+
+  @Test
+  public void testPropagatedException() {
+    final AtomicInteger counter = new AtomicInteger();
+    Jobs.getJobManager().schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (counter.incrementAndGet() == 2) {
+          RunMonitor.CURRENT.get().cancel(false);
+        }
+        else {
+          throw new Exception();
+        }
+      }
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.NANOSECONDS)
+        .withExceptionHandling(null, false /* propagated */ ))
+        .awaitDone();
+    assertEquals(1, counter.get());
+  }
+
+  @Test
+  public void testDefaultExceptionHandling() {
+    final AtomicInteger counter = new AtomicInteger();
+    Jobs.getJobManager().schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (counter.incrementAndGet() == 2) {
+          RunMonitor.CURRENT.get().cancel(false);
+        }
+        else {
+          throw new Exception();
+        }
+      }
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.NANOSECONDS))
+        .awaitDone();
+    assertEquals(1, counter.get());
   }
 }

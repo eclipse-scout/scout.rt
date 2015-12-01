@@ -58,7 +58,7 @@ public class JobManagerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -68,7 +68,7 @@ public class JobManagerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -78,7 +78,7 @@ public class JobManagerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(latch.await());
 
@@ -120,7 +120,7 @@ public class JobManagerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -138,7 +138,7 @@ public class JobManagerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -156,7 +156,7 @@ public class JobManagerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(setupLatch.await());
 

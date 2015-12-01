@@ -145,7 +145,8 @@ public class ClientJobCancelTest {
           }
         });
       }
-    }, Jobs.newInput().withLogOnError(false));
+    }, Jobs.newInput()
+        .withExceptionHandling(null, false));
 
     // Wait for the ping request to enter service implementation.
     assertTrue(serviceCallSetupLatch.await());

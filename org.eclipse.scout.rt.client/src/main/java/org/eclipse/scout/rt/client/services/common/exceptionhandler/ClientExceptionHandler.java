@@ -73,7 +73,8 @@ public class ClientExceptionHandler extends ExceptionHandler {
               public void run() throws Exception {
                 showExceptionInUI(pe);
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false)
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+                .withExceptionHandling(null, true)
                 .withName("Visualizing ProcessingException"))
                 .awaitDoneAndGet();
           }

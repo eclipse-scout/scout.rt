@@ -76,7 +76,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job1")
         .withMutex(m_mutex1)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // SESSION 1 (JOB-2)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -90,7 +90,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job2")
         .withMutex(m_mutex1)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // SESSION 1 (JOB-3)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -129,7 +129,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job2")
         .withMutex(m_mutex2)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // SESSION 2  (JOB-3)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -147,7 +147,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job3")
         .withMutex(m_mutex2)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     // SESSION 2  (JOB-4)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -174,7 +174,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex3_job1")
         .withMutex(m_mutex3)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(latch.await());
   }

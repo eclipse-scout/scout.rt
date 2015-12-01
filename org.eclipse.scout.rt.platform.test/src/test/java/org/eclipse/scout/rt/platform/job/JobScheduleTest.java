@@ -106,7 +106,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     try {
       future.awaitDoneAndGet();
@@ -130,7 +130,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     try {
       future.awaitDoneAndGet();
@@ -154,7 +154,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     try {
       future.awaitDoneAndGet();
@@ -179,7 +179,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     try {
       future.awaitDoneAndGet();
@@ -204,7 +204,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     try {
       future.awaitDoneAndGet();
@@ -229,7 +229,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     try {
       future.awaitDoneAndGet();
@@ -372,7 +372,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -382,7 +382,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -392,7 +392,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     assertTrue(barrier.await());
     barrier.unblock();
@@ -501,7 +501,7 @@ public class JobScheduleTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withMutex(mutex)
-        .withLogOnError(false));
+        .withExceptionHandling(null, false));
 
     IFuture<String> future2 = Jobs.getJobManager().schedule(new Callable<String>() {
 

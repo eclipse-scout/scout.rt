@@ -91,7 +91,7 @@ public class UiJobs {
   public <RESULT, ERROR extends Throwable> RESULT runAsModelJob(final Callable<RESULT> callable, final JobInput jobInput, final Class<? extends IThrowableTranslator<ERROR>> throwableTranslatorClass) throws ERROR {
     Assertions.assertTrue(!ModelJobs.isModelThread(), "must not be invoked in model thread");
 
-    final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput.copy().withLogOnError(false));
+    final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput.copy().withExceptionHandling(null, false));
 
     // Wait until the job is done (completed or cancelled), or enters a blocking condition.
     boolean timeout;
