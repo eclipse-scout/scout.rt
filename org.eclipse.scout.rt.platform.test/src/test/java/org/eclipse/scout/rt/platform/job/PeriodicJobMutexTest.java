@@ -127,7 +127,7 @@ public class PeriodicJobMutexTest {
 
         protocol.add("end");
       }
-    }, periodicJobInput.withSchedulingDelay(200, TimeUnit.MILLISECONDS)); // schedule delayed
+    }, periodicJobInput.copy().withSchedulingDelay(200, TimeUnit.MILLISECONDS)); // schedule delayed
 
     // Schedule other job
     Jobs.schedule(new IRunnable() {
