@@ -8,18 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.service;
+package org.eclipse.scout.rt.platform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -33,7 +29,7 @@ import org.junit.runner.RunWith;
  * @since 3.9.0
  */
 @RunWith(PlatformTestRunner.class)
-public class SERVICESTest {
+public class BEANSTest {
   private IBean<?> m_ref1;
   private IBean<?> m_ref2;
   private IBean<?> m_ref3;
@@ -43,12 +39,12 @@ public class SERVICESTest {
    */
   @Before
   public void registerTestServices() {
-    m_ref1 = registerService(TestService1.class, 2);
-    m_ref2 = registerService(TestService2.class, 1);
-    m_ref3 = registerService(TestService3.class, 0);
+    m_ref1 = registerBean(TestService1.class, 2);
+    m_ref2 = registerBean(TestService2.class, 1);
+    m_ref3 = registerBean(TestService3.class, 0);
   }
 
-  private IBean<?> registerService(Class<? extends ITestService> serviceClazz, double order) {
+  private IBean<?> registerBean(Class<? extends ITestService> serviceClazz, double order) {
     BeanMetaData bean = new BeanMetaData(serviceClazz);
     bean.withAnnotation(AnnotationFactory.createOrder(order));
     return Platform.get().getBeanManager().registerBean(bean);
@@ -133,6 +129,13 @@ public class SERVICESTest {
    * Test service interface with no services registered
    */
   private static interface IUnregisteredTestService {
+  }
+
+  public interface ITestService2 extends IService {
+  }
+
+  @ApplicationScoped
+  public class TestService implements ITestService2 {
   }
 
 }

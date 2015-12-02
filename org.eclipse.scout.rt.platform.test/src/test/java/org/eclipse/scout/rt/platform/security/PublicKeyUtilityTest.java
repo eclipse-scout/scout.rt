@@ -13,16 +13,15 @@ package org.eclipse.scout.rt.platform.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.rt.platform.security.PublicKeyUtility;
 import org.junit.Test;
 
 /**
  * Unit Test for {@link PublicKeyUtility}
  */
+@SuppressWarnings("deprecation")
 public final class PublicKeyUtilityTest {
 
   @Test
-  @SuppressWarnings("deprecation")
   public void test() throws Exception {
     byte[][] tmp = PublicKeyUtility.createKeyPair(null, 1024);
     assertEquals("array size", 2, tmp.length);
