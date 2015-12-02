@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -135,6 +136,13 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return json;
   }
 
+  /**
+   * Returns a string used to identify the object-type in the JSON output (JSON attribute 'objectType'). Unlike
+   * {@link #getObjectType()}, this method returns the object type <b>including the model variant</b> (if set). The
+   * resulting string looks like this: <code>"&lt;ObjectType&gt;.&lt;ModelVariant&gt;"</code>.
+   *
+   * @see {@link ModelVariant}
+   */
   protected String getObjectTypeVariant() {
     return JsonAdapterUtility.getObjectType(getObjectType(), getModel());
   }
