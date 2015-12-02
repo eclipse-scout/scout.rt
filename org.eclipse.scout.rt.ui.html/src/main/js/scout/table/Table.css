@@ -55,7 +55,8 @@
 }
 
 .table-data-fill {
-  width: 100%;
+  background: linear-gradient(to bottom, transparent, transparent 97.5%, @border-color 97.5%,@border-color);
+  background-size: 100% 40px; //FIXME CGU adjust row height for regular table
 }
 
 .table-row,

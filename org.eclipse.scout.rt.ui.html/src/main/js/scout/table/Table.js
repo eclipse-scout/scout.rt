@@ -32,7 +32,7 @@ scout.Table = function(model) {
   this.tooltips = [];
   this._aggregateRows = [];
   this._animationRowLimit = 25;
-  this._blockLoadThreshold = 50;
+  this._blockLoadThreshold = 25;
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
@@ -983,7 +983,6 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
   var $rows, fromRow, toRow,
     rowString = '',
     that = this,
-    height = 0,
     numRowsRendered = 0;
 
   rows = rows || this.rows;
@@ -1036,9 +1035,6 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
     scout.Table.linkRowToDiv(row, $row);
   });
 
-  // calculate block height
-  height = toRow.$row.offset().top + toRow.$row.outerHeight(true) - fromRow.$row.offset().top;
-
   this._installRows($rows);
 
   // notify
@@ -1058,16 +1054,12 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
 
 scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
   var fromRow, toRow,
-    numRowsRemoved = 0,
-    height = 0;
+    numRowsRemoved = 0;
 
   fromIndex = Math.max(fromIndex, 0);
   fromRow = this.rows[fromIndex],
   toIndex = Math.min(toIndex, this.rows.length - 1);
   toRow = this.rows[toIndex];
-
-  // calculate block height
-  height = toRow.$row.offset().top + toRow.$row.outerHeight(true) - fromRow.$row.offset().top;
 
   for (var i = fromIndex; i <= toIndex; i++) {
     var row = this.rows[i];
@@ -1095,7 +1087,6 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
     $.log.trace(numRowsRemoved + ' rows removed from ' + fromIndex + ' to ' + toIndex + '.');
     $.log.trace(this._rowsRenderedInfo());
   }
-  return height;
 };
 
 scout.Table.prototype._removeRows = function($rows) {
@@ -2932,6 +2923,7 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
   }
 };
 
+
 scout.Table.prototype._onDataScroll = function() {
   if (this.firstRenderedRowIndex === 0 &&
     this.lastRenderedRowIndex === this.rows.length - 1) {
@@ -2944,18 +2936,14 @@ scout.Table.prototype._onDataScroll = function() {
     pos = scrollTop / maxScrollTop,
     rowIndex = Math.min(Math.floor(pos * this.rows.length), this.rows.length - 1);
 
+  this.scrollTop = scrollTop;
   this._renderViewRangeForRowIndex(rowIndex);
 };
 
 scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
   var viewRange = {};
-  if (rowIndex < this.firstRenderedRowIndex || this.firstRenderedRowIndex === -1) {
-    viewRange.from = rowIndex;
-    viewRange.to = rowIndex + 2 * this._blockLoadThreshold - 1;
-  } else if (rowIndex > this.lastRenderedRowIndex) {
-    viewRange.from = rowIndex - 2 * this._blockLoadThreshold + 1;
-    viewRange.to = rowIndex;
-  }
+  viewRange.from = Math.max(rowIndex - this._blockLoadThreshold, 0);
+  viewRange.to = Math.min(rowIndex + this._blockLoadThreshold, this.rows.length - 1);
   this._renderViewRange(viewRange);
 };
 
@@ -2970,8 +2958,10 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     if (this.firstRenderedRowIndex !== -1) {
       this._removeRowsFromTo(this.firstRenderedRowIndex, Math.min(viewRange.from, this.lastRenderedRowIndex));
     }
+  }
+  if (viewRange.to > this.lastRenderedRowIndex) {
     if (this.lastRenderedRowIndex > from) {
-      from = this.lastRenderedRowIndex + 1;
+      from = Math.min(this.lastRenderedRowIndex + 1, this.rows.length - 1);
     }
     this._renderRows(this.rows, from, viewRange.to);
   }
@@ -2979,11 +2969,31 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     if (this.firstRenderedRowIndex !== -1) {
       this._removeRowsFromTo(Math.max(viewRange.to, this.firstRenderedRowIndex), this.lastRenderedRowIndex);
     }
+  }
+  if (viewRange.from < this.firstRenderedRowIndex || this.firstRenderedRowIndex === -1) {
     if (this.firstRenderedRowIndex !== -1 && this.firstRenderedRowIndex < to) {
       to = this.firstRenderedRowIndex - 1;
     }
-    this._renderRows(this.rows, viewRange.from, to);
+    this._renderRows(this.rows, viewRange.from, to, true);
   }
+
+  if (!this.$fillBefore) {
+    this.$fillBefore = this.$data.prependDiv('table-data-fill');
+  }
+
+  var fillBeforeHeight = this.firstRenderedRowIndex * 40; //FIXME CGU calculate row height
+  this.$fillBefore.cssHeight(fillBeforeHeight);
+  this.$fillBefore.cssWidth(this.rowWidth);
+  $.log.trace('FillBefore height: ' + fillBeforeHeight);
+
+  if (!this.$fillAfter) {
+    this.$fillAfter = this.$data.appendDiv('table-data-fill');
+  }
+
+  var fillAfterHeight = (this.rows.length - (this.lastRenderedRowIndex + 1)) * 40;
+  this.$fillAfter.cssHeight(fillAfterHeight);
+  this.$fillAfter.cssWidth(this.rowWidth);
+  $.log.trace('FillAfter height: ' + fillAfterHeight);
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
