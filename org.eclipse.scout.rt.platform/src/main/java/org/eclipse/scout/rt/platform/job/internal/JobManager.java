@@ -46,7 +46,6 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -84,7 +83,7 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   @Override
   public IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
-    return schedule(Callables.callable(runnable), input);
+    return schedule(Callables.callable(runnable), ensureJobInputName(input, runnable.getClass().getName()));
   }
 
   @Override
@@ -208,6 +207,17 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
+   * Checks if the given job input has a name set. If yes, the input is returned. If no, a copy of the input is returned
+   * with the given defaultName set as name.
+   */
+  protected JobInput ensureJobInputName(JobInput input, String defaultName) {
+    if (input != null && input.getName() == null) {
+      return input.copy().withName(defaultName);
+    }
+    return input;
+  }
+
+  /**
    * Creates the Future to interact with the executable.
    *
    * @param callable
@@ -219,7 +229,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input) {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
 
-    final JobInput inputCopy = input.copy().withName(StringUtility.nvl(input.getName(), callable.getClass().getName()));
+    final JobInput inputCopy = ensureJobInputName(input, callable.getClass().getName());
     final CallableChain<RESULT> callableChain = new CallableChain<>();
     final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, callableChain, callable);
 
