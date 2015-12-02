@@ -19,7 +19,7 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
   // Clear any pending loading function
   clearTimeout(this._loadingIndicatorTimeoutId);
 
-  if (!this.field || !this.field.rendered) {
+  if (!this.field) {
     return;
   }
 
