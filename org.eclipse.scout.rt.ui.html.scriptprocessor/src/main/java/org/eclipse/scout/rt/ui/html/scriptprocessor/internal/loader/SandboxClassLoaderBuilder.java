@@ -36,6 +36,7 @@ public final class SandboxClassLoaderBuilder {
 
   private final Map<String, URL> m_urls = new LinkedHashMap<String, URL>();
   private final JarLocator m_jarLocator;
+  private final ClassLoader m_originalClassLoader = SandboxClassLoaderBuilder.class.getClassLoader();
 
   public SandboxClassLoaderBuilder() {
     this(null);
@@ -78,7 +79,7 @@ public final class SandboxClassLoaderBuilder {
     return AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
       @Override
       public URLClassLoader run() {
-        return new URLClassLoader(m_urls.values().toArray(new URL[0]), parent);
+        return new P_ScriptClassLoader(m_urls.values().toArray(new URL[0]), parent);
       }
     });
   }
@@ -166,5 +167,40 @@ public final class SandboxClassLoaderBuilder {
         out.write(buf, 0, n);
       }
     }
+  }
+
+  /**
+   * This class loader has only access to resources in the given JARs (provided by urls parameter) and also to script
+   * resources (CSS, JS) from the parent class loader. The later is required, because the LessCompiler looks on the
+   * current classpath to find a resource which is imported with the @import directive.
+   */
+  private class P_ScriptClassLoader extends URLClassLoader {
+
+    public P_ScriptClassLoader(URL[] urls, ClassLoader parent) {
+      super(urls, parent);
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String name) {
+      String ext = getFileExtension(name);
+      if ("css".equals(ext) || "js".equals(ext) || "less".equals(ext)) {
+        return m_originalClassLoader.getResourceAsStream(name);
+      }
+      else {
+        return super.getResourceAsStream(name);
+      }
+    }
+
+    // Cannot use FileUtility here since the script-processor module has no dependency to Scout platform
+    private String getFileExtension(String name) {
+      int pos = name.lastIndexOf('.');
+      if (pos > -1) {
+        return name.substring(pos + 1);
+      }
+      else {
+        return null;
+      }
+    }
+
   }
 }
