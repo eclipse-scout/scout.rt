@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -47,6 +46,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
@@ -115,42 +115,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_jsonEventProcessor = createJsonEventProcessor();
-
-    m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
-        ModelJobs.newEventFilterBuilder()
-            .andMatchEventType(
-                JobEventType.BLOCKED,
-                JobEventType.DONE,
-                JobEventType.REJECTED,
-                JobEventType.SHUTDOWN)
-            .andMatch(new IFilter<JobEvent>() {
-              @Override
-              public boolean accept(JobEvent event) {
-                if (BEANS.get(UiJobs.class).isPollingRequest(event.getFuture().getJobInput().getRunContext())) {
-                  return false; // only non-polling requests are of interest
-                }
-
-                // no client request must currently being processed (because in that case, the result of the
-                // model job will be returned as payload of the current JSON response).
-                if (isProcessingJsonRequest()) {
-                  return false;
-                }
-                // the model job's session has to match our session
-                ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().getRunContext();
-                return runContext.getSession() == getClientSession();
-              }
-            })
-            .toFilter(),
-        new IJobListener() {
-          @Override
-          public void changed(JobEvent event) {
-            // When a model job finishes but no client request is currently being processed, the background poller has to be notified.
-            // This enables sending JSON responses to the UI without user interaction. Note that a model job is also considered
-            // "finished", when it is blocked, e.g. form.waitFor().
-            LOG.trace("Model job finished: " + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
-            notifyPollingBackgroundJobRequests();
-          }
-        });
   }
 
   protected JsonResponse createJsonResponse() {
@@ -187,6 +151,59 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     return map;
   }
 
+  /**
+   * Installs a job listener that notifies polling background jobs whenever a model job on the given client session has
+   * finished, but no user request is currently being processed. This enables sending JSON responses back to the UI
+   * without direct user interaction.
+   */
+  protected void installPollingBackgroundJobsNotifier(final IClientSession clientSession) {
+    // Ensure no listener is currently registered
+    uninstallPollingBackgroundJobsNotifier();
+
+    // Add new job listener
+    m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
+        ModelJobs.newEventFilterBuilder()
+            .andMatch(new SessionJobEventFilter(clientSession))
+            .andMatchEventType(
+                JobEventType.EXECUTION_HINT_CHANGED,
+                JobEventType.DONE,
+                JobEventType.REJECTED,
+                JobEventType.SHUTDOWN)
+            .andMatch(new IFilter<JobEvent>() {
+              @Override
+              public boolean accept(JobEvent event) {
+                // Only changed hints of type EXECUTION_HINT_UI_INTERACTION_REQUIRED are of interest
+                if (event.getType() == JobEventType.EXECUTION_HINT_CHANGED && !event.getFuture().containsExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)) {
+                  return false;
+                }
+                if (BEANS.get(UiJobs.class).isPollingRequest(event.getFuture().getJobInput().getRunContext())) {
+                  return false; // only non-polling requests are of interest
+                }
+                // no client request must currently being processed (because in that case, the result of the
+                // model job will be returned as payload of the current JSON response).
+                if (isProcessingJsonRequest()) {
+                  return false;
+                }
+                return true;
+              }
+            })
+            .toFilter(),
+        new IJobListener() {
+          @Override
+          public void changed(JobEvent event) {
+            LOG.trace("Model job finished: {} ({}). Notify waiting requests...", event.getFuture().getJobInput().getName(), event.getType());
+            notifyPollingBackgroundJobRequests();
+          }
+        });
+  }
+
+  protected void uninstallPollingBackgroundJobsNotifier() {
+    if (m_modelJobFinishedListenerRegistration != null) {
+      m_modelJobFinishedListenerRegistration.dispose();
+      m_modelJobFinishedListenerRegistration = null;
+    }
+  }
+
   @Override
   public void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
     if (currentSubject() == null) {
@@ -220,6 +237,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
       // Apply theme from model to HTTP session and cookie
       boolean reloadTheme = initUiTheme(req, resp, httpSession);
+
+      // Register polling background jobs notifier for this session
+      installPollingBackgroundJobsNotifier(m_clientSession);
 
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
@@ -438,10 +458,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       return;
     }
 
-    m_modelJobFinishedListenerRegistration.dispose();
-
     // Notify waiting requests - should not delay web-container shutdown
+    uninstallPollingBackgroundJobsNotifier();
     notifyPollingBackgroundJobRequests();
+
     m_jsonAdapterRegistry.disposeAdapters();
     m_currentHttpContext.clear();
     m_currentJsonResponse = null;
