@@ -97,6 +97,10 @@
   &.disabled {
     background-color: @control-disabled-background-color;
   }
+
+  &.checked {
+    background-color: @table-row-checked-background-color;
+  }
 }
 
 .table-cell {
@@ -116,6 +120,10 @@
 
   .disabled > .table-row > & {
     color: @disabled-color;
+  }
+
+  .table-row.checked > & {
+    color: @text-selection-color;
   }
 
   &.empty {

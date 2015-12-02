@@ -31,6 +31,7 @@
 @palette-blue-1: #D2DDE6;
 @palette-blue-2: #BAC9D5;
 @palette-blue-3: #8CA1B1;
+@palette-blue-35: #389DB6; /* FIXME AWE: (filter) constant for this color? */
 @palette-blue-4: #2B73B3;
 @palette-blue-5: #256298;
 @palette-blue-6: #014786;
@@ -205,13 +206,14 @@
 @table-info-warning-color: @palette-blue-4;
 @table-info-warning-hover-color: @palette-blue-6;
 @table-row-border-color: @border-color;
+@table-row-checked-background-color: @palette-blue-35;
 @text-field-icon-color: @palette-gray-6;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;
 @text-field-placeholder-color: @palette-gray-6;
 @tooltip-background-color: @palette-gray-3;
 @tooltip-border-color: @palette-gray-6;
-@tooltip-color: text-color;
+@tooltip-color: @text-color;
 @tooltip-info-background-color: @tooltip-background-color;
 @tooltip-info-border-color: @tooltip-border-color;
 @tooltip-info-color: @tooltip-color;

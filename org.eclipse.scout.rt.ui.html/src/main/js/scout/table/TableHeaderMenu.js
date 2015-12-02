@@ -454,7 +454,7 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
     headerVisible: false,
     autoResizeColumns: true,
     checkable: true,
-    checkOnClick: true,
+    checkableStyle: scout.Table.CheckableStyle.TABLE_ROW,
     columns: [scout.create('Column', {
       index: 0,
       text: 'filter-value', // text is not visible since header is not visible

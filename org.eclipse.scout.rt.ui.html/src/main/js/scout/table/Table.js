@@ -37,7 +37,7 @@ scout.Table = function(model) {
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
-  this.checkOnClick = false;
+  this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
 
   this._permanentHeadSortColumns = [];
@@ -45,6 +45,18 @@ scout.Table = function(model) {
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
+
+scout.Table.CheckableStyle = {
+  /**
+   * When row is checked a boolean column with a checkbox is inserted into the table.
+   */
+  CHECKBOX: 'checkbox',
+  /**
+   * When a row is checked the table-row is marked as checked. By default a background
+   * color is set on the table-row when the row is checked.
+   */
+  TABLE_ROW: 'tableRow'
+};
 
 scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
@@ -154,6 +166,10 @@ scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.Table.prototype._insertCheckBoxColumn = function() {
+  // don't add checkbox column when we're in checkableStyle mode
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    return;
+  }
   var column = scout.create('BooleanColumn', {
     session: this.session,
     fixedWidth: true,
@@ -247,7 +263,7 @@ scout.Table.prototype._render = function($parent) {
 
   //----- inline methods: --------
 
-  var $mouseDownRow, mouseDownColumn, that = this;
+  var $mouseDownRow, mouseDownColumn, row, that = this;
 
   function onMouseDown(event) {
     that._doubleClickSupport.mousedown(event);
@@ -255,8 +271,9 @@ scout.Table.prototype._render = function($parent) {
     mouseDownColumn = that._columnAtX(event.pageX);
     that.selectionHandler.onMouseDown(event);
 
-    if (that.checkOnClick) {
-      that.checkRow($mouseDownRow.data('row'));
+    if (that.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+      row = $mouseDownRow.data('row');
+      that.checkRow(row, !row.checked);
     }
   }
 
@@ -1746,12 +1763,16 @@ scout.Table.prototype._renderRowChecked = function(row) {
   if (!this.checkable) {
     return;
   }
-  if (!this.checkableColumn) {
-    throw new Error('checkableColumn not set');
+  var $styleElem;
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    $styleElem = row.$row;
+  } else {
+    if (!this.checkableColumn) {
+      throw new Error('checkableColumn not set');
+    }
+    $styleElem = this.checkableColumn.$checkBox(row.$row);
   }
-
-  var $checkbox = this.checkableColumn.$checkBox(row.$row);
-  $checkbox.toggleClass('checked', row.checked);
+  $styleElem.toggleClass('checked', row.checked);
 };
 
 scout.Table.prototype.checkRow = function(row, checked) {
