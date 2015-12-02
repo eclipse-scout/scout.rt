@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.server.context;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -30,12 +30,12 @@ import org.slf4j.LoggerFactory;
  * to successfully commit the transaction consistently over all involved transaction members like relational databases,
  * message queues, webservice consumers and so on.
  * <p>
- * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
  * {@link Callable}.
  *
  * @since 5.1
  */
-public class TransactionProcessor<RESULT> implements IInvocationDecorator<RESULT> {
+public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransactionProcessor.class);
 
@@ -72,8 +72,8 @@ public class TransactionProcessor<RESULT> implements IInvocationDecorator<RESULT
     return new IUndecorator<RESULT>() {
 
       @Override
-      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
-        addTransactionalFailureIfNotNull(invocationException);
+      public void undecorate(final RESULT callableResult, final Throwable callableException) {
+        addTransactionalFailureIfNotNull(callableException);
         BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(ITransaction.CURRENT.get());
         threadLocalRegistration.undo();
         monitorRegistration.undo();
@@ -107,8 +107,8 @@ public class TransactionProcessor<RESULT> implements IInvocationDecorator<RESULT
     return new IUndecorator<RESULT>() {
 
       @Override
-      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
-        addTransactionalFailureIfNotNull(invocationException);
+      public void undecorate(final RESULT callableResult, final Throwable callableException) {
+        addTransactionalFailureIfNotNull(callableException);
         threadLocalRegistration.undo();
       }
     };

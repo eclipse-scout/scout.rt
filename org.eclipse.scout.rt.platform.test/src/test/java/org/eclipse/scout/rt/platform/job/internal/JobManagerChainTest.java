@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Iterator;
 
 import org.eclipse.scout.rt.platform.chain.IChainable;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -33,9 +33,9 @@ public class JobManagerChainTest {
 
   @Test
   public void testCallableChain() throws Exception {
-    InvocationChain<Object> chain = new InvocationChain<Object>();
+    CallableChain<Object> chain = new CallableChain<Object>();
 
-    new JobManager().interceptInvocationChain(chain, mock(JobFutureTask.class), mock(RunMonitor.class), mock(JobInput.class));
+    new JobManager().interceptCallableChain(chain, mock(JobFutureTask.class), mock(RunMonitor.class), mock(JobInput.class));
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 

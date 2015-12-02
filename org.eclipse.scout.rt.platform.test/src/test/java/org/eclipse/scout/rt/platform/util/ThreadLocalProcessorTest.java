@@ -14,9 +14,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
-import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.junit.Test;
 
 public class ThreadLocalProcessorTest {
@@ -29,9 +28,9 @@ public class ThreadLocalProcessorTest {
 
     THREAD_LOCAL.set("ORIG");
 
-    InvocationChain<Void> invocationChain = new InvocationChain<>();
-    invocationChain.add(new ThreadLocalProcessor<>(THREAD_LOCAL, "ABC"));
-    invocationChain.invoke(new Callable<Void>() {
+    CallableChain<Void> callableChain = new CallableChain<>();
+    callableChain.add(new ThreadLocalProcessor<>(THREAD_LOCAL, "ABC"));
+    callableChain.call(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {

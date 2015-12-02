@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -59,9 +59,9 @@ public class ExceptionProcessorTest {
   public void testSuccess() throws Exception {
     JobInput jobInput = Jobs.newInput();
 
-    InvocationChain<String> chain = new InvocationChain<>();
+    CallableChain<String> chain = new CallableChain<>();
     chain.add(new ExceptionProcessor<String>(jobInput));
-    String result = chain.invoke(new Callable<String>() {
+    String result = chain.call(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -78,10 +78,10 @@ public class ExceptionProcessorTest {
 
     JobInput jobInput = Jobs.newInput();
 
-    InvocationChain<String> chain = new InvocationChain<>();
+    CallableChain<String> chain = new CallableChain<>();
     chain.add(new ExceptionProcessor<String>(jobInput));
     try {
-      chain.invoke(new Callable<String>() {
+      chain.call(new Callable<String>() {
 
         @Override
         public String call() throws Exception {
@@ -103,9 +103,9 @@ public class ExceptionProcessorTest {
 
     JobInput jobInput = Jobs.newInput().withExceptionHandling(ExceptionHandler.class, true);
 
-    InvocationChain<String> chain = new InvocationChain<>();
+    CallableChain<String> chain = new CallableChain<>();
     chain.add(new ExceptionProcessor<String>(jobInput));
-    chain.invoke(new Callable<String>() {
+    chain.call(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -122,9 +122,9 @@ public class ExceptionProcessorTest {
 
     JobInput jobInput = Jobs.newInput().withExceptionHandling(null, true);
 
-    InvocationChain<String> chain = new InvocationChain<>();
+    CallableChain<String> chain = new CallableChain<>();
     chain.add(new ExceptionProcessor<String>(jobInput));
-    chain.invoke(new Callable<String>() {
+    chain.call(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -140,10 +140,10 @@ public class ExceptionProcessorTest {
 
     JobInput jobInput = Jobs.newInput().withExceptionHandling(null, false);
 
-    InvocationChain<String> chain = new InvocationChain<>();
+    CallableChain<String> chain = new CallableChain<>();
     chain.add(new ExceptionProcessor<String>(jobInput));
     try {
-      chain.invoke(new Callable<String>() {
+      chain.call(new Callable<String>() {
 
         @Override
         public String call() throws Exception {
@@ -166,9 +166,9 @@ public class ExceptionProcessorTest {
 
       JobInput jobInput = Jobs.newInput().withExceptionHandling(TestExceptionHandler.class, true);
 
-      InvocationChain<String> chain = new InvocationChain<>();
+      CallableChain<String> chain = new CallableChain<>();
       chain.add(new ExceptionProcessor<String>(jobInput));
-      chain.invoke(new Callable<String>() {
+      chain.call(new Callable<String>() {
 
         @Override
         public String call() throws Exception {

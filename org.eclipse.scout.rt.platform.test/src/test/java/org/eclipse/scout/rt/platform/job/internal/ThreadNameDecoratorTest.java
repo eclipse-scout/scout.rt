@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.holders.Holder;
@@ -69,9 +69,9 @@ public class ThreadNameDecoratorTest {
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
     IFuture.CURRENT.set(mockFuture());
 
-    InvocationChain<Void> invocationChain = new InvocationChain<Void>();
-    invocationChain.add(new ThreadNameDecorator("scout-client-thread", "123:job1"));
-    invocationChain.invoke(new Callable<Void>() {
+    CallableChain<Void> callableChain = new CallableChain<Void>();
+    callableChain.add(new ThreadNameDecorator("scout-client-thread", "123:job1"));
+    callableChain.call(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -94,9 +94,9 @@ public class ThreadNameDecoratorTest {
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
     IFuture.CURRENT.set(mockFuture());
 
-    InvocationChain<Void> invocationChain = new InvocationChain<Void>();
-    invocationChain.add(new ThreadNameDecorator("scout-client-thread", null));
-    invocationChain.invoke(new Callable<Void>() {
+    CallableChain<Void> callableChain = new CallableChain<Void>();
+    callableChain.add(new ThreadNameDecorator("scout-client-thread", null));
+    callableChain.call(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {

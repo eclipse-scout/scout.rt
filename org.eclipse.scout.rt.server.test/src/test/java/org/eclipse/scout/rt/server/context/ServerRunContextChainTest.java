@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Iterator;
 
 import org.eclipse.scout.rt.platform.chain.IChainable;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -56,8 +56,8 @@ public class ServerRunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    InvocationChain<Object> chain = new InvocationChain<Object>();
-    new ServerRunContext().interceptInvocationChain(chain);
+    CallableChain<Object> chain = new CallableChain<Object>();
+    new ServerRunContext().interceptCallableChain(chain);
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 

@@ -22,7 +22,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
@@ -43,8 +43,8 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * state changes to be done for the time of executing some code.
  * <p>
  * Internally, the context is obtained by <code>BEANS.get(RunContext.class)</code>, meaning that the context can be
- * intercepted, or replaced. Thereto, the method {@link #interceptInvocationChain(InvocationChain)} can be overwritten
- * to contribute some additional behavior.
+ * intercepted, or replaced. Thereto, the method {@link #interceptCallableChain(CallableChain)} can be overwritten to
+ * contribute some additional behavior.
  *
  * @since 5.1
  */
@@ -113,9 +113,9 @@ public class RunContext implements IAdaptable {
    */
   public <RESULT, ERROR extends Throwable> RESULT call(final Callable<RESULT> callable, final IThrowableTranslator<? extends ERROR> throwableTranslator) throws ERROR {
     try {
-      final InvocationChain<RESULT> invocationChain = new InvocationChain<>();
-      interceptInvocationChain(invocationChain);
-      return invocationChain.invoke(callable);
+      final CallableChain<RESULT> callableChain = new CallableChain<>();
+      interceptCallableChain(callableChain);
+      return callableChain.call(callable);
     }
     catch (final Throwable t) {
       final ERROR error = throwableTranslator.translate(t);
@@ -129,7 +129,7 @@ public class RunContext implements IAdaptable {
   }
 
   /**
-   * Method invoked to intercept the invocation chain used to initialize this context. Overwrite this method to
+   * Method invoked to contribute to the {@link CallableChain} to initialize this context. Overwrite this method to
    * contribute some behavior to the context.
    * <p>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br/>
@@ -138,23 +138,23 @@ public class RunContext implements IAdaptable {
    * following form:
    *
    * <pre>
-   * super.initInvocationChain(invocationChain);
-   * invocationChain.addLast(new YourDecorator());
+   * super.interceptCallableChain(callableChain);
+   * callableChain.addLast(new YourDecorator());
    * </pre>
    *
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
    *
    * <pre>
-   * super.initInvocationChain(invocationChain);
-   * invocationChain.addFirst(new YourDecorator());
+   * super.interceptCallableChain(callableChain);
+   * callableChain.addFirst(new YourDecorator());
    * </pre>
    *
-   * @param invocationChain
+   * @param callableChain
    *          The chain used to construct the context.
    */
-  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
-    invocationChain
+  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
+    callableChain
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<RESULT>(m_subject))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(PrinicpalContextValueProvider.class)))

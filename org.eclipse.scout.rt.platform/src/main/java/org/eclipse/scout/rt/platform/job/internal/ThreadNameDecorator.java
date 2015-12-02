@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -26,12 +26,12 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 /**
  * Processor to decorate the thread-name of the worker-thread during the time of executing a job.
  * <p>
- * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
  * {@link Callable}. #d
  *
  * @since 5.1
  */
-public class ThreadNameDecorator<RESULT> implements IInvocationDecorator<RESULT> {
+public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
 
   private final String m_threadName;
   private final String m_jobName;
@@ -80,7 +80,7 @@ public class ThreadNameDecorator<RESULT> implements IInvocationDecorator<RESULT>
     return new IUndecorator<RESULT>() {
 
       @Override
-      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
+      public void undecorate(final RESULT callableResult, final Throwable callableException) {
         listenerRegistration.dispose();
         currentThreadInfo.reset();
       }

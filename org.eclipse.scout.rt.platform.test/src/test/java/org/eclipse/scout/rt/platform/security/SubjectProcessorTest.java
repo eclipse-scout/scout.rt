@@ -20,9 +20,8 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.holders.Holder;
-import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.junit.Test;
 
 public class SubjectProcessorTest {
@@ -33,9 +32,9 @@ public class SubjectProcessorTest {
   public void test() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    InvocationChain<String> invocationChain = new InvocationChain<>();
-    invocationChain.add(new SubjectProcessor<String>(m_subject));
-    String result = invocationChain.invoke(new Callable<String>() {
+    CallableChain<String> callableChain = new CallableChain<>();
+    callableChain.add(new SubjectProcessor<String>(m_subject));
+    String result = callableChain.call(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -53,9 +52,9 @@ public class SubjectProcessorTest {
   public void testWithoutSubject() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    InvocationChain<String> invocationChain = new InvocationChain<>();
-    invocationChain.add(new SubjectProcessor<String>(null));
-    String result = invocationChain.invoke(new Callable<String>() {
+    CallableChain<String> callableChain = new CallableChain<>();
+    callableChain.add(new SubjectProcessor<String>(null));
+    String result = callableChain.call(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -75,10 +74,10 @@ public class SubjectProcessorTest {
 
     final Exception exception = new Exception("error");
 
-    InvocationChain<String> invocationChain = new InvocationChain<>();
-    invocationChain.add(new SubjectProcessor<String>(m_subject));
+    CallableChain<String> callableChain = new CallableChain<>();
+    callableChain.add(new SubjectProcessor<String>(m_subject));
     try {
-      invocationChain.invoke(new Callable<String>() {
+      callableChain.call(new Callable<String>() {
 
         @Override
         public String call() throws Exception {
@@ -102,10 +101,10 @@ public class SubjectProcessorTest {
     final RuntimeException runtimeException = new RuntimeException("error");
 
     // RUN THE TEST
-    InvocationChain<String> invocationChain = new InvocationChain<>();
-    invocationChain.add(new SubjectProcessor<String>(m_subject));
+    CallableChain<String> callableChain = new CallableChain<>();
+    callableChain.add(new SubjectProcessor<String>(m_subject));
     try {
-      invocationChain.invoke(new Callable<String>() {
+      callableChain.call(new Callable<String>() {
 
         @Override
         public String call() throws Exception {

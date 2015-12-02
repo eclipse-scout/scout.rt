@@ -17,7 +17,7 @@ import static org.junit.Assert.assertSame;
 import java.util.Iterator;
 
 import org.eclipse.scout.rt.platform.chain.IChainable;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
@@ -34,8 +34,8 @@ public class RunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    InvocationChain<Object> chain = new InvocationChain<Object>();
-    new RunContext().interceptInvocationChain(chain);
+    CallableChain<Object> chain = new CallableChain<Object>();
+    new RunContext().interceptCallableChain(chain);
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 

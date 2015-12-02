@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
@@ -47,10 +47,10 @@ public class ServletRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
-    super.interceptInvocationChain(invocationChain);
+  protected <RESULT> void interceptCallableChain(CallableChain<RESULT> callableChain) {
+    super.interceptCallableChain(callableChain);
 
-    invocationChain
+    callableChain
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest))
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(HttpSessionIdContextValueProvider.class)))

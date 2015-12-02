@@ -17,7 +17,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
@@ -43,10 +43,10 @@ public class UiRunContext extends RunContext {
   protected JsonRequest m_jsonRequest;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
-    super.interceptInvocationChain(invocationChain);
+  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
+    super.interceptCallableChain(callableChain);
 
-    invocationChain
+    callableChain
         .add(new ThreadLocalProcessor<>(IUiSession.CURRENT, m_session))
         .add(new ThreadLocalProcessor<>(JsonRequest.CURRENT, m_jsonRequest))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(ClientSessionIdContextValueProvider.class)))

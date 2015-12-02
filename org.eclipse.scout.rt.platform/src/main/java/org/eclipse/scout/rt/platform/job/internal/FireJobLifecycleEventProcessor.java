@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -21,12 +21,12 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 /**
  * Processor to fire a job lifecycle event.
  * <p>
- * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
  * {@link Callable}.
  *
  * @since 5.1
  */
-public class FireJobLifecycleEventProcessor<RESULT> implements IInvocationDecorator<RESULT> {
+public class FireJobLifecycleEventProcessor<RESULT> implements ICallableDecorator<RESULT> {
 
   private final JobManager m_jobManager;
   private final JobEventType m_eventType;

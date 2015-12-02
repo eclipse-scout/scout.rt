@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
@@ -76,12 +76,12 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected Set<String> m_executionHints = new HashSet<>();
 
-  public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final InvocationChain<RESULT> invocationChain, final Callable<RESULT> callable) {
+  public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
 
       @Override
       public RESULT call() throws Exception {
-        return invocationChain.invoke(callable); // Run all processors as contained in the chain before invoking the Callable.
+        return callableChain.call(callable); // Run all processors as contained in the chain before invoking the Callable.
       }
     });
 
@@ -124,8 +124,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * Method invoked if this task was accepted by the executor immediately before this task is executed. This method is
    * also invoked for <code>cancelled</code> tasks which are not subject for execution. This method is invoked by the
    * thread that will execute this task. When being invoked and this task is a mutex task, this task is the mutex owner.
-   *
-   * @see #invoke(Callable)
    */
   @Override
   public void run() {

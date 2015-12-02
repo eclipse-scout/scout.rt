@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.chain;
+package org.eclipse.scout.rt.platform.chain.callable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,14 +16,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.IInvocationDecorator.IUndecorator;
+import org.eclipse.scout.rt.platform.chain.IChainable;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator.IUndecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Invocation chain according to the design pattern 'Chain-of-responsibility'.
+ * Chain to decorate {@link Callable#call()} according to the design pattern 'Chain-of-responsibility'.
  * <p>
- * This chain allows to perform a series of actions prior running a {@link Callable} command. This implementation allows
+ * This chain allows to perform a series of actions prior calling a {@link Callable} command. This implementation allows
  * both, the interception by decorators and interceptors. A decorator can run some actions before or after the execution
  * of the command, but cannot wrap execution. That is where interceptors come into play, because they continue the chain
  * themselves by invoking the next element in the chain.
@@ -34,72 +35,72 @@ import org.slf4j.LoggerFactory;
  *
  * @since 5.2
  */
-public class InvocationChain<RESULT> {
+public class CallableChain<RESULT> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(InvocationChain.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CallableChain.class);
 
   private final LinkedList<IChainable> m_chainables = new LinkedList<>();
 
   /**
-   * Adds the given decorator at the beginning of this chain to decorate the execution of a command.
+   * Adds the given decorator at the beginning of this chain to decorate the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> addFirst(final IInvocationDecorator decorator) {
+  public CallableChain<RESULT> addFirst(final ICallableDecorator decorator) {
     m_chainables.addFirst(decorator);
     return this;
   }
 
   /**
-   * Adds the given interceptor at the beginning of this chain to wrap the execution of a command.
+   * Adds the given interceptor at the beginning of this chain to wrap the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> addFirst(final IInvocationInterceptor<RESULT> interceptor) {
+  public CallableChain<RESULT> addFirst(final ICallableInterceptor<RESULT> interceptor) {
     m_chainables.addFirst(interceptor);
     return this;
   }
 
   /**
-   * Adds the given decorator at the end of this chain to decorate the execution of a command.
+   * Adds the given decorator at the end of this chain to decorate the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> addLast(final IInvocationDecorator decorator) {
+  public CallableChain<RESULT> addLast(final ICallableDecorator decorator) {
     m_chainables.addLast(decorator);
     return this;
   }
 
   /**
-   * Adds the given interceptor at the end of this chain to wrap the execution of a command.
+   * Adds the given interceptor at the end of this chain to wrap the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> addLast(final IInvocationInterceptor<RESULT> interceptor) {
+  public CallableChain<RESULT> addLast(final ICallableInterceptor<RESULT> interceptor) {
     m_chainables.add(interceptor);
     return this;
   }
 
   /**
-   * Adds the given decorator at the end of this chain to decorate the execution of a command.
+   * Adds the given decorator at the end of this chain to decorate the execution of a {@link Callable}.
    * <p>
-   * This method is equivalent to {@link #addLast(IInvocationDecorator))}.
+   * This method is equivalent to {@link #addLast(ICallableDecorator))}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> add(final IInvocationDecorator decorator) {
+  public CallableChain<RESULT> add(final ICallableDecorator decorator) {
     addLast(decorator);
     return this;
   }
 
   /**
-   * Adds the given interceptor at the end of this chain to wrap the execution of a command.
+   * Adds the given interceptor at the end of this chain to wrap the execution of a {@link Callable}.
    * <p>
-   * This method is equivalent to {@link #addLast(IInvocationInterceptor)}.
+   * This method is equivalent to {@link #addLast(ICallableInterceptor)}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> add(final IInvocationInterceptor<RESULT> interceptor) {
+  public CallableChain<RESULT> add(final ICallableInterceptor<RESULT> interceptor) {
     addLast(interceptor);
     return this;
   }
@@ -109,7 +110,7 @@ public class InvocationChain<RESULT> {
    *
    * @return <code>this</code> in order to support method chaining.
    */
-  public InvocationChain<RESULT> clear() {
+  public CallableChain<RESULT> clear() {
     m_chainables.clear();
     return this;
   }
@@ -130,12 +131,12 @@ public class InvocationChain<RESULT> {
    * @throws Exception
    *           thrown during execution of the command.
    */
-  public RESULT invoke(final Callable<RESULT> command) throws Exception {
+  public RESULT call(final Callable<RESULT> command) throws Exception {
     return new Chain<RESULT>(m_chainables, command).continueChain();
   }
 
   /**
-   * A Chain is an object provided by {@link InvocationChain} used to invoke the next handler in the chain, or if the
+   * A Chain is an object provided by {@link CallableChain} used to invoke the next handler in the chain, or if the
    * calling handler is the last handler in the chain, to invoke the {@link Callable} at the end of the chain.
    *
    * @param <RESULT>
@@ -169,17 +170,17 @@ public class InvocationChain<RESULT> {
         while (m_iterator.hasNext()) {
           final IChainable next = m_iterator.next();
 
-          if (next instanceof IInvocationDecorator) {
+          if (next instanceof ICallableDecorator) {
             @SuppressWarnings("unchecked")
-            final IInvocationDecorator<RESULT> decorator = (IInvocationDecorator<RESULT>) next;
+            final ICallableDecorator<RESULT> decorator = (ICallableDecorator<RESULT>) next;
             final IUndecorator<RESULT> undecorator = decorator.decorate();
             if (undecorator != null) {
               undecorators.add(undecorator);
             }
           }
-          else if (next instanceof IInvocationInterceptor && ((IInvocationInterceptor) next).isEnabled()) {
+          else if (next instanceof ICallableInterceptor && ((ICallableInterceptor) next).isEnabled()) {
             @SuppressWarnings("unchecked")
-            final IInvocationInterceptor<RESULT> interceptor = ((IInvocationInterceptor<RESULT>) next);
+            final ICallableInterceptor<RESULT> interceptor = ((ICallableInterceptor<RESULT>) next);
             return (result = interceptor.intercept(this));
           }
         }
@@ -199,9 +200,9 @@ public class InvocationChain<RESULT> {
       }
     }
 
-    private void undecorateSafe(final IUndecorator<RESULT> undecorator, final RESULT invocationResult, final Throwable invocationException) {
+    private void undecorateSafe(final IUndecorator<RESULT> undecorator, final RESULT callableResult, final Throwable callableException) {
       try {
-        undecorator.undecorate(invocationResult, invocationException);
+        undecorator.undecorate(callableResult, callableException);
       }
       catch (final RuntimeException e) {
         LOG.error(String.format("Unexpected error during the undecoration of a command's execution. [undecorator=%s, command=%s]", undecorator.getClass().getSimpleName(), m_command), e);

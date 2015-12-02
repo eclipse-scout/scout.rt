@@ -137,7 +137,7 @@ public class InvocationContextTest {
     final Holder<ITransaction> currentTransaction = new Holder<>();
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
-    final Holder<Exception> invocationException = new Holder<>();
+    final Holder<Exception> callableException = new Holder<>();
 
     // simulate that 'webMethod' throws an exception.
     final RuntimeException exception = new RuntimeException();
@@ -171,7 +171,7 @@ public class InvocationContextTest {
             invocationContext.getPort().webMethod();
           }
           catch (Exception e) {
-            invocationException.setValue(e);
+            callableException.setValue(e);
             throw e;
           }
         }
@@ -188,7 +188,7 @@ public class InvocationContextTest {
     verify(m_commitListener, never()).onCommitPhase1();
     verify(m_commitListener, never()).onCommitPhase2();
     verify(m_rollbackListener).onRollback();
-    assertSame(invocationException.getValue(), exception);
+    assertSame(callableException.getValue(), exception);
   }
 
   @Test

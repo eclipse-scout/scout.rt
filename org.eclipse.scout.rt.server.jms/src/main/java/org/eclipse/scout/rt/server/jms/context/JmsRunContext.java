@@ -17,7 +17,7 @@ import javax.jms.Message;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -44,9 +44,10 @@ public class JmsRunContext extends RunContext {
   protected Message m_jmsMessage;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
-    super.interceptInvocationChain(invocationChain);
-    invocationChain.add(new ThreadLocalProcessor<>(CURRENT_JMS_MESSAGE, m_jmsMessage));
+  protected <RESULT> void interceptCallableChain(CallableChain<RESULT> callableChain) {
+    super.interceptCallableChain(callableChain);
+
+    callableChain.add(new ThreadLocalProcessor<>(CURRENT_JMS_MESSAGE, m_jmsMessage));
   }
 
   @Override

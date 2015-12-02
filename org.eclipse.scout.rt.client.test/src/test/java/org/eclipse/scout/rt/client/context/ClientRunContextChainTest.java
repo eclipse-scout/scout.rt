@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.chain.IChainable;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -57,8 +57,8 @@ public class ClientRunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    InvocationChain<Object> chain = new InvocationChain<Object>();
-    new ClientRunContext().interceptInvocationChain(chain);
+    CallableChain<Object> chain = new CallableChain<Object>();
+    new ClientRunContext().interceptCallableChain(chain);
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 

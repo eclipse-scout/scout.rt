@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.logger;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.IInvocationDecorator;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.MDC;
 
@@ -21,13 +21,13 @@ import org.slf4j.MDC;
  * Processor to put a diagnostic context value into the current thread's diagnostic context map for the subsequent
  * sequence of actions.
  * <p>
- * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
  * {@link Callable}.
  *
  * @see MDC
  * @since 5.1
  */
-public class DiagnosticContextValueProcessor<RESULT> implements IInvocationDecorator<RESULT> {
+public class DiagnosticContextValueProcessor<RESULT> implements ICallableDecorator<RESULT> {
 
   private final IDiagnosticContextValueProvider m_mdcValueProvider;
   private final String m_mdcKey;
@@ -46,7 +46,7 @@ public class DiagnosticContextValueProcessor<RESULT> implements IInvocationDecor
     return new IUndecorator<RESULT>() {
 
       @Override
-      public void undecorate(final RESULT invocationResult, final Throwable invocationException) {
+      public void undecorate(final RESULT callableResult, final Throwable callableException) {
         if (originValue != null) {
           MDC.put(m_mdcKey, originValue);
         }

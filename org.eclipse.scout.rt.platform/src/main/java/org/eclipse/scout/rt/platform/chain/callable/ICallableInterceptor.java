@@ -8,24 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.chain;
+package org.eclipse.scout.rt.platform.chain.callable;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.InvocationChain.Chain;
+import org.eclipse.scout.rt.platform.chain.IChainable;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 
 /**
- * An <code>Interceptor</code> is an object to be used in {@link InvocationChain} to intercept the execution of a
+ * An <code>Interceptor</code> is an object to be used in {@link CallableChain} to intercept the execution of a
  * {@link Callable}.
  * <p>
  * In contrast to a decorator, an interceptor wraps execution of subsequent handlers and of the {@link Callable}.
  * Inherently, each interceptor in the chain blows up the stack, which is why to prefer decorators over interceptors
  * whenever possible.
  *
- * @see IInvocationDecorator
  * @since 5.2
  */
-public interface IInvocationInterceptor<RESULT> extends IChainable {
+public interface ICallableInterceptor<RESULT> extends IChainable {
 
   /**
    * Method invoked prior to executing the {@link Callable}. The {@link Chain} passed in to this method allows the

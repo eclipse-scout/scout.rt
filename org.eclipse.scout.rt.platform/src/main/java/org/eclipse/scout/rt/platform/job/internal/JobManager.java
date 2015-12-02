@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerAllowCoreThreadTimeoutProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerCorePoolSizeProperty;
@@ -220,11 +220,11 @@ public class JobManager implements IJobManager, IPlatformListener {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
 
     final JobInput inputCopy = input.copy().withName(StringUtility.nvl(input.getName(), callable.getClass().getName()));
-    final InvocationChain<RESULT> invocationChain = new InvocationChain<>();
-    final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, invocationChain, callable);
+    final CallableChain<RESULT> callableChain = new CallableChain<>();
+    final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, callableChain, callable);
 
     // Add functionality to be applied while executing the Callable (Thread-Locals, RunContext, ...).
-    interceptInvocationChain(invocationChain, futureTask, runMonitor, inputCopy);
+    interceptCallableChain(callableChain, futureTask, runMonitor, inputCopy);
 
     return futureTask;
   }
@@ -264,8 +264,8 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Method invoked to intercept the invocation chain used to run the {@link Callable}. Overwrite this method to
-   * contribute some behavior to the execution of the {@link Callable}.
+   * Method invoked to contribute to the {@link CallableChain} which finally executes the {@link Callable}. Overwrite
+   * this method to contribute some behavior to the execution of the {@link Callable}.
    * <p>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br/>
    * To contribute to the end of the chain (meaning that you are invoked <strong>after</strong> the contributions of
@@ -273,23 +273,23 @@ public class JobManager implements IJobManager, IPlatformListener {
    * following form:
    *
    * <pre>
-   * this.interceptInvocationChain(invocationChain, future, runMonitor, input);
-   * invocationChain.addLast(new YourDecorator());
+   * this.interceptCallableChain(callableChain, future, runMonitor, input);
+   * callableChain.addLast(new YourDecorator());
    * </pre>
    *
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
    *
    * <pre>
-   * this.interceptInvocationChain(invocationChain, future, runMonitor, input);
-   * invocationChain.addFirst(new YourDecorator());
+   * this.interceptCallableChain(callableChain, future, runMonitor, input);
+   * callableChain.addFirst(new YourDecorator());
    * </pre>
    *
-   * @param invocationChain
-   *          The chain used to construct the context.
+   * @param callableChain
+   *          the chain to intercept the {@link Callable} before execution.
    */
-  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain, final JobFutureTask<?> future, final RunMonitor runMonitor, final JobInput input) {
-    invocationChain
+  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain, final JobFutureTask<?> future, final RunMonitor runMonitor, final JobInput input) {
+    callableChain
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
         .add(new ExceptionProcessor<RESULT>(input))

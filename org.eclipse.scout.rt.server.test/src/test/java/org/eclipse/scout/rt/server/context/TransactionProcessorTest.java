@@ -30,7 +30,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -107,11 +107,11 @@ public class TransactionProcessorTest {
 
   @Test
   public void testMandatoryWithoutExistingTransaction() throws Exception {
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(null, TransactionScope.MANDATORY));
 
     try {
-      chain.invoke(new Callable<Object>() {
+      chain.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {
@@ -130,9 +130,9 @@ public class TransactionProcessorTest {
     ITransaction callingTransaction = mock(ITransaction.class);
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
-    Object result = chain.invoke(new Callable<Object>() {
+    Object result = chain.call(new Callable<Object>() {
 
       @Override
       public Object call() throws Exception {
@@ -154,10 +154,10 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
     try {
-      chain.invoke(new Callable<Object>() {
+      chain.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {
@@ -184,9 +184,9 @@ public class TransactionProcessorTest {
   public void testRequiresNewWithoutExistingTransactionAndSuccess() throws Exception {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
-    Object result = chain.invoke(new Callable<Object>() {
+    Object result = chain.call(new Callable<Object>() {
 
       @Override
       public Object call() throws Exception {
@@ -214,10 +214,10 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
     try {
-      chain.invoke(new Callable<Object>() {
+      chain.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {
@@ -246,9 +246,9 @@ public class TransactionProcessorTest {
     ITransaction callingTransaction = mock(ITransaction.class);
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
-    Object result = chain.invoke(new Callable<Object>() {
+    Object result = chain.call(new Callable<Object>() {
 
       @Override
       public Object call() throws Exception {
@@ -278,10 +278,10 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
     try {
-      chain.invoke(new Callable<Object>() {
+      chain.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {
@@ -311,9 +311,9 @@ public class TransactionProcessorTest {
   public void testRequiredWithoutExistingTransactionAndSuccess() throws Exception {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRED));
-    Object result = chain.invoke(new Callable<Object>() {
+    Object result = chain.call(new Callable<Object>() {
 
       @Override
       public Object call() throws Exception {
@@ -341,10 +341,10 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
     try {
-      chain.invoke(new Callable<Object>() {
+      chain.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {
@@ -374,9 +374,9 @@ public class TransactionProcessorTest {
     ITransaction callingTransaction = mock(ITransaction.class);
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
-    Object result = chain.invoke(new Callable<Object>() {
+    Object result = chain.call(new Callable<Object>() {
 
       @Override
       public Object call() throws Exception {
@@ -401,10 +401,10 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
-    InvocationChain<Object> chain = new InvocationChain<>();
+    CallableChain<Object> chain = new CallableChain<>();
     chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
     try {
-      chain.invoke(new Callable<Object>() {
+      chain.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {

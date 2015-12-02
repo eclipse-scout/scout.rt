@@ -10,18 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.IInvocationInterceptor;
-import org.eclipse.scout.rt.platform.chain.InvocationChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
  * Processor to control exception handling of uncaught exceptions during job execution.
+ * <p>
+ * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
+ * {@link Callable}.
  *
  * @since 5.1
  */
-public class ExceptionProcessor<RESULT> implements IInvocationInterceptor<RESULT> {
+public class ExceptionProcessor<RESULT> implements ICallableInterceptor<RESULT> {
 
   protected final JobInput m_input;
 

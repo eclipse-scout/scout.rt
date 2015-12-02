@@ -22,7 +22,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -47,9 +47,10 @@ public class JaxWsServletRunContext extends ServletRunContext {
   protected WebServiceContext m_webServiceContext;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(InvocationChain<RESULT> invocationChain) {
-    super.interceptInvocationChain(invocationChain);
-    invocationChain.add(new ThreadLocalProcessor<>(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
+  protected <RESULT> void interceptCallableChain(CallableChain<RESULT> callableChain) {
+    super.interceptCallableChain(callableChain);
+
+    callableChain.add(new ThreadLocalProcessor<>(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
   }
 
   @Override

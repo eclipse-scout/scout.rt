@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
@@ -59,10 +59,10 @@ public class ClientRunContext extends RunContext {
   protected IDesktop m_desktop;
 
   @Override
-  protected <RESULT> void interceptInvocationChain(final InvocationChain<RESULT> invocationChain) {
-    super.interceptInvocationChain(invocationChain);
+  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
+    super.interceptCallableChain(callableChain);
 
-    invocationChain
+    callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))

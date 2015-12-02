@@ -17,20 +17,20 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.chain.IInvocationInterceptor;
-import org.eclipse.scout.rt.platform.chain.InvocationChain;
-import org.eclipse.scout.rt.platform.chain.InvocationChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
  * Processor to run the subsequent sequence of actions on behalf of the given {@link Subject}.
  * <p>
- * Instances of this class are to be added to a {@link InvocationChain} to participate in the execution of a
+ * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
  * {@link Callable}.
  *
  * @since 5.1
  */
-public class SubjectProcessor<RESULT> implements IInvocationInterceptor<RESULT> {
+public class SubjectProcessor<RESULT> implements ICallableInterceptor<RESULT> {
   protected final Subject m_subject;
 
   public SubjectProcessor(final Subject subject) {
