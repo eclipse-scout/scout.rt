@@ -115,6 +115,6 @@
     width: 100%;
     margin-top: 15px;
     margin-bottom: 10px;
-    height: @logical-grid-height;
+    padding: 5px;
   }
 }

@@ -79,7 +79,7 @@ scout.FileChooser.prototype._render = function($parent) {
 
   } else {
     // legacy iframe code
-    this.$legacyFormTarget = this.$container.appendElement('<iframe>')
+    this.$legacyFormTarget = this.$fileInputField.appendElement('<iframe>')
       .attr('name', 'legacyFileUpload' + this.id)
       .on('load', function() {
         // Manually handle JSON response from iframe
