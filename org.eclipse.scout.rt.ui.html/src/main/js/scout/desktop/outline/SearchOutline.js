@@ -113,22 +113,24 @@ scout.SearchOutline.prototype._sendSearch = function() {
 };
 
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {
-  // Store locally so that the value persists when changing the outline without performing the search
-  this._setSearchQuery(this.$queryField.val());
+  // Don't send query if value did not change (may happen when _onQueryFieldInput is executed after _onQueryFieldKeyPress)
+  var searchQuery = this.$queryField.val();
+  if (this.searchQuery !== searchQuery) {
+    // Store locally so that the value persists when changing the outline without performing the search
+    this._setSearchQuery(searchQuery);
+    this._sendSearch();
+  }
 };
 
 scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
   if (event.which === scout.keys.ENTER) {
     this._setSearchQuery(this.$queryField.val());
+    this._sendSearch();
   }
 };
 
 scout.SearchOutline.prototype._setSearchQuery = function(searchQuery) {
-  // Don't send query if value did not change (may happen when _onQueryFieldInput is executed after _onQueryFieldKeyPress)
-  if (this.searchQuery !== searchQuery) {
     this.searchQuery = searchQuery;
-    this._sendSearch();
-  }
 };
 
 /**
