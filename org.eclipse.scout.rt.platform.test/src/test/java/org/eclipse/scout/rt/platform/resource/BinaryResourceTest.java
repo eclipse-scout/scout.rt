@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.resource;
 
-import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.resource.MimeType;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class BinaryResourceTest {
@@ -62,5 +61,25 @@ public class BinaryResourceTest {
   @Test(expected = NullPointerException.class)
   public void testFileConstructor() {
     new BinaryResource(null);
+  }
+
+  @Test
+  public void testCreateAlias() {
+    byte[] content = new byte[]{'a', 'b', 'c'};
+    BinaryResource resource = new BinaryResource("index.txt", content);
+    Assert.assertEquals("index.txt", resource.getFilename());
+    Assert.assertArrayEquals(content, resource.getContent());
+
+    BinaryResource aliasedResource = resource.createAlias("help.log");
+    Assert.assertEquals("help.log", aliasedResource.getFilename());
+    Assert.assertArrayEquals(content, aliasedResource.getContent());
+
+    BinaryResource aliasedResource2 = resource.createAliasWithSameExtension("help");
+    Assert.assertEquals("help.txt", aliasedResource2.getFilename());
+    Assert.assertArrayEquals(content, aliasedResource2.getContent());
+
+    BinaryResource aliasedResource3 = new BinaryResource("index", content).createAliasWithSameExtension("help");
+    Assert.assertEquals("help", aliasedResource3.getFilename());
+    Assert.assertArrayEquals(content, aliasedResource3.getContent());
   }
 }

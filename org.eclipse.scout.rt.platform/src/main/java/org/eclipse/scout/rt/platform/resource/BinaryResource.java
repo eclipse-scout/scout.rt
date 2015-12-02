@@ -201,6 +201,16 @@ public final class BinaryResource implements Serializable {
     return new BinaryResource(newName, m_contentType, m_charset, m_content, m_lastModified, m_fingerprint);
   }
 
+  /**
+   * @return a new {@link BinaryResource} that represents the same content, but has another name with the same file
+   *         extension
+   */
+  public BinaryResource createAliasWithSameExtension(String newNameWithoutExtension) {
+    String fileExtension = FileUtility.getFileExtension(m_filename);
+    String newName = newNameWithoutExtension + (fileExtension == null ? "" : "." + fileExtension);
+    return createAlias(newName);
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
