@@ -15,7 +15,6 @@ scout.PopupWithHead = function() {
   this.$deco;
   this.$parent;
   this._headVisible = true;
-  this.openAnimated = true;
   this.resizeHandler = this.onResize.bind(this);
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);

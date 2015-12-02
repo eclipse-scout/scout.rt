@@ -34,11 +34,6 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
     }
 
     scout.graphics.setSize(this.popup.$body, popupSize);
-
-    if (this.popup.$body.data('scrollable') && !this.popup.animationPrepare) {
-      scout.scrollbars.update(this.popup.$body);
-
-    }
   }
 };
 

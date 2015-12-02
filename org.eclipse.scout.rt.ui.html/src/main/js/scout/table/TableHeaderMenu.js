@@ -14,7 +14,6 @@ scout.TableHeaderMenu = function() {
   this.tableHeader;
   this.table;
   this.$headerItem;
-  this.openAnimated = true;
   this.$columnActions;
   this.$columnFilters;
   this.filterSelectionMode = scout.TableHeaderMenu.SelectionMode.ALL;

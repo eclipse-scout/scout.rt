@@ -13,7 +13,6 @@ scout.ContextMenuPopup = function() {
 
   // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
   this._headVisible = false;
-  this.openAnimated = false;
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
@@ -38,17 +37,6 @@ scout.ContextMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeConte
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
-  if (this.openAnimated) {
-    this.events.on('popupOpened', function() {
-      scout.scrollbars.install(this.$body, {
-        parent: this
-      });
-    }.bind(this));
-  } else {
-    scout.scrollbars.install(this.$body, {
-      parent: this
-    });
-  }
   this._renderMenuItems();
 };
 
@@ -122,7 +110,6 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
         });
         this.$body.css('box-shadow', "");
         this.bodyAnimating = false;
-        this.animationPrepare = false;
       }.bind(this)
     });
 
@@ -196,7 +183,6 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       progress: this.revalidateLayout.bind(this),
       complete: function() {
         this.bodyAnimating = false;
-        this.animationPrepare = false;
       }.bind(this),
       queue: false
     });

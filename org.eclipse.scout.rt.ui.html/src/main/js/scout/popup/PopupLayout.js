@@ -27,7 +27,6 @@ scout.PopupLayout.prototype.layout = function($container) {
   // If there is enough space on the left -> use preferred width -> The opening direction will be switched using position() at the end
   // If there is not enough space on the left as well, the greater width is used -> Position() will either switch the direction or not, depending on the size of the popup
   // The same happens for y direction if there is not enough space on the bottom
-  if (!this.popup.animating) {
     if (this.popup.openingDirectionX === 'right' &&
       prefSize.width > maxSizes.right && prefSize.width > maxSizes.left) {
       popupSize.width = Math.max(maxSizes.right, maxSizes.left);
@@ -48,7 +47,6 @@ scout.PopupLayout.prototype.layout = function($container) {
     }
 
     scout.graphics.setSize(htmlComp.$comp, popupSize);
-  }
 };
 
 /**

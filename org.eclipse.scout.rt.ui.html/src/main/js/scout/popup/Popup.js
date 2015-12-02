@@ -26,7 +26,6 @@ scout.Popup = function() {
   this.focusableContainer;
   this.openingDirectionX;
   this.openingDirectionY;
-  this.openAnimated = false;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -97,44 +96,12 @@ scout.Popup.prototype._open = function($parent, event) {
   this.render($parent, event);
   var oldPopupSize = scout.graphics.getSize(this.$container);
 
-  this.animationPrepare = this.openAnimated;
   this.revalidateLayout();
   this.position();
 
   var handledScrollables = this._uninstallAllChildScrollbars();
 
   var popupSize = scout.graphics.getSize(this.$container);
-  if (this.openAnimated) {
-    this.animating = true;
-    this.$container.cssHeightAnimated(popupSize.height - 40, popupSize.height, {
-      progress: function() {
-        this.revalidateLayout();
-        this.position();
-      }.bind(this),
-      duration: 100,
-      complete: function() {
-        this.animating = false;
-        this.animationPrepare = false;
-        this.trigger('popupOpened', {
-          popup: this
-        });
-      }.bind(this)
-    }).css('overflow', 'visible');
-    this.$body.cssHeightAnimated(popupSize.height - 40, popupSize.height, {
-      progress: function() {
-        this.revalidateLayout();
-        this.position();
-      }.bind(this),
-      duration: 100,
-      complete: function() {
-        this.animating = false;
-        this.animationPrepare = false;
-        this.trigger('popupOpened', {
-          popup: this
-        });
-      }.bind(this)
-    });
-  }
 
   this.events.on('popupOpened', function() {
     handledScrollables.forEach(function(scrollable) {
@@ -173,9 +140,6 @@ scout.Popup.prototype._postRender = function() {
 scout.Popup.prototype._remove = function() {
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
-  }
-  if (this.openAnimated) {
-    this.$container.stop();
   }
   // remove all clean-up handlers
   this._detachCloseHandler();

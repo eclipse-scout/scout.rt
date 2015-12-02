@@ -18,7 +18,6 @@ scout.MenuBarPopup = function() {
   this.$headBlueprint;
   this.ignoreEvent;
   this._headVisible = true;
-  this.openAnimated = true;
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 

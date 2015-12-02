@@ -101,7 +101,7 @@ scout.MenuNavigationExecKeyStroke.prototype.handle = function(event) {
 
 scout.MenuNavigationExecKeyStroke.prototype._accept = function(event) {
   var accepted = scout.MenuNavigationExecKeyStroke.parent.prototype._accept.call(this, event);
-  if (!accepted || this.field.bodyAnimating || this.field.animating) {
+  if (!accepted || this.field.bodyAnimating) {
     return false;
   }
   return accepted;
