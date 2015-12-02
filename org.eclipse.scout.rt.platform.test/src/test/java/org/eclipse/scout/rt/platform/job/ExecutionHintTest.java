@@ -21,30 +21,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ExecutionHintTest {
-
-  private IBean<IJobManager> m_jobManagerBean;
-
-  @Before
-  public void before() {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
-  }
-
-  @After
-  public void after() {
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
-  }
 
   @Test
   public void testWaitingForTaggedJobs() throws InterruptedException {

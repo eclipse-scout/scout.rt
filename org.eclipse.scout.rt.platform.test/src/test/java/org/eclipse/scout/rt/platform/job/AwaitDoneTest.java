@@ -22,33 +22,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class AwaitDoneTest {
-
-  private IBean<IJobManager> m_jobManagerBean;
-
-  @Before
-  public void before() {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
-  }
-
-  @After
-  public void after() {
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
-  }
 
   @Test
   public void testAwaitAllDone() {
@@ -158,6 +142,12 @@ public class AwaitDoneTest {
         .toFilter(), 10, TimeUnit.SECONDS));
 
     assertEquals(Arrays.asList("before-1"), protocol);
+
+    // Cleanup
+    bc.setBlocking(false);
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 10, TimeUnit.SECONDS));
 
   }
 

@@ -4,7 +4,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.junit.runners.model.Statement;
@@ -28,7 +27,6 @@ public class RunInModelJobStatement extends Statement {
       m_next.evaluate();
     }
     else {
-      JobInput input = ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("JUnit model job");
       ModelJobs.schedule(new IRunnable() {
 
         @Override
@@ -43,7 +41,9 @@ public class RunInModelJobStatement extends Statement {
             throw new Error(t);
           }
         }
-      }, input).awaitDoneAndGet(BEANS.get(ThrowableTranslator.class));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+          .withName("Running JUnit test in model job"))
+          .awaitDoneAndGet(BEANS.get(ThrowableTranslator.class));
     }
   }
 }

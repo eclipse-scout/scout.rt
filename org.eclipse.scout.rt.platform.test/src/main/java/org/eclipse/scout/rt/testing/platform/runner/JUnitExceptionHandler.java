@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.testing.platform.runner;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see PlatformTestRunner
  */
+@IgnoreBean
 public class JUnitExceptionHandler extends ExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(JUnitExceptionHandler.class);

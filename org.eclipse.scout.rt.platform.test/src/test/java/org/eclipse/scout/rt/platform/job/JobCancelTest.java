@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement.JUnitJobManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,12 +48,15 @@ public class JobCancelTest {
 
   @Before
   public void before() {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
+    // Use dedicated job manager because job manager is shutdown in tests.
+    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JUnitJobManager() {
+      // must be a subclass in order to replace JUnitJobManager
+    });
   }
 
   @After
   public void after() {
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
+    JobTestUtil.unregisterAndShutdownJobManager(m_jobManagerBean);
   }
 
   @Test

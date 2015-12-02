@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.job;
 
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
@@ -17,40 +18,31 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
- * Helper class to run job related JUnit tests.
+ * Helper class for Job API in JUnit tests.
  */
 public class JobTestUtil {
 
   /**
-   * Registers a dedicated {@link IJobManager}.
+   * Replaces the current {@link JobManager} with the given job manager instance.
+   *
+   * @return the registration to be used to restore to the current job manager.
    */
-  public static IBean<IJobManager> registerJobManager() {
-    return registerJobManager(new JobManager());
-  }
+  public static IBean<IJobManager> replaceCurrentJobManager(final JobManager jobManager) {
+    final IBean<IJobManager> jobManagerBean = BEANS.getBeanManager().registerBean(new BeanMetaData(jobManager.getClass(), jobManager).withReplace(true));
+    assertSame("Unexpected: wrong job manager registered", jobManager, BEANS.get(IJobManager.class));
 
-  /**
-   * Registers the given job manager as dedicated {@link IJobManager}.
-   */
-  public static IBean<IJobManager> registerJobManager(final IJobManager jobManager) {
-    final IBean<IJobManager> jobManagerBean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, jobManager).withReplace(true).withOrder(-1));
-    Assertions.assertSame(jobManager, BEANS.get(IJobManager.class));
     return jobManagerBean;
   }
 
-  /**
-   * Unregisters the given job manager.
-   */
-  public static void unregisterJobManager(final IBean<?> jobManagerBean) {
-    Jobs.getJobManager().shutdown();
-    Platform.get().getBeanManager().unregisterBean(jobManagerBean);
+  public static void unregisterAndShutdownJobManager(final IBean<IJobManager> jobManagerBean) {
+    final IJobManager jobManager = jobManagerBean.getInstance();
+    BEANS.getBeanManager().unregisterBean(jobManagerBean);
+    jobManager.shutdown();
   }
 
   /**

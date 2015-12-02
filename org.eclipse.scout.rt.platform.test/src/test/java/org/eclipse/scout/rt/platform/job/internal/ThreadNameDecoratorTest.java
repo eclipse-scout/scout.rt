@@ -20,9 +20,6 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -31,7 +28,6 @@ import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
-import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
@@ -39,28 +35,11 @@ import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ThreadNameDecoratorTest {
-
-  private IJobManager m_jobManager;
-  private IBean<Object> m_bean;
-
-  @Before
-  public void before() {
-    m_jobManager = new JobManager();
-    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, m_jobManager).withReplace(true).withOrder(-1));
-  }
-
-  @After
-  public void after() {
-    m_jobManager.shutdown();
-    Platform.get().getBeanManager().unregisterBean(m_bean);
-  }
 
   @Test
   public void testThreadName() throws Exception {

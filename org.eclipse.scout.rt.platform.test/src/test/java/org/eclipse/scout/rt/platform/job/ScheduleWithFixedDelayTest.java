@@ -21,35 +21,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ScheduleWithFixedDelayTest {
-
-  private IBean<IJobManager> m_jobManagerBean;
-
-  @Before
-  public void before() {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
-
-    // Unregister JUnit exception handler
-    BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
-  }
-
-  @After
-  public void after() {
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
-  }
 
   @Test
   public void testFiveRunsAndCancel() {
@@ -280,6 +261,9 @@ public class ScheduleWithFixedDelayTest {
 
   @Test
   public void testDefaultExceptionHandling() {
+    // Unregister JUnit exception handler
+    BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
+
     final AtomicInteger counter = new AtomicInteger();
     Jobs.getJobManager().schedule(new IRunnable() {
 

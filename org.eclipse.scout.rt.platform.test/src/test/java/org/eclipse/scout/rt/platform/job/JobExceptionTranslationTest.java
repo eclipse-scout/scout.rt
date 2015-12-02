@@ -14,30 +14,25 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
-import org.junit.After;
+import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class JobExceptionTranslationTest {
-
-  private IBean<IJobManager> m_jobManagerBean;
 
   @Before
   public void before() {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
-  }
-
-  @After
-  public void after() {
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
+    // Unregister JUnit exception handler
+    BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
   }
 
   @Test

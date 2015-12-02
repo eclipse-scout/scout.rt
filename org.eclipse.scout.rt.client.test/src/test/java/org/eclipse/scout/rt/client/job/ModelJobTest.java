@@ -20,15 +20,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.holders.Holder;
-import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -41,19 +38,13 @@ public class ModelJobTest {
   private IClientSession m_clientSession1;
   private IClientSession m_clientSession2;
 
-  private IBean<IJobManager> m_jobManagerBean;
-
   @Before
   public void before() {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
-
     m_clientSession1 = mock(IClientSession.class);
     when(m_clientSession1.getModelJobMutex()).thenReturn(Jobs.newMutex());
 
     m_clientSession2 = mock(IClientSession.class);
     when(m_clientSession2.getModelJobMutex()).thenReturn(Jobs.newMutex());
-
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @After

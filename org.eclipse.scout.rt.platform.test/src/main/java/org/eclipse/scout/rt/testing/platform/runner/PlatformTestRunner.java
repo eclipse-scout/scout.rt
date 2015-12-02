@@ -16,11 +16,14 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement.JUnitJobManager;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
@@ -37,14 +40,18 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Use this Runner to run tests which require the scout {@link IPlatform}
- * <p/>
- * Use {@link RunWithPrivatePlatform} to control whether the platform used for this test execution is shared or private.
- * Default is shared.
- * <p/>
+ * Use this Runner to run tests which require the Scout {@link IPlatform}
+ * <p>
+ * Use {@link RunWithNewPlatform} to run the test with a new platform.
+ * <p>
  * Use <code>RunWithSubject</code> annotation to specify the user to run the test. This annotation can be defined on
  * class or method-level. If defining the user on class-level, all test-methods inherit that user.
- * <p/>
+ * <p>
+ * A new dedicated {@link JobManager} is installed for every JUnit test class, which replaces {@link JobManager}. This
+ * prevents job interferences among test classes using a shared platform.<br/>
+ * If you require to replace the job manager in your test case, register a subclass of {@link JUnitJobManager} as a
+ * replacement of {@link JUnitJobManager} in the bean manager.
+ * <p>
  * Example:
  *
  * <pre>
@@ -66,7 +73,11 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    return new PlatformStatement(super.classBlock(notifier), ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
+    final Statement s3 = super.classBlock(notifier);
+    final Statement s2 = new ReplaceJobManagerStatement(s3);
+    final Statement s1 = new PlatformStatement(s2, ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
+
+    return s1;
   }
 
   @Override
@@ -168,14 +179,14 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   /**
    * Overwrite this method to contribute some 'class-level' behavior to this Runner.
-   * <p/>
+   * <p>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
    * chain from 'bottom-to-top'.
-   * <p/>
+   * <p>
    * To contribute on top of the chain (meaning that you are invoked <strong>after</strong> the contributions of super
    * classes and therefore can base on their contributed functionality), you can use constructions of the following
    * form:
-   * <p/>
+   * <p>
    * <code>
    *   Statement s2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
    *   Statement s1 = new YourInterceptor1(s2); // executed 2nd<br/>
@@ -185,7 +196,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * </p>
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
-   * <p/>
+   * <p>
    * <code>
    *   Statement s2 = <i>super.interceptClassLevelStatement(<strong>next</strong>)</i>; // executed 3th<br/>
    *   Statement s1 = new YourInterceptor2(s2); // executed 2nd<br/>
@@ -206,14 +217,14 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   /**
    * Overwrite this method to contribute some 'method-level' behavior to this Runner.
-   * <p/>
+   * <p>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
    * chain from 'bottom-to-top'.
-   * <p/>
+   * <p>
    * To contribute on top of the chain (meaning that you are invoked <strong>after</strong> the contributions of super
    * classes and therefore can base on their contributed functionality), you can use constructions of the following
    * form:
-   * <p/>
+   * <p>
    * <code>
    *   Statement s2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
    *   Statement s1 = new YourInterceptor1(s2); // executed 2nd<br/>
@@ -223,7 +234,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * </p>
    * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
    * form:
-   * <p/>
+   * <p>
    * <code>
    *   Statement s2 = <i>super.interceptMethodLevelStatement(<strong>next</strong>)</i>; // executed 3th<br/>
    *   Statement s1 = new YourInterceptor2(s2); // executed 2nd<br/>

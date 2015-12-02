@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
@@ -28,15 +27,12 @@ import org.eclipse.scout.rt.platform.visitor.IVisitor;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class JobFutureVisitTest {
-
-  private IBean<IJobManager> m_jobManagerBean;
 
   private IMutex m_mutex1;
   private IMutex m_mutex2;
@@ -51,8 +47,6 @@ public class JobFutureVisitTest {
 
   @Before
   public void before() throws InterruptedException {
-    m_jobManagerBean = JobTestUtil.registerJobManager();
-
     m_mutex1 = Jobs.newMutex();
     m_mutex2 = Jobs.newMutex();
     m_mutex3 = Jobs.newMutex();
@@ -177,11 +171,6 @@ public class JobFutureVisitTest {
         .withExceptionHandling(null, false));
 
     assertTrue(latch.await());
-  }
-
-  @After
-  public void after() {
-    JobTestUtil.unregisterJobManager(m_jobManagerBean);
   }
 
   @Test
