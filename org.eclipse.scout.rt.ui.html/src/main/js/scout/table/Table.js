@@ -37,6 +37,7 @@ scout.Table = function(model) {
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
+  this.checkOnClick = false;
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
 
   this._permanentHeadSortColumns = [];
@@ -253,6 +254,10 @@ scout.Table.prototype._render = function($parent) {
     $mouseDownRow = $(event.currentTarget);
     mouseDownColumn = that._columnAtX(event.pageX);
     that.selectionHandler.onMouseDown(event);
+
+    if (that.checkOnClick) {
+      that.checkRow($mouseDownRow.data('row'));
+    }
   }
 
   function onMouseUp(event) {
@@ -267,7 +272,7 @@ scout.Table.prototype._render = function($parent) {
     $mouseUpRow = $(event.currentTarget);
     that.selectionHandler.onMouseUp(event, $mouseUpRow);
 
-    if ($mouseDownRow && $mouseUpRow && $mouseDownRow.attr('data-rowid') !== $mouseUpRow.attr('data-rowid')) {
+    if ($mouseDownRow && $mouseUpRow && $mouseDownRow.attr('data-rowid') !== $mouseUpRow.attr('data-rowid')) { // FIXME AWE: replace with $data('row')[0] !== $data('row')[0]
       return;
     }
 
