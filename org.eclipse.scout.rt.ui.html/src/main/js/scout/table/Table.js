@@ -967,6 +967,9 @@ scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelec
   if (!row.enabled) {
     rowClass += ' disabled';
   }
+  if (row.checked && this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    rowClass += ' checked';
+  }
   var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCellForRow(row);
