@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePageWithForm;
@@ -157,7 +157,7 @@ public class JsonOutlineTest {
     object.dispose();
     m_uiSession = null;
     object = null;
-    TestUtility.assertGC(ref);
+    TestingUtility.assertGC(ref);
   }
 
   /**

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
 import org.junit.Test;
 
 /**
@@ -44,25 +44,31 @@ public class IOUtilityTest {
   private static final byte[] CONTENT = new byte[]{1, 2, 3, 4};
   private static final String FILENAME = "myTempFile";
   private static final String EXTENSION = ".tmp";
+  private static final String PLATFORM_PATH = "org/eclipse/scout/rt/platform/";
 
   @Test
   public void testGetContentInEncoding() {
     File utf8File = null;
     File ansiFile = null;
     try {
-      utf8File = TestUtility.createTempFileFromFilename("org/eclipse/scout/rt/platform/ioUtilityTestUtf8.txt", getClass());
-      ansiFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/rt/platform/ioUtilityTestAnsi.txt", getClass());
+      utf8File = createTempFile("ioUtilityTestUtf8.txt");
+      ansiFile = createTempFile("ioUtilityTestAnsi.txt");
 
       String testContent = IOUtility.getContentInEncoding(utf8File.getPath(), StandardCharsets.UTF_8.name());
-      assertTrue("content is correct", StringUtility.equalsIgnoreCase(testContent, "TestTestöäü"));
+      assertEquals(testContent, "TestTestöäü");
 
       testContent = IOUtility.getContentInEncoding(ansiFile.getPath(), StandardCharsets.UTF_8.name());
       assertFalse("content is correct", StringUtility.equalsIgnoreCase(testContent, "TestTestöäü"));
     }
     finally {
-      TestUtility.deleteTempFile(utf8File);
-      TestUtility.deleteTempFile(ansiFile);
+      IOUtility.deleteFile(utf8File);
+      IOUtility.deleteFile(ansiFile);
     }
+  }
+
+  private File createTempFile(String name) {
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + name);
+    return IOUtility.createTempFile(inputStream, "temp", "zip");
   }
 
   private byte[] readFile(File file) throws Throwable {
@@ -82,7 +88,7 @@ public class IOUtilityTest {
       assertArrayEquals(CONTENT, readFile(tempFile));
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
 
     try {
@@ -93,7 +99,7 @@ public class IOUtilityTest {
       tempFile.delete();
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -106,7 +112,7 @@ public class IOUtilityTest {
       assertArrayEquals(new byte[]{}, readFile(tempFile));
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
 
     try {
@@ -116,7 +122,7 @@ public class IOUtilityTest {
       assertArrayEquals(new byte[]{}, readFile(tempFile));
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -129,7 +135,7 @@ public class IOUtilityTest {
       assertArrayEquals(CONTENT, readFile(tempFile));
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -142,7 +148,7 @@ public class IOUtilityTest {
       assertArrayEquals(CONTENT, readFile(tempFile));
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -210,7 +216,7 @@ public class IOUtilityTest {
       assertArrayEquals("arrays with read lines not as expected", LINES, readLinesArray);
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -218,14 +224,15 @@ public class IOUtilityTest {
   public void testReadLinesUTF8() throws FileNotFoundException {
     File tempFile = null;
     try {
-      tempFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/rt/platform/ioUtilityTestUtf8.txt", getClass());
+      InputStream inputStream = getClass().getClassLoader().getResourceAsStream("org/eclipse/scout/rt/platform/ioUtilityTestUtf8.txt");
+      tempFile = IOUtility.createTempFile(inputStream, "temp", "zip");
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
       String[] readLinesArray = readLines.toArray(new String[readLines.size()]);
       assertTrue(StringUtility.equalsIgnoreCase(readLinesArray[0], "TestTestöäü"));
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -249,7 +256,7 @@ public class IOUtilityTest {
       assertTrue("Expected an empty list when reading an empty file.", readLines.isEmpty());
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -283,8 +290,8 @@ public class IOUtilityTest {
       assertListEquals(expectedLines, readLines);
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
-      TestUtility.deleteTempFile(tempFile2);
+      IOUtility.deleteFile(tempFile);
+      IOUtility.deleteFile(tempFile2);
     }
   }
 
@@ -307,8 +314,8 @@ public class IOUtilityTest {
       assertListEquals(expectedLines, readLines);
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
-      TestUtility.deleteTempFile(tempFile2);
+      IOUtility.deleteFile(tempFile);
+      IOUtility.deleteFile(tempFile2);
     }
   }
 
@@ -331,7 +338,7 @@ public class IOUtilityTest {
       }
     }
     finally {
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 
@@ -368,7 +375,7 @@ public class IOUtilityTest {
       if (pw != null) {
         pw.close();
       }
-      TestUtility.deleteTempFile(tempFile);
+      IOUtility.deleteFile(tempFile);
     }
   }
 

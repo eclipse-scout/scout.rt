@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.shared;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.junit.Assert;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,6 +249,26 @@ public final class TestingUtility {
     }
     sb.append(percentSuffix.getSuffix(symbols));
     return sb.toString();
+  }
+
+  /**
+   * Invokes the GC several times and verifies that the object referenced by the weak reference was garbage collected.
+   */
+  public static void assertGC(WeakReference<?> ref) {
+    int maxRuns = 50;
+    for (int i = 0; i < maxRuns; i++) {
+      if (ref.get() == null) {
+        return;
+      }
+      System.gc();
+      try {
+        Thread.sleep(50);
+      }
+      catch (InterruptedException e) {
+        // NOP
+      }
+    }
+    Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
 }

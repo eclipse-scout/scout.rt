@@ -33,9 +33,6 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.shared.csv.CsvHelper;
-import org.eclipse.scout.rt.shared.csv.IDataConsumer;
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +54,7 @@ public class CsvHelperTest {
 
   @After
   public void tearDown() {
-    TestUtility.deleteTempFile(m_testFile);
+    IOUtility.deleteFile(m_testFile);
   }
 
   @Test

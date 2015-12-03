@@ -409,6 +409,39 @@ public final class IOUtility {
   }
 
   /**
+   * Creates a temp file from an input stream.
+   *
+   * @param content
+   * @param filename
+   * @param extension
+   * @return new file
+   * @throws ProcessingException
+   */
+  public static File createTempFile(InputStream content, String filename, String extension) throws ProcessingException {
+    File temp = null;
+    FileOutputStream fo = null;
+    try {
+      temp = File.createTempFile(filename, extension);
+      fo = new FileOutputStream(temp);
+      IOUtility.writeContent(fo, IOUtility.getContent(content));
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error creating temp file", e);
+    }
+    finally {
+      if (fo != null) {
+        try {
+          fo.close();
+        }
+        catch (IOException e) {
+          // nop
+        }
+      }
+    }
+    return temp;
+  }
+
+  /**
    * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
    * deleted when the virtual machine terminates. The temporary file will look like this: <i>prefix</i>2093483323922923
    * <i>.suffix</i>
@@ -484,6 +517,18 @@ public final class IOUtility {
       if (f.exists()) {
         return f.delete();
       }
+    }
+    return false;
+  }
+
+  /**
+   * Null-safe file delete
+   *
+   * @return <code>true</code>, if deletion successful.
+   */
+  public static boolean deleteFile(File file) {
+    if (file != null && file.exists()) {
+      return file.delete();
     }
     return false;
   }

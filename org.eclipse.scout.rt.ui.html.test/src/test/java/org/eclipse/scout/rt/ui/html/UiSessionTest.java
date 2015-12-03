@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -75,7 +74,7 @@ public class UiSessionTest {
     session.dispose();
     assertTrue(session.isDisposed());
     session = null;
-    TestUtility.assertGC(ref);
+    TestingUtility.assertGC(ref);
   }
 
   @Test
@@ -110,7 +109,7 @@ public class UiSessionTest {
     assertTrue(uiSession.isDisposed());
 
     uiSession = null;
-    TestUtility.assertGC(ref);
+    TestingUtility.assertGC(ref);
   }
 
   /**

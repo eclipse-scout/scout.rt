@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistryTest;
@@ -89,7 +89,7 @@ public class JsonDesktopTest {
     WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
     jsonDesktop.dispose();
     jsonDesktop = null;
-    TestUtility.assertGC(ref);
+    TestingUtility.assertGC(ref);
   }
 
   @Test

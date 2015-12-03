@@ -17,8 +17,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.InputStream;
 
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
 import org.junit.Test;
 
 /**
@@ -28,38 +28,45 @@ import org.junit.Test;
  */
 public class FileUtilityTest {
 
+  private static final String TEXT_EXT = "txt";
   private static final String FILE_NAME = "fooBar.txt";
   private static final String FILE_NAME_MULTIPLE_DOTS = "foo.bar.txt";
   private static final String FILE_NAME_NO_EXT = "fooBar";
+  private static final String PLATFORM_PATH = "org/eclipse/scout/rt/platform/";
 
   @Test
   public void testIsZipFile() throws Exception {
     File zipFile = null;
     File noZipFile = null;
     try {
-      zipFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/rt/platform/zip.zip", getClass());
-      noZipFile = TestUtility.createTempFileFromFilename("org/eclipse/scout/rt/platform/nozip.zip", getClass());
+      zipFile = createTempFile("zip.zip");
+      noZipFile = createTempFile("nozip.zip");
       assertTrue("zip.zip is not a zip file", FileUtility.isZipFile(zipFile));
       assertFalse("nozip.zip is a zip file", FileUtility.isZipFile(noZipFile));
     }
     finally {
-      TestUtility.deleteTempFile(zipFile);
-      TestUtility.deleteTempFile(noZipFile);
+      IOUtility.deleteFile(zipFile);
+      IOUtility.deleteFile(noZipFile);
     }
+  }
+
+  private File createTempFile(String name) {
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + name);
+    return IOUtility.createTempFile(inputStream, "temp", "zip");
   }
 
   @Test
   public void testGetFileExtension_String() {
-    assertEquals("txt", FileUtility.getFileExtension(FILE_NAME));
-    assertEquals("txt", FileUtility.getFileExtension(FILE_NAME_MULTIPLE_DOTS));
+    assertEquals(TEXT_EXT, FileUtility.getFileExtension(FILE_NAME));
+    assertEquals(TEXT_EXT, FileUtility.getFileExtension(FILE_NAME_MULTIPLE_DOTS));
     assertNull(FileUtility.getFileExtension(FILE_NAME_NO_EXT));
     assertNull(FileUtility.getFileExtension((String) null));
   }
 
   @Test
   public void testGetFileExtension_File() {
-    assertEquals("txt", FileUtility.getFileExtension(new File(FILE_NAME)));
-    assertEquals("txt", FileUtility.getFileExtension(new File(FILE_NAME_MULTIPLE_DOTS)));
+    assertEquals(TEXT_EXT, FileUtility.getFileExtension(new File(FILE_NAME)));
+    assertEquals(TEXT_EXT, FileUtility.getFileExtension(new File(FILE_NAME_MULTIPLE_DOTS)));
     assertNull(FileUtility.getFileExtension((File) new File(FILE_NAME_NO_EXT)));
     assertNull(FileUtility.getFileExtension((File) null));
   }
@@ -68,7 +75,7 @@ public class FileUtilityTest {
   public void testGetFilenameParts_String() {
     String[] tmp = FileUtility.getFilenameParts(FILE_NAME);
     assertEquals("fooBar", tmp[0]);
-    assertEquals("txt", tmp[1]);
+    assertEquals(TEXT_EXT, tmp[1]);
     assertNull(FileUtility.getFilenameParts((String) null));
     // other tests already covered by testGetFileExtension_String
   }
@@ -77,7 +84,7 @@ public class FileUtilityTest {
   public void testGetFilenameParts_File() {
     String[] tmp = FileUtility.getFilenameParts(new File(FILE_NAME));
     assertEquals("fooBar", tmp[0]);
-    assertEquals("txt", tmp[1]);
+    assertEquals(TEXT_EXT, tmp[1]);
     assertNull(FileUtility.getFilenameParts((File) null));
     // other tests already covered by testGetFileExtension_File
   }

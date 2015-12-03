@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.util.TestUtility;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -176,7 +176,7 @@ public class JsonTreeTest {
     object.dispose();
     m_uiSession = null;
     object = null;
-    TestUtility.assertGC(ref);
+    TestingUtility.assertGC(ref);
   }
 
   @Test
