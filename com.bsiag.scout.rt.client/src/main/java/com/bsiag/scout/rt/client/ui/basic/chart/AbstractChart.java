@@ -48,14 +48,15 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * {@link ChartBean#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
  * the {@link ChartValueGroupBean}.
  * <p>
- * <h2>Fulfillment cCart</h2> ({@link IChartType.FULFILLMENT})
+ * <h2>Fulfillment Cart</h2> ({@link IChartType.FULFILLMENT})
  * <p>
  * There have to be exactly two {@link ChartValueGroupBean} on the {@link ChartBean}, with just one value each. The
- * first group contains the degree of fulfillment and the second group contains the value to fulfill.
+ * first group contains the degree of fulfillment and the second group contains the value to fulfill. This type has no
+ * legendbox.
  * <h2>Sales Funnel Chart</h2> ({@link IChartType.SALESFUNNEL})
  * <p>
  * A salesfunnel consists of n {@link ChartValueGroupBean}. Each represents a bar in the chart. Every group must have at
- * least one value and at most two values.
+ * least one value and at most two values. This type has no legendbox.
  * <p>
  * There are custom attributes for the sales funnel chart:
  * <ul>
@@ -69,7 +70,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * For a speedo chart there have to be just one {@link ChartValueGroupBean} on the {@link ChartBean}. The first value on
  * the group is the min value of the range, the second the actual value is the actual value for the pointer and the
  * third value is the max value for the range. The {@link IChartType#PROP_SPEEDO_CHART_GREEN_AREA_POSITION} is a custom
- * property which defines where the green area is located on the speedo.
+ * property which defines where the green area is located on the speedo. This type has no legendbox.
  * <h2>Venn Chart</h2> ({@link IChartType.VENN})
  * <p>
  * A Venn-chart consist of one to seven {@link ChartValueGroupBean} with exactly one value. First there are all values
@@ -132,6 +133,7 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
     setAnimated(getConfiguredAnimated());
     setLegendPosition(getConfiguredLegendPosition());
     setLegendVisible(getConfiguredLegendVisible());
+    setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -191,6 +193,12 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
   protected boolean getConfiguredLegendVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  protected boolean getConfiguredInteractiveLegendVisible() {
     return true;
   }
 
@@ -345,6 +353,16 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   @Override
   public void setLegendVisible(boolean visible) {
     propertySupport.setPropertyBool(PROP_LEGEND_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isInteractiveLegendVisible() {
+    return propertySupport.getPropertyBool(PROP_INTERACTIVE_LEGEND_VISIBLE);
+  }
+
+  @Override
+  public void setInteractiveLegendVisible(boolean visible) {
+    propertySupport.setPropertyBool(PROP_INTERACTIVE_LEGEND_VISIBLE, visible);
   }
 
   protected class P_UIFacade implements IChartUIFacade {

@@ -31,14 +31,13 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
   String PROP_MODEL_HANDLES_CLICK = "modelHandlesClick";
   String PROP_ANIMATED = "animated";
   String PROP_LEGEND_VISIBLE = "legendVisible";
+  String PROP_INTERACTIVE_LEGEND_VISIBLE = "interactiveLegendVisible";
   String PROP_LEGEND_POSITION = "legendPosition";
 
   int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
   int LEGEND_POSITION_BOTTOM = 0;
-  int LEGEND_POSITION_BOTTOM_SINGLE = 1;
   int LEGEND_POSITION_TOP = 2;
-  int LEGEND_POSITION_TOP_SINGLE = 3;
   int LEGEND_POSITION_RIGHT = 4;
   int LEGEND_POSITION_LEFT = 5;
 
@@ -107,4 +106,8 @@ public interface IChart extends IPropertyObserver, ITypeWithClassId {
   boolean isLegendVisible();
 
   void setLegendVisible(boolean visible);
+
+  boolean isInteractiveLegendVisible();
+
+  void setInteractiveLegendVisible(boolean visible);
 }

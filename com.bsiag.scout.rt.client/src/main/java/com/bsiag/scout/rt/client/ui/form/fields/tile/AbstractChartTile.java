@@ -87,6 +87,15 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
     return true;
   }
 
+  /**
+   * If set, this value is applied to the tile field chart's "legend visible" property.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  protected Boolean getConfiguredInteractiveLegendVisible() {
+    return true;
+  }
+
   @Override
   protected void initFileFieldInternal() {
     super.initFileFieldInternal();
@@ -108,6 +117,9 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
     }
     if (getConfiguredLegendVisible() != null) {
       getTileField().getChart().setLegendVisible(getConfiguredLegendVisible());
+    }
+    if (getConfiguredInteractiveLegendVisible() != null) {
+      getTileField().getChart().setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
     }
   }
 
