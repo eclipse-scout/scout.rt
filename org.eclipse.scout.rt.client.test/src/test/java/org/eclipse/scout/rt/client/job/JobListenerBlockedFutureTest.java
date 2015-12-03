@@ -30,13 +30,13 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement.JUnitJobManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,8 +50,8 @@ public class JobListenerBlockedFutureTest {
   @Before
   public void before() {
     // Use dedicated job manager because job manager is shutdown in tests.
-    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JUnitJobManager() {
-      // must be a subclass in order to replace JUnitJobManager
+    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
+      // must be a subclass in order to replace JobManager
     });
   }
 

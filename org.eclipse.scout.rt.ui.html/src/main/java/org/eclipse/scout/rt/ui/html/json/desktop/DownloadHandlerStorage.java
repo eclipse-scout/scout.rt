@@ -27,6 +27,12 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  */
 @Bean
 public class DownloadHandlerStorage {
+
+  /**
+   * Execution hint to mark internal cleanup jobs.
+   */
+  public static final String RESOURCE_CLEANUP_JOB_MARKER = DownloadHandlerStorage.class.getName();
+
   private final Map<String, BinaryResource> m_valueMap = new HashMap<>();
   private final Map<String, IFuture> m_futureMap = new HashMap<>();
 
@@ -64,6 +70,7 @@ public class DownloadHandlerStorage {
         removeOnTimeout(key);
       }
     }, Jobs.newInput()
+        .withExecutionHint(RESOURCE_CLEANUP_JOB_MARKER)
         .withRunContext(RunContexts.copyCurrent())
         .withSchedulingDelay(ttl, TimeUnit.MILLISECONDS)));
   }

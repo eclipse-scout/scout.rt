@@ -307,7 +307,7 @@ public class RunContext implements IAdaptable {
    * @return this
    * @see RunContextIdentifiers#isCurrent(String)
    */
-  public RunContext withIdentifier(String id) {
+  public RunContext withIdentifier(final String id) {
     m_identifiers.push(id);
     return this;
   }
@@ -318,7 +318,7 @@ public class RunContext implements IAdaptable {
     builder.ref("runMonitor", getRunMonitor());
     builder.ref("subject", getSubject());
     builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
+    builder.attr("identifiers", CollectionUtility.format(getIdentifiers()));
     return builder.toString();
   }
 
@@ -345,16 +345,18 @@ public class RunContext implements IAdaptable {
     m_subject = Subject.getSubject(AccessController.getContext());
     m_locale = NlsLocale.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
+
+    // RunMonitor
     m_runMonitor = BEANS.get(RunMonitor.class);
-
-    m_identifiers = new LinkedList<>();
-    Deque<String> existingIds = RunContextIdentifiers.CURRENT.get();
-    if (existingIds != null) {
-      m_identifiers.addAll(existingIds);
-    }
-
     if (RunMonitor.CURRENT.get() != null) {
       RunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
+    }
+
+    // RunContextIdentifiers
+    m_identifiers = new LinkedList<>();
+    final Deque<String> callingRunContextIdentifiers = RunContextIdentifiers.CURRENT.get();
+    if (callingRunContextIdentifiers != null) {
+      m_identifiers.addAll(callingRunContextIdentifiers);
     }
   }
 

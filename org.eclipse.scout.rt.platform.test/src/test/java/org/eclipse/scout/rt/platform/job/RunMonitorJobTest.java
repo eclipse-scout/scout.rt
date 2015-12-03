@@ -12,16 +12,19 @@ package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Test;
@@ -32,7 +35,7 @@ public class RunMonitorJobTest {
 
   @After
   public void after() {
-    RunMonitorEx.CURRENT.remove();
+    RunMonitor.CURRENT.remove();
   }
 
   @Test
@@ -40,101 +43,132 @@ public class RunMonitorJobTest {
     final RunMonitorEx currentMonitor = new RunMonitorEx();
     final RunMonitorEx explicitMonitor = new RunMonitorEx();
 
-    RunMonitorEx.CURRENT.set(currentMonitor);
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
+    RunMonitor.CURRENT.set(currentMonitor);
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        assertEquals(1, currentMonitor.getChildCount());//+1 from RunContexts.copyCurrent
-        assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
-        assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
+        setupLatch.countDownAndBlock();
+
+        assertSame(explicitMonitor, RunMonitor.CURRENT.get());
+        assertNotSame(explicitMonitor, currentMonitor);
+        assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
+        assertEquals(1, explicitMonitor.getCancellablesCount());//+1 from job cancellable
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
-    assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
+    setupLatch.await();
+    assertSame(currentMonitor, RunMonitor.CURRENT.get());
+    setupLatch.unblock();
 
-    awaitFutureDone(future); // do not wait on Future via 'awaitDoneAndGet' because cleanup is done shortly after 'done' (JobManager implementation detail).
-    assertEquals(1, currentMonitor.getChildCount());//+1 from RunContexts.copyCurrent
-    assertEquals(0, explicitMonitor.getChildCount());
+    future.awaitDoneAndGet();
+    assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
+    waitUntilCancellableCount(explicitMonitor, 0);
+    assertSame(currentMonitor, RunMonitor.CURRENT.get());
   }
 
   @Test
   public void testNoCurrentAndExplicitMonitor() throws Exception {
     final RunMonitorEx explicitMonitor = new RunMonitorEx();
 
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
     RunMonitor.CURRENT.remove();
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
-        assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
+        setupLatch.countDownAndBlock();
+
+        assertEquals(1, explicitMonitor.getCancellablesCount());//+1 from job cancellable
+        assertSame(explicitMonitor, RunMonitor.CURRENT.get());
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
-    assertNull(RunMonitorEx.CURRENT.get());
+    setupLatch.await();
+    assertNull(RunMonitor.CURRENT.get());
+    setupLatch.unblock();
 
-    awaitFutureDone(future); // do not wait on Future via 'awaitDoneAndGet' because cleanup is done shortly after 'done' (JobManager implementation detail).
-    assertEquals(0, explicitMonitor.getChildCount());
+    future.awaitDoneAndGet();
+    waitUntilCancellableCount(explicitMonitor, 0);
+    assertNull(RunMonitor.CURRENT.get());
   }
 
-  @Times(200)
   @Test
   public void testCurrentAndNoExplicitMonitor() throws Exception {
     final RunMonitorEx currentMonitor = new RunMonitorEx();
+    RunMonitor.CURRENT.set(currentMonitor);
 
-    RunMonitorEx.CURRENT.set(currentMonitor);
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        assertTrue(currentMonitor.containsCancellable(RunMonitorEx.CURRENT.get()));
+        setupLatch.countDownAndBlock();
+
+        assertTrue(currentMonitor.containsCancellable(RunMonitor.CURRENT.get()));
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
+    setupLatch.await();
+    assertSame(currentMonitor, RunMonitor.CURRENT.get());
+    setupLatch.unblock();
 
-    awaitFutureDone(future); // do not wait on Future via 'awaitDoneAndGet' because cleanup is done shortly after 'done' (JobManager implementation detail).
-    assertEquals(1, currentMonitor.getChildCount());//+1 from RunContexts.copyCurrent
+    future.awaitDoneAndGet();
+    assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
+    assertSame(currentMonitor, RunMonitor.CURRENT.get());
   }
 
   @Test
   public void testNoCurrentAndNoExplicitMonitor() throws Exception {
-    RunMonitorEx.CURRENT.remove();
-    Jobs.schedule(new IRunnable() {
+    RunMonitor.CURRENT.remove();
+
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        assertNotNull(RunMonitorEx.CURRENT.get());
+        setupLatch.countDownAndBlock();
+
+        assertNotNull(RunMonitor.CURRENT.get());
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    assertNull(RunMonitorEx.CURRENT.get());
-  }
+    setupLatch.await();
+    assertNull(RunMonitor.CURRENT.get());
+    setupLatch.unblock();
 
-  private void awaitFutureDone(IFuture<Void> future) throws InterruptedException {
-    final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<Void>() {
-
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        latch.countDown();
-      }
-    }, null);
-    latch.await();
+    future.awaitDoneAndGet();
+    assertNull(RunMonitor.CURRENT.get());
   }
 
   private static class RunMonitorEx extends RunMonitor {
-    public int getChildCount() {
+
+    public int getCancellablesCount() {
       return getCancellables().size();
     }
 
-    public boolean containsCancellable(ICancellable c) {
-      return getCancellables().contains(c);
+    public boolean containsCancellable(ICancellable cancellable) {
+      return getCancellables().contains(cancellable);
+    }
+  }
+
+  private static void waitUntilCancellableCount(RunMonitorEx monitor, int expectedCount) {
+    final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+
+    while (monitor.getCancellablesCount() != expectedCount) {
+      if (System.currentTimeMillis() > deadline) {
+        fail(String.format("Timeout elapsed while waiting for a 'cancellable' count. [expectedCancellableCount=%s, actualCancellableCount=%s]", expectedCount, monitor.getCancellablesCount()));
+      }
+      Thread.yield();
     }
   }
 }

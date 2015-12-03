@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -37,5 +38,10 @@ public class JobNameRegexFutureFilterTest {
     assertTrue(filter.accept(future1));
     assertTrue(filter.accept(future2));
     assertFalse(filter.accept(future3));
+
+    // cleanup
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future1, future2, future3)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 }

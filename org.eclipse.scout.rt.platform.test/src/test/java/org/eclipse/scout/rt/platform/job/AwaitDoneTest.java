@@ -20,10 +20,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -34,11 +34,13 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class AwaitDoneTest {
 
+  private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
+
   @Test
   public void testAwaitAllDone() {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -46,9 +48,9 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
-    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(future.isDone());
   }
 
   @Test
@@ -67,7 +69,9 @@ public class AwaitDoneTest {
         .andMatchFuture(future1)
         .toFilter(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
-    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future1)
+        .toFilter()));
     assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter()));
@@ -85,7 +89,9 @@ public class AwaitDoneTest {
       public void run() throws Exception {
         protocol.add("run-1");
       }
-    }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
     Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -96,6 +102,7 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -104,13 +111,21 @@ public class AwaitDoneTest {
     assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter()));
-    assertFalse(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
-    assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
+    assertFalse(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter()));
+    assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter(), 500, TimeUnit.MILLISECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
 
     latchJob2.countDown();
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
-    assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter()));
     assertEquals(CollectionUtility.hashSet("run-1", "run-2"), protocol);
   }
 
@@ -174,28 +189,22 @@ public class AwaitDoneTest {
 
     assertTrue(setupLatch.await());
 
+    // cancel the Future in 1 second
     Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        // cancel the Future in 1 second
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            // run the test.
-            future.cancel(true);
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent())
-            .withSchedulingDelay(1, TimeUnit.SECONDS));
-
-        // start waiting for the job to complete or until cancelled
-        assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-            .andMatchFuture(future)
-            .toFilter(), 5, TimeUnit.SECONDS));
+        // run the test.
+        future.cancel(true);
       }
-    }, Jobs.newInput()).awaitDoneAndGet();
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withSchedulingDelay(1, TimeUnit.SECONDS));
+
+    // start waiting for the job to complete or until cancelled
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 5, TimeUnit.SECONDS));
 
     continueRunningLatch.release();
   }

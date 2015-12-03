@@ -61,6 +61,7 @@ public class FutureAwaitTest {
     }, Jobs.newInput());
     assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
     setupLatch.unblock();
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -158,6 +159,7 @@ public class FutureAwaitTest {
     }, Jobs.newInput());
     assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
     setupLatch.unblock();
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -271,6 +273,7 @@ public class FutureAwaitTest {
     }, Jobs.newInput());
     assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
     setupLatch.unblock();
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -360,6 +363,7 @@ public class FutureAwaitTest {
     }, Jobs.newInput());
     assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
     setupLatch.unblock();
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -444,6 +448,12 @@ public class FutureAwaitTest {
     catch (ProcessingException e) {
       assertTrue(e.isTimeout());
     }
+
+    // cleanup
+    setupLatch.unblock();
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -480,6 +490,7 @@ public class FutureAwaitTest {
     }, Jobs.newInput());
     assertTrue(controller.awaitDone(10, TimeUnit.SECONDS));
     setupLatch.unblock();
+    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)
@@ -531,6 +542,12 @@ public class FutureAwaitTest {
     assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .toFilter(), 1, TimeUnit.MILLISECONDS));
+
+    // cleanup
+    setupLatch.unblock();
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 5000)

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -41,20 +42,19 @@ import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement.JUnitJobManager;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.util.UncaughtExceptionRunnable;
 import org.junit.After;
@@ -68,6 +68,8 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(PlatformTestRunner.class)
 public class MutualExclusionTest {
+
+  private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
 
   private static ExecutorService s_executor;
 
@@ -113,7 +115,8 @@ public class MutualExclusionTest {
           modelThreadProtocol.add("model-thread-1");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -124,7 +127,8 @@ public class MutualExclusionTest {
           modelThreadProtocol.add("model-thread-2");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -135,9 +139,9 @@ public class MutualExclusionTest {
           modelThreadProtocol.add("model-thread-3");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withExecutionHint(JOB_IDENTIFIER));
 
-    Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
+    awaitDoneElseFail(JOB_IDENTIFIER);
 
     assertEquals(CollectionUtility.hashSet(1, 2, 3), protocol);
     assertEquals(CollectionUtility.arrayList("model-thread-1", "model-thread-2", "model-thread-3"), modelThreadProtocol);
@@ -198,7 +202,8 @@ public class MutualExclusionTest {
               public void run() throws Exception {
                 protocol.add(9);
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+                .withExecutionHint(JOB_IDENTIFIER));
 
             try {
               future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(RuntimeExceptionTranslator.class));
@@ -209,7 +214,8 @@ public class MutualExclusionTest {
 
             protocol.add(6);
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withExecutionHint(JOB_IDENTIFIER));
 
         protocol.add(2);
 
@@ -226,17 +232,20 @@ public class MutualExclusionTest {
               public void run() throws Exception {
                 protocol.add(10);
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+                .withExecutionHint(JOB_IDENTIFIER));
 
             protocol.add(8);
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withExecutionHint(JOB_IDENTIFIER));
 
         protocol.add(3);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
     assertEquals(CollectionUtility.arrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), protocol);
   }
 
@@ -259,7 +268,8 @@ public class MutualExclusionTest {
           public void run() throws Exception {
             protocol.add(3);
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withExecutionHint(JOB_IDENTIFIER));
 
         try {
           future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(ExceptionTranslator.class));
@@ -271,9 +281,10 @@ public class MutualExclusionTest {
           protocol.add(4);
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
     assertEquals(CollectionUtility.arrayList(1, 2, 3), protocol);
   }
 
@@ -292,7 +303,9 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("1: running");
 
-        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(JOB_IDENTIFIER)
+            .toFilter())) {
           protocol.add("1: idle [a]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -306,7 +319,9 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("1: afterAwait");
 
-        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(JOB_IDENTIFIER)
+            .toFilter())) {
           protocol.add("1: idle [b]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -318,6 +333,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withName("job-1")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     ModelJobs.schedule(new IRunnable() {
@@ -326,7 +342,9 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("2: running");
 
-        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(JOB_IDENTIFIER)
+            .toFilter())) {
           protocol.add("2: idle [a]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -341,7 +359,9 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
         protocol.add("2: afterSignaling");
 
-        if (Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())) {
+        if (Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(JOB_IDENTIFIER)
+            .toFilter())) {
           protocol.add("2: idle [b]");
         }
         if (IFuture.CURRENT.get().isBlocked()) {
@@ -353,12 +373,13 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withName("job-2")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     // Wait until job1 completed.
     future1.awaitDoneAndGet(30, TimeUnit.SECONDS);
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
 
     List<String> expected = new ArrayList<>();
     expected.add("1: running");
@@ -432,7 +453,8 @@ public class MutualExclusionTest {
         }
         verifyLatch.countDown();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -442,14 +464,17 @@ public class MutualExclusionTest {
         setupLatch.countDownAndBlock();
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withExceptionHandling(null, false));
+        .withExceptionHandling(null, false)
+        .withExecutionHint(JOB_IDENTIFIER));
+
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("running-3");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
     setupLatch.await();
     assertTrue(future1.isBlocked());
@@ -459,13 +484,13 @@ public class MutualExclusionTest {
 
     // VERIFY
     verifyLatch.await();
-    assertFalse(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
-    assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.MILLISECONDS));
+    assertFalse(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter()));
+    assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter(), 10, TimeUnit.MILLISECONDS));
     assertEquals(Arrays.asList("running-1", "running-2", "interrupted-1", "non-model-thread-1"), protocol);
 
     // clenaup
     setupLatch.unblock();
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
   }
 
   /**
@@ -509,6 +534,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withName("job-1")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     final IFuture<Void> future2 = ModelJobs.schedule(new IRunnable() {
@@ -526,6 +552,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withName("job-2")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     final IFuture<Void> future3 = ModelJobs.schedule(new IRunnable() {
@@ -536,6 +563,7 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withName("job-3")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     assertTrue(latchJob2.await());
@@ -587,7 +615,7 @@ public class MutualExclusionTest {
 
     // let job2 finish its work so that job1 can re-acquire the mutex.
     latchJob2.unblock();
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
 
     expectedProtocol.add("done-2");
     expectedProtocol.add("done-3");
@@ -642,7 +670,7 @@ public class MutualExclusionTest {
       }).when(executorMock).execute(any(Runnable.class));
 
       // Job-1
-      final IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
+      final IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -651,29 +679,35 @@ public class MutualExclusionTest {
 
           protocol.add("running-job-1");
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-1"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+          .withName("job-1")
+          .withExecutionHint(JOB_IDENTIFIER));
 
       // Job-2
-      final IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
+      final IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           protocol.add("running-job-2");
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-2"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+          .withName("job-2")
+          .withExecutionHint(JOB_IDENTIFIER));
 
       // Job-3
-      IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
+      IFuture<Void> future3 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           protocol.add("running-job-3");
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-3"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+          .withName("job-3")
+          .withExecutionHint(JOB_IDENTIFIER));
 
-      assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+      awaitDoneElseFail(JOB_IDENTIFIER);
       assertEquals(Arrays.asList("running-job-1", "running-job-3"), protocol);
-      assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+      assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter()));
       assertFalse(future1.isCancelled());
       assertTrue(future2.isCancelled());
       assertFalse(future3.isCancelled());
@@ -723,7 +757,7 @@ public class MutualExclusionTest {
       final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
 
       // Job-1
-      IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
+      IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -745,10 +779,11 @@ public class MutualExclusionTest {
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("job-1")
+          .withExecutionHint(JOB_IDENTIFIER)
           .withExceptionHandling(null, false));
 
       // Job-2
-      IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
+      IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -757,10 +792,11 @@ public class MutualExclusionTest {
 
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("job-2")
+          .withExecutionHint(JOB_IDENTIFIER)
           .withExceptionHandling(null, false));
 
       // Job-3
-      IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
+      IFuture<Void> future3 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -775,10 +811,11 @@ public class MutualExclusionTest {
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("job-3")
+          .withExecutionHint(JOB_IDENTIFIER)
           .withExceptionHandling(null, false));
 
       // Job-4
-      IFuture<Void> future4 = Jobs.getJobManager().schedule(new IRunnable() {
+      IFuture<Void> future4 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -793,10 +830,11 @@ public class MutualExclusionTest {
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("job-4")
+          .withExecutionHint(JOB_IDENTIFIER)
           .withExceptionHandling(null, false));
 
       // Job-5
-      IFuture<Void> future5 = Jobs.getJobManager().schedule(new IRunnable() {
+      IFuture<Void> future5 = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -804,11 +842,12 @@ public class MutualExclusionTest {
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("job-5")
+          .withExecutionHint(JOB_IDENTIFIER)
           .withExceptionHandling(null, false));
 
       assertTrue(job4RunningLatch.await());
-      assertFalse(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 and job-5 are pending
-      assertFalse(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>())); // job-4 and job-5 are pending
+      assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter(), 1, TimeUnit.MILLISECONDS)); // job-4 and job-5 are pending
+      assertFalse(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter())); // job-4 and job-5 are pending
 
       List<String> expectedProtocol = new ArrayList<>();
       expectedProtocol.add("running-job-1 (a)");
@@ -836,13 +875,13 @@ public class MutualExclusionTest {
 
       // cancel job4
       future4.cancel(true);
-      assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+      awaitDoneElseFail(JOB_IDENTIFIER);
 
       expectedProtocol.add("job-4 [interrupted]");
       expectedProtocol.add("running-job-5");
       assertEquals(expectedProtocol, protocol);
 
-      assertTrue(Jobs.getJobManager().isDone(new AlwaysFilter<IFuture<?>>()));
+      assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter()));
 
       assertTrue(future4.isCancelled());
       assertTrue(future4.isDone());
@@ -868,7 +907,9 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withName("job-1"));
 
     final IFuture<Void> future2 = ModelJobs.schedule(new IRunnable() {
 
@@ -878,7 +919,9 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withName("job-2"));
 
     final IFuture<Void> future3 = ModelJobs.schedule(new IRunnable() {
 
@@ -888,7 +931,9 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-3"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withName("job-3"));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -896,7 +941,9 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("job-4-running");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-4"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withName("job-4"));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -941,9 +988,11 @@ public class MutualExclusionTest {
 
         protocol.add("job-5-ending");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("job-5"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withName("job-5"));
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
 
     List<String> expected = new ArrayList<>();
     expected.add("job-1-beforeAwait");
@@ -1013,7 +1062,8 @@ public class MutualExclusionTest {
                   public void run() throws Exception {
                     protocol.add("job-4-running");
                   }
-                }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+                }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+                    .withExecutionHint(JOB_IDENTIFIER));
 
                 protocol.add("job-3-before-signaling");
                 BC.setBlocking(false);
@@ -1028,22 +1078,26 @@ public class MutualExclusionTest {
                   public void run() throws Exception {
                     protocol.add("job-5-running");
                   }
-                }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+                }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+                    .withExecutionHint(JOB_IDENTIFIER));
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+                .withExecutionHint(JOB_IDENTIFIER));
 
             protocol.add("job-2-beforeAwait");
             BC.waitFor();
             protocol.add("JOB-X-AFTERAWAIT");
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withExecutionHint(JOB_IDENTIFIER));
 
         protocol.add("job-1-beforeAwait");
         BC.waitFor();
         protocol.add("JOB-X-AFTERAWAIT");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
+    awaitDoneElseFail(JOB_IDENTIFIER);
 
     List<String> expected = new ArrayList<>();
     expected.add("job-1-running");
@@ -1076,16 +1130,19 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         BC.waitFor();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
+
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         BC.waitFor();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
   }
 
   /**
@@ -1125,9 +1182,10 @@ public class MutualExclusionTest {
         protocol.add("3: afterWaitFor [outer]");
         done.release();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    awaitDoneElseFail(JOB_IDENTIFIER);
     runnable.throwOnError();
 
     List<String> expected = new ArrayList<>();
@@ -1158,14 +1216,15 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("3: afterWaitFor");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExecutionHint(JOB_IDENTIFIER));
 
     JobTestUtil.waitForMutexCompetitors(m_clientSession.getModelJobMutex(), 0); // Wait until job1 is blocked
     assertTrue(BC.isBlocking());
     protocol.add("2: setBlocking=false");
     BC.setBlocking(false);
     assertFalse(BC.isBlocking());
-    Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
+    awaitDoneElseFail(JOB_IDENTIFIER);
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -1177,8 +1236,6 @@ public class MutualExclusionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
         .awaitDoneAndGet();
-
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("1: beforeWaitFor");
@@ -1237,7 +1294,7 @@ public class MutualExclusionTest {
 
   @Replace
   @IgnoreBean
-  private static class P_JobManager extends JUnitJobManager {
+  private static class P_JobManager extends JobManager {
 
     @Override
     protected ExecutorService createExecutor() {
@@ -1247,5 +1304,11 @@ public class MutualExclusionTest {
     public ExecutorService getExecutorMock() {
       return m_executor;
     }
+  }
+
+  private static void awaitDoneElseFail(String executionHint) {
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(executionHint)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 }

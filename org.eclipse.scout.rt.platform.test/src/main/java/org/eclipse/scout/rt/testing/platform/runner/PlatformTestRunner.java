@@ -16,14 +16,12 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
+import org.eclipse.scout.rt.testing.platform.runner.statement.AssertNoRunningJobsStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement.JUnitJobManager;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
@@ -47,11 +45,6 @@ import org.junit.runners.model.Statement;
  * Use <code>RunWithSubject</code> annotation to specify the user to run the test. This annotation can be defined on
  * class or method-level. If defining the user on class-level, all test-methods inherit that user.
  * <p>
- * A new dedicated {@link JobManager} is installed for every JUnit test class, which replaces {@link JobManager}. This
- * prevents job interferences among test classes using a shared platform.<br/>
- * If you require to replace the job manager in your test case, register a subclass of {@link JUnitJobManager} as a
- * replacement of {@link JUnitJobManager} in the bean manager.
- * <p>
  * Example:
  *
  * <pre>
@@ -73,8 +66,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    final Statement s3 = super.classBlock(notifier);
-    final Statement s2 = new ReplaceJobManagerStatement(s3);
+    final Statement s2 = super.classBlock(notifier);
     final Statement s1 = new PlatformStatement(s2, ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
 
     return s1;
@@ -247,8 +239,9 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s3 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
-    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
+    final Statement s4 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+    final Statement s3 = new RegisterBeanStatement(s4, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
+    final Statement s2 = new AssertNoRunningJobsStatement(s3);
     final Statement s1 = new TimesStatement(s2, ReflectionUtility.getAnnotation(Times.class, testMethod, testClass));
 
     return s1;

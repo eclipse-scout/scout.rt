@@ -348,7 +348,7 @@ public class JobScheduleTest {
   public void testParallelExecution() throws Exception {
     final BlockingCountDownLatch barrier = new BlockingCountDownLatch(3);
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -358,7 +358,7 @@ public class JobScheduleTest {
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -368,7 +368,7 @@ public class JobScheduleTest {
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -380,6 +380,11 @@ public class JobScheduleTest {
 
     assertTrue(barrier.await());
     barrier.unblock();
+
+    // wait for all jobs to complete
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future1, future2, future3)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 
   @Test
@@ -475,7 +480,7 @@ public class JobScheduleTest {
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    Jobs.getJobManager().schedule(new Callable<String>() {
+    IFuture<String> future1 = Jobs.getJobManager().schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -506,6 +511,11 @@ public class JobScheduleTest {
     }
 
     latch.unblock();
+
+    // wait for all jobs to complete
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future1, future2)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 
   @Test

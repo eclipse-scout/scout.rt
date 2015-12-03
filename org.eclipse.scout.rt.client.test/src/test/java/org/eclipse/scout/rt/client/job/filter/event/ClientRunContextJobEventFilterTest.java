@@ -137,6 +137,12 @@ public class ClientRunContextJobEventFilterTest {
         .andAreSingleExecuting()
         .toFilter()
         .accept(modelEvent));
+
+    // cleanup
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(clientJobFuture, modelJobFuture)
+        .toFilter(), true);
+
   }
 
   @Test

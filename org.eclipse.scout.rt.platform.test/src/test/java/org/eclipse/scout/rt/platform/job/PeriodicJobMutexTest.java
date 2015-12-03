@@ -16,10 +16,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -28,6 +28,8 @@ import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class PeriodicJobMutexTest {
+
+  private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
 
   @Test
   public void testAtFixedRate() {
@@ -88,7 +90,8 @@ public class PeriodicJobMutexTest {
                 protocol.add("running-2");
               }
             }, Jobs.newInput()
-                .withMutex(periodicJobInput.getMutex()))
+                .withMutex(periodicJobInput.getMutex())
+                .withExecutionHint(JOB_IDENTIFIER))
                 .awaitDone(200, TimeUnit.MILLISECONDS);
 
             if (timeout) {
@@ -96,7 +99,9 @@ public class PeriodicJobMutexTest {
             }
 
           }
-        }, Jobs.newInput()).awaitDone();
+        }, Jobs.newInput()
+            .withExecutionHint(JOB_IDENTIFIER))
+            .awaitDone();
 
         // Schedule other job with same mutex
         // expected: must only commence execution once this iteration completes.
@@ -107,11 +112,14 @@ public class PeriodicJobMutexTest {
             protocol.add("running-3");
           }
         }, Jobs.newInput()
-            .withMutex(periodicJobInput.getMutex()));
+            .withMutex(periodicJobInput.getMutex())
+            .withExecutionHint(JOB_IDENTIFIER));
 
         protocol.add("end");
       }
-    }, periodicJobInput.copy().withSchedulingDelay(200, TimeUnit.MILLISECONDS)); // schedule delayed
+    }, periodicJobInput.copy()
+        .withSchedulingDelay(200, TimeUnit.MILLISECONDS) // schedule delayed
+        .withExecutionHint(JOB_IDENTIFIER));
 
     // Schedule other job
     Jobs.schedule(new IRunnable() {
@@ -124,7 +132,9 @@ public class PeriodicJobMutexTest {
         .withMutex(periodicJobInput.getMutex()));
 
     // Wait for the job to complete
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<String>();
     expected.add("other job");

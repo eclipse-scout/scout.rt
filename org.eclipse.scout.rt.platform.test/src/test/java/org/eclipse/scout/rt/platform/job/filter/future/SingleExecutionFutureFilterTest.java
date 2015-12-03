@@ -37,5 +37,11 @@ public class SingleExecutionFutureFilterTest {
     assertTrue(filter.accept(future1));
     assertFalse(filter.accept(future2));
     assertFalse(filter.accept(future3));
+
+    // cleanup
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future1, future2, future3)
+        .toFilter(), true);
+
   }
 }

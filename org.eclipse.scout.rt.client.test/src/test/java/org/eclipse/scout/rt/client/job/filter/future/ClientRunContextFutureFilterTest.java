@@ -132,6 +132,11 @@ public class ClientRunContextFutureFilterTest {
         .andAreSingleExecuting()
         .toFilter()
         .accept(modelJobFuture));
+
+    // cleanup
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(clientJobFuture, modelJobFuture)
+        .toFilter(), true);
   }
 
   @Test

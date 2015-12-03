@@ -19,13 +19,12 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ReplaceJobManagerStatement.JUnitJobManager;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
@@ -40,8 +39,8 @@ public class JobManagerTest {
   @Before
   public void before() {
     // Use dedicated job manager because job manager is shutdown in tests.
-    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JUnitJobManager() {
-      // must be a subclass in order to replace JUnitJobManager
+    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
+      // must be a subclass in order to replace JobManager
     });
   }
 
@@ -88,14 +87,16 @@ public class JobManagerTest {
 
     // RUN THE TEST
     final Set<IFuture<?>> protocol = new HashSet<>();
-    Jobs.getJobManager().visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
+    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(future1, future2, future3)
+        .toFilter(), new IVisitor<IFuture<?>>() {
 
-      @Override
-      public boolean visit(IFuture<?> future) {
-        protocol.add(future);
-        return true;
-      }
-    });
+          @Override
+          public boolean visit(IFuture<?> future) {
+            protocol.add(future);
+            return true;
+          }
+        });
 
     // VERIFY
     assertEquals(CollectionUtility.hashSet(future1, future2, future3), protocol);

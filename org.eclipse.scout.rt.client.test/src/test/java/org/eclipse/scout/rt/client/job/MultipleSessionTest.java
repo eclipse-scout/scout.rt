@@ -18,12 +18,11 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -36,6 +35,8 @@ import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class MultipleSessionTest {
+
+  private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
 
   private IClientSession m_clientSession1;
   private IClientSession m_clientSession2;
@@ -64,6 +65,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-1-S1")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     ModelJobs.schedule(new IRunnable() {
@@ -75,6 +77,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-2-S1")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     ModelJobs.schedule(new IRunnable() {
@@ -86,6 +89,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-1-S2")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     ModelJobs.schedule(new IRunnable() {
@@ -97,6 +101,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-2-S2")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     assertTrue(latch1.await());
@@ -107,7 +112,10 @@ public class MultipleSessionTest {
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2", "job2-S1", "job2-S2"), protocol);
     latch2.unblock();
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    // Wait until all jobs completed
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 
   @Test
@@ -138,6 +146,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-1-S1")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     // Session 1 (job2) --> never starts running because cancelled while job1 is mutex-owner
@@ -156,6 +165,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-2-S1")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     // Session 2 (job1)
@@ -173,6 +183,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-1-S2")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     // Session 2 (job2)
@@ -190,6 +201,7 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-2-S2")
+        .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     assertTrue(setupLatch1.await());
@@ -208,6 +220,9 @@ public class MultipleSessionTest {
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S1-interrupted", "job1-S2", "job2-S2"), protocol);
     setupLatch2.unblock();
 
-    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    // Wait until all jobs completed
+    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter(), 10, TimeUnit.SECONDS));
   }
 }

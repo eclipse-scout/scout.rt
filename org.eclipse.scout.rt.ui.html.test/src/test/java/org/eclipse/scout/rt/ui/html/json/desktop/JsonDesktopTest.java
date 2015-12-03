@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -311,5 +312,10 @@ public class JsonDesktopTest {
     JSONObject data = events.get(0).getData();
     assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run
     assertEquals("download", data.getString("action"));
+
+    // cleanup
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(DownloadHandlerStorage.RESOURCE_CLEANUP_JOB_MARKER)
+        .toFilter(), true);
   }
 }

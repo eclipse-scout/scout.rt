@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -27,11 +28,21 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class JobEventFilterBuilderTest {
+
+  private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
+
+  @After
+  public void after() {
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .toFilter(), true);
+  }
 
   @Test
   public void test() {
@@ -39,38 +50,46 @@ public class JobEventFilterBuilderTest {
     IMutex mutex2 = Jobs.newMutex();
 
     IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-        .withName("A"));
+        .withName("A")
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("B")
         .withRunContext(RunContexts.empty())
-        .withMutex(mutex1));
+        .withMutex(mutex1)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("C")
         .withRunContext(new P_RunContext())
-        .withMutex(mutex1));
+        .withMutex(mutex1)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("D")
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future5 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("E")
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future6 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("E")
         .withRunContext(new P_RunContext())
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future7 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("F")
-        .withMutex(mutex1));
+        .withMutex(mutex1)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future8 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("G")
-        .withMutex(mutex1));
+        .withMutex(mutex1)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future9 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("H")
@@ -79,7 +98,8 @@ public class JobEventFilterBuilderTest {
     IFuture<?> future10 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("I")
         .withRunContext(new P_RunContext())
-        .withMutex(mutex1));
+        .withMutex(mutex1)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     assertTrue(new JobEventFilterBuilder().toFilter().accept(newAboutToRunJobEvent(future1)));
     assertTrue(new JobEventFilterBuilder().toFilter().accept(newAboutToRunJobEvent(future2)));
@@ -250,16 +270,40 @@ public class JobEventFilterBuilderTest {
   public void testFutureExclusion() {
     IMutex mutex = Jobs.newMutex();
 
-    IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    IFuture<?> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    IFuture<?> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    IFuture<?> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    IFuture<?> future5 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    IFuture<?> future6 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex));
-    IFuture<?> future7 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex));
-    IFuture<?> future8 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex));
-    IFuture<?> future9 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex));
-    IFuture<?> future10 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mutex));
+    IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future5 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future6 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withMutex(mutex)
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future7 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withMutex(mutex)
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future8 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withMutex(mutex)
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future9 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withMutex(mutex)
+        .withExecutionHint(JOB_IDENTIFIER));
+
+    IFuture<?> future10 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withMutex(mutex)
+        .withExecutionHint(JOB_IDENTIFIER));
 
     // One future exclusion with not other criteria
     IFilter<JobEvent> filter = Jobs.newEventFilterBuilder()
