@@ -16,9 +16,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-2)
+@RemoteServiceAccessDenied
 public class LogExceptionHandlerService extends AbstractService implements IExceptionHandlerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogExceptionHandlerService.class);
 

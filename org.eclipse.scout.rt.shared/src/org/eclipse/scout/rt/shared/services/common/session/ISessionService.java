@@ -13,12 +13,14 @@ package org.eclipse.scout.rt.shared.services.common.session;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.IService;
 
 /**
  * @since 3.8.0
  */
 @Priority(-3)
+@RemoteServiceAccessDenied
 public interface ISessionService extends IService {
 
   /**

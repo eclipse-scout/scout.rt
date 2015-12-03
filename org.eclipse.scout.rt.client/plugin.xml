@@ -20,7 +20,6 @@
     <proxy class="org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
-    <proxy class="org.eclipse.scout.rt.shared.services.common.workflow.IWorkflowProviderService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.shell.DefaultShellService" createImmediately="false"/>
     <service class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService" createImmediately="false" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" ranking="-100"/>
     <service class="org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService" createImmediately="false" factory="org.eclipse.scout.service.DefaultServiceFactory" ranking="-50"/>
