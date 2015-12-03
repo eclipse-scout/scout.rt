@@ -266,6 +266,7 @@ scout.Table.prototype._render = function($parent) {
 
   this._calculateRowBorderWidth();
   this._updateRowWidth();
+  this._updateRowHeight();
   this._renderViewRangeForRowIndex(0);
 
   //----- inline methods: --------
@@ -975,6 +976,13 @@ scout.Table.prototype._updateRowWidth = function() {
   for (var i = 0; i < this.columns.length; i++) {
     this.rowWidth += this.columns[i].width;
   }
+};
+
+scout.Table.prototype._updateRowHeight = function() {
+  var $emptyRow = this.$data.appendDiv('table-row');
+  $emptyRow.appendDiv('table-cell').html('&nbsp;');
+  this.rowHeight = $emptyRow.outerHeight();
+  $emptyRow.remove();
 };
 
 /**
@@ -3017,7 +3025,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this.$fillBefore = this.$data.prependDiv('table-data-fill');
   }
 
-  var fillBeforeHeight = this.viewRangeRendered.from * 40; //FIXME CGU calculate row height
+  var fillBeforeHeight = this.viewRangeRendered.from * this.rowHeight;
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.cssWidth(this.rowWidth);
   $.log.trace('FillBefore height: ' + fillBeforeHeight);
@@ -3026,7 +3034,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this.$fillAfter = this.$data.appendDiv('table-data-fill');
   }
 
-  var fillAfterHeight = (this.rows.length - (this.viewRangeRendered.to + 1)) * 40;
+  var fillAfterHeight = (this.rows.length - (this.viewRangeRendered.to + 1)) * this.rowHeight;
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.trace('FillAfter height: ' + fillAfterHeight);
