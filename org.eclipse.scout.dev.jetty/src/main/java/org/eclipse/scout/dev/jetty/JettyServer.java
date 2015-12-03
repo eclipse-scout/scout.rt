@@ -12,6 +12,7 @@ package org.eclipse.scout.dev.jetty;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -79,6 +80,20 @@ public class JettyServer {
     Server server = new Server(port);
     server.setHandler(webApp);
     server.start();
+    if (LOG.isInfoEnabled()) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("Server ready. To run the application, open one of the following addresses in a web browser:\n");
+      sb.append("---------------------------------------------------------------------\n");
+      sb.append("  http://localhost:").append(port).append(contextPath).append("\n");
+      String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
+      String ip = InetAddress.getLocalHost().getHostAddress();
+      sb.append("  http://").append(hostname).append(":").append(port).append(contextPath).append("\n");
+      if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
+        sb.append("  http://").append(ip).append(":").append(port).append(contextPath).append("\n");
+      }
+      sb.append("---------------------------------------------------------------------\n");
+      LOG.info(sb.toString());
+    }
   }
 
   protected WebAppContext createWebApp(File webappDir, String contextPath) throws Exception {
