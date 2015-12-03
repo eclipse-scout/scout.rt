@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 /* -------------------------------- */
-/* Default color palette definition */
+/* Scout default theme              */
+/* extends: -                       */
+/* affects: Scout OSS               */
+/* -------------------------------- */
+
+/* -------------------------------- */
+/* Color palette                    */
 /* -------------------------------- */
 
 @palette-black: #000;
@@ -64,9 +71,9 @@
 @palette-orange-3: #FDAD4F;
 @palette-orange-4: #FE9915;
 
-/* ------------- */
-/* Global colors */
-/* ------------- */
+/* -------------------------------- */
+/* Global colors                    */
+/* -------------------------------- */
 
 @active-color: @palette-blue-6;
 @active-inverted-background-color: @palette-blue-5;
@@ -106,9 +113,9 @@
 @text-selection-disabled-color: @palette-gray-3;
 @title-color: @palette-gray-10;
 
-/* ------------------------- */
-/* Component specific colors */
-/* ------------------------- */
+/* -------------------------------- */
+/* Component specific colors        */
+/* -------------------------------- */
 
 @applink-color: @palette-blue-6;
 @boxbutton-active-background-color: @palette-gray-4;

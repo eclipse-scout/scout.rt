@@ -12,13 +12,19 @@ package org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl;
 
 import java.io.IOException;
 
+import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.ScoutClasspathResourceLoader;
+
 import com.asual.lesscss.LessEngine;
 import com.asual.lesscss.LessException;
+import com.asual.lesscss.LessOptions;
+import com.asual.lesscss.loader.ResourceLoader;
 
 public class CompileCssWithLess {
 
   public String run(String content) throws IOException {
-    LessEngine engine = new LessEngine();
+    LessOptions options = new LessOptions();
+    ResourceLoader resourceLoader = new ScoutClasspathResourceLoader(LessEngine.class.getClassLoader());
+    LessEngine engine = new LessEngine(options, resourceLoader);
     try {
       return engine.compile(content);
     }
