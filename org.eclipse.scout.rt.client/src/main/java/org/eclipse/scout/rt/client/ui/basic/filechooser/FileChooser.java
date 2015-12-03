@@ -154,7 +154,7 @@ public class FileChooser implements IFileChooser {
     }
   }
 
-  private class P_UIFacade implements IFileChooserUIFacade {
+  protected class P_UIFacade implements IFileChooserUIFacade {
 
     @Override
     public void setResultFromUI(List<BinaryResource> files) {

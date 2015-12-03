@@ -170,7 +170,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     return m_uiFacade;
   }
 
-  private class P_UIFacade implements IPlannerFieldUIFacade {
+  protected class P_UIFacade implements IPlannerFieldUIFacade {
 
     @Override
     public void refreshFromUI() {

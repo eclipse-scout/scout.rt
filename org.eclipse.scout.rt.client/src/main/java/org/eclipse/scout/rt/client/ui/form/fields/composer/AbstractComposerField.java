@@ -745,7 +745,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   /**
    * ui facade
    */
-  private class P_UIFacade implements IComposerFieldUIFacade {
+  protected class P_UIFacade implements IComposerFieldUIFacade {
 
   }
 

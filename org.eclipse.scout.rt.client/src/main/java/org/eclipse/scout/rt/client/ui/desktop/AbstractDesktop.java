@@ -2163,7 +2163,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  private class P_UIFacade implements IDesktopUIFacade {
+  protected class P_UIFacade implements IDesktopUIFacade {
 
     @Override
     public void fireGuiAttached() {

@@ -185,7 +185,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return propertySupport.getPropertyBool(PROP_SCROLLBARS_ENABLED);
   }
 
-  private class P_UIFacade implements IHtmlFieldUIFacade {
+  protected class P_UIFacade implements IHtmlFieldUIFacade {
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {

@@ -642,7 +642,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     }
   }
 
-  private class P_UIFacade implements IGroupBoxUIFacade {
+  protected class P_UIFacade implements IGroupBoxUIFacade {
     @Override
     public void setExpandedFromUI(boolean expanded) {
       setExpanded(expanded);

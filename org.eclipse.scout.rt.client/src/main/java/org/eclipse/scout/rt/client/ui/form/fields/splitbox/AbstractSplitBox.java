@@ -178,7 +178,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return m_uiFacade;
   }
 
-  private class P_UIFacade implements ISplitBoxUIFacade {
+  protected class P_UIFacade implements ISplitBoxUIFacade {
 
     @Override
     public void setSplitterPositionFromUI(double splitterPosition) {

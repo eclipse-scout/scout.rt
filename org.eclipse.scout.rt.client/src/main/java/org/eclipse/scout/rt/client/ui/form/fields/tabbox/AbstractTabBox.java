@@ -283,7 +283,8 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
   }
 
-  private class P_UIFacade implements ITabBoxUIFacade {
+  protected class P_UIFacade implements ITabBoxUIFacade {
+
     @Override
     public void setSelectedTabFromUI(IGroupBox box) {
       setSelectedTab(box);

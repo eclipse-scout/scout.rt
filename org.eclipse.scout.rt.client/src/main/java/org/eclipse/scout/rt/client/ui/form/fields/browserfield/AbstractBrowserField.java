@@ -299,7 +299,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     return (EnumSet<SandboxPermission>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
   }
 
-  private class P_UIFacade implements IBrowserFieldUIFacade {
+  protected class P_UIFacade implements IBrowserFieldUIFacade {
 
     @Override
     public void firePostMessageFromUI(String data, String origin) {

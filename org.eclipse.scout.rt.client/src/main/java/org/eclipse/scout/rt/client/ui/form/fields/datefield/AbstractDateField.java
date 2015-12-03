@@ -476,7 +476,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     return null;
   }
 
-  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
+  protected class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
 
     @Override
     public void setDateTimeFromUI(Date date) {

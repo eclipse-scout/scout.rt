@@ -881,7 +881,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   /*
    * UI Notifications
    */
-  private class P_UIFacade implements ICalendarUIFacade {
+  protected class P_UIFacade implements ICalendarUIFacade {
     private int m_uiProcessorCount = 0;
 
     protected void pushUIProcessor() {

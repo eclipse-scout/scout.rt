@@ -154,7 +154,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     uninstallWizard();
   }
 
-  private class P_UIFacade implements IWizardProgressFieldUIFacade {
+  protected class P_UIFacade implements IWizardProgressFieldUIFacade {
 
     @Override
     public void stepActionFromUI(int stepIndex) {

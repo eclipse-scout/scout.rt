@@ -188,7 +188,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     }
   }
 
-  private class P_UIFacade implements ISvgFieldUIFacade {
+  protected class P_UIFacade implements ISvgFieldUIFacade {
     @Override
     public void fireAppLinkActionFromUI(String ref) {
       doAppLinkAction(ref);

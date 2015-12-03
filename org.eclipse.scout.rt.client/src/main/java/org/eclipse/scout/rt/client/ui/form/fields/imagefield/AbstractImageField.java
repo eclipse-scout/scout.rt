@@ -483,7 +483,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
   }
 
-  private class P_UIFacade implements IImageFieldUIFacade {
+  protected class P_UIFacade implements IImageFieldUIFacade {
 
     @Override
     public void setImageTransformFromUI(AffineTransformSpec t) {

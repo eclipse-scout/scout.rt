@@ -2990,7 +2990,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   }
 
-  private class P_UIFacade implements IFormUIFacade {
+  protected class P_UIFacade implements IFormUIFacade {
     @Override
     public void fireFormActivatedFromUI() {
       fireFormActivated();

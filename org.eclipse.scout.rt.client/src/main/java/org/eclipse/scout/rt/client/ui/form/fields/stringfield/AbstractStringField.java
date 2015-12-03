@@ -508,7 +508,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     }
   }
 
-  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
+  protected class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
 
     @Override
     public void fireActionFromUI() {

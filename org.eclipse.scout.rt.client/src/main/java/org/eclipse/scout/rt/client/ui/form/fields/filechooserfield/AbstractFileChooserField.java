@@ -170,7 +170,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     return null;
   }
 
-  private class P_UIFacade implements IFileChooserFieldUIFacade {
+  protected class P_UIFacade implements IFileChooserFieldUIFacade {
 
     @Override
     public void parseAndSetValueFromUI(String value) {
