@@ -42,8 +42,8 @@ scout.Table = function(model) {
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
-  this.firstRenderedRowIndex = -1;
-  this.lastRenderedRowIndex = -1;
+  this.viewRangeSize = 25;
+  this.viewRangeRendered = new scout.Range(-1, -1);
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
@@ -607,51 +607,52 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {
-  var $row, oldTop, i, rowWasInserted, animate,
+  var animate,
     $rows = this.$rows(),
-    $sortedRows = $();
+    oldRowPositions = {};
 
   // store old position
-  if ($rows.length < this._animationRowLimit) {
+  // animate only if every row is rendered, otherwise some rows would be animated and some not
+  if ($rows.length === this.rows.length) {
     $rows.each(function(index, elem) {
-      $row = $(elem);
+      var rowWasInserted = false,
+        $row = $(elem),
+        row = $row.data('row');
 
-      //Prevent the order animation for newly inserted rows (to not confuse the user)
-      rowWasInserted = false;
-      for (var i in this._insertedRows) {
-        if (this._insertedRows[i].id === $row.data('row').id) {
-          rowWasInserted = true;
-          break;
+      // Prevent the order animation for newly inserted rows (to not confuse the user)
+      if (this._insertedRows) {
+        for (var i = 0; i < this._insertedRows.length; i++) {
+          if (this._insertedRows[i].id === row.id) {
+            rowWasInserted = true;
+            break;
+          }
         }
       }
 
       if (!rowWasInserted) {
         animate = true;
-        $row.data('old-top', $row.offset().top);
+        oldRowPositions[row.id] = $row.offset().top;
       }
     }.bind(this));
   }
 
-  for (i = 0; i < this.rows.length; i++) {
-    $row = this.rows[i].$row;
-    if ($row) {
-      $sortedRows.push($row[0]);
-    }
-  }
-
-  // change order in dom
-  this.$data.prepend($sortedRows);
+  var newViewRange = this._calculateCurrentViewRange();
+  this._removeRows();
+  this._renderViewRange(newViewRange);
 
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
+    $rows = this.$rows();
     $rows.each(function(index, elem) {
-      $row = $(elem);
-      oldTop = $row.data('old-top');
+      var $row = $(elem),
+        row = $row.data('row'),
+        oldTop = oldRowPositions[row.id];
+
       if (oldTop !== undefined) {
         $row.css('top', oldTop - $row.offset().top).animate({
           top: 0
         }, {
-          progress: this._triggerRowOrderChanged.bind(this, $row.data('row'), true)
+          progress: this._triggerRowOrderChanged.bind(this, row, true)
         });
       }
     }.bind(this));
@@ -993,15 +994,15 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
   prepend = scout.nvl(prepend, false);
   fromIndex = scout.nvl(fromIndex, 0);
   fromIndex = Math.max(fromIndex, 0);
-  toIndex = scout.nvl(toIndex, Math.min(rows.length, fromIndex + this._blockLoadThreshold) - 1);
+  toIndex = scout.nvl(toIndex, Math.min(rows.length, fromIndex + this.viewRangeSize) - 1);
   toIndex = Math.min(toIndex, rows.length - 1);
   fromRow = this.rows[fromIndex];
   toRow = this.rows[toIndex];
-  if (this.firstRenderedRowIndex === -1 || fromIndex < this.firstRenderedRowIndex) {
-    this.firstRenderedRowIndex = fromIndex;
+  if (this.viewRangeRendered.from === -1 || fromIndex < this.viewRangeRendered.from) {
+    this.viewRangeRendered.from = fromIndex;
   }
-  if (toIndex > this.lastRenderedRowIndex) {
-    this.lastRenderedRowIndex = toIndex;
+  if (toIndex > this.viewRangeRendered.to) {
+    this.viewRangeRendered.to = toIndex;
   }
   this._removeEmptyData();
 
@@ -1049,7 +1050,13 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
     $.log.trace(numRowsRendered + ' new rows rendered from ' + fromIndex + ' to ' + toIndex + '.');
     $.log.trace(this._rowsRenderedInfo());
   }
-  return height;
+};
+
+scout.Table.prototype._rowsRenderedInfo = function(fromIndex, toIndex) {
+  var numRenderedRows = this.$rows().length,
+    renderedRowsRange = '(' + this.viewRangeRendered.from + '-' + this.viewRangeRendered.to + ')',
+    text = numRenderedRows + ' rows rendered ' + renderedRowsRange;
+  return text;
 };
 
 scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
@@ -1093,6 +1100,7 @@ scout.Table.prototype._removeRows = function($rows) {
   $rows = $rows || this.$rows(true);
   $rows.remove();
   this._renderEmptyData();
+  this.viewRangeRendered = new scout.Range(-1, -1);
 };
 
 /**
@@ -2000,12 +2008,19 @@ scout.Table.prototype.scrollTo = function(row) {
 
 scout.Table.prototype.scrollPageUp = function() {
   var newScrollTop = Math.max(0, this.$data[0].scrollTop - this.$data.height());
-  scout.scrollbars.scrollTop(this.$data, newScrollTop);
+  this.setScrollTop(newScrollTop);
 };
 
 scout.Table.prototype.scrollPageDown = function() {
   var newScrollTop = Math.min(this.$data[0].scrollHeight, this.$data[0].scrollTop + this.$data.height());
-  scout.scrollbars.scrollTop(this.$data, newScrollTop);
+  this.setScrollTop(newScrollTop);
+};
+
+scout.Table.prototype.setScrollTop = function(scrollTop) {
+  scout.scrollbars.scrollTop(this.$data, scrollTop);
+
+  // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+  this._renderViewport();
 };
 
 scout.Table.prototype.revealSelection = function() {
@@ -2923,27 +2938,43 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
   }
 };
 
-
 scout.Table.prototype._onDataScroll = function() {
-  if (this.firstRenderedRowIndex === 0 &&
-    this.lastRenderedRowIndex === this.rows.length - 1) {
-    // All rows rendered -> do nothing
-    return;
-  }
+  this._renderViewport();
+};
 
-  var scrollTop = this.$data[0].scrollTop,
-    maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight,
+scout.Table.prototype._calculateCurrentViewRange = function() {
+  var pos, rowIndex,
+    scrollTop = this.$data[0].scrollTop,
+    maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
+
+  if (maxScrollTop === 0) {
+    // no scrollbars visible
+    rowIndex = 0;
+  } else {
     pos = scrollTop / maxScrollTop,
     rowIndex = Math.min(Math.floor(pos * this.rows.length), this.rows.length - 1);
+  }
 
-  this.scrollTop = scrollTop;
-  this._renderViewRangeForRowIndex(rowIndex);
+  return this._calculateViewRangeForRowIndex(rowIndex);
+};
+
+scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
+  var viewRange = new scout.Range();
+  viewRange.from = Math.max(rowIndex - this.viewRangeSize, 0);
+  viewRange.to = Math.min(rowIndex + this.viewRangeSize, this.rows.length - 1);
+  return viewRange;
+};
+
+/**
+ * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
+ */
+scout.Table.prototype._renderViewport = function() {
+  var viewRange = this._calculateCurrentViewRange();
+  this._renderViewRange(viewRange);
 };
 
 scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
-  var viewRange = {};
-  viewRange.from = Math.max(rowIndex - this._blockLoadThreshold, 0);
-  viewRange.to = Math.min(rowIndex + this._blockLoadThreshold, this.rows.length - 1);
+  var viewRange = this._calculateViewRangeForRowIndex(rowIndex);
   this._renderViewRange(viewRange);
 };
 
@@ -2954,25 +2985,30 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   var from = viewRange.from,
     to = viewRange.to;
 
-  if (viewRange.from > this.firstRenderedRowIndex) {
-    if (this.firstRenderedRowIndex !== -1) {
-      this._removeRowsFromTo(this.firstRenderedRowIndex, Math.min(viewRange.from, this.lastRenderedRowIndex));
+  if (from === this.viewRangeRendered.from && to === this.viewRangeRendered.to) {
+    // Range already rendered -> do nothing
+    return;
+  }
+
+  if (viewRange.from > this.viewRangeRendered.from) {
+    if (this.viewRangeRendered.from !== -1) {
+      this._removeRowsFromTo(this.viewRangeRendered.from, Math.min(viewRange.from, this.viewRangeRendered.to));
     }
   }
-  if (viewRange.to > this.lastRenderedRowIndex) {
-    if (this.lastRenderedRowIndex > from) {
-      from = Math.min(this.lastRenderedRowIndex + 1, this.rows.length - 1);
+  if (viewRange.to > this.viewRangeRendered.to) {
+    if (this.viewRangeRendered.to > from) {
+      from = Math.min(this.viewRangeRendered.to + 1, this.rows.length - 1);
     }
     this._renderRows(this.rows, from, viewRange.to);
   }
-  if (viewRange.to < this.lastRenderedRowIndex) {
-    if (this.firstRenderedRowIndex !== -1) {
-      this._removeRowsFromTo(Math.max(viewRange.to, this.firstRenderedRowIndex), this.lastRenderedRowIndex);
+  if (viewRange.to < this.viewRangeRendered.to) {
+    if (this.viewRangeRendered.from !== -1) {
+      this._removeRowsFromTo(Math.max(viewRange.to, this.viewRangeRendered.from), this.viewRangeRendered.to);
     }
   }
-  if (viewRange.from < this.firstRenderedRowIndex || this.firstRenderedRowIndex === -1) {
-    if (this.firstRenderedRowIndex !== -1 && this.firstRenderedRowIndex < to) {
-      to = this.firstRenderedRowIndex - 1;
+  if (viewRange.from < this.viewRangeRendered.from || this.viewRangeRendered.from === -1) {
+    if (this.viewRangeRendered.from !== -1 && this.viewRangeRendered.from < to) {
+      to = this.viewRangeRendered.from - 1;
     }
     this._renderRows(this.rows, viewRange.from, to, true);
   }
@@ -2981,7 +3017,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this.$fillBefore = this.$data.prependDiv('table-data-fill');
   }
 
-  var fillBeforeHeight = this.firstRenderedRowIndex * 40; //FIXME CGU calculate row height
+  var fillBeforeHeight = this.viewRangeRendered.from * 40; //FIXME CGU calculate row height
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.cssWidth(this.rowWidth);
   $.log.trace('FillBefore height: ' + fillBeforeHeight);
@@ -2990,7 +3026,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this.$fillAfter = this.$data.appendDiv('table-data-fill');
   }
 
-  var fillAfterHeight = (this.rows.length - (this.lastRenderedRowIndex + 1)) * 40;
+  var fillAfterHeight = (this.rows.length - (this.viewRangeRendered.to + 1)) * 40;
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.trace('FillAfter height: ' + fillAfterHeight);

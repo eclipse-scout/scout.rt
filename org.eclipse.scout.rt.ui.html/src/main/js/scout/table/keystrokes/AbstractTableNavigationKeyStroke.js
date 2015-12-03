@@ -130,9 +130,14 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
 scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = function(table, viewportBounds) {
   var rows = table.filteredRows();
   return scout.arrays.find(rows, function(row, i) {
-    var $row = row.$row,
-      rowOffset = $row.offset();
+    var rowOffset,
+      $row = row.$row;
 
+    if (!row.$row) {
+      // If row is not rendered, it cannot be part of the view port -> check next row
+      return false;
+    }
+    rowOffset = $row.offset();
     // If the row is fully visible in the viewport -> break and return the row
     return viewportBounds.contains(rowOffset.left, rowOffset.top);
   });
@@ -144,13 +149,19 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = functi
     return rows[startRowIndex];
   }
   return scout.arrays.findFromNext(rows, startRowIndex, function(row, i) {
-    var nextRow = rows[i + 1];
+    var nextRowOffsetBounds, $nextRow,
+      nextRow = rows[i + 1];
+
     if (!nextRow) {
       // If next row is not available (row is the last row) -> break and return current row
       return true;
     }
-    var $nextRow = nextRow.$row;
-    var nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
+    $nextRow = nextRow.$row;
+    if (!$nextRow) {
+      // If next row is not rendered anymore, current row has to be the last in the viewport
+      return true;
+    }
+    nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
     // If the next row is not fully visible in the viewport -> break and return current row
     return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height);
   });
