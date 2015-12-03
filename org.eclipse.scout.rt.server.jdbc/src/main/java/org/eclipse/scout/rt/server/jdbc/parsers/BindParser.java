@@ -59,11 +59,7 @@ import org.slf4j.LoggerFactory;
  * char           = [.] .
  * S              = ([ \n\t\r])+  .
  * </pre>
- * <p>
- * The legacy functionality supporting &...& binds - which can lead to sql injection if not carefully used - will be
- * eliminated in future releases. To avoid unexpected usages, a warning is thrown on every usage. Using the server-side
- * config.properties property <b>org.eclipse.scout.commons.sqlplainbind=true|false</b> true means activating the legacy
- * functionality (which will be removed in future releases) and false throws an exception when using &...& binds.
+ * </p>
  */
 public class BindParser {
   private static final Logger LOG = LoggerFactory.getLogger(BindParser.class);
