@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.util.date.DateProvider;
 public class FixedDateProvider extends DateProvider {
 
   private Date m_date;
-  private Object m_lock;
+  private Object m_lock = new Object();
 
   /**
    * Default constructor.<br/>
