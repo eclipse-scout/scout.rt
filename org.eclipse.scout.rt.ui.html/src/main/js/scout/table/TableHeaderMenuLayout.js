@@ -27,7 +27,6 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   var
     $columnFilters = this.popup.$columnFilters,
     columnFiltersSize = scout.graphics.getSize($columnFilters),
-    $groupedFilterValues = this.popup.$filteringContainer,
     $groupedFilterValuesContainer = this.popup.$filtering,
     groupedFilterValuesContainerHeight,
     groupedFilterValuesContainerScrollHeight = $columnFilters.get(0).scrollHeight,

@@ -176,7 +176,7 @@ public final class SandboxClassLoaderBuilder {
    */
   private class P_ScriptClassLoader extends URLClassLoader {
 
-    public P_ScriptClassLoader(URL[] urls, ClassLoader parent) {
+    private P_ScriptClassLoader(URL[] urls, ClassLoader parent) {
       super(urls, parent);
     }
 
