@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-import static org.eclipse.scout.rt.testing.commons.ScoutAssert.assertListEquals;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertListEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.commons;
+package org.eclipse.scout.rt.testing.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 /**

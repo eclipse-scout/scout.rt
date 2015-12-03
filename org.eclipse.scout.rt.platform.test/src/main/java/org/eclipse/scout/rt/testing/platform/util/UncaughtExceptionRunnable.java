@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.commons;
+package org.eclipse.scout.rt.testing.platform.util;
 
 /**
  * Callable to catch uncaught exceptions and offers functionality to re-throw them.

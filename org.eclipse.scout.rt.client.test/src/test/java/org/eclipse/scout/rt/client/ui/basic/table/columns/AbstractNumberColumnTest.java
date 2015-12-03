@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;

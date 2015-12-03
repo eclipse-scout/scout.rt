@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG-initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.date;
+package org.eclipse.scout.rt.testing.platform.util.date;
 
 import java.util.Date;
 

@@ -31,8 +31,8 @@ import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
+import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Before;
 import org.junit.Test;
 

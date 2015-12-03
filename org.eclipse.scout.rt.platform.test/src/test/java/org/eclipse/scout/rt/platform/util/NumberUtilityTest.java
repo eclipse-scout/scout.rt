@@ -18,7 +18,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 public class NumberUtilityTest {

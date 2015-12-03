@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.date;
+package org.eclipse.scout.rt.testing.platform.util.date;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.testing.platform.util.date.FixedDateProvider;
 import org.junit.Test;
 
 /**

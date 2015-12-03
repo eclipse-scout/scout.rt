@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.commons;
+package org.eclipse.scout.rt.testing.platform.util;
 
 import static org.junit.Assert.fail;
 

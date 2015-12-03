@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG-initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.commons;
+package org.eclipse.scout.rt.testing.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

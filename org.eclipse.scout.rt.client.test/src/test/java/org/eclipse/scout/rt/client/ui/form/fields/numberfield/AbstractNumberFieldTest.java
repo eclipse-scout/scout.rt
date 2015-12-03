@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
-import static org.eclipse.scout.rt.testing.commons.ScoutAssert.assertComparableEquals;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertComparableEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
