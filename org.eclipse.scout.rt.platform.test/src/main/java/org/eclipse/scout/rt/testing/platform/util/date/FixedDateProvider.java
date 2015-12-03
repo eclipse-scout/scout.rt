@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.date.DateProvider;
 public class FixedDateProvider extends DateProvider {
 
   private Date m_date;
+  private Object m_lock;
 
   /**
    * Default constructor.<br/>
@@ -42,7 +43,9 @@ public class FixedDateProvider extends DateProvider {
    *          Date to return in subsequent invocations of the provider methods
    */
   public FixedDateProvider(Date date) {
-    m_date = date;
+    synchronized (m_lock) {
+      m_date = date;
+    }
   }
 
   /**
@@ -52,7 +55,9 @@ public class FixedDateProvider extends DateProvider {
    */
   @Override
   public Date getDate() {
-    return m_date;
+    synchronized (m_lock) {
+      return m_date;
+    }
   }
 
   /**
@@ -62,7 +67,9 @@ public class FixedDateProvider extends DateProvider {
    *          new date to return as provider value
    */
   public void setDate(Date newDate) {
-    m_date = newDate;
+    synchronized (m_lock) {
+      m_date = newDate;
+    }
   }
 
 }
