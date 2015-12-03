@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * Pendant for org.eclipse.scout.commons.resource.MimeType enumeration.
+ * Pendant for org.eclipse.scout.rt.platform.resource.MimeType enumeration.
  */
 scout.mimeTypes = {
 
