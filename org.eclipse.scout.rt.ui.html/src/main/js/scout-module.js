@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 __include("jquery/jquery-scout.js");
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
