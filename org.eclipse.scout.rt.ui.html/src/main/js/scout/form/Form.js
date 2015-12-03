@@ -264,7 +264,7 @@ scout.Form.prototype.onModelAction = function(event) {
  *  - this is a child 'dialog' or 'view' and its 'displayParent' is attached;
  * @override Widget.js
  */
-scout.Form.prototype._attach = function(event) {
+scout.Form.prototype._attach = function() {
   this._$parent.append(this.$container);
 
   // If the parent was resized while this view was detached, the view has a wrong size.
@@ -286,7 +286,7 @@ scout.Form.prototype._attach = function(event) {
   this.formController.attachDialogs();
   this.messageBoxController.attach();
   this.fileChooserController.attach();
-  scout.Form.parent.prototype._attach.call(this, event);
+  scout.Form.parent.prototype._attach.call(this);
 };
 
 /**
@@ -296,7 +296,7 @@ scout.Form.prototype._attach = function(event) {
  *  - this is a child 'dialog' or 'view' and its 'displayParent' is detached;
  * @override Widget.js
  */
-scout.Form.prototype._detach = function(event) {
+scout.Form.prototype._detach = function() {
   // Detach child dialogs, message boxes and file choosers, not views.
   this.formController.detachDialogs();
   this.messageBoxController.detach();
@@ -304,7 +304,7 @@ scout.Form.prototype._detach = function(event) {
 
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-  scout.Form.parent.prototype._detach.call(this, event);
+  scout.Form.parent.prototype._detach.call(this);
 };
 
 scout.Form.prototype.renderInitialFocus = function() {

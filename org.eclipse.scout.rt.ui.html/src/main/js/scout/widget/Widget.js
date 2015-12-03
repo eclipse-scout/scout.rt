@@ -319,17 +319,23 @@ scout.Widget.prototype.off = function(type, func) {
 /**
  * This method attaches the detached $container to the DOM.
  */
-scout.Widget.prototype.attach = function(event) {
+scout.Widget.prototype.attach = function() {
   if (this.attached || !this.rendered) {
     return;
   }
-  event = event || {target: this};
-  this._attach(event);
-  if (this.attached) {
-    this.children.forEach(function(child) {
-      child.attach(event);
-    });
-  }
+  this._attach();
+  this._triggerChildrenAfterAttach(this);
+};
+
+scout.Widget.prototype._triggerChildrenAfterAttach = function(parent) {
+  this.children.forEach(function(child) {
+    child._afterAttach(parent);
+    child._triggerChildrenAfterAttach(parent);
+  });
+};
+
+scout.Widget.prototype._afterAttach = function(parent) {
+  // NOP
 };
 
 /**
@@ -351,15 +357,12 @@ scout.Widget.prototype._attach = function(event) {
  * before a DOM element is detached and propagate the detach "event" to all child-
  * widgets, because when a DOM element is detached - child elements are not notified
  */
-scout.Widget.prototype.detach = function(event) {
+scout.Widget.prototype.detach = function() {
   if (!this.attached || !this.rendered) {
     return;
   }
-  event = event || {target: this};
-  this.children.forEach(function(child) {
-    child.detach(event);
-  });
-  this._detach(event);
+  this._triggerChildrenBeforeDetach(this);
+  this._detach();
 };
 
 /**
@@ -373,8 +376,19 @@ scout.Widget.prototype.detach = function(event) {
  *   itself must _not_ detach its own $container. That's why we should only
  *   detach when event.target is === this.
  */
-scout.Widget.prototype._detach = function(event) {
+scout.Widget.prototype._detach = function() {
   this.attached = false;
+};
+
+scout.Widget.prototype._triggerChildrenBeforeDetach = function(parent) {
+  this.children.forEach(function(child) {
+    child._beforeDetach(parent);
+    child._triggerChildrenBeforeDetach(parent);
+  });
+};
+
+scout.Widget.prototype._beforeDetach = function(parent) {
+  // NOP
 };
 
 scout.Widget.prototype.toString = function() {

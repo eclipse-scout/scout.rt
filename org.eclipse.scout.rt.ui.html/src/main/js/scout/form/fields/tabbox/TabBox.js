@@ -220,12 +220,3 @@ scout.TabBox.prototype.getFields = function() {
   return this.tabItems;
 };
 
-/**
- * @override Widget.js
- */
-scout.TabBox.prototype._attachChildren = function(event) {
-  // All tab-items are children of the tab-box. But we don't want to attach _all_ tab-items
-  // but only the currently selected tab-item.
-  this.tabItems[this.selectedTab].attach(event);
-};
-

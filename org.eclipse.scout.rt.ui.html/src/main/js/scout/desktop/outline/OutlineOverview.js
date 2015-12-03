@@ -36,21 +36,21 @@ scout.OutlineOverview.prototype.destroy = function() {
 /**
  * @override Widget.js
  */
-scout.OutlineOverview.prototype._attach = function(event) {
+scout.OutlineOverview.prototype._attach = function() {
   this._$parent.append(this.$container);
   var htmlParent = this.htmlComp.getParent();
   this.htmlComp.setSize(htmlParent.getSize());
   this.session.detachHelper.afterAttach(this.$container);
-  scout.OutlineOverview.parent.prototype._attach.call(this, event);
+  scout.OutlineOverview.parent.prototype._attach.call(this);
 };
 
 /**
  * @override Widget.js
  */
-scout.OutlineOverview.prototype._detach = function(event) {
+scout.OutlineOverview.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-  scout.OutlineOverview.parent.prototype._detach.call(this, event);
+  scout.OutlineOverview.parent.prototype._detach.call(this);
 };
 
 scout.OutlineOverview.prototype.onResize = function() {
