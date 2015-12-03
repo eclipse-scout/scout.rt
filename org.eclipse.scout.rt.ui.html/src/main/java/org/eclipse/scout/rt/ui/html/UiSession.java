@@ -93,6 +93,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private String m_uiSessionId;
   private IClientSession m_clientSession;
   private long m_jsonAdapterSeq = ROOT_ID;
+  private long m_responseSequenceNo = 1;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
   /**
@@ -118,7 +119,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected JsonResponse createJsonResponse() {
-    return new JsonResponse();
+    JsonResponse response = new JsonResponse();
+    response.assignSequenceNo(m_responseSequenceNo++);
+    return response;
   }
 
   protected JsonAdapterRegistry createJsonAdapterRegistry() {

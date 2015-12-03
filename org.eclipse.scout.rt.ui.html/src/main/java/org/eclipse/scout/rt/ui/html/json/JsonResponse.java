@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.json.JSONArray;
@@ -34,12 +35,14 @@ public class JsonResponse {
   public static final int ERR_SESSION_TIMEOUT = 10;
   public static final int ERR_UI_PROCESSING = 20;
 
+  public static final String PROP_SEQUENCE = "#";
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
   public static final String PROP_ERROR = "error";
   public static final String PROP_ERROR_CODE = "code";
   public static final String PROP_ERROR_MESSAGE = "message";
 
+  private Long m_sequenceNo;
   private final Map<String/*adapterId*/, IJsonAdapter<?>> m_adapterMap;
   private final List<JsonEvent> m_eventList;
   private final Map<String/*adapterId*/, JsonEvent> m_idToPropertyChangeEventMap; // helper map to ensure max. 1 event per adapter
@@ -185,6 +188,11 @@ public class JsonResponse {
     return m_error;
   }
 
+  public void assignSequenceNo(Long sequenceNo) {
+    Assertions.assertNull(m_sequenceNo, "SequenceNo cannot be changed once it has been assigned (existing value=%d, new value=%d)", m_sequenceNo, sequenceNo);
+    m_sequenceNo = sequenceNo;
+  }
+
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
 
   /**
@@ -241,6 +249,7 @@ public class JsonResponse {
         }
       }
 
+      json.put(PROP_SEQUENCE, m_sequenceNo);
       json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
       if (m_error) {

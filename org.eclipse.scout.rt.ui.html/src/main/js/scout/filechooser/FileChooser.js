@@ -89,7 +89,7 @@ scout.FileChooser.prototype._render = function($parent) {
           if (scout.strings.hasText(text)) {
             // Manually handle JSON response
             var json = $.parseJSON(text);
-            this.session.processJsonResponse(json);
+            this.session.responseQueue.process(json);
           }
         } finally {
           // "onAjaxAlways"

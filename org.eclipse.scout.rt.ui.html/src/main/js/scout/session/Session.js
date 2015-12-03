@@ -61,7 +61,7 @@ scout.Session = function($entryPoint, options) {
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
   this._asyncEvents = [];
-  this._asyncResponses = [];
+  this.responseQueue = new scout.ResponseQueue(this);
   this._deferred;
   this.ready = false; // true after desktop has been completely rendered
   this.unloaded = false; // true after unload event has been received from the window
@@ -369,12 +369,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
       if (busyHandling) {
         this.setBusy(false);
       }
-      success = this.processJsonResponse(data);
-      // If responses are queued (by ?poll requests), handle them now
-      for (var i = 0; i < this._asyncResponses.length; i++) {
-        this.processJsonResponse(this._asyncResponses[i]);
-      }
-      this._asyncResponses = [];
+      success = this.responseQueue.process(data);
     } catch (err) {
       jsError = jsError || err;
     }
@@ -463,10 +458,10 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       this._backgroundJobPollingSupport.setFailed();
       if (this.areRequestsPending()) {
         // Add response to queue, handle later by _performUserAjaxRequest()
-        this._asyncResponses.push(data);
+        this.responseQueue.add(data);
       } else {
         // No user request pending, handle immediately
-        this._processErrorJsonResponse(data.error);
+        this.responseQueue.process(data);
       }
     } else if (data.sessionTerminated) {
       $.log.warn('Session terminated, stopped polling for background jobs');
@@ -478,10 +473,10 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     } else {
       if (this.areRequestsPending()) {
         // Add response to queue, handle later by _performUserAjaxRequest()
-        this._asyncResponses.push(data);
+        this.responseQueue.add(data);
       } else {
         // No user request pending, handle immediately
-        this._processSuccessResponse(data);
+        this.responseQueue.process(data);
         this.layoutValidator.validate();
       }
       setTimeout(this._pollForBackgroundJobs.bind(this));
@@ -494,7 +489,14 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
   }
 };
 
-scout.Session.prototype.processJsonResponse = function(data) {
+/**
+ * Do NOT call this method directly, always use the response queue:
+ *
+ *   session.responseQueue.process(data);
+ *
+ * Otherwise, the response queue's expected sequence number will get out of sync.
+ */
+scout.Session.prototype.processJsonResponseInternal = function(data) {
   var success = false;
   if (data.error) {
     this._processErrorJsonResponse(data.error);
@@ -787,7 +789,7 @@ scout.Session.prototype.areEventsQueued = function() {
 };
 
 scout.Session.prototype.areResponsesQueued = function() {
-  return this._asyncResponses.length > 0;
+  return this.responseQueue.size() > 0;
 };
 
 scout.Session.prototype.areRequestsPending = function() {

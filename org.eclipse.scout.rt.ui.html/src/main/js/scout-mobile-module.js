@@ -54,6 +54,7 @@ __include("scout/session/BusyIndicator.js");
 __include("scout/session/Event.js");
 __include("scout/session/Locale.js");
 __include("scout/session/Reconnector.js");
+__include("scout/session/ResponseQueue.js");
 __include("scout/session/Session.js");
 __include("scout/session/UserAgent.js");
 // Basic layout
