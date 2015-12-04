@@ -38,6 +38,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   scout.TableHeaderMenu.parent.prototype._init.call(this, options);
 
   this.tableHeader = options.tableHeader;
+  this.column = options.column;
   this.table = this.tableHeader.table;
   this.$headerItem = this.$anchor;
 
@@ -46,6 +47,19 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.table.on('removeFilter', this._tableFilterHandler);
 
   this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
+
+  // Filtering
+  this.filter = this.table.getFilter(this.column.id);
+  if (!this.filter) {
+    this.filter = scout.create('ColumnUserFilter', {
+      session: this.session,
+      table: this.table,
+      column: this.column
+    });
+  }
+  // always recalculate available values to make sure new/updated/deleted rows are considered
+  this.filter.calculate();
+  this._updateFilterCheckedMode();
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -53,12 +67,8 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
 };
 
 scout.TableHeaderMenu.prototype._render = function($parent) {
-  var $headerItem = this.$anchor,
-    column = $headerItem.data('column');
-
   this.$parent = $parent;
-  this.column = column;
-  $headerItem.select(true);
+  this.$headerItem.select(true);
 
   this.$container = $parent.appendDiv('table-header-menu');
   this.$columnActions = this.$container.appendDiv('table-header-menu-actions');
@@ -88,7 +98,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     return column.type === 'number';
   });
   if (containsNumberColumn) {
-    if (column.type !== 'number') {
+    if (this.column.type !== 'number') {
       this._renderGroupingGroup();
       this._renderSelectedGrouping();
     } else {
@@ -98,25 +108,12 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Coloring
-  if (column.type === 'number') {
+  if (this.column.type === 'number') {
     this._renderColoringGroup();
     this._renderSelectedColoring();
   }
 
-  // Filtering
-  this.filter = this.table.getFilter(this.column.id);
-  if (!this.filter) {
-    this.filter = scout.create('ColumnUserFilter', {
-      session: this.session,
-      table: this.table,
-      column: this.column
-    });
-  }
-  // always recalculate available values to make sure new/updated/deleted rows are considered
-  this.filter.calculate();
   this._renderFilterGroup();
-
-  // FIXME AWE: (filter) free-text or from/to fields
   this._renderFilterField();
 
   // name all label elements
@@ -529,7 +526,7 @@ scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
   this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
 };
 
-scout.TableHeaderMenu.prototype._renderFilterField = function() {
+scout.TableHeaderMenu.prototype._renderFilterField = function() { // FIXME AWE: (filter) free-text or from/to fields
   this.$filteringField = this.$columnFilters.appendDiv('table-header-menu-filter-field');
   this.$filteringField.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterText'));
@@ -637,15 +634,18 @@ scout.TableHeaderMenu.prototype._onFilterTableCheckedRows = function(event) {
 
 scout.TableHeaderMenu.prototype._onTableFilterChanged = function() {
   this.$filterGroupTitle.text(this._filterByText());
+  this._updateFilterCheckedMode();
+  this._updateGroupFilterActions();
+};
 
-  // When no filter value is selected, we change the selection mode to ALL
-  // since it makes no sense to choose NONE when no value is currently selected
+// When no filter value is selected, we change the selection mode to ALL
+// since it makes no sense to choose NONE when no value is currently selected
+scout.TableHeaderMenu.prototype._updateFilterCheckedMode = function() {
   if (this.filter.selectedValues.length === 0) {
     this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
   } else {
     this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.NONE;
   }
-  this._updateGroupFilterActions();
 };
 
 scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {

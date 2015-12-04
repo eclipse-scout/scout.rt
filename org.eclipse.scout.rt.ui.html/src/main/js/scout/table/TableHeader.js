@@ -256,6 +256,7 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
   var $header = column.$header;
   this._tableHeaderMenu = scout.create(scout.TableHeaderMenu, {
     parent: this,
+    column: $header.data('column'),
     tableHeader: this,
     $anchor: $header,
     focusableContainer: true

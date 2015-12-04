@@ -50,9 +50,9 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   groupedFilterValuesContainerHeight = Math.min(groupedFilterValuesContainerHeight, groupedFilterValuesContainerScrollHeight);
   $groupedFilterValuesContainer.cssHeight(groupedFilterValuesContainerHeight);
 
-//  // Layout scrollable list
+  // Layout scrollable list
   this.popup.filterTable.htmlComp.pixelBasedSizing = true;
   this.popup.filterTable.htmlComp.setSize(new scout.Dimension(
-      columnFiltersSize.width - 10, // FIXME AWE: (filter) read padding from group
+      columnFiltersSize.width - 20, // FIXME AWE: (filter) read padding from group
       groupedFilterValuesContainerHeight - groupedFilterValuesInsets.vertical() - groupedFilterValuesTitleSize.height));
 };
