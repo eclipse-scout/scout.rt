@@ -113,8 +113,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this._renderSelectedColoring();
   }
 
-  this._renderFilterGroup();
-  this._renderFilterField();
+  this._renderFilterTable();
+  this._renderFilterFields();
 
   // name all label elements
   $('.table-header-menu-group-text', this.$container).each(function(i, elem) {
@@ -143,7 +143,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     column = this.column,
     pos = table.columns.indexOf(column);
 
-  this.$moving = this.$columnActions.appendDiv('table-header-menu-group first');
+  this.$moving = this.$columnActions.appendDiv('table-header-menu-group buttons first');
   this.$moving.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Move'));
 
@@ -187,7 +187,7 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     column = this.column,
     that = this;
 
-  this.$sorting = this.$columnActions.appendDiv('table-header-menu-group');
+  this.$sorting = this.$columnActions.appendDiv('table-header-menu-group buttons');
   this.$sorting.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ColumnSorting'));
 
@@ -279,7 +279,7 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     column = this.column,
     groupCount = this._groupColumnCount();
 
-  this.$grouping = this.$columnActions.appendDiv('table-header-menu-group');
+  this.$grouping = this.$columnActions.appendDiv('table-header-menu-group buttons');
   this.$grouping.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Grouping'));
 
@@ -344,7 +344,7 @@ scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
 scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   var table = this.table,
     column = this.column;
-  this.$aggregation = this.$columnActions.appendDiv('table-header-menu-group');
+  this.$aggregation = this.$columnActions.appendDiv('table-header-menu-group buttons');
   this.$aggregation.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Aggregation'));
 
@@ -388,7 +388,7 @@ scout.TableHeaderMenu.prototype._renderSelectedAggregation = function() {
 scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   var table = this.table,
     column = this.column;
-  this.$coloring = this.$columnActions.appendDiv('table-header-menu-group');
+  this.$coloring = this.$columnActions.appendDiv('table-header-menu-group buttons');
   this.$coloring.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Coloring'));
 
@@ -431,18 +431,20 @@ scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
   }.bind(this));
 };
 
-scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
-  this.$filtering = this.$columnFilters.appendDiv('table-header-menu-group-filter');
+scout.TableHeaderMenu.prototype._renderFilterTable = function() {
+  var $filterActions;
 
-  this.$filterActions = this.$filtering
+  this.$filterTableGroup = this.$columnFilters.appendDiv('table-header-menu-group first');
+
+  $filterActions = this.$filterTableGroup
     .appendDiv('table-header-menu-filter-actions');
 
-  this.$filterToggleChecked = this.$filterActions
+  this.$filterToggleChecked = $filterActions
     .appendDiv('table-header-menu-filter-toggle-checked')
     .text(this.session.text(this.filterCheckedMode.text))
     .on('click', this._toggleFiltersChecked.bind(this));
 
-  this.$filterGroupTitle = this.$filtering
+  this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
     .data('label', this._filterByText());
 
@@ -483,7 +485,7 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
     tableRows.push(tableRow);
   }, this);
   this.filterTable._insertRows(tableRows);
-  this.filterTable.render(this.$filtering);
+  this.filterTable.render(this.$filterTableGroup);
 };
 
 scout.TableHeaderMenu.prototype._filterByText = function() {
@@ -526,9 +528,10 @@ scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
   this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
 };
 
-scout.TableHeaderMenu.prototype._renderFilterField = function() { // FIXME AWE: (filter) free-text or from/to fields
-  this.$filteringField = this.$columnFilters.appendDiv('table-header-menu-filter-field');
-  this.$filteringField.appendDiv('table-header-menu-group-text')
+scout.TableHeaderMenu.prototype._renderFilterFields = function() { // FIXME AWE: (filter) free-text or from/to fields
+  this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
+  this.$filterFieldsGroup
+    .appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterText'));
 
   var freeTextField = scout.create('StringField', {
@@ -538,7 +541,7 @@ scout.TableHeaderMenu.prototype._renderFilterField = function() { // FIXME AWE: 
     statusVisible: false,
     maxLength: 100
   });
-  freeTextField.render(this.$filteringField);
+  freeTextField.render(this.$filterFieldsGroup);
 
   // FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
   freeTextField.$mandatory.remove();
@@ -633,7 +636,7 @@ scout.TableHeaderMenu.prototype._onFilterTableCheckedRows = function(event) {
 };
 
 scout.TableHeaderMenu.prototype._onTableFilterChanged = function() {
-  this.$filterGroupTitle.text(this._filterByText());
+  this.$filterTableGroupTitle.text(this._filterByText());
   this._updateFilterCheckedMode();
   this._updateGroupFilterActions();
 };

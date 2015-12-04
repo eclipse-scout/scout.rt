@@ -40,6 +40,10 @@
   width: 222px;
   border-left: solid 1px @border-color;
   padding-left: 10px;
+
+  & > .table-header-menu-group > .form-field {
+    position: relative;
+  }
 }
 
 .table-header-menu-whiter {
@@ -58,10 +62,14 @@
 }
 
 .table-header-menu-group {
-  padding: 10px 0 35px 0;
+  padding-top: 10px;
 
   &.first {
     padding-top: 0;
+  }
+
+  &.buttons {
+    padding-bottom: 35px;
   }
 }
 
@@ -244,22 +252,6 @@
   &.column-remove::before {
     content: @icon-remove;
   }
-}
-
-.table-header-menu-group-filter {
-}
-
-.table-header-menu-filter-field {
-  & > .form-field {
-    position: relative;
-  }
-}
-
-.table-header-menu-filter-container {
-  position: relative;
-  overflow: hidden;
-  max-height: 226px;
-  padding: 0;
 }
 
 .table-header-menu-filter {

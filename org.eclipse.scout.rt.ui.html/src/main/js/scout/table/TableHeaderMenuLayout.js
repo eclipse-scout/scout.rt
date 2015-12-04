@@ -30,37 +30,40 @@ scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT = 330;
 scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   scout.TableHeaderMenuLayout.parent.prototype.layout.call(this, $container);
 
-  // FIXME AWE: (filter) cleanup naming / properties for filtering DIVs
   var
     $filterColumn = this.popup.$columnFilters,
     filterColumnSize = scout.graphics.getSize($filterColumn),
     filterColumnInsets = scout.graphics.getInsets($filterColumn),
-    $filterFieldContainer = $filterColumn.find('.table-header-menu-filter-field'),
-    filterFieldContainerInsets = scout.graphics.getInsets($filterFieldContainer),
-    filterFieldContainerSize,
-    filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldContainer.find('.form-field')),
-    $filterTableContainer = this.popup.$filtering,
-    filterTableContainerInsets = scout.graphics.getInsets($filterTableContainer),
+    $filterFieldsGroup = this.popup.$filterFieldsGroup,
+    filterFieldGroupSize,
+    filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldsGroup.find('.form-field')),
+    $filterTableGroup = this.popup.$filterTableGroup,
+    filterTableContainerInsets = scout.graphics.getInsets($filterTableGroup),
     filterTableContainerHeight,
-    groupTitleSize = scout.graphics.getSize($filterTableContainer.find('.table-header-menu-group-text'), true);
+    filterTableHtmlComp = this.popup.filterTable.htmlComp;
 
   // Layout filter field(s) and get size
   filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT));
-  filterFieldContainerSize = scout.graphics.getSize($filterFieldContainer, true);
+  filterFieldGroupSize = scout.graphics.getSize($filterFieldsGroup, true);
 
   filterTableContainerHeight = filterColumnSize.height;
   // subtract height of filter-fields container
-  filterTableContainerHeight -= filterFieldContainerSize.height;
+  filterTableContainerHeight -= filterFieldGroupSize.height;
   // subtract group-title height
-  filterTableContainerHeight -= groupTitleSize.height;
+  filterTableContainerHeight -= this._groupTitleHeight($filterTableGroup);
   // subtract insets of table container
   filterTableContainerHeight -= filterTableContainerInsets.vertical();
 
   // Layout filter table
-  this.popup.filterTable.htmlComp.pixelBasedSizing = true;
-  this.popup.filterTable.htmlComp.setSize(new scout.Dimension(
-      filterColumnSize.width - 20, // FIXME AWE: (filter) read padding from group
+  filterTableHtmlComp.pixelBasedSizing = true;
+  filterTableHtmlComp.setSize(new scout.Dimension(
+      filterColumnSize.width - filterColumnInsets.horizontal(),
       filterTableContainerHeight));
+};
+
+//group title (size used for table + field container)
+scout.TableHeaderMenuLayout.prototype._groupTitleHeight = function($group) {
+  return scout.graphics.getSize($group.find('.table-header-menu-group-text'), true).height;
 };
 
 /**
@@ -73,26 +76,21 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   var
     containerInsets = scout.graphics.getInsets($container),
     // filter table container
-    $filterTableContainer = this.popup.$filtering,
-    filterTableSize = scout.graphics.getSize($filterTableContainer.find('.table'), true),
-    filterTableHeight = filterTableSize.height,
-    filterTableContainerInsets = scout.graphics.getInsets($filterTableContainer),
+    $filterTableGroup = this.popup.$filterTableGroup,
+    filterTableHeight = this.popup.filterTable.htmlComp.getSize(true).height,
+    filterTableContainerInsets = scout.graphics.getInsets($filterTableGroup),
     filterTableContainerHeight,
     // filter field(s) container
-    $filterFieldContainer = this.popup.$columnFilters.find('.table-header-menu-filter-field'),
-    filterFieldContainerInsets = scout.graphics.getInsets($filterFieldContainer),
+    filterFieldContainerInsets = scout.graphics.getInsets(this.popup.$filterFieldsGroup),
     filterFieldContainerHeight,
-    filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldContainer.find('.form-field')),
-    // group title (size used for table + field container)
-    groupTitleSize = scout.graphics.getSize($filterTableContainer.find('.table-header-menu-group-text'), true);
-
+    groupTitleHeight = this._groupTitleHeight($filterTableGroup);
 
   // limit height of table
   filterTableHeight = Math.min(filterTableHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
   // size of container with table
   filterTableContainerHeight = filterTableHeight;
   // add group-title height
-  filterTableContainerHeight += groupTitleSize.height;
+  filterTableContainerHeight += groupTitleHeight;
   // add insets of container
   filterTableContainerHeight += filterTableContainerInsets.vertical();
 
@@ -100,12 +98,12 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   // size of filter fields
   filterFieldContainerHeight = scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT;
   // add group-title height
-  filterFieldContainerHeight += groupTitleSize.height;
+  filterFieldContainerHeight += groupTitleHeight;
   // add insets of container
   filterFieldContainerHeight += filterFieldContainerInsets.vertical();
 
 
   var prefSize = scout.graphics.prefSize($container);
-  prefSize.height = (filterTableContainerHeight + filterFieldContainerHeight + containerInsets.horizontal()); // FIXME AWE: (filter) add paddings of surrounding div (table-header-menu)
+  prefSize.height = (filterTableContainerHeight + filterFieldContainerHeight + containerInsets.vertical());
   return prefSize;
 };
