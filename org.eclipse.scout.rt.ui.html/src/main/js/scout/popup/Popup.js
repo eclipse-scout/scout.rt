@@ -94,24 +94,8 @@ scout.Popup.prototype._uninstallAllChildScrollbars = function() {
 
 scout.Popup.prototype._open = function($parent, event) {
   this.render($parent, event);
-  var oldPopupSize = scout.graphics.getSize(this.$container);
-
   this.revalidateLayout();
   this.position();
-
-  var handledScrollables = this._uninstallAllChildScrollbars();
-
-  var popupSize = scout.graphics.getSize(this.$container);
-
-  this.events.on('popupOpened', function() {
-    handledScrollables.forEach(function(scrollable) {
-      if (scrollable.options) {
-        scrollable.options.forEach(function(options) {
-          scout.scrollbars.install(scrollable.$scrollable, options);
-        }.bind(this));
-      }
-    }.bind(this));
-  }.bind(this));
 };
 
 scout.Popup.prototype.render = function($parent, event) {
