@@ -36,6 +36,7 @@ import org.eclipse.scout.service.ServiceConstants;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -103,9 +104,16 @@ public class ServicesExtensionManager implements Listener {
     if (contributorBundle == null) {
       return;
     }
-    final BundleContext context = contributorBundle.getBundleContext();
-    if (context == null) {
-      return;
+
+    // Ensure to have a valid bundle context to register declared services on behalf of the contributing bundle.
+    if (contributorBundle.getBundleContext() == null) {
+      try {
+        LOG.info("Starting bundle '{}' to provide Scout services", extension.getContributor().getName());
+        contributorBundle.start(); // Has no effect if the bundle is about to start or is already started in the meantime.
+      }
+      catch (BundleException e) {
+        throw new IllegalStateException(String.format("Failed to start bundle contributing Scout services [bundle=%s]", extension.getContributor().getName()), e);
+      }
     }
     ArrayList<ServiceRegistration> list = new ArrayList<ServiceRegistration>();
     for (IConfigurationElement serviceElement : extension.getConfigurationElements()) {
@@ -162,7 +170,7 @@ public class ServicesExtensionManager implements Listener {
           else {
             initParams.put(Constants.SERVICE_RANKING, ranking.intValue());
           }
-          final ServiceRegistration reg = context.registerService(clazzes.toArray(new String[clazzes.size()]), factory, initParams);
+          final ServiceRegistration reg = contributorBundle.getBundleContext().registerService(clazzes.toArray(new String[clazzes.size()]), factory, initParams);
           list.add(reg);
           if (factory instanceof IServiceFactory) {
             addToDirectAccessorCache(extension, (IServiceFactory) factory, clazzes, reg);
@@ -187,7 +195,7 @@ public class ServicesExtensionManager implements Listener {
           else {
             initParams.put(Constants.SERVICE_RANKING, ranking.intValue());
           }
-          ServiceRegistration reg = context.registerService(clazzes.toArray(new String[clazzes.size()]), factory, initParams);
+          ServiceRegistration reg = contributorBundle.getBundleContext().registerService(clazzes.toArray(new String[clazzes.size()]), factory, initParams);
           list.add(reg);
           if (factory instanceof IServiceFactory) {
             addToDirectAccessorCache(extension, (IServiceFactory) factory, clazzes, reg);
