@@ -45,7 +45,7 @@ scout.Column.prototype.init = function(model) {
  * @see JsonCell.java
  */
 scout.Column.prototype.initCell = function(cell) {
-  if (typeof cell === 'string') {
+  if (typeof cell !== 'object') {
     cell = {
       text: cell
     };
@@ -59,6 +59,10 @@ scout.Column.prototype.initCell = function(cell) {
         cell.value = Number(cell.text);
       }
     }
+  }
+  // when cell doesn't define horiz. alignment - use value from column
+  if (cell.horizontalAlignment === undefined) {
+    cell.horizontalAlignment = this.horizontalAlignment;
   }
   scout.defaultValues.applyTo(cell, 'Cell');
   return cell;
@@ -85,7 +89,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
   var icon = this._icon(iconId, !!text) || '';
   var cssClass = this._cellCssClass(cell);
   var style = this._cellStyle(cell);
- 
+
   if (cell.errorStatus) {
     row.hasError = true;
   }

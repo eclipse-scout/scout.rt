@@ -50,14 +50,14 @@ scout.TableCube.prototype.addData = function(data, dataGroup) {
   };
 
   // count, sum, avg
-  if (dataGroup === -1) {
+  if (dataGroup === scout.TableCube.NumberGroup.COUNT) {
     dataAxis.norm = function(f) {
       return 1;
     };
     dataAxis.group = function(array) {
       return array.length;
     };
-  } else if (dataGroup === 1) {
+  } else if (dataGroup === scout.TableCube.NumberGroup.SUM) {
     dataAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -70,7 +70,7 @@ scout.TableCube.prototype.addData = function(data, dataGroup) {
         return a + b;
       });
     };
-  } else if (dataGroup === 2) {
+  } else if (dataGroup === scout.TableCube.NumberGroup.AVG) {
     dataAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;

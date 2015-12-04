@@ -39,9 +39,10 @@ scout.ColumnUserFilter.prototype.calculate = function() {
       group = scout.TableCube.DateGroup.NONE;
     }
   }
-  this.matrix = new scout.TableCube(this.table, this.session),
-    this.xAxis = this.matrix.addAxis(this.column, group);
-  this.matrix.calculate();
+  this.matrix = new scout.TableCube(this.table, this.session);
+  this.matrix.addData(this.column, scout.TableCube.NumberGroup.COUNT);
+  this.xAxis = this.matrix.addAxis(this.column, group);
+  var cube = this.matrix.calculate();
 
   this.selectedValues.forEach(function(selectedValue) {
     containsSelectedValue = false;
@@ -66,15 +67,18 @@ scout.ColumnUserFilter.prototype.calculate = function() {
     this.xAxis.reorder();
   }
 
+  var text, displayKey;
   this.availableValues = [];
   this.xAxis.forEach(function(key) {
-    var text = this.xAxis.format(key);
+    displayKey = key;
+    text = this.xAxis.format(key);
     if (this._useTextInsteadOfNormValue(key)) {
-      key = text;
+      displayKey = text;
     }
     this.availableValues.push({
-      key: key,
-      text: text
+      key: displayKey,
+      text: text,
+      count: cube.getValue([key])[0]
     });
   }, this);
 };

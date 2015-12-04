@@ -455,18 +455,29 @@ scout.TableHeaderMenu.prototype._renderFilterGroup = function() {
     autoResizeColumns: true,
     checkable: true,
     checkableStyle: scout.Table.CheckableStyle.TABLE_ROW,
-    columns: [scout.create('Column', {
-      index: 0,
-      text: 'filter-value', // text is not visible since header is not visible
-      session: this.session
-    })]
+    // column-texts are not visible since header is not visible
+    columns: [
+      scout.create('Column', {
+        index: 0,
+        text: 'filter-value',
+        width: 160,
+        session: this.session
+      }),
+      scout.create('Column', {
+        index: 1,
+        type: 'number',
+        horizontalAlignment: 1,
+        text: 'aggregate-count',
+        width: 40,
+        session: this.session
+      })]
   });
   this.filterTable.on('rowsChecked', this._filterTableCheckedRowsHandler);
 
   var tableRow, tableRows = [];
   this.filter.availableValues.forEach(function(filterValue) {
     tableRow = {
-      cells: [filterValue.text],
+      cells: [filterValue.text, filterValue.count],
       checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,
       dataMap: {
         filterValue: filterValue
