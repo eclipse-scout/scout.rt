@@ -67,7 +67,7 @@ scout.ColumnUserFilter.prototype.calculate = function() {
     this.xAxis.reorder();
   }
 
-  var text, displayKey;
+  var text, displayKey, cubeValue;
   this.availableValues = [];
   this.xAxis.forEach(function(key) {
     displayKey = key;
@@ -75,10 +75,11 @@ scout.ColumnUserFilter.prototype.calculate = function() {
     if (this._useTextInsteadOfNormValue(key)) {
       displayKey = text;
     }
+    cubeValue = cube.getValue([key]);
     this.availableValues.push({
       key: displayKey,
       text: text,
-      count: cube.getValue([key])[0]
+      count: cubeValue ? cubeValue[0] : 0
     });
   }, this);
 };
