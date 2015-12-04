@@ -59,11 +59,11 @@ public class BasicCache<K, V> implements ICache<K, V> {
     }
   }
 
-  public ICacheValueResolver<K, V> getResolver() {
+  protected ICacheValueResolver<K, V> getResolver() {
     return m_resolver;
   }
 
-  public Map<K, V> getCacheMap() {
+  protected Map<K, V> getCacheMap() {
     return m_cacheMap;
   }
 
