@@ -40,6 +40,12 @@
     #scout.glow(@focus-glow-color);
   }
 
+  .focus-border-inverted(@bordersize: 1px) {
+    outline: none;
+    border: @bordersize solid @focus-border-color-inverted;
+    #scout.glow(@focus-glow-color-inverted);
+  }
+
   .no-focus-border() {
     outline: none;
     border: 0;

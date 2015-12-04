@@ -73,12 +73,12 @@ scout.Outline.prototype._render = function($parent) {
       this._showOutlineOverview();
     }
   }
+
 };
 
 scout.Outline.prototype._renderProperties = function() {
-  scout.Outline.parent.prototype._renderProperties.call(this);
-
   this._renderTitleVisible();
+  scout.Outline.parent.prototype._renderProperties.call(this);
 };
 
 /**
@@ -92,15 +92,34 @@ scout.Outline.prototype._remove = function() {
 scout.Outline.prototype._renderTitle = function() {
   if (!this.$title) {
     this.$title = this.$container.prependDiv('outline-title');
+    this.$titleText = this.$title.prependDiv('outline-title-text');
   }
-  this.$title.text(this.title)
+  this.$titleText.text(this.title)
     .on('click', this._onTitleClick.bind(this));
+  this._renderTitleMenuBar();
+};
+
+scout.Outline.prototype._renderTitleMenuBar = function() {
+  this.titleMenuBar = scout.create(scout.MenuBar, {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
+  });
+  if (this.$title) {
+    this.titleMenuBar.render(this.$title);
+    this.titleMenuBar.$container.toggleClass('prevent-initial-focus', true);
+  }
+};
+
+scout.Outline.prototype._removeTitleMenuBar = function() {
+  this.titleMenuBar.remove();
+  this.titleMenuBar = null;
 };
 
 scout.Outline.prototype._removeTitle = function() {
   if (this.$title) {
     this.$title.remove();
     this.$title = null;
+    this._removeTitleMenuBar();
   }
 };
 
@@ -537,6 +556,11 @@ scout.Outline.prototype.glassPaneTargets = function() {
   }
 
   return elements;
+};
+
+scout.Outline.prototype._renderMenus = function() {
+  var menuItems = scout.menus.filter(this.menus, ['Outline.Title']);
+  this.titleMenuBar.updateItems(menuItems);
 };
 
 /**

@@ -92,6 +92,8 @@
 @focus-border-color: @palette-blue-6;
 @focus-color: @palette-blue-6;
 @focus-glow-color: fade(@focus-border-color, 50%);
+@focus-border-color-inverted: @active-inverted-color;
+@focus-glow-color-inverted: fade(@active-inverted-color, 50%);
 @highlight-color: @palette-orange-4;
 @hover-color: @palette-blue-6;
 @icon-color: @palette-gray-7;

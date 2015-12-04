@@ -255,8 +255,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
     setBreadcrumbEnabled(getConfiguredBreadcrumbEnabled());
-    // The outline must not display any menus because the detail form or table does
-    getContextMenu().setVisibleGranted(false);
     ensureDefaultDetailFormCreated();
     ensureDefaultDetailFormStarted();
   }
