@@ -14,6 +14,7 @@
   background-color: @table-header-menu-background-color;
   padding-bottom: 5px;
   border: 1px solid @border-color;
+  padding: 10px;
 
   &:focus {
     outline: 0;
@@ -38,6 +39,7 @@
   height: 100%;
   width: 222px;
   border-left: solid 1px @border-color;
+  padding-left: 10px;
 }
 
 .table-header-menu-whiter {
@@ -56,7 +58,11 @@
 }
 
 .table-header-menu-group {
-  padding: 10px 0px 35px 10px;
+  padding: 10px 0 35px 0;
+
+  &.first {
+    padding-top: 0;
+  }
 }
 
 .table-header-menu-group-text {
@@ -241,12 +247,9 @@
 }
 
 .table-header-menu-group-filter {
-  padding: 10px 0 0 10px;
 }
 
 .table-header-menu-filter-field {
-  padding: 10px 10px 0 10px;
-
   & > .form-field {
     position: relative;
   }
@@ -304,7 +307,6 @@
   display: inline;
   float: right;
   line-height: 22px;
-  margin-right: 10px;
 }
 
 .table-header-menu-filter-toggle-checked {

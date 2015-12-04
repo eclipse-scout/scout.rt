@@ -143,7 +143,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     column = this.column,
     pos = table.columns.indexOf(column);
 
-  this.$moving = this.$columnActions.appendDiv('table-header-menu-group');
+  this.$moving = this.$columnActions.appendDiv('table-header-menu-group first');
   this.$moving.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Move'));
 
