@@ -174,7 +174,7 @@ public final class SandboxClassLoaderBuilder {
    * resources (CSS, JS) from the parent class loader. The later is required, because the LessCompiler looks on the
    * current classpath to find a resource which is imported with the @import directive.
    */
-  private class P_ScriptClassLoader extends URLClassLoader {
+  private final class P_ScriptClassLoader extends URLClassLoader {
 
     private P_ScriptClassLoader(URL[] urls, ClassLoader parent) {
       super(urls, parent);
