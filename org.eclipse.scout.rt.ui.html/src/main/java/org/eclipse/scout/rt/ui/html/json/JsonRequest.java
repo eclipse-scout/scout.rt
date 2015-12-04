@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -23,26 +25,30 @@ public class JsonRequest {
    */
   public static final ThreadLocal<JsonRequest> CURRENT = new ThreadLocal<>();
 
-  public static final String PROP_STARTUP = "startup";
-  public static final String PROP_UNLOAD = "unload";
-  public static final String PROP_LOG = "log";
-  public static final String PROP_POLL_FOR_BACKGROUND_JOBS = "pollForBackgroundJobs";
-  public static final String PROP_CANCEL = "cancel";
+  private static final String PROP_STARTUP = "startup";
+  private static final String PROP_UNLOAD = "unload";
+  private static final String PROP_LOG = "log";
+  private static final String PROP_POLL = "pollForBackgroundJobs";
+  private static final String PROP_CANCEL = "cancel";
+  private static final String PROP_PING = "ping";
+
   public static final String PROP_UI_SESSION_ID = "uiSessionId";
   public static final String PROP_EVENTS = "events";
 
   private final JSONObject m_request;
+  private final RequestType m_requestType;
 
   /**
    * Creates a new JsonRequest instance.
    *
-   * @throws IllegalArgumentException
-   *           when mandatory property uiSessionId is not set
+   * @throws AssertionException
+   *           if mandatory property 'uiSessionId' is not set for a request other than 'PING' request.
    */
   public JsonRequest(JSONObject request) {
-    if (!request.has(PROP_UI_SESSION_ID)) {
-      throw new IllegalArgumentException("Missing property '" + PROP_UI_SESSION_ID + "' in request " + request);
-    }
+    final RequestType requestType = RequestType.valueOf(request);
+    Assertions.assertTrue(RequestType.PING_REQUEST.equals(requestType) || request.has(PROP_UI_SESSION_ID), "Missing property '%s' in request %s", PROP_UI_SESSION_ID, request);
+
+    m_requestType = requestType;
     m_request = request;
   }
 
@@ -67,28 +73,52 @@ public class JsonRequest {
     return actionList;
   }
 
-  public boolean isStartupRequest() {
-    return m_request.optBoolean(PROP_STARTUP);
-  }
-
-  public boolean isUnloadRequest() {
-    return m_request.optBoolean(PROP_UNLOAD);
-  }
-
-  public boolean isPollForBackgroundJobsRequest() {
-    return m_request.has(PROP_POLL_FOR_BACKGROUND_JOBS);
-  }
-
-  public boolean isCancelRequest() {
-    return m_request.has(PROP_CANCEL);
-  }
-
-  public boolean isLogRequest() {
-    return m_request.has(PROP_LOG);
+  /**
+   * Returns the type of the {@link JsonRequest}, and is never <code>null</code>.
+   */
+  public RequestType getRequestType() {
+    return m_requestType;
   }
 
   @Override
   public String toString() {
     return JsonObjectUtility.toString(m_request);
+  }
+
+  public static enum RequestType {
+    REQUEST,
+    STARTUP_REQUEST,
+    UNLOAD_REQUEST,
+    POLL_REQUEST,
+    CANCEL_REQUEST,
+    PING_REQUEST,
+    LOG_REQUEST;
+
+    /**
+     * Returns the <code>enum constant</code> which represents the given {@link JSONObject}.
+     */
+    private static final RequestType valueOf(JSONObject request) {
+      if (request.has(PROP_PING)) {
+        return PING_REQUEST;
+      }
+      else if (request.optBoolean(PROP_STARTUP)) {
+        return STARTUP_REQUEST;
+      }
+      else if (request.optBoolean(PROP_UNLOAD)) {
+        return UNLOAD_REQUEST;
+      }
+      else if (request.has(PROP_POLL)) {
+        return POLL_REQUEST;
+      }
+      else if (request.has(PROP_CANCEL)) {
+        return CANCEL_REQUEST;
+      }
+      else if (request.has(PROP_LOG)) {
+        return LOG_REQUEST;
+      }
+      else {
+        return REQUEST;
+      }
+    }
   }
 }

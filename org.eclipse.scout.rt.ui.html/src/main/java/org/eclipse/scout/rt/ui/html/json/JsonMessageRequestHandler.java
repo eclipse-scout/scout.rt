@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,19 +63,19 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     IUiSession uiSession = null;
-    JsonRequest jsonReq = null;
+    JsonRequest jsonRequest = null;
     try {
       // never cache json requests
       m_httpCacheControl.disableCacheHeaders(req, resp);
 
       JSONObject jsonObject = m_jsonRequestHelper.readJsonRequest(req);
-      if (isPingRequest(jsonObject)) {
-        handlePing(resp);
+      jsonRequest = new JsonRequest(jsonObject);
+      if (RequestType.PING_REQUEST.equals(jsonRequest.getRequestType())) {
+        handlePingRequest(resp);
         return true;
       }
 
-      jsonReq = new JsonRequest(jsonObject);
-      uiSession = getOrCreateUiSession(req, resp, jsonReq);
+      uiSession = getOrCreateUiSession(req, resp, jsonRequest);
       if (uiSession == null) {
         return true;
       }
@@ -82,7 +83,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // Associate subsequent processing with the uiSession and jsonRequest.
       UiRunContexts.copyCurrent()
           .withSession(uiSession)
-          .withJsonRequest(jsonReq)
+          .withJsonRequest(jsonRequest)
           .run(new IRunnable() {
 
             @Override
@@ -92,7 +93,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
-      if (jsonReq == null || uiSession == null || jsonReq.isStartupRequest()) {
+      if (jsonRequest == null || uiSession == null || RequestType.STARTUP_REQUEST.equals(jsonRequest.getRequestType())) {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
@@ -110,22 +111,21 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
    * Method invoked to handle a JSON request from UI.
    */
   protected void handleJsonRequest(IUiSession uiSession, JsonRequest jsonRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-    long start = System.nanoTime();
+    final long startNanos = System.nanoTime();
     if (LOG.isDebugEnabled()) {
       LOG.debug("JSON request started");
     }
 
-    if (jsonRequest.isLogRequest()) {
-      handleLog(httpServletResponse, jsonRequest.getRequestObject());
-      return;
-    }
-
-    if (jsonRequest.isPollForBackgroundJobsRequest()) {
-      handlePollForBackgroundJobs(uiSession, start);
-    }
-    else if (jsonRequest.isCancelRequest()) {
-      handleCancel(httpServletResponse, uiSession);
-      return;
+    switch (jsonRequest.getRequestType()) {
+      case LOG_REQUEST:
+        handleLogRequest(httpServletResponse, jsonRequest.getRequestObject());
+        return;
+      case CANCEL_REQUEST:
+        handleCancelRequest(httpServletResponse, uiSession);
+        return;
+      case POLL_REQUEST:
+        handlePollRequest(uiSession, startNanos);
+        break;
     }
 
     // GUI requests for the same session must be processed consecutively
@@ -133,15 +133,17 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     try {
       if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
         handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
-        return;
       }
-      handleEvents(httpServletRequest, httpServletResponse, uiSession, jsonRequest);
+      else {
+        handleEvents(httpServletRequest, httpServletResponse, uiSession, jsonRequest);
+      }
     }
     finally {
       uiSession.uiSessionLock().unlock();
     }
+
     if (LOG.isDebugEnabled()) {
-      LOG.debug("JSON request completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+      LOG.debug("JSON request completed in {}ms", StringUtility.formatNanos(System.nanoTime() - startNanos));
     }
   }
 
@@ -154,7 +156,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected void handleUiSessionDisposed(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
-    if (jsonReq.isPollForBackgroundJobsRequest()) { // TODO BSH isManualLogout?
+    if (RequestType.POLL_REQUEST.equals(jsonReq.getRequestType())) { // TODO BSH isManualLogout?
       writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
     }
     else {
@@ -162,11 +164,11 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected void handlePing(HttpServletResponse resp) throws IOException {
+  protected void handlePingRequest(HttpServletResponse resp) throws IOException {
     writeJsonResponse(resp, m_jsonRequestHelper.createPingResponse());
   }
 
-  protected void handleLog(HttpServletResponse resp, JSONObject jsonReqObj) throws IOException {
+  protected void handleLogRequest(HttpServletResponse resp, JSONObject jsonReqObj) throws IOException {
     String message = jsonReqObj.getString("message");
 
     if (message.length() > 10000) {
@@ -177,12 +179,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }
 
-  protected void handleCancel(HttpServletResponse resp, IUiSession uiSession) throws IOException {
+  protected void handleCancelRequest(HttpServletResponse resp, IUiSession uiSession) throws IOException {
     uiSession.processCancelRequest();
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }
 
-  protected void handlePollForBackgroundJobs(IUiSession uiSession, long start) {
+  protected void handlePollRequest(IUiSession uiSession, long start) {
     int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
     int maxIdle = m_maxUserIdleTime;
     // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
@@ -211,7 +213,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
-  protected void handleUnload(HttpServletResponse resp, JsonRequest jsonReq, String uiSessionAttributeName, HttpSession httpSession, IUiSession uiSession) throws IOException {
+  protected void handleUnloadRequest(HttpServletResponse resp, JsonRequest jsonReq, String uiSessionAttributeName, HttpSession httpSession, IUiSession uiSession) throws IOException {
     LOG.info("Unloading UI session with ID " + jsonReq.getUiSessionId() + " (requested by UI)");
     if (uiSession != null) {
       // Unbinding the uiSession will cause it to be disposed automatically, see UiSession.valueUnbound()
@@ -226,13 +228,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
   }
 
-  /**
-   * Check if request is a simple ping. We don't use JsonRequest here because a ping request has no uiSessionId.
-   */
-  protected boolean isPingRequest(JSONObject json) {
-    return json.has("ping");
-  }
-
   protected IUiSession getOrCreateUiSession(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
     String uiSessionAttributeName = IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getUiSessionId();
     HttpSession httpSession = req.getSession();
@@ -244,22 +239,23 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     try {
       IUiSession uiSession = (IUiSession) httpSession.getAttribute(uiSessionAttributeName);
 
-      if (jsonReq.isUnloadRequest()) {
-        handleUnload(resp, jsonReq, uiSessionAttributeName, httpSession, uiSession);
+      if (RequestType.UNLOAD_REQUEST.equals(jsonReq.getRequestType())) {
+        handleUnloadRequest(resp, jsonReq, uiSessionAttributeName, httpSession, uiSession);
         return null;
       }
 
       // check startup
-      if (uiSession == null && !jsonReq.isStartupRequest()) {
+      boolean startupRequest = RequestType.STARTUP_REQUEST.equals(jsonReq.getRequestType());
+      if (!startupRequest && uiSession == null) {
         handleSessionTimeout(resp, jsonReq);
         return null;
       }
-      else if (uiSession != null && jsonReq.isStartupRequest()) {
+      else if (startupRequest && uiSession != null) {
         throw new IllegalStateException("Startup requested for existing UI session with ID " + jsonReq.getUiSessionId());
       }
 
       if (uiSession == null) {
-        LOG.info("Creating new UI session with ID " + jsonReq.getUiSessionId() + ". MaxIdleTime: " + m_maxUserIdleTime + "sec, httpSession.MaxInactiveInterval: " + req.getSession().getMaxInactiveInterval() + "sec");
+        LOG.info("Creating new UI session with ID {} [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]", jsonReq.getUiSessionId(), m_maxUserIdleTime, req.getSession().getMaxInactiveInterval());
 
         uiSession = BEANS.get(IUiSession.class);
         uiSession.uiSessionLock().lock();
@@ -281,7 +277,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
 
       // update timeout
-      if (!jsonReq.isPollForBackgroundJobsRequest()) {
+      if (!RequestType.POLL_REQUEST.equals(jsonReq.getRequestType())) {
         uiSession.touch();
       }
 

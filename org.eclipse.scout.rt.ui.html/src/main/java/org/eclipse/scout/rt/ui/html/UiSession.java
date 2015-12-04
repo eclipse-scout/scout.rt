@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
 import org.eclipse.scout.rt.ui.html.json.JsonLocale;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
@@ -184,6 +185,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
                 }
                 // no client request must currently being processed (because in that case, the result of the
                 // model job will be returned as payload of the current JSON response).
+                // TODO [BSH] This check is not thread-safe. At least, 'm_currentJsonRequest' should be volatile. Still, thread-safety is not given.
                 if (isProcessingJsonRequest()) {
                   return false;
                 }
@@ -618,7 +620,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         public void run() throws Exception {
           processJsonRequestInternal();
         }
-      }), uiJobs.newModelJobInput("event-processing", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()));
+      }), uiJobs.newModelJobInput("event-processing", getClientSession(), RequestType.POLL_REQUEST.equals(m_currentJsonRequest.getRequestType())));
 
       // Wait for any other model jobs that might have been scheduled during event processing. If there are any
       // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
@@ -641,7 +643,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           }
           return json;
         }
-      }, uiJobs.newModelJobInput("response-to-json", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()), RuntimeExceptionTranslator.class);
+      }, uiJobs.newModelJobInput("response-to-json", getClientSession(), RequestType.POLL_REQUEST.equals(m_currentJsonRequest.getRequestType())), RuntimeExceptionTranslator.class);
       return result;
     }
     finally {
