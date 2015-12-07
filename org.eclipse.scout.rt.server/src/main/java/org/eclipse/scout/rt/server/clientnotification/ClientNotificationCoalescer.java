@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +30,12 @@ public class ClientNotificationCoalescer {
 
   public List<ClientNotificationMessage> coalesce(List<ClientNotificationMessage> inNotifications) {
     LinkedHashSet<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<ClientNotificationMessage>(inNotifications);
-    List<ClientNotificationMessage> result = new ArrayList<>();
-    // sort by address
-    Map<ClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = new HashMap<>();
+    // sort by distribute & address property
+    Map<Boolean, Map<ClientNotificationAddress, List<ClientNotificationMessage>>> messagesPerDistributeAndAddress = new HashMap<>();
+    messagesPerDistributeAndAddress.put(true, new HashMap<ClientNotificationAddress, List<ClientNotificationMessage>>());
+    messagesPerDistributeAndAddress.put(false, new HashMap<ClientNotificationAddress, List<ClientNotificationMessage>>());
     for (ClientNotificationMessage message : notificationsNoDuplicates) {
+      Map<ClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = messagesPerDistributeAndAddress.get(message.isDistributeOverCluster());
       List<ClientNotificationMessage> messages = messagesPerAddress.get(message.getAddress());
       if (messages == null) {
         messages = new ArrayList<ClientNotificationMessage>();
@@ -42,13 +43,17 @@ public class ClientNotificationCoalescer {
       }
       messages.add(message);
     }
-    for (Entry<ClientNotificationAddress, List<ClientNotificationMessage>> e : messagesPerAddress.entrySet()) {
-      result.addAll(coalesce(e.getKey(), e.getValue()));
+    List<ClientNotificationMessage> result = new ArrayList<>();
+    for (Entry<Boolean, Map<ClientNotificationAddress, List<ClientNotificationMessage>>> distributeEntry : messagesPerDistributeAndAddress.entrySet()) {
+      boolean distribute = distributeEntry.getKey();
+      for (Entry<ClientNotificationAddress, List<ClientNotificationMessage>> e : distributeEntry.getValue().entrySet()) {
+        result.addAll(coalesce(distribute, e.getKey(), e.getValue()));
+      }
     }
     return result;
   }
 
-  protected List<ClientNotificationMessage> coalesce(ClientNotificationAddress address, List<ClientNotificationMessage> messagesIn) {
+  protected List<ClientNotificationMessage> coalesce(boolean distributeOverCluster, ClientNotificationAddress address, List<ClientNotificationMessage> messagesIn) {
     if (messagesIn.isEmpty()) {
       return new ArrayList<>();
     }
@@ -58,17 +63,16 @@ public class ClientNotificationCoalescer {
       return CollectionUtility.arrayList(new ClientNotificationMessage(address, singleMessage.getNotification(), singleMessage.isDistributeOverCluster()));
     }
     else {
-      Map<Serializable, Boolean> notificationsIn = new LinkedHashMap<Serializable, Boolean>();
+      List<Serializable> notificationsIn = new ArrayList<>();
       for (ClientNotificationMessage singleMessage : messagesIn) {
-        notificationsIn.put(singleMessage.getNotification(), singleMessage.isDistributeOverCluster());
+        notificationsIn.add(singleMessage);
       }
-      List<? extends Serializable> outNotifications = BEANS.get(NotificationCoalescer.class).coalesce(new ArrayList<Serializable>(notificationsIn.keySet()));
+      List<? extends Serializable> outNotifications = BEANS.get(NotificationCoalescer.class).coalesce(notificationsIn);
       List<ClientNotificationMessage> result = new ArrayList<ClientNotificationMessage>();
       for (Serializable n : outNotifications) {
-        result.add(new ClientNotificationMessage(address, n, notificationsIn.get(n)));
+        result.add(new ClientNotificationMessage(address, n, distributeOverCluster));
       }
       return result;
     }
   }
-
 }
