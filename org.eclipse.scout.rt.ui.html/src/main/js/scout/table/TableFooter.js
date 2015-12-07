@@ -335,7 +335,6 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
     var animationOpts = {
       progress: this.revalidateLayout.bind(this),
       complete: function() {
-        this.revalidateLayout();
         if (complete) {
           complete();
         }
