@@ -1586,7 +1586,7 @@ scout.Table.prototype._group = function(animate) {
   rows = this.filteredRows();
   this._forEachColumn('aggrStart', states);
   rows.forEach(function(row, r) {
-  this._forEachColumn('aggrStep', states, row);
+    this._forEachColumn('aggrStep', states, row);
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
     // test if group is finished
@@ -1703,14 +1703,9 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
 
     for (c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
-      if (typeof contents[c] === 'number') {
-        var aggrValue = contents[c];
-        if (column.format) {
-          var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
-          aggrValue = decimalFormat.format(aggrValue);
-        }
+      if (column instanceof scout.NumberColumn) {
         cell = {
-          text: aggrValue,
+          text: column.decimalFormat.format(contents[c]),
           iconId: column.aggrSymbol,
           horizontalAlignment: column.horizontalAlignment,
           cssClass: 'table-aggregate-cell'

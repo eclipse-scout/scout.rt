@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFilter;
 import org.json.JSONObject;
 
@@ -34,9 +35,9 @@ public class JsonNumberColumn<NUMBER_COLUMN extends INumberColumn<?>> extends Js
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put("format", ((INumberColumn) getColumn()).getFormat().toPattern());
-    json.put("aggregationFunction", ((INumberColumn) getColumn()).getAggregationFunction());
-    json.put("backgroundEffect", ((INumberColumn) getColumn()).getBackgroundEffect());
+    json.put("decimalFormat", MainJsonObjectFactory.get().createJsonObject(getColumn().getFormat()).toJson());
+    json.put("aggregationFunction", getColumn().getAggregationFunction());
+    json.put("backgroundEffect", getColumn().getBackgroundEffect());
     return json;
   }
 

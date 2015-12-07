@@ -17,6 +17,16 @@ scout.inherits(scout.NumberColumn, scout.Column);
 /**
  * @override Column.js
  */
+scout.NumberColumn.prototype.init = function(model) {
+  scout.NumberColumn.parent.prototype.init.call(this, model);
+  if(!this.decimalFormat instanceof scout.DecimalFormat) {
+    this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
+  }
+};
+
+/**
+ * @override Column.js
+ */
 scout.NumberColumn.prototype._initCell = function(cell) {
   // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
   // Cell.value may be undefined for other column types -> use table.cellValue to access the value.

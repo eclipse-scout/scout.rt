@@ -84,9 +84,8 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
         empty: true
       };
     } else {
-      if (column.format) {
-        decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
-        aggregateValue = decimalFormat.format(aggregateValue);
+      if (column.decimalFormat) {
+        aggregateValue = column.decimalFormat.format(aggregateValue);
       }
       cell = {
         text: aggregateValue,

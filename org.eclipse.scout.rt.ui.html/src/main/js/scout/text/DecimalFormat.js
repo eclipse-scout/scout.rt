@@ -18,7 +18,7 @@
  *   <li>%</li>
  * </ul>
  */
-scout.DecimalFormat = function(locale, pattern) {
+scout.DecimalFormat = function(locale, decimalFormatConfiguration) {
   // format function will use these (defaults)
   this.positivePrefix = '';
   this.positiveSuffix = '';
@@ -30,14 +30,15 @@ scout.DecimalFormat = function(locale, pattern) {
   this.zeroBefore = 1;
   this.zeroAfter = 0;
   this.allAfter = 0;
-  //FIXME bsh: HALF_UP is the default, other rounding modes need to be considered as well.
-  //this._roundingMode ='HALF_UP';
+
+  decimalFormatConfiguration = decimalFormatConfiguration || {};
+  this.pattern = decimalFormatConfiguration.pattern || locale.decimalFormatPatternDefault;
+  this.multiplier = decimalFormatConfiguration.multiplier || 1;
+  this.roundingMode = decimalFormatConfiguration.roundingMode || scout.numbers.RoundingMode.HALF_UP;
 
   var SYMBOLS = scout.DecimalFormat.PATTERN_SYMBOLS;
-  pattern = pattern || locale.decimalFormatPatternDefault;
-
   // Check if there are separate subpatterns for positive and negative numbers ("PositivePattern;NegativePattern")
-  var split = pattern.split(SYMBOLS.patternSeparator);
+  var split = this.pattern.split(SYMBOLS.patternSeparator);
   // Use the first subpattern as positive prefix/suffix
   var positivePrefixAndSuffix = findPrefixAndSuffix(split[0]);
   this.positivePrefix = positivePrefixAndSuffix.prefix;
@@ -48,7 +49,7 @@ scout.DecimalFormat = function(locale, pattern) {
     this.negativePrefix = negativePrefixAndSuffix.prefix;
     this.negativeSuffix = negativePrefixAndSuffix.suffix;
     // from now on, only look at the positive subpattern
-    pattern = split[0];
+    this.pattern = split[0];
   } else {
     // No, there is no negative subpattern, so the positive prefix/suffix are used for both positive and negative numbers.
     // Check if there is a minus sign in the prefix/suffix.
@@ -66,18 +67,18 @@ scout.DecimalFormat = function(locale, pattern) {
   }
 
   // find group length
-  var posDecimalSeparator = pattern.indexOf(SYMBOLS.decimalSeparator);
+  var posDecimalSeparator = this.pattern.indexOf(SYMBOLS.decimalSeparator);
   if (posDecimalSeparator === -1) {
-    posDecimalSeparator = pattern.length; // assume decimal separator at end
+    posDecimalSeparator = this.pattern.length; // assume decimal separator at end
   }
-  var posGroupingSeparator = pattern.lastIndexOf(SYMBOLS.groupingSeparator, posDecimalSeparator); // only search before decimal separator
+  var posGroupingSeparator = this.pattern.lastIndexOf(SYMBOLS.groupingSeparator, posDecimalSeparator); // only search before decimal separator
   if (posGroupingSeparator > 0) {
     this.groupLength = posDecimalSeparator - posGroupingSeparator - 1;
   }
-  pattern = pattern.replace(new RegExp('[' + SYMBOLS.groupingSeparator + ']', 'g'), '');
+  this.pattern = this.pattern.replace(new RegExp('[' + SYMBOLS.groupingSeparator + ']', 'g'), '');
 
   // split on decimal point
-  split = pattern.split(SYMBOLS.decimalSeparator);
+  split = this.pattern.split(SYMBOLS.decimalSeparator);
 
   // find digits before and after decimal point
   this.zeroBefore = scout.strings.count(split[0], SYMBOLS.zeroDigit);
@@ -115,6 +116,31 @@ scout.DecimalFormat = function(locale, pattern) {
 scout.DecimalFormat.prototype.format = function(number) {
   var prefix = this.positivePrefix;
   var suffix = this.positiveSuffix;
+
+  // apply multiplier
+  if (this.multiplier != 1) {
+    number *= this.multiplier;
+  }
+
+  // round
+  number = scout.numbers.round(number, this.roundingMode, this.allAfter);
+
+  // after decimal point
+  var after = '';
+  if (this.allAfter) {
+    after = number.slice(number.indexOf('.') + 1);
+    for (var j = after.length - 1; j > this.zeroAfter - 1; j--) {
+      if (after[j] !== '0') {
+        break;
+      }
+      after = after.slice(0, -1);
+    }
+    if (after) { // did we find any non-zero characters?
+      after = this.decimalSeparatorChar + after;
+    }
+  }
+
+  // absolute value
   if (number < 0) {
     prefix = this.negativePrefix;
     suffix = this.negativeSuffix;
@@ -130,22 +156,6 @@ scout.DecimalFormat.prototype.format = function(number) {
   if (this.groupLength) {
     for (var i = before.length - this.groupLength; i > 0; i -= this.groupLength) {
       before = before.substr(0, i) + this.groupingChar + before.substr(i);
-    }
-  }
-
-  // after decimal point
-  var after = '';
-  if (this.allAfter) {
-    after = number.toFixed(this.allAfter);
-    after = after.slice(after.indexOf('.') + 1);
-    for (var j = after.length - 1; j > this.zeroAfter - 1; j--) {
-      if (after[j] !== '0') {
-        break;
-      }
-      after = after.slice(0, -1);
-    }
-    if (after) { // did we find any non-zero characters?
-      after = this.decimalSeparatorChar + after;
     }
   }
 

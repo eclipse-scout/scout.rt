@@ -142,7 +142,9 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 1000;
       rows[1].cells[1].value = 1000;
       rows[2].cells[1].value = 2000;
-      column1.format = '#.00';
+      column1.decimalFormat = new scout.DecimalFormat(session.locale, {
+        pattern: '#.00'
+      });
       table.render(session.$entryPoint);
 
       var $aggrRow = $aggregateRow(tableControl);

@@ -46,7 +46,7 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
 
   // data always is number
   dataAxis.format = function(n) {
-    return locale.decimalFormat.format(n);
+    return dataAxis.column.decimalFormat.format(n);
   };
 
   // count, sum, avg
@@ -215,13 +215,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
       if (isNaN(n) || n === null) {
         return emptyCell;
       } else {
-        var format = axis.format;
-        if (format) {
-          format = new scout.DecimalFormat(locale, format);
-        } else {
-          format = locale.decimalFormat;
-        }
-        return format.format(n);
+        return axis.decimalFormat.format(n);
       }
     };
   } else if (axis instanceof scout.BooleanColumn) {

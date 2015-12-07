@@ -13,6 +13,13 @@ scout.NumberField = function() {
 };
 scout.inherits(scout.NumberField, scout.BasicField);
 
+scout.NumberField.prototype._init = function(model) {
+  scout.NumberField.parent.prototype._init.call(this, model);
+  if (!this.decimalFormat instanceof scout.DecimalFormat) {
+    this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
+  }
+};
+
 /**
  * @override Widget.js
  */
@@ -29,8 +36,6 @@ scout.NumberField.prototype._render = function($parent) {
     .blur(this._parse.bind(this))
     .blur(this._onFieldBlur.bind(this)));
   this.addStatus();
-
-  this._renderDecimalFormat();
 };
 
 scout.NumberField.prototype._renderGridData = function() {
@@ -39,16 +44,20 @@ scout.NumberField.prototype._renderGridData = function() {
   });
 };
 
-scout.NumberField.prototype._renderDecimalFormat = function() {
-  this._decimalFormat = this.decimalFormat ? new scout.DecimalFormat(this.session.locale, this.decimalFormat) : this.session.locale.decimalFormat;
+scout.NumberField.prototype._syncDecimalFormat = function(decimalFormat) {
+  if (decimalFormat instanceof scout.DecimalFormat) {
+    this.decimalFormat = decimalFormat;
+  } else {
+    this.decimalFormat = new scout.DecimalFormat(this.session.locale, decimalFormat);
+  }
 };
 
 scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
     input = input
-      .replace(new RegExp('[' + this._decimalFormat.groupingChar + ']', 'g'), '')
-      .replace(new RegExp('[' + this._decimalFormat.pointChar + ']', 'g'), '.')
+      .replace(new RegExp('[' + this.decimalFormat.groupingChar + ']', 'g'), '')
+      .replace(new RegExp('[' + this.decimalFormat.pointChar + ']', 'g'), '.')
       .replace(/\s/g, '');
 
     // if only math symbols are in the input string...
@@ -59,7 +68,7 @@ scout.NumberField.prototype._parse = function() {
       // changed, ValueField.js will make sure, the new value is sent to the model.
       try {
         input = eval(input);
-        input = this._decimalFormat.format(input);
+        input = this.decimalFormat.format(input);
         this.$field.val(input);
       } catch (err) {
         // ignore errors, let the input be handled by scout model

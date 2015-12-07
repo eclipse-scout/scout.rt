@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonBasicField;
 
 public class JsonNumberField<T extends INumberField> extends JsonBasicField<T> {
@@ -46,7 +47,7 @@ public class JsonNumberField<T extends INumberField> extends JsonBasicField<T> {
       @Override
       public Object prepareValueForToJson(Object value) {
         DecimalFormat format = (DecimalFormat) value;
-        return format != null ? format.toPattern() : "";
+        return MainJsonObjectFactory.get().createJsonObject(format).toJson();
       }
     });
   }

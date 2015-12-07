@@ -78,6 +78,7 @@ TableSpecHelper.prototype.createModelColumn = function(text, type) {
     id: scout.objectFactory.createUniqueId(),
     text: text,
     objectType: (type === undefined ? 'StringColumn' : type),
+    decimalFormat: (type === 'NumberColumn' ? new scout.DecimalFormat(this.session.locale) : undefined),
     uiSortPossible: true
   };
   scout.defaultValues.applyTo(column, 'Column');

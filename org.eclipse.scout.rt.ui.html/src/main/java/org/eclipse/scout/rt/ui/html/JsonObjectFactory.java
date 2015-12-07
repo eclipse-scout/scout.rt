@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -85,6 +86,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonByteArray;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
+import org.eclipse.scout.rt.ui.html.json.JsonDecimalFormat;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
 import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
@@ -377,6 +379,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof TableTextUserFilterState) {
       return new JsonTableTextUserFilter((TableTextUserFilterState) object);
+    }
+    if (object instanceof DecimalFormat) {
+      return new JsonDecimalFormat((DecimalFormat) object);
     }
     return null;
   }
