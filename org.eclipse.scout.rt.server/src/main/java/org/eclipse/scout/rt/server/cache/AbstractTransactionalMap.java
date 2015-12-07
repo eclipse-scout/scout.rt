@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.cache;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -403,7 +404,9 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
 
       public EntryIterator() {
         m_sharedIterator = getReadSharedMap().entrySet().iterator();
-        m_insertedIterator = m_insertedMap.entrySet().iterator();
+        // we must create a copy of the inserted map at iterator construction else
+        // ConcurrentModificationException might be thrown
+        m_insertedIterator = new HashMap<K, V>(m_insertedMap).entrySet().iterator();
         advance();
       }
 

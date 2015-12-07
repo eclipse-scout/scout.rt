@@ -279,6 +279,7 @@ public abstract class AbstractTransactionalMapTest {
     assertMapStateSimple(map, 1, "1", 2, "2.2", 3, "3");
   }
 
+  @Test
   public void testRollback() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
@@ -312,5 +313,27 @@ public abstract class AbstractTransactionalMapTest {
 
     rollbackTransaction(tr2);
     assertMapStateSimple(map, 1, "1", 2, "2", 3, "3");
+  }
+
+  @Test
+  public void testIteratorRemove() {
+    ITransaction tr1 = createNewTransaction();
+
+    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    initalMap.put(2, "2");
+    initalMap.put(3, "3");
+    Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, false, initalMap);
+    ITransaction.CURRENT.set(tr1);
+    map.put(1, "1");
+    map.put(2, "2.2");
+    map.put(4, "4");
+
+    // remove entries while iterating (no concurrent modification exception is thrown)
+    for (Iterator<Entry<Integer, String>> iterator = map.entrySet().iterator(); iterator.hasNext();) {
+      iterator.next();
+      iterator.remove();
+    }
+
+    assertTrue("Map must be empty", map.isEmpty());
   }
 }
