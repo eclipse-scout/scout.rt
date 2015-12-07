@@ -297,4 +297,5 @@ __include("scout/desktop/DesktopFormController.js");
 __include("scout/desktop/AbstractNavigateMenu.js"); // requires Menu.js
 __include("scout/desktop/NavigateDownMenu.js");
 __include("scout/desktop/NavigateUpMenu.js");
+__include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
 }(window.scout = window.scout || {}, jQuery));

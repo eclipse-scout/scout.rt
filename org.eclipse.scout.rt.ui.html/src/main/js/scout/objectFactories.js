@@ -332,4 +332,9 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.ClipboardField();
   }
+}, {
+  objectType: 'FilterFieldsGroupBox',
+  create: function() {
+    return new scout.FilterFieldsGroupBox();
+  }
 }];

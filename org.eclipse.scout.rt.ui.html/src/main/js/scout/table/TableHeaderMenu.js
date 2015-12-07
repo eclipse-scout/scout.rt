@@ -534,18 +534,24 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() { // FIXME AWE:
     .appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterText'));
 
-  var freeTextField = scout.create('StringField', {
+  var groupBox = scout.create('FilterFieldsGroupBox', {
     parent: this,
-    session: this.session,
-    labelVisible: false,
-    statusVisible: false,
-    maxLength: 100
+    column: this.column
   });
-  freeTextField.render(this.$filterFieldsGroup);
+  groupBox.render(this.$filterFieldsGroup);
 
-  // FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
-  freeTextField.$mandatory.remove();
-  freeTextField.$mandatory = null;
+//  var freeTextField = scout.create('StringField', {
+//    parent: this,
+//    session: this.session,
+//    labelVisible: false,
+//    statusVisible: false,
+//    maxLength: 100
+//  });
+//  freeTextField.render(this.$filterFieldsGroup);
+//
+//  // FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
+//  freeTextField.$mandatory.remove();
+//  freeTextField.$mandatory = null;
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
