@@ -182,11 +182,26 @@ describe("Table", function() {
       expect(checkedRows.length).toBe(0);
     });
 
+    it("considers view ragne", function() {
+      //FIXME CGU implement
+    });
+
   });
 
   describe("selectRows", function() {
 
-    it("selects rows and unselects others", function() {
+    it("updates model", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var rows = [table.rows[0], model.rows[4]];
+      table.selectRows(rows);
+
+      expect(table.selectedRows).toEqual(rows);
+    });
+
+    it("selects rendered rows and unselects others", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
@@ -196,6 +211,11 @@ describe("Table", function() {
 
       helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
       helper.selectRowsAndAssert(table, [model.rows[2]]);
+    });
+
+
+    it("considers view ragne", function() {
+      //FIXME CGU implement
     });
 
     it("sends selection event containing rowIds", function() {
@@ -214,17 +234,6 @@ describe("Table", function() {
         rowIds: helper.getRowIds(rows)
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
-    });
-
-    it("updates cached model", function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
-      table.render(session.$entryPoint);
-
-      var rows = [table.rows[0], model.rows[4]];
-      table.selectRows(rows);
-
-      expect(table.selectedRows).toEqual(rows);
     });
 
   });
@@ -263,6 +272,26 @@ describe("Table", function() {
       helper.assertSelection(table, table.rows);
       sendQueuedAjaxCalls();
       helper.assertSelectionEvent(model.id, helper.getRowIds(table.rows));
+    });
+  });
+
+  describe("selectAll", function() {
+    it("selects all rows", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $selectedRows = table.$selectedRows();
+      expect($selectedRows.length).toBe(0);
+
+      table.toggleSelection();
+      helper.assertSelection(table, model.rows);
+      sendQueuedAjaxCalls();
+      helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
+    });
+
+    it("considers view range -> renders selection only for rendered rows", function() {
+      // FIXME CGU tests
     });
   });
 
@@ -827,6 +856,31 @@ describe("Table", function() {
     afterEach(function() {
       $.fx.off = false;
     });
+
+    it("renders an aggregate row for each group", function() {
+      //FIXME CGU implement
+    });
+
+    it("considers view range -> only renders an aggregate row for rendered rows", function() {
+      //FIXME CGU implement
+    });
+
+    it("regroups if rows get inserted", function() {
+      //FIXME CGU implement
+    });
+
+    it("regroups if rows get deleted", function() {
+      //FIXME CGU implement
+    });
+
+    it("regroups if rows get updated", function() {
+      //FIXME CGU implement
+    });
+
+    it("removes aggregate rows if all rows get deleted", function() {
+      //FIXME CGU implement
+    });
+
     //group only column 0
     it("groups column 0 only", function() {
       if (!scout.device.supportsInternationalization()) {
@@ -1520,6 +1574,10 @@ describe("Table", function() {
       expect(table.columns.indexOf($header0.data('column'))).toBe(2);
     });
 
+    it("considers view range", function() {
+      //FIXME CGU does not throw exception if row which is not in view range gets updated
+    });
+
   });
 
   describe("onModelAction", function() {
@@ -1587,7 +1645,7 @@ describe("Table", function() {
         expect(table.rows.length).toBe(0);
       });
 
-      it("deletes single rows from model html document", function() {
+      it("deletes single rows from model document", function() {
         table.render(session.$entryPoint);
 
         expect(table.$rows().length).toBe(3);
@@ -1608,6 +1666,14 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.$rows().length).toBe(0);
+      });
+
+      it("considers view range", function() {
+        //FIXME CGU remove rendered and non rendered row without exception
+      });
+
+      it("adjusts viewRangeRendered", function() {
+        //FIXME CGU remove in block, remove before, after and exactly
       });
 
     });
@@ -1654,6 +1720,10 @@ describe("Table", function() {
         expect(table.$rows().length).toBe(0);
       });
 
+      it("adjusts viewRangeRendered", function() {
+        //FIXME CGU remove in block, remove before, after and exactly
+      });
+
     });
 
     describe("rowsInserted event", function() {
@@ -1684,6 +1754,14 @@ describe("Table", function() {
 
         expect(table.rows.length).toBe(5 + 3);
         expect(Object.keys(table.rowsMap).length).toBe(5 + 3);
+      });
+
+      it("renders rows only if view range is not full yet", function() {
+        //FIXME CGU remove rendered and non rendered row without exception
+      });
+
+      it("adjusts viewRangeRendered if new rows were rendered", function() {
+        //FIXME CGU remove in block, remove before, after and exactly
       });
     });
 
@@ -1750,7 +1828,7 @@ describe("Table", function() {
         };
         session._processSuccessResponse(message);
 
-        //Checkif rows were inserted
+        //Check if rows were inserted
         expect(table.rows.length).toBe(5);
 
         //Check if animation is not done for the inserted rows
@@ -1766,6 +1844,10 @@ describe("Table", function() {
             expect(oldTop).toBeDefined();
           }
         });
+      });
+
+      it("considers view range", function() {
+        //FIXME check if rendered rows in view range are in correct order
       });
     });
 
@@ -1843,6 +1925,10 @@ describe("Table", function() {
 
         expect($('.selected').length).toBe(1);
         expect($('.selected')[0]).toBe(table.selectedRows[0].$row[0]);
+      });
+
+      it("considers view range", function() {
+        //FIXME CGU does not throw exception if row which is not in view range gets updated
       });
 
     });
@@ -1974,6 +2060,10 @@ describe("Table", function() {
         expect($cells1.eq(0).text()).toBe('2');
         expect($cells1.eq(1).text()).toBe('0');
         expect($cells1.eq(2).text()).toBe('1');
+      });
+
+      it("considers view range", function() {
+        //FIXME CGU does not throw exception if row which is not in view range gets updated
       });
 
       //TODO [5.2] cgu: fails because css is not applied -> include css files in SpecRunner

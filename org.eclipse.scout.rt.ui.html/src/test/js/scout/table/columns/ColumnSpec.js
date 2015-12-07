@@ -302,6 +302,10 @@ describe("Column", function() {
       });
     });
 
+    it("considers view range -> only colors rendered cells", function() {
+      //FIXME CGU implement
+    });
+
     it("updates colors if row gets deleted", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);

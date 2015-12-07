@@ -373,8 +373,10 @@ scout.Table.prototype._remove = function() {
   this.footer = null;
   this._removeAggregateRows();
   this._uninstallCellTooltipSupport();
-  this.firstRenderedRowIndex = -1;
-  this.lastRenderedRowIndex = -1;
+  this.viewRangeRendered.from = -1;
+  this.viewRangeRendered.to = -1;
+  this.$fillBefore = null;
+  this.$fillAfter = null;
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -1049,7 +1051,7 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
 
   // When all blocks are rendered, render the aggregate rows
   // Grouping cannot be done in init() because row filter only works with rendered rows -> needs to be done always when rows get rendered
-  this._group();
+  this._group(); // //FIXME CGU move filter and group to init
   this._renderAggregateRows();
   this._renderBackgroundEffect();
   if ($.log.isTraceEnabled()) {
@@ -1081,19 +1083,19 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
     numRowsRemoved++;
   }
 
-  if (this.firstRenderedRowIndex === fromIndex && toIndex === this.lastRenderedRowIndex) {
+  if (this.viewRangeRendered.from === fromIndex && toIndex === this.viewRangeRendered.to) {
     // all rendered rows removed
-    this.firstRenderedRowIndex = -1;
-    this.lastRenderedRowIndex = -1;
+    this.viewRangeRendered.from = -1;
+    this.viewRangeRendered.to = -1;
   } else {
     // Set the new index borders of the rendered rows
     // -> rows were removed on top of the rendered rows
-    if (toIndex < this.lastRenderedRowIndex && toIndex > this.firstRenderedRowIndex) {
-      this.firstRenderedRowIndex = toIndex + 1;
+    if (toIndex < this.viewRangeRendered.to && toIndex > this.viewRangeRendered.from) {
+      this.viewRangeRendered.from = toIndex + 1;
     }
     // -> rows were removed on the bottom of rendered rows
-    if (fromIndex >= this.firstRenderedRowIndex && fromIndex < this.lastRenderedRowIndex) {
-      this.lastRenderedRowIndex = fromIndex - 1;
+    if (fromIndex >= this.viewRangeRendered.from && fromIndex < this.viewRangeRendered.to) {
+      this.viewRangeRendered.to = fromIndex - 1;
     }
   }
   if ($.log.isTraceEnabled()) {
@@ -1103,8 +1105,8 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
 };
 
 scout.Table.prototype._removeRows = function(rows) {
-  rows = scout.arrays.ensure(rows);
   rows = rows || this.rows;
+  rows = scout.arrays.ensure(rows);
   rows.forEach(function(row) {
     var $row = row.$row,
       rowIndex = this.rows.indexOf(row);
@@ -1658,8 +1660,11 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    $aggregateRow = this.$container.makeDiv('table-aggregate-row');
     row = aggregateRow.row;
+    if (!row.$row) {
+      return;
+    }
+    $aggregateRow = this.$container.makeDiv('table-aggregate-row');
     contents = aggregateRow.contents;
 
     for (c = 0; c < this.columns.length; c++) {
@@ -1869,7 +1874,8 @@ scout.Table.prototype._insertRows = function(rows) {
       scout.arrays.pushAll(this._insertedRows, rows);
     }
 
-    this._renderRows(rows);
+    this.viewRangeDirty = true;
+    this._renderViewport();
   }
   this._triggerRowsInserted(rows);
 };
@@ -2007,7 +2013,6 @@ scout.Table.prototype._deleteAllRows = function() {
 
     this.selectionHandler.clearLastSelectedRowMarker();
     this._removeRows();
-    this.invalidateLayoutTree();
   }
 
   // Update model
@@ -2018,6 +2023,12 @@ scout.Table.prototype._deleteAllRows = function() {
 
   if (filterChanged) {
     this._rowsFiltered();
+  }
+
+  // Update HTML
+  if (this.rendered) {
+    this._renderViewport();
+    this.invalidateLayoutTree();
   }
 
   this._triggerAllRowsDeleted();
@@ -3020,7 +3031,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   var from = viewRange.from,
     to = viewRange.to;
 
-  if (from === this.viewRangeRendered.from && to === this.viewRangeRendered.to) {
+  if (from === this.viewRangeRendered.from && to === this.viewRangeRendered.to && !this.viewRangeDirty) {
     // Range already rendered -> do nothing
     return;
   }
@@ -3065,6 +3076,9 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.trace('FillAfter height: ' + fillAfterHeight);
+
+  this.invalidateLayoutTree();
+  this.viewRangeDirty = false;
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
