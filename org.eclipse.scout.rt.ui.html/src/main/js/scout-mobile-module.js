@@ -295,7 +295,6 @@ __include("scout/desktop/AbstractNavigateMenu.js"); // requires Menu.js
 __include("scout/desktop/NavigateDownMenu.js");
 __include("scout/desktop/NavigateUpMenu.js");
 
-__include("scout/mobileObjectFactories.js");
 __include("scout/table/MobileTable.js");
 __include("scout/desktop/MobileDesktop.js");
 }(window.scout = window.scout || {}, jQuery));

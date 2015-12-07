@@ -100,7 +100,7 @@ describe("ObjectFactory", function() {
   it("creates objects which are getting registered in the widget map", function() {
     setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1'),
-      factories = scout.defaultObjectFactories;
+      factories = scout.objectFactories;
     session.locale = new LocaleSpecHelper().createLocale('de');
     verifyCreationAndRegistration(session, factories);
   });

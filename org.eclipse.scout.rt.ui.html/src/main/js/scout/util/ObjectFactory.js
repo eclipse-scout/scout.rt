@@ -10,9 +10,6 @@
  ******************************************************************************/
 scout.ObjectFactory = function(session) {
   this.session = session;
-  this._factories = {};
-
-  this.deviceTypeLookupOrder = ['TABLET', 'MOBILE', 'DESKTOP'];
 };
 
 /**
@@ -21,49 +18,33 @@ scout.ObjectFactory = function(session) {
  *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
 scout.ObjectFactory.prototype.create = function(model) {
-  var factories, factory, deviceType,
-    index = this.deviceTypeLookupOrder.indexOf(currentDeviceType),
-    currentDeviceType = this.session.userAgent.deviceType;
+  // check if requested objectType / variant is registered
+  var objectTypeParts, scoutClass, scoutObject,
+    objectType = model.objectType,
+    createFunc = scout.objectFactories[objectType];
 
-  for (index = index; index < this.deviceTypeLookupOrder.length || factory; index++) {
-    deviceType = this.deviceTypeLookupOrder[index];
-    factories = this._factories[deviceType] || {};
-    factory = factories[model.objectType];
-    if (factory) {
-      break;
+  if (createFunc) {
+    // When a factory is registered for the given objectType
+    scoutObject = createFunc(model);
+  } else {
+    // When no factory is registered for the given objectType
+    objectTypeParts = objectType.split('.');
+    if (objectTypeParts.length === 2) {
+      // variant + objectType
+      scoutClass = objectTypeParts[1] + objectTypeParts[0];
+    } else {
+      // only objectType
+      scoutClass = objectType;
     }
+    scoutObject = new scout[scoutClass]();
   }
 
-  if (!factory) {
-    throw new Error('No factory registered for objectType ' + model.objectType);
+  if (!scoutObject) {
+    throw new Error('Failed to create Scout object for objectType:' + objectType + '. Either file/class \'scout.' + objectType +
+        '\' does not exist, or no factory is registered to create an instance for the given objectType');
   }
-  var object = factory.create(model);
+
   model.session = this.session;
-  object.init(model);
-  return object;
-};
-
-/**
- * @param single factory or array of factories with objectType and optional deviceType.
- */
-scout.ObjectFactory.prototype.register = function(factories) {
-  if (!factories) {
-    return;
-  }
-
-  if (!Array.isArray(factories)) {
-    factories = [factories];
-  }
-
-  var i, factory;
-  for (i = 0; i < factories.length; i++) {
-    factory = factories[i];
-    if (!factory.deviceType) {
-      factory.deviceType = this.deviceTypeLookupOrder[this.deviceTypeLookupOrder.length - 1];
-    }
-    if (!this._factories[factory.deviceType]) {
-      this._factories[factory.deviceType] = {};
-    }
-    this._factories[factory.deviceType][factory.objectType] = factory;
-  }
+  scoutObject.init(model);
+  return scoutObject;
 };

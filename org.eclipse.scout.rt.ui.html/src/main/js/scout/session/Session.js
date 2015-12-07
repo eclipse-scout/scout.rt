@@ -27,8 +27,6 @@
  *     clientSessionId can be found, a new one is generated on the server.
  *   [userAgent]
  *     Default: DESKTOP
- *   [objectFactories]
- *     Factories to build model adapters. Default: scout.defaultObjectFactories.
  *   [backgroundJobPollingEnabled]
  *     Unless websockets is used, this property turns on (default) or off background
  *     polling using an async ajax call together with setTimeout()
@@ -69,7 +67,6 @@ scout.Session = function($entryPoint, options) {
   this.url = 'json';
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
-  this._initObjectFactory(options.objectFactories);
   this._texts = new scout.Texts();
   this._sessionStartupParams;
   this._requestsPendingCounter = 0;
@@ -117,17 +114,6 @@ scout.Session.prototype._throwError = function(message) {
   if (!this.suppressErrors) {
     throw new Error(message);
   }
-};
-
-scout.Session.prototype._initObjectFactory = function(objectFactories) {
-  if (!objectFactories) {
-    if (this.userAgent.deviceType === scout.Device.Type.MOBILE) {
-      objectFactories = scout.mobileObjectFactories;
-    } else {
-      objectFactories = scout.defaultObjectFactories;
-    }
-  }
-  this.objectFactory.register(objectFactories);
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
