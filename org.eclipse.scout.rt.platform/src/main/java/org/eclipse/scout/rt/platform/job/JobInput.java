@@ -273,6 +273,23 @@ public class JobInput {
   }
 
   /**
+   * Conditionally associates the job with an execution hint. Unlike {@link #withExecutionHint(String)}, this method
+   * sets the hint only if the condition is <code>true</code>, and is used to ease fluent usage of {@link JobInput}.
+   *
+   * @param hint
+   *          the execution hint to be set.
+   * @param setExecutionHint
+   *          <code>true</code> to set the execution hint, or <code>false</code> otherwise.
+   * @see #withExecutionHint(String)
+   */
+  public JobInput withExecutionHint(final String hint, final boolean setExecutionHint) {
+    if (setExecutionHint) {
+      m_executionHints.add(hint);
+    }
+    return this;
+  }
+
+  /**
    * Returns the scheduling rule to run the job, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
    * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
    * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY}.

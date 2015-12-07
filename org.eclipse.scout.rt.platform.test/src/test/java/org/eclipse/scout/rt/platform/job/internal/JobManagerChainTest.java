@@ -49,10 +49,6 @@ public class JobManagerChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(RunMonitor.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 3. ExceptionProcessor
-    c = (IChainable) chainIterator.next();
-    assertEquals(ExceptionProcessor.class, c.getClass());
-
     // 4. ThreadNameDecorator
     c = (IChainable) chainIterator.next();
     assertEquals(ThreadNameDecorator.class, c.getClass());
@@ -60,6 +56,10 @@ public class JobManagerChainTest {
     // 5. RunContextRunner
     c = (IChainable) chainIterator.next();
     assertEquals(RunContextRunner.class, c.getClass());
+
+    // 6. ExceptionProcessor
+    c = (IChainable) chainIterator.next();
+    assertEquals(ExceptionProcessor.class, c.getClass());
 
     // 5. FireAboutToRunProcessor
     c = (IChainable) chainIterator.next();

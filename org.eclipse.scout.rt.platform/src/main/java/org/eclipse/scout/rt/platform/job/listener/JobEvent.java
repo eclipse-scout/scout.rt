@@ -30,6 +30,7 @@ public class JobEvent extends EventObject {
   private final JobEventType m_eventType;
   private IFuture<?> m_future;
   private IBlockingCondition m_blockingCondition;
+  private String m_executionHint;
 
   public JobEvent(final IJobManager jobManager, final JobEventType type) {
     super(jobManager);
@@ -49,6 +50,14 @@ public class JobEvent extends EventObject {
   }
 
   /**
+   * Returns the {@link IBlockingCondition} for events of the type {@link JobEventType#BLOCKED} or
+   * {@link JobEventType#UNBLOCKED}, or <code>null</code> otherwise.
+   */
+  public IBlockingCondition getBlockingCondition() {
+    return m_blockingCondition;
+  }
+
+  /**
    * To associate this event with a {@link IBlockingCondition}.
    */
   public JobEvent withBlockingCondition(final IBlockingCondition blockingCondition) {
@@ -57,12 +66,11 @@ public class JobEvent extends EventObject {
   }
 
   /**
-   * @return blocking condition which a 'blocking event' is associated with; is <code>null</code> for other events.
-   * @see JobEventType#BLOCKED
-   * @see JobEventType#UNBLOCKED
+   * @return Future that is associated with the event. For events of the type {@link JobEventType#SHUTDOWN}, there is no
+   *         future associated.
    */
-  public IBlockingCondition getBlockingCondition() {
-    return m_blockingCondition;
+  public IFuture<?> getFuture() {
+    return m_future;
   }
 
   /**
@@ -74,11 +82,19 @@ public class JobEvent extends EventObject {
   }
 
   /**
-   * @return Future that is associated with the event. Depending on the event, there is no Future associated with the
-   *         event.
+   * Returns the execution hint for events of the type {@link JobEventType#EXECUTION_HINT_CHANGED}, or <code>null</code>
+   * otherwise.
    */
-  public IFuture<?> getFuture() {
-    return m_future;
+  public String getExecutionHint() {
+    return m_executionHint;
+  }
+
+  /**
+   * To associate this event with an execution hint.
+   */
+  public JobEvent withExecutionHint(final String executionHint) {
+    m_executionHint = executionHint;
+    return this;
   }
 
   @Override

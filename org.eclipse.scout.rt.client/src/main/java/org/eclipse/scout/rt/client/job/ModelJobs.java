@@ -107,7 +107,7 @@ public final class ModelJobs {
    *
    * @see {@link IJobManager#awaitDone(org.eclipse.scout.rt.platform.filter.IFilter, long, java.util.concurrent.TimeUnit)}
    */
-  public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "uiInteractionRequired";
+  public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "ui.interaction.required";
 
   private ModelJobs() {
   }

@@ -187,7 +187,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_executionHints.add(hint);
     }
     finally {
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED)
+          .withFuture(this)
+          .withExecutionHint(hint));
     }
   }
 
@@ -197,7 +199,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_executionHints.remove(hint);
     }
     finally {
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED).withFuture(this));
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED)
+          .withFuture(this)
+          .withExecutionHint(hint));
     }
   }
 

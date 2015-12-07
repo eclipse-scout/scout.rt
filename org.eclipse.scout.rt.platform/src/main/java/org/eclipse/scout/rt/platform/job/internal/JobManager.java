@@ -207,17 +207,6 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Checks if the given job input has a name set. If yes, the input is returned. If no, a copy of the input is returned
-   * with the given defaultName set as name.
-   */
-  protected JobInput ensureJobInputName(JobInput input, String defaultName) {
-    if (input != null && input.getName() == null) {
-      return input.copy().withName(defaultName);
-    }
-    return input;
-  }
-
-  /**
    * Creates the Future to interact with the executable.
    *
    * @param callable
@@ -302,9 +291,9 @@ public class JobManager implements IJobManager, IPlatformListener {
     callableChain
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
-        .add(new ExceptionProcessor<RESULT>(input))
         .add(new ThreadNameDecorator(input.getThreadName(), input.getName()))
         .add(new RunContextRunner<RESULT>(input.getRunContext()))
+        .add(new ExceptionProcessor<RESULT>(input)) // Must following RunContextRunner to handle exception in proper RunContext.
         .add(new FireJobLifecycleEventProcessor<>(JobEventType.ABOUT_TO_RUN, this, future));
   }
 
@@ -321,6 +310,18 @@ public class JobManager implements IJobManager, IPlatformListener {
   @Internal
   protected void unregisterFuture(final JobFutureTask<?> future) {
     m_futures.remove(future);
+  }
+
+  /**
+   * Ensures that the given job input has a name set. If already set, the input is returned, or otherwise, a copy of the
+   * input is returned with the given <code>defaultName</code> set as name.
+   */
+  @Internal
+  protected JobInput ensureJobInputName(final JobInput input, final String defaultName) {
+    if (input != null && input.getName() == null) {
+      return input.copy().withName(defaultName);
+    }
+    return input;
   }
 
   @Override

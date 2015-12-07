@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
@@ -104,7 +105,7 @@ public class UiSessionTest {
     JsonTestUtility.endRequest(uiSession);
     uiSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
-    BEANS.get(UiJobs.class).awaitAllModelJobs(clientSession);
+    BEANS.get(UiJobs.class).awaitModelJobs(clientSession, JUnitExceptionHandler.class);
     assertFalse(clientSession.isActive());
     assertTrue(uiSession.isDisposed());
 
