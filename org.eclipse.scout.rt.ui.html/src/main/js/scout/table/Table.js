@@ -637,9 +637,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
     }.bind(this));
   }
 
-  var newViewRange = this._calculateCurrentViewRange();
-  this._removeRows();
-  this._renderViewRange(newViewRange);
+  this._rerenderViewport();
 
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
@@ -1104,11 +1102,34 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
   }
 };
 
-scout.Table.prototype._removeRows = function($rows) {
-  $rows = $rows || this.$rows(true);
-  $rows.remove();
-  this._renderEmptyData();
-  this.viewRangeRendered = new scout.Range(-1, -1);
+scout.Table.prototype._removeRows = function(rows) {
+  rows = scout.arrays.ensure(rows);
+  rows = rows || this.rows;
+  rows.forEach(function(row) {
+    var $row = row.$row,
+      rowIndex = this.rows.indexOf(row);
+
+    if (rowIndex === -1) {
+      throw new Error('Row not found, cannot remove $row');
+    }
+
+    if (row.$row) {
+      $row.remove();
+      row.$row = null;
+    }
+
+    if (rowIndex === this.viewRangeRendered.from && rowIndex === this.viewRangeRendered.to) {
+      this.viewRangeRendered.from = -1;
+      this.viewRangeRendered.to = -1;
+    } else if (rowIndex < this.viewRangeRendered.from ) {
+      this.viewRangeRendered.from--;
+      this.viewRangeRendered.to--;
+    } else if (rowIndex === this.viewRangeRendered.from) {
+      this.viewRangeRendered.from++;
+    } else if (rowIndex <= this.viewRangeRendered.to) {
+      this.viewRangeRendered.to--;
+    }
+  }.bind(this));
 };
 
 /**
@@ -1862,6 +1883,19 @@ scout.Table.prototype._deleteRows = function(rows) {
 
   this.deselectRows(rows, false);
   rows.forEach(function(row) {
+    // Update HTML
+    if (this.rendered) {
+      // Cancel cell editing if cell editor belongs to a cell of the deleted row
+      if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
+        this.cellEditorPopup.cancelEdit();
+      }
+      // Remove tooltips for the deleted row
+      this._removeTooltipsForRow(row);
+
+      this._removeRows(row);
+      invalidate = true;
+    }
+
     // Update model
     scout.arrays.remove(this.rows, row);
     if (scout.arrays.remove(this._filteredRows, row)) {
@@ -1872,20 +1906,6 @@ scout.Table.prototype._deleteRows = function(rows) {
     if (this.selectionHandler.lastActionRow === row) {
       this.selectionHandler.clearLastSelectedRowMarker();
     }
-
-    // Update HTML
-    if (this.rendered) {
-      // Cancel cell editing if cell editor belongs to a cell of the deleted row
-      if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
-        this.cellEditorPopup.cancelEdit();
-      }
-      // Remove tooltips for the deleted row
-      this._removeTooltipsForRow(row);
-
-      this._removeRows(row.$row);
-      delete row.$row;
-      invalidate = true;
-    }
   }.bind(this));
 
   if (filterChanged) {
@@ -1895,6 +1915,8 @@ scout.Table.prototype._deleteRows = function(rows) {
   this._updateBackgroundEffect();
   this._triggerRowsDeleted(rows);
   if (invalidate) {
+    this._renderViewport();
+    this._renderEmptyData();
     this.invalidateLayoutTree();
   }
 };
@@ -1976,16 +1998,6 @@ scout.Table.prototype._removeTooltipsForRow = function(row) {
 scout.Table.prototype._deleteAllRows = function() {
   var filterChanged = this._filteredRows.length > 0;
 
-  // Update model
-  this.rows = [];
-  this.rowsMap = {};
-  this.selectRows([], false);
-  this._filteredRows = [];
-
-  if (filterChanged) {
-    this._rowsFiltered();
-  }
-
   // Update HTML
   if (this.rendered) {
     // Cancel cell editing
@@ -1997,6 +2009,17 @@ scout.Table.prototype._deleteAllRows = function() {
     this._removeRows();
     this.invalidateLayoutTree();
   }
+
+  // Update model
+  this.rows = [];
+  this.rowsMap = {};
+  this.selectRows([], false);
+  this._filteredRows = [];
+
+  if (filterChanged) {
+    this._rowsFiltered();
+  }
+
   this._triggerAllRowsDeleted();
 };
 
@@ -2609,8 +2632,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   this._sendColumnMoved(column, index);
 
   // move cells
-  this._removeRows();
-  this._renderRows();
+  this._rerenderViewport();
 };
 
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
@@ -2830,8 +2852,7 @@ scout.Table.prototype._renderRowIconVisible = function() {
 
 scout.Table.prototype._redraw = function() {
   this._rerenderHeaderColumns();
-  this._removeRows();
-  this._renderRows();
+  this._rerenderViewport();
 };
 
 scout.Table.prototype._rerenderHeaderColumns = function() {
@@ -2981,6 +3002,12 @@ scout.Table.prototype._renderViewport = function() {
   this._renderViewRange(viewRange);
 };
 
+scout.Table.prototype._rerenderViewport = function() {
+  var newViewRange = this._calculateCurrentViewRange();
+  this._removeRows();
+  this._renderViewRange(newViewRange);
+};
+
 scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
   var viewRange = this._calculateViewRangeForRowIndex(rowIndex);
   this._renderViewRange(viewRange);
@@ -2997,7 +3024,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     // Range already rendered -> do nothing
     return;
   }
-
+  // FIXME CGU create intersect methods
   if (viewRange.from > this.viewRangeRendered.from) {
     if (this.viewRangeRendered.from !== -1) {
       this._removeRowsFromTo(this.viewRangeRendered.from, Math.min(viewRange.from, this.viewRangeRendered.to));
