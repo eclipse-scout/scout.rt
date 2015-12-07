@@ -41,7 +41,7 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
-  var duration = 1000 ;
+  var duration = 300 ;
 
   this.$body = parentMenu.parentMenu.$subMenuBody;
   //move new body to back;
