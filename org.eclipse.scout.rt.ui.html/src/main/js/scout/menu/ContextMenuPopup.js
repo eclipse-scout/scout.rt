@@ -41,7 +41,7 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
-  var duration = 300;
+  var duration = 1000 ;
 
   this.$body = parentMenu.parentMenu.$subMenuBody;
   //move new body to back;
@@ -78,7 +78,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     });
     var targetBounds = this.htmlComp.getBounds();
     var targetSize = this.htmlComp.getSize();
-    this.$body.css('box-shadow', 'none');
+    parentMenu.$subMenuBody.css('box-shadow', 'none');
     this.htmlComp.setBounds(actualBounds);
     if (this.openingDirectionY !== 'up') {
       //set container to element
