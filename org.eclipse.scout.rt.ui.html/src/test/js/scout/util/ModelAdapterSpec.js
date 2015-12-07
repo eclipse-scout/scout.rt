@@ -22,31 +22,30 @@ describe("ModelAdapter", function() {
     session.init();
     uninstallUnloadHandlers(session);
 
-    var genericFactories = [{
-      objectType: 'Generic',
-      create: function() {
+    scout.objectFactories = $.extend(scout.objectFactories, {
+      'Generic': function() {
         return new scout.ModelAdapter();
-      }}, {
-      objectType: 'HasChildAdapter',
-      create: function() {
+      },
+      'HasChildAdapter': function() {
         var adapter = new scout.ModelAdapter();
         adapter._addAdapterProperties('childAdapter');
         return adapter;
-      }}, {
-      objectType: 'HasChildAdapters',
-      create: function() {
+      },
+      'HasChildAdapters': function() {
         var adapter = new scout.ModelAdapter();
         adapter._addAdapterProperties('childAdapters');
         return adapter;
       }
-    }];
-    session.objectFactory.register(genericFactories);
+    });
   });
 
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    delete scout.objectFactories['Generic'];
+    delete scout.objectFactories['HasChildAdapter'];
+    delete scout.objectFactories['HasChildAdapters'];
   });
 
   function createGenericModel() {

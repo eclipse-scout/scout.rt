@@ -20,6 +20,7 @@ describe("ObjectFactory", function() {
   afterEach(function() {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    scout.device.type = scout.Device.Type.DESKTOP;
   });
 
   /**
@@ -78,39 +79,31 @@ describe("ObjectFactory", function() {
     return model;
   }
 
-  /**
-   * When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
-   * you should check if the required .js File is registered in SpecRunnerMaven.html.
-   */
-  function verifyCreationAndRegistration(session, factories) {
-    var i, model, factory, object, modelAdapter;
-    session.objectFactory.register(factories);
+  it("creates objects which are registered in scout.objectFactories", function() {
+    setFixtures(sandbox());
+    var session = new scout.Session($('#sandbox'), '1.1');
+    session.locale = new LocaleSpecHelper().createLocale('de');
 
-    for (i = 0; i < factories.length; i++) {
-      factory = factories[i];
-      model = createModel(session, i, factory.objectType);
-      object = factory.create(model);
+    // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
+    // you should check if the required .js File is registered in SpecRunnerMaven.html.
+    var i, model, factory, object, modelAdapter;
+    for (objectType in scout.objectFactories) {
+      model = createModel(session, i, objectType);
+      object = scout.objectFactories[objectType](model);
       object.init(model);
       session.registerModelAdapter(object);
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
     }
-  }
-
-  it("creates objects which are getting registered in the widget map", function() {
-    setFixtures(sandbox());
-    var session = new scout.Session($('#sandbox'), '1.1'),
-      factories = scout.objectFactories;
-    session.locale = new LocaleSpecHelper().createLocale('de');
-    verifyCreationAndRegistration(session, factories);
   });
 
-  it("distinguishes between mobile and desktop objects", function() {
-    setFixtures(sandbox());
-    var session = new scout.Session($('#sandbox'), '1.1'),
-      factories = scout.mobileObjectFactories;
-    session.locale = new LocaleSpecHelper().createLocale('de');
-    verifyCreationAndRegistration(session, factories);
+  it("distinguishes between mobile and regular objects", function() {
+    scout.device.type = scout.Device.Type.DESKTOP;
+    var object = scout.objectFactories['Desktop']();
+    expect(object instanceof scout.Desktop).toBe(true);
+    scout.device.type = scout.Device.Type.MOBILE;
+    object = scout.objectFactories['Desktop']();
+    expect(object instanceof scout.MobileDesktop).toBe(true);
   });
 
 });
