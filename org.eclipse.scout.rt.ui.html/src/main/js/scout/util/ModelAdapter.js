@@ -39,10 +39,17 @@ scout.ModelAdapter = function() {
   this._modelProperties = [];
 
   this._register = true;
+  this.remoteHandler = scout.NullRemoteHandler;
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
 };
 scout.inherits(scout.ModelAdapter, scout.Widget);
+
+// NullRemoteHandler is used as default for local objects
+// in place of this.session.sendEvent
+scout.NullRemoteHandler = function() {
+  // NOP
+};
 
 /**
  * @param model expects parent session to be set. Other options:
@@ -53,10 +60,10 @@ scout.ModelAdapter.prototype._init = function(model) {
   scout.ModelAdapter.parent.prototype._init.call(this, model);
   this.id = model.id;
   this.objectType = model.objectType;
-  this.remoteHandler = this.session.sendEvent.bind(this.session);
   this._register = scout.nvl(model._register, true);
   if (this._register) {
     this.session.registerModelAdapter(this);
+    this.remoteHandler = this.session.sendEvent.bind(this.session);
   }
 
   // copy all properties from model to this adapter
