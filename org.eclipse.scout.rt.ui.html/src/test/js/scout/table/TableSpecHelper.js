@@ -35,7 +35,7 @@ TableSpecHelper.prototype.createModel = function(columns, rows) {
 
 TableSpecHelper.prototype.createModelRow = function(id, cells) {
   return {
-    id: id || scout.createUniqueId(),
+    id: id || scout.objectFactory.createUniqueId(),
     cells: cells,
     enabled: true
   };
@@ -75,7 +75,7 @@ TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
 
 TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
   var column = {
-    id: id || scout.createUniqueId(),
+    id: id || scout.objectFactory.createUniqueId(),
     text: text,
     type: type,
     objectType: 'Column',

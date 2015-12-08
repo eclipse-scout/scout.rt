@@ -37,7 +37,7 @@ scout.Table = function(model) {
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
-  this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
+  this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX; // FIXME AWE: (filter) hand cursor when in TABLE_ROW mode
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
 
   this._permanentHeadSortColumns = [];

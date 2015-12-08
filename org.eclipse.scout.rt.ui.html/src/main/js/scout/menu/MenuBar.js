@@ -67,7 +67,7 @@ scout.MenuBar.prototype._render = function($parent) {
   // Visibility may change when updateItems() function is called, see updateVisibility().
   this.visible = (this.menuItems.length > 0);
   this.$container = $parent.makeDiv('menubar')
-    .attr('id', 'MenuBar-' + scout.createUniqueId())
+    .attr('id', 'MenuBar-' + scout.objectFactory.createUniqueId())
     .toggleClass('main-menubar', this.size === 'large')
     .setVisible(this.visible);
   this.$left = this.$container.appendDiv('menubox left');

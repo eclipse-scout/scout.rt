@@ -66,7 +66,6 @@ scout.Session = function($entryPoint, options) {
   this.desktop;
   this.url = 'json';
   this._adapterDataCache = {};
-  this.objectFactory = new scout.ObjectFactory(this);
   this._texts = new scout.Texts();
   this._sessionStartupParams;
   this._requestsPendingCounter = 0;
@@ -182,7 +181,8 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   // we can access them in ModelAdapter#init()
   adapterData.owner = owner;
   adapterData.parent = parent;
-  adapter = this.objectFactory.create(adapterData);
+  adapterData._register = true;
+  adapter = scout.create(adapterData);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
 
   owner.addOwnedAdapter(adapter);

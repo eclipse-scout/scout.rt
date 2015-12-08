@@ -46,7 +46,7 @@ function sandboxDesktop() {
 
 function createSimpleModel(objectType, session, id) {
   if (id === undefined) {
-    id = scout.createUniqueId();
+    id = scout.objectFactory.createUniqueId();
   }
   return {
     id: id,

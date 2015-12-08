@@ -13,7 +13,6 @@
 // }(window.scout = window.scout || {}, jQuery));
 
 scout.sessions = [];
-scout.uniqueIdSeqNo = 0; // use createUniqueId() to generate a new ID
 
 /**
  * @memberOf scout
@@ -82,15 +81,6 @@ scout._init = function(options) {
 };
 
 /**
- * Returns a new unique ID to be used for Widgets/Adapters created by the UI
- * without a model delivered by the server-side client.
- *
- */
-scout.createUniqueId = function() {
-  return 'ui' + (++scout.uniqueIdSeqNo).toString();
-};
-
-/**
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
  */
 scout.inherits = function(childCtor, parentCtor) {
@@ -125,55 +115,10 @@ scout.isOneOf = function() {
 };
 
 /**
- * Creates a new object instance.<p>
- * Depending on the first parameter, either the object factory or the constructor function is used.
- * - String (objectType):
- *   Creates a new instance using the object factory.
- * - Object:
- *   Creates a new instance using the object factory.
- *   The objectType has to be specified as property in this first parameter.
- *   The second parameter is not used.
- * - Constructor function:
- *   Creates a new instance using the given constructor function and calls init(options) of that instance.<p>
- *   Used mainly for widgets but may actually be used for any objects which have a init method with one parameter.
+ * Creates a new object instance.<p> Delegates the create call to scout.ObjectFactory#create.
  */
 scout.create = function(vararg, options) {
-  options = options || {};
-  if (typeof vararg === 'string') {
-    options.objectType = vararg;
-    return scout._createLocalObject(options);
-  } else if (typeof vararg === 'object') {
-    options = vararg;
-    return scout._createLocalObject(options);
-  } else {
-    var Constructor = vararg;
-    var obj = new Constructor();
-    obj.init(options);
-    return obj;
-  }
-};
-
-/**
- * Creates a new object instance based on the given model by using the object factory.
- * This method should be used when you create Widgets or Adapters in the UI without a
- * model from the server-side client.
- *
- * The required properties are 'objectType', 'session' and 'parent'. A unique ID is generated automatically,
- * when it is not provided by the model.
- */
-scout._createLocalObject = function(model) {
-  if (typeof model !== 'object') {
-    throw new Error('model must be an object');
-  }
-  if (!model.objectType) {
-    throw new Error('missing property objectType');
-  }
-  if (model.id === undefined) {
-    model.id = scout.createUniqueId();
-  }
-  model._register = false;
-  var session = model.session || model.parent.session;
-  return session.objectFactory.create(model);
+  return scout.objectFactory.create(vararg, options);
 };
 
 /**
