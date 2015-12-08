@@ -43,7 +43,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
     filterTableHtmlComp = this.popup.filterTable.htmlComp;
 
   // Layout filter field(s) and get size
-  filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT));
+  filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), this._filterFieldsGroupBoxHeight()));
   filterFieldGroupSize = scout.graphics.getSize($filterFieldsGroup, true);
 
   filterTableContainerHeight = filterColumnSize.height;
@@ -64,6 +64,10 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
 //group title (size used for table + field container)
 scout.TableHeaderMenuLayout.prototype._groupTitleHeight = function($group) {
   return scout.graphics.getSize($group.find('.table-header-menu-group-text'), true).height;
+};
+
+scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
+  return this.popup.filterFieldsGroupBox.htmlComp.getPreferredSize().height;
 };
 
 /**
@@ -95,8 +99,8 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   filterTableContainerHeight += filterTableContainerInsets.vertical();
 
 
-  // size of filter fields
-  filterFieldContainerHeight = scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT;
+  // size of group-box with 1 or 2 filter fields
+  filterFieldContainerHeight = this._filterFieldsGroupBoxHeight();
   // add group-title height
   filterFieldContainerHeight += groupTitleHeight;
   // add insets of container

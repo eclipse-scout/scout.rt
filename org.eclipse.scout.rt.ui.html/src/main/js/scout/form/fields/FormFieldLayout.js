@@ -17,7 +17,7 @@
 scout.FormFieldLayout = function(formField) {
   scout.FormFieldLayout.parent.call(this);
   this.formField = formField;
-  this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+  this.labelWidth = formField.labelWidthInPixel;
   this.mandatoryIndicatorWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
   this.statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;

@@ -16,6 +16,7 @@
       "keyStrokes": [],
       "labelVisible": true,
       "labelPosition": 0,
+      "labelWidthInPixel": 0,
       "loading": false,
       "mandatory": false,
       "statusVisible": true,

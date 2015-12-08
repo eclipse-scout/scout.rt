@@ -534,11 +534,11 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() { // FIXME AWE:
     .appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterText'));
 
-  var groupBox = scout.create('GroupBox.FilterFields', {
+  this.filterFieldsGroupBox = scout.create('GroupBox.FilterFields', {
     parent: this,
     column: this.column
   });
-  groupBox.render(this.$filterFieldsGroup);
+  this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {

@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 
 public abstract class JsonFormField<FORM_FIELD extends IFormField> extends AbstractJsonPropertyObserver<FORM_FIELD> {
 
+  private static final String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
+
   public JsonFormField(FORM_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
@@ -133,6 +135,18 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
       @Override
       protected String modelValue() {
         return getModel().getLabelForegroundColor();
+      }
+    });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_LABEL_FOREGROUND_COLOR, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLabelForegroundColor();
+      }
+    });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(PROP_LABEL_WIDTH_IN_PIXEL, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getLabelWidthInPixel();
       }
     });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_ERROR_STATUS, model) {

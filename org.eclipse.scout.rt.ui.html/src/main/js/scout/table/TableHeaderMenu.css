@@ -307,10 +307,15 @@
   display: inline;
 }
 
+/* Filter fields group-box */
 .filter-fields {
   padding: 0;
 
   & > .group-box-body {
     padding: 0;
+
+    & > .form-field > label {
+      margin-left: 0;
+    }
   }
 }

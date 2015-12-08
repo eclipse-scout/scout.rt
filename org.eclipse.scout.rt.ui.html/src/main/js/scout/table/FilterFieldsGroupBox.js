@@ -34,8 +34,8 @@ scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
   this.fields.push(scout.create('NumberField', {
     parent: this,
     label: this.session.text('ui.from'),
-    labelUseUiWidth: true,
     statusVisible: false,
+    labelWidthInPixel: 50,
     maxLength: 100,
     gridData: {
       y: 0
@@ -44,8 +44,8 @@ scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
   this.fields.push(scout.create('NumberField', {
     parent: this,
     label: this.session.text('ui.to'),
-    labelUseUiWidth: true,
     statusVisible: false,
+    labelWidthInPixel: 50,
     maxLength: 100,
     gridData: {
       y: 1
@@ -58,6 +58,7 @@ scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
     parent: this,
     label: this.session.text('ui.from'),
     statusVisible: false,
+    labelWidthInPixel: 50,
     maxLength: 100,
     gridData: {
       y: 0
@@ -67,6 +68,7 @@ scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
     parent: this,
     label: this.session.text('ui.to'),
     statusVisible: false,
+    labelWidthInPixel: 50,
     maxLength: 100,
     gridData: {
       y: 1
