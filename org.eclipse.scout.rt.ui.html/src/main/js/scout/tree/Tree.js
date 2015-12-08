@@ -413,11 +413,11 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
     .toggleClass('checked', node.checked);
 };
 
-scout.Tree.prototype._renderNodeFilterAccepted = function(node) {
+scout.Tree.prototype._renderNodeFilterAccepted = function(node, animated) {
   if (node.filterAccepted) {
-    this.showNode(node.$node);
+    this.showNode(node.$node, animated);
   } else {
-    this.hideNode(node.$node);
+    this.hideNode(node.$node, animated);
   }
 };
 
@@ -1435,43 +1435,41 @@ scout.Tree.prototype.removeFilter = function(filter) {
 };
 
 scout.Tree.prototype.filter = function() {
-  var i, useAnimation,
-    that = this,
-    nodeCount = 0,
-    nodesToHide = [],
-    nodesToShow = [];
+  var useAnimation = false,
+    changedNodes = [],
+    newHiddenRows = [];
 
-  // Filter rows
+  // Filter nodes
   this._visitNodes(this.nodes, function(node) {
-    var $node = node.$node;
-    if (!$node) {
+    if (!node.$node) {
       // filter may only be called for rendered nodes because the filter may want to use the actual html content
       // if a node is collapsed, it is not rendered -> filter is called when node gets expanded
+      //TODO CGU make filter not depend on $node -> filter must not be called in decorate rows, but in init, insert, update, delete instead (as done in table)
       return;
     }
-    that._applyFiltersForNode(node);
-    if (node.filterAccepted) {
-      if ($node.hasClass('hidden')) {
-        nodesToShow.push(node);
-      }
-      nodeCount++;
-    } else {
-      if (!$node.hasClass('hidden')) {
-        nodesToHide.push(node);
+
+    var changed = this._applyFiltersForNode(node);
+    if (changed) {
+      changedNodes.push(node);
+      if (!node.filterAccepted) {
+        newHiddenRows.push(node);
       }
     }
-  });
+  }.bind(this));
 
-  // Show / hide nodes that changed their state during filtering
-  useAnimation = ((nodesToShow.length + nodesToHide.length) <= that._animationNodeLimit);
-  nodesToHide.forEach(function(node) {
-    that.hideNode(node.$node, useAnimation);
-  });
-  nodesToShow.forEach(function(node) {
-    that.showNode(node.$node, useAnimation);
-  });
+  if (changedNodes.length === 0) {
+    return;
+  }
 
-  this._nodesFiltered(nodesToHide);
+  // Show / hide rows that changed their state during filtering
+  if (this.rendered) {
+    useAnimation = changedNodes.length <= this._animationNodeLimit;
+    changedNodes.forEach(function(node) {
+      this._renderNodeFilterAccepted(node, useAnimation);
+    }, this);
+  }
+
+  this._nodesFiltered(newHiddenRows);
 };
 
 scout.Tree.prototype._nodesFiltered = function(hiddenNodes) {
@@ -1482,7 +1480,7 @@ scout.Tree.prototype._nodesFiltered = function(hiddenNodes) {
 scout.Tree.prototype._nodeAcceptedByFilters = function(node) {
   for (var i = 0; i < this._filters.length; i++) {
     var filter = this._filters[i];
-    if (!filter.accept(node.$node)) {
+    if (!filter.accept(node)) {
       return false;
     }
   }
@@ -1500,8 +1498,6 @@ scout.Tree.prototype._applyFiltersForNode = function(node) {
     }
   } else {
     if (node.filterAccepted) {
-      // flag is necessary to get correct filter count even when animation is still in progress
-      // and to store filter state to prevent unnecessary events
       node.filterAccepted = false;
       return true;
     }

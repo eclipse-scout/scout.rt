@@ -803,8 +803,8 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var filter = {
-        accept: function($node) {
-          return $node.data('node') === tree.nodes[0];
+        accept: function(node) {
+          return node === tree.nodes[0];
         }
       };
       tree.addFilter(filter);
@@ -822,8 +822,8 @@ describe("Tree", function() {
       var model = createModelFixture(1, 1, true);
       var tree = createTree(model);
       var filter = {
-        accept: function($node) {
-          return $node.data('node') === tree.nodes[0];
+        accept: function(node) {
+          return node === tree.nodes[0];
         }
       };
       tree.addFilter(filter);
@@ -842,8 +842,7 @@ describe("Tree", function() {
       var model = createModelFixture(2, 1);
       var tree = createTree(model);
       var filter = {
-        accept: function($node) {
-          var node = $node.data('node');
+        accept: function(node) {
           return node === tree.nodes[0] || node === tree.nodes[0].childNodes[0];
         }
       };
@@ -866,8 +865,8 @@ describe("Tree", function() {
       var model = createModelFixture(2, 1);
       var tree = createTree(model);
       var filter = {
-        accept: function($node) {
-          return $node.text() === 'node 0';
+        accept: function(node) {
+          return node.text === 'node 0';
         }
       };
       tree.addFilter(filter);

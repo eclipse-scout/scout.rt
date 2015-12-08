@@ -14,9 +14,8 @@ scout.DetailTableTreeFilter = function() { //
 /**
  * Must correspond with logic in P_TableFilterBasedTreeNodeFilter
  */
-scout.DetailTableTreeFilter.prototype.accept = function($node) {
+scout.DetailTableTreeFilter.prototype.accept = function(node) {
   var row,
-    node = $node.data('node'),
     rowId = node.rowId;
 
   if (!node.parentNode) {
