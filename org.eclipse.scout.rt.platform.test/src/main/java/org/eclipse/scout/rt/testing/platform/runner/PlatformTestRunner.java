@@ -66,7 +66,8 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    final Statement s2 = super.classBlock(notifier);
+    final Statement s3 = super.classBlock(notifier);
+    final Statement s2 = new AssertNoRunningJobsStatement(s3, "Test class");
     final Statement s1 = new PlatformStatement(s2, ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
 
     return s1;
@@ -241,7 +242,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
     final Statement s4 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
     final Statement s3 = new RegisterBeanStatement(s4, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
-    final Statement s2 = new AssertNoRunningJobsStatement(s3);
+    final Statement s2 = new AssertNoRunningJobsStatement(s3, "Test method");
     final Statement s1 = new TimesStatement(s2, ReflectionUtility.getAnnotation(Times.class, testMethod, testClass));
 
     return s1;

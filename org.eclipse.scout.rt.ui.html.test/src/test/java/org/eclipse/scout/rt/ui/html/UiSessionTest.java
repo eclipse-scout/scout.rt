@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -36,10 +35,14 @@ import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-@RunWith(PlatformTestRunner.class)
+/*
+ * This test must be executed by a bare JUnit runner.
+ * Reason: The PlatformTestRunner and its sub classes keep track of every job scheduled during test execution and verify that they are completed. The list of scheduled jobs
+ *         are referencing a JobInput which in turn references a RunContext and a session. The tests in this class will fail because they assert that the sessions are
+ *         not referenced by any other object and therefore garbage collected.
+ */
 public class UiSessionTest {
 
   private List<IBean<?>> m_beans;
