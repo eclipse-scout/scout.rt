@@ -118,6 +118,10 @@ public class BasicCache<K, V> implements ICache<K, V> {
         iterator.remove();
       }
     }
+    if (keys.isEmpty()) {
+      // all keys could be resolved with cache
+      return result;
+    }
     Map<K, V> resolvedValues;
     try {
       resolvedValues = m_resolver.resolveAll(keys);
