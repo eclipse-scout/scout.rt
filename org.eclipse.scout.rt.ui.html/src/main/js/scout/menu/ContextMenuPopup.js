@@ -142,10 +142,16 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 
   parentMenu.parentMenu.$subMenuBody = this.$body;
 
+
   if (!parentMenu.$subMenuBody) {
+    var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left');
+    if(textPaddingLeft){
+      textPaddingLeft=textPaddingLeft.replace('px','');
+      textPaddingLeft = Number(textPaddingLeft);
+    }
     this.$body = this._$createNewBody();
     parentMenu.$subMenuBody = this.$body;
-    this._renderMenuItems(menus, initialSubMenuRendering);
+    this._renderMenuItems(menus, initialSubMenuRendering, textPaddingLeft);
   } else {
     //append $body
     this.$body = parentMenu.$subMenuBody;
@@ -249,7 +255,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   }
 };
 
-scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
+scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering, iconOffset) {
   var menuClone;
   menus = menus ? menus : this._getMenuItems();
   // TODO ASA,NBU where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
@@ -264,6 +270,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     return;
   }
 
+  iconOffset = iconOffset ? iconOffset : 0;
   menus.some(function(menu) {
     // Invisible menus are rendered as well because their visibility might change dynamically
     if (menu.separator) {
@@ -296,6 +303,23 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
     menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
+    if(menu.iconId && menu.$container.data('$icon').cssWidth()>iconOffset){
+      iconOffset = menu.$container.data('$icon').cssWidth();
+      //update already rendered menu-items
+      this.$body.children().each( function(index, element){
+        var $element =$(element);
+        var $icon = $element.data('$icon');
+        if($icon && $icon.cssWidth() < iconOffset){
+          $element.find('.text').css('padding-left', iconOffset-$icon.cssWidth());
+        } else if(element!==menu.$container[0]){
+          $element.find('.text').css('padding-left', iconOffset);
+        }
+      });
+    } else if(iconOffset && !menu.iconId){
+      menu.$container.find('.text').css('padding-left', iconOffset);
+    } else if(menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset){
+      menu.$container.find('.text').css('padding-left', iconOffset-menu.$container.data('$icon').cssWidth());
+    }
   }, this);
   while (this.initialSubmenusToRender && !initialSubMenuRendering) {
     var parentMenu = this.initialSubmenusToRender.parentMenu,
