@@ -534,26 +534,11 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() { // FIXME AWE:
     .appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.FilterText'));
 
-  /* FIXME AWE: (filter) proceed with groupbox...
-  var groupBox = scout.create('FilterFieldsGroupBox', {
+  var groupBox = scout.create('GroupBox.FilterFields', {
     parent: this,
     column: this.column
   });
   groupBox.render(this.$filterFieldsGroup);
-  */
-
-  var freeTextField = scout.create('StringField', {
-    parent: this,
-    session: this.session,
-    labelVisible: false,
-    statusVisible: false,
-    maxLength: 100
-  });
-  freeTextField.render(this.$filterFieldsGroup);
-
-  // FIXME AWE: (filter) property mandatoryVisible? or padding/margin hack?
-  freeTextField.$mandatory.remove();
-  freeTextField.$mandatory = null;
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {

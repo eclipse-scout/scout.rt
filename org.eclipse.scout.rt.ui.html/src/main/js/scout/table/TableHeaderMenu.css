@@ -306,3 +306,11 @@
   color: @table-header-menu-link-color;
   display: inline;
 }
+
+.filter-fields {
+  padding: 0;
+
+  & > .group-box-body {
+    padding: 0;
+  }
+}

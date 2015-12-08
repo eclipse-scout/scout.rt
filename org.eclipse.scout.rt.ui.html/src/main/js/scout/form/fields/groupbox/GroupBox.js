@@ -41,10 +41,21 @@ scout.GroupBox.prototype._init = function(model) {
 scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.GroupBox.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
   this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  this.keyStrokeContext.$bindTarget = function() {
-    // keystrokes on a group box have form scope
-    return this.getForm().$container;
-  }.bind(this);
+  this.keyStrokeContext.$bindTarget = this._keyStrokeBindTarget.bind(this);
+};
+
+/**
+ * Returns a $container used as a bind target for the key-stroke context of the group-box.
+ * By default this function returns the container of the form, or when group-box is has no
+ * form as a parent the container of the group-box.
+ */
+scout.GroupBox.prototype._keyStrokeBindTarget = function() {
+  var form = this.getForm();
+  if (form) {
+    // keystrokes on a group-box have form scope
+    return form.$container;
+  }
+  return this.$container;
 };
 
 scout.GroupBox.prototype._render = function($parent) {

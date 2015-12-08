@@ -39,7 +39,11 @@ scout.objectFactory = {
         // only objectType
         scoutClass = objectType;
       }
-      scoutObject = new scout[scoutClass]();
+      try {
+        scoutObject = new scout[scoutClass]();
+      } catch (e) {
+        // NOP - error handling below
+      }
     }
 
     if (!scoutObject) {
@@ -98,6 +102,14 @@ scout.objectFactory = {
 
     scoutObject.init(model);
     return scoutObject;
+  },
+
+  /**
+   * Extracts the basic-objectType when objectType contains a model-variant.
+   * Example: "GroupBox.FilterFields" will return "GroupBox"
+   */
+  _extractObjectType: function(objectType) {
+    return objectType.split('.')[0];
   },
 
   /**

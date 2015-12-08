@@ -604,7 +604,7 @@ scout.Calendar.prototype.layoutLabel = function() {
   if (this._isDay()) {
     text = this._format(exFrom, 'd. MMMM yyyy');
   } else if (this._isWorkWeek() || this._isWeek()) {
-    var toText = this.session.text('ui.To');
+    var toText = this.session.text('ui.to');
     if (exFrom.getMonth() === exTo.getMonth()) {
       text = scout.strings.join(' ', this._format(exFrom, 'd.'), toText, this._format(exTo, 'd. MMMM yyyy'));
     } else if (exFrom.getFullYear() === exTo.getFullYear()) {

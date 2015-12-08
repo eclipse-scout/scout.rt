@@ -300,7 +300,7 @@ scout.Planner.prototype._renderRange = function() {
   }
   var text,
     toDate = new Date(this.viewRange.to.valueOf() - 1),
-    toText = this.session.text('ui.To'),
+    toText = this.session.text('ui.to'),
     displayMode = scout.Planner.DisplayMode;
 
   // find range text
@@ -537,7 +537,7 @@ scout.Planner.prototype._renderScale = function() {
 /* -- scale events --------------------------------------------------- */
 
 scout.Planner.prototype._scaleTooltipText = function($scale) {
-  var toText = ' ' + this.session.text('ui.To') + ' ',
+  var toText = ' ' + this.session.text('ui.to') + ' ',
     from = new Date($scale.data('date-from').valueOf()),
     to = new Date($scale.data('date-to').valueOf() - 1);
 
