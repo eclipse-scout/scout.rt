@@ -521,8 +521,6 @@ scout.Table.prototype.selectAll = function() {
 
 scout.Table.prototype.checkAll = function(check) {
   check = scout.nvl(check, true);
-  // FIXME AWE: (filter) ask CG.U - send check/uncheckAll event to server instead of events for single rows?
-  // currently it doesnt matter because filter table is UI only and does not send anything to the server
   var rows = this.filteredRows();
   rows.forEach(function(row) {
     this.checkRow(row, check);
@@ -1084,7 +1082,7 @@ scout.Table.prototype._removeRows = function($rows) {
  * are expected to be linked with the corresponding 'rows' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRows = function($rows) {
-  var newInvisibleRows = [],
+  var newHiddenRows = [],
     that = this;
 
   $rows.each(function(entry, index, $rows) {
@@ -1819,7 +1817,7 @@ scout.Table.prototype._insertRow = function(row) {
 
 scout.Table.prototype._insertRows = function(rows) {
   var filterChanged = false,
-    newInvisibleRows = [];
+    newHiddenRows = [];
 
   // Update model
   rows.forEach(function(row) {
@@ -1895,7 +1893,7 @@ scout.Table.prototype._deleteRows = function(rows) {
 };
 
 scout.Table.prototype._updateRows = function(rows) {
-  var filterChanged, newInvisibleRows = [],
+  var filterChanged, newHiddenRows = [],
     $updatedRows = $();
 
   // Update model
@@ -1921,7 +1919,7 @@ scout.Table.prototype._updateRows = function(rows) {
       if (this._applyFiltersForRow(updatedRow)) {
         filterChanged = true;
         if (!updatedRow.filterAccepted) {
-          newInvisibleRows.push(updatedRow);
+          newHiddenRows.push(updatedRow);
         }
       } else {
         // If filter state has not changed, just update cached rows
@@ -1954,7 +1952,7 @@ scout.Table.prototype._updateRows = function(rows) {
     this._installRows($updatedRows);
   }
   if (filterChanged) {
-    this._rowsFiltered(newInvisibleRows);
+    this._rowsFiltered(newHiddenRows);
   }
   this._updateBackgroundEffect();
 };
@@ -2203,15 +2201,11 @@ scout.Table.prototype.$rows = function(includeAggrRows) {
 };
 
 scout.Table.prototype.newFilteredRowsSelector = function(includeAggrRows) {
-  var selector = '.table-row:not(.invisible)';
+  var selector = '.table-row:not(.hidden)';
   if (includeAggrRows) {
-    selector += ', .table-aggregate-row:not(.invisible)';
+    selector += ', .table-aggregate-row:not(.hidden)';
   }
   return selector;
-};
-
-scout.Table.prototype.$filteredRows = function(includeAggrRows) {
-  return this.$data.find(this.newFilteredRowsSelector(includeAggrRows));
 };
 
 scout.Table.prototype.$prevFilteredRow = function($row, includeAggrRow) {
@@ -2264,7 +2258,7 @@ scout.Table.prototype.columnById = function(columnId) {
 scout.Table.prototype.filter = function() {
   var useAnimation = false,
     changedRows = [],
-    newInvisibleRows = [];
+    newHiddenRows = [];
 
   // Filter rows
   this.rows.forEach(function(row) {
@@ -2272,7 +2266,7 @@ scout.Table.prototype.filter = function() {
     if (changed) {
       changedRows.push(row);
       if (!row.filterAccepted) {
-        newInvisibleRows.push(row);
+        newHiddenRows.push(row);
       }
     }
   }, this);
@@ -2289,7 +2283,7 @@ scout.Table.prototype.filter = function() {
     }, this);
   }
 
-  this._rowsFiltered(newInvisibleRows);
+  this._rowsFiltered(newHiddenRows);
   this._group(useAnimation);
 
   if (this.rendered) {
@@ -2297,9 +2291,9 @@ scout.Table.prototype.filter = function() {
   }
 };
 
-scout.Table.prototype._rowsFiltered = function(invisibleRows) {
+scout.Table.prototype._rowsFiltered = function(hiddenRows) {
   // non visible rows must be deselected
-  this.deselectRows(invisibleRows);
+  this.deselectRows(hiddenRows);
   // notify
   this._filteredRowsDirty = true;
   this._sendRowsFiltered(this._rowsToIds(this.filteredRows()));
@@ -2340,12 +2334,12 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
  */
 scout.Table.prototype._applyFilters = function(rows) {
   var filterChanged,
-    newInvisibleRows = [];
+    newHiddenRows = [];
 
   rows.forEach(function(row) {
     if (this._applyFiltersForRow(row)) {
       if (!row.filterAccepted) {
-        newInvisibleRows.push(row);
+        newHiddenRows.push(row);
       }
     }
     // always notify if there are new rows which accept the filter
@@ -2355,7 +2349,7 @@ scout.Table.prototype._applyFilters = function(rows) {
   }, this);
 
   if (filterChanged) {
-    this._rowsFiltered(newInvisibleRows);
+    this._rowsFiltered(newHiddenRows);
   }
 };
 
@@ -2445,31 +2439,29 @@ scout.Table.prototype.getFilter = function(key) {
 };
 
 scout.Table.prototype.showRow = function($row, useAnimation) {
-  var that = this,
-    row = $row.data('row');
-  if (!$row.hasClass('invisible')) {
+  var that = this;
+  if ($row.isVisible() && !$row.is(':animated')) {
     return;
   }
 
   if (useAnimation) {
+    $row.removeClass('hidden');
     $row.stop().slideDown({
       duration: 250,
       complete: function() {
-        $row.removeClass('invisible');
         that.updateScrollbars();
       }
     });
   } else {
     $row.showFast();
-    $row.removeClass('invisible');
+    $row.removeClass('hidden');
     that.updateScrollbars();
   }
 };
 
 scout.Table.prototype.hideRow = function($row, useAnimation) {
-  var that = this,
-    row = $row.data('row');
-  if ($row.hasClass('invisible')) {
+  var that = this;
+  if (!$row.isVisible() && !$row.is(':animated')) {
     return;
   }
 
@@ -2477,13 +2469,13 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
     $row.stop().slideUp({
       duration: 250,
       complete: function() {
-        $row.addClass('invisible');
+        $row.addClass('hidden');
         that.updateScrollbars();
       }
     });
   } else {
     $row.hideFast();
-    $row.addClass('invisible');
+    $row.addClass('hidden');
     that.updateScrollbars();
   }
 };

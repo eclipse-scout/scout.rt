@@ -23,7 +23,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  if (!this.field.$filteredRows().length) {
+  if (!this.field.filteredRows().length) {
     return false;
   }
 

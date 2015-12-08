@@ -352,11 +352,11 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   // apply node filter
   if (this._applyFiltersForNode(node)) {
-    var newInvisibleNodes = [];
+    var newHiddenNodes = [];
     if (!node.filterAccepted) {
-      newInvisibleNodes.push(node);
+      newHiddenNodes.push(node);
     }
-    this._nodesFiltered(newInvisibleNodes);
+    this._nodesFiltered(newHiddenNodes);
   }
   this._renderNodeFilterAccepted(node);
 
@@ -518,7 +518,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
   var $node = node.$node,
     expanded = node.expanded;
 
-  // Only render if node is rendered to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
+  // Only render if node is rendered to make it possible to expand/collapse currently hidden nodes (used by collapseAll).
   if (!$node || $node.length === 0) {
     return;
   }
@@ -1451,12 +1451,12 @@ scout.Tree.prototype.filter = function() {
     }
     that._applyFiltersForNode(node);
     if (node.filterAccepted) {
-      if ($node.hasClass('invisible')) {
+      if ($node.hasClass('hidden')) {
         nodesToShow.push(node);
       }
       nodeCount++;
     } else {
-      if (!$node.hasClass('invisible')) {
+      if (!$node.hasClass('hidden')) {
         nodesToHide.push(node);
       }
     }
@@ -1474,9 +1474,9 @@ scout.Tree.prototype.filter = function() {
   this._nodesFiltered(nodesToHide);
 };
 
-scout.Tree.prototype._nodesFiltered = function(invisibleNodes) {
+scout.Tree.prototype._nodesFiltered = function(hiddenNodes) {
   // non visible nodes must be deselected
-  this.deselectNodes(invisibleNodes);
+  this.deselectNodes(hiddenNodes);
 };
 
 scout.Tree.prototype._nodeAcceptedByFilters = function(node) {
@@ -1510,31 +1510,29 @@ scout.Tree.prototype._applyFiltersForNode = function(node) {
 };
 
 scout.Tree.prototype.showNode = function($node, useAnimation) {
-  var that = this,
-    node = $node.data('node');
-  if (!$node.hasClass('invisible')) {
+  var that = this;
+  if ($node.isVisible() && !$node.is(':animated')) {
     return;
   }
 
   if (useAnimation) {
+    $node.removeClass('hidden');
     $node.stop().slideDown({
       duration: 250,
       complete: function() {
-        $node.removeClass('invisible');
         that.invalidateLayoutTree();
       }
     });
   } else {
     $node.showFast();
-    $node.removeClass('invisible');
+    $node.removeClass('hidden');
     that.invalidateLayoutTree();
   }
 };
 
 scout.Tree.prototype.hideNode = function($node, useAnimation) {
-  var that = this,
-    node = $node.data('node');
-  if ($node.hasClass('invisible')) {
+  var that = this;
+  if (!$node.isVisible() && !$node.is(':animated')) {
     return;
   }
 
@@ -1542,13 +1540,13 @@ scout.Tree.prototype.hideNode = function($node, useAnimation) {
     $node.stop().slideUp({
       duration: 250,
       complete: function() {
-        $node.addClass('invisible');
+        $node.addClass('hidden');
         that.invalidateLayoutTree();
       }
     });
   } else {
     $node.hideFast();
-    $node.addClass('invisible');
+    $node.addClass('hidden');
     that.invalidateLayoutTree();
   }
 };

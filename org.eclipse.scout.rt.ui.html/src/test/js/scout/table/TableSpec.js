@@ -1343,7 +1343,7 @@ describe("Table", function() {
       var $row3 = $rows.eq(3);
       var $row4 = $rows.eq(4);
 
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('invisible');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('hidden');
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
 
       $row1.triggerMouseDown();
@@ -1352,7 +1352,7 @@ describe("Table", function() {
       $row3.triggerMouseUp();
 
       // before filtering
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('invisible');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('hidden');
       expect([$row1, $row2, $row3]).allToHaveClass('selected');
       expect($row1).toHaveClass('select-top');
       expect($row2).toHaveClass('select-middle');
@@ -1372,11 +1372,11 @@ describe("Table", function() {
       table.filter();
 
       // after filtering
-      expect([$row0, $row2, $row3]).allToHaveClass('invisible');
+      expect([$row0, $row2, $row3]).allToHaveClass('hidden');
       expect($row1).allToHaveClass('selected');
       expect($row1).toHaveClass('select-single');
 
-      expect([$row1, $row4]).not.anyToHaveClass('invisible');
+      expect([$row1, $row4]).not.anyToHaveClass('hidden');
       expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('selected');
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
