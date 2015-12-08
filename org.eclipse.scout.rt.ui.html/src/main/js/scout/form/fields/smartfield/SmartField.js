@@ -63,7 +63,7 @@ scout.SmartField.prototype._init = function(model) {
 
 scout.SmartField.prototype.addPopup = function() {
   if (!this._popup) {
-    var popupType = this.touch ? scout.SmartFieldTouchPopup : scout.SmartFieldPopup;
+    var popupType = this.touch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
     this._popup = scout.create(popupType, {
       parent: this,
       $anchor: this.$field,

@@ -131,7 +131,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     overflowMenus.push(menu);
   });
 
-  popup = scout.create(scout.ContextMenuPopup, {
+  popup = scout.create('ContextMenuPopup', {
     parent: tabBox,
     menuItems: overflowMenus,
     cloneMenuItems: false,

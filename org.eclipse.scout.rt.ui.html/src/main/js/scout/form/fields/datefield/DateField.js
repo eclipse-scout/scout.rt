@@ -49,7 +49,7 @@ scout.DateField.prototype._init = function(model) {
 
 scout.DateField.prototype.addPopup = function() {
   if (!this._popup) {
-    var popupType = this.touch ? scout.DatePickerTouchPopup : scout.DatePickerPopup;
+    var popupType = this.touch ? 'DatePickerTouchPopup' : 'DatePickerPopup';
     this._popup = scout.create(popupType, {
       parent: this,
       $anchor: this.$field,

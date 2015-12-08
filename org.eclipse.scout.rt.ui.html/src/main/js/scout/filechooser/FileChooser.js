@@ -17,7 +17,7 @@ scout.inherits(scout.FileChooser, scout.ModelAdapter);
 
 scout.FileChooser.prototype._init = function(model) {
   scout.FileChooser.parent.prototype._init.call(this, model);
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, true);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
 };
 
 /**

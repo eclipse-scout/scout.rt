@@ -64,7 +64,7 @@ describe('main', function() {
 
   describe('create', function() {
 
-    it('accepts string, object or functions as first argument', function() {
+    it('accepts string or object as first argument', function() {
       // must fail
       expect(function() {
         scout.create(1);
@@ -74,6 +74,9 @@ describe('main', function() {
       }).toThrow();
       expect(function() {
         scout.create(true);
+      }).toThrow();
+      expect(function() {
+        scout.create(function() {});
       }).toThrow();
 
       var menu = scout.create('Menu', {
@@ -90,9 +93,9 @@ describe('main', function() {
       expect(menu instanceof scout.Menu).toBe(true);
     });
 
-    it('creates a new widget if the first parameter is a constructor function', function() {
+    it('creates a new initialized widget with parent and session set', function() {
       var parent = new scout.NullWidget();
-      var widget = scout.create(scout.Tooltip, {
+      var widget = scout.create('Tooltip', {
         parent: parent,
         session: session
       });

@@ -23,7 +23,7 @@ describe("MenuBar", function() {
     it('prefers EmptySpace for the left position if menu has multiple menuTypes', function() {
       var menu1 = helper.createMenu(helper.createModel('multi')),
         menu2 = helper.createMenu(helper.createModel('selection')),
-        menuBar = scout.create(scout.MenuBar, {
+        menuBar = scout.create('MenuBar', {
           parent: new scout.NullWidget(),
           session: session,
           menuOrder: new scout.MenuItemsOrder(session, 'Table')
@@ -45,7 +45,7 @@ describe("MenuBar", function() {
         menu1 = helper.createMenu(helper.createModel('empty')),
         menu2 = helper.createMenu(helper.createModel('selection-1')),
         menu3 = helper.createMenu(helper.createModel('selection-2')),
-        menuBar = scout.create(scout.MenuBar, {
+        menuBar = scout.create('MenuBar', {
           parent: new scout.NullWidget(),
           session: session,
           menuOrder: new scout.MenuItemsOrder(session, 'Table')
@@ -79,7 +79,7 @@ describe("MenuBar", function() {
 
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
-        menuBar = scout.create(scout.MenuBar, {
+        menuBar = scout.create('MenuBar', {
           parent: new scout.NullWidget(),
           session: session,
           menuOrder: new scout.MenuItemsOrder(session, 'Table')
@@ -111,7 +111,7 @@ describe("MenuBar", function() {
 
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
-        menuBar = scout.create(scout.MenuBar, {
+        menuBar = scout.create('MenuBar', {
           parent: new scout.NullWidget(),
           session: session,
           menuOrder: new scout.MenuItemsOrder(session, 'Table')
@@ -137,7 +137,7 @@ describe("MenuBar", function() {
 
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
-        menuBar = scout.create(scout.MenuBar, {
+        menuBar = scout.create('MenuBar', {
           parent: new scout.NullWidget(),
           session: session,
           menuOrder: new scout.MenuItemsOrder(session, 'Table')

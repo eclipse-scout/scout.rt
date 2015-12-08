@@ -90,7 +90,7 @@ scout.Calendar.prototype._isWorkWeek = function() {
 
 scout.Calendar.prototype._init = function(model) {
   scout.Calendar.parent.prototype._init.call(this, model);
-  this._yearPanel = scout.create(scout.YearPanel, {
+  this._yearPanel = scout.create('YearPanel', {
     parent: this
   });
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
@@ -760,7 +760,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
     if (filteredMenus.length === 0) {
       return;
     }
-    var popup = scout.create(scout.ContextMenuPopup, {
+    var popup = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: filteredMenus,
       location: {

@@ -39,7 +39,7 @@ scout.SmartFieldButton.prototype._render = function($parent) {
 };
 
 scout.SmartFieldButton.prototype.addSmartFieldButtonPopup = function() {
-  this._popup = scout.create(scout.SmartFieldButtonPopup, {
+  this._popup = scout.create('SmartFieldButtonPopup', {
     parent: this,
     $anchor: this.$field,
     smartFieldButton: this

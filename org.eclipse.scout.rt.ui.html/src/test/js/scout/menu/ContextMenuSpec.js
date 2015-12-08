@@ -30,7 +30,7 @@ describe("ContextMenuSpec", function() {
     it('renders invisible menus', function() {
       var menuItems = [menu0, menu1, menu2];
       menu2.visible = false;
-      popup = scout.create(scout.ContextMenuPopup, {
+      popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
         session: session,
         menuItems: menuItems
@@ -48,7 +48,7 @@ describe("ContextMenuSpec", function() {
 
     it('adds last and first classes', function() {
       var menuItems = [menu0, menu1, menu2];
-      popup = scout.create(scout.ContextMenuPopup, {
+      popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
         session: session,
         menuItems: menuItems
@@ -67,7 +67,7 @@ describe("ContextMenuSpec", function() {
     it('considers visibility when adding last and first classes', function() {
       var menuItems = [menu0, menu1, menu2];
       menu2.visible = false;
-      popup = scout.create(scout.ContextMenuPopup, {
+      popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
         session: session,
         menuItems: menuItems

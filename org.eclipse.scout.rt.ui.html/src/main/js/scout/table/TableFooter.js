@@ -468,7 +468,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
     autoRemove: (!isError),
     $anchor: this._$infoTableStatusIcon
   };
-  this._tableStatusTooltip = scout.create(scout.Tooltip, opts);
+  this._tableStatusTooltip = scout.create('Tooltip', opts);
   this._tableStatusTooltip.render();
 
   // Adjust icon style

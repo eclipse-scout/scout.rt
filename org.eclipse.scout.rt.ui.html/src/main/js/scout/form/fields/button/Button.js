@@ -145,7 +145,7 @@ scout.Button.prototype.togglePopup = function() {
 
 scout.Button.prototype._openPopup = function() {
   // FIXME BSH Improve this
-  var popup = scout.create(scout.ContextMenuPopup, {
+  var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,
     cloneMenuItems: false,

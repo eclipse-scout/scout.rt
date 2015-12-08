@@ -66,7 +66,7 @@ scout.Table.prototype._init = function(model) {
     this._initRow(row);
   }, this);
 
-  this.menuBar = scout.create(scout.MenuBar, {
+  this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.MenuItemsOrder(this.session, 'Table')
   });
@@ -332,7 +332,7 @@ scout.Table.prototype.onContextMenu = function(event) {
         event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
       }
       if (menuItems.length > 0) {
-        popup = scout.create(scout.ContextMenuPopup, {
+        popup = scout.create('ContextMenuPopup', {
           parent: this,
           menuItems: menuItems,
           location: {
@@ -425,7 +425,7 @@ scout.Table.prototype._hasVisibleTableControls = function() {
 };
 
 scout.Table.prototype._createHeader = function() {
-  return scout.create(scout.TableHeader, {
+  return scout.create('TableHeader', {
     parent: this,
     table: this,
     enabled: this.headerEnabled
@@ -433,7 +433,7 @@ scout.Table.prototype._createHeader = function() {
 };
 
 scout.Table.prototype._createFooter = function() {
-  return scout.create(scout.TableFooter, {
+  return scout.create('TableFooter', {
     parent: this,
     table: this
   });
@@ -1136,7 +1136,7 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
     $anchor: $cell,
     table: this
   };
-  tooltip = scout.create(scout.TableTooltip, opts);
+  tooltip = scout.create('TableTooltip', opts);
   tooltip.render();
   // link to be able to remove it when row gets deleted
   tooltip.row = row;

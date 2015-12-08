@@ -134,7 +134,7 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
 
 scout.ViewMenuTab.prototype._openPopup = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
-  var popup = scout.create(scout.ViewMenuPopup, {
+  var popup = scout.create('ViewMenuPopup', {
     parent: this.session.desktop,
     $tab: this.$container,
     viewMenus: this._popupViewMenus(),

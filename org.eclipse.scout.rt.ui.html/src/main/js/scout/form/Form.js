@@ -36,13 +36,13 @@ scout.Form.prototype._init = function(model) {
     this.rootGroupBox.menuBar.bottom();
   }
 
-  this.formController = new scout.FormController(this, model.session);
-  this.messageBoxController = new scout.MessageBoxController(this, model.session);
-  this.fileChooserController = new scout.FileChooserController(this, model.session);
+  this.formController = new scout.FormController(this, this.session);
+  this.messageBoxController = new scout.MessageBoxController(this, this.session);
+  this.fileChooserController = new scout.FileChooserController(this, this.session);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(model.session, this, renderGlassPanes);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, renderGlassPanes);
 };
 
 /**

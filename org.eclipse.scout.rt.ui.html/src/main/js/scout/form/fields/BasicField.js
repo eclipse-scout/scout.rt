@@ -122,7 +122,7 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
     }
   };
 
-  var popup = scout.create(scout.ContextMenuPopup, {
+  var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: [menu],
     cloneMenuItems: false,

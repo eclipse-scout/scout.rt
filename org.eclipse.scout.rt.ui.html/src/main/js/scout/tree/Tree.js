@@ -35,7 +35,7 @@ scout.Tree.prototype._init = function(model) {
   scout.Tree.parent.prototype._init.call(this, model);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
-  this.menuBar = scout.create(scout.MenuBar, {
+  this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.MenuItemsOrder(this.session, 'Tree')
   });
@@ -1254,7 +1254,7 @@ scout.Tree.prototype._showContextMenu = function(event, destination) {
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
-    var popup = scout.create(scout.ContextMenuPopup, {
+    var popup = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: filteredMenus,
       location: {

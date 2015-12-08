@@ -17,7 +17,7 @@ scout.DatePickerPopup.prototype._init = function(options) {
   options.installFocusContext = false;
   scout.DatePickerPopup.parent.prototype._init.call(this, options);
 
-  this.picker = scout.create(scout.DatePicker, {
+  this.picker = scout.create('DatePicker', {
     parent: this,
     dateFormat: options.dateFormat
   });

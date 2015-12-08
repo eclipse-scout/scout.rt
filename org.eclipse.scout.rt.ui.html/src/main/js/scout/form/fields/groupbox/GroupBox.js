@@ -26,7 +26,7 @@ scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
-  this.menuBar = scout.create(scout.MenuBar, {
+  this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });

@@ -812,7 +812,7 @@ scout.Session.prototype._renderBusy = function() {
     if (!this.desktop || !this.desktop.rendered) {
       return; // No busy indicator without desktop (e.g. during shutdown)
     }
-    this._busyIndicator = scout.create(scout.BusyIndicator, {
+    this._busyIndicator = scout.create('BusyIndicator', {
       parent: this.desktop
     });
     this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));

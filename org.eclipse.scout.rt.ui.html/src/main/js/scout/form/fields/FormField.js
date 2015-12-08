@@ -375,7 +375,7 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
           })) {
           return; // at least one menu item must be visible
         }
-        this.contextPopup = scout.create(scout.ContextMenuPopup, {
+        this.contextPopup = scout.create('ContextMenuPopup', {
           parent: this,
           menuItems: menus,
           cloneMenuItems: false,
@@ -432,7 +432,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
       $anchor: this.$status
     };
     $.extend(opts, options);
-    this.tooltip = scout.create(scout.Tooltip, opts);
+    this.tooltip = scout.create('Tooltip', opts);
     this.tooltip.render();
   }
 };

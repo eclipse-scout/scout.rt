@@ -27,9 +27,9 @@ scout.inherits(scout.Outline, scout.Tree);
 scout.Outline.prototype._init = function(model) {
   scout.Outline.parent.prototype._init.call(this, model);
 
-  this.formController = new scout.FormController(this, model.session);
-  this.messageBoxController = new scout.MessageBoxController(this, model.session);
-  this.fileChooserController = new scout.FileChooserController(this, model.session);
+  this.formController = new scout.FormController(this, this.session);
+  this.messageBoxController = new scout.MessageBoxController(this, this.session);
+  this.fileChooserController = new scout.FileChooserController(this, this.session);
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
@@ -100,7 +100,7 @@ scout.Outline.prototype._renderTitle = function() {
 };
 
 scout.Outline.prototype._renderTitleMenuBar = function() {
-  this.titleMenuBar = scout.create(scout.MenuBar, {
+  this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });

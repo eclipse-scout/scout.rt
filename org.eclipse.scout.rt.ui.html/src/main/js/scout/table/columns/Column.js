@@ -217,7 +217,7 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
   // Override field alignment with the cell's alignment
   cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
 
-  popup = scout.create(scout.CellEditorPopup, {
+  popup = scout.create('CellEditorPopup', {
     parent: this.table,
     column: this,
     row: row,

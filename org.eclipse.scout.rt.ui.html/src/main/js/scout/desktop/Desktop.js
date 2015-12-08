@@ -42,9 +42,9 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
   this.viewTabsController = new scout.ViewTabsController(this);
-  this.formController = new scout.DesktopFormController(this, model.session);
-  this.messageBoxController = new scout.MessageBoxController(this, model.session);
-  this.fileChooserController = new scout.FileChooserController(this, model.session);
+  this.formController = new scout.DesktopFormController(this, this.session);
+  this.messageBoxController = new scout.MessageBoxController(this, this.session);
+  this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._addNullOutline(model.outline);
 };
 
@@ -302,7 +302,7 @@ scout.Desktop.prototype._createSplitter = function($parent) {
   if (!this._hasNavigation()) {
     return;
   }
-  this.splitter = scout.create(scout.Splitter, {
+  this.splitter = scout.create('Splitter', {
     parent: this,
     $anchor: this.navigation.$navigation,
     $root: this.$container,

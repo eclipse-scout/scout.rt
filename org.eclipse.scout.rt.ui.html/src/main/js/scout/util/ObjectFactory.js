@@ -58,7 +58,6 @@ scout.objectFactory = {
   *     find the constructor function.</li>
   * <li><code>object</code> model object. The object must have a property 'objectType'. The second parameter is not
   *     required. A lookup is performed to find the constructor function.</li>
-  * <li><code>function</code> constructor function. The second parameter must provide the model</li>
   * </ul>
   *
   * When the provided model does not contain the property '_register', the property is set to false, which means the
@@ -69,8 +68,12 @@ scout.objectFactory = {
   *
   * The returned Scout object is initialized, by calling the init() function.
   *
-  *  @param vararg string, object or constructor-function
-  *  @param model (optional)
+  * Note: support to pass a constructor-function as vararg has been removed because we cannot determine the name of the
+  * function at runtime (ECMA 6 Function.name is not supported by all browsers currently). Thus the objectType would be
+  * missing and it makes no sense to pass an additional objectType when we already have the constructor.
+  *
+  *  @param vararg string or object
+  *  @param model (optional) must be set when vararg is a string
   */
   create: function(vararg, model) {
     var scoutObject;
@@ -81,8 +84,8 @@ scout.objectFactory = {
     } else if (typeof vararg === 'object') {
       model = vararg;
       scoutObject = this._createObjectByType(model);
-    } else if (typeof vararg === 'function') {
-      scoutObject = new vararg(); // jshint ignore:line
+    } else {
+      throw new Error('parameter vararg must be an objectType string or an object having an objectType property');
     }
 
     if (scoutObject instanceof scout.ModelAdapter && model._register === undefined) {

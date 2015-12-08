@@ -25,7 +25,7 @@ scout.TableHeader.prototype._init = function(options) {
 
   this.table = options.table;
   this.enabled = options.enabled;
-  this.menuBar = scout.create(scout.MenuBar, {
+  this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
@@ -254,7 +254,7 @@ scout.TableHeader.prototype._headerItemTooltipText = function($col) {
 
 scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
   var $header = column.$header;
-  this._tableHeaderMenu = scout.create(scout.TableHeaderMenu, {
+  this._tableHeaderMenu = scout.create('TableHeaderMenu', {
     parent: this,
     column: $header.data('column'),
     tableHeader: this,

@@ -23,7 +23,7 @@ scout.ViewTabsController = function(desktop) {
  */
 scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
   // Create the view tab.
-  var viewTab = scout.create(scout.DesktopViewTab, {
+  var viewTab = scout.create('DesktopViewTab', {
     parent: this._desktop,
     view: view,
     $bench: this._desktop.$bench,

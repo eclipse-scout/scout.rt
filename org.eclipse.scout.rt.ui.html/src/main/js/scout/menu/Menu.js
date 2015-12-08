@@ -222,7 +222,7 @@ scout.Menu.prototype._openPopup = function(event) {
 };
 
 scout.Menu.prototype._createPopup = function(event) {
-  return scout.create(scout.MenuBarPopup, {
+  return scout.create('MenuBarPopup', {
     parent: this,
     menu: this,
     ignoreEvent: event,

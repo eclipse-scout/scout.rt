@@ -33,7 +33,7 @@ describe("DetachHelper", function() {
         .width(20)
         .height(20);
 
-    var tooltip = scout.create(scout.Tooltip, {
+    var tooltip = scout.create('Tooltip', {
       parent: new scout.NullWidget(),
       session: session,
       text: 'hello',
@@ -66,7 +66,7 @@ describe("DetachHelper", function() {
         .width(20)
         .height(20);
 
-    var topLevelTooltip = scout.create(scout.Tooltip, {
+    var topLevelTooltip = scout.create('Tooltip', {
       parent: new scout.NullWidget(),
       session: session,
       text: 'top level',
@@ -74,7 +74,7 @@ describe("DetachHelper", function() {
     });
     topLevelTooltip.render($sandbox);
 
-    var tooltip = scout.create(scout.Tooltip, {
+    var tooltip = scout.create('Tooltip', {
       parent: new scout.NullWidget(),
       session: session,
       text: 'hello',

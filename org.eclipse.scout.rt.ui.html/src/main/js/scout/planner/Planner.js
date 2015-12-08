@@ -61,12 +61,12 @@ scout.Planner.SelectionMode = {
 
 scout.Planner.prototype._init = function(model) {
   scout.Planner.parent.prototype._init.call(this, model);
-  this._yearPanel = scout.create(scout.YearPanel, {
+  this._yearPanel = scout.create('YearPanel', {
     parent: this,
     alwaysSelectFirstDay: true
   });
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-  this._header = scout.create(scout.PlannerHeader, {
+  this._header = scout.create('PlannerHeader', {
     parent: this
   });
   this._header.on('todayClick', this._onTodayClick.bind(this));
@@ -88,7 +88,7 @@ scout.Planner.prototype._init = function(model) {
     arrowPosition: 50
   });
 
-  this.menuBar = scout.create(scout.MenuBar, {
+  this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.PlannerMenuItemsOrder(this.session, 'Planner')
   });
@@ -269,7 +269,7 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
-    var popup = scout.create(scout.ContextMenuPopup, {
+    var popup = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: filteredMenus,
       location: {

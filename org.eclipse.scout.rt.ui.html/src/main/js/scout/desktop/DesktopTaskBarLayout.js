@@ -203,7 +203,7 @@ scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
     overflowMenus.push(menu);
   });
 
-  popup = scout.create(scout.ContextMenuPopup, {
+  popup = scout.create('ContextMenuPopup', {
     parent: desktop,
     menuItems: overflowMenus,
     cloneMenuItems: false,

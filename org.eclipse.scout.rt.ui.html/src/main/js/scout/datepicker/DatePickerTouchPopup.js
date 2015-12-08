@@ -17,7 +17,7 @@ scout.inherits(scout.DatePickerTouchPopup, scout.TouchPopup);
  * @override TouchPopup.js
  */
 scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
-  this._widget = scout.create(scout.DatePicker, {
+  this._widget = scout.create('DatePicker', {
     parent: this,
     dateFormat: options.dateFormat
   });

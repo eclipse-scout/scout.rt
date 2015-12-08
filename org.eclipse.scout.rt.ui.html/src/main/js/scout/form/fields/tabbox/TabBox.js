@@ -27,7 +27,7 @@ scout.inherits(scout.TabBox, scout.CompositeField);
 scout.TabBox.prototype._init = function(model) {
   scout.TabBox.parent.prototype._init.call(this, model);
   this.tabItems[this.selectedTab].setTabActive(true);
-  this.menuBar = scout.create(scout.MenuBar, {
+  this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
