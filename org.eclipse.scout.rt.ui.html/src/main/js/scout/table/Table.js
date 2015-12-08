@@ -77,6 +77,9 @@ scout.Table.prototype._init = function(model) {
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._calculateValuesForBackgroundEffect();
+  if (this._filterCount() > 0) {
+    this._applyFilters(this.rows);
+  }
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -1039,15 +1042,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
       lastRowOfBlockSelected = $row.isSelected();
-    });
-
-    // Apply row filters
-    // This cannot be done in the above loop because the filter calculates the cube which calls column.cellValueForGrouping for every row
-    // -> depending on the implementation row.$row has to exist (see BeanColumn.js)
-    // This cannot be done in install rows as well, because the notification handling differs when rows are updated
-    if (this._filterCount() > 0) {
-      this._applyFilters($rows);
-    }
+    }.bind(this));
 
     this._installRows($rows);
 
@@ -1096,6 +1091,10 @@ scout.Table.prototype._installRows = function($rows) {
     var editorField,
       $row = $(this),
       row = $row.data('row');
+
+    if (that._filterCount() > 0) {
+      that._renderRowFilterAccepted(row);
+    }
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -1819,14 +1818,17 @@ scout.Table.prototype._insertRow = function(row) {
 };
 
 scout.Table.prototype._insertRows = function(rows) {
-  var filterChanged = false;
+  var filterChanged = false,
+    newInvisibleRows = [];
+
   // Update model
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
+  rows.forEach(function(row) {
     this._initRow(row);
     // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
     this.rows.push(row);
-  }
+  }, this);
+
+  this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
 
   // Update HTML
@@ -1913,6 +1915,20 @@ scout.Table.prototype._updateRows = function(rows) {
     var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
+    // Apply row filter
+    updatedRow.filterAccepted = oldRow.filterAccepted;
+    if (this._filterCount() > 0) {
+      if (this._applyFiltersForRow(updatedRow)) {
+        filterChanged = true;
+        if (!updatedRow.filterAccepted) {
+          newInvisibleRows.push(updatedRow);
+        }
+      } else {
+        // If filter state has not changed, just update cached rows
+        scout.arrays.replace(this._filteredRows, oldRow, updatedRow);
+      }
+    }
+
     // Replace old $row
     if (this.rendered && oldRow.$row) {
       var rowSelected = this.selectedRows.indexOf(updatedRow) > -1,
@@ -1931,21 +1947,6 @@ scout.Table.prototype._updateRows = function(rows) {
       scout.Table.linkRowToDiv(updatedRow, $updatedRow);
       oldRow.$row.replaceWith($updatedRow);
       $updatedRows = $updatedRows.add($updatedRow);
-
-      // Apply row filter
-      updatedRow.filterAccepted = oldRow.filterAccepted;
-      if (this._filterCount() > 0) {
-        if (this._applyFiltersForRow(updatedRow)) {
-          filterChanged = true;
-          if (!updatedRow.filterAccepted) {
-            newInvisibleRows.push(updatedRow);
-          }
-        } else {
-          // If filter state has not changed, just update cached rows
-          scout.arrays.replace(this._filteredRows, oldRow, updatedRow);
-        }
-        this._renderRowFilterAccepted(updatedRow);
-      }
     }
   }
 
@@ -2183,8 +2184,7 @@ scout.Table.prototype.filteredRows = function() {
   if (this._filteredRowsDirty) {
     this._filteredRows = [];
     this.rows.forEach(function(row) {
-      // row.$row check is necessary because filterAccepted state is only correct for rendered rows (_applyFilters is only called for rendered rows)
-      if (row.$row && row.filterAccepted) {
+      if (row.filterAccepted) {
         this._filteredRows.push(row);
       }
     }, this);
@@ -2262,40 +2262,37 @@ scout.Table.prototype.columnById = function(columnId) {
 };
 
 scout.Table.prototype.filter = function() {
-  var i, useAnimation,
-    that = this,
-    rowsToHide = [],
-    rowsToShow = [];
+  var useAnimation = false,
+    changedRows = [],
+    newInvisibleRows = [];
 
   // Filter rows
   this.rows.forEach(function(row) {
-    var $row = row.$row;
-
-    that._applyFiltersForRow(row);
-    if (row.filterAccepted) {
-      if ($row.hasClass('invisible')) {
-        rowsToShow.push(row);
-      }
-    } else {
-      if (!$row.hasClass('invisible')) {
-        rowsToHide.push(row);
+    var changed = this._applyFiltersForRow(row);
+    if (changed) {
+      changedRows.push(row);
+      if (!row.filterAccepted) {
+        newInvisibleRows.push(row);
       }
     }
-  });
+  }, this);
+
+  if (changedRows.length === 0) {
+    return;
+  }
 
   // Show / hide rows that changed their state during filtering
-  useAnimation = ((rowsToShow.length + rowsToHide.length) <= that._animationRowLimit);
-  rowsToHide.forEach(function(row) {
-    that.hideRow(row.$row, useAnimation);
-  });
-  rowsToShow.forEach(function(row) {
-    that.showRow(row.$row, useAnimation);
-  });
+  if (this.rendered) {
+    useAnimation = changedRows.length <= this._animationRowLimit;
+    changedRows.forEach(function(row) {
+      this._renderRowFilterAccepted(row, useAnimation);
+    }, this);
+  }
 
-  // notify and regroup only if at least one row changed it's state
-  if (rowsToShow.length > 0 || rowsToHide.length > 0) {
-    this._rowsFiltered(rowsToHide);
-    this._group(useAnimation);
+  this._rowsFiltered(newInvisibleRows);
+  this._group(useAnimation);
+
+  if (this.rendered) {
     this.renderSelection();
   }
 };
@@ -2312,7 +2309,7 @@ scout.Table.prototype._rowsFiltered = function(invisibleRows) {
 scout.Table.prototype._rowAcceptedByFilters = function(row) {
   for (var key in this._filterMap) {
     var filter = this._filterMap[key];
-    if (!filter.accept(row.$row)) {
+    if (!filter.accept(row)) {
       return false;
     }
   }
@@ -2330,8 +2327,6 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
     }
   } else {
     if (row.filterAccepted) {
-      // flag is necessary to get correct filter count even when animation is still in progress
-      // and to store filter state to prevent unnecessary events
       row.filterAccepted = false;
       return true;
     }
@@ -2340,19 +2335,15 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 };
 
 /**
- * Applies the filters for the given $rows.<p>
+ * Applies the filters for the given rows.<p>
  * This function is intended to be used for new rows. That's why rowsFiltered event is only triggered if there are accepted rows in the given list.
  */
-scout.Table.prototype._applyFilters = function($rows) {
+scout.Table.prototype._applyFilters = function(rows) {
   var filterChanged,
-    newInvisibleRows = [],
-    that = this;
+    newInvisibleRows = [];
 
-  $rows.each(function() {
-    var $row = $(this),
-      row = $row.data('row');
-
-    if (that._applyFiltersForRow(row)) {
+  rows.forEach(function(row) {
+    if (this._applyFiltersForRow(row)) {
       if (!row.filterAccepted) {
         newInvisibleRows.push(row);
       }
@@ -2361,19 +2352,21 @@ scout.Table.prototype._applyFilters = function($rows) {
     if (row.filterAccepted) {
       filterChanged = true;
     }
-    that._renderRowFilterAccepted(row);
-  });
+  }, this);
 
   if (filterChanged) {
     this._rowsFiltered(newInvisibleRows);
   }
 };
 
-scout.Table.prototype._renderRowFilterAccepted = function(row) {
+scout.Table.prototype._renderRowFilterAccepted = function(row, animated) {
+  if (!row.$row) {
+    return;
+  }
   if (row.filterAccepted) {
-    this.showRow(row.$row);
+    this.showRow(row.$row, animated);
   } else {
-    this.hideRow(row.$row);
+    this.hideRow(row.$row, animated);
   }
 };
 

@@ -37,14 +37,10 @@ scout.BeanColumn.prototype._renderValue = function($cell, value) {
 };
 
 /**
- * Default approach reads the html and uses _prepareTextForGrouping to generate the value. Just using text() does not work because new lines get omitted.
+ * Default approach reads the html using buildCellForRow and uses _prepareTextForGrouping to generate the value. Just using text() does not work because new lines get omitted.
  * If this approach does not work for a specific bean column, just override this method.
  */
 scout.BeanColumn.prototype.cellValueForGrouping = function(row) {
-  if (!row.$row) {
-    throw new Error('row not rendered yet');
-  }
-
-  var text = this.table.$cell(this, row.$row).html();
-  return this._prepareTextForGrouping(text, true);
+  var html = this.buildCellForRow(row);
+  return this._prepareTextForGrouping(html, true);
 };

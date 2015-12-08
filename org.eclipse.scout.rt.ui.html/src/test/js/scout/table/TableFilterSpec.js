@@ -27,6 +27,14 @@ describe("Table Filter", function() {
     jasmine.clock().uninstall();
   });
 
+  function createColumnFilterModel(columnId, selectedValues) {
+    return {
+      objectType: 'ColumnUserFilter',
+      column: columnId,
+      selectedValues: selectedValues
+    };
+  }
+
   function createAndRegisterColumnFilter(table, column, selectedValues) {
     return helper.createAndRegisterColumnFilter({
       table: table,
@@ -38,13 +46,11 @@ describe("Table Filter", function() {
 
   describe("row filtering", function() {
 
-    it("applies row filter when table gets rendered", function() {
-      var model = helper.createModelFixture(2, 2),
-        table = helper.createTable(model),
-        column0 = table.columns[0];
-
-      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
-      table.render(session.$entryPoint);
+    it("applies row filter when table gets initialized", function() {
+      var model = helper.createModelFixture(2, 2);
+      var filter = createColumnFilterModel(model.columns[0].id, ['cell1_0']);
+      model.filters = [filter];
+      var table = helper.createTable(model);
 
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
@@ -52,12 +58,10 @@ describe("Table Filter", function() {
     });
 
     it("doesn't filter anymore if filter gets removed", function() {
-      var model = helper.createModelFixture(2, 2),
-        table = helper.createTable(model),
-        column0 = table.columns[0];
-
-      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
-      table.render(session.$entryPoint);
+      var model = helper.createModelFixture(2, 2);
+      var filter = createColumnFilterModel(model.columns[0].id, ['cell1_0']);
+      model.filters = [filter];
+      var table = helper.createTable(model);
 
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
@@ -76,6 +80,7 @@ describe("Table Filter", function() {
         column0 = table.columns[0];
 
       var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
       table.render(session.$entryPoint);
       expect(table.filteredRows().length).toBe(1);
 
@@ -98,6 +103,28 @@ describe("Table Filter", function() {
       expect(filteredRows[1]).toBe(table.rows[3]);
     });
 
+    it("applies row filter if a new row gets inserted, even if table is not rendered", function() {
+      var model = helper.createModelFixture(2, 2),
+        table = helper.createTable(model),
+        column0 = table.columns[0];
+
+      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
+      expect(table.filteredRows().length).toBe(1);
+
+      var rows = helper.createModelRows(2, 1);
+      rows[0].cells[0].value = 'newCell';
+      table._insertRows(rows);
+
+      var filteredRows = table.filteredRows();
+      expect(filteredRows.length).toBe(1);
+      expect(table.rows[2].filterAccepted).toBe(false);
+      expect(table.rows[2].$row).toBeFalsy();
+
+      table.render(session.$entryPoint);
+      expect(table.rows[2].$row.isVisible()).toBe(false);
+    });
+
     it("applies row filter if a row gets updated", function() {
       var model = helper.createModelFixture(2, 2),
         table = helper.createTable(model),
@@ -106,6 +133,7 @@ describe("Table Filter", function() {
 
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
       table.render(session.$entryPoint);
       expect(table.filteredRows().length).toBe(1);
 
@@ -142,6 +170,33 @@ describe("Table Filter", function() {
       expect(filteredRows[0]).toBe(table.rows[1]);
     });
 
+    it("applies row filter if a row gets updated, even if table is not rendered", function() {
+      var model = helper.createModelFixture(2, 2),
+        table = helper.createTable(model),
+        column0 = table.columns[0],
+        row1 = table.rows[1];
+
+      // expects 1 row to be visible
+      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
+      expect(table.filteredRows().length).toBe(1);
+
+      var rows = helper.createModelRows(2, 1);
+      rows[0].id = row1.id;
+      rows[0].cells[0].value = 'updatedCell';
+      table._updateRows(rows);
+
+      // expects no row to be visible
+      var filteredRows = table.filteredRows();
+      expect(filteredRows.length).toBe(0);
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.rows[1].$row).toBeFalsy();
+
+      table.render(session.$entryPoint);
+      expect(table.rows[0].$row.isVisible()).toBe(false);
+      expect(table.rows[1].$row.isVisible()).toBe(false);
+    });
+
     it("properly handles successive row insertion and updates", function() {
       var model = helper.createModelFixture(2, 2),
         table = helper.createTable(model),
@@ -150,6 +205,7 @@ describe("Table Filter", function() {
 
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
       table.render(session.$entryPoint);
       expect(table.filteredRows().length).toBe(1);
 
@@ -185,6 +241,7 @@ describe("Table Filter", function() {
 
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
       table.render(session.$entryPoint);
 
       expect(table.rows.length).toBe(7);
@@ -218,6 +275,7 @@ describe("Table Filter", function() {
         row1 = table.rows[1];
 
       var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0', 'cell2_0']);
+      table.filter();
       table.render(session.$entryPoint);
       table.selectAll();
       expect(table.selectedRows.length).toBe(2);
@@ -253,12 +311,50 @@ describe("Table Filter", function() {
         _onRowsFiltered: function() {}
       };
 
-      it("gets fired if rows are filtered", function() {
+      it("gets fired when table with a filter is initializing", function() {
+        var model = helper.createModelFixture(2, 2);
+        var table = new scout.Table();
+        var filter = createColumnFilterModel(model.columns[0].id, ['cell1_0']);
+        model.filters = [filter];
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        table.init(model);
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("does not get fired when table with no filters is initializing", function() {
+        var model = helper.createModelFixture(2, 2);
+        var table = new scout.Table();
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        table.init(model);
+        expect(listener._onRowsFiltered).not.toHaveBeenCalled();
+      });
+
+      it("gets fired if filter() is called", function() {
         var model = helper.createModelFixture(2, 2),
           table = helper.createTable(model),
           column0 = table.columns[0];
 
         table.render(session.$entryPoint);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
+
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets fired if filter() is called, even if table is not rendered", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0];
 
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
@@ -293,6 +389,7 @@ describe("Table Filter", function() {
           row1 = table.rows[1];
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
         table.render(session.$entryPoint);
 
         spyOn(listener, '_onRowsFiltered');
@@ -314,6 +411,7 @@ describe("Table Filter", function() {
           row1 = table.rows[1];
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 
@@ -342,6 +440,7 @@ describe("Table Filter", function() {
           row1 = table.rows[1];
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 
@@ -361,6 +460,7 @@ describe("Table Filter", function() {
           row1 = table.rows[1];
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 
@@ -380,6 +480,7 @@ describe("Table Filter", function() {
           row1 = table.rows[1];
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
         table.render(session.$entryPoint);
 
         spyOn(listener, '_onRowsFiltered');

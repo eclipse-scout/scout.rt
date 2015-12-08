@@ -177,9 +177,14 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
   return table;
 };
 
-TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model) {
+TableSpecHelper.prototype.createColumnFilter = function (model) {
   var filter = new scout.ColumnUserFilter();
   filter.init(model);
+  return filter;
+};
+
+TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model) {
+  var filter = this.createColumnFilter(model);
   model.table.addFilter(filter);
   return filter;
 };

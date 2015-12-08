@@ -101,6 +101,7 @@ describe('TableHeaderMenu', function() {
         var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
         var column = table.columns[0];
         var filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
+        table.filter();
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 
@@ -117,6 +118,7 @@ describe('TableHeaderMenu', function() {
         var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
         var column = table.columns[0];
         var filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
+        table.filter();
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 
@@ -142,6 +144,7 @@ describe('TableHeaderMenu', function() {
         var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
         var column = table.columns[0];
         var filter = createAndRegisterColumnFilter(table, column, ['AnotherValueNotInTable']);
+        table.filter();
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(0);
 

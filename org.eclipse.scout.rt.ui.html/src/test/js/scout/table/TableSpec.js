@@ -1367,7 +1367,7 @@ describe("Table", function() {
       // filter table (descending)
       table.addFilter({
         createKey: function() { return 1; },
-        accept: function($row) { return $row.text() % 2 === 0; }
+        accept: function(row) { return row.$row.text() % 2 === 0; }
       });
       table.filter();
 

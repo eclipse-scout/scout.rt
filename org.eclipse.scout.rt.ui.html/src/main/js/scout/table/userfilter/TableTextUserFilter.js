@@ -27,7 +27,12 @@ scout.TableTextUserFilter.prototype.createLabel = function() {
   return this.text;
 };
 
-scout.TableTextUserFilter.prototype.accept = function($row) {
-  var rowText = $row.text().toLowerCase();
+scout.TableTextUserFilter.prototype.accept = function(row) {
+  var rowText = '';
+  for (var i = 0; i < row.cells.length; i++) {
+    var cell = row.cells[i];
+    rowText += cell.text;
+  }
+  rowText = rowText.toLowerCase();
   return rowText.indexOf(this.text) > -1;
 };

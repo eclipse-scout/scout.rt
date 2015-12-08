@@ -120,13 +120,12 @@ scout.ColumnUserFilter.prototype.createKey = function() {
   return this.column.id;
 };
 
-scout.ColumnUserFilter.prototype.accept = function($row) {
+scout.ColumnUserFilter.prototype.accept = function(row) {
   if (!this.xAxis) {
     // Lazy calculation. It is not possible on init, because the table is not rendered yet.
     this.calculate();
   }
-  var row = $row.data('row'),
-    key = this.column.cellValueForGrouping(row),
+  var key = this.column.cellValueForGrouping(row),
     normKey = this.xAxis.norm(key);
 
   if (this._useTextInsteadOfNormValue(normKey)) {

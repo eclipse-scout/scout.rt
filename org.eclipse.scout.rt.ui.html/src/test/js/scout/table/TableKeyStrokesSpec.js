@@ -148,8 +148,8 @@ describe("TableKeyStrokes", function() {
         createKey: function() {
           return 1;
         },
-        accept: function($row) {
-          return $row.data('row') !== rows[4];
+        accept: function(row) {
+          return row !== rows[4];
         }
       });
       table.filter();
@@ -321,8 +321,8 @@ describe("TableKeyStrokes", function() {
         createKey: function() {
           return 1;
         },
-        accept: function($row) {
-          return $row.data('row') !== rows[1];
+        accept: function(row) {
+          return row !== rows[1];
         }
       });
       table.filter();
@@ -447,8 +447,8 @@ describe("TableKeyStrokes", function() {
           createKey: function() {
             return 1;
           },
-          accept: function($row) {
-            return $row.data('row') !== rows[1];
+          accept: function(row) {
+            return row !== rows[1];
           }
         });
         table.filter();
@@ -545,8 +545,8 @@ describe("TableKeyStrokes", function() {
           createKey: function() {
             return 1;
           },
-          accept: function($row) {
-            return $row.data('row') !== rows[4];
+          accept: function(row) {
+            return row !== rows[4];
           }
         });
         table.filter();

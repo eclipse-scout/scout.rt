@@ -126,8 +126,8 @@ describe("AggregateTableControl", function() {
       table.render(session.$entryPoint);
 
       table.addFilter(createFilter(
-        function($row) {
-          return $row.data('row').id !== table.rows[2].id;
+        function(row) {
+          return row.id !== table.rows[2].id;
         }));
       table.filter();
       var $aggrRow = $aggregateRow(tableControl);
