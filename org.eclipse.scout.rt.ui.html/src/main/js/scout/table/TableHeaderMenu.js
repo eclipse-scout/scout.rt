@@ -528,16 +528,15 @@ scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
   this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
 };
 
-scout.TableHeaderMenu.prototype._renderFilterFields = function() { // FIXME AWE: (filter) free-text or from/to fields
-  this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
-  this.$filterFieldsGroup
-    .appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.FilterText'));
-
+scout.TableHeaderMenu.prototype._renderFilterFields = function() {
   this.filterFieldsGroupBox = scout.create('GroupBox.FilterFields', {
     parent: this,
     column: this.column
   });
+  this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
+  this.$filterFieldsGroup
+    .appendDiv('table-header-menu-group-text')
+    .data('label', this.filterFieldsGroupBox.groupText());
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
 };
 

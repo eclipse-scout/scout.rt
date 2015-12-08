@@ -17,6 +17,16 @@ scout.FilterFieldsGroupBox.prototype._init = function(model) {
   this.cssClass = 'filter-fields';
 };
 
+scout.FilterFieldsGroupBox.prototype.groupText = function() {
+  if (this.column.type === 'number') {
+    return this.session.text('ui.NumberRange');
+  } else if (this.column.type === 'date') {
+    return this.session.text('ui.DateRange');
+  } else {
+    return this.session.text('ui.FreeText');
+  }
+};
+
 /**
  * @override GroupBox.js
  */
