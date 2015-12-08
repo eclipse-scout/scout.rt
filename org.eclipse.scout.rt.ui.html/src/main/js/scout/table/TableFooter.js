@@ -319,7 +319,7 @@ scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
 };
 
 scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete) {
-  if ($info.isVisible() === visible) {
+  if ($info.isVisible() === visible && !(visible && $info.data('hiding'))) {
     if (complete) {
       complete();
     }
@@ -331,7 +331,6 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
     return;
   }
   if (visible) {
-    $info.cssWidth(0).show();
     var animationOpts = {
       progress: this.revalidateLayout.bind(this),
       complete: function() {
@@ -342,7 +341,11 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
     };
     // Save complete function so that layout may use it
     $info.data('animationComplete', animationOpts.complete);
-    $info.widthToContent(animationOpts);
+    // If info is shown the first time, set the width to 0 to make animation work
+    if ($info[0].style.width === '') {
+      $info.cssWidth(0);
+    }
+    $info.show().stop().widthToContent(animationOpts);
   } else {
     // Mark element as hiding so that the layout does not try to resize it
     $info.data('hiding', true);
