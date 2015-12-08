@@ -489,10 +489,14 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
 };
 
 scout.TableHeaderMenu.prototype._filterByText = function() {
-  var text = this.session.text('ui.FilterBy'),
-    numSelected = this.filter.selectedValues.length;
-  if (numSelected > 0) {
-    text += ' (' + numSelected + ')';
+  var text = this.session.text('ui.Filter'),
+    numSelected = this.filter.selectedValues.length,
+    numFilters = this.filter.availableValues.length;
+
+  if (numSelected && numFilters) {
+    text += ' ' + this.session.text('ui.FilterInfoXOfY', numSelected, numFilters);
+  } else if (numFilters) {
+    text += ' ' + this.session.text('ui.FilterInfoCount', numFilters);
   }
   return text;
 };
