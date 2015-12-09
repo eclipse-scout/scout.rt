@@ -156,7 +156,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected void handleUiSessionDisposed(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
-    if (RequestType.POLL_REQUEST.equals(jsonReq.getRequestType())) { // TODO BSH isManualLogout?
+    if (RequestType.POLL_REQUEST.equals(jsonReq.getRequestType())) { // TODO [5.2] bsh: isManualLogout?
       writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
     }
     else {

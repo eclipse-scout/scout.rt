@@ -132,8 +132,8 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     var numVisibleTabs = Math.floor(tabsWidth / this.TAB_WIDTH_SMALL),
       numOverflowTabs = numTabs - numVisibleTabs;
 
-    // FIXME AWE: display correct range of tabs (around visible tab)
-    // FIXME AWE: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
+    // FIXME awe: display correct range of tabs (around visible tab)
+    // FIXME awe: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
     // Never put selected tab into overflow
     var i = 0,
       selectedIndex, tab;
@@ -184,7 +184,7 @@ scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
     desktop = this._desktop,
     that = this;
   this._overflowTabsIndizes.forEach(function(i) {
-    // FIXME AWE: fix bugs in overflow-menu:
+    // FIXME awe: fix bugs in overflow-menu:
     // - 1. menu schliesst nicht
     // - 2. manchmal verschwindet ein (noch offener) Tab - wenn nur einer sichtbar ist
     // - 3. add selenium tests

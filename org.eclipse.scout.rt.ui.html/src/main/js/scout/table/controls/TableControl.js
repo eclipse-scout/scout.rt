@@ -75,7 +75,7 @@ scout.TableControl.prototype._renderContent = function($parent) {
 
   this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());
-  //FIXME CGU make this more easy to use
+  //FIXME cgu: make this more easy to use
   this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.revalidateLayout();
@@ -235,7 +235,7 @@ scout.TableControl.prototype._onMouseDown = function() {
 
 scout.TableControl.prototype.onControlContainerOpened = function() {
   if (this.form) {
-    // TODO [dwi] temporary solution; set focus to last known position
+    // TODO [5.2] dwi: temporary solution; set focus to last known position
     this.form.renderInitialFocus();
   }
 };

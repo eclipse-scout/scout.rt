@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 
 public interface IPlannerDisplayMode extends ICalendarDisplayMode {
 
-  // TODO AWE: (Planner) check with BAP project if INTRADAY is still needed.
+  // TODO [5.2] awe: (Planner) check with BAP project if INTRADAY is still needed.
   // If not delete the constant and also the get/setIntradayInterval methods
   // on IPlanner.
   int INTRADAY = 0;

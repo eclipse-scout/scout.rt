@@ -21,7 +21,7 @@ scout.inherits(scout.TableFilterControlKeyStrokes, scout.KeyStroke);
 scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
   // set focus
   var $input = $('.table-text-filter', this._field.$container);
-  //TODO nbu check if keyStroke should be registered when no filter control is available.
+  //TODO [5.2] nbu: check if keyStroke should be registered when no filter control is available.
   if ($input[0]) {
     $input.focus();
     var length = scout.nvl($input.val(), '').length;

@@ -50,7 +50,7 @@ public class DownloadHandlerStorageTest {
     BinaryResource res = new BinaryResource("bar.txt", null);
     storage.put(KEY, res);
     sleepSafe(100);
-    // FIXME AWE Improve this test (it fails sometimes because of timing issues)
+    // FIXME awe: Improve this test (it fails sometimes because of timing issues)
     assertNull(storage.remove(KEY));
     assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
   }

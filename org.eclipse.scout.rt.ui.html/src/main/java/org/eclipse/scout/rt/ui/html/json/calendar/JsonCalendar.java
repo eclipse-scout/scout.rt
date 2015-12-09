@@ -237,8 +237,8 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     }
   }
 
-//   FIXME BSH Check if we need event filter here, as in the following example
-//   FIXME AWE: (calendar) check how the selected property is used in swing UI, decide if we can remove the property/event
+//   FIXME bsh: Check if we need event filter here, as in the following example
+//   FIXME awe: (calendar) check how the selected property is used in swing UI, decide if we can remove the property/event
 //    protected void handleUiSelectionChanged(JsonEvent event) {
 //      boolean selected = event.getData().getBoolean(IAction.PROP_SELECTED);
 //      addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
@@ -260,7 +260,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     getModel().getUIFacade().fireReloadFromUI();
   }
 
-  // FIXME AWE: (calendar) replace selectedDate with selectionRange(from/to)
+  // FIXME awe: (calendar) replace selectedDate with selectionRange(from/to)
 
   protected void handleUiSelectionChanged(JsonEvent event) {
     JSONObject data = event.getData();
@@ -329,7 +329,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
-  // FIXME AWE: (calendar) discuss with C.GU: this is copy&paste. See other impl. if IJsonContextMenuOwner
+  // FIXME awe: (calendar) discuss with C.GU: this is copy&paste. See other impl. if IJsonContextMenuOwner
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
@@ -354,7 +354,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
         jsonArray.put(new JsonCalendarEvent(JsonCalendar.this, event).toJson());
       }
       JSONObject json = new JSONObject();
-      json.put("batch", jsonArray); // FIXME BSH: Calendar | Check if this works
+      json.put("batch", jsonArray); // FIXME bsh: Calendar | Check if this works
       addActionEvent(EVENT_CALENDAR_CHANGED_BATCH, json);
     }
   }

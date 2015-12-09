@@ -315,7 +315,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   protected String checkFormatPatternSupported(String formatPattern) {
-    // FIXME BSH How to implement?
+    // FIXME bsh: How to implement?
     return formatPattern;
   }
 

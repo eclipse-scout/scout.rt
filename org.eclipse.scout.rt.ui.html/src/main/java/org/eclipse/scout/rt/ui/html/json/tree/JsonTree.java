@@ -404,7 +404,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         handleModelOtherTreeEvent(event);
         break;
     }
-    // TODO Tree | Events not yet implemented:
+    // TODO [5.2] bsh: Tree | Events not yet implemented:
     // - TYPE_NODE_REQUEST_FOCUS
     // - TYPE_NODE_ENSURE_VISIBLE what is the difference to scroll_to_selection? delete in treeevent
     // - TYPE_NODES_DRAG_REQUEST
@@ -437,7 +437,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   protected void handleModelNodesInserted(TreeEvent event) {
     JSONArray jsonNodes = new JSONArray();
-    attachNodes(event.getNodes(), true);//FIXME CGU why not inside loop? attaching for rejected nodes?
+    attachNodes(event.getNodes(), true);//FIXME cgu: why not inside loop? attaching for rejected nodes?
     for (ITreeNode node : event.getNodes()) {
       if (!isNodeAccepted(node)) {
         continue;

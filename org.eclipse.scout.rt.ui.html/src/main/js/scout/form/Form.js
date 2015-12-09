@@ -220,7 +220,7 @@ scout.Form.prototype.appendTo = function($parent) {
 };
 
 scout.Form.prototype._remove = function() {
-  // FIXME AWE: call acceptInput() when form is removed
+  // FIXME awe: call acceptInput() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._glassPaneRenderer.removeGlassPanes();
   this._uninstallFocusContext();
@@ -242,7 +242,7 @@ scout.Form.prototype._renderIconId = function() {
 scout.Form.prototype._onRequestFocus = function(formFieldId) {
   var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
   if (formField) {
-    // FIXME AWE/NBU/DWI: hier darf focus nicht direkt aufgerufen werden. Es muss geprüft werden ob
+    // FIXME awe, nbu, dwi: hier darf focus nicht direkt aufgerufen werden. Es muss geprüft werden ob
     // der focuscontext überhaupt "aktivierbar" ist, auch die modalität muss hier berücksichtigt werden
     // je nach dem kann es sein, dass das field gar nicht den fokus kriegt.
     formField.$field.focus();

@@ -12,7 +12,7 @@ scout.LayoutValidator = function() {
   this._invalidComponents = [];
 };
 
-// FIXME CGU maybe it is necessary to sort the list so that the top most root is layouted first.
+// FIXME cgu: maybe it is necessary to sort the list so that the top most root is layouted first.
 // Testcase: Field in scrollable groupbox gets invisible and also a field outside the groupbox.
 // If scrollable is layouted first it may be relayouted again when the form gets layouted
 scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {

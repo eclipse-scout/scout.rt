@@ -96,7 +96,7 @@ public final class JsonObjectUtility {
     }
   }
 
-  // TODO BSH Remove this method
+  // TODO [5.2] bsh: Remove this method
   public static JSONObject newOrderedJSONObject() {
     return new JSONObject();
   }

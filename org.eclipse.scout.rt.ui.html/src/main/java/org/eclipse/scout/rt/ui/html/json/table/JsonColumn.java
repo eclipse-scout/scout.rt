@@ -72,7 +72,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     if (getColumn().getTable().isCheckable() && getColumn().getTable().getCheckableColumn() == getColumn()) {
       json.put("checkable", true);
     }
-    //TODO CGU remove this properties, they get sent by cell, or change behaviour in model, see also todo in Column.js
+    //TODO [5.2] cgu: remove this properties, they get sent by cell, or change behaviour in model, see also todo in Column.js
     json.put(IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
     json.put(IColumn.PROP_EDITABLE, getColumn().isEditable());
     json.put("mandatory", getColumn().isMandatory());

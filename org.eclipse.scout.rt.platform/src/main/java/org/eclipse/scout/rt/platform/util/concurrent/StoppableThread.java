@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.concurrent;
 
-//TODO [jgu] delete?
+//TODO [5.2] jgu: delete?
 public class StoppableThread extends Thread {
   private boolean m_stopSignal;
 

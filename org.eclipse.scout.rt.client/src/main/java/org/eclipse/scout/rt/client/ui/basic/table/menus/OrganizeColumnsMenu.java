@@ -74,7 +74,7 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<IOrganizeColumns
    * @return
    */
   public boolean isDevelopment() {
-    // FIXME AWE/CGU: (dev-mode) send this flag with JsonSession - global
+    // FIXME awe, cgu: (dev-mode) send this flag with JsonSession - global
     return Platform.get().inDevelopmentMode();
   }
 

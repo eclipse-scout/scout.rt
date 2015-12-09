@@ -24,14 +24,14 @@ import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.ContentBox.WrappedWizardForm;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.StatusBox;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.StatusBox.StatusField;
-import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardCancelButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardFinishButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardNextStepButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardPreviousStepButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardSuspendButton;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -196,7 +196,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
         @Override
         protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
           super.injectFieldsInternal(fields);
-          // TODO BSH Inject info boxes and groups here
+          // TODO [5.2] bsh: Inject info boxes and groups here
         }
 
         @Order(20)

@@ -552,7 +552,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     IColumn column = extractColumn(data);
     boolean sortingRemoved = data.optBoolean("sortingRemoved");
 
-    // FIXME CGU: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
+    // FIXME cgu: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
     if (sortingRemoved) {
       getModel().getUIFacade().fireSortColumnRemovedFromUI(column);
     }
@@ -679,12 +679,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     // Confirm end cell edit so that gui can dispose the adapter.
     // It is not possible to dispose the adapter on the gui before sending complete or cancelCellEdit, because the field may send property change events back)
     // It would be possible if we added a filter mechanism so that events for disposed adapters won't be sent to client
-    // TODO maybe optimize by adding a filter for disposed adapters
+    // TODO [5.2] cgu: maybe optimize by adding a filter for disposed adapters
     JSONObject json = new JSONObject();
     putProperty(json, "fieldId", jsonField.getId());
     addActionEvent(EVENT_END_CELL_EDIT, json);
 
-    //FIXME CGU feld merken, revert bei toJson für page reload
+    //FIXME cgu: feld merken, revert bei toJson für page reload
     jsonField.dispose();
   }
 

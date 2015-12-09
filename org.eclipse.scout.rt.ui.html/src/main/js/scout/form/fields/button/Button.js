@@ -84,7 +84,7 @@ scout.Button.prototype._render = function($parent) {
   }
   this.addContainer($parent, 'button-field', new scout.ButtonLayout(this));
   this.addField($button);
-  // FIXME CGU: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
+  // FIXME cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
 
   $button
@@ -144,7 +144,7 @@ scout.Button.prototype.togglePopup = function() {
 };
 
 scout.Button.prototype._openPopup = function() {
-  // FIXME BSH Improve this
+  // FIXME bsh: Improve this
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,

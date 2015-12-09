@@ -26,7 +26,7 @@ public interface ICustomHtmlRenderer {
   boolean isHtml(String text);
 
   /**
-   * TODO kle make complete using BBCode with KefirBB maven
+   * TODO [5.2] jgu: from kle: make complete using BBCode with KefirBB maven
    *
    * <pre>
    * <xmp>

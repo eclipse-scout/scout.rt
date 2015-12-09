@@ -110,7 +110,7 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
    * value. Complex model objects require more sophisticated approaches to transform the model state into JSON.
    */
   public Object prepareValueForToJson(Object value) {
-    // TODO BSH JSON | Check if we can / should add convenience here (e.g. for Date, lists etc.)
+    // TODO [5.2] bsh: JSON | Check if we can / should add convenience here (e.g. for Date, lists etc.)
     return value;
   }
 

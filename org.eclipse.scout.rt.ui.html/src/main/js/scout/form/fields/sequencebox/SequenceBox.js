@@ -44,7 +44,7 @@ scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
  * Moves the status relevant properties from the last visible field to the sequencebox. This makes sure that the fields inside the sequencebox have the same size.
  */
 scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
-  //FIXME CGU what if sequencebox itself has a tooltip or errorstatus? probably field has higher prio -> override status of seq box
+  //FIXME cgu: what if sequencebox itself has a tooltip or errorstatus? probably field has higher prio -> override status of seq box
   if (visibilityChanged && this._lastVisibleField) {
     // if there is a new last visible field, make sure the status is shown on the previously last one
     this._lastVisibleField.suppressStatus = false;
@@ -93,7 +93,7 @@ scout.SequenceBox.prototype._updateStatusVisible = function() {
   this._renderStatusVisible();
 };
 
-// TODO AWE: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5
+// TODO [5.2] awe: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5
 // The new sequence-box sets the label to invisible on the model.
 scout.SequenceBox.prototype._modifyLabel = function(field) {
   if (field instanceof scout.CheckBoxField) {

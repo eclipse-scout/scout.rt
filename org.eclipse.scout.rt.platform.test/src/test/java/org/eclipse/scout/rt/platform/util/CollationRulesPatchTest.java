@@ -28,7 +28,7 @@ import org.junit.Test;
  * JUnit tests for {@link CollationRulesPatch}
  *
  * @since 3.8.2 <br>
- *        TODO asa: Remove {@link CollationRulesPatch} and replace bean.
+ *        TODO [5.2] asa: Remove {@link CollationRulesPatch} and replace bean.
  */
 @Ignore
 public class CollationRulesPatchTest {

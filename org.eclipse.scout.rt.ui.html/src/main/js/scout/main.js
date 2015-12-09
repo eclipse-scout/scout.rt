@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// TODO AWE/CGU: think about refactoring this code to a Scout.js class and use an
+// TODO [5.2] awe, CGU: think about refactoring this code to a Scout.js class and use an
 // instance of that new class in scout-module.js for the last line of code:
 // }(window.scout = window.scout || {}, jQuery));
 
@@ -189,7 +189,7 @@ scout._installGlobalJavascriptErrorHandler = function() {
       if (window.console) {
         window.console.log(logStr);
       }
-      // FIXME BSH: Improve this! Accessing session at index 0 is not a good idea when a window has multiple scout instances (portlet use-case)
+      // FIXME bsh: Improve this! Accessing session at index 0 is not a good idea when a window has multiple scout instances (portlet use-case)
       if (scout.sessions.length > 0) {
         var session = scout.sessions[0],
           boxOptions = {

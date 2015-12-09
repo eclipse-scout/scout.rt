@@ -855,7 +855,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  // TODO [dwi] Clarify whether this method is still used.
+  // TODO [5.2] dwi: Clarify whether this method is still used.
   public List<IForm> getSimilarViewForms(final IForm form) {
     if (form == null) {
       return CollectionUtility.emptyArrayList();
@@ -895,7 +895,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void ensureViewStackVisible() { // TODO [dwi] Clarify whether this method is still used.
+  public void ensureViewStackVisible() { // TODO [5.2] dwi: Clarify whether this method is still used.
     for (IForm view : m_formStore.getViews()) {
       activateForm(view);
     }
@@ -965,7 +965,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       if (oldActivePage == null) {
         // if no page is selected, remove the bookmark -> It is not necessary to have an active page
         m_bookmarkPerOutline.remove(m_outline);
-        // TODO cgu Enhance navigation history service so that null pages can be handled
+        // TODO [5.2] cgu: Enhance navigation history service so that null pages can be handled
       }
       else {
         Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
@@ -1092,7 +1092,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       Assertions.assertFalse(applicationLocked, "Modal view cannot be showed because application is in 'desktop-modal' state; otherwise, no user interaction would be possible.");
     }
 
-    // TODO [dwi] Clarify whether this logic is still required.
+    // TODO [5.2] dwi: Clarify whether this logic is still required.
     // If the Form is not a View, close all open PopUp windows.
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
       for (IForm popupWindow : m_formStore.getByDisplayHint(IForm.DISPLAY_HINT_POPUP_WINDOW)) {

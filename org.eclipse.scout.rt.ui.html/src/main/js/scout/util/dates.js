@@ -415,10 +415,10 @@ scout.dates = {
   },
 
   /**
-   * TODO NBU Add jasmine test
+   * TODO [5.2] nbu: Add jasmine test
    * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.
    */
-  // FIXME BSH Check if this is needed, otherwise remove
+  // FIXME bsh: Check if this is needed, otherwise remove
   combineDateTime: function(date, time) {
     var newDate = new Date(0);
     if (date) {

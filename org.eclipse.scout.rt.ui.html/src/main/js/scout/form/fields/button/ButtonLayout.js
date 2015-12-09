@@ -26,7 +26,7 @@ scout.ButtonLayout.prototype.naturalSize = function() {
   // (https://github.com/jquery/jquery/issues/1724), but it won't be fixed until jQuery 3.0.
   // To ensure that button texts are always fully visible, we add a pixel. This prevents ellipsis
   // ("...") being shown even when the text would fit.
-  // TODO BSH/AWE Check if there a better solution
+  // TODO [5.2] bsh, awe: Check if there a better solution
   prefSize.width += 1;
   // </Workaround>
 

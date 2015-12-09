@@ -21,8 +21,7 @@ scout.mimeTypes = {
   IMAGE_GIF: 'image/gif',
 
   getDefaultFilename: function(type, suffix, prefix) {
-    // TODO MOT/BSH Use translated texts
-    // TODO MOT/BSH Check with com.bsiag.crm.client.core.document.AbstractDocumentTableBox.execHandleClipboardPaste(Collection<BinaryResource>)
+    // TODO [5.2] mot, bsh: Use translated texts, Check with com.bsiag.crm.client.core.document.AbstractDocumentTableBox.execHandleClipboardPaste(Collection<BinaryResource>)
     var filename = 'Data';
     var extension = '';
     if (type === this.TEXT_PLAIN) {

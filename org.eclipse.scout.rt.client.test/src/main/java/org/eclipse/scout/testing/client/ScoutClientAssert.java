@@ -42,7 +42,7 @@ public final class ScoutClientAssert {
   }
 
   private static void assertContainsKeys(boolean strict, AbstractListBox<?> listbox, Object... keys) {
-    // TODO abr check row visibility
+    // TODO [5.2] abr: check row visibility
     HashSet<Object> expectedKeys = new HashSet<Object>(Arrays.asList(keys));
     HashSet<Object> unexpectedKeys = new HashSet<Object>();
     List listBoxKeys = ((DefaultListBoxTable) listbox.getTable()).getKeyColumn().getValues();

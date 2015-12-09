@@ -77,7 +77,7 @@ scout.Session = function($entryPoint, options) {
   this._loggedOut = false;
   this.uiUseTaskbarLogo = options.uiUseTaskbarLogo;
 
-  this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+  this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     parent: new scout.NullWidget(),
@@ -892,7 +892,7 @@ scout.Session.prototype._processEvents = function(events) {
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getModelAdapter(event.target);
     if (!adapter) {
-      // FIXME BSH/CGU: Check if this should only be getModelAdapter()
+      // FIXME bsh, cgu: Check if this should only be getModelAdapter()
       // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
       // --> This re-links the parent adapter to the root adapter!!!
       adapter = this.getOrCreateModelAdapter(event.target, this.rootAdapter);
@@ -952,7 +952,7 @@ scout.Session.prototype._onReloadPage = function(event) {
 scout.Session.prototype._onLocaleChanged = function(event) {
   this.locale = new scout.Locale(event.locale);
   this._texts = new scout.Texts(event.textMap);
-  // FIXME BSH(?): inform components to reformat display text?
+  // FIXME bsh: inform components to reformat display text?
 };
 
 scout.Session.prototype._onInitialized = function(event) {

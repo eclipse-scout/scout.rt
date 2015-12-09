@@ -19,7 +19,7 @@ scout.inherits(scout.MobileTable, scout.Table);
  * @override
  */
 scout.MobileTable.prototype.init = function(model, session, register) {
-  // FIXME CGU: should be done by server, or should we add gui only property to control it? model may set it to true at any time later
+  // FIXME cgu: should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   model.headerVisible = false;
   scout.MobileTable.parent.prototype.init.call(this, model, session, register);
 };
@@ -36,7 +36,7 @@ scout.MobileTable.prototype._renderRows = function(rows, startRowIndex) {
  * @override
  */
 scout.MobileTable.prototype._buildRowDiv = function(row, rowSelected, previousRowSelected, followingRowSelected) {
-  //TODO nbu selection border
+  //TODO [5.2] nbu: selection border
   var rowClass,
     cellContent = '',
     columns = this.columns,
@@ -105,7 +105,7 @@ scout.MobileTable.prototype._computeHeaderColumns = function() {
   for (i = 0; i < columns.length; i++) {
     column = columns[i];
 
-    if (column.visible) { // FIXME CGU also check for other criterias (checkboxcolum, see AbstractRowSummaryColumn);
+    if (column.visible) { // FIXME cgu: also check for other criterias (checkboxcolum, see AbstractRowSummaryColumn);
       headerColumns.push(column);
       return headerColumns;
     }

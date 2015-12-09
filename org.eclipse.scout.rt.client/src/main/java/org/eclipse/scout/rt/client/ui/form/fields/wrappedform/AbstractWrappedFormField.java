@@ -147,7 +147,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
       return;
     }
 
-    // TODO [dwi] Add assertion to ensure Form is not started yet; currently, that cannot be done because of AbstractPageField.
+    // TODO [5.2] dwi: Add assertion to ensure Form is not started yet; currently, that cannot be done because of AbstractPageField.
 //    if (form != null) {
 //      Assertions.assertFalse(form.isFormStarted(), "Inner Form must not be started yet [wrappedFormField=%s, innerForm=%s]", this, form);
 //    }
@@ -162,7 +162,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     calculateVisibleInternal();
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) { // TODO [dwi] Remove 'started check' once assertion is in place
+      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) { // TODO [5.2] dwi: Remove 'started check' once assertion is in place
         m_innerForm.start();
       }
     }
@@ -183,7 +183,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     m_innerForm.setShowOnStart(false);
     m_innerForm.setWrapperFieldInternal(this);
     m_innerForm.getRootGroupBox().setBorderVisible(false);
-    // TODO DWI Only override if different from preferred value
+    // TODO [5.2] dwi: Only override if different from preferred value
     //m_innerForm.getRootGroupBox().setScrollable(false);
     m_innerForm.getRootGroupBox().updateKeyStrokes();
     m_innerForm.addPropertyChangeListener(m_innerFormPropertyListener);

@@ -52,7 +52,7 @@ scout.MenuBarPopup.prototype.close = function(event) {
 scout.MenuBarPopup.prototype._renderHead = function() {
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
 
-  // FIXME AWE throws exception if this.menu is a button because button is not rendered (MenuButtonAdapter is)
+  // FIXME awe: throws exception if this.menu is a button because button is not rendered (MenuButtonAdapter is)
   if (this.menu.$container.parent().hasClass('main-menubar')) {
     this.$head.addClass('in-main-menubar');
   }

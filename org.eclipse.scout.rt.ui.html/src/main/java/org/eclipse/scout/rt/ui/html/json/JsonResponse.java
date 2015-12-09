@@ -193,7 +193,7 @@ public class JsonResponse {
     m_sequenceNo = sequenceNo;
   }
 
-  // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
+  // FIXME cgu: potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
 
   /**
    * Returns a JSON string representation of this instance. This method is called at the end of a request. The return

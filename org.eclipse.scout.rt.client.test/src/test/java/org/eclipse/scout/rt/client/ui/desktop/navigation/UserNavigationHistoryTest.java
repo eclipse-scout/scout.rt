@@ -268,7 +268,7 @@ public class UserNavigationHistoryTest {
 
   @Test
   public void testHistoryTruncation() {
-    //TODO history size should be accessible
+    //TODO [5.2] jgu: history size should be accessible
     UserNavigationHistory history = new UserNavigationHistory();
     final int historySize = 25;
     Bookmark testBookmark = null;

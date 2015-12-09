@@ -101,7 +101,7 @@ public class JsonTreeTest {
   /**
    * If the selection event triggers the selection of another node, the selection event must not be ignored.
    */
-  //FIXME CGU Test fails due to scout model bug: selectNode puts first selection event AFTER this new selection event -> gets filtered in processEventBuffers. With table it works though.
+  //FIXME cgu: Test fails due to scout model bug: selectNode puts first selection event AFTER this new selection event -> gets filtered in processEventBuffers. With table it works though.
 //  @Test
 //  public void testIgnorableSelectionEvent2() throws JSONException {
 //    List<ITreeNode> nodes = new LinkedList<>();

@@ -23,7 +23,7 @@ scout.TreeCompact.prototype.init = function(model, session, register) {
   scout.TreeCompact.parent.prototype.init.call(this, model, session, register);
 
   // Keystroke context for the search field.
-  // TODO [dwi] migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
+  // TODO [5.2] dwi: migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
   this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
   this.searchFieldKeyStrokeContext.$bindTarget = function() {
     return this.$filter;

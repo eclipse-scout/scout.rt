@@ -99,7 +99,7 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       $step.appendDiv('wizard-step-separator');
     }
 
-    // TODO BSH Wizard | Add icon
+    // TODO [5.2] bsh: Wizard | Add icon
   }.bind(this));
 
   this.invalidateLayoutTree(false);

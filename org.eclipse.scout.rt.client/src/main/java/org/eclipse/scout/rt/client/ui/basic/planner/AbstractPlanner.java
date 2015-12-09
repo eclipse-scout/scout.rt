@@ -657,7 +657,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         List<Resource<RI>> notificationCopy = CollectionUtility.arrayList(m_selectedResources);
 
         fireResourcesSelected(notificationCopy);
-        //FIXME implement activity selection (activity may only be selected if it belongs to the selected resource)
+        //FIXME cgu: implement activity selection (activity may only be selected if it belongs to the selected resource)
       }
     }
     finally {

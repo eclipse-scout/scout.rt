@@ -258,9 +258,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering, iconOffset) {
   var menuClone;
   menus = menus ? menus : this._getMenuItems();
-  // TODO ASA,NBU where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
+  // TODO [5.2] asa, nbu: where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
   if (this.menu && this.menu.filterFunc) {
-    // TODO nbu figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
+    // TODO [5.2] nbu: figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
     menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
   } else if (this.menu && this.menu.cloneOf && this.menu.cloneOf.filterFunc) {
     menus = this.menu.cloneOf.filterFunc(menus, this instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
@@ -383,7 +383,7 @@ scout.ContextMenuPopup.prototype._getMenuItems = function() {
 scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
   var $firstMenuItem, $lastMenuItem;
 
-  // TODO CGU after refactoring of menu-item to context-menu-item we can use last/first instead of a fully qualified name. We also could move this function to jquery-scout to make it reusable.
+  // TODO [5.2] cgu: after refactoring of menu-item to context-menu-item we can use last/first instead of a fully qualified name. We also could move this function to jquery-scout to make it reusable.
   this.$body.children('.menu-item').each(function() {
     var $menuItem = $(this);
     $menuItem.removeClass('context-menu-item-first context-menu-item-last');

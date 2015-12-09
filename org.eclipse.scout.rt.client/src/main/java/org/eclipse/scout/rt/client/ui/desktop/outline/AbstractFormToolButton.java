@@ -127,8 +127,8 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
 
   protected void decorateForm(IForm form) {
     form.setShowOnStart(false);
-    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW); // FIXME [dwi] set in UI instead
-    form.setDisplayViewId(IForm.VIEW_ID_E); // FIXME [dwi] set in UI instead
+    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW); // FIXME dwi: set in UI instead
+    form.setDisplayViewId(IForm.VIEW_ID_E); // FIXME dwi: set in UI instead
   }
 
   protected final void interceptInitForm(FORM form) {

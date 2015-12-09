@@ -113,7 +113,7 @@ scout.TabItem.prototype._renderVisible = function(visible) {
 
 scout.TabItem.prototype._syncLabel = function(label) {
   this.label = label;
-  // TODO BSH/AWE/CGU Find a better solution for this!
+  // TODO [5.2] bsh, awe, cgu: Find a better solution for this!
   // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
   // tabButton IS, render the properties that affect the tab button.
   if (!this.rendered && this._tabRendered) {

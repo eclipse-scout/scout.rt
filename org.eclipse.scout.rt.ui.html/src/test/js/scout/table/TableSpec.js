@@ -1127,13 +1127,13 @@ describe("Table", function() {
 //      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
 //      menu2 = helper.menuHelper.createMenu(menuModel2);
 //      menu2.menuTypes = ['Table.MultiSelection'];
-//      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+//      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
 ////      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
 ////      menu3 = helper.menuHelper.createMenu(menuModel3);
 ////      menu3.menuTypes = ['Table.EmptySpace'];
 //
 //      menuTop.childActions = [menu1, menu2
-//      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+//      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
 //                              //, menu3
 //                              ];
 //      table.menus = [menuTop];
@@ -1152,7 +1152,7 @@ describe("Table", function() {
 //      sendQueuedAjaxCalls();
 //      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
 //      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
-//      // TODO nbu enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+//      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
 ////      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
 //    });
 
@@ -1972,7 +1972,7 @@ describe("Table", function() {
         expect($cells1.eq(2).text()).toBe('1');
       });
 
-      //TODO CGU fails because css is not applied -> include css files in SpecRunner
+      //TODO [5.2] cgu: fails because css is not applied -> include css files in SpecRunner
       //      it("moves the table header menu if it is open", function() {
       //        table.render(session.$entryPoint);
       //

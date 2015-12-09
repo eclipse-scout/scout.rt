@@ -61,7 +61,7 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
    */
   void cleanUpEventFilters();
 
-  // TODO CGU/BSH: The following methods should be renamed:
+  // TODO [5.2] cgu, bsh: The following methods should be renamed:
   // attachAdapter -> attachChildAdapter
   // getAdapter -> getChildAdapter
   // getAdapters -> getChildAdapters

@@ -361,7 +361,7 @@ scout.Tree.prototype._decorateNode = function(node) {
   this._renderNodeFilterAccepted(node);
 
   this.dragAndDropHandler.install($node);
-  // TODO BSH More attributes...
+  // TODO [5.2] bsh: More attributes...
   // iconId
 
   // If parent node is marked as 'lazy', check if any hidden child nodes remain.
@@ -577,7 +577,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
         $existingNodes.each(function() {
           // unlink '$nodes' from 'nodes' before deleting them
           var node = $(this).data('node');
-          if (node) { // FIXME BSH Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
+          if (node) { // FIXME bsh: Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
             delete node.$node;
           }
         });
@@ -664,7 +664,7 @@ scout.Tree.prototype._removeSelection = function() {
 
   this.selectedNodes.forEach(function(node) {
     var $node = node.$node;
-    if ($node) { // TODO BSH Check if $node can be undefined
+    if ($node) { // TODO [5.2] bsh: Check if $node can be undefined
       $node.select(false);
 
       // remove ancestor and child classes
@@ -1249,7 +1249,7 @@ scout.Tree.prototype._showContextMenu = function(event, destination) {
   event.preventDefault();
   event.stopPropagation();
   var func = function func(event, destination) {
-    var filteredMenus = this._filterMenus(this.menus, destination, true), //TODO nbu move to menu->filterFunc
+    var filteredMenus = this._filterMenus(this.menus, destination, true), //TODO [5.2] nbu: move to menu->filterFunc
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible

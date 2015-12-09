@@ -80,7 +80,7 @@ scout.FormController.prototype.render = function() {
 scout.FormController.prototype.activateForm = function(formAdapterId) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
 
-  // FIXME AWE: (2nd screen) handle popupWindow?
+  // FIXME awe: (2nd screen) handle popupWindow?
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._activateView(form);
   } else {
@@ -101,7 +101,7 @@ scout.FormController.prototype._renderView = function(view, register, position) 
   if (!this._displayParent.rendered) {
     return;
   }
-  // Prevent "Already rendered" errors / FIXME BSH/DWI Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
   if (view.rendered) {
     return;
   }
@@ -134,7 +134,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   if (!this._displayParent.rendered) {
     return;
   }
-  // Prevent "Already rendered" errors / FIXME BSH/DWI Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
   if (dialog.rendered) {
     return;
   }
@@ -223,7 +223,7 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
     .cssLeft(left)
     .cssTop(top);
 
-  // FIXME [dwi][awe] If not validated anew, focus on single-button forms is not gained.
+  // FIXME dwi: If not validated anew, focus on single-button forms is not gained.
   //                 Maybe, this is the same problem as in BusyIndicator.js
   this.session.focusManager.validateFocus();
 };

@@ -29,7 +29,7 @@ describe("MobileTable", function() {
 
   describe("render", function() {
 
-    //FIXME CGU temporarily disabled until mobile works again
+    //FIXME cgu: temporarily disabled until mobile works again
 //    it("does not create an addional div for scrolling", function() {
 //      var model = helper.createModelFixture(2);
 //      var table = helper.createMobileTable(model);

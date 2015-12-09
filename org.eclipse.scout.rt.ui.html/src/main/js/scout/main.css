@@ -10,7 +10,7 @@
  ******************************************************************************/
 /* global section, narrow to .scout for usage as portlet */
 
-/* TODO AWE/CGU: (css) YUI compressor destroys calc(100% + x) expressions (only with plus operator)
+/* TODO awe, cgu: (css) YUI compressor destroys calc(100% + x) expressions (only with plus operator)
  * This bug will be fixed with YUI compressor 2.4.9 which is not released yet:
  * https://github.com/yui/yuicompressor/commits/master
  * We must update maven-yui-compressor-plugin (v >= 1.6.0, with YUI >= 2.4.9) or...
@@ -172,7 +172,7 @@ button {
   border: 1px solid @button-border-color;
   border-radius: @border-radius;
   cursor: pointer;
-  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+  /* FIXME cgu/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
   /* ellipsis, but this breaks the focus, because the ::before inline element gets */
   /* cut off. We should find a better solution for this. */
   white-space: nowrap;

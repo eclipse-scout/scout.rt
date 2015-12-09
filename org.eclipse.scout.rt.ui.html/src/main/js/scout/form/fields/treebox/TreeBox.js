@@ -28,7 +28,7 @@ scout.TreeBox.prototype._render = function($parent) {
     this._renderTree();
   }
   if (this.filterBox) {
-    // TODO BSH Tree | Only render when filter active
+    // TODO [5.2] bsh: Tree | Only render when filter active
     this._renderFilterBox();
   }
 };

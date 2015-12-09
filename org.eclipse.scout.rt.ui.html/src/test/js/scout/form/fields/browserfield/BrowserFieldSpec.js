@@ -24,7 +24,7 @@ describe('BrowserField', function() {
     browserField.init(createSimpleModel('BrowserField', session, 'foo'));
     browserField.render(session.$entryPoint);
 
-    // FIXME AWE: discuss with C.GU: postMessage is an async call - how to test this with Jasmine?
+    // FIXME awe: discuss with C.GU: postMessage is an async call - how to test this with Jasmine?
     // window.postMessage('hello world', '*');
     browserField._onPostMessage({
       data: 'hello world',

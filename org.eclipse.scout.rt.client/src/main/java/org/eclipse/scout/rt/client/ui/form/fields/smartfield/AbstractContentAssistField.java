@@ -928,7 +928,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   protected abstract VALUE handleMissingLookupRow(String text);
 
   /**
-   * FIXME AWE: check difference between handleMissingLookupRow and handleAcceptByDisplayText?
+   * FIXME awe: check difference between handleMissingLookupRow and handleAcceptByDisplayText?
    */
   protected abstract boolean handleAcceptByDisplayText(String text);
 

@@ -39,7 +39,7 @@
     #scout.drop-shadow(@y: -6px;);
   }
 
-  /* Enable submenu FIXME BSH We should not need to copy/paste this! */
+  /* Enable submenu FIXME bsh: We should not need to copy/paste this! */
   & > .submenu-icon {
     display: inline-block;
     vertical-align: middle;

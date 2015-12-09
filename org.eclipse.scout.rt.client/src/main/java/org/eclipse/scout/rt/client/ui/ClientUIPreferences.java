@@ -78,7 +78,7 @@ public class ClientUIPreferences {
   protected static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   protected static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
   protected static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
-  // TODO AWE Check if this property is still needed with the new Html UI
+  // TODO [5.2] awe: Check if this property is still needed with the new Html UI
   protected static final String FORM_BOUNDS = "form.bounds.";
 
   protected final IClientSession m_session;

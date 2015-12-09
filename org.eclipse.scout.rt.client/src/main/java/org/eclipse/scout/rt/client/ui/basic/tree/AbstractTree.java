@@ -396,7 +396,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(18)
   protected void execAppLinkAction(String ref) {
-    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
     if (ref != null) {

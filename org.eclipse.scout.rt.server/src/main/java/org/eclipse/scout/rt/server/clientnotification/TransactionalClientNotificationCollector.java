@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
- * TODO [jgu] rename<br>
+ * TODO [5.2] jgu: rename<br>
  * Collector for client notifications issued during processing of a service request, and which are to be included in the
  * request's response upon successful commit (piggyback). The collector is not active anymore when it is
  *

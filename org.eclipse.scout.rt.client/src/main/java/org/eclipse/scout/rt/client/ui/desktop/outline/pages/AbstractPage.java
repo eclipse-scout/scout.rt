@@ -690,7 +690,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
     }
 
-    form.setModal(false); // TODO [dwi] do the same as WrappedFormField
+    form.setModal(false); // TODO [5.2] dwi: do the same as WrappedFormField
     form.setShowOnStart(false);
   }
 

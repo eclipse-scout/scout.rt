@@ -58,7 +58,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
 scout.ViewTabsController.prototype._calculateExactPosition = function(parent, position) {
   if (position === 0) {
     return 0; // return 1; --> BenchModeTest = grün
-    // FIXME NBU: (von A.WE) das hier macht den BENCH modus vom Desktop kaputt (siehe BenchModeTest)
+    // FIXME nbu: (von A.WE) das hier macht den BENCH modus vom Desktop kaputt (siehe BenchModeTest)
     // dort gibt es keine outline, die app wird mit einem einzigen form (view) gestartet
     // von diesem form aus öffnet man ein weiteres form (view), das modal zum aktuellen form sein soll
     // der aktuelle code fügt dieses neue form an position 0 ein. Das ist nicht richtig, das neue form
@@ -83,7 +83,7 @@ scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
   delete this._viewTabMap[viewId];
 
   // Select next available view tab.
-  // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
+  // FIXME dwi: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
   if (this._selectedViewTab === viewTab) {
     var parentViewTab = this.viewTab(viewTab._view.parent);
     if (viewTabIndexBefore >= 0) {

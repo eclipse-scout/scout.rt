@@ -63,7 +63,7 @@ scout.TouchPopup.prototype.prefLocation = function($container, openingDirectionY
 
 scout.TouchPopup.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('touch-popup');
-    //    .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME AWE: (popups) is this line required?
+    //    .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME awe: (popups) is this line required?
   this._field.render(this.$container);
 
   this._$widgetContainer = this.$container.appendDiv('widget-container');

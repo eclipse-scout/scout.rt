@@ -1305,7 +1305,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public IFormField getFocusOwner() { // FIXME [dwi]: make this work with Html UI (blocking-condition, browser must send focused element in a separate request).
+  public IFormField getFocusOwner() { // FIXME dwi: make this work with Html UI (blocking-condition, browser must send focused element in a separate request).
     IFormField field = getDesktop().getFocusOwner();
     if (field == null) {
       return null;

@@ -122,7 +122,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       // Wait for the consumer to be stopped.
       try {
-        // TODO [dwi]: Filter: wrong usage --> COMPLETED
+        // TODO [5.2] dwi: Filter: wrong usage --> COMPLETED
         Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
             .andMatchFuture(m_messageConsumerFuture)
             .toFilter(), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);

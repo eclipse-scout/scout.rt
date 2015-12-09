@@ -103,7 +103,7 @@ scout.TabBox.prototype._removeTabContent = function() {
 };
 
 scout.TabBox.prototype.rebuildTabs = function() {
-  // FIXME AWE: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
+  // FIXME awe: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
   // DOM element which currently has the focus - the focus is lost. An other solution would be, to render the
   // tab at the correct position but probably that's not so easy because the render impl. does always append.
   this.tabItems.forEach(function(tabItem) {
@@ -145,7 +145,7 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
 };
 
 // keyboard navigation in tab-box button area
-// FIXME AWE: (tab-box) overflow menu must be accessible by keyboard navigation
+// FIXME awe: (tab-box) overflow menu must be accessible by keyboard navigation
 scout.TabBox.prototype._onKeyDown = function(event) {
   var tabIndex, navigationKey =
     event.which === scout.keys.LEFT ||
@@ -205,7 +205,7 @@ scout.TabBox.prototype._renderTabContent = function() {
 
 scout.TabBox.prototype._renderMenus = function() {
   this.updateMenuBar();
-  // TODO BSH Key strokes?
+  // TODO [5.2] bsh: Key strokes?
 };
 
 scout.TabBox.prototype.updateMenuBar = function() {

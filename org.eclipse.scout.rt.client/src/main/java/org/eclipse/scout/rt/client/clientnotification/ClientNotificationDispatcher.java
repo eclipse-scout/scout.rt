@@ -171,7 +171,7 @@ public class ClientNotificationDispatcher {
     synchronized (m_notificationFutures) {
       futures.addAll(m_notificationFutures);
     }
-    // TODO [jgu] how long to wait? Is this method still in use?
+    // TODO [5.2] jgu: how long to wait? Is this method still in use?
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(futures)
         .andMatchNotFuture(IFuture.CURRENT.get())

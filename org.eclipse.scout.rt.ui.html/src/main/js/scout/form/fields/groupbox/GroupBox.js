@@ -90,7 +90,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this.controls.forEach(function(control) {
     control.render(this.$body);
   }, this);
-  // FIXME AWE: andere lösung finden für das hier
+  // FIXME awe: andere lösung finden für das hier
   // only render when 2nd argument is undefined or matches this.position
   //  if (whenPosition !== undefined && this.position !== whenPosition) {
   //    return;

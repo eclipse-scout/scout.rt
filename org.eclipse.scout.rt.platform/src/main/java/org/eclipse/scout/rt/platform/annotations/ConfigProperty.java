@@ -91,7 +91,7 @@ public @interface ConfigProperty {
    */
   String CODE_TYPE = "CODE_TYPE";
 
-// XXX[aho]
+  // FIXME mvi: from aho without text
   String CODE_ROW = "CODE_ROW";
   /**
    * int

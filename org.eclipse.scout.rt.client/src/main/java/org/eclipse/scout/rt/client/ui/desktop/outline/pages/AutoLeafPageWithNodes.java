@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
-// FIXME CGU: is AutoLeafPageWithNodes still needed? currently not used by CRM or somewhere else.
+// FIXME cgu: is AutoLeafPageWithNodes still needed? currently not used by CRM or somewhere else.
 public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   private ITableRow m_tableRow;
   private IPage<?> m_actualParentPage;

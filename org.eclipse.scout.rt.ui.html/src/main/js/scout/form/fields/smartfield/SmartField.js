@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
+// FIXME awe: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
 // --> Keine Daten vorhanden
 
-// FIXME AWE: (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
+// FIXME awe: (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
 
-// FIXME AWE: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
+// FIXME awe: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
 
 /**
  * Three smart-field modes:
@@ -392,7 +392,7 @@ scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, f
   });
 };
 
-// FIXME AWE/DWI: check if we can find next tabbable in the current focus-context (FocusManager)
+// FIXME awe, dwi: check if we can find next tabbable in the current focus-context (FocusManager)
 scout.SmartField.prototype._focusNextTabbable = function() {
   var $tabElements = this.entryPoint().find(':tabbable');
   var nextIndex = 0;

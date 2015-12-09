@@ -784,7 +784,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @ConfigOperation
   @Order(120)
   protected void execAppLinkAction(String ref) {
-    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
     if (ref != null) {
@@ -1040,7 +1040,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  // FIXME AWE/MVI: make TableControls extensible, check copy/paste code in this class
+  // FIXME awe, mvi: make TableControls extensible, check copy/paste code in this class
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
     OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
@@ -3137,7 +3137,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         else {
           fireRowsDeleted(deletedRows);
         }
-        //TODO CGU is this necessary? Deleted rows are deselected above
+        //TODO [5.2] cgu: is this necessary? Deleted rows are deselected above
         selectRows(selectionRows, false);
       }
       finally {
@@ -3501,7 +3501,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void resetColumns(Set<String> options) {
     try {
       setTableChanging(true);
-      // TODO ASA move to internal?
+      // TODO [5.2] asa: move to internal?
       if (options.contains(IResetColumnsOption.SORTING)) {
         m_sortValid = false;
       }

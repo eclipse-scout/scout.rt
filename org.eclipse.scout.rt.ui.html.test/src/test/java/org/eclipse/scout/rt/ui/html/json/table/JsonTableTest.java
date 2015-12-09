@@ -769,7 +769,7 @@ public class JsonTableTest {
     assertEquals(3, table.getRowCount());
     assertEquals(1, table.getFilteredRowCount());
     assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
-    //TODO BSH CGU delete ? assertEquals(6, jsonTable.eventBuffer().size()); // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED = TYPE_ROWS_DELETED + TYPE_ROWS_INSERTED + TYPE_ROWS_UPDATED (row0) + TYPE_ROWS_UPDATED (row2)
+    //TODO [5.2] bsh: CGU delete ? assertEquals(6, jsonTable.eventBuffer().size()); // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED = TYPE_ROWS_DELETED + TYPE_ROWS_INSERTED + TYPE_ROWS_UPDATED (row0) + TYPE_ROWS_UPDATED (row2)
 
     // Rejection of row 0 generates a deleted event, rejection of row 2 an update event
     JsonTestUtility.processBufferedEvents(m_uiSession);

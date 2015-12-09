@@ -12,8 +12,8 @@ scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
   this._$viewTabBar;
-  this._$taskBar; // FIXME AWE: uniform naming
-  this._$toolBar; // FIXME AWE: uniform naming
+  this._$taskBar; // FIXME awe: uniform naming
+  this._$toolBar; // FIXME awe: uniform naming
   this.$bench;
 
   this.navigation;
@@ -23,7 +23,7 @@ scout.Desktop = function() {
   this._outlineContent;
 
   /**
-   * FIXME DWI: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeContext.js)
+   * FIXME dwi: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeContext.js)
    * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
    * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
@@ -74,7 +74,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.navigation = hasNavigation ? new scout.DesktopNavigation(this) : scout.NullDesktopNavigation;
   this.navigation.render($parent);
-  //TODO maybe better move to desktop navigation?
+  //TODO [5.2] cgu: maybe better move to desktop navigation?
   this._installKeyStrokeContextForDesktopViewButtonBar();
 
   this._renderTaskBar($parent);
@@ -84,7 +84,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderToolMenus();
   this._createSplitter($parent);
   this._setSplitterPosition();
-  // TODO AWE/BSH Maybe remove this? Addon functionality may be provided by using an own desktop.
+  // TODO [5.2] awe, bsh: Maybe remove this? Addon functionality may be provided by using an own desktop.
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
   });
@@ -317,7 +317,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   if (!this._hasNavigation()) {
     return;
   }
-  // FIXME AWE: (user-prefs) Use user-preferences instead of sessionStorage
+  // FIXME awe: (user-prefs) Use user-preferences instead of sessionStorage
   var storedSplitterPosition = this.cacheSplitterPosition && sessionStorage.getItem('scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
     // Restore splitter position
@@ -331,7 +331,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   }
 };
 
-// TODO CGU: maybe better change to actual properties and set on server?
+// TODO [5.2] cgu: maybe better change to actual properties and set on server?
 scout.Desktop.prototype._hasNavigation = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
@@ -461,7 +461,7 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
   //set active form to null because outline is active form.
   this._setOutlineActivated();
   // Request focus on first element in new outlineTab.
-  this.session.focusManager.validateFocus(); // TODO [nbu][dwi] why double validate?
+  this.session.focusManager.validateFocus(); // TODO [5.2] nbu, dwi: why double validate?
 };
 
 scout.Desktop.prototype.setOutline = function(outline, bringToFront) {
@@ -538,7 +538,7 @@ scout.Desktop.prototype._onModelOpenUri = function(event) {
   if (event.action === 'download') {
     this._openUriInIFrame(event.uri);
   } else if (event.action === 'open') {
-    // TODO BSH Does that really work on all platforms?
+    // TODO [5.2] bsh: Does that really work on all platforms?
     this._openUriInIFrame(event.uri);
   } else if (event.action === 'new-window') {
     this._openUriAsNewWindow(event.uri);

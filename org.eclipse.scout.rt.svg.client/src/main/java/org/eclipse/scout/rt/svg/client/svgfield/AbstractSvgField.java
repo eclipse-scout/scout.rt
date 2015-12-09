@@ -89,7 +89,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   @ConfigOperation
   @Order(230)
   protected void execAppLinkAction(String ref) {
-    // FIXME CGU: remove this code when execpHyperlink() has been removed
+    // FIXME cgu: remove this code when execpHyperlink() has been removed
     execHyperlink(new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, ref));
   }
 

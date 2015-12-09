@@ -107,10 +107,10 @@ scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindo
   setTimeout(function() {
     if (popupWindow.isClosed()) {
       $.log.debug('Popup window for form ID ' + form.id + ' has been closed');
-      form.close(); // FIXME AWE: discuss is close Ok or do we need the now unsupported "killed from UI" event?
+      form.close(); // FIXME awe: discuss is close Ok or do we need the now unsupported "killed from UI" event?
       // was passiert im model wenn noch fenster / message boxen offen sind`?
     }
-  }.bind(this), 250); // FIXME AWE: geht hier auch 0?
+  }.bind(this), 250); // FIXME awe: geht hier auch 0?
 };
 
 /**

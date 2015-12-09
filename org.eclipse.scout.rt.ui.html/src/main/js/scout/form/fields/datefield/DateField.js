@@ -712,7 +712,7 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
  * @Override BasicField.js
  */
 scout.DateField.prototype._onDisplayTextModified = function() {
-  // TODO BSH What to do? Maybe change on server that this method is never called.
+  // TODO [5.2] bsh: What to do? Maybe change on server that this method is never called.
 };
 
 /**

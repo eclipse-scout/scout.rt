@@ -185,7 +185,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
                 // no client request must currently being processed (because in that case, the result of the
                 // model job will be returned as payload of the current JSON response).
-                // TODO [BSH] This check is not thread-safe. At least, 'm_currentJsonRequest' should be volatile. Still, thread-safety is not given.
+                // TODO [5.2] bsh: This check is not thread-safe. At least, 'm_currentJsonRequest' should be volatile. Still, thread-safety is not given.
                 if (isProcessingJsonRequest()) {
                   return false;
                 }
@@ -444,7 +444,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     String browserId = currentHttpRequest().getHeader("User-Agent");
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {
-      // FIXME CGU: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
+      // FIXME cgu: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
       if (uiDeviceTypeStr != null) {
         uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);
@@ -810,8 +810,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       catch (IllegalStateException e) {
         // May happen in tomcat if session was already invalidated (e.g. due to expiration)
         // We need to keep a reference to the session and cannot call req.getSession(false) because the model may call logout without having a pending request
-        // TODO CGU verify with BSH if this statement is true.
-        // FIXME This will generate a deadlock in jetty (tomcat will throw the exception). Happens if client session close job is running when UIsession.valueUnboudn is called.
+        // TODO [5.2] cgu: verify with BSH if this statement is true.
+        // FIXME cgu: This will generate a deadlock in jetty (tomcat will throw the exception). Happens if client session close job is running when UIsession.valueUnboudn is called.
         LOG.info("Session already invalidated");
       }
     }

@@ -911,7 +911,7 @@
    * See also showFast.
    */
   $.fn.hideFast = function() {
-    //TODO CGU 5.2 change to use css class (this.addClass('hidden');). Replace jquery hide and show -> should be a lot faster because it is not necessary to remember any state.
+    //TODO [5.2] cgu: change to use css class (this.addClass('hidden');). Replace jquery hide and show -> should be a lot faster because it is not necessary to remember any state.
     this[0].style.display = 'none';
     return this;
   };

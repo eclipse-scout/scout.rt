@@ -30,7 +30,7 @@ public class JsonPlannerEvent implements IJsonObject {
   @Override
   public JSONObject toJson() {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    // TODO ActivityMap | Fill data
+    // TODO [5.2] bsh: ActivityMap | Fill data
     return json;
   }
 }

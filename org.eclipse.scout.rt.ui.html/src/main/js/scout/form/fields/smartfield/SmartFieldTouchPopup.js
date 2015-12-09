@@ -44,13 +44,13 @@ scout.SmartFieldTouchPopup.prototype._onMouseDown = function(event) {
  * should stay open when the SmartField popup is closed. It also prevents the focus blur
  * event on the SmartField input-field.
  */
-//TODO CGU/AWE this is not required by the cell editor anymore, but we cannot remove it either because mouse down on a row would immediately close the popup, why?
+//TODO [5.2] cgu, awe: this is not required by the cell editor anymore, but we cannot remove it either because mouse down on a row would immediately close the popup, why?
 scout.SmartFieldTouchPopup.prototype._onContainerMouseDown = function(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
   //  return false;
-  // FIXME AWE: (popups) durch das prevent default here, wird verhindert, dass ein text-field im popup den fokus bekommen kann
+  // FIXME awe: (popups) durch das prevent default here, wird verhindert, dass ein text-field im popup den fokus bekommen kann
   // müssen wir für mobile und editierbare tabellen (?) noch lösen
 };
 

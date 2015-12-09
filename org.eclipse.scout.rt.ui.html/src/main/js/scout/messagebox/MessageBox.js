@@ -99,7 +99,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderHtml(this.html);
   this._renderHiddenText(this.hiddenText);
 
-  // FIXME MOT: Somehow let the user copy the 'copyPasteText' - but how?
+  // FIXME mot: Somehow let the user copy the 'copyPasteText' - but how?
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -127,7 +127,7 @@ scout.MessageBox.prototype._position = function() {
 };
 
 scout.MessageBox.prototype._renderIconId = function(iconId) {
-  // FIXME BSH implement
+  // FIXME bsh: implement
 };
 
 scout.MessageBox.prototype._renderSeverity = function(severity) {

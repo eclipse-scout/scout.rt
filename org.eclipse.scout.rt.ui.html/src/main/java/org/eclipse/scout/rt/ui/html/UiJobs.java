@@ -68,7 +68,7 @@ public class UiJobs {
           ModelJobFutureFilter.INSTANCE,
           new SessionFutureFilter(clientSession)));
     }
-    catch (TimeoutException | RuntimeException e) { // FIXME [dwi] catch Interrupted Exception
+    catch (TimeoutException | RuntimeException e) { // FIXME dwi: catch Interrupted Exception
       // Handle exception in proper ClientRunContext.
       ClientRunContexts.copyCurrent().withSession(clientSession, true).run(new IRunnable() {
 
@@ -105,7 +105,7 @@ public class UiJobs {
     try {
       await(new FutureFilter(future));
     }
-    catch (final TimeoutException e) { // FIXME [dwi] remove once TimeoutException is RuntimeException
+    catch (final TimeoutException e) { // FIXME dwi: remove once TimeoutException is RuntimeException
       throw new UiException(e);
     }
 
@@ -135,7 +135,7 @@ public class UiJobs {
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .andMatch(filter)
         .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-      // FIXME [dwi] remove if Job API throws TimeoutException
+      // FIXME dwi: remove if Job API throws TimeoutException
       throw new TimeoutException(String.format("Timeout while waiting for model jobs to complete [timeout=%ss]", TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT)));
     }
   }

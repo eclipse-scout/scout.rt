@@ -38,7 +38,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
   }, this);
 
   // add fixed separator between emptySpace and selection
-  //FIXME AWE considier visibility of the menus (-> only create separator if there are visible empty space menus)
+  //FIXME awe: considier visibility of the menus (-> only create separator if there are visible empty space menus)
   if (emptySpaceItems.length > 0 && selectionItems.length > 0) {
     emptySpaceItems.push(this._createSeparator());
   }
@@ -64,7 +64,7 @@ scout.MenuItemsOrder.prototype._menuTypes = function(types) {
  */
 scout.MenuItemsOrder.prototype._createSeparator = function() {
   return scout.create('Menu', {
-    parent: this.session.desktop, // TODO this is not correct, menubar should be the parent
+    parent: this.session.desktop, // TODO [5.2] cgu: this is not correct, menubar should be the parent
     createdBy: this,
     separator: true
   });

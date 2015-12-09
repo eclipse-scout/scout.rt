@@ -138,7 +138,7 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
     }
   }
 
-  // FIXME AWE: (display-text) rename to handleUiValueChanged after renaming in Scout RT
+  // FIXME awe: (display-text) rename to handleUiValueChanged after renaming in Scout RT
   @Override
   protected void handleUiTextChangedImpl(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);

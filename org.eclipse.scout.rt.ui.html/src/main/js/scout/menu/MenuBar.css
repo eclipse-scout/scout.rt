@@ -96,7 +96,7 @@
 
       /* ---------------------------------- */
 
-      /* FIXME AWE: reduce copy/paste --> Button.css */
+      /* FIXME awe: reduce copy/paste --> Button.css */
       &.menu-button {
         padding: @button-padding-y @button-padding-x;
         text-align: center;
@@ -106,7 +106,7 @@
         border-radius: @border-radius;
         min-width: 110px;
 
-        /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+        /* FIXME cgu/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
         /* ellipsis, but this breaks the focus, because the ::before inline element gets */
         /* cut off. We should find a better solution for this. */
         /*white-space: nowrap;*/
@@ -145,7 +145,7 @@
           background-color: @default-button-background-color;
           /* same color border is necessary to align the text with text from buttons with a real border */
           border-color: @default-button-background-color;
-          border-color: transparent; /* FIXME BSH Check which is better! */
+          border-color: transparent; /* FIXME bsh: Check which is better! */
           color: @default-button-color;
 
           &:focus {

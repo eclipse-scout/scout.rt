@@ -283,7 +283,7 @@ public class JSONObject {
    *          a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double, {@link #NULL} or null.
    *          May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    */
-  // TODO: Change {@code append) to {@link #append} when append is
+  // TODO [5.2] bsh: Change {@code append) to {@link #append} when append is
   // unhidden.
   public JSONObject accumulate(String name, Object value) throws JSONException {
     Object current = nameValuePairs.get(checkName(name));

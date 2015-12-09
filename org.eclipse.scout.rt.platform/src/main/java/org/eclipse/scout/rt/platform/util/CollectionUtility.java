@@ -702,7 +702,7 @@ public final class CollectionUtility {
     return Arrays.hashCode(c.toArray());
   }
 
-  // TODO [JGU]
+  // TODO [5.2] jgu: ???
   public static List<Object> parse(String text) {
     List<Object> list = null;
     if (StringUtility.hasText(text)) {

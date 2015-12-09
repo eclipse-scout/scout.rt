@@ -85,7 +85,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @ConfigOperation
   @Order(230)
   protected void execAppLinkAction(String ref) {
-    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
     if (ref != null) {
@@ -176,7 +176,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   public void setScrollBarEnabled(boolean scrollBarEnabled) {
-    // TODO BSH/AWE Cleanup scroll[bB]ar[s] confusion
+    // TODO [5.2] bsh, awe: Cleanup scroll[bB]ar[s] confusion
     propertySupport.setPropertyBool(PROP_SCROLLBARS_ENABLED, scrollBarEnabled);
   }
 

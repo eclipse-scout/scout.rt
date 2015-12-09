@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME AWE: (calendar) check bug reported from Michael: switch month when items are still loading (async)
+// FIXME awe: (calendar) check bug reported from Michael: switch month when items are still loading (async)
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
@@ -172,7 +172,7 @@ scout.Calendar.prototype._render = function($parent) {
       } else if (w > 0 && d === 0) {
         $d.addClass('calendar-week-name');
       } else if (w > 0 && d > 0) {
-        // FIXME AWE: (calendar) we must also select the clicked day and update the model
+        // FIXME awe: (calendar) we must also select the clicked day and update the model
         $d.addClass('calendar-day')
           .data('day', d)
           .data('week', w)
@@ -230,7 +230,7 @@ scout.Calendar.prototype._renderSelectedDate = function() {
 };
 
 scout.Calendar.prototype._renderMenus = function() {
-  // FIXME AWE: (calendar) here we should update the menu-bar (see Table.js)
+  // FIXME awe: (calendar) here we should update the menu-bar (see Table.js)
   $.log.debug('(Calendar#_renderMenus) impl.');
 };
 
@@ -730,7 +730,7 @@ scout.Calendar.prototype._renderListPanel = function() {
     return false;
   }
 
-  // FIXME AWE: (calendar) sort components in list-panel?
+  // FIXME awe: (calendar) sort components in list-panel?
   // $components.sort(this._sortTop);
 
   components.forEach(function(component) {
@@ -777,7 +777,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 
 /* -- components, arrangement------------------------------------ */
 
-// FIXME AWE/CRU: arrange methods should work on the model, not on the DOM
+// FIXME awe, cru: arrange methods should work on the model, not on the DOM
 scout.Calendar.prototype._arrangeComponents = function() {
   var k, $day, $children,
     $days = $('.calendar-day', this.$grid);
@@ -830,7 +830,7 @@ scout.Calendar.prototype._arrangeComponentInitialW = function($children) {
 };
 
 scout.Calendar.prototype._arrangeComponentFindPlacement = function($children) {
-  // FIXME CRU: placement may be improved, test cases needed
+  // FIXME awe: placement may be improved, test cases needed
   // 1: change x if column on the left side free
   // 2: change w if place on the right side not used
   // -> then find new w (just use _arrangeComponentInitialW)

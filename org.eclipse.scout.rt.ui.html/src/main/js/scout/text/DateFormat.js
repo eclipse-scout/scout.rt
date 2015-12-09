@@ -49,7 +49,7 @@ scout.DateFormat = function(locale, pattern) {
   this.pattern = pattern || locale.dateFormatPatternDefault;
 
   this.symbols = locale.dateFormatSymbols;
-  this.symbols.firstDayOfWeek = 1; // monday //FIXME deliver from server
+  this.symbols.firstDayOfWeek = 1; // monday //FIXME cgu: deliver from server
   this.symbols.weekdaysOrdered = scout.dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
   this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.symbols.monthsToNumber;
@@ -995,7 +995,7 @@ scout.DateFormat.prototype.parse = function(text, startDate) {
       return null; // Date and weekday don't match -> parsing failed
     }
   }
-  // TODO Handle week of year
+  // TODO [5.2] bsh: Handle week of year
 
   // Return valid date
   return date;

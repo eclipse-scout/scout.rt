@@ -28,7 +28,7 @@ scout.DesktopViewTab = function() {
     }
   }.bind(this);
 
-  // FIXME AWE: problem ist, dass Widegt#remove prüft ob rendered ist
+  // FIXME awe: problem ist, dass Widegt#remove prüft ob rendered ist
   // im bench mode ist der DesktopViewTab nicht gerendet, _remove wird
   // darum nicht aufgerufen und das 'remove event vom tab nie getriggert
   this._removeListener = this._onViewRemoved.bind(this);

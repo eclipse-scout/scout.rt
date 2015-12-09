@@ -311,7 +311,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(10)
   protected void execAppLinkAction(String ref) {
-    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
     URL url = null;
     boolean local = false;
     if (ref != null) {
@@ -929,7 +929,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
       }
       catch (RuntimeException e) {
-        // TODO ABR Check if logging is the correct here
+        // TODO [5.2] abr: Check if logging is the correct here
         LOG.error("Unexpected error while closing form: {}", m_containerForm, e);
       }
       // dispose all steps
@@ -941,7 +941,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           step.dispose();
         }
         catch (RuntimeException t) {
-          // TODO ABR Check if logging is the correct here
+          // TODO [5.2] abr: Check if logging is the correct here
           LOG.error("Unexpected error while disposing step: {}", step, t);
         }
       }

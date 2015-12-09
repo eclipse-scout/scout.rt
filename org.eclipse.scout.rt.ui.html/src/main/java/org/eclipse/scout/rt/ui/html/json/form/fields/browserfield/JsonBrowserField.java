@@ -110,7 +110,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    // TODO BSH UIFacade required?
+    // TODO [5.2] bsh: UIFacade required?
     return new BinaryResourceHolder(getModel().getUIFacade().requestBinaryResourceFromUI(filename));
   }
 

@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// FIXME AWE: (menu) diese klasse soll kein JsonAdapter mehr sein. Parent der menus ist dann die Table
+// FIXME awe: (menu) diese klasse soll kein JsonAdapter mehr sein. Parent der menus ist dann die Table
 public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends AbstractJsonPropertyObserver<CONTEXT_MENU> {
 
   private ContextMenuListener m_contextMenuListener;

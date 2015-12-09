@@ -86,7 +86,7 @@ scout.objects = {
   },
 
   /**
-   * TODO BSH Document
+   * TODO [5.2] bsh: Document
    *
    * How to use:
    *   scout.objects.checkMethodOverrides().join('\n')

@@ -23,7 +23,7 @@ scout.LabelField.prototype._render = function($parent) {
 scout.LabelField.prototype._renderProperties = function() {
   scout.LabelField.parent.prototype._renderProperties.call(this);
   this._renderWrapText(this.wrapText);
-  // FIXME render selectable
+  // FIXME cgu: render selectable
 };
 
 /**

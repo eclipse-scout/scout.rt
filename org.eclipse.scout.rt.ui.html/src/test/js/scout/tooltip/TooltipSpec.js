@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-//FIXME CGU needs CSS
+//FIXME cgu: needs CSS
 //describe("Tooltip", function() {
 //  var $sandbox;
 //

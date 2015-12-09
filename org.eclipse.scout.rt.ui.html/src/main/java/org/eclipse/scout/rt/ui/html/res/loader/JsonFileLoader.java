@@ -42,7 +42,7 @@ public class JsonFileLoader extends AbstractResourceLoader {
       // not handled here
       return null;
     }
-    // FIXME BSH: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
+    // FIXME bsh: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
     String json = new String(IOUtility.readFromUrl(url), StandardCharsets.UTF_8.name());
     json = JsonUtility.stripCommentsFromJson(json);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), StandardCharsets.UTF_8.name(), json.getBytes(StandardCharsets.UTF_8.name()), System.currentTimeMillis());

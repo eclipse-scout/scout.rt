@@ -347,7 +347,7 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
 };
 
 scout.TableHeader.prototype.updateMenuBar = function() {
-  var menuItems = this.table._filterMenus(this.table.menus, 'header'); //TODO nbu move to menu->filterFunc
+  var menuItems = this.table._filterMenus(this.table.menus, 'header'); //TODO [5.2] nbu: move to menu->filterFunc
   this.menuBar.updateItems(menuItems);
 };
 

@@ -63,6 +63,6 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
 
   @Override
   public void testConnection(Connection conn) throws SQLException {
-    //TODO what is the name of a dummy table or typical check statement to run as a test?
+    //TODO [5.2] sle: what is the name of a dummy table or typical check statement to run as a test?
   }
 }

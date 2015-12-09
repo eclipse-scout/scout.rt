@@ -456,7 +456,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   @SuppressWarnings("unchecked")
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
     Activity<?, ?> activityCell = null;
-    // FIXME CGU Map data from JSON
+    // FIXME cgu: Map data from JSON
 
     getModel().getUIFacade().setSelectedActivityCellFromUI(activityCell);
   }

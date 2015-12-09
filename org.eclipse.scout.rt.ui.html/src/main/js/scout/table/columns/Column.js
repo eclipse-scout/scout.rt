@@ -159,7 +159,7 @@ scout.Column.prototype._cellCssClass = function(cell) {
     cssClass += ' last';
   }
 
-  //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
+  //TODO [5.2] cgu: cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {
     cssClass += ' ' + cell.cssClass;
   } else if (this.cssClass) {
@@ -324,7 +324,7 @@ scout.Column.prototype.updateBackgroundEffect = function() {
 
 scout.Column.prototype._resolveBackgroundEffectFunc = function() {
   var effect = this.backgroundEffect;
-  // TODO CRU Don't use hardcoded colors (or make them customizable)
+  // TODO [5.2] bsh: CRU Don't use hardcoded colors (or make them customizable)
   if (effect === 'colorGradient1') {
     return this._colorGradient1.bind(this);
   }

@@ -28,7 +28,7 @@ describe('scout.icons', function() {
     expect(icon.font).toBe('scoutIcons');
   });
 
-  // FIXME AWE: rename font crmIcons.* to widgetIcons.*
+  // FIXME awe: rename font crmIcons.* to widgetIcons.*
   it('parses font icons (custom font)', function() {
     icon = scout.icons.parseIconId('font:crmIcons x');
     expect(icon.isFontIcon()).toBe(true);

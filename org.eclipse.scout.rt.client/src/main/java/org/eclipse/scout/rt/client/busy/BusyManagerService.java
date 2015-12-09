@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
-//TODO bsh: Use or remove BusiManager Code in Scout client
+//TODO [5.2] bsh: Use or remove BusiManager Code in Scout client
 /**
  * The busy manager is the primary place to register/unregister {@link IBusyHandler} per {@link IClientSession}
  * <p>

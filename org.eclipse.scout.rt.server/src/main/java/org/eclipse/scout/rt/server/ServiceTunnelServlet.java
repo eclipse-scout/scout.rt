@@ -119,7 +119,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
           if (isSessionLess(serviceRequest)) {
-            // TODO [jgu] Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
+            // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
             invokeServiceWithoutSession(serviceRequest);
           }
           else {
@@ -214,7 +214,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Process request without creating a server session
    */
   protected void invokeServiceWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, Exception {
-    // TODO [jgu] Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
+    // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
     ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
 
     Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());

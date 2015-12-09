@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
  * Provider used in 'shared' Plug-Ins to work on concrete <code>RunContexts</code>, e.g. for lookup calls.<br/>
- * TODO [dwi] try to eliminate this class
+ * TODO [5.2] dwi: try to eliminate this class
  *
  * @since 5.1
  */

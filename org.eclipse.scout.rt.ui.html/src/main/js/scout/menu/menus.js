@@ -13,7 +13,7 @@ scout.menus = {
   /**
    * @memberOf scout.menus
    */
-  CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu', //FIXME keydown/keyup is a bad idea -> interferes with ctrl click on table to multi select rows
+  CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu', //FIXME cgu: keydown/keyup is a bad idea -> interferes with ctrl click on table to multi select rows
 
   /**
    * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
@@ -94,7 +94,7 @@ scout.menus = {
   },
 
   isButton: function(obj) {
-    // FIXME AWE: check this too, move to Menu.js#isButton
+    // FIXME awe: check this too, move to Menu.js#isButton
     return obj instanceof scout.Menu && obj.actionStyle === scout.Action.ActionStyle.BUTTON;
   },
 

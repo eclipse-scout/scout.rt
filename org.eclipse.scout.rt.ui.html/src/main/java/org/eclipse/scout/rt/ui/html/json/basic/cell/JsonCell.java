@@ -58,7 +58,7 @@ public class JsonCell implements IJsonObject {
     json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     json.put("tooltipText", m_cell.getTooltipText());
     if (m_cell.getErrorStatus() != null && m_cell.getErrorStatus().getSeverity() == IStatus.ERROR) {
-      //FIXME CGU ask JGU why is errorStatus set with severity = OK if there is no error?
+      //FIXME cgu: ask JGU why is errorStatus set with severity = OK if there is no error?
       json.put("errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
     }
     json.put("cssClass", m_cell.getCssClass());
@@ -66,7 +66,7 @@ public class JsonCell implements IJsonObject {
     json.put("foregroundColor", m_cell.getForegroundColor());
     json.put("backgroundColor", m_cell.getBackgroundColor());
     json.put("font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
-    //TODO CGU maybe only send if it differs from column, same for horizontal alignment. Could be difficult, depends on event order (update before column_structure_changed is bad. maybe solve in model?
+    //TODO [5.2] cgu: maybe only send if it differs from column, same for horizontal alignment. Could be difficult, depends on event order (update before column_structure_changed is bad. maybe solve in model?
     json.put("editable", m_cell.isEditable());
     json.put("htmlEnabled", m_cell.isHtmlEnabled());
     return json;

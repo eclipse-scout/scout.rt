@@ -89,7 +89,7 @@
     max-width: 200px;
     line-height: normal;
     vertical-align: middle;
-    margin-top: -2px; /* TODO BSH Why is this necessary? inline-block seems to add some implicit margins, which causes the block not to be vertically centered */
+    margin-top: -2px; /* TODO [15.1] bsh: Why is this necessary? inline-block seems to add some implicit margins, which causes the block not to be vertically centered */
     min-height: 30px;
 
     & > .wizard-step-title {
@@ -206,7 +206,7 @@
     }
   }
 
-  /* FIXME BSH Try to find a better solution */
+  /* FIXME bsh: Try to find a better solution */
   & > .group-box-body > .group-box > .group-box-body {
     padding-top: 0;
     padding-bottom: @group-margin-bottom;

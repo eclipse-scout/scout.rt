@@ -30,7 +30,7 @@ scout.DecimalFormat = function(locale, pattern) {
   this.zeroBefore = 1;
   this.zeroAfter = 0;
   this.allAfter = 0;
-  //FIXME HALF_UP is the default, other rounding modes need to be considered as well.
+  //FIXME bsh: HALF_UP is the default, other rounding modes need to be considered as well.
   //this._roundingMode ='HALF_UP';
 
   var SYMBOLS = scout.DecimalFormat.PATTERN_SYMBOLS;
