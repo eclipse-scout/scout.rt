@@ -163,7 +163,7 @@ public class POP3Adapter {
       m_store = session.getStore("pop3");
       m_store.connect();
     }
-    catch (Exception e) {
+    catch (MessagingException e) {
       throw new ProcessingException(e.getMessage(), e);
     }
   }

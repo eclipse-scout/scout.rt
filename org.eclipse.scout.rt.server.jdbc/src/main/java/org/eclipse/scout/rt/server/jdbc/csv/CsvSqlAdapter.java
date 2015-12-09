@@ -17,6 +17,7 @@ package org.eclipse.scout.rt.server.jdbc.csv;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -83,30 +84,25 @@ public class CsvSqlAdapter {
     if (encoding == null) {
       encoding = StandardCharsets.UTF_8.name();
     }
-    try {
-      CsvSettings params = new CsvSettings();
-      params.setFile(f);
-      params.setEncoding(encoding);
-      params.setContentLocale(contentLocale);
-      params.setColSeparator((colSeparator == null) ? 0 : colSeparator.charAt(0));
-      params.setTextDelimiter((textDelimiter == null) ? 0 : textDelimiter.charAt(0));
-      params.setTableName(tableName);
-      params.setGroupKeyColumnName(groupKeyColumnName);
-      params.setGroupKeyValue(groupKeyValue);
-      params.setLineNumberColumnName(lineNumberColumnName);
-      params.setWriteColumnNames(writeColumnNames);
-      params.setWriteColumnTypes(writeColumnTypes);
-      if (csvColumnNames != null) {
-        params.setCsvColumnNames(csvColumnNames);
-      }
-      if (csvColumnTypes != null) {
-        params.setCsvColumnTypes(csvColumnTypes);
-      }
-      exportData(params);
+    CsvSettings params = new CsvSettings();
+    params.setFile(f);
+    params.setEncoding(encoding);
+    params.setContentLocale(contentLocale);
+    params.setColSeparator((colSeparator == null) ? 0 : colSeparator.charAt(0));
+    params.setTextDelimiter((textDelimiter == null) ? 0 : textDelimiter.charAt(0));
+    params.setTableName(tableName);
+    params.setGroupKeyColumnName(groupKeyColumnName);
+    params.setGroupKeyValue(groupKeyValue);
+    params.setLineNumberColumnName(lineNumberColumnName);
+    params.setWriteColumnNames(writeColumnNames);
+    params.setWriteColumnTypes(writeColumnTypes);
+    if (csvColumnNames != null) {
+      params.setCsvColumnNames(csvColumnNames);
     }
-    catch (Exception e) {
-      throw new ProcessingException(e.getMessage(), e);
+    if (csvColumnTypes != null) {
+      params.setCsvColumnTypes(csvColumnTypes);
     }
+    exportData(params);
   }
 
   /**
@@ -239,7 +235,7 @@ public class CsvSqlAdapter {
         }
       }
     }
-    catch (Exception e) {
+    catch (IOException e) {
       throw new ProcessingException(e.getMessage(), e);
     }
   }
@@ -249,30 +245,25 @@ public class CsvSqlAdapter {
     if (encoding == null) {
       encoding = StandardCharsets.UTF_8.name();
     }
-    try {
-      CsvSettings params = new CsvSettings();
-      params.setFile(f);
-      params.setEncoding(encoding);
-      params.setContentLocale(contentLocale);
-      params.setHeaderRowCount(headerRowCount);
-      params.setColSeparator((colSeparator == null) ? 0 : colSeparator.charAt(0));
-      params.setTextDelimiter((textDelimiter == null) ? 0 : textDelimiter.charAt(0));
-      params.setTableName(tableName);
-      params.setGroupKeyColumnName(groupKeyColumnName);
-      params.setGroupKeyValue(groupKeyValue);
-      params.setLineNumberColumnName(lineNumberColumnName);
-      params.setAllowVariableColumnCount(allowVariableColumnCount);
-      if (csvColumnNames != null) {
-        params.setCsvColumnNames(csvColumnNames);
-      }
-      if (csvColumnTypes != null) {
-        params.setCsvColumnTypes(csvColumnTypes);
-      }
-      importData(params);
+    CsvSettings params = new CsvSettings();
+    params.setFile(f);
+    params.setEncoding(encoding);
+    params.setContentLocale(contentLocale);
+    params.setHeaderRowCount(headerRowCount);
+    params.setColSeparator((colSeparator == null) ? 0 : colSeparator.charAt(0));
+    params.setTextDelimiter((textDelimiter == null) ? 0 : textDelimiter.charAt(0));
+    params.setTableName(tableName);
+    params.setGroupKeyColumnName(groupKeyColumnName);
+    params.setGroupKeyValue(groupKeyValue);
+    params.setLineNumberColumnName(lineNumberColumnName);
+    params.setAllowVariableColumnCount(allowVariableColumnCount);
+    if (csvColumnNames != null) {
+      params.setCsvColumnNames(csvColumnNames);
     }
-    catch (Exception e) {
-      throw new ProcessingException(e.getMessage(), e);
+    if (csvColumnTypes != null) {
+      params.setCsvColumnTypes(csvColumnTypes);
     }
+    importData(params);
   }
 
   public void importData(CsvSettings params) {
@@ -327,7 +318,7 @@ public class CsvSqlAdapter {
         reader.close();
       }
     }
-    catch (Exception e) {
+    catch (IOException e) {
       throw new ProcessingException(e.getMessage(), e);
     }
   }
@@ -362,7 +353,7 @@ public class CsvSqlAdapter {
         }
         m_sqlService.insert(m_statement, bindBase.toArray());
       }
-      catch (Exception e) {
+      catch (RuntimeException e) {
         throw new ProcessingException("line=" + lineNr + " row=" + row + "\n" + e.getMessage());
       }
     }

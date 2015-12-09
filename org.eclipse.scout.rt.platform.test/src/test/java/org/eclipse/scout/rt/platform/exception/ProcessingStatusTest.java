@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.platform.exception;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.junit.Before;
 import org.junit.Ignore;

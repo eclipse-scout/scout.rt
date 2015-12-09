@@ -97,8 +97,7 @@ public abstract class AbstractJmsService<T> implements IService {
       con.setClientID(clientId);
     }
     catch (Exception e) {
-      LOG.info("Unable to set clientID '{}' for consumer connection, possibly because of running in J2EE container: {}", clientId, e.getMessage());
-      LOG.trace("Full Exception:", e);
+      LOG.info("Unable to set clientID '{}' for consumer connection, possibly because of running in J2EE container", clientId, LOG.isTraceEnabled() ? e : null);
     }
     m_connection = con;
   }

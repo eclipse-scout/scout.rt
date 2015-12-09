@@ -17,6 +17,7 @@ import java.util.Properties;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
@@ -157,7 +158,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
       m_store = null;
       m_opened = false;
     }
-    catch (Exception e) {
+    catch (MessagingException e) {
       throw new ProcessingException(e.getMessage(), e);
     }
     finally {
@@ -228,7 +229,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
           }
         }
       }
-      catch (Exception e) {
+      catch (MessagingException e) {
         throw new ProcessingException(e.getMessage(), e);
       }
     }
@@ -266,7 +267,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
           }
         }
       }
-      catch (Exception e) {
+      catch (MessagingException e) {
         throw new ProcessingException(e.getMessage(), e);
       }
     }

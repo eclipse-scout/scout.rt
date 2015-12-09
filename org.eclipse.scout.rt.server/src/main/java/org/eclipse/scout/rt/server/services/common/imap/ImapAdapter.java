@@ -267,7 +267,7 @@ public class ImapAdapter implements IImapAdapter {
       catch (AuthenticationFailedException e) {
         throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port + ":" + m_username);
       }
-      catch (Exception e) {
+      catch (MessagingException e) {
         throw new ProcessingException(e.getMessage(), e);
       }
     }

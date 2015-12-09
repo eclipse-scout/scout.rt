@@ -24,9 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -47,6 +44,7 @@ public class ProcessingExceptionTest {
 
     ProcessingException pe = new ProcessingException(m_body, testThrowable, errorCode, severity);
     assertEquals(m_body + " [severity=FATAL, code=-1]", pe.getMessage());
+    assertEquals(m_body, pe.getDisplayMessage());
     assertEquals(testThrowable, pe.getCause());
 
     IStatus errorStatus = pe.getStatus();
@@ -70,6 +68,7 @@ public class ProcessingExceptionTest {
     ProcessingException p2 = new ProcessingException(m_body);
     assertEquals(IStatus.ERROR, p2.getStatus().getSeverity());
     assertEquals(m_body + " [severity=ERROR]", p2.getMessage());
+    assertEquals(m_body, p2.getDisplayMessage());
     assertEquals(m_body, p2.getStatus().getMessage());
     assertEquals(m_body, p2.getStatus().getBody());
     assertNull(p2.getStatus().getTitle());

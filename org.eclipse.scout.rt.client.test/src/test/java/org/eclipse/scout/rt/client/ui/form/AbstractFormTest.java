@@ -119,7 +119,7 @@ public class AbstractFormTest {
       form.validateForm();
     }
     catch (VetoException ve) {
-      errorMessage = ve.getMessage();
+      errorMessage = ve.getDisplayMessage();
     }
 
     assertTrue(errorMessage.contains("MainBox: ErrorMessage"));

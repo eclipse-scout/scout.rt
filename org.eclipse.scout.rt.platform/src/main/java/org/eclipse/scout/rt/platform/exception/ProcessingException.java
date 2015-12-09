@@ -140,6 +140,16 @@ public class ProcessingException extends RuntimeException implements Serializabl
     return m_status != null && (m_status.getException() instanceof TimeoutException);
   }
 
+  /**
+   * Returns the bare message without severity, code or context messages. This method should be used to show the
+   * exception to the user.
+   *
+   * @since 5.2
+   */
+  public String getDisplayMessage() {
+    return super.getMessage();
+  }
+
   @Override
   public String getMessage() {
     // custom getMessage method to get the same results from pe.toString(), pe.printStackTrace() and using a logger

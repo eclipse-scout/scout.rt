@@ -731,7 +731,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         else {
           String message = null;
           if (pe instanceof VetoException) {
-            message = pe.getMessage();
+            message = pe.getDisplayMessage();
           }
           if (StringUtility.isNullOrEmpty(message)) {
             message = ScoutTexts.get("ErrorWhileLoadingData");
