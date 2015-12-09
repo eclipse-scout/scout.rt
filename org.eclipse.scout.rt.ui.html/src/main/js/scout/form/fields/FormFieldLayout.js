@@ -17,15 +17,23 @@
 scout.FormFieldLayout = function(formField) {
   scout.FormFieldLayout.parent.call(this);
   this.formField = formField;
-  this.labelWidth = formField.labelWidthInPixel;
   this.mandatoryIndicatorWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
   this.statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;
 
-  // Minimum field with to normal state, for smaller widths the "compact" style is applied.
-  this.MIN_FIELD_WIDTH = 50;
+  // use configured label width in pixel or default label width
+  if (scout.FormFieldLayout.LABEL_WIDTH_DEFAULT === formField.labelWidthInPixel) {
+    this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+  } else {
+    this.labelWidth = formField.labelWidthInPixel;
+  }
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
+
+//Minimum field with to normal state, for smaller widths the "compact" style is applied.
+scout.FormFieldLayout.MIN_FIELD_WIDTH = 50;
+
+scout.FormFieldLayout.LABEL_WIDTH_DEFAULT = 0;
 
 scout.FormFieldLayout.prototype.layout = function($container) {
   var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
