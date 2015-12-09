@@ -55,7 +55,10 @@ public class ServiceUtility {
       return data;
     }
     catch (Exception e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, String.format("service: %s, operation: %s, args: %s", service.getClass(), serviceOperation.getName(), VerboseUtility.dumpObjects(callerArgs)));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("service.name", service.getClass())
+          .withContextInfo("service.operation", serviceOperation.getName())
+          .withContextInfo("service.args", VerboseUtility.dumpObjects(callerArgs));
     }
   }
 

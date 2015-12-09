@@ -1445,7 +1445,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       firePrint(device, parameters);
     }
     catch (RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, ScoutTexts.get("FormPrint") + " " + getTitle());
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("operation", "{} {}", ScoutTexts.get("FormPrint"), getTitle());
     }
   }
 

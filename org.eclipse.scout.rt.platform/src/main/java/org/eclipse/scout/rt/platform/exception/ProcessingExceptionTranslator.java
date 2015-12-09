@@ -64,23 +64,6 @@ public class ProcessingExceptionTranslator implements IThrowableTranslator<Proce
   }
 
   /**
-   * Translates the given {@link Throwable} into a {@link ProcessingException} and adds the given context messages.
-   *
-   * @see #translate(Throwable)
-   */
-  public ProcessingException translateAndAddContextMessages(Throwable t, String... msgs) {
-    ProcessingException pe = translate(t);
-    if (msgs != null) {
-      for (String msg : msgs) {
-        if (StringUtility.hasText(msg)) {
-          pe.addContextMessage(msg);
-        }
-      }
-    }
-    return pe;
-  }
-
-  /**
    * Method invoked to intercept the {@link ProcessingException} to be returned. The default implementation adds the
    * current user's identity and the current executing job to the exception's context message.
    */

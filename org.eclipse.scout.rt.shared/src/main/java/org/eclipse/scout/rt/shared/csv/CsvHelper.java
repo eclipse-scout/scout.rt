@@ -254,7 +254,9 @@ public class CsvHelper {
               objList.add(importCell(cell, getColumnFormat(colIndex)));
             }
             catch (RuntimeException e) {
-              throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "cell=" + cell, "colIndex=" + colIndex);
+              throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+                  .withContextInfo("cell", cell)
+                  .withContextInfo("colIndex", colIndex);
             }
           }
         }
@@ -264,7 +266,8 @@ public class CsvHelper {
       }
     }
     catch (IOException | RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, "lineNr=" + lineNr);
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("lineNr", lineNr);
     }
   }
 

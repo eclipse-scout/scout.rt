@@ -2833,7 +2833,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           msg.append(node.getCell().getText());
           msg.append("]");
         }
-        throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, msg.toString());
+        throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+            .withContextInfo("nodes", msg.toString());
       }
       finally {
         popUIProcessor();
@@ -2866,7 +2867,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (RuntimeException e) {
         if (node != null) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, node.getCell().getText());
+          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+              .withContextInfo("node", node.getCell().getText());
         }
         throw e;
       }
@@ -2901,7 +2903,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (RuntimeException e) {
         if (node != null) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, node.getCell().getText());
+          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+              .withContextInfo("cell", node.getCell().getText());
         }
         throw e;
       }
@@ -2944,7 +2947,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (RuntimeException e) {
         if (nodes != null) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, nodes.toString());
+          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+              .withContextInfo("nodes", nodes.toString());
         }
         throw e;
       }

@@ -1417,7 +1417,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           }
         }
         catch (RuntimeException e) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, getLabel());
+          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+              .withContextInfo("button", getLabel());
         }
       }
     }

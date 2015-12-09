@@ -177,7 +177,8 @@ public class StatementProcessor implements IStatementProcessor {
       }
     }
     catch (RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
     }
   }
 
@@ -286,7 +287,8 @@ public class StatementProcessor implements IStatementProcessor {
       return rows.toArray(new Object[rows.size()][]);
     }
     catch (SQLException | RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
     }
     finally {
       releasePreparedStatementAndResultSet(ps, cache, rs);
@@ -337,7 +339,8 @@ public class StatementProcessor implements IStatementProcessor {
       }
     }
     catch (SQLException | RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
     }
     finally {
       releasePreparedStatementAndResultSet(ps, cache, rs);
@@ -393,7 +396,8 @@ public class StatementProcessor implements IStatementProcessor {
       handler.finished(conn, ps, rs, rowCount);
     }
     catch (SQLException | RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
     }
     finally {
       releasePreparedStatementAndResultSet(ps, cache, rs);
@@ -430,7 +434,8 @@ public class StatementProcessor implements IStatementProcessor {
       return rowCount;
     }
     catch (SQLException | RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
     }
     finally {
       cache.releasePreparedStatement(ps);
@@ -470,7 +475,8 @@ public class StatementProcessor implements IStatementProcessor {
       return status;
     }
     catch (SQLException | RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translateAndAddContextMessages(e, createSqlDump(true, false));
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
     }
     finally {
       cache.releaseCallableStatement(cs);
