@@ -131,7 +131,7 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserve
   }
 
   protected void handleUiValueClicked(JsonEvent event) {
-    // TODO nbu
+    // TODO [15.1] nbu: ???
     getModel().getUIFacade().fireValueClickedFromUI(new int[0], null);
   }
 }
