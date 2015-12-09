@@ -53,16 +53,15 @@
   <script type="text/javascript" src="src/main/js/jasmine/JasmineScout.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/JasmineMavenReporter.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/boot.ext.js"></script>
-
   <script type="text/javascript">loadDynamicScript('src/main/js/scout-module.js');</script>
-
-  <script type="text/javascript" src="src/main/js/scout/mobileObjectFactories.js"></script>
   <script type="text/javascript" src="src/main/js/scout/desktop/MobileDesktop.js"></script>
   <script type="text/javascript" src="src/main/js/scout/table/MobileTable.js"></script>
-
+</head>
+<body>
+  <!-- Test for UTF-8 encoding: äöü -->
   <script type="text/javascript">
-    <!-- This is usually done in main.js, but here, we have to do it manually -->
-    scout.logging.bootstrap();
+    // Scout Bootstrap, see main.js
+    // To load default-values in Jasmine test suite we need another implementation
     scout.defaultValues.bootstrap = function loadDefaultValues() {
       jQuery.ajax({
         async: false,
@@ -73,20 +72,16 @@
         url: 'src/main/resources/org/eclipse/scout/rt/ui/html/json/defaultValues.json',
         data: ''
       }).done(function(data) {
-        var dataWithoutComments = stripCommentsFromJson(data),
-          dataObj = JSON.parse(dataWithoutComments);
+        var dataWithoutComments = stripCommentsFromJson(data), dataObj = JSON.parse(dataWithoutComments);
         scout.defaultValues._loadDefaultsConfiguration(dataObj);
       }).fail(function(jqXHR, textStatus, errorThrown) {
         throw new Error('Error while loading default values: ' + errorThrown);
       });
     }
-    scout.defaultValues.bootstrap();
-
+    scout._bootstrap();
   </script>
 
   $specScriptTags$
-</head>
-<body>
-  <!-- Test for UTF-8 encoding: äöü -->
+
 </body>
 </html>

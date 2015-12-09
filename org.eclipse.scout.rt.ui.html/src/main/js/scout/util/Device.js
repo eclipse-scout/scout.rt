@@ -8,10 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 /* global FastClick */
+
 /**
  * Provides information about the device and its supported features.<p>
  * The informations are detected lazily.
+ *
+ * @singleton
  */
 scout.Device = function(userAgent) {
   this.userAgent = userAgent;
@@ -412,7 +416,5 @@ scout.Device.prototype.toString = function() {
     ' scrollbarWidth=' + this.scrollbarWidth +
     ' features=' + JSON.stringify(this.features) + ']';
 };
-
-// ------------ Singleton ----------------
 
 scout.device = new scout.Device(navigator.userAgent);

@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("ModelAdapter", function() {
+describe('ModelAdapter', function() {
 
-  var session;
-  var model = {};
+  var session, myObjectFactory,
+    model = {},
+    originalObjectFactory = scout.objectFactory;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -22,30 +23,29 @@ describe("ModelAdapter", function() {
     session.init();
     uninstallUnloadHandlers(session);
 
-    scout.objectFactories = $.extend(scout.objectFactories, {
-      'Generic': function() {
-        return new scout.ModelAdapter();
-      },
-      'HasChildAdapter': function() {
-        var adapter = new scout.ModelAdapter();
-        adapter._addAdapterProperties('childAdapter');
-        return adapter;
-      },
-      'HasChildAdapters': function() {
-        var adapter = new scout.ModelAdapter();
-        adapter._addAdapterProperties('childAdapters');
-        return adapter;
-      }
+    // Create a private object factory used for these tests
+    myObjectFactory = new scout.ObjectFactory();
+    myObjectFactory.register('Generic', function() {
+      return new scout.ModelAdapter();
     });
+    myObjectFactory.register('HasChildAdapter', function() {
+      var adapter = new scout.ModelAdapter();
+      adapter._addAdapterProperties('childAdapter');
+      return adapter;
+    });
+    myObjectFactory.register('HasChildAdapters', function() {
+      var adapter = new scout.ModelAdapter();
+      adapter._addAdapterProperties('childAdapters');
+      return adapter;
+    });
+    scout.objectFactory = myObjectFactory;
   });
 
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    delete scout.objectFactories['Generic'];
-    delete scout.objectFactories['HasChildAdapter'];
-    delete scout.objectFactories['HasChildAdapters'];
+    scout.objectFactory = originalObjectFactory;
   });
 
   function createGenericModel() {

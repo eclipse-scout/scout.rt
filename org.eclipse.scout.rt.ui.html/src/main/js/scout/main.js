@@ -41,7 +41,8 @@ scout._bootstrap = function(options) {
     scout.logging.bootstrap(),
     scout.device.bootstrap(),
     scout.defaultValues.bootstrap(),
-    scout.fonts.bootstrap(options.fonts)
+    scout.fonts.bootstrap(options.fonts),
+    scout.objectFactory.bootstrap()
   ];
 
   var deferreds = [];

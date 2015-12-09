@@ -19,17 +19,12 @@ scout.fonts = {
   loadingComplete: true,
 
   /**
-   * Start preloading the specified fonts. Font names may be passed as multiple arguments
-   * or in a single string array.
+   * Start preloading the specified fonts.
+   * @param fonts (optional) array of fonts
    */
-  bootstrap: function() {
-    // Allow vararg and single-array-arg style
-    if (arguments.length === 0) {
+  bootstrap: function(fonts) {
+    if (!fonts || fonts.length === 0) {
       return;
-    }
-    var fonts = Array.prototype.slice.call(arguments);
-    if (fonts.length === 1 && Array.isArray(fonts[0])) {
-      fonts = fonts[0];
     }
 
     // Start preloading

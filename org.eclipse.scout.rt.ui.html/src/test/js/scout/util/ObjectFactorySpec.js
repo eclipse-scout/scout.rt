@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global LocaleSpecHelper*/
-describe("ObjectFactory", function() {
+describe('ObjectFactory', function() {
 
   beforeEach(function() {
     // Needed because some model adapters make JSON calls during initialization (e.g. Calendar.js)
@@ -61,7 +61,7 @@ describe("ObjectFactory", function() {
         id: tabItemId,
         objectType: 'TabItem',
         getForm: function() {
-          return createSimpleModel("Form", session);
+          return createSimpleModel('Form', session);
         }
       };
     } else if ('ButtonAdapterMenu' === objectType) {
@@ -72,21 +72,21 @@ describe("ObjectFactory", function() {
 
     if ('GroupBox' === objectType || 'TabItem' === objectType) {
       model.getForm = function() {
-        return createSimpleModel("Form", session);
+        return createSimpleModel('Form', session);
       };
     }
 
     return model;
   }
 
-  it("creates objects which are registered in scout.objectFactories", function() {
+  it('creates objects which are registered in scout.objectFactories', function() {
     setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1');
     session.locale = new LocaleSpecHelper().createLocale('de');
 
     // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
     // you should check if the required .js File is registered in SpecRunnerMaven.html.
-    var i, model, factory, object, modelAdapter;
+    var i, model, factory, object, modelAdapter, objectType;
     for (objectType in scout.objectFactories) {
       model = createModel(session, i, objectType);
       object = scout.objectFactories[objectType](model);
@@ -97,12 +97,12 @@ describe("ObjectFactory", function() {
     }
   });
 
-  it("distinguishes between mobile and regular objects", function() {
+  it('distinguishes between mobile and regular objects', function() {
     scout.device.type = scout.Device.Type.DESKTOP;
-    var object = scout.objectFactories['Desktop']();
+    var objectType, object = scout.objectFactories.Desktop();
     expect(object instanceof scout.Desktop).toBe(true);
     scout.device.type = scout.Device.Type.MOBILE;
-    object = scout.objectFactories['Desktop']();
+    object = scout.objectFactories.Desktop();
     expect(object instanceof scout.MobileDesktop).toBe(true);
   });
 
