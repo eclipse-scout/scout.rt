@@ -16,9 +16,6 @@ scout.objectFactories = {
       return new scout.Desktop();
     }
   },
-  'BooleanColumn': function() {
-    return new scout.CheckBoxColumn();
-  },
   'KeyStroke': function() {
     // A model keystroke is represented as an Action
     return new scout.Action();

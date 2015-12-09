@@ -12,21 +12,21 @@
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
  * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
  */
-scout.CheckBoxColumn = function() {
-  scout.CheckBoxColumn.parent.call(this);
+scout.BooleanColumn = function() {
+  scout.BooleanColumn.parent.call(this);
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
 };
-scout.inherits(scout.CheckBoxColumn, scout.Column);
+scout.inherits(scout.BooleanColumn, scout.Column);
 
 /**
  * @override
  */
-scout.CheckBoxColumn.prototype.buildCell = function(cell, row) {
+scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   var style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
   var enabled = row.enabled;
   if (cell.empty) {
     // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
-    return scout.CheckBoxColumn.parent.prototype.buildCell.call(this, cell, row);
+    return scout.BooleanColumn.parent.prototype.buildCell.call(this, cell, row);
   }
 
   checked = cell.value;
@@ -51,19 +51,19 @@ scout.CheckBoxColumn.prototype.buildCell = function(cell, row) {
   return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute.string + '>' + content + '</div>';
 };
 
-scout.CheckBoxColumn.prototype.$checkBox = function($row) {
+scout.BooleanColumn.prototype.$checkBox = function($row) {
   var $cell = this.table.$cell(this, $row);
   return $cell.children('.check-box');
 };
 
-scout.CheckBoxColumn.prototype._cellCssClass = function(cell) {
-  var cssClass = scout.CheckBoxColumn.parent.prototype._cellCssClass.call(this, cell);
+scout.BooleanColumn.prototype._cellCssClass = function(cell) {
+  var cssClass = scout.BooleanColumn.parent.prototype._cellCssClass.call(this, cell);
   cssClass = cssClass.replace(' editable', '');
   cssClass += ' checkable';
   return cssClass;
 };
 
-scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
+scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
     $target = $(event.target);
 

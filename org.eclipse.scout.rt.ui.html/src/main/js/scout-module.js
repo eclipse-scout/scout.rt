@@ -145,7 +145,7 @@ __include("scout/table/TableSelectionHandler.js");
 __include("scout/table/TableTooltip.js");
 __include("scout/table/columns/Column.js");
 __include("scout/table/columns/BeanColumn.js"); // requires Column.js
-__include("scout/table/columns/CheckBoxColumn.js"); // requires Column.js
+__include("scout/table/columns/BooleanColumn.js"); // requires Column.js
 __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");

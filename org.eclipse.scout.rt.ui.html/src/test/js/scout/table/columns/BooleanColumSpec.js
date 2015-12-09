@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global TableSpecHelper */
-describe("CheckBoxColumn", function() {
+describe('BooleanColumn', function() {
   var session;
   var helper;
 
@@ -27,9 +27,9 @@ describe("CheckBoxColumn", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("table checkable column", function() {
+  describe('table checkable column', function() {
 
-    it("a checkbox column gets inserted if table.checkable=true", function() {
+    it('a checkbox column gets inserted if table.checkable=true', function() {
       var model = helper.createModelFixture(2);
       model.checkable = true;
       expect(model.columns.length).toBe(2);
@@ -37,10 +37,10 @@ describe("CheckBoxColumn", function() {
       expect(table.columns.length).toBe(3);
 
       table.render(session.$entryPoint);
-      expect(table.columns[0] instanceof scout.CheckBoxColumn).toBeTruthy();
+      expect(table.columns[0] instanceof scout.BooleanColumn).toBeTruthy();
     });
 
-    it("no checkbox column gets inserted if table.checkable=false", function() {
+    it('no checkbox column gets inserted if table.checkable=false', function() {
       var model = helper.createModelFixture(2);
       model.checkable = false;
       expect(model.columns.length).toBe(2);
@@ -48,10 +48,10 @@ describe("CheckBoxColumn", function() {
       expect(table.columns.length).toBe(2);
 
       table.render(session.$entryPoint);
-      expect(table.columns[0] instanceof scout.CheckBoxColumn).toBeFalsy();
+      expect(table.columns[0] instanceof scout.BooleanColumn).toBeFalsy();
     });
 
-    it("this.checkableColumn is set to the new column", function() {
+    it('this.checkableColumn is set to the new column', function() {
       var model = helper.createModelFixture(2);
       model.checkable = true;
       var table = helper.createTable(model);
@@ -61,7 +61,7 @@ describe("CheckBoxColumn", function() {
       expect(table.checkableColumn).toBe(table.columns[0]);
     });
 
-    it("displays the row.checked state as checkbox", function() {
+    it('displays the row.checked state as checkbox', function() {
       var model = helper.createModelFixture(2, 2);
       model.checkable = true;
       model.rows[0].checked = true;
@@ -77,9 +77,9 @@ describe("CheckBoxColumn", function() {
 
   });
 
-  describe("boolean column", function() {
+  describe('boolean column', function() {
 
-    it("displays the cell value as checkbox", function() {
+    it('displays the cell value as checkbox', function() {
       var model = helper.createModelFixture(2, 2);
       model.columns[0].objectType = 'BooleanColumn';
       model.rows[0].cells[0].value = true;

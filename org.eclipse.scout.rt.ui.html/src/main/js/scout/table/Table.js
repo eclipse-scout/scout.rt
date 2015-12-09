@@ -169,7 +169,7 @@ scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
   });
 };
 
-scout.Table.prototype._insertCheckBoxColumn = function() {
+scout.Table.prototype._insertBooleanColumn = function() {
   // don't add checkbox column when we're in checkableStyle mode
   if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     return;
@@ -2703,7 +2703,7 @@ scout.Table.prototype._syncCheckable = function(checkable, oldValue) {
 
   var column = this.checkableColumn;
   if (this.checkable && !column) {
-    this._insertCheckBoxColumn();
+    this._insertBooleanColumn();
   } else if (!this.checkable && column) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
