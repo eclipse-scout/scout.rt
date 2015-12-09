@@ -186,7 +186,7 @@ public class MutualExclusionTest {
 
       @Override
       public void run() throws Exception {
-        IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
+        IBlockingCondition bc = Jobs.newBlockingCondition("BC", true);
         try {
           bc.waitFor(1, TimeUnit.SECONDS);
           fail("timeout expected");
@@ -339,7 +339,7 @@ public class MutualExclusionTest {
   public void testBlockingConditionSingle() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("bc", true);
 
     IFuture<Void> future1 = ModelJobs.schedule(new IRunnable() {
 
@@ -445,7 +445,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionMultipleFlat() {
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
     runTestBlockingConditionMultipleFlat(BC);
@@ -457,7 +457,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionMultipleNested() {
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
     runTestBlockingCondition(BC);
@@ -472,7 +472,7 @@ public class MutualExclusionTest {
   @Test
   public void testBlockingCondition_InterruptedWhileBeingBlocked() throws java.lang.InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("bc", true);
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
@@ -552,7 +552,7 @@ public class MutualExclusionTest {
   @Test
   public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws java.lang.InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("bc", true);
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job1FinishLatch = new BlockingCountDownLatch(1);
@@ -803,7 +803,7 @@ public class MutualExclusionTest {
 
       final BlockingCountDownLatch job4RunningLatch = new BlockingCountDownLatch(1);
 
-      final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("bc", true);
+      final IBlockingCondition BC = Jobs.newBlockingCondition("bc", true);
 
       // Job-1
       IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
@@ -1179,7 +1179,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionNotBlocking() {
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", false);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("BC", false);
     ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -1212,7 +1212,7 @@ public class MutualExclusionTest {
     final BlockingCountDownLatch unblockedLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch done = new BlockingCountDownLatch(1);
 
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("BC", true);
 
     final AtomicReference<Throwable> throwableHolder = new AtomicReference<>();
     ModelJobs.schedule(new IRunnable() {
@@ -1271,7 +1271,7 @@ public class MutualExclusionTest {
   public void testReuseUnblockedBlockingCondition() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("BC", true);
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -1317,7 +1317,7 @@ public class MutualExclusionTest {
   public void testExpiredWhenReAcquiringMutex() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("BC", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("BC", true);
 
     IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 

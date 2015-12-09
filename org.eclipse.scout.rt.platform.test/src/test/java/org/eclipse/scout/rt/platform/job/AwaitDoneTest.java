@@ -141,7 +141,7 @@ public class AwaitDoneTest {
   public void testAwaitDoneOrBlocked() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("bc", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition("bc", true);
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 

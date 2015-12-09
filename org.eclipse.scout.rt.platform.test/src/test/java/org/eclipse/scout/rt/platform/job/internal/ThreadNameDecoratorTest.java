@@ -96,7 +96,7 @@ public class ThreadNameDecoratorTest {
   // This test is executed 50 times (regression)
   public void testThreadNameBlocking() throws Exception {
     final IMutex mutex = Jobs.newMutex();
-    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("blocking-condition", true);
+    final IBlockingCondition BC = Jobs.newBlockingCondition("blocking-condition", true);
 
     final Holder<Thread> workerThreadJob1Holder = new Holder<>();
     final Holder<ThreadInfo> threadInfoJob1Holder = new Holder<>();

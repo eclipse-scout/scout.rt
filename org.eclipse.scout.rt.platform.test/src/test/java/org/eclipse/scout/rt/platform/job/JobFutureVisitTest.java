@@ -57,8 +57,8 @@ public class JobFutureVisitTest {
 
     // prepare the test-case
     protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
-    bc1 = Jobs.getJobManager().createBlockingCondition("BC1", true);
-    bc2 = Jobs.getJobManager().createBlockingCondition("BC2", true);
+    bc1 = Jobs.newBlockingCondition("BC1", true);
+    bc2 = Jobs.newBlockingCondition("BC2", true);
 
     m_latch = new BlockingCountDownLatch(3);
 

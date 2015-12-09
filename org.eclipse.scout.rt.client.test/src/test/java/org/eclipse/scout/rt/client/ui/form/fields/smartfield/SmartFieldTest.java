@@ -405,7 +405,7 @@ public class SmartFieldTest {
 
   @Test
   public void testDefaultSelectionWithOnlyOneResult() throws Exception {
-    IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+    IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
 
     PropertyChangeListener bcListener = getUnblockOnSearchResultListener(bc);
     m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(bcListener);
@@ -434,7 +434,7 @@ public class SmartFieldTest {
 
   @Test
   public void testNoDefaultSelectionWithMoreThanOneResult() throws Exception {
-    IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+    IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
 
     m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(getUnblockOnSearchResultListener(bc));
     m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);

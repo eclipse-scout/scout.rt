@@ -581,7 +581,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testBlockingConditionWaitFor_Interrupted() throws java.lang.InterruptedException {
-    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition("BC", true);
 
     // Run the test in a separate thread
     IFuture<Void> controller = Jobs.schedule(new IRunnable() {
@@ -605,7 +605,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testBlockingConditionWaitFor_Timeout() {
-    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("BC", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition("BC", true);
 
     try {
       bc.waitFor(1, TimeUnit.NANOSECONDS);

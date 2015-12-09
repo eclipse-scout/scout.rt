@@ -131,7 +131,7 @@ public class SmartFieldParseValueTest {
    */
   void testMatch(String searchText, Long expectedValue, String expectedDisplayText, int expectedNumProposals,
       boolean expectedProposalChooserOpen, boolean expectValidationError) {
-    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
 
     m_smartField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
       @Override

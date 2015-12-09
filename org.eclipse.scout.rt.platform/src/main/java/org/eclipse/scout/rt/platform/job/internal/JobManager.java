@@ -301,7 +301,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public IBlockingCondition createBlockingCondition(final String name, final boolean blocking) {
+  public IBlockingCondition newBlockingCondition(final String name, final boolean blocking) {
     return new BlockingCondition(name, blocking, this);
   }
 

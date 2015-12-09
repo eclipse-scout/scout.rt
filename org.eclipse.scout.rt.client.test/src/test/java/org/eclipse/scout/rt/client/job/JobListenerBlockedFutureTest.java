@@ -99,7 +99,7 @@ public class JobListenerBlockedFutureTest {
 
   @Test(timeout = 10000)
   public void testEventsForBlockingJob() {
-    final IBlockingCondition condition = Jobs.getJobManager().createBlockingCondition("test condition", true);
+    final IBlockingCondition condition = Jobs.newBlockingCondition("test condition", true);
 
     IClientSession clientSession = mock(IClientSession.class);
     when(clientSession.getModelJobMutex()).thenReturn(Jobs.newMutex());

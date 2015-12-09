@@ -207,4 +207,19 @@ public final class Jobs {
   public static IMutex newMutex() {
     return BEANS.get(IMutex.class);
   }
+
+  /**
+   * Creates a blocking condition to put a job into waiting mode until the condition falls. If the job is a mutually
+   * exclusive job, the job's mutex is released and passed to the next competing job while being blocked.
+   * <p>
+   * See {@link IBlockingCondition} for more information.
+   * 
+   * @param name
+   *          the name of the blocking condition; primarily used for logging purpose.
+   * @param blocking
+   *          initial blocking-state of the blocking condition.
+   */
+  public static IBlockingCondition newBlockingCondition(final String name, final boolean blocking) {
+    return BEANS.get(IJobManager.class).newBlockingCondition(name, blocking);
+  }
 }

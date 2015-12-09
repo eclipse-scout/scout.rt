@@ -63,7 +63,7 @@ public class SmartFieldSingleResultTest {
 
   @Test
   public void test() throws Exception {
-    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
 
     m_smartField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
       @Override

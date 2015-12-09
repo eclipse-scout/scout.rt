@@ -197,16 +197,17 @@ public interface IJobManager {
   boolean cancel(IFilter<IFuture<?>> filter, boolean interruptIfRunning);
 
   /**
-   * Creates a blocking condition to put a task into waiting mode until the condition falls. See
-   * {@link IBlockingCondition} for more information.
+   * Creates a blocking condition to put a job into waiting mode until the condition falls. If the job is a mutually
+   * exclusive job, the job's mutex is released and passed to the next competing job while being blocked.
+   * <p>
+   * See {@link IBlockingCondition} for more information.
    *
    * @param name
    *          the name of the blocking condition; primarily used for logging purpose.
    * @param blocking
    *          initial blocking-state of the blocking condition.
-   * @return {@link IBlockingCondition}
    */
-  IBlockingCondition createBlockingCondition(String name, boolean blocking);
+  IBlockingCondition newBlockingCondition(String name, boolean blocking);
 
   /**
    * Interrupts all running tasks and prevents scheduled tasks from running. After having shutdown, this job manager
