@@ -19,5 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 public enum TreeMenuType implements IMenuType {
   EmptySpace,
   SingleSelection,
-  MultiSelection
+  MultiSelection,
+  Header
 }

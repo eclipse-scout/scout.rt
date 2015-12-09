@@ -559,7 +559,7 @@ scout.Outline.prototype.glassPaneTargets = function() {
 };
 
 scout.Outline.prototype._renderMenus = function() {
-  var menuItems = scout.menus.filter(this.menus, ['Outline.Title']);
+  var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
   this.titleMenuBar.updateItems(menuItems);
 };
 
