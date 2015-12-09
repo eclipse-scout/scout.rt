@@ -46,15 +46,13 @@ describe('TableTextUserFilter', function() {
   describe('filter', function() {
 
     beforeEach(function() {
-      scout.objectFactories = $.extend(scout.objectFactories, {
-        'ASpecBeanColumn': function() {
-          return new ASpecBeanColumn();
-        }
+      scout.objectFactory.register('ASpecBeanColumn', function() {
+        return new ASpecBeanColumn();
       });
     });
 
     afterEach(function() {
-      delete scout.objectFactories.ASpecBeanColumn;
+      scout.objectFactory.unregister('ASpecBeanColumn');
     });
 
     it('filters rows based on cell text', function() {

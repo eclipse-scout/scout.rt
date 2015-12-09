@@ -78,6 +78,10 @@
         throw new Error('Error while loading default values: ' + errorThrown);
       });
     }
+    // breaks scrollbarsSpec in phantomjs
+    scout.device.isTableAdditionalDivRequired = function() {
+      return false;
+    }
     scout._bootstrap();
   </script>
 
