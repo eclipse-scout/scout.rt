@@ -440,7 +440,7 @@ public final class ConfigurationUtility {
    *
    * @return class to be replaced
    */
-  private static Class<?> getOriginalClass(Class<?> c) {
+  public static Class<?> getOriginalClass(Class<?> c) {
     while (c.isAnnotationPresent(Replace.class)) {
       c = c.getSuperclass();
     }
