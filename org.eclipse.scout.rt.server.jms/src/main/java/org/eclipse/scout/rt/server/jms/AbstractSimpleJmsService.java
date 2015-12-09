@@ -112,8 +112,9 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
   }
 
   protected synchronized void startMessageConsumer() {
+    LOG.debug("starting message consumer for {}", getClass().getSimpleName(), LOG.isTraceEnabled() ? new Exception("stack trace") : null);
     stopMessageConsumer();
-    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput().withName("JmsMessageConsumer"));
+    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput().withName("JmsMessageConsumer-%s", getClass().getSimpleName()));
   }
 
   protected synchronized void stopMessageConsumer() {
