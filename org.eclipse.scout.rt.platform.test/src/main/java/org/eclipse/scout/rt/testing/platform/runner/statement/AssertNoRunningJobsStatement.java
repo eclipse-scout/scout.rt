@@ -121,6 +121,7 @@ public class AssertNoRunningJobsStatement extends Statement {
       m_initialThread = m_initialJobFuture == null ? Thread.currentThread() : null;
     }
 
+    @org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement //FIXME sle remove when https://github.com/mojohaus/animal-sniffer/issues/8 is solved
     public Set<IFuture<?>> getScheduledFutures() {
       return m_scheduledFutures.keySet();
     }
