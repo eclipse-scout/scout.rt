@@ -199,11 +199,19 @@
       "sortIndex": -1,
       "summary": false,
       "type": "text",
-      "width": 60
+      "width": 60,
+      "uiSortPossible": false
     },
     "DateColumn": {
       "hasDate": true,
-      "hasTime": false
+      "hasTime": false,
+      "uiSortPossible": true
+    },
+    "StringColumn": {
+      "uiSortPossible": true
+    },
+    "NumberColumn": {
+      "uiSortPossible": true
     },
     "TreeNode": {
       "checked": false,
@@ -271,7 +279,9 @@
     "Column": {
       "BeanColumn": null,
       "BooleanColumn": null,
-      "DateColumn": null
+      "DateColumn": null,
+      "StringColumn": null,
+      "NumberColumn": null
     }
   }
 }
