@@ -139,12 +139,6 @@ public class ErrorPopup {
         createNetErrorMessage(msg);
         return;
       }
-      else if (t instanceof UserInterruptedException) {
-        m_title = ScoutTexts.get("IOErrorTitle");
-        m_text = UserInterruptedException.class.getSimpleName();
-        m_detail = ScoutTexts.get("IOErrorInfo");
-        return;
-      }
       else if (t instanceof IOException) {
         m_title = ScoutTexts.get("IOErrorTitle");
         m_text = ScoutTexts.get("IOErrorText") + ": " + t.getLocalizedMessage() + msg;
