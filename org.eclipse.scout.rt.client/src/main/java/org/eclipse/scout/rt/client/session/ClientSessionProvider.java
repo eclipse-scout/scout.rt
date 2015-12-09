@@ -70,7 +70,7 @@ public class ClientSessionProvider {
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
             .withSession(clientSession, true))
-            .withName("Starting ClientSession [sessionId=%s]", sessionId)
+            .withName("Starting ClientSession [sessionId={}]", sessionId)
             .withExceptionHandling(null, true))
             .awaitDoneAndGet();
 

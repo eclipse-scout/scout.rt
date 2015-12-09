@@ -134,7 +134,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
 
     final ServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
         .withRunContext(m_tunnel.createCurrentRunContext().withRunMonitor(BEANS.get(RunMonitor.class))) // do not link the RunMonitor with the current RunMonitor to not cancel this request.))
-        .withName("Cancelling service request [%s]", requestSequence))
+        .withName("Cancelling service request [{}]", requestSequence))
         .awaitDoneAndGet(10, TimeUnit.SECONDS);
 
     if (cancelResponse == null) {

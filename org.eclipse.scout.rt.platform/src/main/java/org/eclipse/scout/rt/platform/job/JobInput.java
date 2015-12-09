@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  * A <code>JobInput</code> contains information about a job like its name with execution instructions for the job
@@ -150,15 +151,18 @@ public class JobInput {
   }
 
   /**
-   * Sets the name of a job. Optional. Is used to decorate the worker thread's name and for logging purposes.
+   * Sets the name of the job, which is used to name the worker thread and for logging purpose.
+   * <p>
+   * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the name, which will be replaced by
+   * the respective argument.
    *
    * @param name
-   *          the name
-   * @param args
-   *          arguments to be used in the name, e.g. <code>JobInput.name("load data [id=%s]", id)</code>
+   *          the name with support for <em>formatting anchors</em> in the form of {} pairs.
+   * @param valueArgs
+   *          optional arguments to substitute <em>formatting anchors</em> in the name.
    */
   public JobInput withName(final String name, final Object... args) {
-    m_name = (name != null ? String.format(name, args) : null);
+    m_name = MessageFormatter.arrayFormat(name, args).getMessage();
     return this;
   }
 
