@@ -14,10 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
@@ -42,44 +43,23 @@ public class TimeoutClientRunContextStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    if (ModelJobs.isModelThread()) {
-      throw new IllegalStateException("Already running in a model job. but tests with max allowed runtime (i.e. @Test(timeout=...)) "
-          + "cannot be nested into a model job. Check your test setup or remove timeout.");
-    }
-    else {
-      IRunnable nestedRunnable = new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            m_next.evaluate();
-          }
-          catch (final Error e) {
-            throw e;
-          }
-          catch (final Throwable t) {
-            throw new ProcessingException("Wrapper", t);
-          }
-        }
-      };
+    final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
 
-      IFuture<Void> future = ModelJobs.schedule(nestedRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("nested JUnit model job"));
-      try {
-        if (m_timeoutMillis <= 0) {
-          future.awaitDoneAndGet();
-        }
-        else {
-          future.awaitDoneAndGet(m_timeoutMillis, TimeUnit.MILLISECONDS);
-        }
+    final IFuture<Void> future = ModelJobs.schedule(invoker, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Running test with support for JUnit timeout"));
+
+    try {
+      if (m_timeoutMillis <= 0) {
+        future.awaitDone();
       }
-      catch (ProcessingException e) {
-        if (e.isTimeout() || e.isInterruption()) {
-          // Timeout or interruption: Try to cancel the job and translate exception into JUnit counterpart.
-          future.cancel(true);
-          throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS);
-        }
-
-        throw e.getCause(); // re-throw wrapped exception
+      else {
+        future.awaitDone(m_timeoutMillis, TimeUnit.MILLISECONDS);
       }
     }
+    catch (InterruptedException | TimeoutException e) {
+      future.cancel(true);
+      throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS); // JUnit timeout exception
+    }
+
+    invoker.throwOnError();
   }
 }

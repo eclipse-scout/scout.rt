@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -48,7 +50,7 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
+    future.awaitDone(10, TimeUnit.SECONDS);
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
     assertTrue(future.isDone());
   }
@@ -65,9 +67,9 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
     assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
@@ -105,24 +107,30 @@ public class AwaitDoneTest {
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1)
         .toFilter()));
     assertFalse(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
         .toFilter()));
-    assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-        .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), 500, TimeUnit.MILLISECONDS));
+    try {
+      Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchExecutionHint(JOB_IDENTIFIER)
+          .toFilter(), 500, TimeUnit.MILLISECONDS);
+      fail("timeout expected");
+    }
+    catch (TimeoutException e) {
+      // NOOP
+    }
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
 
     latchJob2.countDown();
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertTrue(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
         .toFilter()));
@@ -147,22 +155,28 @@ public class AwaitDoneTest {
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    assertFalse(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-        .andMatchFuture(future)
-        .toFilter(), 100, TimeUnit.MILLISECONDS));
+    try {
+      Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(future)
+          .toFilter(), 100, TimeUnit.MILLISECONDS);
+      fail("timeout expected");
+    }
+    catch (TimeoutException e) {
+      // NOOP
+    }
 
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .andAreNotBlocked()
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
 
     assertEquals(Arrays.asList("before-1"), protocol);
 
     // Cleanup
     bc.setBlocking(false);
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
 
   }
 
@@ -202,9 +216,9 @@ public class AwaitDoneTest {
         .withSchedulingDelay(1, TimeUnit.SECONDS));
 
     // start waiting for the job to complete or until cancelled
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 5, TimeUnit.SECONDS));
+        .toFilter(), 5, TimeUnit.SECONDS);
 
     continueRunningLatch.release();
   }

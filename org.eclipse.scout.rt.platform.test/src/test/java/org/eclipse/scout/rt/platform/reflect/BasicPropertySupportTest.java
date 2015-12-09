@@ -18,9 +18,10 @@ import static org.mockito.Mockito.mock;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.beans.fixture.WeakPropertyChangeListener;
-import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -167,11 +168,9 @@ public class BasicPropertySupportTest {
       specificListeners.remove(weakTestPropertyListener);
       weakTestPropertyListener = null;
       System.gc();
-      try {
-        Thread.sleep(10);
-      }
-      catch (InterruptedException e) {
-      }
+
+      SleepUtil.sleepSafe(10, TimeUnit.MILLISECONDS);
+
       checkExpectedListeners(propertySupport, specificListeners, eventListener1, eventListener2, weakEventListener2);
 
       // remove everything

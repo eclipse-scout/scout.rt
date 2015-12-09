@@ -18,6 +18,7 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -28,7 +29,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -39,6 +42,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
@@ -461,6 +465,22 @@ public final class SecurityUtility {
     System.out.format("base64 encoded key pair:\n  priavte key: %s\n  public key:  %s\n",
         Base64Utility.encode(keyPair.getPrivateKey()),
         Base64Utility.encode(keyPair.getPublicKey()));
+  }
+
+  /**
+   * Returns the principal names of the given {@link Subject}, or <code>null</code> if the given {@link Subject} is
+   * <code>null</code>. Multiple principal names are separated by comma.
+   */
+  public static String getPrincipalNames(Subject subject) {
+    if (subject == null) {
+      return null;
+    }
+
+    final List<String> principalNames = new ArrayList<>(subject.getPrincipals().size());
+    for (final Principal principal : subject.getPrincipals()) {
+      principalNames.add(principal.getName());
+    }
+    return StringUtility.join(", ", principalNames);
   }
 
   /**

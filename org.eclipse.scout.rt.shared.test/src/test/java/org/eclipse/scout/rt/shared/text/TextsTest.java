@@ -40,7 +40,7 @@ public class TextsTest {
   private List<IBean<?>> m_testTextService;
 
   @Before
-  public void before() throws InterruptedException {
+  public void before() {
     m_testTextService = TestingUtility.registerBeans(
         new BeanMetaData(TestTextProviderService.class)
             .withApplicationScoped(true));

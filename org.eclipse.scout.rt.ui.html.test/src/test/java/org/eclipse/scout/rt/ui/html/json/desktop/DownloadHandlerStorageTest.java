@@ -13,8 +13,11 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -49,19 +52,11 @@ public class DownloadHandlerStorageTest {
     };
     BinaryResource res = new BinaryResource("bar.txt", null);
     storage.put(KEY, res);
-    sleepSafe(100);
+
+    SleepUtil.sleepElseLog(100, TimeUnit.MILLISECONDS);
+
     // FIXME awe: Improve this test (it fails sometimes because of timing issues)
     assertNull(storage.remove(KEY));
     assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
   }
-
-  private static void sleepSafe(long sleepTime) {
-    try {
-      Thread.sleep(sleepTime);
-    }
-    catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
-
 }

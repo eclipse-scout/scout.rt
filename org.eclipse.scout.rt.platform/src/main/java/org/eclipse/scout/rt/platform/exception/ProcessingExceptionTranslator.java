@@ -13,16 +13,12 @@ package org.eclipse.scout.rt.platform.exception;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.AccessController;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -94,46 +90,6 @@ public class ProcessingExceptionTranslator implements IThrowableTranslator<Proce
       return pe;
     }
 
-    // Add the current user to the context message.
-    final String user = "user=" + getCurrentUserIdentity();
-    if (!status.getContextMessages().contains(user)) {
-      pe.addContextMessage(user);
-    }
-
-    // Add the current job to the context message.
-    final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    if (currentFuture != null && !StringUtility.isNullOrEmpty(currentFuture.getJobInput().getName())) {
-      final String job = "job=" + currentFuture.getJobInput().getName();
-      if (!status.getContextMessages().contains(job)) {
-        pe.addContextMessage(job);
-      }
-    }
-
-    return pe;
-  }
-
-  /**
-   * @return Principal of the current Subject, or <i>anonymous</i> if not running on behalf of a Subject or if no
-   *         Principal is associated with that Subject. Multiple Principals are separated by comma.
-   */
-  @Internal
-  protected String getCurrentUserIdentity() {
-    Subject subject = null;
-    try {
-      subject = Subject.getSubject(AccessController.getContext());
-    }
-    catch (final SecurityException e) {
-      // NOOP
-    }
-
-    if (subject == null || subject.getPrincipals().isEmpty()) {
-      return "anonymous";
-    }
-
-    final List<String> principalNames = new ArrayList<String>();
-    for (final Principal principal : subject.getPrincipals()) {
-      principalNames.add(principal.getName());
-    }
-    return StringUtility.join(", ", principalNames);
+    return pe.withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
   }
 }

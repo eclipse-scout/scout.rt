@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -61,9 +60,9 @@ public class ScheduleAtFixedRateTest {
         .withRunContext(RunContexts.empty()));
 
     // verify
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -106,9 +105,9 @@ public class ScheduleAtFixedRateTest {
         .withExceptionHandling(null, false));
 
     // verify
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -153,9 +152,9 @@ public class ScheduleAtFixedRateTest {
         .withExceptionHandling(null, false));
 
     // verify
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -200,9 +199,9 @@ public class ScheduleAtFixedRateTest {
         .withExceptionHandling(null, false));
 
     // verify
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);

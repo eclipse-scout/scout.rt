@@ -17,11 +17,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,10 +101,13 @@ public class Mutex implements IMutex {
         try {
           acquisitionLock.wait();
         }
-        catch (final InterruptedException e) {
-          waitingForMutex.set(false);
+        catch (final java.lang.InterruptedException e) {
           Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-          throw new ProcessingException(String.format("Interrupted while competing for the mutex [%s]", mutexTask), e);
+          waitingForMutex.set(false);
+
+          throw new InterruptedException("Interrupted while competing for the mutex")
+              .withContextInfo("job", mutexTask.getJobInput().getName())
+              .withContextInfo("mutex", mutexTask.getJobInput().getMutex());
         }
       }
     }

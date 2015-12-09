@@ -25,13 +25,15 @@ import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
@@ -212,25 +214,26 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     RunMonitor.CURRENT.get().registerCancellable(monitor);
 
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
-    ServiceTunnelResponse serviceResponse;
     try {
-      serviceResponse = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
+      return Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
           .withRunContext(createCurrentRunContext().withRunMonitor(monitor))
           .withName(createServiceRequestName(requestSequence)))
-          .awaitDoneAndGet();
+          .awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
     }
-    catch (final ProcessingException e) {
-      if (e.isInterruption() && !monitor.isCancelled()) {
-        monitor.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted.
-      }
-      serviceResponse = new ServiceTunnelResponse(e);
+    catch (InterruptedException | CancellationException e) {
+      monitor.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
+      return new ServiceTunnelResponse(new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
     }
+    catch (final RuntimeException e) {
+      return new ServiceTunnelResponse(e);
+    }
+  }
 
-    if (monitor.isCancelled()) {
-      serviceResponse = new ServiceTunnelResponse(new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
-    }
-
-    return serviceResponse;
+  /**
+   * This method is called just after the HTTP response is received, but before being processed, and might be used to
+   * read and interpret custom HTTP headers.
+   */
+  protected void interceptHttpResponse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
   }
 
   /**
@@ -241,20 +244,11 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * This method is called just after the http response is received but before the http response is processed by scout.
-   * This might be used to read and interpret custom http headers.
-   *
-   * @since 06.07.2009
+   * Returns the name to decorate the thread's name while executing the service request.
    */
-  protected void preprocessHttpResponse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
-  }
-
-  /**
-   * Returns the name to decorate the thread's name which executes the service request.
-   */
-  protected String createServiceRequestName(long requestSequence) {
-    IFuture<?> currentFuture = IFuture.CURRENT.get();
-    String scheduledBy = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
-    return String.format("Tunneling service request [seq=%s]; scheduled by %s", requestSequence, scheduledBy);
+  protected String createServiceRequestName(final long requestSequence) {
+    final IFuture<?> currentFuture = IFuture.CURRENT.get();
+    final String submitter = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
+    return String.format("Tunneling service request [seq=%s, submitter=%s]", requestSequence, submitter);
   }
 }

@@ -14,8 +14,11 @@ import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,23 +52,19 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       // error handler
       Throwable t = response.getException();
       if (t != null) {
-        String msg = "Calling " + serviceInterfaceClass.getSimpleName() + "." + operation.getName() + "()";
-        ProcessingException pe;
-        if (t instanceof ProcessingException) {
-          ((ProcessingException) t).addContextMessage(msg);
-          pe = (ProcessingException) t;
+        RuntimeException serviceException = interceptServiceException(t);
+        if (serviceException instanceof PlatformException) {
+          ((PlatformException) serviceException).withContextInfo("remoteService", "{}.{}()", serviceInterfaceClass.getSimpleName(), operation.getName());
         }
-        else {
-          pe = new ProcessingException(msg, t);
-        }
+
         // combine local and remote stacktraces
-        StackTraceElement[] trace1 = pe.getStackTrace();
+        StackTraceElement[] trace1 = serviceException.getStackTrace();
         StackTraceElement[] trace2 = new Exception().getStackTrace();
         StackTraceElement[] both = new StackTraceElement[trace1.length + trace2.length];
         System.arraycopy(trace1, 0, both, 0, trace1.length);
         System.arraycopy(trace2, 0, both, trace1.length, trace2.length);
-        pe.setStackTrace(both);
-        throw pe;
+        serviceException.setStackTrace(both);
+        throw serviceException;
       }
       serviceUtility.updateHolderArguments(callerArgs, response.getOutVars(), false);
       return response.getData();
@@ -121,5 +120,14 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * @param serviceResponse
    */
   protected void afterTunnel(long t0, ServiceTunnelResponse serviceResponse) {
+  }
+
+  /**
+   * Method invoked to intercept a service exception before being propagated to the caller.
+   * <p>
+   * The default implementation translates the {@link Throwable} via {@link RuntimeExceptionTranslator}.
+   */
+  protected RuntimeException interceptServiceException(Throwable t) {
+    return BEANS.get(RuntimeExceptionTranslator.class).translate(t);
   }
 }

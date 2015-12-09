@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.junit.Assert;
 import org.mockito.Mockito;
@@ -49,26 +51,6 @@ public final class TestingUtility {
   public static final int TESTING_RESOURSE_ORDER = 10000;
 
   private TestingUtility() {
-  }
-
-  /**
-   * Wait until the condition returns a non-null result or timeout is reached.
-   * <p>
-   * When timeout is reached an exception is thrown.
-   */
-  public static <T> T waitUntil(long timeout, WaitCondition<T> w) throws Throwable {
-    long ts = System.currentTimeMillis() + timeout;
-    T t = w.run();
-    while ((t == null) && System.currentTimeMillis() < ts) {
-      Thread.sleep(40);
-      t = w.run();
-    }
-    if (t != null) {
-      return t;
-    }
-    else {
-      throw new InterruptedException("timeout reached");
-    }
   }
 
   /**
@@ -261,12 +243,8 @@ public final class TestingUtility {
         return;
       }
       System.gc();
-      try {
-        Thread.sleep(50);
-      }
-      catch (InterruptedException e) {
-        // NOP
-      }
+
+      SleepUtil.sleepSafe(50, TimeUnit.MILLISECONDS);
     }
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }

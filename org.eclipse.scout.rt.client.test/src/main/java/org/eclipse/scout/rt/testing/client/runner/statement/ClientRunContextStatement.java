@@ -16,16 +16,13 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 
 /**
@@ -50,37 +47,31 @@ public class ClientRunContextStatement extends Statement {
       m_next.evaluate();
     }
     else {
-      final Class<? extends ISession> clientSessionClass = m_clientSessionAnnotation.value();
+      evaluateWithClientRunContext();
+    }
+  }
 
-      new RegisterBeanStatement(new Statement() {
+  private void evaluateWithClientRunContext() throws Throwable {
+    final Subject currentSubject = Subject.getSubject(AccessController.getContext());
+    if (currentSubject == null) {
+      Assertions.fail("Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
+    }
 
-        @Override
-        public void evaluate() throws Throwable {
-          final Class<? extends ClientSessionProvider> clientSessionProvider = m_clientSessionAnnotation.provider();
-          final Subject subject =
-              Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
+    final IBean clientSessionBean = BEANS.getBeanManager().registerBean(new BeanMetaData(m_clientSessionAnnotation.value()).withOrder(-Long.MAX_VALUE));
+    try {
+      // Obtain the client session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
+      final IClientSession clientSession = BEANS.get(m_clientSessionAnnotation.provider()).provide(ClientRunContexts.copyCurrent().withSubject(currentSubject));
 
-          // Obtain the client session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
-          final IClientSession clientSession = BEANS.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent().withSubject(subject));
-
-          // Run the test in a new ClientRunContext. The subject is set explicitly in case a different subject is defined on the session.
-          ClientRunContexts.copyCurrent().withSession(clientSession, true).withSubject(subject).run(new IRunnable() {
-
-            @Override
-            public void run() throws Exception {
-              try {
-                m_next.evaluate();
-              }
-              catch (final Exception | Error e) {
-                throw e;
-              }
-              catch (final Throwable e) {
-                throw new Error(e);
-              }
-            }
-          }, BEANS.get(ThrowableTranslator.class));
-        }
-      }, new BeanMetaData(clientSessionClass).withOrder(-Long.MAX_VALUE)).evaluate();
+      // Run the test on behalf of a ClientRunContext.
+      final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+      ClientRunContexts.copyCurrent()
+          .withSession(clientSession, true)
+          .withSubject(currentSubject) // set the test subject explicitly in case it is different to the session subject
+          .run(invoker);
+      invoker.throwOnError();
+    }
+    finally {
+      BEANS.getBeanManager().unregisterBean(clientSessionBean);
     }
   }
 }

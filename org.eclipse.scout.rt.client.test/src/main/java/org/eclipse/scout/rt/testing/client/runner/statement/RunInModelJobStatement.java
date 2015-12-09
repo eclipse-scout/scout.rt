@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.testing.client.runner.statement;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 
 /**
@@ -37,23 +35,11 @@ public class RunInModelJobStatement extends Statement {
       m_next.evaluate();
     }
     else {
-      ModelJobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          try {
-            m_next.evaluate();
-          }
-          catch (final Exception | Error e) {
-            throw e;
-          }
-          catch (final Throwable t) {
-            throw new Error(t);
-          }
-        }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+      final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+      ModelJobs.schedule(invoker, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withName("Running JUnit test in model job"))
-          .awaitDoneAndGet(BEANS.get(ThrowableTranslator.class));
+          .awaitDone();
+      invoker.throwOnError();
     }
   }
 }

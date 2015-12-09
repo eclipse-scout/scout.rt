@@ -53,14 +53,13 @@ public class ExecutionHintFutureFilterTest {
 
     // job4
     IFuture<Void> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(
             future1,
             future2,
             future3,
             future4)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
 
     IFilter<IFuture<?>> filter = new ExecutionHintFutureFilter("ui-interaction-required");
     assertTrue(filter.accept(future1)); // hint added by job input

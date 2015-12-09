@@ -17,15 +17,17 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 
 /**
@@ -323,17 +325,13 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         @Override
         public void run() throws Exception {
           try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByKey();
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(rows, null);
-            }
+            caller.dataFetched(getDataByKey(), null);
+          }
+          catch (InterruptedException | CancellationException e) {
+            // NOOP
           }
           catch (RuntimeException e) {
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
-                caller.dataFetched(null, e);
-              }
-            }
+            caller.dataFetched(null, e);
           }
         }
       }, Jobs.newInput()
@@ -383,17 +381,13 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         @Override
         public void run() throws Exception {
           try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByText();
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(rows, null);
-            }
+            caller.dataFetched(getDataByText(), null);
+          }
+          catch (InterruptedException | CancellationException e) {
+            // NOOP
           }
           catch (RuntimeException e) {
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
-                caller.dataFetched(null, e);
-              }
-            }
+            caller.dataFetched(null, e);
           }
         }
       }, Jobs.newInput()
@@ -443,17 +437,13 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         @Override
         public void run() throws Exception {
           try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByAll();
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(rows, null);
-            }
+            caller.dataFetched(getDataByAll(), null);
+          }
+          catch (InterruptedException | CancellationException e) {
+            // NOOP
           }
           catch (RuntimeException e) {
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
-                caller.dataFetched(null, e);
-              }
-            }
+            caller.dataFetched(null, e);
           }
         }
       }, Jobs.newInput()
@@ -502,17 +492,13 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         @Override
         public void run() throws Exception {
           try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByRec();
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              caller.dataFetched(rows, null);
-            }
+            caller.dataFetched(getDataByRec(), null);
+          }
+          catch (InterruptedException | CancellationException e) {
+            // NOOP
           }
           catch (RuntimeException e) {
-            if (!RunMonitor.CURRENT.get().isCancelled()) {
-              if (!(e instanceof ProcessingException) || !((ProcessingException) e).isInterruption()) {
-                caller.dataFetched(null, e);
-              }
-            }
+            caller.dataFetched(null, e);
           }
         }
       }, Jobs.newInput()
@@ -523,27 +509,14 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
 
   @Override
   public String toString() {
-    StringBuffer b = new StringBuffer(getClass().getSimpleName() + "[");
-    if (m_key != null) {
-      b.append("key=" + m_key + " ");
-    }
-    if (m_text != null) {
-      b.append("text=" + m_text + " ");
-    }
-    if (m_all != null) {
-      b.append("all=" + m_all + " ");
-    }
-    if (m_rec != null) {
-      b.append("rec=" + m_rec + " ");
-    }
-    if (m_master != null) {
-      b.append("master=" + m_master + " ");
-    }
-    if (m_maxRowCount > 0) {
-      b.append("maxRowCount=" + m_maxRowCount + " ");
-    }
-    b.append("]");
-    return b.toString();
+    ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("key", m_key, false);
+    builder.attr("text", m_text, false);
+    builder.attr("all", m_all, false);
+    builder.attr("rec", m_rec, false);
+    builder.attr("master", m_master, false);
+    builder.attr("maxRowCount", m_maxRowCount);
+    return builder.toString();
   }
 
   @Override

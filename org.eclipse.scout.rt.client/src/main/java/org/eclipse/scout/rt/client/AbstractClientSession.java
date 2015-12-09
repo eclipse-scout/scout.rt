@@ -53,6 +53,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -339,8 +341,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         LOG.debug("Shared variables updated");
       }
     }
-    catch (InterruptedException e) {
-      throw new ProcessingException("Error waiting for initialized shared variables", e);
+    catch (java.lang.InterruptedException e) {
+      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+      throw new InterruptedException("Interrupted while waiting for shared variables to be initialized");
     }
   }
 
@@ -494,8 +497,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       }
       cancelRunningJobs();
     }
-    catch (RuntimeException e) {
-      LOG.warn("Encountered an error while waiting for running jobs to complete.", e);
+    catch (InterruptedException | TimeoutException e) {
+      LOG.warn("Failed to await for running jobs to complete.", e);
     }
     finally {
       inactivateSession();

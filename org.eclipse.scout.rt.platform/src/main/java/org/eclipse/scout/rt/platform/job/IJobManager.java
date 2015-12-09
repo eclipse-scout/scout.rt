@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -23,6 +22,8 @@ import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
@@ -86,7 +87,7 @@ public interface IJobManager {
    * criteria joined by logical 'AND' operation.
    * <p>
    * Example:
-   * 
+   *
    * <pre>
    * Jobs.newFutureFilterBuilder()
    *     .andMatchFuture(...)
@@ -102,15 +103,15 @@ public interface IJobManager {
   boolean isDone(IFilter<IFuture<?>> filter);
 
   /**
-   * Blocks the calling thread until all Futures accepted by the given Filter are in 'done-state' (completed or
-   * cancelled), or the given timeout elapses.
+   * Waits if necessary for at most the given time for the futures matching the given filter to be in 'done' state
+   * (completed or cancelled), or the timeout elapses.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
    * criteria joined by logical 'AND' operation.
    * <p>
    * Example:
-   * 
+   *
    * <pre>
    * Jobs.newFutureFilterBuilder()
    *     .andMatchFuture(...)
@@ -125,12 +126,12 @@ public interface IJobManager {
    *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
-   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws ProcessingException
-   *           if this thread was interrupted while waiting for the task to complete; see
-   *           {@link ProcessingException#isInterruption()}
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
    */
-  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
+  void awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
@@ -177,7 +178,7 @@ public interface IJobManager {
    * criteria joined by logical 'AND' operation.
    * <p>
    * Example:
-   * 
+   *
    * <pre>
    * Jobs.newFutureFilterBuilder()
    *     .andMatchFuture(...)
@@ -233,7 +234,7 @@ public interface IJobManager {
    * joined by logical 'AND' operation.
    * <p>
    * Example:
-   * 
+   *
    * <pre>
    * Jobs.newEventFilterBuilder()
    *     .andMatchEventType(JobEventType.SCHEDULED, JobEventType.DONE)

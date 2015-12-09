@@ -181,10 +181,9 @@ public class ClientNotificationNodeQueue {
           collected.add(next);
         }
       }
-
     }
-    catch (InterruptedException e1) {
-      LOG.warn("Consume notification thread waiting for notifications interrupted.");
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting for client notification messages", e);
     }
     return collected;
   }

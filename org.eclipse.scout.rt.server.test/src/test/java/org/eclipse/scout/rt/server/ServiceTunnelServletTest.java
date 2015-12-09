@@ -146,7 +146,7 @@ public class ServiceTunnelServletTest {
    * @link ServerSessionProvider#provide(ServerJobInput)} is called only once.
    */
   @Test
-  public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException, InterruptedException {
+  public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException {
     final Map<String, ICacheEntry<?>> cache = new HashMap<String, ICacheEntry<?>>();
 
     final TestServerSession testServerSession = new TestServerSession();

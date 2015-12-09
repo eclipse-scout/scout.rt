@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.transaction;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 
 /**
@@ -38,10 +38,10 @@ public interface ITransaction extends ICancellable {
   ThreadLocal<ITransaction> CURRENT = new ThreadLocal<>();
 
   /**
-   * register the member (even if the transaction is canceled)
+   * Registers the given {@link ITransactionMember}.
    *
-   * @throws ProcessingException
-   *           with an {@link InterruptedException} when the transaction is canceled
+   * @throws CancellationException
+   *           if the transaction is cancelled.
    */
   void registerMember(ITransactionMember member);
 
@@ -60,14 +60,11 @@ public interface ITransaction extends ICancellable {
   void addFailure(Throwable t);
 
   /**
-   * Two-phase commit
-   * <p>
-   * Temporary commits the transaction members
-   * <p>
+   * Tries to temporarily commit the transaction on all transaction members.
    *
-   * @return true without any exception if the commit phase 1 was successful on all members.
-   *         <p>
-   *         Subsequently there will be a call to {@link #commitPhase2()} or {@link #rollback()}
+   * @return <code>true</code> without if the commit phase 1 was successful on all members.
+   * @throws CancellationException
+   *           if the transaction is cancelled.
    */
   boolean commitPhase1();
 

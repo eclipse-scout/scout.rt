@@ -69,7 +69,7 @@ public class ProposalFieldTest {
    * When no proposal matches the searchText, the ProposalField uses that searchText as value.
    */
   @Test
-  public void testNoMatch() throws InterruptedException {
+  public void testNoMatch() {
     testMatch("c", "c", 0);
   }
 
@@ -78,7 +78,7 @@ public class ProposalFieldTest {
    * proposal match as value, it only sets the searchText as value.
    */
   @Test
-  public void testSingleMatch() throws InterruptedException {
+  public void testSingleMatch() {
     testMatch("a", "a", 1);
   }
 
@@ -87,12 +87,12 @@ public class ProposalFieldTest {
    * (other than the SmartField which throws a VetoException in that case).
    */
   @Test
-  public void testMultiMatch() throws InterruptedException {
+  public void testMultiMatch() {
     testMatch("b", "b", 2);
   }
 
   @Test
-  public void testSelectFromProposalChooser() throws InterruptedException {
+  public void testSelectFromProposalChooser() {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -129,7 +129,7 @@ public class ProposalFieldTest {
   /**
    * This method deals with the async nature of the proposal chooser
    */
-  void testMatch(String searchText, String expectedValue, int expectedNumProposals) throws InterruptedException {
+  void testMatch(String searchText, String expectedValue, int expectedNumProposals) {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {

@@ -62,6 +62,8 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
@@ -711,34 +713,25 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (getTable() != null) {
       try {
         getTable().setTableChanging(true);
-        //
+
         ensureSearchFormCreated();
         ensureSearchFormStarted();
         interceptPopulateTable();
       }
-      catch (Exception t) {
+      catch (InterruptedException | CancellationException e) {
         getTable().discardAllRows();
-        ProcessingException pe;
-        if (t instanceof ProcessingException) {
-          pe = (ProcessingException) t;
-        }
-        else {
-          pe = new ProcessingException(t.getMessage(), t);
-        }
-        if (pe.isInterruption()) {
-          setTableStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
-        }
-        else {
-          String message = null;
-          if (pe instanceof VetoException) {
-            message = pe.getDisplayMessage();
-          }
-          if (StringUtility.isNullOrEmpty(message)) {
-            message = ScoutTexts.get("ErrorWhileLoadingData");
-          }
-          setTableStatus(new Status(message, IStatus.ERROR));
-        }
-        throw pe;
+        setTableStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
+        throw e;
+      }
+      catch (VetoException e) {
+        getTable().discardAllRows();
+        setTableStatus(new Status(StringUtility.nvl(e.getDisplayMessage(), ScoutTexts.get("ErrorWhileLoadingData")), IStatus.ERROR));
+        throw e;
+      }
+      catch (RuntimeException e) {
+        getTable().discardAllRows();
+        setTableStatus(new Status(ScoutTexts.get("ErrorWhileLoadingData"), IStatus.ERROR));
+        throw e;
       }
       finally {
         getTable().setTableChanging(false);
@@ -785,10 +778,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         loadTableDataImpl();
       }
-      catch (ProcessingException pe) {
-        if (!pe.isInterruption()) {
-          throw pe;
-        }
+      catch (InterruptedException | CancellationException e) {
+        // NOOP
       }
       finally {
         ClientSessionProvider.currentSession().getMemoryPolicy().afterTablePageLoadData(this);

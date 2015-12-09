@@ -13,11 +13,13 @@ package org.eclipse.scout.rt.server.scheduler;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -28,8 +30,6 @@ import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests for IScheduler
@@ -79,7 +79,6 @@ public class SchedulerTest {
 }
 
 class JobAcceptTick extends AbstractSchedulerJob {
-  private static Logger LOG = LoggerFactory.getLogger(JobAcceptTick.class);
 
   public JobAcceptTick(String groupId, String jobId) {
     super(groupId, jobId);
@@ -87,12 +86,7 @@ class JobAcceptTick extends AbstractSchedulerJob {
 
   @Override
   public void run(IScheduler scheduler, TickSignal signal) {
-    try {
-      Thread.sleep(200);
-    }
-    catch (InterruptedException e) {
-      LOG.error("Interrupted tick", e);
-    }
+    SleepUtil.sleepElseLog(200, TimeUnit.MILLISECONDS, "Interrupted tick");
     setDisposed(true);
   }
 

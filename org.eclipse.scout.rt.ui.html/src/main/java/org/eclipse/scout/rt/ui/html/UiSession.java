@@ -44,8 +44,10 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
@@ -738,7 +740,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           pollWaitSeconds = newPollWaitSeconds;
         }
       }
-      catch (InterruptedException e) {
+      catch (java.lang.InterruptedException e) {
         LOG.warn("Interrupted while waiting for notification token", e);
       }
     }
@@ -748,12 +750,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     // Wait at least 100ms to allow some sort of "coalescing background job result" (if many jobs
     // finish at the same time, we want to prevent too many polling requests).
-    try {
-      Thread.sleep(100);
-    }
-    catch (InterruptedException e1) {
-      // nop
-    }
+    SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
   }
 
   protected void notifyPollingBackgroundJobRequests() {
@@ -904,15 +901,18 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     try {
       m_uiSessionLock.lock();
       ModelJobs.schedule(new IRunnable() {
+
         @Override
         public void run() throws Exception {
           dispose();
           LOG.info("UI session with ID {} unbound from HTTP session.", m_uiSessionId);
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getClientSession(), true))).awaitDone();
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
+          .withSession(getClientSession(), true)))
+          .awaitDone();
     }
-    catch (RuntimeException e) {
-      LOG.error("Error during dispose of UI session", e);
+    catch (InterruptedException e) {
+      LOG.error("Interrupted while waiting for the UISession to be disposed", e);
     }
     finally {
       m_uiSessionLock.unlock();

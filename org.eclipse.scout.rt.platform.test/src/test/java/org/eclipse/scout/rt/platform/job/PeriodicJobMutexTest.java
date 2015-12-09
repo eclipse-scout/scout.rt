@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,21 +83,21 @@ public class PeriodicJobMutexTest {
 
           @Override
           public void run() throws Exception {
-            boolean timeout = !Jobs.schedule(new IRunnable() {
+            try {
+              Jobs.schedule(new IRunnable() {
 
-              @Override
-              public void run() throws Exception {
-                protocol.add("running-2");
-              }
-            }, Jobs.newInput()
-                .withMutex(periodicJobInput.getMutex())
-                .withExecutionHint(JOB_IDENTIFIER))
-                .awaitDone(200, TimeUnit.MILLISECONDS);
-
-            if (timeout) {
+                @Override
+                public void run() throws Exception {
+                  protocol.add("running-2");
+                }
+              }, Jobs.newInput()
+                  .withMutex(periodicJobInput.getMutex())
+                  .withExecutionHint(JOB_IDENTIFIER))
+                  .awaitDone(200, TimeUnit.MILLISECONDS);
+            }
+            catch (TimeoutException e) {
               protocol.add("timeout-because-mutex-owner");
             }
-
           }
         }, Jobs.newInput()
             .withExecutionHint(JOB_IDENTIFIER))
@@ -132,9 +132,9 @@ public class PeriodicJobMutexTest {
         .withMutex(periodicJobInput.getMutex()));
 
     // Wait for the job to complete
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
 
     List<String> expected = new ArrayList<String>();
     expected.add("other job");

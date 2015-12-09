@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.ws.Service;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.PortCacheEntry;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -104,12 +105,7 @@ public class PortCacheTest {
       String msg = String.format("Timeout elapsed while waiting for queue size to become expected size [actualSize=%s, expectedSize=%s]", queue.size(), expectedSize);
       assertTrue(msg, deadline > System.currentTimeMillis());
 
-      try {
-        Thread.sleep(10);
-      }
-      catch (InterruptedException e) {
-        // NOOP
-      }
+      SleepUtil.sleepSafe(10, TimeUnit.MILLISECONDS);
     }
   }
 }

@@ -12,24 +12,22 @@ package org.eclipse.scout.rt.testing.server.runner.statement;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 
 /**
  * Statement for executing tests with a timeout (i.e. the annotated test method is expected to complete within the
- * specified amount of time). If the given timeout is <code>0</code> the next statement is executed using a copy of the
- * current {@link ServerRunContext}. A positive timeout value requires a new server job to be scheduled. In both cases,
- * the next statement is executed in the callers transaction, or in a new transaction if not available.
+ * specified amount of time). If the given timeout is <code>0</code> the next statement is executed in the calling
+ * thread. A positive timeout value requires a new job to be scheduled and awaited for. That job runs with a new
+ * transaction, because a transaction is only allowed to be accessed by the same thread.
  *
  * @see Test#timeout()
  * @since 5.1
@@ -46,45 +44,29 @@ public class TimeoutServerRunContextStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    IRunnable nestedRunnable = new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        try {
-          m_next.evaluate();
-        }
-        catch (final Error e) {
-          throw e;
-        }
-        catch (final Throwable t) {
-          throw new ProcessingException("Wrapper", t);
-        }
-      }
-    };
-
-    // Create a copy of the calling RunContext and re-use its transaction if available.
-    // TODO [5.2] abr: Should we use the current TX if available? (REQUIRED)
-    ServerRunContext runContext = ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW);
-
     if (m_timeoutMillis <= 0) {
-      // no timeout specified. Hence run in a nested transaction that uses the calling thread
-      runContext.run(nestedRunnable, BEANS.get(ThrowableTranslator.class));
+      m_next.evaluate();
     }
     else {
-      // timeout specified. Run statement in a new server job and wait the amount specified.
-      IFuture<Void> future = Jobs.schedule(nestedRunnable, Jobs.newInput()
-          .withRunContext(runContext));
-      try {
-        future.awaitDoneAndGet(m_timeoutMillis, TimeUnit.MILLISECONDS);
-      }
-      catch (ProcessingException e) {
-        if (e.isTimeout() || e.isInterruption()) {
-          // Timeout or interruption: Try to cancel the job and translate exception into JUnit counterpart.
-          future.cancel(true);
-          throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS);
-        }
-
-        throw e.getCause(); // re-throw wrapped exception
-      }
+      evaluateWithTimeout();
     }
+  }
+
+  protected void evaluateWithTimeout() throws Throwable {
+    final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+
+    final IFuture<Void> future = Jobs.schedule(invoker, Jobs.newInput()
+        .withRunContext(ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW)) // Run in new TX, because the same TX is not allowed to be used by multiple threads.
+        .withName("Running test with support for JUnit timeout"));
+
+    try {
+      future.awaitDone(m_timeoutMillis, TimeUnit.MILLISECONDS);
+    }
+    catch (InterruptedException | TimeoutException e) {
+      future.cancel(true);
+      throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS); // JUnit timeout exception
+    }
+
+    invoker.throwOnError();
   }
 }

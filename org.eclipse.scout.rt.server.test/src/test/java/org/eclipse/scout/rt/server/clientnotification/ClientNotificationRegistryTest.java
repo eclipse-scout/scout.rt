@@ -159,8 +159,6 @@ public class ClientNotificationRegistryTest {
 
   /**
    * If no message is consumed, queue is removed
-   *
-   * @throws InterruptedException
    */
   @Test
   public void testQueueRemovedAfterTimeout() throws InterruptedException {

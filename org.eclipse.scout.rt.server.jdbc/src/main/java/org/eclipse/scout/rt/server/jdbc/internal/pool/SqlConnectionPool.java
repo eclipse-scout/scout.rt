@@ -19,7 +19,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.util.SleepUtil;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +72,7 @@ public final class SqlConnectionPool {
       @Override
       public void run() {
         while (true) {
-          try {
-            Thread.sleep(60000L);
-          }
-          catch (InterruptedException ie) {
-          }
+          SleepUtil.sleepSafe(60, TimeUnit.SECONDS);
           managePool();
         }
       }
@@ -111,8 +110,9 @@ public final class SqlConnectionPool {
           try {
             m_poolLock.wait();
           }
-          catch (InterruptedException ie) {
-            throw ie;
+          catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt(); // Restore the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
+            throw new InterruptedException("Interrupted while leasing database connection");
           }
         }
         // test candidate connection

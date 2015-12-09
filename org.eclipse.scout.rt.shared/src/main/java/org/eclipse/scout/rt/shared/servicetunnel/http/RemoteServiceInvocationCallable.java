@@ -81,7 +81,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
 
       // Receive the response.
       final int httpStatusCode = (m_urlConnection instanceof HttpURLConnection ? ((HttpURLConnection) m_urlConnection).getResponseCode() : 200);
-      m_tunnel.preprocessHttpResponse(m_urlConnection, m_serviceRequest, httpStatusCode);
+      m_tunnel.interceptHttpResponse(m_urlConnection, m_serviceRequest, httpStatusCode);
       if (httpStatusCode != 0 && (httpStatusCode < 200 || httpStatusCode > 299)) {
         return new ServiceTunnelResponse(new HttpException(httpStatusCode)); // request failed
       }
@@ -129,8 +129,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
   }
 
   protected Boolean sendCancelRequest(long requestSequence) throws NoSuchMethodException, SecurityException {
-    final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class,
-        IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
+    final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
     final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
 
     final ServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()

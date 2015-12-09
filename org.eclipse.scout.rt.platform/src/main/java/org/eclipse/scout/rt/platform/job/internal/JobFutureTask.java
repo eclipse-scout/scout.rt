@@ -15,14 +15,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
@@ -30,8 +29,8 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -241,64 +240,66 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public void awaitDone() {
+    assertNotSameMutex();
+
     try {
-      awaitDoneAndGet();
+      m_donePromise.get();
     }
-    catch (final ProcessingException e) {
-      if (e.isInterruption()) {
-        throw e;
-      }
-      else {
-        // NOOP: Do not propagate exception (see JavaDoc contract)
-      }
+    catch (final ExecutionException | java.util.concurrent.CancellationException e) {
+      // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
+    }
+    catch (final java.lang.InterruptedException e) {
+      restoreInterruptionStatus();
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
   }
 
   @Override
-  public boolean awaitDone(final long timeout, final TimeUnit unit) {
+  public void awaitDone(final long timeout, final TimeUnit unit) {
+    assertNotSameMutex();
+
     try {
-      awaitDoneAndGet(timeout, unit);
+      m_donePromise.get(timeout, unit);
     }
-    catch (final ProcessingException e) {
-      if (e.isInterruption()) {
-        throw e;
-      }
-      else if (e.isTimeout()) {
-        return false;
-      }
-      else {
-        // NOOP: Do not propagate exception (see JavaDoc contract)
-      }
+    catch (final ExecutionException | java.util.concurrent.CancellationException e) {
+      // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
-    return true;
+    catch (final java.lang.InterruptedException e) {
+      restoreInterruptionStatus();
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
+    }
+    catch (final java.util.concurrent.TimeoutException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for a job to complete because the maximal wait time elapsed", timeout, unit));
+    }
   }
 
   @Override
   public RESULT awaitDoneAndGet() {
-    return awaitDoneAndGet(BEANS.get(ProcessingExceptionTranslator.class));
+    return awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
   }
 
   @Override
-  public <ERROR extends Throwable> RESULT awaitDoneAndGet(final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
+  public <ERROR extends Throwable> RESULT awaitDoneAndGet(final IThrowableTranslator<ERROR> translator) throws ERROR {
     assertNotSameMutex();
 
     try {
       return m_donePromise.get();
     }
-    catch (final CancellationException e) {
-      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.getName())), throwableTranslator);
+    catch (final ExecutionException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, translator));
     }
-    catch (final InterruptedException e) {
-      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.getName())), throwableTranslator);
+    catch (final java.util.concurrent.CancellationException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
-    catch (final Throwable t) {
-      return throwElseReturnNull(t, throwableTranslator);
+    catch (final java.lang.InterruptedException e) {
+      restoreInterruptionStatus();
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
   }
 
   @Override
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) {
-    return awaitDoneAndGet(timeout, unit, BEANS.get(ProcessingExceptionTranslator.class));
+    return awaitDoneAndGet(timeout, unit, BEANS.get(RuntimeExceptionTranslator.class));
   }
 
   @Override
@@ -308,17 +309,18 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       return m_donePromise.get(timeout, unit);
     }
-    catch (final CancellationException e) {
-      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.getName())), throwableTranslator);
+    catch (final ExecutionException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, throwableTranslator));
     }
-    catch (final InterruptedException e) {
-      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.getName())), throwableTranslator);
+    catch (final java.util.concurrent.CancellationException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
-    catch (final TimeoutException e) {
-      return throwElseReturnNull(new TimeoutException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.getName())), throwableTranslator);
+    catch (final java.lang.InterruptedException e) {
+      restoreInterruptionStatus();
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
-    catch (final Throwable t) {
-      return throwElseReturnNull(t, throwableTranslator);
+    catch (final java.util.concurrent.TimeoutException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for a job to complete because the maximal wait time elapsed", timeout, unit));
     }
   }
 
@@ -355,21 +357,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return m_donePromise;
   }
 
-  private <ERROR extends Throwable> RESULT throwElseReturnNull(final Throwable t, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
-    final ERROR error = throwableTranslator.translate(t);
-    if (error != null) {
-      throw error;
-    }
-    else {
-      return null;
-    }
-  }
-
   /**
    * Asserts that the current job (if applicable) does not share the same mutex as the job to be awaited for. Otherwise,
    * that would end up in a deadlock.
    */
-  private void assertNotSameMutex() {
+  protected void assertNotSameMutex() {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
     if (currentFuture == null) {
       return; // not running in a job.
@@ -378,6 +370,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     final IMutex currentMutex = currentFuture.getJobInput().getMutex();
     if (currentMutex == null) {
       return; // current job is not running in mutual exclusive manner.
+    }
+
+    if (!currentMutex.isMutexOwner(currentFuture)) {
+      return; // current job is not mutex owner.
     }
 
     if (isDone()) {
@@ -394,6 +390,23 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     if (isMutexOwner()) {
       getMutex().release(this);
     }
+  }
+
+  /**
+   * Restores the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
+   */
+  protected void restoreInterruptionStatus() {
+    Thread.currentThread().interrupt();
+  }
+
+  /**
+   * Method invoked to intercept an exception before given to the submitter.
+   */
+  protected <ERROR extends Throwable> ERROR interceptException(final ERROR exception) {
+    if (exception instanceof PlatformException) {
+      ((PlatformException) exception).withContextInfo("job", getJobInput().getName());
+    }
+    return exception;
   }
 
   @Override

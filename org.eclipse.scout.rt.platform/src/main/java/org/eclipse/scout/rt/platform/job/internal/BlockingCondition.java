@@ -14,12 +14,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -29,15 +27,13 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
  * Implementation of {@link IBlockingCondition}.
  */
 public class BlockingCondition implements IBlockingCondition {
-
-  private static final Logger LOG = LoggerFactory.getLogger(BlockingCondition.class);
 
   private volatile boolean m_blocking;
   private final String m_name;
@@ -103,13 +99,13 @@ public class BlockingCondition implements IBlockingCondition {
   }
 
   @Override
-  public boolean waitFor(final long timeout, final TimeUnit unit, final String... executionHints) {
+  public void waitFor(final long timeout, final TimeUnit unit, final String... executionHints) {
     final JobFutureTask<?> currentTask = (JobFutureTask<?>) IFuture.CURRENT.get();
     if (currentTask != null) {
-      return blockManagedThread(currentTask, timeout, unit, executionHints);
+      blockManagedThread(currentTask, timeout, unit, executionHints);
     }
     else {
-      return blockArbitraryThread(timeout, unit);
+      blockArbitraryThread(timeout, unit);
     }
   }
 
@@ -117,18 +113,19 @@ public class BlockingCondition implements IBlockingCondition {
    * Blocks the current thread if being managed by {@link IJobManager}. That is if the thread as a {@link JobFutureTask}
    * associated.
    *
-   * @return <code>false</code> if the timeout elapsed, <code>false</code> otherwise.
-   * @throws ProcessingException
-   *           if the waiting thread was interrupted.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
    */
-  protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit, final String... executionHints) {
+  protected void blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit, final String... executionHints) {
     final IMutex mutex = jobTask.getMutex();
     final Set<String> associatedExecutionHints = new HashSet<>();
 
     m_lock.lock();
     try {
       if (!m_blocking) {
-        return true;
+        return;
       }
 
       // Associate the current IFuture with execution hints.
@@ -163,15 +160,9 @@ public class BlockingCondition implements IBlockingCondition {
         }
       });
     }
-    catch (final InterruptedException e) {
-      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+    catch (final InterruptedException | TimeoutException e) {
       unregisterAndMarkAsUnblocked(jobTask);
-      throw new ProcessingException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
-    }
-    catch (final TimeoutException e) {
-      unregisterAndMarkAsUnblocked(jobTask);
-      LOG.debug("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition={}, thread={}]", m_name, Thread.currentThread().getName(), e);
-      return false;
+      throw e;
     }
     finally {
       // Restore to the previous execution hints.
@@ -194,22 +185,21 @@ public class BlockingCondition implements IBlockingCondition {
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED)
         .withFuture(jobTask)
         .withBlockingCondition(this));
-
-    return true;
   }
 
   /**
    * Blocks the current thread if not being managed by {@link IJobManager}.
    *
-   * @return <code>false</code> if the timeout elapsed, <code>false</code> otherwise.
-   * @throws ProcessingException
-   *           if the waiting thread was interrupted.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
    */
-  protected boolean blockArbitraryThread(final long timeout, final TimeUnit unit) {
+  protected void blockArbitraryThread(final long timeout, final TimeUnit unit) {
     m_lock.lock();
     try {
       if (!m_blocking) {
-        return true;
+        return;
       }
 
       blockUntilSignaledOrTimeout(timeout, unit, new IBlockingGuard() {
@@ -219,15 +209,6 @@ public class BlockingCondition implements IBlockingCondition {
           return m_blocking; // This method is called once the condition is signaled or a spurious wake-up occurs.
         }
       });
-      return true;
-    }
-    catch (final InterruptedException e) {
-      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-      throw new ProcessingException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
-    }
-    catch (final TimeoutException e) {
-      LOG.debug("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition={}, thread={}]", m_name, Thread.currentThread().getName(), e);
-      return false;
     }
     finally {
       m_lock.unlock();
@@ -247,22 +228,38 @@ public class BlockingCondition implements IBlockingCondition {
   /**
    * Blocks the current thread until being signaled and {@link IBlockingGuard#shouldBlock()} evaluates to
    * <code>false</code>, or the timeout elapses.
+   *
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
    */
-  protected void blockUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final IBlockingGuard guard) throws InterruptedException, TimeoutException {
-    if (timeout == -1L) {
-      while (guard.shouldBlock()) {
-        m_unblockedCondition.await();
+  protected void blockUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final IBlockingGuard guard) {
+    try {
+      if (timeout == -1L) {
+        while (guard.shouldBlock()) {
+          m_unblockedCondition.await();
+        }
+      }
+      else {
+        long nanos = unit.toNanos(timeout);
+        while (guard.shouldBlock() && nanos > 0L) {
+          nanos = m_unblockedCondition.awaitNanos(nanos);
+        }
+
+        if (nanos <= 0L) {
+          throw new TimeoutException("Timeout elapsed while waiting for a blocking condition to fall")
+              .withContextInfo("blockingCondition", m_name)
+              .withContextInfo("timeout", "{}ms", unit.toMillis(timeout))
+              .withContextInfo("thread", Thread.currentThread().getName());
+        }
       }
     }
-    else {
-      long nanos = unit.toNanos(timeout);
-      while (guard.shouldBlock() && nanos > 0L) {
-        nanos = m_unblockedCondition.awaitNanos(nanos);
-      }
-
-      if (nanos <= 0L) {
-        throw new TimeoutException();
-      }
+    catch (java.lang.InterruptedException e) {
+      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+      throw new InterruptedException("Interrupted while waiting for a blocking condition to fall")
+          .withContextInfo("blockingCondition", m_name)
+          .withContextInfo("thread", Thread.currentThread().getName());
     }
   }
 

@@ -23,7 +23,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

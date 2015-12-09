@@ -10,20 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Core exception in Scout.
- *
- * @see org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService
+ * Represents processing errors that occur during application execution.
  */
-public class ProcessingException extends RuntimeException implements Serializable {
+public class ProcessingException extends PlatformException {
   private static final long serialVersionUID = 1L;
 
   private ProcessingStatus m_status;
@@ -34,6 +29,14 @@ public class ProcessingException extends RuntimeException implements Serializabl
    */
   public ProcessingException() {
     this("undefined");
+  }
+
+  /**
+   * See constructor of {@link PlatformException}
+   */
+  public ProcessingException(final String message, final Object... args) {
+    super(message, args);
+    initStatus(new ProcessingStatus(null, getMessage(), getCause(), 0, IProcessingStatus.ERROR));
   }
 
   public ProcessingException(String message) {
@@ -70,6 +73,10 @@ public class ProcessingException extends RuntimeException implements Serializabl
 
   public ProcessingException(IProcessingStatus status) {
     super(status.getMessage(), status.getException());
+    initStatus(status);
+  }
+
+  private final void initStatus(IProcessingStatus status) {
     m_status = status instanceof ProcessingStatus ? (ProcessingStatus) status : new ProcessingStatus(status);
     if (m_status.getException() == null) {
       ((ProcessingStatus) status).setException(this);
@@ -82,6 +89,12 @@ public class ProcessingException extends RuntimeException implements Serializabl
 
   public void setStatus(IProcessingStatus status) {
     m_status = new ProcessingStatus(status);
+  }
+
+  @Override
+  public ProcessingException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+    super.withContextInfo(name, value, valueArgs);
+    return this;
   }
 
   /**
@@ -116,28 +129,6 @@ public class ProcessingException extends RuntimeException implements Serializabl
 
   public void consume() {
     m_consumed = true;
-  }
-
-  /**
-   * @return <code>true</code> to indicate that a thread waiting for a lock or condition was interrupted.
-   */
-  public boolean isInterruption() {
-    return m_status != null && (m_status.getException() instanceof InterruptedException);
-  }
-
-  /**
-   * @return <code>true</code> to indicate that processing was cancelled.
-   */
-  public boolean isCancellation() {
-    return m_status != null && (m_status.getException() instanceof CancellationException);
-  }
-
-  /**
-   * @return <code>true</code> to indicate that a timeout elapsed while waiting for an operation to complete, e.g. a
-   *         job's execution.
-   */
-  public boolean isTimeout() {
-    return m_status != null && (m_status.getException() instanceof TimeoutException);
   }
 
   /**

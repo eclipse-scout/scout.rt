@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -144,9 +145,8 @@ public class JobScheduleTest {
       future.awaitDoneAndGet();
       fail("Exception expected");
     }
-    catch (Exception e) {
-      assertTrue(e instanceof ProcessingException);
-      assertSame(exception, e.getCause());
+    catch (RuntimeException e) {
+      assertSame(exception, e);
       assertTrue(future.isDone());
     }
   }
@@ -169,9 +169,8 @@ public class JobScheduleTest {
       future.awaitDoneAndGet();
       fail("Exception expected");
     }
-    catch (Exception e) {
-      assertTrue(e instanceof ProcessingException);
-      assertSame(exception, e.getCause());
+    catch (RuntimeException e) {
+      assertSame(exception, e);
       assertTrue(future.isDone());
     }
   }
@@ -194,7 +193,7 @@ public class JobScheduleTest {
       future.awaitDoneAndGet();
       fail("Exception expected");
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
       assertTrue(e instanceof ProcessingException);
       assertSame(exception, e.getCause());
       assertTrue(future.isDone());
@@ -219,7 +218,7 @@ public class JobScheduleTest {
       future.awaitDoneAndGet();
       fail("Exception expected");
     }
-    catch (Exception e) {
+    catch (RuntimeException e) {
       assertTrue(e instanceof ProcessingException);
       assertSame(exception, e.getCause());
       assertTrue(future.isDone());
@@ -382,9 +381,9 @@ public class JobScheduleTest {
     barrier.unblock();
 
     // wait for all jobs to complete
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1, future2, future3)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
   }
 
   @Test
@@ -504,18 +503,18 @@ public class JobScheduleTest {
 
     try {
       assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));
-      fail();
+      fail("TimeoutException expected");
     }
-    catch (ProcessingException e) {
-      assertTrue(e.isTimeout());
+    catch (TimeoutException e) {
+      // NOOP
     }
 
     latch.unblock();
 
     // wait for all jobs to complete
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1, future2)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
   }
 
   @Test

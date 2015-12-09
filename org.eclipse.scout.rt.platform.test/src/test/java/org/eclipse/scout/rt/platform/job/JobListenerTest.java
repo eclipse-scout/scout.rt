@@ -67,7 +67,7 @@ public class JobListenerTest {
         .toFilter(), shutdownListener);
 
     IFuture<Void> future = Jobs.getJobManager().schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()));
-    assertTrue(future.awaitDone(10, TimeUnit.SECONDS));
+    future.awaitDone(10, TimeUnit.SECONDS);
     jobListenerRegistration.dispose();
 
     Jobs.getJobManager().shutdown();
@@ -137,7 +137,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testGlobalListener2() throws InterruptedException {
+  public void testGlobalListener2() {
     JobListenerEventCollector listener = new JobListenerEventCollector();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(

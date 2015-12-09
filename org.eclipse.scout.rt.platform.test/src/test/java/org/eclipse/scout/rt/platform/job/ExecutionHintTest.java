@@ -144,19 +144,19 @@ public class ExecutionHintTest {
     }, Jobs.newInput());
 
     // Wait until the job completes, or until tagged as 'USER-INTERACTION-REQUIRED'
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .andMatchNotExecutionHint(hint)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
 
     protocol.add("b");
 
     latch.unblock();
 
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .andMatchExecutionHint(hint)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
 
     assertEquals(Arrays.asList("a", "b", "c"), protocol);
   }

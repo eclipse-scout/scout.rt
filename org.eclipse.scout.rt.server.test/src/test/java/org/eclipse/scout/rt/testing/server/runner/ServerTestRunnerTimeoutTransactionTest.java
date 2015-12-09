@@ -50,9 +50,9 @@ public class ServerTestRunnerTimeoutTransactionTest {
     s_protocolByTestMethod = new HashMap<String, Set<ITransaction>>();
     s_expectedTransactionCountByTestMethod = new HashMap<>();
     s_expectedTransactionCountByTestMethod.put("testDefault", 1);
-    s_expectedTransactionCountByTestMethod.put("testTimeout", 3);
+    s_expectedTransactionCountByTestMethod.put("testTimeout", 2);
     s_expectedTransactionCountByTestMethod.put("testDefaultExpectException", 1);
-    s_expectedTransactionCountByTestMethod.put("testTimeoutExpectException", 3);
+    s_expectedTransactionCountByTestMethod.put("testTimeoutExpectException", 2);
   }
 
   @AfterClass

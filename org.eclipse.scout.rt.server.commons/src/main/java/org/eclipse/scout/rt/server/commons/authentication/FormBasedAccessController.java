@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -115,12 +117,7 @@ public class FormBasedAccessController implements IAccessController {
    */
   protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException, ServletException {
     if (m_config.get403WaitMillis() > 0L) {
-      try {
-        Thread.sleep(m_config.get403WaitMillis());
-      }
-      catch (final InterruptedException e) {
-        // NOOP
-      }
+      SleepUtil.sleepSafe(m_config.get403WaitMillis(), TimeUnit.MILLISECONDS);
     }
     response.sendError(HttpServletResponse.SC_FORBIDDEN);
   }

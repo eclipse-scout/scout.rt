@@ -190,13 +190,13 @@ public class JobFutureVisitTest {
     m_latch.unblock();
     bc1.setBlocking(false);
 
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
   }
 
   @Test
-  public void testProtocol() throws InterruptedException {
+  public void testProtocol() {
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
@@ -211,7 +211,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitNullFilter() throws InterruptedException {
+  public void testVisitNullFilter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(null, new IVisitor<IFuture<?>>() {
 
@@ -234,7 +234,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitFilter() throws InterruptedException {
+  public void testVisitFilter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
@@ -259,7 +259,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitBlockedFilter() throws InterruptedException {
+  public void testVisitBlockedFilter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andAreBlocked()
@@ -284,7 +284,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitNotBlockedFilter() throws InterruptedException {
+  public void testVisitNotBlockedFilter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(new NotFilter<>(Jobs.newFutureFilterBuilder()
         .andAreBlocked()
@@ -309,7 +309,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitSession1Filter() throws InterruptedException {
+  public void testVisitSession1Filter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))
@@ -334,7 +334,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitSession2Filter() throws InterruptedException {
+  public void testVisitSession2Filter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex2_.*"))
@@ -359,7 +359,7 @@ public class JobFutureVisitTest {
   }
 
   @Test
-  public void testVisitSessionFilterAndBlocked() throws InterruptedException {
+  public void testVisitSessionFilterAndBlocked() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))

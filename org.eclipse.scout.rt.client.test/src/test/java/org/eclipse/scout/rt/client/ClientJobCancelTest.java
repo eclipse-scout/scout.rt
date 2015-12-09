@@ -28,9 +28,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -88,10 +88,10 @@ public class ClientJobCancelTest {
   public void testCancellation() throws Exception {
     try {
       doPingRequestAsync("abc").cancel();
-      fail();
+      fail("interruption expected");
     }
-    catch (ProcessingException e) {
-      assertTrue(e.isInterruption());
+    catch (InterruptedException e) {
+      // NOOP
     }
   }
 
@@ -111,7 +111,7 @@ public class ClientJobCancelTest {
         try {
           assertTrue(serviceCallSetupLatch.countDownAndBlock());
         }
-        catch (InterruptedException e) {
+        catch (java.lang.InterruptedException e) {
           serviceCallInterrupted.set(true);
         }
         finally {

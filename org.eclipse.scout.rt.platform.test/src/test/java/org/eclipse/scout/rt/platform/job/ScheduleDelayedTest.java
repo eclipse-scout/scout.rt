@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -47,9 +46,9 @@ public class ScheduleDelayedTest {
         .withSchedulingDelay(delayNanos, TimeUnit.NANOSECONDS));
 
     // verify
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 30, TimeUnit.SECONDS));
+        .toFilter(), 30, TimeUnit.SECONDS);
     assertEquals(1, protocol.size());
     Long actualExecutionTime = protocol.get(0);
     long expectedExecutionTime = tStartNano + delayNanos;

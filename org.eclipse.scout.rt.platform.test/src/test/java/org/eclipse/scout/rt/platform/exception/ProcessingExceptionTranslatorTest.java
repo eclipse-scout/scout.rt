@@ -10,32 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.security.PrivilegedAction;
-import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 
-import javax.security.auth.Subject;
-
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ProcessingExceptionTranslatorTest {
+
+  @After
+  public void after() {
+    IFuture.CURRENT.remove();
+  }
 
   @Test
   public void testTranslate() {
@@ -140,121 +135,5 @@ public class ProcessingExceptionTranslatorTest {
     assertTrue(e2Translated.getStatus().getContextMessages().contains("message 1"));
     assertTrue(e2Translated.getStatus().getContextMessages().contains("message 2"));
 
-  }
-
-  @Test
-  public void testJobContextMessage() throws Exception {
-    final ProcessingExceptionTranslator exceptionTranslator = new ProcessingExceptionTranslator();
-
-    // test context message with 'no job' and 'no subject'
-    IFuture.CURRENT.remove();
-    ProcessingException pe = Subject.doAs(null, new PrivilegedAction<ProcessingException>() {
-
-      @Override
-      public ProcessingException run() {
-        return exceptionTranslator.translate(new ProcessingException());
-      }
-    });
-    assertEquals(CollectionUtility.hashSet("user=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
-
-    // test context message with 'anonymous job' and 'no subject'
-    IFuture future = mock(IFuture.class);
-    IFuture.CURRENT.set(future);
-    when(future.getJobInput()).thenReturn(Jobs.newInput().withRunContext(RunContexts.empty()));
-    pe = Subject.doAs(null, new PrivilegedAction<ProcessingException>() {
-
-      @Override
-      public ProcessingException run() {
-        return exceptionTranslator.translate(new ProcessingException());
-      }
-    });
-    assertEquals(CollectionUtility.hashSet("user=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
-
-    // test context message with 'job' and 'no subject'
-    future = mock(IFuture.class);
-    IFuture.CURRENT.set(future);
-    when(future.getJobInput()).thenReturn(Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withName("do-something"));
-    pe = Subject.doAs(null, new PrivilegedAction<ProcessingException>() {
-
-      @Override
-      public ProcessingException run() {
-        return exceptionTranslator.translate(new ProcessingException());
-      }
-    });
-    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
-
-    // test context message with 'job' and 'subject'
-    future = mock(IFuture.class);
-    IFuture.CURRENT.set(future);
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("anna"));
-    subject.getPrincipals().add(new SimplePrincipal("john"));
-
-    when(future.getJobInput()).thenReturn(Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withName("do-something"));
-    pe = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
-
-      @Override
-      public ProcessingException run() {
-        return exceptionTranslator.translate(new ProcessingException());
-      }
-    });
-    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anna, john"), new HashSet<>(pe.getStatus().getContextMessages()));
-  }
-
-  @Test
-  public void testJobContextMessageWithSameJob() {
-    final ProcessingExceptionTranslator exceptionTranslator = new ProcessingExceptionTranslator();
-
-    // test context message that already contains job
-    IFuture future = mock(IFuture.class);
-    IFuture.CURRENT.set(future);
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("anna"));
-
-    when(future.getJobInput()).thenReturn(Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withName("do-something"));
-    ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
-
-      @Override
-      public ProcessingException run() {
-        ProcessingException cause = new ProcessingException();
-        cause.addContextMessage("user=anna");
-        return exceptionTranslator.translate(cause);
-      }
-    });
-
-    assertEquals(2, actualException.getStatus().getContextMessages().size()); // not 3 entries
-    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
-  }
-
-  @Test
-  public void testJobContextMessageWithSameUser() {
-    final ProcessingExceptionTranslator exceptionTranslator = new ProcessingExceptionTranslator();
-
-    // test context message that already contains job
-    IFuture future = mock(IFuture.class);
-    IFuture.CURRENT.set(future);
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("anna"));
-
-    when(future.getJobInput()).thenReturn(Jobs.newInput()
-        .withRunContext(RunContexts.empty())
-        .withName("do-something"));
-    ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
-
-      @Override
-      public ProcessingException run() {
-        ProcessingException cause = new ProcessingException();
-        cause.addContextMessage("job=do-something");
-        return exceptionTranslator.translate(cause);
-      }
-    });
-    assertEquals(2, actualException.getStatus().getContextMessages().size()); // not 3 entries
-    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
   }
 }

@@ -17,7 +17,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 
 public abstract class MockHttpURLConnection extends HttpURLConnection {
   private ByteArrayOutputStream m_out;
@@ -76,12 +79,7 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
       };
       t.start();
       while (t.isAlive()) {
-        try {
-          Thread.sleep(100);
-        }
-        catch (InterruptedException ie) {
-          //nop
-        }
+        SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
       }
       m_in = new ByteArrayInputStream(servletOut.toByteArray());
       int sc = scRef.get();

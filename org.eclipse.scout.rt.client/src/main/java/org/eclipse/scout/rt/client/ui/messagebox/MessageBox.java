@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.DisplayParentResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HTMLUtility;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -37,7 +36,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -376,20 +374,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   protected void waitFor() {
-    try {
-      m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
-    }
-    catch (ProcessingException e) {
-      if (e.isInterruption()) {
-        LOG.info(ScoutTexts.get("UserInterrupted"), e.getCause());
-      }
-      else {
-        LOG.error("Failed to wait for the MessageBox to close", e);
-      }
-
-      // Make sure to continue run in model thread.
-      Assertions.assertTrue(ModelJobs.isModelThread(), "Failed to wait for the message box to close. Exit processing because not synchronized with the model-thread anymore.");
-    }
+    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 
   protected void closeMessageBox() {

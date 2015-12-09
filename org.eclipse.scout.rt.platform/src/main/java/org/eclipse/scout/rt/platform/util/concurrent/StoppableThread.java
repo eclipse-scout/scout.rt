@@ -45,12 +45,6 @@ public class StoppableThread extends Thread {
     interrupt();
   }
 
-  public void checkStopSignal() throws InterruptedException {
-    if (m_stopSignal) {
-      throw new InterruptedException("WorkerThread received stop signal");
-    }
-  }
-
   public boolean isStopSignal() {
     return m_stopSignal;
   }

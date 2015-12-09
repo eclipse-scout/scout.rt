@@ -113,9 +113,9 @@ public class MultipleSessionTest {
     latch2.unblock();
 
     // Wait until all jobs completed
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
   }
 
   @Test
@@ -221,8 +221,8 @@ public class MultipleSessionTest {
     setupLatch2.unblock();
 
     // Wait until all jobs completed
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
   }
 }

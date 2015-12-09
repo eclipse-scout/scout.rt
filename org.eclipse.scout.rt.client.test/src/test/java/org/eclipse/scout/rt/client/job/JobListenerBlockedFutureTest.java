@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,9 +74,9 @@ public class JobListenerBlockedFutureTest {
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.empty().withSession(clientSession, true)));
 
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 1, TimeUnit.MINUTES));
+        .toFilter(), 1, TimeUnit.MINUTES);
     Jobs.getJobManager().shutdown();
     listenerRegistration.dispose();
 
@@ -99,7 +98,7 @@ public class JobListenerBlockedFutureTest {
   }
 
   @Test(timeout = 10000)
-  public void testEventsForBlockingJob() throws Exception {
+  public void testEventsForBlockingJob() {
     final IBlockingCondition condition = Jobs.getJobManager().createBlockingCondition("test condition", true);
 
     IClientSession clientSession = mock(IClientSession.class);
@@ -133,9 +132,9 @@ public class JobListenerBlockedFutureTest {
           condition.waitFor();
         }
       }, input.copy());
-      assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+      Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
           .andMatchFuture(outerFuture)
-          .toFilter(), 1, TimeUnit.MINUTES));
+          .toFilter(), 1, TimeUnit.MINUTES);
       Jobs.getJobManager().shutdown();
     }
     finally {

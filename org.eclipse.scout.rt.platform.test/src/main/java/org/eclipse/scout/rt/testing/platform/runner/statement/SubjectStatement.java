@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 
 /**
@@ -55,31 +54,13 @@ public class SubjectStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    if (m_subject != null) {
-      try {
-        Subject.doAs(m_subject, new PrivilegedExceptionAction<Void>() {
-
-          @Override
-          public Void run() throws Exception {
-            try {
-              m_next.evaluate();
-              return null;
-            }
-            catch (final Exception | Error e) {
-              throw e;
-            }
-            catch (final Throwable e) {
-              throw new Error(e);
-            }
-          }
-        });
-      }
-      catch (PrivilegedActionException e) {
-        throw e.getCause();
-      }
+    if (m_subject == null) {
+      m_next.evaluate();
     }
     else {
-      m_next.evaluate();
+      SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+      RunContexts.copyCurrent().withSubject(m_subject).run(invoker);
+      invoker.throwOnError();
     }
   }
 }

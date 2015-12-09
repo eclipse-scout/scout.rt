@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -163,25 +164,22 @@ public class FutureSet {
   }
 
   /**
-   * Blocks the calling thread until all Futures accepted by the given Filter are in 'done-state', or the given timeout
-   * elapses.
-   * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.<br/>
-   * e.g. <code>new AndFilter(new ClientSessionFutureFilter(...), new NotFilter(new BlockedFutureFilter()));</code>
+   * Waits if necessary for at most the given time for the futures matching the given filter to be in 'done' state
+   * (completed or cancelled), or the timeout elapses.
    *
    * @param filter
-   *          filter to limit the Futures to await to become 'done'. If <code>null</code>, all contained Futures are
-   *          awaited, which is the same as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await to become 'done'. If <code>null</code>, all Futures are awaited,
+   *          which is the same as using {@link AlwaysFilter}.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
-   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
    * @throws InterruptedException
-   *           if the current thread is interrupted while waiting.
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
    */
-  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
+  public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout=%s]", timeout);
 
     // Wait until all Futures matching the filter are 'done' or the deadline is passed.
@@ -191,7 +189,10 @@ public class FutureSet {
       while (!matchesAll(filter, DonePromise.DONE_EVENT_FIRED_MATCHER) && nanos > 0L) {
         nanos = m_changedCondition.awaitNanos(nanos);
       }
-      return (nanos > 0L);
+
+      if (nanos <= 0L) {
+        throw new TimeoutException();
+      }
     }
     finally {
       m_writeLock.unlock();

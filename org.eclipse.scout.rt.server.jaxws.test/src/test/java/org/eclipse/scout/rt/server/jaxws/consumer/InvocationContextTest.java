@@ -227,7 +227,6 @@ public class InvocationContextTest {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          e.printStackTrace();
           // NOOP
         }
 

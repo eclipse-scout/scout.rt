@@ -15,26 +15,28 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Used to translate {@link Throwable}s into {@link RuntimeException}s. Thereby, wrapper exceptions like
- * {@link UndeclaredThrowableException}, {@link InvocationTargetException} or {@link ExecutionException} are unwrapped
- * and their cause translated accordingly. Solely, an {@link Error} is not translated but re-throw instead. That is
- * because an {@link Error} indicates a serious problem due to a abnormal condition.
+ * Used to translate an exception into a {@link RuntimeException}.
+ * <p>
+ * If an exception is of the type {@link RuntimeException}, it is not translated and returned as given. But, a checked
+ * exception is translated into {@link ProcessingException}, with the given checked exception as its cause. Thereby,
+ * wrapper exceptions like {@link UndeclaredThrowableException}, {@link InvocationTargetException} or
+ * {@link ExecutionException} are unwrapped and their cause translated accordingly.
+ * <p>
+ * If an exception is of the type {@link Error}, it is not translated but re-throw instead. That is because an
+ * {@link Error} indicates a serious problem due to a abnormal condition.
  */
 @ApplicationScoped
 public class RuntimeExceptionTranslator implements IThrowableTranslator<RuntimeException> {
 
-  /**
-   * Translates the given {@link Throwable} into a {@link RuntimeException}. Solely, an {@link Error} is not translated
-   * but re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
-   */
   @Override
   public RuntimeException translate(final Throwable t) {
     if (t instanceof Error) {
       throw (Error) t;
     }
-    if (t instanceof UndeclaredThrowableException && t.getCause() != null) {
+    else if (t instanceof UndeclaredThrowableException && t.getCause() != null) {
       return translate(t.getCause());
     }
     else if (t instanceof InvocationTargetException && t.getCause() != null) {
@@ -46,7 +48,8 @@ public class RuntimeExceptionTranslator implements IThrowableTranslator<RuntimeE
     else if (t instanceof RuntimeException) {
       return (RuntimeException) t;
     }
-
-    return new RuntimeException(t);
+    else {
+      return new ProcessingException(StringUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t);
+    }
   }
 }

@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 
 public class Ticker {
   private Calendar m_cal;
@@ -112,11 +115,7 @@ public class Ticker {
     long t = nextCal.getTimeInMillis();
     long dt = t - System.currentTimeMillis();
     while (dt > 0) {
-      try {
-        Thread.sleep(Math.min(dt, 15000));
-      }
-      catch (InterruptedException ie) {
-      }
+      SleepUtil.sleepSafe(Math.min(dt, 15000), TimeUnit.MILLISECONDS);
       dt = t - System.currentTimeMillis();
     }
     // apply next time

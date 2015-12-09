@@ -32,14 +32,15 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -313,8 +314,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
             .awaitDone();
       }
-      catch (ProcessingException e) {
-        // NOOP (interrupted)
+      catch (InterruptedException e) {
+        // NOOP
       }
     }
   }
@@ -406,10 +407,11 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         try {
           interceptLoadItemsInBackground(ClientSessionProvider.currentSession(), m_loadingMinDate, m_loadingMaxDate, m_result);
         }
-        catch (ProcessingException e) {
-          if (!e.isInterruption()) {
-            LOG.error("Could not reload calendar items", e);
-          }
+        catch (InterruptedException | CancellationException e) {
+          // NOOP
+        }
+        catch (RuntimeException e) {
+          LOG.error("Failed to reload calendar items", e);
         }
 
         ModelJobs.schedule(new IRunnable() {

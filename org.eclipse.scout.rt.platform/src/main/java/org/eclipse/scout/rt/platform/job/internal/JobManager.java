@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerM
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -114,12 +113,16 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
+  public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
     try {
-      return m_futures.awaitDone(filter, timeout, unit);
+      m_futures.awaitDone(filter, timeout, unit);
     }
-    catch (final InterruptedException e) {
-      throw new ProcessingException("Interrupted while waiting for jobs to complete", e);
+    catch (final java.util.concurrent.TimeoutException e) {
+      throw BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for jobs to complete because the maximal wait time elapsed", timeout, unit);
+    }
+    catch (final java.lang.InterruptedException e) {
+      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+      throw BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for jobs to complete");
     }
   }
 
@@ -135,7 +138,7 @@ public class JobManager implements IJobManager, IPlatformListener {
     try {
       m_executor.awaitTermination(1, TimeUnit.MINUTES);
     }
-    catch (final InterruptedException e) {
+    catch (final java.lang.InterruptedException e) {
       // NOOP
     }
 

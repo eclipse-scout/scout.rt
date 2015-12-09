@@ -265,7 +265,9 @@ public class JobInput {
 
   /**
    * Associates the job with an execution hint, which can be evaluated by filters like when listening to job lifecycle
-   * events, or when waiting for job completion, or by the job manager.
+   * events, or when waiting for job completion, or when cancelling jobs, or by the job manager.
+   * <p>
+   * A job may have multiple hints associated, and hints are not propagated to nested jobs.
    */
   public JobInput withExecutionHint(final String hint) {
     m_executionHints.add(hint);

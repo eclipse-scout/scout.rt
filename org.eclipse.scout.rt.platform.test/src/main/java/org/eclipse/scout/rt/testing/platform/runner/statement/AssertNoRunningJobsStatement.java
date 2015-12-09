@@ -27,11 +27,12 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to assert no running jobs after test execution to prevents job interferences among test classes using a
+ * Statement to assert no running jobs after test execution to prevent job interferences among test classes using a
  * shared platform.
  *
  * @since 5.2
@@ -43,7 +44,7 @@ public class AssertNoRunningJobsStatement extends Statement {
   private final Statement m_next;
   private final String m_context;
 
-  public AssertNoRunningJobsStatement(final Statement next, String context) {
+  public AssertNoRunningJobsStatement(final Statement next, final String context) {
     m_context = context;
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
   }
@@ -52,23 +53,20 @@ public class AssertNoRunningJobsStatement extends Statement {
   public void evaluate() throws Throwable {
     final ScheduledDescendantJobListener jobListener = new ScheduledDescendantJobListener();
 
-    IJobListenerRegistration reg = null;
+    IJobListenerRegistration reg = Jobs.getJobManager().addListener(jobListener);
     try {
-      reg = Jobs.getJobManager().addListener(jobListener);
-
       // Continue the chain.
       m_next.evaluate();
     }
     finally {
-      if (reg != null) {
-        reg.dispose();
-      }
+      reg.dispose();
     }
 
     Set<IFuture<?>> scheduledFutures = jobListener.getScheduledFutures();
     if (!scheduledFutures.isEmpty()) {
-      IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder().andMatchFuture(scheduledFutures).toFilter();
-      assertNoRunningJobs(filter);
+      assertNoRunningJobs(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(scheduledFutures)
+          .toFilter());
     }
   }
 
@@ -76,7 +74,10 @@ public class AssertNoRunningJobsStatement extends Statement {
    * Asserts that all jobs accepted by the given filter are in 'done' state.
    */
   private void assertNoRunningJobs(final IFilter<IFuture<?>> jobFilter) {
-    if (!Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
+    try {
+      Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+    }
+    catch (final TimeoutException e) {
       final List<String> runningJobs = findJobNames(jobFilter);
       if (!runningJobs.isEmpty()) {
         fail(String.format("Test failed because some jobs did not complete yet. [context=%s, jobs=%s]", m_context, runningJobs));
@@ -127,17 +128,13 @@ public class AssertNoRunningJobsStatement extends Statement {
     }
 
     @Override
-    public void changed(JobEvent event) {
+    public void changed(final JobEvent event) {
       if (event.getType() != JobEventType.SCHEDULED) {
         return;
       }
 
       if (isScheduledByInitialThread() || isScheduledByInitialJob() || isScheduledByDescendantJob()) {
-        IFuture<?> future = event.getFuture();
-        if (future == null) {
-          throw new IllegalStateException("event.getFuture() is not expected to be null");
-        }
-        m_scheduledFutures.put(future, PRESENT);
+        m_scheduledFutures.put(event.getFuture(), PRESENT);
       }
     }
 
@@ -162,7 +159,7 @@ public class AssertNoRunningJobsStatement extends Statement {
      *         initial thread or the initial job.
      */
     private boolean isScheduledByDescendantJob() {
-      IFuture<?> future = IFuture.CURRENT.get();
+      final IFuture<?> future = IFuture.CURRENT.get();
       return future != null && m_scheduledFutures.containsKey(future);
     }
   }

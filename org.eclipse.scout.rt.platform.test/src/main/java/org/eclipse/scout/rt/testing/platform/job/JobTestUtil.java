@@ -50,7 +50,7 @@ public class JobTestUtil {
    * mutex-owner plus any queued task. This method blocks 30s at maximum, and throws an {@link AssertionError} if
    * elapsed.
    */
-  public static void waitForMutexCompetitors(final IMutex mutex, final int expectedCompetitorCount) throws InterruptedException {
+  public static void waitForMutexCompetitors(final IMutex mutex, final int expectedCompetitorCount) {
     final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
 
     while (mutex.getCompetitorCount() != expectedCompetitorCount) {

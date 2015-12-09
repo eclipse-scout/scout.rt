@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -73,14 +72,6 @@ public class JobExceptionTranslationTest {
     catch (RuntimeException e) {
       assertSame(error, e.getCause());
     }
-
-    future.awaitDoneAndGet(new IThrowableTranslator<RuntimeException>() {
-
-      @Override
-      public RuntimeException translate(Throwable t) {
-        return null; // null=swallow
-      }
-    });
   }
 
   @Test
@@ -121,14 +112,5 @@ public class JobExceptionTranslationTest {
     catch (RuntimeException e) {
       assertSame(error, e.getCause());
     }
-
-    // Test with 'swallowed' exception.
-    future.awaitDoneAndGet(new IThrowableTranslator<RuntimeException>() {
-
-      @Override
-      public RuntimeException translate(Throwable t) {
-        return null; // null=swallow
-      }
-    });
   }
 }

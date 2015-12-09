@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.platform.job;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.internal.IMutexAcquiredCallback;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 
 /**
  * Represents a mutex object to achieve mutual exclusion among jobs of the same mutex object. Mutual exclusion means,
@@ -42,8 +42,8 @@ public interface IMutex {
    * @param queuePosition
    *          the position where to place the task in the queue of competing tasks if the mutex is not free at the time
    *          of invocation.
-   * @throws ProcessingException
-   *           is thrown if the current thread is interrupted while waiting for the mutex to become available.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
    */
   void acquire(IFuture<?> task, QueuePosition queuePosition);
 

@@ -22,7 +22,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
@@ -130,6 +132,13 @@ class DonePromise<RESULT> {
   /**
    * Waits if necessary for the computation to complete, and then returns its result.
    *
+   * @return the computed result
+   * @throws ExecutionException
+   *           if the computation threw an exception.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws CancellationException
+   *           if the computation was cancelled.
    * @see Future#get()
    */
   public RESULT get() throws InterruptedException, ExecutionException {
@@ -150,6 +159,19 @@ class DonePromise<RESULT> {
    * Waits if necessary for at most the given time for the computation to complete, and then returns its result, if
    * available.
    *
+   * @param timeout
+   *          the maximum time to wait
+   * @param unit
+   *          the time unit of the timeout argument
+   * @return the computed result
+   * @throws ExecutionException
+   *           if the computation threw an exception.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws CancellationException
+   *           if the computation was cancelled.
+   * @throws TimeoutException
+   *           if the wait timed out.
    * @see Future#get(long, TimeUnit)
    */
   public RESULT get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
@@ -183,6 +205,14 @@ class DonePromise<RESULT> {
 
   /**
    * Retrieves the given future's final value. This method expects the future to be in 'done' state.
+   *
+   * @return the computed result
+   * @throws IllegalStateException
+   *           if the future in not in 'done' state yet.
+   * @throws ExecutionException
+   *           if the computation threw an exception.
+   * @throws CancellationException
+   *           if the computation was cancelled.
    */
   private static <RESULT> RESULT retrieveFinalValue(final Future<RESULT> future) throws ExecutionException {
     try {
@@ -202,7 +232,8 @@ class DonePromise<RESULT> {
       return new DoneEvent<>(retrieveFinalValue(future), null, false);
     }
     catch (final ExecutionException e) {
-      return new DoneEvent<>(null, e.getCause(), false);
+      final Throwable exception = BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, BEANS.get(ThrowableTranslator.class));
+      return new DoneEvent<>(null, exception, false);
     }
     catch (final CancellationException e) {
       return new DoneEvent<>(null, null, true);

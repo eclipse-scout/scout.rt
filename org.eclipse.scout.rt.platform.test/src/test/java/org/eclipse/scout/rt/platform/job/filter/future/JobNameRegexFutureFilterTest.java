@@ -40,8 +40,8 @@ public class JobNameRegexFutureFilterTest {
     assertFalse(filter.accept(future3));
 
     // cleanup
-    assertTrue(Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1, future2, future3)
-        .toFilter(), 10, TimeUnit.SECONDS));
+        .toFilter(), 10, TimeUnit.SECONDS);
   }
 }

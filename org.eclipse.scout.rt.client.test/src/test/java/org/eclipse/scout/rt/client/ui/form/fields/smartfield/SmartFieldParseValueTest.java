@@ -70,7 +70,7 @@ public class SmartFieldParseValueTest {
    * Tests the case where only a single proposal matches the seachText and the proposal is accepted.
    */
   @Test
-  public void testSingleMatch() throws InterruptedException {
+  public void testSingleMatch() {
     testMatch("a", 1L, "aName", 1, false, false);
   }
 
@@ -78,7 +78,7 @@ public class SmartFieldParseValueTest {
    * Expect the proposal chooser to be open when multiple matches have been found.
    */
   @Test
-  public void testMultiMatch() throws InterruptedException {
+  public void testMultiMatch() {
     testMatch("b", 0L, null, 2, true, true);
   }
 
@@ -86,7 +86,7 @@ public class SmartFieldParseValueTest {
    * Expect the proposal chooser to be open when no match has been found.
    */
   @Test
-  public void testNoMatch() throws InterruptedException {
+  public void testNoMatch() {
     testMatch("c", 0L, null, 0, true, true);
   }
 
@@ -130,7 +130,7 @@ public class SmartFieldParseValueTest {
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, Long expectedValue, String expectedDisplayText, int expectedNumProposals,
-      boolean expectedProposalChooserOpen, boolean expectValidationError) throws InterruptedException {
+      boolean expectedProposalChooserOpen, boolean expectValidationError) {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_smartField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {

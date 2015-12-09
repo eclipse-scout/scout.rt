@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
@@ -23,7 +24,10 @@ import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
  * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's
@@ -87,93 +91,109 @@ public interface IFuture<RESULT> extends ICancellable {
    * Waits if necessary for the job to complete, or until cancelled. This method does not throw an exception if
    * cancelled or the computation failed.
    *
-   * @throws ProcessingException
-   *           if this thread was interrupted while waiting for the job to complete; see
-   *           {@link ProcessingException#isInterruption()}
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
    */
   void awaitDone();
 
   /**
-   * Waits if necessary for the job to complete, or until cancelled, or the timeout elapses. This method does not throw
-   * an exception if cancelled, or the timeout elapses, or the computation failed.
+   * Waits if necessary for at most the given time for the job to complete, or until cancelled, or the timeout elapses.
+   * This method does not throw an exception if cancelled, or the computation failed.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
    * @param unit
    *          unit of the timeout.
-   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws ProcessingException
-   *           if this thread was interrupted while waiting for the job to complete; see
-   *           {@link ProcessingException#isInterruption()}
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
    */
-  boolean awaitDone(long timeout, TimeUnit unit);
+  void awaitDone(long timeout, TimeUnit unit);
 
   /**
-   * Waits if necessary for the computation to complete, and then retrieves its result, or throws a
-   * {@link ProcessingException} if the computation failed, or if cancelled, or if the calling thread was interrupted.
+   * Waits if necessary for the job to complete, and then retrieves its result or throws its exception according to
+   * {@link RuntimeExceptionTranslator}, or throws {@link CancellationException} if cancelled, or throws
+   * {@link InterruptedException} if the current thread was interrupted while waiting.
    *
-   * @return the computed result.
-   * @throws ProcessingException
-   *           <ul>
-   *           <li>if an exception is thrown during the job's execution</li>
-   *           <li>if this thread was interrupted while waiting for the job to complete; see
-   *           {@link ProcessingException#isInterruption()}</li>
-   *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
-   *           </ul>
+   * @return the job's result.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws CancellationException
+   *           if the job was cancelled.
+   * @throws RuntimeException
+   *           exception as thrown by the job, translated by {@link RuntimeExceptionTranslator} if other than
+   *           {@link RuntimeException}.
    */
   RESULT awaitDoneAndGet();
 
   /**
-   * Waits if necessary for the computation to complete, and then retrieves its result, or throws an exception according
-   * to the given {@link IThrowableTranslator} if the computation failed, or if cancelled, or if the calling thread was
-   * interrupted.
+   * Waits if necessary for the job to complete, and then retrieves its result or throws its exception according to
+   * {@link IThrowableTranslator}, or throws {@link CancellationException} if cancelled, or throws
+   * {@link InterruptedException} if the current thread was interrupted while waiting.
+   * <p>
+   * Use a specific {@link IThrowableTranslator} to control exception translation.
    *
    * @param throwableTranslator
-   *          to translate execution, cancellation and interruption exceptions.
-   * @return the computed result.
-   * @throws ERROR
-   *           thrown according to the given {@link IThrowableTranslator}.
+   *          to translate the job's exception if the job threw an exception.
+   * @return the job's result.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws CancellationException
+   *           if the job was cancelled.
+   * @throws EXECUTION_EXCEPTION
+   *           exception as thrown by the job, translated by the given {@link IThrowableTranslator}.
    */
-  <ERROR extends Throwable> RESULT awaitDoneAndGet(IThrowableTranslator<ERROR> throwableTranslator) throws ERROR;
+  <EXECUTION_EXCEPTION extends Throwable> RESULT awaitDoneAndGet(IThrowableTranslator<EXECUTION_EXCEPTION> throwableTranslator) throws EXECUTION_EXCEPTION;
 
   /**
-   * Waits if necessary for the computation to complete, and then retrieves its result, or throws a
-   * {@link ProcessingException} if the computation failed, or if cancelled, or if the calling thread was interrupted,
-   * or the timeout elapses.
+   * Waits if necessary for at most the given time for the job to complete, and then retrieves its result or throws its
+   * exception according to {@link RuntimeExceptionTranslator}, or throws {@link CancellationException} if cancelled, or
+   * throws {@link TimeoutException} if waiting timeout elapsed, or throws {@link InterruptedException} if the current
+   * thread was interrupted while waiting.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
    * @param unit
    *          unit of the timeout.
-   * @return the computed result.
-   * @throws ProcessingException
-   *           <ul>
-   *           <li>if an exception is thrown during the job's execution</li>
-   *           <li>if this thread was interrupted while waiting for the job to complete; see
-   *           {@link ProcessingException#isInterruption()}</li>
-   *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
-   *           <li>if this job did not return within the timeout specified; see {@link ProcessingException#isTimeout()}
-   *           </li>
-   *           </ul>
+   * @return the job's result.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws CancellationException
+   *           if the job was cancelled.
+   * @throws TimeoutException
+   *           if the wait timed out.
+   * @throws RuntimeException
+   *           exception as thrown by the job, translated by {@link RuntimeExceptionTranslator} if other than
+   *           {@link RuntimeException}.
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit);
 
   /**
-   * Waits if necessary for the computation to complete, and then retrieves its result, or throws an exception according
-   * to the given {@link IThrowableTranslator} if the computation failed, or if cancelled, or if the calling thread was
-   * interrupted, or the timeout elapses.
+   * Waits if necessary for at most the given time for the job to complete, and then retrieves its result or throws its
+   * exception according to {@link IThrowableTranslator}, or throws {@link CancellationException} if cancelled, or
+   * throws {@link TimeoutException} if waiting timeout elapsed, or throws {@link InterruptedException} if the current
+   * thread was interrupted while waiting.
+   * <p>
+   * Use a specific {@link IThrowableTranslator} to control exception translation.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
    * @param unit
    *          unit of the timeout.
    * @param throwableTranslator
-   *          to translate execution, cancellation, timeout and interruption exceptions.
-   * @return the computed result.
-   * @throws ERROR
-   *           thrown according to the given {@link IThrowableTranslator}.
+   *          to translate the job's exception if the job threw an exception.
+   * @return the job's result.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws CancellationException
+   *           if the job was cancelled.
+   * @throws TimeoutException
+   *           if the wait timed out.
+   * @throws EXECUTION_EXCEPTION
+   *           exception as thrown by the job, translated by the given {@link IThrowableTranslator}.
    */
-  <ERROR extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, IThrowableTranslator<ERROR> throwableTranslator) throws ERROR;
+  <EXECUTION_EXCEPTION extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, IThrowableTranslator<EXECUTION_EXCEPTION> throwableTranslator) throws EXECUTION_EXCEPTION;
 
   /**
    * Registers the given <code>callback</code> to be invoked once the Future enters 'done' state. That is once the

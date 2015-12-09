@@ -139,7 +139,7 @@ public class DonePromiseTest {
 
   @Test
   @Times(1000) // do not remove this regression
-  public void testAwaitDone1() throws InterruptedException, ExecutionException, TimeoutException {
+  public void testAwaitDone1() {
     IFuture<Void> future = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
 
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -150,7 +150,7 @@ public class DonePromiseTest {
 
   @Test
   @Times(1000) // do not remove this regression
-  public void testAwaitDone2() throws InterruptedException, ExecutionException, TimeoutException {
+  public void testAwaitDone2() {
     IFuture<Void> future = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
 
     future.awaitDone();

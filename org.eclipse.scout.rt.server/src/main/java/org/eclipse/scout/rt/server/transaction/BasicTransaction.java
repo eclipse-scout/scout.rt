@@ -16,9 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +51,7 @@ public class BasicTransaction implements ITransaction {
       m_memberMap.put(memberId, member);
       //throw AFTER registering the resource in order to correctly release it later-on, bug 383736.
       if (m_cancelled) {
-        throw new ProcessingException("Interrupted", new InterruptedException(), 0, IProcessingStatus.INFO);
+        throw new CancellationException("Transaction cancelled");
       }
     }
   }
@@ -102,7 +100,7 @@ public class BasicTransaction implements ITransaction {
   public boolean commitPhase1() {
     synchronized (m_memberMapLock) {
       if (m_cancelled) {
-        throw new ProcessingException("Interrupted", new InterruptedException());
+        throw new CancellationException("Transaction cancelled");
       }
       m_commitPhase = true;
     }
@@ -203,8 +201,7 @@ public class BasicTransaction implements ITransaction {
         return true;
       }
       m_cancelled = true;
-      ProcessingException cancelException = new ProcessingException(ScoutTexts.get("SearchWasCanceled"), new InterruptedException(), 0, IProcessingStatus.INFO);
-      addFailure(cancelException);
+      addFailure(new CancellationException("Transaction cancelled"));
     }
     for (ITransactionMember mem : getMembers()) {
       try {

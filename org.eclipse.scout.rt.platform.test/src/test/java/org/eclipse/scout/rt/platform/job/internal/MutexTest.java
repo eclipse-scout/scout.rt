@@ -24,13 +24,14 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Before;
@@ -216,15 +217,21 @@ public class MutexTest {
     assertEquals(1, mutex.getCompetitorCount());
 
     // Task2 tries to acquire the mutex, and blocks until acquired
-    boolean timeout = Jobs.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         mutex.acquire(m_task2, QueuePosition.TAIL);
       }
-    }, Jobs.newInput())
-        .awaitDone(1, TimeUnit.SECONDS);
-    assertFalse(timeout);
+    }, Jobs.newInput());
+
+    try {
+      future.awaitDone(1, TimeUnit.SECONDS);
+      fail("timeout expected");
+    }
+    catch (TimeoutException e) {
+      // NOOP
+    }
     assertTrue(mutex.isMutexOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 
@@ -243,7 +250,7 @@ public class MutexTest {
    * the mutex, meaning that when task1 releases the mutex, task2 does not become the mutex owner.
    */
   @Test(timeout = 5_000)
-  public void testAcquisition5() throws InterruptedException {
+  public void testAcquisition5() throws java.lang.InterruptedException {
     final IMutex mutex = m_task1.getJobInput().getMutex();
 
     assertEquals(0, mutex.getCompetitorCount());
@@ -265,7 +272,7 @@ public class MutexTest {
         try {
           mutex.acquire(m_task2, QueuePosition.TAIL);
         }
-        catch (ProcessingException e) {
+        catch (InterruptedException e) {
           interruptedLatch.countDown();
         }
       }

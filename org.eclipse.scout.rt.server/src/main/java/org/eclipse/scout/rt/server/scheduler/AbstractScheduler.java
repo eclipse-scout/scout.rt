@@ -15,7 +15,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.StoppableThread;
 import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
 import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
@@ -370,11 +372,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
             if (LOG.isDebugEnabled()) {
               LOG.debug("ticking suspended");
             }
-            try {
-              sleep(1000);
-            }
-            catch (InterruptedException ie) {
-            }
+            SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
           }
         }
         catch (RuntimeException t) {

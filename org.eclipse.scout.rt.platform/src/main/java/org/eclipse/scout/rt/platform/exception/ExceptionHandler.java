@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
-import java.util.concurrent.CancellationException;
-
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +29,11 @@ public class ExceptionHandler {
    * Method invoked to handle the given {@code Throwable}. This method must not throw an exception.
    */
   public void handle(final Throwable t) {
-    final Throwable rootCause = ExceptionHandler.getRootCause(t);
-    if (rootCause instanceof InterruptedException) {
-      handleInterruptedException((InterruptedException) rootCause);
+    if (t instanceof InterruptedException) {
+      handleInterruptedException((InterruptedException) t);
     }
-    else if (rootCause instanceof CancellationException) {
-      handleCancelledException((CancellationException) rootCause);
+    else if (t instanceof CancellationException) {
+      handleCancelledException((CancellationException) t);
     }
     else if (t instanceof ProcessingException) {
       final ProcessingException pe = (ProcessingException) t;
@@ -104,8 +103,9 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle a {@code Throwable} which is not of the type {@code ProcessingException} or
-   * {@code InterruptedException}.<br/>
+   * Method invoked to handle a {@code Throwable} which is not of the type {@code ProcessingException}, or
+   * {@link InterruptedException}, or {@link CancellationException}.
+   * <p>
    * The default implementation logs the throwable as <code>ERROR</code>.
    */
   protected void handleThrowable(final Throwable t) {

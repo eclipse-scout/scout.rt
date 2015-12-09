@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html;
 
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -28,7 +26,10 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 
 /**
@@ -68,7 +69,7 @@ public class UiJobs {
           ModelJobFutureFilter.INSTANCE,
           new SessionFutureFilter(clientSession)));
     }
-    catch (TimeoutException | RuntimeException e) { // FIXME dwi: catch Interrupted Exception
+    catch (TimeoutException | InterruptedException e) {
       // Handle exception in proper ClientRunContext.
       ClientRunContexts.copyCurrent().withSession(clientSession, true).run(new IRunnable() {
 
@@ -97,17 +98,12 @@ public class UiJobs {
    * @throws InterruptedException
    *           if the current thread is interrupted while waiting for the job to complete.
    * @throws TimeoutException
-   *           if the job did not complete within the maximal timeout.
+   *           if the job did not complete within the timeout.
    * @throws RuntimeException
    *           if the job completed with an exception.
    */
   public <RESULT> RESULT awaitAndGet(final IFuture<RESULT> future) {
-    try {
-      await(new FutureFilter(future));
-    }
-    catch (final TimeoutException e) { // FIXME dwi: remove once TimeoutException is RuntimeException
-      throw new UiException(e);
-    }
+    await(new FutureFilter(future));
 
     if (future.containsExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)) {
       // The job did not complete yet, but requires 'user interaction'.
@@ -130,13 +126,10 @@ public class UiJobs {
    * @throws TimeoutException
    *           if the job did not complete within the maximal timeout.
    */
-  public void await(final IFilter<IFuture<?>> filter) throws TimeoutException {
-    if (!Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+  public void await(final IFilter<IFuture<?>> filter) {
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .andMatch(filter)
-        .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-      // FIXME dwi: remove if Job API throws TimeoutException
-      throw new TimeoutException(String.format("Timeout while waiting for model jobs to complete [timeout=%ss]", TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT)));
-    }
+        .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
   }
 }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.clientnotification;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -22,11 +21,13 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -46,7 +47,7 @@ public class ClientNotificationPoller {
     // ensure the poller starts only once.
     Assertions.assertNull(m_pollerFuture);
     if (BEANS.get(IServiceTunnel.class).isActive()) {
-      m_pollerFuture = Jobs.schedule(new P_NotificationPollJob(), Jobs.newInput()
+      m_pollerFuture = Jobs.schedule(new P_NotificationPoller(), Jobs.newInput()
           .withRunContext(ClientRunContexts.copyCurrent()
               .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
               .withUserAgent(UserAgent.createDefault())
@@ -74,36 +75,22 @@ public class ClientNotificationPoller {
     }
   }
 
-  private class P_NotificationPollJob implements IRunnable {
+  private class P_NotificationPoller implements IRunnable {
+
     @Override
-    public void run() throws InterruptedException {
+    public void run() {
       while (!RunMonitor.CURRENT.get().isCancelled()) {
         try {
           handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(IClientNode.ID));
         }
-        catch (UndeclaredThrowableException e) {
-          if (e.getCause() instanceof ProcessingException) {
-            ProcessingException ex = (ProcessingException) e.getCause();
-            if (ex.isInterruption() || ex.isCancellation()) {
-              LOG.debug("Client notification polling has been interrupted.", e);
-            }
-            else {
-              handleNotificationException(ex);
-            }
-          }
-          else {
-            handleNotificationException(e);
-          }
+        catch (InterruptedException | CancellationException e) {
+          LOG.debug("Client notification polling has been interrupted.", e);
         }
-        catch (Exception e) {
-          handleNotificationException(e);
+        catch (RuntimeException e) {
+          LOG.error("Error receiving client notifications", e);
+          SleepUtil.sleepSafe(10, TimeUnit.SECONDS); // sleep some time before connecting anew
         }
       }
-    }
-
-    private void handleNotificationException(Exception e) throws InterruptedException {
-      LOG.error("Error receiving client notifications", e);
-      Thread.sleep(TimeUnit.SECONDS.toMillis(10));
     }
   }
 }

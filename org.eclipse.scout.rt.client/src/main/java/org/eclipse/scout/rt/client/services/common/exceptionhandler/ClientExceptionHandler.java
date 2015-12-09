@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,10 +77,10 @@ public class ClientExceptionHandler extends ExceptionHandler {
             }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
                 .withExceptionHandling(null, true)
                 .withName("Visualizing ProcessingException"))
-                .awaitDoneAndGet();
+                .awaitDone();
           }
-          catch (final Exception e) {
-            LOG.error("Failed to synchronize with model thread to visualize ProcessingException", e);
+          catch (final InterruptedException e) {
+            // NOOP
           }
         }
       }

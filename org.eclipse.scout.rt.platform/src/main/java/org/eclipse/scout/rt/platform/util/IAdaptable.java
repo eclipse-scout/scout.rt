@@ -14,7 +14,7 @@ package org.eclipse.scout.rt.platform.util;
  * Adaptable objects allows to be converted into other objects without having to implement the particular interface.
  * This is kind of a dynamic extension on object level, and lets clients to query whether an object has a particular
  * extension.
- * <p/>
+ * <p>
  * For example,
  *
  * <pre>
