@@ -31,15 +31,11 @@ scout.DateColumn.prototype.initCell = function(cell) {
 };
 
 scout.DateColumn.prototype.cellTextForGrouping = function(row) {
-  if (this.groupFormat === undefined || this.groupFormat === this.format) {
+  if (this.groupFormat === undefined || this.groupFormat === this.format || !this.groupFormatFormatter) {
     // fallback/shortcut, if no groupFormat defined or groupFormat equals format use cellText
-    return this.table.cellText(this, row);
+    return scout.DateColumn.parent.prototype.cellTextForGrouping.call(this, row);
   }
 
-  if (this.groupFormatFormatter) {
-    var val = this.table.cellValue(this, row);
-    return this.groupFormatFormatter.format(val);
-  }
-
-  return this.table.cellText(this, row);
+  var val = this.table.cellValue(this, row);
+  return this.groupFormatFormatter.format(val);
 };

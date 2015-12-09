@@ -719,11 +719,11 @@ describe("Table", function() {
     var $colHeaders, $header0, $header1;
 
     function prepareTable() {
-      columns = [helper.createModelColumn(null, 'col0'),
-        helper.createModelColumn(null, 'col1'),
-        helper.createModelColumn(null, 'col2'),
-        helper.createModelColumn(null, 'col3', 'number'),
-        helper.createModelColumn(null, 'col4', 'number')
+      columns = [helper.createModelColumn('col0'),
+        helper.createModelColumn('col1'),
+        helper.createModelColumn('col2'),
+        helper.createModelColumn('col3', 'number'),
+        helper.createModelColumn('col4', 'number')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -2018,10 +2018,12 @@ describe("Table", function() {
       it("updates the text and sorting state of model columns", function() {
         var text0 = table.columns[0].text;
 
-        column1 = helper.createModelColumn(column1.id, 'newText1');
+        column1 = helper.createModelColumn('newText1');
+        column1.id = model.columns[1].id;
         column1.sortActive = true;
         column1.sortAscending = true;
-        column2 = helper.createModelColumn(column2.id, 'newText2');
+        column2 = helper.createModelColumn('newText2');
+        column2.id = model.columns[2].id;
 
         var message = {
           events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
@@ -2047,10 +2049,12 @@ describe("Table", function() {
         expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
         expect($colHeaders.eq(2).text()).toBe(column2.text);
 
-        column1 = helper.createModelColumn(column1.id, 'newText1');
+        column1 = helper.createModelColumn('newText1');
+        column1.id = model.columns[1].id;
         column1.sortActive = true;
         column1.sortAscending = true;
-        column2 = helper.createModelColumn(column2.id, 'newText2');
+        column2 = helper.createModelColumn('newText2');
+        column2.id = model.columns[2].id;
 
         var message = {
           events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
@@ -2070,7 +2074,8 @@ describe("Table", function() {
         var $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
 
-        column1 = helper.createModelColumn(column1.id);
+        column1 = helper.createModelColumn();
+        column1.id = model.columns[1].id;
         column1.headerCssClass = 'custom-header';
         var message = {
           events: [createColumnHeadersUpdatedEvent(model, [column1])]
@@ -2081,7 +2086,8 @@ describe("Table", function() {
         expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
         expect($colHeaders.eq(1)).toHaveClass('custom-header');
 
-        column1 = helper.createModelColumn(column1.id);
+        column1 = helper.createModelColumn();
+        column1.id = model.columns[1].id;
         message = {
           events: [createColumnHeadersUpdatedEvent(model, [column1])]
         };

@@ -194,10 +194,6 @@ scout.Column.prototype._cellStyle = function(cell) {
   return style;
 };
 
-scout.Column.prototype.cellTextForGrouping = function(row) {
-  return this.table.cellText(this, row);
-};
-
 scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
     cell = this.table.cell(this, row);
@@ -228,6 +224,7 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
   return popup;
 };
 
+// TODO CGU/AWE cleanup these cellValue/TextForXY methods, currently they are very confusing
 /**
  * Returns the cell value to be used for grouping and filtering (chart, column filter).
  */
@@ -239,21 +236,60 @@ scout.Column.prototype.cellValueForGrouping = function(row) {
   if (!cell.text) {
     return null;
   }
-  return this._prepareTextForGrouping(cell.text, cell.htmlEnabled);
+  return this._preprocessTextForValueGrouping(cell.text, cell.htmlEnabled);
+};
+
+scout.Column.prototype._preprocessTextForValueGrouping = function(text, htmlEnabled) {
+  return this._preprocessText(text, {
+    removeHtmlTags: htmlEnabled,
+    removeNewlines: true,
+    trim: true
+  });
+};
+
+/**
+ * Returns the cell text to be used for table grouping
+ */
+scout.Column.prototype.cellTextForGrouping = function(row) {
+  var cell = this.table.cell(this, row);
+  return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
+};
+
+scout.Column.prototype._preprocessTextForGrouping = function(text, htmlEnabled) {
+  return this._preprocessText(text, {
+    removeHtmlTags: htmlEnabled,
+    trim: true
+  });
+};
+
+/**
+ * Returns the cell text to be used for the text filter
+ */
+scout.Column.prototype.cellTextForTextFilter = function(row) {
+  var cell = this.table.cell(this, row);
+  return this._preprocessTextForTextFilter(cell.text, cell.htmlEnabled);
+};
+
+scout.Column.prototype._preprocessTextForTextFilter = function(text, htmlEnabled) {
+  return this._preprocessText(text, {
+    removeHtmlTags: htmlEnabled
+  });
 };
 
 /**
  * Removes html tags, converts to single line, removes leading and trailing whitespaces.
  */
-scout.Column.prototype._prepareTextForGrouping = function(text, htmlEnabled) {
-  if (htmlEnabled) {
-    // remove html tags
+scout.Column.prototype._preprocessText = function(text, options) {
+  options = options || {};
+  if (options.removeHtmlTags) {
     text = scout.strings.plainText(text);
   }
-
-  // convert to single line
-  text = text.replace('\n', ' ');
-  text = text.trim();
+  if (options.removeNewlines) {
+    text = text.replace('\n', ' ');
+  }
+  if (options.trim) {
+    text = text.trim();
+  }
   return text;
 };
 

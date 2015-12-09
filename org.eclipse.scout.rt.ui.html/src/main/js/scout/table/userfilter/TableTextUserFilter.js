@@ -29,10 +29,10 @@ scout.TableTextUserFilter.prototype.createLabel = function() {
 
 scout.TableTextUserFilter.prototype.accept = function(row) {
   var rowText = '';
-  for (var i = 0; i < row.cells.length; i++) {
-    var cell = row.cells[i];
-    rowText += cell.text;
+  for (var i = 0; i < this.table.columns.length; i++) {
+    var column = this.table.columns[i];
+    rowText += column.cellTextForTextFilter(row) + ' ';
   }
-  rowText = rowText.toLowerCase();
+  rowText = rowText.trim().toLowerCase();
   return rowText.indexOf(this.text) > -1;
 };

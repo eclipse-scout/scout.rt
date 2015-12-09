@@ -73,9 +73,9 @@ TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
  return this.createModelRow(id, cells);
 };
 
-TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
+TableSpecHelper.prototype.createModelColumn = function(text, type) {
   var column = {
-    id: id || scout.objectFactory.createUniqueId(),
+    id: scout.objectFactory.createUniqueId(),
     text: text,
     type: type,
     objectType: 'Column',
@@ -111,7 +111,7 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
 
   var columns = [];
   for (var i = 0; i < count; i++) {
-    columns[i] = this.createModelColumn(null, 'col' + i, columnType);
+    columns[i] = this.createModelColumn('col' + i, columnType);
     columns[i].index = i;
   }
   return columns;

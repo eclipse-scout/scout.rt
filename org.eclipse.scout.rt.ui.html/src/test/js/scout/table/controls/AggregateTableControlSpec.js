@@ -79,8 +79,8 @@ describe("AggregateTableControl", function() {
     var $colHeaders, $header0, $header1;
 
     function prepareTable() {
-      columns = [helper.createModelColumn(null, 'col1'),
-        helper.createModelColumn(null, 'col2', 'number')
+      columns = [helper.createModelColumn('col1'),
+        helper.createModelColumn('col2', 'number')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -157,8 +157,8 @@ describe("AggregateTableControl", function() {
     var columns, rows, model, table, tableControl;
 
     function prepareTable() {
-      columns = [helper.createModelColumn(null, 'col1'),
-        helper.createModelColumn(null, 'col2')
+      columns = [helper.createModelColumn('col1'),
+        helper.createModelColumn('col2')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -182,8 +182,8 @@ describe("AggregateTableControl", function() {
 
     it("is true if there is at least one number column", function() {
       columns = [
-        helper.createModelColumn(null, 'col1'),
-        helper.createModelColumn(null, 'col2', 'number')
+        helper.createModelColumn('col1'),
+        helper.createModelColumn('col2', 'number')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
