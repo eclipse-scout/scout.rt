@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.csv;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyListOf;
@@ -29,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -75,13 +75,10 @@ public class CsvHelperTest {
       fail("No exception was thrown! Expected ProcessingException");
     }
     catch (ProcessingException e) {
-      HashSet<String> contextMessages = CollectionUtility.hashSet(e.getStatus().getContextMessages());
-      assertTrue(contextMessages.remove("lineNr=2"));
+      Set<String> contextInfos = CollectionUtility.hashSet(e.getContextInfos());
+      assertTrue(contextInfos.remove("lineNr=2"));
       String fullMessage = e.getDisplayMessage() + " " + Arrays.asList(e.getStackTrace());
-      assertEquals("expected a single context message: " + contextMessages + " full Exception Message : " + fullMessage, 1, contextMessages.size());
-      String msg = CollectionUtility.firstElement(contextMessages);
-      assertFalse(msg.startsWith("colIndex="));
-      assertFalse(msg.startsWith("cell="));
+      assertEquals("expected a single context message: " + contextInfos + " full Exception Message : " + fullMessage, 0, contextInfos.size());
     }
   }
 
@@ -101,10 +98,10 @@ public class CsvHelperTest {
       fail("No exception was thrown! Expected ProcessingException");
     }
     catch (ProcessingException e) {
-      HashSet<String> contextMessages = CollectionUtility.hashSet(e.getStatus().getContextMessages());
-      assertTrue(contextMessages.contains("lineNr=3"));
-      assertTrue(contextMessages.contains("colIndex=2"));
-      assertTrue(contextMessages.contains("cell=d"));
+      HashSet<String> contextInfos = CollectionUtility.hashSet(e.getContextInfos());
+      assertTrue(contextInfos.contains("lineNr=3"));
+      assertTrue(contextInfos.contains("colIndex=2"));
+      assertTrue(contextInfos.contains("cell=d"));
     }
   }
 

@@ -12,11 +12,14 @@ package org.eclipse.scout.rt.platform.exception;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Represents processing errors that occur during application execution.
+ * <p>
+ * TODO abr, dwi [15.2] Remove the many constructors and use fluent api instead
  */
 public class ProcessingException extends PlatformException {
   private static final long serialVersionUID = 1L;
@@ -97,32 +100,6 @@ public class ProcessingException extends PlatformException {
     return this;
   }
 
-  /**
-   * Adds the given message to the list of context messages at first position.
-   *
-   * @param msg
-   *          context message to be added.
-   */
-  public void addContextMessage(String msg) {
-    if (m_status != null) {
-      m_status.addContextMessage(msg);
-    }
-  }
-
-  /**
-   * Adds the given message to the list of context messages at first position.
-   *
-   * @param msg
-   *          context message to be added.
-   * @param msgArgs
-   *          arguments to be used in the message; see {@link String#format(String, Object...)}.
-   */
-  public void addContextMessage(String msg, Object... msgArgs) {
-    if (m_status != null && msg != null) {
-      m_status.addContextMessage(String.format(msg, msgArgs));
-    }
-  }
-
   public boolean isConsumed() {
     return m_consumed;
   }
@@ -144,22 +121,25 @@ public class ProcessingException extends PlatformException {
   @Override
   public String getMessage() {
     // custom getMessage method to get the same results from pe.toString(), pe.printStackTrace() and using a logger
-    String msg = super.getMessage();
+    final List<String> infos = new ArrayList<>();
+
+    // status
     if (m_status != null) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(StringUtility.hasText(msg) ? msg : "<empty>");
-      sb.append(" [severity=").append(m_status.getSeverityName());
+      infos.add(String.format("severity=%s", m_status.getSeverityName()));
       if (m_status.getCode() != 0) {
-        sb.append(", code=").append(m_status.getCode());
+        infos.add(String.format("code=%s", m_status.getCode()));
       }
-      String ctx = StringUtility.join(", ", m_status.getContextMessages());
-      if (StringUtility.hasText(ctx)) {
-        sb.append(", context={").append(ctx).append("}");
-      }
-      sb.append("]");
-      return sb.toString();
     }
-    return msg;
+
+    // context-infos
+    final String contextInfos = StringUtility.join(", ", getContextInfos());
+    if (StringUtility.hasText(contextInfos)) {
+      infos.add(String.format("context={%s}", contextInfos));
+    }
+
+    // message
+    final String msg = super.getMessage();
+    return String.format("%s [%s]", StringUtility.hasText(msg) ? msg : "<empty>", StringUtility.join(", ", infos));
   }
 
   /**

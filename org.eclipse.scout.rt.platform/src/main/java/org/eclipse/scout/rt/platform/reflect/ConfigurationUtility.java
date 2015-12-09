@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -192,17 +193,16 @@ public final class ConfigurationUtility {
     catch (InvocationTargetException ite) {
       Throwable t = ite.getCause();
       while (t != null) {
-        if (t instanceof ProcessingException) {
-          ProcessingException pe = (ProcessingException) t;
-          pe.addContextMessage("InnerClass=" + innerClass);
-          throw pe;
+        if (t instanceof PlatformException) {
+          throw ((PlatformException) t)
+              .withContextInfo("innerClass", innerClass);
         }
         t = t.getCause();
       }
-      throw new ProcessingException("Error creating instance of '" + innerClass + "'.", ite.getCause());
+      throw new ProcessingException("Failed to create instance of '{}'.", innerClass, ite.getCause());
     }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-      throw new ProcessingException("Error creating instance of '" + innerClass + "'.", e);
+      throw new ProcessingException("Failed to create instance of '{}'.", innerClass, e);
     }
   }
 

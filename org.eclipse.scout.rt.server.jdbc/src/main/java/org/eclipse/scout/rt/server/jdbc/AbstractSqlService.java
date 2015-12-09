@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.holders.LongHolder;
@@ -121,7 +122,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         style = styleClass.newInstance();
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + styleClass.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed to create instance of class '{}'.", styleClass.getName(), e));
       }
     }
     else {
@@ -367,14 +368,14 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       String codeClassName = args[0];
       Class codeClass = loadBundleClassLenient(m_codeNameToDescriptor, codeClassName);
       if (codeClass == null) {
-        throw new ProcessingException("cannot find class for code '" + args[0] + "'");
+        throw new ProcessingException("Cannot find class for code '{}", args[0]);
       }
       try {
         Object ret = codeClass.getField("ID").get(null);
         return ret != null ? ret : new LongHolder();
       }
       catch (Exception t) {
-        throw new ProcessingException("ID of code '" + args[0] + "'", t);
+        throw new ProcessingException("ID of code '{}'", args[0], t);
       }
     }
     else if ("text".equals(functionName)) {
@@ -415,7 +416,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
     }
     catch (Exception e) {
-      throw new ProcessingException("getLevel of permission '" + permissionClass.getName() + "'.", e);
+      throw new ProcessingException("getLevel of permission '{}'.", permissionClass.getName(), e);
     }
   }
 
@@ -549,18 +550,14 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
     }
     catch (Exception e) {
-      ProcessingException pe;
-      if (e instanceof ProcessingException) {
-        pe = (ProcessingException) e;
-      }
-      else {
-        pe = new ProcessingException("unexpected exception", e);
-      }
+      PlatformException pe = (e instanceof PlatformException ? (PlatformException) e : new PlatformException("Failed to lease connection", e));
+
       if (isDirectJdbcConnection()) {
-        pe.addContextMessage("jdbcDriverName=" + getJdbcDriverName() + ", jdbcMappingName=" + getJdbcMappingName());
+        pe.withContextInfo("jdbcDriverName", getJdbcDriverName())
+            .withContextInfo("jdbcMappingName", getJdbcMappingName());
       }
       else {
-        pe.addContextMessage("jndiName=" + getJndiName());
+        pe.withContextInfo("jndiName", getJndiName());
       }
       throw pe;
     }
@@ -688,7 +685,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
     }
     catch (SQLException e) {
-      throw new ProcessingException("unexpected exception", e);
+      throw new ProcessingException("Failed to commit", e);
     }
   }
 
@@ -716,7 +713,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
     }
     catch (SQLException e) {
-      throw new ProcessingException("unexpected exception", e);
+      throw new ProcessingException("Failed to rollback", e);
     }
   }
 

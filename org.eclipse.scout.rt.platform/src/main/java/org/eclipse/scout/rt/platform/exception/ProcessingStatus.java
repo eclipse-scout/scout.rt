@@ -11,13 +11,10 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
@@ -63,8 +60,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    * Message, localized to the current locale.
    */
   private String m_messageBody = "";
-
-  private List<String> m_contextMessages;
 
   /**
    * Wrapped exception, or <code>null</code> if none.
@@ -216,21 +211,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     m_messageBody = messageBody;
   }
 
-  @Override
-  public void addContextMessage(String message) {
-    if (message != null) {
-      if (m_contextMessages == null) {
-        m_contextMessages = new ArrayList<String>();
-      }
-      m_contextMessages.add(0, message);
-    }
-  }
-
-  @Override
-  public List<String> getContextMessages() {
-    return CollectionUtility.arrayList(m_contextMessages);
-  }
-
   /**
    * @param severity
    *          the severity; one of <code>OK</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>, or
@@ -261,7 +241,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     builder.attr("body", getBody(), false);
     builder.attr("severity", getSeverityName());
     builder.attr("code", getCode());
-    builder.attr("context", getContextMessages(), false);
     builder.attr("exception", m_exception, false);
     return builder.toString();
   }
@@ -285,7 +264,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((m_exception == null) ? 0 : m_exception.hashCode());
-    result = prime * result + ((m_contextMessages == null) ? 0 : m_contextMessages.hashCode());
     result = prime * result + ((m_messageBody == null) ? 0 : m_messageBody.hashCode());
     result = prime * result + ((m_messageTitle == null) ? 0 : m_messageTitle.hashCode());
     return result;
@@ -311,14 +289,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     else if (!m_exception.equals(other.m_exception)) {
       return false;
     }
-    if (m_contextMessages == null) {
-      if (other.m_contextMessages != null) {
-        return false;
-      }
-    }
-    else if (!m_contextMessages.equals(other.m_contextMessages)) {
-      return false;
-    }
     if (m_messageBody == null) {
       if (other.m_messageBody != null) {
         return false;
@@ -337,5 +307,4 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     }
     return true;
   }
-
 }

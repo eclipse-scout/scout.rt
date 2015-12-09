@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
-import java.util.List;
-
 import org.eclipse.scout.rt.platform.status.IStatus;
 
 public interface IProcessingStatus extends IStatus {
@@ -29,16 +27,6 @@ public interface IProcessingStatus extends IStatus {
    * The body of the message. {@link #getMessage()} is composed of {@link #getTitle()} and {@link #getBody()}.
    */
   String getBody();
-
-  /**
-   * Returns a list of context informations that were collected while the exception was traveling from its origin to the
-   * handler
-   *
-   * @return a list of localized context messages
-   */
-  List<String> getContextMessages();
-
-  void addContextMessage(String message);
 
   Throwable getException();
 

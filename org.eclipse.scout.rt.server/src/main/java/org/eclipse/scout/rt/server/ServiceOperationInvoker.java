@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
@@ -232,15 +233,13 @@ public class ServiceOperationInvoker {
       return;
     }
 
-    String serviceOperation = String.format("service=%s, method=%s", serviceTunnelRequest.getServiceInterfaceClassName(), serviceTunnelRequest.getOperation());
-    if (t instanceof ProcessingException) {
-      ProcessingException pe = (ProcessingException) t;
-      pe.addContextMessage(serviceOperation);
-      BEANS.get(ExceptionHandler.class).handle(pe);
+    // Associate the exception with context info about the service call.
+    if (t instanceof PlatformException) {
+      ((PlatformException) t)
+          .withContextInfo("service.name", serviceTunnelRequest.getServiceInterfaceClassName())
+          .withContextInfo("service.operation", serviceTunnelRequest.getOperation());
     }
-    else {
-      LOG.error("Unexpected error while invoking service operation [{}]", serviceOperation, t);
-    }
+    BEANS.get(ExceptionHandler.class).handle(t);
   }
 
   /**

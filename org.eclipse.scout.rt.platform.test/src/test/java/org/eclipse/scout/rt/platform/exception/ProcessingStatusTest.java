@@ -117,15 +117,17 @@ public class ProcessingStatusTest {
   @Ignore("This test is used only for verifying how exceptions are formatted using toString(), printStackTrace() and a logger instance.")
   public void testExceptionFormatting() {
     printException("NullPointer", new NullPointerException("npe message text"));
-    ProcessingException pe = new ProcessingException(new ProcessingStatus("pe message text", IStatus.OK));
-    printException("simple ProcessingException", pe);
-    ProcessingException wrappingPe = new ProcessingException("wrapping PE Title", "wrapping Processing Exception message", pe);
-    printException("wrapped ProcessingException", wrappingPe);
-    wrappingPe.addContextMessage("a=1234");
-    wrappingPe.addContextMessage("b=foo");
-    pe.addContextMessage("foo=bar");
-    pe.addContextMessage("interrupted");
-    printException("wrapped ProcessingException with status", wrappingPe);
+    ProcessingException processingException = new ProcessingException(new ProcessingStatus("pe message text", IStatus.OK));
+    printException("simple ProcessingException", processingException);
+    ProcessingException wrappingProcessingException = new ProcessingException("wrapping PE Title", "wrapping Processing Exception message", processingException);
+    printException("wrapped ProcessingException", wrappingProcessingException);
+    wrappingProcessingException
+        .withContextInfo("a", "1234")
+        .withContextInfo("b", "foo");
+    processingException
+        .withContextInfo("foo", "bar")
+        .withContextInfo("status", "interrupted");
+    printException("wrapped ProcessingException with status", wrappingProcessingException);
   }
 
   private void printException(String msg, Throwable t) {

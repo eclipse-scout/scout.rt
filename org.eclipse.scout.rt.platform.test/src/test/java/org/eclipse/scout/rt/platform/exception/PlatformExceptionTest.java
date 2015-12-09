@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 public class PlatformExceptionTest {
@@ -80,5 +82,16 @@ public class PlatformExceptionTest {
     e = new PlatformException("hello {} {}", "world", cause);
     assertEquals("hello world " + cause.toString(), e.getMessage());
     assertNull(e.getCause());
+  }
+
+  @Test
+  public void testWithContextInfo() {
+    PlatformException exception = new PlatformException("exception");
+    exception
+        .withContextInfo("key1", "value 1")
+        .withContextInfo("key2", "value {}", 2)
+        .withContextInfo("key3", "value 3");
+
+    assertEquals(Arrays.asList("key3=value 3", "key2=value 2", "key1=value 1"), exception.getContextInfos());
   }
 }

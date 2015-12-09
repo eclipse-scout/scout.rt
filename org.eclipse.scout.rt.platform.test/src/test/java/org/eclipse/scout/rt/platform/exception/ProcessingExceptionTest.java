@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -84,36 +83,18 @@ public class ProcessingExceptionTest {
   @Test
   public void testToStringWithCause() {
     final VetoException cause = new VetoException(m_title, m_body);
-    ProcessingException p = new ProcessingException(m_body, cause);
-    p.addContextMessage("context1");
-    p.addContextMessage("context2");
-    p.consume();
-    final String exText = p.toString();
+    ProcessingException processingException = new ProcessingException(m_body, cause);
+    processingException
+        .withContextInfo("key1", "value1")
+        .withContextInfo("key2", "value2")
+        .consume();
+
+    final String exText = processingException.toString();
     assertContainsExceptionAttributes(exText);
     assertFalse(exText.contains(m_title));
     assertTrue(exText.contains(m_body));
     assertFalse(exText.contains("VetoException"));
-    assertTrue(exText.contains("{context2, context1}"));
-  }
-
-  @Test
-  public void testAddContextMessage1() {
-    ProcessingException e = new ProcessingException("exception");
-    e.addContextMessage("3");
-    e.addContextMessage("2");
-    e.addContextMessage("1");
-
-    assertEquals(Arrays.asList("1", "2", "3"), e.getStatus().getContextMessages());
-  }
-
-  @Test
-  public void testAddContextMessage2() {
-    ProcessingException e = new ProcessingException("exception");
-    e.addContextMessage("position=%s", 3);
-    e.addContextMessage("position=%s", 2);
-    e.addContextMessage("position=%s", 1);
-
-    assertEquals(Arrays.asList("position=1", "position=2", "position=3"), e.getStatus().getContextMessages());
+    assertTrue(exText.contains("{key2=value2, key1=value1}"));
   }
 
   @Test

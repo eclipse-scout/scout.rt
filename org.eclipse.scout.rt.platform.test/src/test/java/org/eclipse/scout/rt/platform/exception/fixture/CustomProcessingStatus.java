@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception.fixture;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 
@@ -24,16 +21,6 @@ public class CustomProcessingStatus implements IProcessingStatus {
     super();
     this.m_message = message;
     this.m_cause = cause;
-  }
-
-  @Override
-  public void addContextMessage(String message) {
-    // nop
-  }
-
-  @Override
-  public List<String> getContextMessages() {
-    return new ArrayList<>();
   }
 
   @Override

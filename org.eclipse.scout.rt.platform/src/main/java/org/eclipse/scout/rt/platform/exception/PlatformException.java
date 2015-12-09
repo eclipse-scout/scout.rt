@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import java.io.Serializable;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class PlatformException extends RuntimeException implements Serializable 
 
   private static final long serialVersionUID = 1L;
 
-  private final Deque<String> m_contextInfos = new LinkedList<>();
+  private final LinkedList<String> m_contextInfos = new LinkedList<>();
 
   /**
    * Creates a {@link PlatformException} from the given message.
