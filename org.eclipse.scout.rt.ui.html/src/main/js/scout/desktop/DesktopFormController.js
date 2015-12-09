@@ -123,6 +123,7 @@ scout.DesktopFormController.prototype.closePopupWindows = function() {
   this._popupWindows.forEach(function(popupWindow) {
     this._removePopupWindow(popupWindow.form);
   }, this);
+  this._popupWindows = [];
 };
 
 /**
@@ -133,7 +134,6 @@ scout.DesktopFormController.prototype._removePopupWindow = function(form) {
   if (!popupWindow) {
     throw new Error('Form has no popupWindow reference');
   }
-  scout.arrays.remove(this._popupWindows, popupWindow);
   if (form.rendered) {
     form.remove();
     popupWindow.close();

@@ -1092,19 +1092,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       Assertions.assertFalse(applicationLocked, "Modal view cannot be showed because application is in 'desktop-modal' state; otherwise, no user interaction would be possible.");
     }
 
-    // TODO [5.2] dwi: Clarify whether this logic is still required.
-    // If the Form is not a View, close all open PopUp windows.
-    if (form.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
-      for (IForm popupWindow : m_formStore.getByDisplayHint(IForm.DISPLAY_HINT_POPUP_WINDOW)) {
-        try {
-          popupWindow.doClose();
-        }
-        catch (Exception e) {
-          LOG.error("Failed to close popup window: {}", popupWindow, e);
-        }
-      }
-    }
-
     m_formStore.add(form);
     activateForm(form);
     fireFormShow(form);
