@@ -1,28 +1,22 @@
-/*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 .compact-tree {
 
   .tree-field > & {
     margin-left: @mandatory-indicator-width;
   }
 
-  & > input {
-    width: 100%;
-    height: @logical-grid-height;
+  &:focus {
+    #scout.no-focus-border;
+
+    & > .tree-data > .nodes > .section  > .section-node.selected {
+      text-decoration:underline;
+      color:@active-color;
+    }
   }
 
-  & > .nodes-wrapper {
+  & > .tree-data {
     position: relative;
     overflow: hidden;
-    margin-top: 10px;
+    padding-top: 10px;
 
     & > .nodes {
       #scout.vendor(column-count, 2);
@@ -48,7 +42,7 @@
           font-weight: bold;
         }
 
-        & > .process {
+        & > .section-node {
           cursor: pointer;
           line-height: 18px;
           /* Hanging indents: */
@@ -56,12 +50,7 @@
           text-indent: -10px;
 
           &:hover {
-            color:@hover-color;
-          }
-
-          &.selected {
-            text-decoration:underline;
-            color:@active-color;
+            color: @hover-color;
           }
         }
       }

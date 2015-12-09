@@ -174,9 +174,7 @@ __include("scout/table/userfilter/ColumnUserFilter.js");
 __include("scout/table/userfilter/TableTextUserFilter.js");
 // Tree
 __include("scout/tree/Tree.js");
-__include("scout/tree/TreeCompact.js");
 __include("scout/tree/TreeLayout.js");
-__include("scout/tree/TreeCompactLayout.js");
 __include("scout/tree/keystrokes/AbstractTreeNavigationKeyStroke.js");
 __include("scout/tree/keystrokes/TreeSpaceKeyStroke.js");
 __include("scout/tree/keystrokes/TreeNavigationUpKeyStroke.js");
@@ -184,6 +182,13 @@ __include("scout/tree/keystrokes/TreeNavigationDownKeyStroke.js");
 __include("scout/tree/keystrokes/TreeCollapseAllKeyStroke.js");
 __include("scout/tree/keystrokes/TreeCollapseOrDrillUpKeyStroke.js");
 __include("scout/tree/keystrokes/TreeExpandOrDrillDownKeyStroke.js");
+// Compact Tree
+__include("scout/tree/CompactTree.js");
+__include("scout/tree/keystrokes/AbstractCompactTreeControlKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeUpKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeDownKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeLeftKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeRightKeyStroke.js");
 // Desktop
 __include("scout/desktop/BaseDesktop.js");
 __include("scout/desktop/Desktop.js");

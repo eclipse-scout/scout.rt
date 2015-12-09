@@ -19,9 +19,6 @@ scout.objectFactories = {
   'BooleanColumn': function() {
     return new scout.CheckBoxColumn();
   },
-  'Tree.Compact': function() {
-    return new scout.TreeCompact();
-  },
   'KeyStroke': function() {
     // A model keystroke is represented as an Action
     return new scout.Action();

@@ -174,9 +174,7 @@ __include("scout/table/userfilter/ColumnUserFilter.js");
 __include("scout/table/userfilter/TableTextUserFilter.js");
 // Tree
 __include("scout/tree/Tree.js");
-__include("scout/tree/TreeCompact.js");
 __include("scout/tree/TreeLayout.js");
-__include("scout/tree/TreeCompactLayout.js");
 __include("scout/tree/keystrokes/AbstractTreeNavigationKeyStroke.js");
 __include("scout/tree/keystrokes/TreeSpaceKeyStroke.js");
 __include("scout/tree/keystrokes/TreeNavigationUpKeyStroke.js");
