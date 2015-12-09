@@ -87,7 +87,10 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
     // filter field(s) container
     filterFieldContainerInsets = scout.graphics.getInsets(this.popup.$filterFieldsGroup),
     filterFieldContainerHeight,
-    groupTitleHeight = this._groupTitleHeight($filterTableGroup);
+    groupTitleHeight = this._groupTitleHeight($filterTableGroup),
+    leftColumnHeight = scout.graphics.getSize(this.popup.$columnActions, true).height,
+    rightColumnHeight,
+    prefSize;
 
   // limit height of table
   filterTableHeight = Math.min(filterTableHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
@@ -106,8 +109,10 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   // add insets of container
   filterFieldContainerHeight += filterFieldContainerInsets.vertical();
 
+  rightColumnHeight = filterTableContainerHeight + filterFieldContainerHeight;
 
-  var prefSize = scout.graphics.prefSize($container);
-  prefSize.height = (filterTableContainerHeight + filterFieldContainerHeight + containerInsets.vertical());
+  // Use height of left or right column as preferred size (and add insets of container)
+  prefSize = scout.graphics.prefSize($container);
+  prefSize.height = Math.max(leftColumnHeight, rightColumnHeight) + containerInsets.vertical();
   return prefSize;
 };
