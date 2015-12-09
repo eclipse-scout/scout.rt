@@ -30,13 +30,6 @@
   </properties>
 
   <dependencies>
-    <!-- Temp Dependency until https://github.com/mojohaus/animal-sniffer/issues/8 is solved -->
-    <dependency>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>animal-sniffer-annotations</artifactId>
-      <version>${master_plugin_animal-sniffer_version}</version>
-    </dependency>
-
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>

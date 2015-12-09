@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -112,7 +113,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     private final Thread m_initialThread;
     private final IFuture<?> m_initialJobFuture;
-    private final ConcurrentHashMap<IFuture<?>, Object> m_scheduledFutures;
+    private final ConcurrentMap<IFuture<?>, Object> m_scheduledFutures;
 
     public ScheduledDescendantJobListener() {
       m_scheduledFutures = new ConcurrentHashMap<>();
@@ -121,7 +122,6 @@ public class AssertNoRunningJobsStatement extends Statement {
       m_initialThread = m_initialJobFuture == null ? Thread.currentThread() : null;
     }
 
-    @org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement //FIXME sle remove when https://github.com/mojohaus/animal-sniffer/issues/8 is solved
     public Set<IFuture<?>> getScheduledFutures() {
       return m_scheduledFutures.keySet();
     }
