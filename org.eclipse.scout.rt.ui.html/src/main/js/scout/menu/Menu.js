@@ -117,15 +117,6 @@ scout.Menu.prototype._removeSubMenuItems = function(parentMenu) {
 };
 
 scout.Menu.prototype._renderSubMenuItems = function(parentMenu, menus) {
-
-  // TODO [5.2] asa, nbu: where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
-  if (this.filterFunc) {
-    // TODO [5.2] nbu: figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
-    menus = this.filterFunc(menus, this.parent instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
-  } else if (this.cloneOf && this.cloneOf.filterFunc) {
-    menus = this.cloneOf.filterFunc(menus, this.parent instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
-  }
-
   this.subMenuExpanded = true;
   if (this.parent instanceof scout.ContextMenuPopup) {
     this.parent.renderSubMenuItems(parentMenu, menus, true);
@@ -222,13 +213,20 @@ scout.Menu.prototype._openPopup = function(event) {
 };
 
 scout.Menu.prototype._createPopup = function(event) {
-  return scout.create('MenuBarPopup', {
+  var options = {
     parent: this,
     menu: this,
     ignoreEvent: event,
     openingDirectionX: this.popupOpeningDirectionX,
     openingDirectionY: this.popupOpeningDirectionY
-  });
+  };
+
+  if (this.parent._filterMenusHandler) {
+    options.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+      return this.parent._filterMenusHandler(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
+    }.bind(this);
+  }
+  return scout.create('MenuBarPopup', options);
 };
 
 scout.Menu.prototype._createActionKeyStroke = function() {

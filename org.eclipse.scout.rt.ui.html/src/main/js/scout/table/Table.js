@@ -68,7 +68,8 @@ scout.Table.prototype._init = function(model) {
 
   this.menuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.MenuItemsOrder(this.session, 'Table')
+    menuOrder: new scout.MenuItemsOrder(this.session, 'Table'),
+    menuFilter: this._filterMenusHandler
   });
   this.menuBar.bottom();
 
@@ -327,7 +328,7 @@ scout.Table.prototype.onContextMenu = function(event) {
     var menuItems, popup;
     event.preventDefault();
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, 'contextMenu', true); //TODO nbu move to menu ->filterFunc
+      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
@@ -342,7 +343,8 @@ scout.Table.prototype.onContextMenu = function(event) {
             x: event.pageX,
             y: event.pageY
           },
-          $anchor: this.$data
+          $anchor: this.$data,
+          menuFilter: this._filterMenusHandler
         });
         popup.open(undefined, event);
       }
@@ -1204,22 +1206,7 @@ scout.Table.prototype._find$AppLink = function(event) {
 };
 
 scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-  var allowedTypes = [];
-  if (destination === 'menuBar') {
-    allowedTypes = ['Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection'];
-  } else if (destination === 'contextMenu') {
-    allowedTypes = ['Table.SingleSelection', 'Table.MultiSelection'];
-  } else if (destination === 'header') {
-    allowedTypes = ['Table.Header'];
-  }
-
-  if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length !== 1) {
-    scout.arrays.remove(allowedTypes, 'Table.SingleSelection');
-  }
-  if (allowedTypes.indexOf('Table.MultiSelection') > -1 && this.selectedRows.length <= 1) {
-    scout.arrays.remove(allowedTypes, 'Table.MultiSelection');
-  }
-  return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke);
 };
 
 scout.Table.prototype._renderMenus = function() {
@@ -1230,7 +1217,7 @@ scout.Table.prototype._renderMenus = function() {
 };
 
 scout.Table.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenus(this.menus, 'menuBar', false, true);
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };
@@ -2770,15 +2757,7 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
 };
 
 scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
-  this._injectFilterFuncToMenus(newMenus);
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
-};
-
-scout.Table.prototype._injectFilterFuncToMenus = function(menus) {
-  menus.forEach(function(menu) {
-    menu.filterFunc = this._filterMenusHandler;
-    this._injectFilterFuncToMenus(menu.childActions);
-  }.bind(this));
 };
 
 scout.Table.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {

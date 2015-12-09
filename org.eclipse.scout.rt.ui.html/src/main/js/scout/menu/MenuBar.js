@@ -51,6 +51,7 @@ scout.MenuBar.prototype._init = function(options) {
   scout.MenuBar.parent.prototype._init.call(this, options);
 
   this.menuSorter = options.menuOrder;
+  this.menuFilter = options.menuFilter;
 };
 
 scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {

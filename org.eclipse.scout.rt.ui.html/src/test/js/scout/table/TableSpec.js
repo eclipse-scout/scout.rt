@@ -742,19 +742,18 @@ describe("Table", function() {
       column4.setAggregationFunction('sum');
     }
 
-    function prepareContent(){
+    function prepareContent() {
       var column0Values = ['a', 'b'],
-      column1Values = ['c', 'd'],
-      column2Values = ['e', 'f'],
-      value, text, j;
+        column1Values = ['c', 'd'],
+        column2Values = ['e', 'f'],
+        value, text, j;
 
-      for(var i=0; i<rows.length; i++){
-        value = column0Values[Math.floor(i/4)];
+      for (var i = 0; i < rows.length; i++) {
+        value = column0Values[Math.floor(i / 4)];
         text = value.toString();
         rows[i].cells[0] = helper.createModelCell(text, value);
 
-
-        value = column1Values[(Math.floor(i/2)) % 2];
+        value = column1Values[(Math.floor(i / 2)) % 2];
         text = value.toString();
         rows[i].cells[1] = helper.createModelCell(text, value);
 
@@ -765,8 +764,8 @@ describe("Table", function() {
         j = i + 1;
         rows[i].cells[3].value = j;
         rows[i].cells[3].text = j.toString();
-        rows[i].cells[4].value = j*3;
-        rows[i].cells[4].text = (j*3).toString();
+        rows[i].cells[4].value = j * 3;
+        rows[i].cells[4].text = (j * 3).toString();
       }
 
     }
@@ -782,21 +781,20 @@ describe("Table", function() {
       table.groupColumn(column, multi, 'asc', false);
     }
 
-    function removeGrouping(table, column){
+    function removeGrouping(table, column) {
       table.groupColumn(column, "", 'asc', true);
     }
 
-    function assertGroupingProperty(table){
+    function assertGroupingProperty(table) {
       var i, expectGrouped = scout.arrays.init(5, false);
-      for(i=1; i<arguments.length; i++){
+      for (i = 1; i < arguments.length; i++) {
         expectGrouped[arguments[i]] = true;
       }
 
-      for(i=0; i<5; i++){
-        if(expectGrouped[i]){
+      for (i = 0; i < 5; i++) {
+        if (expectGrouped[i]) {
           expect(table.columns[i].grouped).toBeTruthy();
-        }
-        else{
+        } else {
           expect(table.columns[i].grouped).toBeFalsy();
         }
       }
@@ -806,12 +804,12 @@ describe("Table", function() {
       return table.$data.find('.table-aggregate-row');
     }
 
-    function assertGroupingValues(table, column, values){
+    function assertGroupingValues(table, column, values) {
       var i, c, $sumCell;
       c = table.columns.indexOf(column);
       expect(find$aggregateRows(table).length).toBe(values.length);
 
-      for(i=0; i<values.length; i++){
+      for (i = 0; i < values.length; i++) {
         $sumCell = find$aggregateRows(table).eq(i).children().eq(c);
         $sumCell.find('.table-cell-icon').remove();
         expect($sumCell.text()).toBe(values[i]);
@@ -904,7 +902,7 @@ describe("Table", function() {
       expect(find$aggregateRows(table).length).toBe(8);
       assertGroupingProperty(table, 0, 1, 2);
       assertGroupingValues(table, column3, ['1', '2', '3', '4', '5', '6', '7', '8']);
-      assertGroupingValues(table, column4, ['3', '6', '9', '12','15', '18', '21', '24']);
+      assertGroupingValues(table, column4, ['3', '6', '9', '12', '15', '18', '21', '24']);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
@@ -927,7 +925,7 @@ describe("Table", function() {
       addGrouping(table, column1, true);
       expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 2, 1);
-      assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
+      assertGroupingValues(table, column3, ['6', '10', '8', '12']);
       assertGroupingValues(table, column4, ['18', '30', '24', '36']);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
@@ -973,8 +971,8 @@ describe("Table", function() {
       addGrouping(table, column1, true);
       removeGrouping(table, column0);
       expect(find$aggregateRows(table).length).toBe(4);
-      assertGroupingProperty(table, 1,2);
-      assertGroupingValues(table, column3, ['6', '10', '8', '12' ]);
+      assertGroupingProperty(table, 1, 2);
+      assertGroupingValues(table, column3, ['6', '10', '8', '12']);
       assertGroupingValues(table, column4, ['18', '30', '24', '36']);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
@@ -1182,19 +1180,19 @@ describe("Table", function() {
     // context menu
     it("returns no menus for contextMenu if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenus(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([]);
     });
 
     it("returns only single selection menus for contextMenu if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([singleSelMenu]);
     });
 
     it("returns only multi selection menus for contextMenu if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([multiSelMenu]);
     });
 
@@ -1204,34 +1202,34 @@ describe("Table", function() {
       });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, 'contextMenu');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([singleSelMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenus(table.menus, 'contextMenu');
+      menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([multiSelMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenus(table.menus, 'contextMenu');
+      menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([]);
     });
 
     // menuBar
     it("returns only empty space menus if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenus(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
       expect(menus).toEqual([emptySpaceMenu]);
     });
 
     it("returns empty space and single selection menus if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu]);
     });
 
     it("returns empty space and multi selection menus if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu]);
     });
 
@@ -1241,15 +1239,15 @@ describe("Table", function() {
       });
       table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, 'menuBar');
+      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenus(table.menus, 'menuBar');
+      menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenus(table.menus, 'menuBar');
+      menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
       expect(menus).toEqual([emptySpaceMenu]);
     });
   });
@@ -1366,8 +1364,12 @@ describe("Table", function() {
 
       // filter table (descending)
       table.addFilter({
-        createKey: function() { return 1; },
-        accept: function(row) { return row.$row.text() % 2 === 0; }
+        createKey: function() {
+          return 1;
+        },
+        accept: function(row) {
+          return row.$row.text() % 2 === 0;
+        }
       });
       table.filter();
 
@@ -1383,7 +1385,6 @@ describe("Table", function() {
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-bottom');
       expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
-
 
     it("only sends selection event, no click", function() {
       var model = helper.createModelFixture(2, 5);

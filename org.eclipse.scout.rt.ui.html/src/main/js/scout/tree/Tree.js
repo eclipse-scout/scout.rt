@@ -37,7 +37,8 @@ scout.Tree.prototype._init = function(model) {
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.MenuItemsOrder(this.session, 'Tree')
+    menuOrder: new scout.MenuItemsOrder(this.session, 'Tree'),
+    menuFilter: this._filterMenusHandler
   });
   this.menuBar.bottom();
   this._syncBreadcrumbEnabled('', this.breadcrumbEnabled);
@@ -80,15 +81,7 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.Tree.prototype._syncMenus = function(newMenus, oldMenus) {
-  this._injectFilterFuncToMenus(newMenus);
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
-};
-
-scout.Tree.prototype._injectFilterFuncToMenus = function(menus) {
-  menus.forEach(function(menu) {
-    menu.filterFunc = this._filterMenusHandler;
-    this._injectFilterFuncToMenus(menu.childActions);
-  }.bind(this));
 };
 
 scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
@@ -422,28 +415,12 @@ scout.Tree.prototype._renderNodeFilterAccepted = function(node, animated) {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(this.menus, 'menuBar', false, true);
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
   this.menuBar.updateItems(menuItems);
 };
 
 scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-  var allowedTypes = [];
-
-  if (destination === 'menuBar') {
-    allowedTypes = ['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'];
-  } else if (destination === 'contextMenu') {
-    allowedTypes = ['Tree.SingleSelection', 'Tree.MultiSelection'];
-  } else if (destination === 'contextMenuEmptySpace') {
-    allowedTypes = ['Tree.EmptySpace'];
-  }
-
-  if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodes.length !== 1) {
-    scout.arrays.remove(allowedTypes, 'Tree.SingleSelection');
-  }
-  if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodes.length <= 1) {
-    scout.arrays.remove(allowedTypes, 'Tree.MultiSelection');
-  }
-  return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+  return scout.menus.filterAccordingToSelection('Tree', this.selectedNodes.length, menus, destination, onlyVisible, enableDisableKeyStroke);
 };
 
 scout.Tree.prototype._renderEnabled = function() {
@@ -754,7 +731,6 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
     }
   }
 };
-
 
 scout.Tree.prototype._installNodeTooltipSupport = function() {
   scout.tooltips.install(this.$data, {
@@ -1245,11 +1221,11 @@ scout.Tree.prototype._sendBreadCrumbEnabled = function() {
   });
 };
 
-scout.Tree.prototype._showContextMenu = function(event, destination) {
+scout.Tree.prototype._showContextMenu = function(event) {
   event.preventDefault();
   event.stopPropagation();
-  var func = function func(event, destination) {
-    var filteredMenus = this._filterMenus(this.menus, destination, true), //TODO [5.2] nbu: move to menu->filterFunc
+  var func = function func(event) {
+    var filteredMenus = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
@@ -1261,12 +1237,13 @@ scout.Tree.prototype._showContextMenu = function(event, destination) {
         x: event.pageX,
         y: event.pageY
       },
-      $anchor: $part
+      $anchor: $part,
+      menuFilter: this._filterMenusHandler
     });
     popup.open();
   }.bind(this);
 
-  scout.menus.showContextMenuWithWait(this.session, func, event, destination);
+  scout.menus.showContextMenuWithWait(this.session, func, event);
 };
 
 scout.Tree.prototype._onNodeMouseDown = function(event) {
@@ -1624,11 +1601,7 @@ scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
 };
 
 scout.Tree.prototype._onContextMenu = function(event) {
-  if (this.$data.is(event.target)) {
-    this._showContextMenu(event, 'c ontextMenuEmptySpace');
-  } else {
-    this._showContextMenu(event, 'contextMenu');
-  }
+  this._showContextMenu(event);
 };
 
 scout.Tree.prototype._onRequestFocus = function() {

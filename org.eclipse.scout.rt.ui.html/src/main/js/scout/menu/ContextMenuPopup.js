@@ -21,6 +21,7 @@ scout.ContextMenuPopup.prototype._init = function(options) {
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
   this.menuItems = options.menuItems;
+  this.menuFilter = options.menuFilter;
   this.options = $.extend({
     cloneMenuItems: true
   }, options);
@@ -41,7 +42,7 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
-  var duration = 300 ;
+  var duration = 300;
 
   this.$body = parentMenu.parentMenu.$subMenuBody;
   //move new body to back;
@@ -63,7 +64,6 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
 
   this.revalidateLayout();
   this.position();
-
 
   parentMenu.$subMenuBody.css('display', displayBackup);
   var position;
@@ -115,8 +115,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
 
     this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
       duration: duration,
-      progress:
-        this.revalidateLayout.bind(this),
+      progress: this.revalidateLayout.bind(this),
       queue: false
     });
 
@@ -142,11 +141,10 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 
   parentMenu.parentMenu.$subMenuBody = this.$body;
 
-
   if (!parentMenu.$subMenuBody) {
     var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left');
-    if(textPaddingLeft){
-      textPaddingLeft=textPaddingLeft.replace('px','');
+    if (textPaddingLeft) {
+      textPaddingLeft = textPaddingLeft.replace('px', '');
       textPaddingLeft = Number(textPaddingLeft);
     }
     this.$body = this._$createNewBody();
@@ -232,13 +230,13 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       this.$container.cssTopAnimated(actualBounds.y, targetBounds.y, {
         duration: duration,
         queue: false
-      }).css('overflow','visible');
+      }).css('overflow', 'visible');
       //ajust top of head and deco
       this.$head.cssTopAnimated(actualSize.height, targetSize.height, {
         duration: duration,
         queue: false
       });
-      this.$deco.cssTopAnimated(actualSize.height-1, targetSize.height-1, {
+      this.$deco.cssTopAnimated(actualSize.height - 1, targetSize.height - 1, {
         duration: duration,
         queue: false
       });
@@ -258,12 +256,8 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering, iconOffset) {
   var menuClone;
   menus = menus ? menus : this._getMenuItems();
-  // TODO [5.2] asa, nbu: where do we put the filterFunc: ContextMenuPopup or Menu? Now we need both --> refactor.
-  if (this.menu && this.menu.filterFunc) {
-    // TODO [5.2] nbu: figure out if we are in menu bar or contextmenu on table (following instanceof check does not work)
-    menus = this.menu.filterFunc(menus, this instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
-  } else if (this.menu && this.menu.cloneOf && this.menu.cloneOf.filterFunc) {
-    menus = this.menu.cloneOf.filterFunc(menus, this instanceof scout.MenuBarPopup ? 'menuBar' : 'contextMenu');
+  if (this.menuFilter) {
+    menus = this.menuFilter(menus, scout.MenuDestinations.CONTEXT_MENU);
   }
 
   if (!menus || menus.length === 0) {
@@ -280,8 +274,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     var parentMenu = menu.parent;
     if (this.options.cloneMenuItems && !menu.cloneOf) {
       menu = menu.cloneAdapter({
-        parent: this,
-        filterFunc: menu.filterFunc
+        parent: this
       });
       menu.on('propertyChange', function(event) {
         if (event.selected) {
@@ -303,22 +296,22 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
     menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
-    if(menu.iconId && menu.$container.data('$icon').cssWidth()>iconOffset){
+    if (menu.iconId && menu.$container.data('$icon').cssWidth() > iconOffset) {
       iconOffset = menu.$container.data('$icon').cssWidth();
       //update already rendered menu-items
-      this.$body.children().each( function(index, element){
-        var $element =$(element);
+      this.$body.children().each(function(index, element) {
+        var $element = $(element);
         var $icon = $element.data('$icon');
-        if($icon && $icon.cssWidth() < iconOffset){
-          $element.find('.text').css('padding-left', iconOffset-$icon.cssWidth());
-        } else if(element!==menu.$container[0]){
+        if ($icon && $icon.cssWidth() < iconOffset) {
+          $element.find('.text').css('padding-left', iconOffset - $icon.cssWidth());
+        } else if (element !== menu.$container[0]) {
           $element.find('.text').css('padding-left', iconOffset);
         }
       });
-    } else if(iconOffset && !menu.iconId){
+    } else if (iconOffset && !menu.iconId) {
       menu.$container.find('.text').css('padding-left', iconOffset);
-    } else if(menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset){
-      menu.$container.find('.text').css('padding-left', iconOffset-menu.$container.data('$icon').cssWidth());
+    } else if (menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset) {
+      menu.$container.find('.text').css('padding-left', iconOffset - menu.$container.data('$icon').cssWidth());
     }
   }, this);
   while (this.initialSubmenusToRender && !initialSubMenuRendering) {

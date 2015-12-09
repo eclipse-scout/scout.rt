@@ -15,6 +15,26 @@ scout.menus = {
    */
   CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu', //FIXME cgu: keydown/keyup is a bad idea -> interferes with ctrl click on table to multi select rows
 
+  filterAccordingToSelection: function(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke) {
+    var allowedTypes = [];
+
+    if (destination === scout.MenuDestinations.MENU_BAR) {
+      allowedTypes = [prefix + '.EmptySpace', prefix + '.SingleSelection', prefix + '.MultiSelection'];
+    } else if (destination === scout.MenuDestinations.CONTEXT_MENU) {
+      allowedTypes = [prefix + '.SingleSelection', prefix + '.MultiSelection'];
+    } else if (destination === scout.MenuDestinations.HEADER) {
+      allowedTypes = [prefix + '.Header'];
+    }
+
+    if (allowedTypes.indexOf(prefix + '.SingleSelection') > -1 && selectionLength !== 1) {
+      scout.arrays.remove(allowedTypes, prefix + '.SingleSelection');
+    }
+    if (allowedTypes.indexOf(prefix + '.MultiSelection') > -1 && selectionLength <= 1) {
+      scout.arrays.remove(allowedTypes, prefix + '.MultiSelection');
+    }
+    return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+  },
+
   /**
    * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
    * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
@@ -113,4 +133,10 @@ scout.menus = {
       func.apply(this, argumentsArray);
     }
   }
+};
+
+scout.MenuDestinations = {
+  MENU_BAR: 1,
+  CONTEXT_MENU: 2,
+  HEADER: 3
 };
