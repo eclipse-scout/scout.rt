@@ -21,6 +21,9 @@ scout.ColumnUserFilter = function() {
    * array of (normalized) keys
    */
   this.selectedValues = [];
+
+  // FIXME AWE: split this class into Text-, Number- and Date-ColumnUserFilter
+  this.freeText;
 };
 scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
@@ -101,7 +104,8 @@ scout.ColumnUserFilter.prototype.createAddFilterEventData = function() {
   var data = scout.ColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
   return $.extend(data, {
     columnId: this.column.id,
-    selectedValues: this.selectedValues
+    selectedValues: this.selectedValues,
+    freeText: this.freeText
   });
 };
 
@@ -125,11 +129,38 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
     // Lazy calculation. It is not possible on init, because the table is not rendered yet.
     this.calculate();
   }
-  var key = this.column.cellValueForGrouping(row),
+  var acceptByTable, acceptByFields,
+    key = this.column.cellValueForGrouping(row),
     normKey = this.xAxis.norm(key);
 
   if (this._useTextInsteadOfNormValue(normKey)) {
     normKey = this.xAxis.format(normKey);
   }
-  return (this.selectedValues.indexOf(normKey) > -1);
+
+  if (this.selectedValues.length) {
+    acceptByTable = this.selectedValues.indexOf(normKey) > -1;
+  } else {
+    acceptByTable = true;
+  }
+
+  if (this.freeText) { // FIXME AWE (filter) use cellTextForTextFilter
+    acceptByFields = normKey.toLowerCase().indexOf(this.freeText.toLowerCase()) > -1;
+  } else {
+    acceptByFields = true;
+  }
+
+  return acceptByTable && acceptByFields;
+};
+
+scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
+  $.log.debug('(ColumnUserFilter#updateFilterFields) filterType=' + event.filterType + ' text=' + event.text);
+  if (event.filterType === 'text') {
+    this.freeText = event.text.trim();
+  } else {
+    throw new Error('other filter types not implemented yet'); // FIXME AWE: (filter) impl. other types
+  }
+};
+
+scout.ColumnUserFilter.prototype.filterActive = function() {
+  return this.selectedValues.length > 0 || this.freeText; // FIXME AWE: (filter) impl. active for other types
 };

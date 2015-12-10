@@ -2380,7 +2380,7 @@ scout.Table.prototype.resetFilter = function() {
  * @param filter object with createKey() and accept()
  */
 scout.Table.prototype.addFilter = function(filter, notifyServer) {
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
+  notifyServer = scout.nvl(notifyServer, true);
   var key = filter.createKey();
   if (!key) {
     throw new Error('key has to be defined');

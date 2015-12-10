@@ -718,6 +718,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     String filterType = data.getString("filterType");
     if ("column".equals(filterType)) {
       IColumn column = extractColumn(data);
+      // filter table
       JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
       Set<Object> selectedValues = new HashSet<Object>();
       for (int i = 0; i < jsonSelectedValues.length(); i++) {
@@ -728,8 +729,13 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
           selectedValues.add(jsonSelectedValues.get(i));
         }
       }
+      // filter fields
+      // FIXME AWE: (filter) implement other filter types
+      String freeText = data.getString("freeText");
+
       ColumnUserFilterState filter = new ColumnUserFilterState(column);
       filter.setSelectedValues(selectedValues);
+      filter.setFreeText(freeText);
       return filter;
     }
     else if ("text".equals(filterType)) {

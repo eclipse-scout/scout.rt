@@ -84,10 +84,12 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
 };
 
 scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
-  this._send('displayTextChanged', {
+  var event = {
     displayText: displayText,
     whileTyping: whileTyping
-  });
+  };
+  this._send('displayTextChanged', event);
+  this.trigger('displayTextChanged', event);
 };
 
 scout.ValueField.prototype.addField = function($field) {

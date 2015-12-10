@@ -6,6 +6,7 @@ scout.inherits(scout.FilterFieldsGroupBox, scout.GroupBox);
 
 scout.FilterFieldsGroupBox.prototype._init = function(model) {
   scout.FilterFieldsGroupBox.parent.prototype._init.call(this, model);
+  this.filter = model.filter;
   this.column = model.column;
   if (this.column.type === 'number') {
     this._addFromToNumberFields();
@@ -41,57 +42,44 @@ scout.FilterFieldsGroupBox.prototype._render = function($parent) {
 };
 
 scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
-  this.fields.push(scout.create('NumberField', {
-    parent: this,
-    label: this.session.text('ui.from'),
-    statusVisible: false,
-    labelWidthInPixel: 50,
-    maxLength: 100,
-    gridData: {
-      y: 0
-    }
-  }));
-  this.fields.push(scout.create('NumberField', {
-    parent: this,
-    label: this.session.text('ui.to'),
-    statusVisible: false,
-    labelWidthInPixel: 50,
-    maxLength: 100,
-    gridData: {
-      y: 1
-    }
-  }));
+  this._addField('NumberField', 'ui.from', 0);
+  this._addField('NumberField', 'ui.to', 1);
 };
 
 scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
-  this.fields.push(scout.create('DateField', {
+  this._addField('DateField', 'ui.from', 0);
+  this._addField('DateField', 'ui.to', 1);
+};
+
+scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, gridY) {
+  this.fields.push(scout.create(objectType, {
     parent: this,
-    label: this.session.text('ui.from'),
+    label: this.session.text(text),
     statusVisible: false,
     labelWidthInPixel: 50,
     maxLength: 100,
     gridData: {
-      y: 0
-    }
-  }));
-  this.fields.push(scout.create('DateField', {
-    parent: this,
-    label: this.session.text('ui.to'),
-    statusVisible: false,
-    labelWidthInPixel: 50,
-    maxLength: 100,
-    gridData: {
-      y: 1
+      y: gridY
     }
   }));
 };
 
 scout.FilterFieldsGroupBox.prototype._addFreeTextField = function() {
-  this.fields.push(scout.create('StringField', {
+  var freeTextField = scout.create('StringField', {
     parent: this,
     labelVisible: false,
     statusVisible: false,
-    maxLength: 100
-  }));
+    maxLength: 100,
+    displayText: this.filter.freeText
+  });
+  freeTextField.on('displayTextChanged', this._updateFilter.bind(this));
+  this.fields.push(freeTextField);
 };
 
+scout.FilterFieldsGroupBox.prototype._updateFilter = function(event) {
+  // FIXME AWE: (filter) other filter types
+  this.trigger('filterUpdated', {
+    filterType: 'text',
+    text: event.displayText
+  });
+};

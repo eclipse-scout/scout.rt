@@ -35,6 +35,7 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
     JSONObject json = super.toJson();
     json.put("column", getJsonTable().getColumnId(getFilterState().getColumn()));
     json.put("selectedValues", new JSONArray(getFilterState().getSelectedValues()));
+    json.put("freeText", getFilterState().getFreeText());
     return json;
   }
 

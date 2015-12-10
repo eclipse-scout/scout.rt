@@ -519,7 +519,7 @@ scout.TableHeaderMenu.prototype._toggleFiltersChecked = function() {
 };
 
 scout.TableHeaderMenu.prototype._updateTableFilters = function() {
-  if (this.filter.selectedValues.length > 0) {
+  if (this.filter.filterActive()) {
     this.table.addFilter(this.filter);
   } else {
     this.table.removeFilterByKey(this.column.id);
@@ -535,13 +535,20 @@ scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
 scout.TableHeaderMenu.prototype._renderFilterFields = function() {
   this.filterFieldsGroupBox = scout.create('GroupBox.FilterFields', {
     parent: this,
-    column: this.column
+    column: this.column,
+    filter: this.filter
   });
   this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
   this.$filterFieldsGroup
     .appendDiv('table-header-menu-group-text')
     .data('label', this.filterFieldsGroupBox.groupText());
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
+  this.filterFieldsGroupBox.on('filterUpdated', this._onFilterFieldsUpdated.bind(this)); // FIXME AWE: (filter) remove -> off
+};
+
+scout.TableHeaderMenu.prototype._onFilterFieldsUpdated = function(event) {
+  this.filter.updateFilterFields(event);
+  this._updateTableFilters();
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
@@ -550,13 +557,11 @@ scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
 
 scout.TableHeaderMenu.prototype._sortColumnCount = function() {
   var i, sortCount = 0;
-
   for (i = 0; i < this.table.columns.length; i++) {
     if (this.table.columns[i].sortActive) {
       sortCount++;
     }
   }
-
   return sortCount;
 };
 

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TableTextUserFilter = function(table, column) {
-  scout.TableTextUserFilter.parent.call(this, table);
+scout.TableTextUserFilter = function() {
+  scout.TableTextUserFilter.parent.call(this);
   this.filterType = scout.TableTextUserFilter.Type;
 };
 scout.inherits(scout.TableTextUserFilter, scout.TableUserFilter);

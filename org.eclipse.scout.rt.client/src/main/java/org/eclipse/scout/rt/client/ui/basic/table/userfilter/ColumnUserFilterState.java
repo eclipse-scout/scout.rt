@@ -27,6 +27,7 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   private transient IColumn<?> m_column;
   private String m_columnId;
   private Set<Object> m_selectedValues;
+  private String m_freeText;
 
   public ColumnUserFilterState(IColumn<String> column) {
     setColumn(column);
@@ -48,6 +49,14 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
 
   public void setSelectedValues(Set<Object> selectedValues) {
     m_selectedValues = selectedValues;
+  }
+
+  public String getFreeText() {
+    return m_freeText;
+  }
+
+  public void setFreeText(String freeText) {
+    m_freeText = freeText;
   }
 
   @Override
