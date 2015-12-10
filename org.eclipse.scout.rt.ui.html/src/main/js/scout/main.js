@@ -41,8 +41,7 @@ scout._bootstrap = function(options) {
     scout.logging.bootstrap(),
     scout.device.bootstrap(),
     scout.defaultValues.bootstrap(),
-    scout.fonts.bootstrap(options.fonts),
-    scout.objectFactory.bootstrap()
+    scout.fonts.bootstrap(options.fonts)
   ];
 
   var deferreds = [];
@@ -67,6 +66,7 @@ scout._init = function(options) {
 
   scout.polyfills.install(window);
   scout.prepareDOM();
+  scout.objectFactory.init();
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor(document);
 

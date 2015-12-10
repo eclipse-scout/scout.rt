@@ -131,7 +131,11 @@ scout.ObjectFactory.prototype.unregister = function(objectType) {
   delete this._registry[objectType];
 };
 
-scout.ObjectFactory.prototype.bootstrap = function() {
+/**
+ * Cannot init ObjectFactory until Log4Javascript is initialized. 
+ * That's why we call this method in the scout._init method.
+ */
+scout.ObjectFactory.prototype.init = function() {
   for (var objectType in scout.objectFactories) {
     this.register(objectType, scout.objectFactories[objectType]);
   }
