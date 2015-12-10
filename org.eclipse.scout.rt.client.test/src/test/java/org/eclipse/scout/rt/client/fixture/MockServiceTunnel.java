@@ -67,7 +67,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
         service = t;
         break;
       }
-      Object result = serviceUtility.invoke(serviceOperation, service, req.getArgs());
+      Object result = serviceUtility.invoke(service, serviceOperation, req.getArgs());
       return new ServiceTunnelResponse(result, null, null);
     }
     catch (Throwable t) {

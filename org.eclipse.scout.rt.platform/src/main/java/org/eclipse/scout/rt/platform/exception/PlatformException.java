@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import java.io.Serializable;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -28,7 +28,7 @@ public class PlatformException extends RuntimeException implements Serializable 
 
   private static final long serialVersionUID = 1L;
 
-  private final LinkedList<String> m_contextInfos = new LinkedList<>();
+  private final List<String> m_contextInfos = new ArrayList<>();
 
   /**
    * Creates a {@link PlatformException} from the given message.
@@ -94,7 +94,7 @@ public class PlatformException extends RuntimeException implements Serializable 
       return this;
     }
 
-    m_contextInfos.addFirst(contextInfo);
+    m_contextInfos.add(contextInfo);
     return this;
   }
 }

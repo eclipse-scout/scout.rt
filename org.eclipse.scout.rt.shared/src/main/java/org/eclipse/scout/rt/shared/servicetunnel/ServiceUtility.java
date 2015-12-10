@@ -14,13 +14,13 @@ import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.HolderUtility;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.internal.AbstractHolderArgumentVisitor;
 
 @ApplicationScoped
@@ -40,25 +40,22 @@ public class ServiceUtility {
   }
 
   /**
-   * @throws ProcessingException
-   *           Invoke the service operation using reflection. The service supports OUT variables using {@link IHolder}
-   *           objects
+   * Invokes the given operation on the service.
+   *
+   * @return the result of the service invocation.
+   * @throws RuntimeException
+   *           if the service invocation failed. Hence, runtime exceptions are propagated, any other exception is
+   *           translated into {@link PlatformException}.
    */
-  public Object invoke(Method serviceOperation, Object service, Object[] callerArgs) {
-    Assertions.assertNotNull(serviceOperation, "serviceOperation is null");
+  public Object invoke(final Object service, final Method operation, final Object[] args) {
     Assertions.assertNotNull(service, "service is null");
-    if (callerArgs == null) {
-      callerArgs = new Object[0];
-    }
+    Assertions.assertNotNull(operation, "operation is null");
+
     try {
-      final Object data = serviceOperation.invoke(service, callerArgs);
-      return data;
+      return operation.invoke(service, args != null ? args : new Object[0]);
     }
-    catch (Exception e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
-          .withContextInfo("service.name", service.getClass())
-          .withContextInfo("service.operation", serviceOperation.getName())
-          .withContextInfo("service.args", VerboseUtility.dumpObjects(callerArgs));
+    catch (final Throwable t) {
+      throw BEANS.get(RuntimeExceptionTranslator.class).translate(t);
     }
   }
 

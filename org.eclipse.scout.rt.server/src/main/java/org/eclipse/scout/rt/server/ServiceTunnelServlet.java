@@ -116,7 +116,6 @@ public class ServiceTunnelServlet extends HttpServlet {
 
         @Override
         public void run() throws Exception {
-
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
           if (isSessionLess(serviceRequest)) {
             // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
@@ -200,14 +199,14 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Method invoked to delegate the HTTP request to the 'process service'.
    */
-  protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) throws Exception {
+  protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) {
     return serverRunContext.call(new Callable<ServiceTunnelResponse>() {
 
       @Override
       public ServiceTunnelResponse call() throws Exception {
         return BEANS.get(ServiceOperationInvoker.class).invoke(serviceTunnelRequest);
       }
-    }, BEANS.get(ExceptionTranslator.class));
+    });
   }
 
   /**
@@ -223,7 +222,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     if (service == null) {
       throw new SecurityException("service registry does not contain a service of type " + serviceRequest.getServiceInterfaceClassName());
     }
-    Object data = serviceUtility.invoke(serviceOp, service, serviceRequest.getArgs());
+    Object data = serviceUtility.invoke(service, serviceOp, serviceRequest.getArgs());
     Object[] outParameters = serviceUtility.extractHolderArguments(serviceRequest.getArgs());
     ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
     serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());

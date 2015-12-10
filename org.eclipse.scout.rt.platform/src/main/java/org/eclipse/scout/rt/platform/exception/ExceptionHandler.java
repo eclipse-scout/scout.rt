@@ -55,9 +55,7 @@ public class ExceptionHandler {
    * Method invoked to handle a {@code InterruptedException}. The default implementation does nothing.
    */
   protected void handleInterruptedException(final InterruptedException e) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Interruption", e);
-    }
+    LOG.debug("Interruption", e);
   }
 
   /**
@@ -65,9 +63,7 @@ public class ExceptionHandler {
    * exception is thrown if waiting for a job to complete, but the job was cancelled.
    */
   protected void handleCancelledException(final CancellationException e) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Cancellation", e);
-    }
+    LOG.debug("Cancellation", e);
   }
 
   /**

@@ -15,9 +15,7 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
@@ -36,47 +34,40 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   @Override
   public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) {
     long t0 = System.nanoTime();
-    try {
-      if (callerArgs == null) {
-        callerArgs = new Object[0];
-      }
-      LOG.debug("{}.{}({})", serviceInterfaceClass, operation, callerArgs);
-
-      ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
-      Object[] serializableArgs = serviceUtility.filterHolderArguments(callerArgs);
-      ServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
-      beforeTunnel(request);
-      ServiceTunnelResponse response = tunnel(request);
-      afterTunnel(t0, response);
-
-      // error handler
-      Throwable t = response.getException();
-      if (t != null) {
-        RuntimeException serviceException = interceptServiceException(t);
-        if (serviceException instanceof PlatformException) {
-          ((PlatformException) serviceException).withContextInfo("remoteService", "{}.{}()", serviceInterfaceClass.getSimpleName(), operation.getName());
-        }
-
-        // combine local and remote stacktraces
-        StackTraceElement[] trace1 = serviceException.getStackTrace();
-        StackTraceElement[] trace2 = new Exception().getStackTrace();
-        StackTraceElement[] both = new StackTraceElement[trace1.length + trace2.length];
-        System.arraycopy(trace1, 0, both, 0, trace1.length);
-        System.arraycopy(trace2, 0, both, trace1.length, trace2.length);
-        serviceException.setStackTrace(both);
-        throw serviceException;
-      }
-      serviceUtility.updateHolderArguments(callerArgs, response.getOutVars(), false);
-      return response.getData();
+    if (callerArgs == null) {
+      callerArgs = new Object[0];
     }
-    catch (Throwable t) {
-      if (t instanceof ProcessingException) {
-        throw (ProcessingException) t;
+    LOG.debug("{}.{}({})", serviceInterfaceClass, operation, callerArgs);
+
+    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
+    Object[] serializableArgs = serviceUtility.filterHolderArguments(callerArgs);
+    ServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
+    beforeTunnel(request);
+    ServiceTunnelResponse response = tunnel(request);
+    afterTunnel(t0, response);
+
+    // Exception handling
+    Throwable t = response.getException();
+    if (t != null) {
+      // Associate the exception with context information about the service call (without arg values due to security reasons).
+      RuntimeException serviceException = interceptServiceException(t);
+      if (serviceException instanceof PlatformException) {
+        ((PlatformException) serviceException)
+            .withContextInfo("remote-service.name", serviceInterfaceClass.getSimpleName())
+            .withContextInfo("remote-service.operation", operation.getName());
       }
-      else {
-        throw new ProcessingException(serviceInterfaceClass.getSimpleName() + "." + operation.getName() + "(" + VerboseUtility.dumpObjects(callerArgs) + ")", t);
-      }
+
+      // Combine local and remote stacktraces.
+      StackTraceElement[] trace1 = serviceException.getStackTrace();
+      StackTraceElement[] trace2 = new Exception().getStackTrace();
+      StackTraceElement[] both = new StackTraceElement[trace1.length + trace2.length];
+      System.arraycopy(trace1, 0, both, 0, trace1.length);
+      System.arraycopy(trace2, 0, both, trace1.length, trace2.length);
+      serviceException.setStackTrace(both);
+      throw serviceException;
     }
+    serviceUtility.updateHolderArguments(callerArgs, response.getOutVars(), false);
+    return response.getData();
   }
 
   protected ServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {

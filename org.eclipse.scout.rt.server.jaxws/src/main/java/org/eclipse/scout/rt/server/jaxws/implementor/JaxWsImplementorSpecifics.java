@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.
- * <br/>
+ * <p>
  * Replace this class via {@link Replace} annotation if your provider implementation divergences from the JAX-WS
  * standard.
  */

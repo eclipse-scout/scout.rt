@@ -92,6 +92,6 @@ public class PlatformExceptionTest {
         .withContextInfo("key2", "value {}", 2)
         .withContextInfo("key3", "value 3");
 
-    assertEquals(Arrays.asList("key3=value 3", "key2=value 2", "key1=value 1"), exception.getContextInfos());
+    assertEquals(Arrays.asList("key1=value 1", "key2=value 2", "key3=value 3"), exception.getContextInfos());
   }
 }

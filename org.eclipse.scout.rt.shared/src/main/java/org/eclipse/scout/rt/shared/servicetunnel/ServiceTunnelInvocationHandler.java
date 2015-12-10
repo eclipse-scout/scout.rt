@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,12 @@ public class ServiceTunnelInvocationHandler implements InvocationHandler {
       return BEANS.get(IServiceTunnel.class).invokeService(m_serviceInterfaceClass, method, args);
     }
     else {
-      return getClass().getMethod(method.getName(), method.getParameterTypes()).invoke(this, args);
+      try {
+        return getClass().getMethod(method.getName(), method.getParameterTypes()).invoke(this, args);
+      }
+      catch (Throwable t) {
+        throw BEANS.get(ThrowableTranslator.class).translate(t);
+      }
     }
   }
 

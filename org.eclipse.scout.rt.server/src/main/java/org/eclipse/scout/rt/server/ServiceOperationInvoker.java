@@ -50,31 +50,37 @@ public class ServiceOperationInvoker {
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
-  public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) throws Exception {
+  public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) {
     long t0 = System.nanoTime();
 
     ServiceTunnelResponse response;
     try {
-      response = invokeImpl(serviceReq);
+      response = invokeInternal(serviceReq);
     }
     catch (Throwable t) {
+      // Associate the exception with context information about the service call.
+      if (t instanceof PlatformException) {
+        ((PlatformException) t)
+            .withContextInfo("service.name", serviceReq.getServiceInterfaceClassName())
+            .withContextInfo("service.operation", serviceReq.getOperation());
+      }
+
+      // Mark the transaction for rollback.
       ITransaction.CURRENT.get().addFailure(t);
-      handleException(t, serviceReq);
+
+      // Handle the exception.
+      handleException(t);
+
+      // Prepare ServiceTunnelResponse.
       response = new ServiceTunnelResponse(interceptException(t));
     }
 
-    long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("TIME {}.{} {}ms", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), elapsedMillis);
-    }
-    response.setProcessingDuration(elapsedMillis);
+    response.setProcessingDuration(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0));
+    LOG.debug("TIME {}.{} {}ms", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), response.getProcessingDuration());
     return response;
   }
 
-  /**
-   * This method is executed within a {@link IServerSession} context on behalf of a server job.
-   */
-  protected ServiceTunnelResponse invokeImpl(ServiceTunnelRequest serviceReq) throws Throwable {
+  protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws Throwable {
     IServerSession serverSession = ServerSessionProvider.currentSession();
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
@@ -84,13 +90,12 @@ public class ServiceOperationInvoker {
     ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
     ServiceTunnelResponse serviceRes = null;
     try {
-      //do checks
       Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
       Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       Object[] args = serviceReq.getArgs();
       Object service = getValidatedServiceAccess(serviceInterfaceClass, serviceOp, args);
 
-      Object data = serviceUtility.invoke(serviceOp, service, args);
+      Object data = serviceUtility.invoke(service, serviceOp, args);
       Object[] outParameters = serviceUtility.extractHolderArguments(args);
 
       serviceRes = new ServiceTunnelResponse(data, outParameters);
@@ -226,27 +231,24 @@ public class ServiceOperationInvoker {
   }
 
   /**
-   * Method invoked to handle a service exception.
+   * Method invoked to handle a service exception. This method must not throw an exception.
+   * <p>
+   * The default implementation handles an exception via {@link ExceptionHandler}, but only if the current context is
+   * not cancelled.
    */
-  protected void handleException(Throwable t, ServiceTunnelRequest serviceTunnelRequest) {
-    if (RunMonitor.CURRENT.get().isCancelled()) {
-      return;
+  protected void handleException(Throwable t) {
+    if (!RunMonitor.CURRENT.get().isCancelled()) {
+      BEANS.get(ExceptionHandler.class).handle(t);
     }
-
-    // Associate the exception with context info about the service call.
-    if (t instanceof PlatformException) {
-      ((PlatformException) t)
-          .withContextInfo("service.name", serviceTunnelRequest.getServiceInterfaceClassName())
-          .withContextInfo("service.operation", serviceTunnelRequest.getOperation());
-    }
-    BEANS.get(ExceptionHandler.class).handle(t);
   }
 
   /**
    * Method invoked to intercept a service exception before being put into the {@link ServiceTunnelResponse} to be sent
-   * to the client.
+   * to the client. This method must not throw an exception.
    * <p>
-   * Security: do not send back original error and stack trace with implementation details.<br/>
+   * <p>
+   * Security: do not send back original error and stack trace with implementation details.
+   * <p>
    * The default implementation returns an empty exception, or in case of a {@link VetoException} only its title,
    * message, htmlMessage, error code and severity.
    */
