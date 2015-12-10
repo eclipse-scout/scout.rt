@@ -1656,20 +1656,14 @@ describe("Table", function() {
 
         expect(table.$rows().length).toBe(3);
 
-        var message = {
-          events: [createRowsDeletedEvent(model, [row0.id])]
-        };
-        session._processSuccessResponse(message);
+        table._deleteRows([table.rows[0]]);
 
         expect(table.$rows().length).toBe(2);
         expect(table.$data.find('[data-rowid="' + row0.id + '"]').length).toBe(0);
         expect(table.$data.find('[data-rowid="' + row1.id + '"]').length).toBe(1);
         expect(table.$data.find('[data-rowid="' + row2.id + '"]').length).toBe(1);
 
-        message = {
-          events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
-        };
-        session._processSuccessResponse(message);
+        table._deleteRows([table.rows[1], table.rows[2]]);
 
         expect(table.$rows().length).toBe(0);
       });

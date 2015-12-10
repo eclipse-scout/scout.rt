@@ -10,27 +10,162 @@
  ******************************************************************************/
 describe('Range', function() {
 
+  it('dateEquals', function() {
+    var date1 = scout.dates.create('2015-25-11'),
+      date2 = scout.dates.create('2015-25-11'),
+      date3 = scout.dates.create('2014-25-11');
 
-    it('dateEquals', function() {
-      var date1 = scout.dates.create('2015-25-11'),
-        date2 = scout.dates.create('2015-25-11'),
-        date3 = scout.dates.create('2014-25-11');
+    expect(scout.Range.dateEquals(null, null)).toBe(true);
+    expect(scout.Range.dateEquals(date1, null)).toBe(false);
+    expect(scout.Range.dateEquals(null, date1)).toBe(false);
+    expect(scout.Range.dateEquals(date1, date2)).toBe(true);
+    expect(scout.Range.dateEquals(date1, date3)).toBe(false);
+  });
 
-      expect(scout.Range.dateEquals(null, null)).toBe(true);
-      expect(scout.Range.dateEquals(date1, null)).toBe(false);
-      expect(scout.Range.dateEquals(null, date1)).toBe(false);
-      expect(scout.Range.dateEquals(date1, date2)).toBe(true);
-      expect(scout.Range.dateEquals(date1, date3)).toBe(false);
+  it('equals', function() {
+    var range1 = new scout.Range(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
+      range2 = new scout.Range(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
+      range3 = new scout.Range(scout.dates.create('2014-24-11'), scout.dates.create('2014-25-11'));
+
+    expect(range1.equals(range2)).toBe(true);
+    expect(range2.equals(range1)).toBe(true);
+    expect(range1.equals(range3)).toBe(false);
+  });
+
+  describe('union', function() {
+    it('returns a new range with the sum of both ranges', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(5, 20);
+      expect(range1.union(range2)).toEqual([new scout.Range(0, 20)]);
+
+      range1 = new scout.Range(5, 20);
+      range2 = new scout.Range(0, 10);
+      expect(range1.union(range2)).toEqual([new scout.Range(0, 20)]);
+
+      range1 = new scout.Range(0, 10);
+      range2 = new scout.Range(10, 20);
+      expect(range1.union(range2)).toEqual([new scout.Range(0, 20)]);
     });
 
-    it('equals', function(){
-      var range1 = new scout.Range(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
-        range2 = new scout.Range(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
-        range3 = new scout.Range(scout.dates.create('2014-24-11'), scout.dates.create('2014-25-11'));
-
-      expect(range1.equals(range2)).toBe(true);
-      expect(range2.equals(range1)).toBe(true);
-      expect(range1.equals(range3)).toBe(false);
+    it('returns a copy of both ranges if the ranges don\'t overlap', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(11, 20);
+      expect(range1.union(range2)).toEqual([new scout.Range(0, 10), new scout.Range(11, 20)]);
     });
 
+    it('returns a copy of the non empty range if one range is empty', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(0, 0);
+      expect(range1.union(range2)).toEqual([new scout.Range(0, 10)]);
+
+      range1 = new scout.Range(0, 0);
+      range2 = new scout.Range(0, 10);
+      expect(range1.union(range2)).toEqual([new scout.Range(0, 10)]);
+    });
+  });
+
+  describe('subtract', function() {
+    it('returns a new range where the second range is removed from the first', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(5, 20);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 5)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(0, 10);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(10, 15)]);
+    });
+
+    it('returns a copy of the first range if the second does not overlap the first', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(11, 20);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 10)]);
+
+      range1 = new scout.Range(0, 10);
+      range2 = new scout.Range(10, 20);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 10)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(0, 5);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(5, 15)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(0, 4);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(5, 15)]);
+    });
+
+    it('returns an empty range if second range completely covers the first', function() {
+      var range1 = new scout.Range(5, 15);
+      var range2 = new scout.Range(0, 20);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 0)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(0, 15);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 0)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(5, 20);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 0)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(5, 15);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 0)]);
+    });
+
+    it('returns a new range if second range is inside the first and touches a border', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(0, 2);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(2, 10)]);
+
+      range1 = new scout.Range(0, 10);
+      range2 = new scout.Range(8, 10);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 8)]);
+    });
+
+    it('returns an array of two ranges if second range is inside the first but does not touch a border', function() {
+      var range1 = new scout.Range(0, 20);
+      var range2 = new scout.Range(5, 15);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 5), new scout.Range(15, 20)]);
+    });
+
+    it('returns a copy of the first range if the second range is empty', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(0, 0);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 10)]);
+    });
+
+    it('returns an empty range if the first range is empty', function() {
+      var range1 = new scout.Range(0, 0);
+      var range2 = new scout.Range(0, 10);
+      expect(range1.subtract(range2)).toEqual([new scout.Range(0, 0)]);
+    });
+
+  });
+
+  describe('intersect', function() {
+    it('returns a new range with the part where both ranges overlap', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(5, 20);
+      expect(range1.intersect(range2)).toEqual(new scout.Range(5, 10));
+    });
+
+    it('returns an empty range if the ranges don\'t overlap', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(10, 20);
+      expect(range1.intersect(range2)).toEqual(new scout.Range(0, 0));
+
+      range1 = new scout.Range(10, 20);
+      range2 = new scout.Range(0, 10);
+      expect(range1.intersect(range2)).toEqual(new scout.Range(0, 0));
+    });
+
+    it('returns an empty range if one range is empty', function() {
+      var range1 = new scout.Range(0, 0);
+      var range2 = new scout.Range(0, 20);
+      expect(range1.intersect(range2)).toEqual(new scout.Range(0, 0));
+
+      range1 = new scout.Range(10, 10);
+      range2 = new scout.Range(10, 20);
+      expect(range1.intersect(range2)).toEqual(new scout.Range(0, 0));
+    });
+  });
 });

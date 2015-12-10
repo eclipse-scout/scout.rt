@@ -43,7 +43,7 @@ scout.Table = function(model) {
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
   this.viewRangeSize = 25;
-  this.viewRangeRendered = new scout.Range(-1, -1);
+  this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
@@ -374,8 +374,7 @@ scout.Table.prototype._remove = function() {
   this.footer = null;
   this._removeAggregateRows();
   this._uninstallCellTooltipSupport();
-  this.viewRangeRendered.from = -1;
-  this.viewRangeRendered.to = -1;
+  this.viewRangeRendered = new scout.Range(0, 0);
   this.$fillBefore = null;
   this.$fillAfter = null;
   scout.Table.parent.prototype._remove.call(this);
@@ -984,47 +983,40 @@ scout.Table.prototype._updateRowHeight = function() {
   $emptyRow.appendDiv('table-cell').html('&nbsp;');
   this.rowHeight = $emptyRow.outerHeight();
   $emptyRow.remove();
-
-//  var timestamp = new Date().getTime();
-//  this._renderRows(this.rows, 0, this.rows.length - 1);
-////  this.rows.forEach(function(row) {
-////    row.height = row.$row.height();
-////  });
-//  this._removeRows();
-//  console.log('Measuring took ' + (new Date().getTime() - timestamp));
 };
 
 /**
  * @param new rows to append at the end of this.$data. If undefined this.rows is used.
  */
-scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) {
-  var $rows, fromRow, toRow,
+scout.Table.prototype._renderRowsInRange = function(range) {
+  var $rows,
     rowString = '',
     that = this,
-    numRowsRendered = 0;
+    numRowsRendered = 0,
+    prepend = false;
 
-  rows = rows || this.rows;
+  var rows = this.rows;
   if (rows.length === 0) {
     return;
   }
 
-  prepend = scout.nvl(prepend, false);
-  fromIndex = scout.nvl(fromIndex, 0);
-  fromIndex = Math.max(fromIndex, 0);
-  toIndex = scout.nvl(toIndex, Math.min(rows.length, fromIndex + this.viewRangeSize) - 1);
-  toIndex = Math.min(toIndex, rows.length - 1);
-  fromRow = this.rows[fromIndex];
-  toRow = this.rows[toIndex];
-  if (this.viewRangeRendered.from === -1 || fromIndex < this.viewRangeRendered.from) {
-    this.viewRangeRendered.from = fromIndex;
+  var maxRange = new scout.Range(0, this.rows.length);
+  range = maxRange.intersect(range);
+  if (!range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
+    throw new Error('New range must not intersect with existing.');
   }
-  if (toIndex > this.viewRangeRendered.to) {
-    this.viewRangeRendered.to = toIndex;
+  if (range.to <= this.viewRangeRendered.from) {
+    prepend = true;
   }
+  var newRange = this.viewRangeRendered.union(range);
+  if (newRange.length == 2) {
+    throw new Error('Can only prepend or append rows to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
+  }
+  this.viewRangeRendered = newRange[0];
   this._removeEmptyData();
 
   // Build $rows (as string instead of jQuery objects due to efficiency reasons)
-  for (var r = fromIndex; r <= toIndex; r++) {
+  for (var r = range.from; r < range.to; r++) {
     var row = rows[r];
     rowString += this._buildRowDiv(row);
     numRowsRendered++;
@@ -1049,7 +1041,7 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
   // Link model and jQuery objects
   $rows.each(function(index, rowObject) {
     var $row = $(rowObject);
-    var row = rows[fromIndex + index];
+    var row = rows[range.from + index];
     scout.Table.linkRowToDiv(row, $row);
     row.height = $row.height();
   });
@@ -1065,56 +1057,48 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
   this._renderAggregateRows();
   this._renderBackgroundEffect();
   if ($.log.isTraceEnabled()) {
-    $.log.trace(numRowsRendered + ' new rows rendered from ' + fromIndex + ' to ' + toIndex + '.');
+    $.log.trace(numRowsRendered + ' new rows rendered from ' + range);
     $.log.trace(this._rowsRenderedInfo());
   }
 };
 
-scout.Table.prototype._rowsRenderedInfo = function(fromIndex, toIndex) {
+scout.Table.prototype._rowsRenderedInfo = function() {
   var numRenderedRows = this.$rows().length,
-    renderedRowsRange = '(' + this.viewRangeRendered.from + '-' + this.viewRangeRendered.to + ')',
+    renderedRowsRange = '(' + this.viewRangeRendered + ')',
     text = numRenderedRows + ' rows rendered ' + renderedRowsRange;
   return text;
 };
 
-scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
+scout.Table.prototype._removeRowsInRange = function(range) {
   var fromRow, toRow, row, i,
     numRowsRemoved = 0;
 
-  fromIndex = Math.max(fromIndex, 0);
-  fromRow = this.rows[fromIndex],
-  toIndex = Math.min(toIndex, this.rows.length - 1);
-  toRow = this.rows[toIndex];
+  var maxRange = new scout.Range(0, this.rows.length);
+  range = maxRange.intersect(range);
+  fromRow = this.rows[range.from],
+  toRow = this.rows[range.to];
 
-  for (i = fromIndex; i <= toIndex; i++) {
+  var newRange = this.viewRangeRendered.subtract(range);
+  if (newRange.length == 2) {
+    throw new Error('Can only remove rows at the beginning or end of the existing range. ' + this.viewRangeRendered + '. New: ' + newRange);
+  }
+  this.viewRangeRendered = newRange[0];
+  this._removeEmptyData();
+
+  for (i = range.from; i < range.to; i++) {
     row = this.rows[i];
     row.height = row.$row.height();
   }
 
-  for (i = fromIndex; i <= toIndex; i++) {
+  for (i = range.from; i < range.to; i++) {
     row = this.rows[i];
     row.$row.remove();
     row.$row = null;
     numRowsRemoved++;
   }
 
-  if (this.viewRangeRendered.from === fromIndex && toIndex === this.viewRangeRendered.to) {
-    // all rendered rows removed
-    this.viewRangeRendered.from = -1;
-    this.viewRangeRendered.to = -1;
-  } else {
-    // Set the new index borders of the rendered rows
-    // -> rows were removed on top of the rendered rows
-    if (toIndex < this.viewRangeRendered.to && toIndex >= this.viewRangeRendered.from) {
-      this.viewRangeRendered.from = toIndex + 1;
-    }
-    // -> rows were removed on the bottom of rendered rows
-    if (fromIndex >= this.viewRangeRendered.from && fromIndex < this.viewRangeRendered.to) {
-      this.viewRangeRendered.to = fromIndex - 1;
-    }
-  }
   if ($.log.isTraceEnabled()) {
-    $.log.trace(numRowsRemoved + ' rows removed from ' + fromIndex + ' to ' + toIndex + '.');
+    $.log.trace(numRowsRemoved + ' rows removed from ' + range + '.');
     $.log.trace(this._rowsRenderedInfo());
   }
 };
@@ -3070,7 +3054,7 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
   var viewRange = new scout.Range();
   viewRange.from = Math.max(rowIndex - this.viewRangeSize, 0);
-  viewRange.to = Math.min(rowIndex + this.viewRangeSize, this.rows.length - 1);
+  viewRange.to = Math.min(rowIndex + this.viewRangeSize, this.rows.length);
   return viewRange;
 };
 
@@ -3097,43 +3081,22 @@ scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
  * Renders the rows visible in the viewport and removes the other rows
  */
 scout.Table.prototype._renderViewRange = function(viewRange) {
-  var from = viewRange.from,
-    to = viewRange.to;
-
-  if (from === this.viewRangeRendered.from && to === this.viewRangeRendered.to && !this.viewRangeDirty) {
+  if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
     // Range already rendered -> do nothing
     return;
   }
   var scrollTop = this.$data[0].scrollTop;
-
-  // FIXME CGU create intersect methods
-  if (viewRange.from > this.viewRangeRendered.from) {
-    if (this.viewRangeRendered.from !== -1) {
-      this._removeRowsFromTo(this.viewRangeRendered.from, Math.max(Math.min(viewRange.from - 1, this.viewRangeRendered.to), 0));
-    }
-  }
-  if (viewRange.to > this.viewRangeRendered.to) {
-    if (this.viewRangeRendered.to > from) {
-      from = Math.min(this.viewRangeRendered.to + 1, this.rows.length - 1);
-    }
-    this._renderRows(this.rows, from, viewRange.to);
-  }
-  if (viewRange.to < this.viewRangeRendered.to) {
-    if (this.viewRangeRendered.from !== -1) {
-      this._removeRowsFromTo(Math.max(viewRange.to, this.viewRangeRendered.from), this.viewRangeRendered.to);
-    }
-  }
-  if (viewRange.from < this.viewRangeRendered.from || this.viewRangeRendered.from === -1) {
-    if (this.viewRangeRendered.from !== -1 && this.viewRangeRendered.from < to) {
-      to = this.viewRangeRendered.from - 1;
-    }
-    this._renderRows(this.rows, viewRange.from, to, true);
-  }
+  var rangesToRender = viewRange.subtract(this.viewRangeRendered);
+  var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
+  rangesToRemove.forEach(function(range) {
+    this._removeRowsInRange(range);
+  }.bind(this));
+  rangesToRender.forEach(function(range) {
+    this._renderRowsInRange(range);
+  }.bind(this));
 
   this._renderFiller();
-
   this.$data[0].scrollTop = scrollTop;
-
   this.invalidateLayoutTree();
   this.viewRangeDirty = false;
 };

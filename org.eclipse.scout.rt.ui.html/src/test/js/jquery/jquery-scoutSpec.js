@@ -74,7 +74,7 @@ describe('scout-jquery', function() {
 
   describe('toggleAttr', function() {
 
-    it('is toggles attribute', function() {
+    it('toggles attribute', function() {
       expect($e.attr('test')).toBeUndefined();
       $e.toggleAttr('test');
       expect($e.attr('test')).toBe('test');
@@ -100,7 +100,7 @@ describe('scout-jquery', function() {
 
   describe('icon', function() {
 
-    it('is sets and removes icons', function() {
+    it('sets and removes icons', function() {
       // Set and remove font icon
       $e.icon();
       expect($e.children().length).toBe(0);
