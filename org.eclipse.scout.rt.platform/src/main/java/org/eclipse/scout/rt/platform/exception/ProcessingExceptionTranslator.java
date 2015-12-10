@@ -12,13 +12,9 @@ package org.eclipse.scout.rt.platform.exception;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.security.AccessController;
 import java.util.concurrent.ExecutionException;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -59,20 +55,7 @@ public class ProcessingExceptionTranslator implements IThrowableTranslator<Proce
       else {
         pe = new ProcessingException(StringUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t);
       }
-      return intercept(pe);
-    }
-  }
-
-  /**
-   * Method invoked to intercept the {@link ProcessingException} to be returned. The default implementation adds the
-   * current user's identity and the current executing job to the exception's context message.
-   */
-  protected ProcessingException intercept(final ProcessingException pe) {
-    final IProcessingStatus status = pe.getStatus();
-    if (status == null) {
       return pe;
     }
-
-    return pe.withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
   }
 }

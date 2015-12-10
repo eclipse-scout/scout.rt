@@ -11,9 +11,13 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import java.io.Serializable;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -50,6 +54,9 @@ public class PlatformException extends RuntimeException implements Serializable 
    */
   public PlatformException(final String message, final Object... args) {
     super(MessageFormatter.arrayFormat(message, args).getMessage(), MessageFormatter.arrayFormat(message, args).getThrowable());
+
+    // Associate the current user with this exception.
+    this.withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
   }
 
   /**
