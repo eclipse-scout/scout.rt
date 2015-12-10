@@ -122,7 +122,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         style = styleClass.newInstance();
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed to create instance of class '{}'.", styleClass.getName(), e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed to create instance of class '{}'.", new Object[]{styleClass.getName(), e}));
       }
     }
     else {
@@ -368,14 +368,14 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       String codeClassName = args[0];
       Class codeClass = loadBundleClassLenient(m_codeNameToDescriptor, codeClassName);
       if (codeClass == null) {
-        throw new ProcessingException("Cannot find class for code '{}", args[0]);
+        throw new ProcessingException("Cannot find class for code '{}", new Object[]{args[0]});
       }
       try {
         Object ret = codeClass.getField("ID").get(null);
         return ret != null ? ret : new LongHolder();
       }
       catch (Exception t) {
-        throw new ProcessingException("ID of code '{}'", args[0], t);
+        throw new ProcessingException("ID of code '{}'", new Object[]{args[0], t});
       }
     }
     else if ("text".equals(functionName)) {
@@ -416,7 +416,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
     }
     catch (Exception e) {
-      throw new ProcessingException("getLevel of permission '{}'.", permissionClass.getName(), e);
+      throw new ProcessingException("getLevel of permission '{}'.", new Object[]{permissionClass.getName(), e});
     }
   }
 
@@ -751,7 +751,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
             }
           }
           catch (ClassNotFoundException t) {
-            LOG.warn("Could not load class with lenient name '{}'", name);
+            LOG.warn("Could not load class with lenient name '{}'", new Object[]{name});
           }
         }
       }
@@ -768,7 +768,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         suffix = seg + suffix;
       }
     }
-    LOG.warn("Could not find class with lenient name '{}'", name);
+    LOG.warn("Could not find class with lenient name '{}'", new Object[]{name});
     return null;
   }
 

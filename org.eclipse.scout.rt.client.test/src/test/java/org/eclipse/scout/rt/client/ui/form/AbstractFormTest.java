@@ -143,7 +143,7 @@ public class AbstractFormTest {
       form.validateForm();
     }
     catch (VetoException ve) {
-      htmlErrorMessage = ve.getHtmlBody().toEncodedHtml();
+      htmlErrorMessage = ve.getHtmlMessage().toEncodedHtml();
     }
 
     assertEquals(expectedErrorMessage, htmlErrorMessage);

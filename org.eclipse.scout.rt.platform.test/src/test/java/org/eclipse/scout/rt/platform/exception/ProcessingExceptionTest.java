@@ -41,7 +41,7 @@ public class ProcessingExceptionTest {
     final int severity = IProcessingStatus.FATAL;
     final int errorCode = -1;
 
-    ProcessingException pe = new ProcessingException(m_body, testThrowable, errorCode, severity);
+    ProcessingException pe = new ProcessingException(m_body, testThrowable).withCode(errorCode).withSeverity(severity);
     assertEquals(m_body + " [severity=FATAL, code=-1]", pe.getMessage());
     assertEquals(m_body, pe.getDisplayMessage());
     assertEquals(testThrowable, pe.getCause());
@@ -54,7 +54,7 @@ public class ProcessingExceptionTest {
 
   @Test
   public void testDefaultStatus() {
-    ProcessingException pe = new ProcessingException(m_title, m_body);
+    ProcessingException pe = new ProcessingException(m_body).withTitle(m_title);
     final IProcessingStatus s = pe.getStatus();
     assertEquals(IStatus.ERROR, s.getSeverity());
     assertEquals(m_body, s.getBody());
@@ -82,7 +82,7 @@ public class ProcessingExceptionTest {
 
   @Test
   public void testToStringWithCause() {
-    final VetoException cause = new VetoException(m_title, m_body);
+    final VetoException cause = new VetoException(m_body).withTitle(m_title);
     ProcessingException processingException = new ProcessingException(m_body, cause);
     processingException
         .withContextInfo("key1", "value1")

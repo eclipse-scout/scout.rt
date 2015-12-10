@@ -28,9 +28,9 @@ public class Status implements IStatus, Serializable {
    */
   public static final Status OK_STATUS = new Status(OK);
 
-  private final int m_severity;
+  private int m_severity;
   private final String m_message;
-  private final int m_code;
+  private int m_code;
 
   /**
    * @param severity
@@ -83,6 +83,10 @@ public class Status implements IStatus, Serializable {
   @Override
   public int getSeverity() {
     return m_severity;
+  }
+
+  public void setSeverity(int severity) {
+    m_severity = severity;
   }
 
   @Override
@@ -185,6 +189,10 @@ public class Status implements IStatus, Serializable {
   @Override
   public int getCode() {
     return m_code;
+  }
+
+  public void setCode(int code) {
+    m_code = code;
   }
 
   @Override

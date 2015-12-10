@@ -1708,9 +1708,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         LOG.info("there are fields with errors");
       }
       m_currentValidateContentDescriptor = firstProblem;
-
-      VetoException veto = new VetoException(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
-      throw veto;
+      throw new VetoException().withHtmlMessage(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
     }
     if (!interceptValidate()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());

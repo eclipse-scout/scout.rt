@@ -17,8 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.security.acl.AclNotFoundException;
 import java.util.Arrays;
 
-import org.eclipse.scout.rt.platform.exception.PlaceholderException;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.fixture.CustomProcessingException;
 import org.eclipse.scout.rt.platform.exception.fixture.CustomProcessingExceptionWithStringConstructor;
 import org.eclipse.scout.rt.platform.exception.fixture.CustomProcessingStatus;
@@ -80,7 +78,7 @@ public class PlaceholderExceptionTest {
 
   @Test
   public void testProcessingException() {
-    ProcessingException e = new ProcessingException(TITLE, MESSAGE);
+    ProcessingException e = new ProcessingException(MESSAGE).withTitle(TITLE);
     Throwable t = PlaceholderException.transformException(e);
     assertEqualExceptionAndCause(e, t);
   }
@@ -88,7 +86,7 @@ public class PlaceholderExceptionTest {
   @Test
   public void testProcessingExceptionWithCausePkgJava() {
     NullPointerException cause = new NullPointerException();
-    ProcessingException e = new ProcessingException(TITLE, MESSAGE, cause);
+    ProcessingException e = new ProcessingException(MESSAGE, cause).withTitle(TITLE);
     Throwable t = PlaceholderException.transformException(e);
     assertEqualExceptionAndCause(e, t);
   }
@@ -96,9 +94,9 @@ public class PlaceholderExceptionTest {
   @Test
   public void testProcessingExceptionWithCauseNonPkgJava() {
     SAXNotRecognizedException cause = new SAXNotRecognizedException(MESSAGE);
-    ProcessingException e = new ProcessingException(TITLE, MESSAGE, cause);
+    ProcessingException e = new ProcessingException(MESSAGE, cause).withTitle(TITLE);
     Throwable t = PlaceholderException.transformException(e);
-    ProcessingException expected = new ProcessingException(TITLE, MESSAGE, new PlaceholderException(cause, null));
+    ProcessingException expected = new ProcessingException(MESSAGE, new PlaceholderException(cause, null)).withTitle(TITLE);
     expected.setStackTrace(e.getStackTrace());
     assertEqualExceptionAndCause(expected, t);
   }

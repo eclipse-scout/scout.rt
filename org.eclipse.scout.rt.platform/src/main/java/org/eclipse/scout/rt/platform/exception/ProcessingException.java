@@ -14,12 +14,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  * Represents processing errors that occur during application execution.
- * <p>
- * TODO abr, dwi [15.2] Remove the many constructors and use fluent api instead
  */
 public class ProcessingException extends PlatformException {
   private static final long serialVersionUID = 1L;
@@ -35,68 +37,90 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * See constructor of {@link PlatformException}
+   * Creates a {@link PlatformException} from the given message.
+   * <p>
+   * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the message, which will be replaced
+   * by the respective argument.
+   * <p>
+   * If the last argument is of the type {@link Throwable} and not referenced as formatting anchor in the message, that
+   * {@link Throwable} is used as the exception's cause.
+   * <p>
+   * Internally, {@link MessageFormatter} is used to provide substitution functionality. Hence, The format is the very
+   * same as if using {@link Logger SLF4j Logger}.
+   *
+   * @param message
+   *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
+   * @param arguments
+   *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
+   *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
    */
   public ProcessingException(final String message, final Object... args) {
     super(message, args);
-    initStatus(new ProcessingStatus(null, getMessage(), getCause(), 0, IProcessingStatus.ERROR));
+    m_status = new ProcessingStatus(null, super.getMessage(), this, 0, IProcessingStatus.ERROR);
   }
 
-  public ProcessingException(String message) {
-    this(null, message);
-  }
-
-  public ProcessingException(String message, Throwable cause) {
-    this(null, message, cause);
-  }
-
-  public ProcessingException(String message, Throwable cause, int errorCode) {
-    this(null, message, cause, errorCode);
-  }
-
-  public ProcessingException(String message, Throwable cause, int errorCode, int severity) {
-    this(null, message, cause, errorCode, severity);
-  }
-
-  public ProcessingException(String title, String message) {
-    this(title, message, null);
-  }
-
-  public ProcessingException(String title, String message, Throwable cause) {
-    this(title, message, cause, 0);
-  }
-
-  public ProcessingException(String title, String message, Throwable cause, int errorCode) {
-    this(title, message, cause, errorCode, IProcessingStatus.ERROR);
-  }
-
-  public ProcessingException(String title, String message, Throwable cause, int errorCode, int severity) {
-    this(new ProcessingStatus(title, message, cause, errorCode, severity));
-  }
-
-  public ProcessingException(IProcessingStatus status) {
+  /**
+   * Creates a {@link ProcessingException} based on the given {@link IProcessingStatus}.
+   */
+  public ProcessingException(final IProcessingStatus status) {
     super(status.getMessage(), status.getException());
-    initStatus(status);
-  }
-
-  private final void initStatus(IProcessingStatus status) {
-    m_status = status instanceof ProcessingStatus ? (ProcessingStatus) status : new ProcessingStatus(status);
-    if (m_status.getException() == null) {
-      ((ProcessingStatus) status).setException(this);
-    }
-  }
-
-  public IProcessingStatus getStatus() {
-    return m_status;
-  }
-
-  public void setStatus(IProcessingStatus status) {
-    m_status = new ProcessingStatus(status);
+    withStatus(status);
   }
 
   @Override
   public ProcessingException withContextInfo(final String name, final Object value, final Object... valueArgs) {
     super.withContextInfo(name, value, valueArgs);
+    return this;
+  }
+
+  /**
+   * Associates this exception's status with a title.
+   * <p>
+   * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the title, which will be replaced by
+   * the respective argument.
+   */
+  public ProcessingException withTitle(final String title, final Object... args) {
+    m_status.setTitle(MessageFormatter.arrayFormat(title, args).getMessage());
+    return this;
+  }
+
+  /**
+   * Associates this exception's status with a code.
+   */
+  public ProcessingException withCode(final int code) {
+    m_status.setCode(code);
+    return this;
+  }
+
+  /**
+   * Associates this exception's status with a severity.
+   *
+   * @see IStatus#OK
+   * @see IStatus#INFO
+   * @see IStatus#WARNING
+   * @see IStatus#ERROR
+   */
+  public ProcessingException withSeverity(final int severity) {
+    m_status.setSeverity(severity);
+    return this;
+  }
+
+  /**
+   * Returns the status; is never <code>null</code>.
+   */
+  public IProcessingStatus getStatus() {
+    return m_status;
+  }
+
+  /**
+   * Associates this exception with a status. The status must not be <code>null</code>.
+   */
+  public ProcessingException withStatus(final IProcessingStatus status) {
+    Assertions.assertNotNull(status);
+    m_status = status instanceof ProcessingStatus ? (ProcessingStatus) status : new ProcessingStatus(status);
+    if (m_status.getException() == null) {
+      m_status.setException(this);
+    }
     return this;
   }
 
@@ -124,11 +148,9 @@ public class ProcessingException extends PlatformException {
     final List<String> infos = new ArrayList<>();
 
     // status
-    if (m_status != null) {
-      infos.add(String.format("severity=%s", m_status.getSeverityName()));
-      if (m_status.getCode() != 0) {
-        infos.add(String.format("code=%s", m_status.getCode()));
-      }
+    infos.add(String.format("severity=%s", m_status.getSeverityName()));
+    if (m_status.getCode() != 0) {
+      infos.add(String.format("code=%s", m_status.getCode()));
     }
 
     // context-infos
@@ -138,7 +160,7 @@ public class ProcessingException extends PlatformException {
     }
 
     // message
-    final String msg = super.getMessage();
+    final String msg = m_status.getMessage();
     return String.format("%s [%s]", StringUtility.hasText(msg) ? msg : "<empty>", StringUtility.join(", ", infos));
   }
 
@@ -146,11 +168,75 @@ public class ProcessingException extends PlatformException {
    * @return the complete stacktrace of the Throwable and all its causes (recursive)
    */
   public static StackTraceElement[] unionStackTrace(Throwable t) {
-    ArrayList<StackTraceElement> list = new ArrayList<StackTraceElement>();
+    final ArrayList<StackTraceElement> list = new ArrayList<StackTraceElement>();
     while (t != null) {
       list.addAll(0, Arrays.asList(t.getStackTrace()));
       t = t.getCause();
     }
     return list.toArray(new StackTraceElement[list.size()]);
+  }
+
+  // ==== Deprecated API which will be removed in 6.1 ==== //
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with {@link #withCode(int)}
+   *             instead.
+   */
+  @Deprecated
+  public ProcessingException(final String message, final Throwable cause, final int errorCode) {
+    this(null, message, cause, errorCode);
+  }
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with {@link #withCode(int)},
+   *             {@link #withSeverity(int)} instead.
+   */
+  @Deprecated
+  public ProcessingException(final String message, final Throwable cause, final int errorCode, final int severity) {
+    this(null, message, cause, errorCode, severity);
+  }
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   *             {@link #withTitle(String, Object...)} instead.
+   */
+  @Deprecated
+  public ProcessingException(final String title, final String message) {
+    this(title, message, null);
+  }
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   *             {@link #withTitle(String, Object...)} instead.
+   */
+  @Deprecated
+  public ProcessingException(final String title, final String message, final Throwable cause) {
+    this(title, message, cause, 0);
+  }
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   *             {@link #withTitle(String, Object...)}, {@link #withCode(int)} instead.
+   */
+  @Deprecated
+  public ProcessingException(final String title, final String message, final Throwable cause, final int errorCode) {
+    this(title, message, cause, errorCode, IProcessingStatus.ERROR);
+  }
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   *             {@link #withTitle(String, Object...)}, {@link #withCode(int)}, {@link #withSeverity(int)} instead.
+   */
+  @Deprecated
+  public ProcessingException(final String title, final String message, final Throwable cause, final int errorCode, final int severity) {
+    this(new ProcessingStatus(title, message, cause, errorCode, severity));
+  }
+
+  /**
+   * @deprecated will be removed in 6.1. Use {@link #withStatus(IProcessingStatus)} instead.
+   */
+  @Deprecated
+  public void setStatus(final IProcessingStatus status) {
+    withStatus(status);
   }
 }

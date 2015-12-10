@@ -366,7 +366,7 @@ public final class EntityContributionUtility {
       return;
     }
     if (CHECK_GROUP_BY_CONTAINS_SELECT_PATTERN.matcher(groupByPart).find()) {
-      throw new ProcessingException("Invalid group by clause", null, STATUS_CODE_INVALID_GROUP_BY_PART);
+      throw new ProcessingException("Invalid group by clause").withCode(STATUS_CODE_INVALID_GROUP_BY_PART);
     }
   }
 

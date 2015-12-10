@@ -77,7 +77,7 @@ public class ErrorPopup {
       m_cause = (ProcessingException) exception;
     }
     else {
-      m_cause = new ProcessingException(ScoutTexts.get("Error"), ScoutTexts.get("ErrorAndRetryTextDefault"), exception);
+      m_cause = new ProcessingException(ScoutTexts.get("ErrorAndRetryTextDefault"), exception).withTitle(ScoutTexts.get("Error"));
     }
     m_text = m_cause.getStatus().getTitle();
     if (m_text == null || m_text.length() == 0) {
@@ -188,8 +188,8 @@ public class ErrorPopup {
 
   protected void createVetoExceptionMessage(VetoException exception, String msg) {
     m_text = exception.getStatus().getTitle();
-    if (exception.getHtmlBody() != null) {
-      m_htmlDetail = exception.getHtmlBody();
+    if (exception.getHtmlMessage() != null) {
+      m_htmlDetail = exception.getHtmlMessage();
       m_detail = "";
     }
     else if (StringUtility.hasText(exception.getStatus().getBody())) {

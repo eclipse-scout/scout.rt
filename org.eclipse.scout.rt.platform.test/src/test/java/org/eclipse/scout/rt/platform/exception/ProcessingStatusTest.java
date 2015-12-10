@@ -104,7 +104,7 @@ public class ProcessingStatusTest {
     final int code = 22;
     final String exceptionMessage = "ex";
     final String innerStatusMessage = "innerStatus";
-    final ProcessingException pe = new ProcessingException("ExTitle", exceptionMessage, new ProcessingException(new ProcessingStatus(innerStatusMessage, IStatus.OK)));
+    final ProcessingException pe = new ProcessingException(exceptionMessage, new ProcessingException(new ProcessingStatus(innerStatusMessage, IStatus.OK))).withTitle("ExTitle");
     final ProcessingStatus ps = new ProcessingStatus(TITLE, BODY, pe, code, IStatus.INFO);
     final String psString = ps.toString();
     assertContainsStatusStrings(code, psString);
@@ -119,7 +119,7 @@ public class ProcessingStatusTest {
     printException("NullPointer", new NullPointerException("npe message text"));
     ProcessingException processingException = new ProcessingException(new ProcessingStatus("pe message text", IStatus.OK));
     printException("simple ProcessingException", processingException);
-    ProcessingException wrappingProcessingException = new ProcessingException("wrapping PE Title", "wrapping Processing Exception message", processingException);
+    ProcessingException wrappingProcessingException = new ProcessingException("wrapping Processing Exception message", processingException).withTitle("wrapping PE Title");
     printException("wrapped ProcessingException", wrappingProcessingException);
     wrappingProcessingException
         .withContextInfo("a", "1234")

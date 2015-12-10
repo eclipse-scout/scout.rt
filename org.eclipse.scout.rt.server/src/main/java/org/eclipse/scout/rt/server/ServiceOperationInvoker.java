@@ -256,7 +256,11 @@ public class ServiceOperationInvoker {
     Throwable p;
     if (t instanceof VetoException) {
       VetoException ve = (VetoException) t;
-      p = new VetoException(ve.getStatus().getTitle(), ve.getStatus().getBody(), ve.getHtmlBody(), null, ve.getStatus().getCode(), ve.getStatus().getSeverity());
+      p = new VetoException(ve.getStatus().getBody())
+          .withTitle(ve.getStatus().getTitle())
+          .withHtmlMessage(ve.getHtmlMessage())
+          .withCode(ve.getStatus().getCode())
+          .withSeverity(ve.getStatus().getSeverity());
     }
     else {
       p = new ProcessingException(ScoutTexts.get("RequestProblem"));

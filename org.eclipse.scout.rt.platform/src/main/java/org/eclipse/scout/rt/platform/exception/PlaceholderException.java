@@ -81,8 +81,7 @@ public class PlaceholderException extends Exception {
         if (pe == null) {
           pe = new ProcessingException();
         }
-        pe.setStatus(newStatus);
-        transformedThrowable = pe;
+        transformedThrowable = pe.withStatus(newStatus);
       }
       else if (throwable.getClass().getPackage() != null && throwable.getClass().getPackage().getName().startsWith("java.")) {
         transformedThrowable = transformWellKnownException(throwable, cause, null);

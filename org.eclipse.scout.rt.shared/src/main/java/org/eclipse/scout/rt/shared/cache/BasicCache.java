@@ -123,7 +123,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
       resolvedValues = m_resolver.resolveAll(keys);
     }
     catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving keys: %s", CollectionUtility.format(keys), e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving keys: {}", new Object[]{CollectionUtility.format(keys), e}));
       return result;
     }
     for (Iterator<Entry<K, V>> iterator = resolvedValues.entrySet().iterator(); iterator.hasNext();) {
