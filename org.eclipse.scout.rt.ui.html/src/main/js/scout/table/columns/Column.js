@@ -390,6 +390,9 @@ scout.Column.prototype._resolveBackgroundEffectFunc = function() {
 
 scout.Column.prototype._renderBackgroundEffect = function() {
   this.table.filteredRows().forEach(function(row) {
+    if (!row.$row) {
+      return;
+    }
     var cell = this.table.cell(this, row),
       $cell = this.table.$cell(this, row.$row);
 

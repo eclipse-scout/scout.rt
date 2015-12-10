@@ -182,7 +182,7 @@ describe("Table", function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it("considers view ragne", function() {
+    it("considers view range", function() {
       //FIXME CGU implement
     });
 
@@ -1342,13 +1342,13 @@ describe("Table", function() {
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
 
-    it("selection classes after sorting", function() {
+    it("restores selection after sorting", function() {
       var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
         column0 = model.columns[0];
       table.render(session.$entryPoint);
 
-      var $rows = table.$data.children('.table-row');
+      var $rows = table.$rows();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -1372,19 +1372,25 @@ describe("Table", function() {
       table.sort(column0, 'desc');
 
       // after sorting
-      expect([$row1, $row2, $row3]).allToHaveClass('selected');
-      expect($row3).toHaveClass('select-top');
-      expect($row1).toHaveClass('select-middle');
-      expect($row2).toHaveClass('select-bottom');
+      $rows = table.$rows();
+      $row0 = $rows.eq(0);
+      $row1 = $rows.eq(1);
+      $row2 = $rows.eq(2);
+      $row3 = $rows.eq(3);
+      $row4 = $rows.eq(4);
+      expect([$row2, $row3, $row4]).allToHaveClass('selected');
+      expect($row2).toHaveClass('select-top');
+      expect($row3).toHaveClass('select-middle');
+      expect($row4).toHaveClass('select-bottom');
 
       expect([$row0, $row4]).not.allToHaveClass('selected');
-      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row3]).not.anyToHaveClass('select-bottom');
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
 
-    it("selection classes after filtering", function() {
+    it("restores selection after filtering", function() {
       var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
         column0 = model.columns[0];

@@ -264,6 +264,7 @@ scout.Table.prototype._render = function($parent) {
     test.remove();
   }
 
+  this.scrollTop = 0;
   this._calculateRowBorderWidth();
   this._updateRowWidth();
   this._updateRowHeight();
@@ -983,6 +984,14 @@ scout.Table.prototype._updateRowHeight = function() {
   $emptyRow.appendDiv('table-cell').html('&nbsp;');
   this.rowHeight = $emptyRow.outerHeight();
   $emptyRow.remove();
+
+//  var timestamp = new Date().getTime();
+//  this._renderRows(this.rows, 0, this.rows.length - 1);
+////  this.rows.forEach(function(row) {
+////    row.height = row.$row.height();
+////  });
+//  this._removeRows();
+//  console.log('Measuring took ' + (new Date().getTime() - timestamp));
 };
 
 /**
@@ -1042,6 +1051,7 @@ scout.Table.prototype._renderRows = function(rows, fromIndex, toIndex, prepend) 
     var $row = $(rowObject);
     var row = rows[fromIndex + index];
     scout.Table.linkRowToDiv(row, $row);
+    row.height = $row.height();
   });
 
   this._installRows($rows);
@@ -1068,7 +1078,7 @@ scout.Table.prototype._rowsRenderedInfo = function(fromIndex, toIndex) {
 };
 
 scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
-  var fromRow, toRow,
+  var fromRow, toRow, row, i,
     numRowsRemoved = 0;
 
   fromIndex = Math.max(fromIndex, 0);
@@ -1076,8 +1086,13 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
   toIndex = Math.min(toIndex, this.rows.length - 1);
   toRow = this.rows[toIndex];
 
-  for (var i = fromIndex; i <= toIndex; i++) {
-    var row = this.rows[i];
+  for (i = fromIndex; i <= toIndex; i++) {
+    row = this.rows[i];
+    row.height = row.$row.height();
+  }
+
+  for (i = fromIndex; i <= toIndex; i++) {
+    row = this.rows[i];
     row.$row.remove();
     row.$row = null;
     numRowsRemoved++;
@@ -1090,7 +1105,7 @@ scout.Table.prototype._removeRowsFromTo = function(fromIndex, toIndex) {
   } else {
     // Set the new index borders of the rendered rows
     // -> rows were removed on top of the rendered rows
-    if (toIndex < this.viewRangeRendered.to && toIndex > this.viewRangeRendered.from) {
+    if (toIndex < this.viewRangeRendered.to && toIndex >= this.viewRangeRendered.from) {
       this.viewRangeRendered.from = toIndex + 1;
     }
     // -> rows were removed on the bottom of rendered rows
@@ -2060,6 +2075,25 @@ scout.Table.prototype.scrollPageDown = function() {
 
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   scout.scrollbars.scrollTop(this.$data, scrollTop);
+  var viewRange;
+//  var viewport = this._viewportInfo();
+//  if (viewport.lastRow) {
+//
+//  }
+
+//  if (scrollTop > this.scrollTop) {
+//    viewRange = {
+//      from: Math.min(this.rows.length - 1, this.viewRangeRendered.from + 1),
+//      to: Math.min(this.rows.length - 1, this.viewRangeRendered.to + 1)
+//    };
+//  } else {
+//    viewRange = {
+//      from: Math.max(this.viewRangeRendered.from - 1, 0),
+//      to: Math.max(this.viewRangeRendered.to - 1, 0)
+//    };
+//  }
+//  this._renderViewRange(viewRange);
+//  this.scrollTop = scrollTop;
 
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   this._renderViewport();
@@ -2567,6 +2601,15 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   this.$rows(true)
     .css('width', this.rowWidth);
 
+  // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
+  this.rows.forEach(function(row) {
+    if (!row.$row) {
+      row.height = null;
+    }
+  });
+  this._renderFiller();
+  //FIXME CGU detect whether last render row is in view and if yes rerender viewport
+
   this._triggerColumnResized(column);
   this._sendColumnResized(column);
 
@@ -2979,23 +3022,49 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
 };
 
 scout.Table.prototype._onDataScroll = function() {
+  var scrollTop = this.$data[0].scrollTop;
+  if (this.scrollTop === scrollTop) {
+    return;
+  }
   this._renderViewport();
+  this.scrollTop = scrollTop;
 };
 
 scout.Table.prototype._calculateCurrentViewRange = function() {
   var pos, rowIndex,
     scrollTop = this.$data[0].scrollTop,
+    scrollTopDiff = this.scrollTop - scrollTop,
     maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
+
+//  if (scrollTopDif)
 
   if (maxScrollTop === 0) {
     // no scrollbars visible
     rowIndex = 0;
   } else {
-    pos = scrollTop / maxScrollTop,
-    rowIndex = Math.min(Math.floor(pos * this.rows.length), this.rows.length - 1);
+//    pos = scrollTop / maxScrollTop,
+    rowIndex = this._rowIndexAtScrollTop(scrollTop);
+//    rowIndex = Math.min(Math.floor(pos * this.rows.length), this.rows.length - 1);
   }
 
   return this._calculateViewRangeForRowIndex(rowIndex);
+};
+
+scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
+  var height = 0,
+    index = -1;
+  this.rows.some(function(row, i) {
+    var rowHeight = this.rowHeight;
+    if (row.height) {
+      rowHeight = row.height;
+    }
+    height += rowHeight;
+    if (scrollTop < height) {
+      index = i;
+      return true;
+    }
+  }.bind(this));
+  return index;
 };
 
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
@@ -3035,10 +3104,12 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     // Range already rendered -> do nothing
     return;
   }
+  var scrollTop = this.$data[0].scrollTop;
+
   // FIXME CGU create intersect methods
   if (viewRange.from > this.viewRangeRendered.from) {
     if (this.viewRangeRendered.from !== -1) {
-      this._removeRowsFromTo(this.viewRangeRendered.from, Math.min(viewRange.from, this.viewRangeRendered.to));
+      this._removeRowsFromTo(this.viewRangeRendered.from, Math.max(Math.min(viewRange.from - 1, this.viewRangeRendered.to), 0));
     }
   }
   if (viewRange.to > this.viewRangeRendered.to) {
@@ -3059,11 +3130,21 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this._renderRows(this.rows, viewRange.from, to, true);
   }
 
+  this._renderFiller();
+
+  this.$data[0].scrollTop = scrollTop;
+
+  this.invalidateLayoutTree();
+  this.viewRangeDirty = false;
+};
+
+scout.Table.prototype._renderFiller = function() {
   if (!this.$fillBefore) {
     this.$fillBefore = this.$data.prependDiv('table-data-fill');
   }
 
-  var fillBeforeHeight = this.viewRangeRendered.from * this.rowHeight;
+  //var fillBeforeHeight = this.viewRangeRendered.from * this.rowHeight;
+  var fillBeforeHeight = this._calculateFillerHeight(0, this.viewRangeRendered.from - 1);
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.cssWidth(this.rowWidth);
   $.log.trace('FillBefore height: ' + fillBeforeHeight);
@@ -3072,13 +3153,101 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this.$fillAfter = this.$data.appendDiv('table-data-fill');
   }
 
-  var fillAfterHeight = (this.rows.length - (this.viewRangeRendered.to + 1)) * this.rowHeight;
+  //var fillAfterHeight = (this.rows.length - (this.viewRangeRendered.to + 1)) * this.rowHeight;
+  var fillAfterHeight = this._calculateFillerHeight(this.viewRangeRendered.to + 1, this.rows.length - 1);
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.trace('FillAfter height: ' + fillAfterHeight);
+};
 
-  this.invalidateLayoutTree();
-  this.viewRangeDirty = false;
+scout.Table.prototype._calculateFillerHeight = function(from, to) {
+  var totalHeight = 0;
+  for (var i = from; i <= to; i++) {
+    var row = this.rows[i],
+      height = this.rowHeight;
+
+    if (row.height) {
+      height = row.height;
+    }
+    totalHeight += height;
+  }
+  return totalHeight;
+};
+
+/**
+ * Returns viewport sensitive information containing the first and last visible row in the viewport.
+ */
+scout.Table.prototype._viewportInfo = function() {
+  var x, y, viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
+    document = this.$data.document(true),
+    viewport = {},
+    rows = this.filteredRows();
+
+  if (rows.length === 0) {
+    return viewport;
+  }
+
+  viewportBounds = scout.graphics.offsetBounds(this.$data);
+  dataInsets = scout.graphics.getInsets(this.$data);
+  dataMarginTop = this.$data.cssMarginTop();
+  viewportBounds = viewportBounds.subtract(dataInsets);
+
+  // if data has a negative margin, adjust viewport otherwise a selected first row will never be in the viewport
+  if (dataMarginTop < 0) {
+    viewportBounds.y -= Math.abs(dataMarginTop);
+    viewportBounds.height += Math.abs(dataMarginTop);
+  }
+
+  // get first element at the top of the viewport
+  x = viewportBounds.x + 1;
+  y = viewportBounds.y + 1;
+
+  firstRow = this._findFirstRowInViewport(viewportBounds);
+  lastRow = this._findLastRowInViewport(rows.indexOf(firstRow), viewportBounds);
+
+  viewport.firstRow = firstRow;
+  viewport.lastRow = lastRow;
+  return viewport;
+};
+
+scout.Table.prototype._findFirstRowInViewport = function(viewportBounds) {
+  var rows = this.filteredRows();
+  return scout.arrays.find(rows, function(row, i) {
+    var rowOffset,
+      $row = row.$row;
+
+    if (!row.$row) {
+      // If row is not rendered, it cannot be part of the view port -> check next row
+      return false;
+    }
+    rowOffset = $row.offset();
+    // If the row is fully visible in the viewport -> break and return the row
+    return viewportBounds.contains(rowOffset.left, rowOffset.top);
+  });
+};
+
+scout.Table.prototype._findLastRowInViewport = function(startRowIndex, viewportBounds) {
+  var rows = this.filteredRows();
+  if (startRowIndex === rows.length - 1) {
+    return rows[startRowIndex];
+  }
+  return scout.arrays.findFromNext(rows, startRowIndex, function(row, i) {
+    var nextRowOffsetBounds, $nextRow,
+      nextRow = rows[i + 1];
+
+    if (!nextRow) {
+      // If next row is not available (row is the last row) -> break and return current row
+      return true;
+    }
+    $nextRow = nextRow.$row;
+    if (!$nextRow) {
+      // If next row is not rendered anymore, current row has to be the last in the viewport
+      return true;
+    }
+    nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
+    // If the next row is not fully visible in the viewport -> break and return current row
+    return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height);
+  });
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {

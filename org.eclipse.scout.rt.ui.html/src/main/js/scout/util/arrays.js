@@ -215,7 +215,7 @@ scout.arrays = {
     }
     for (var i = 0; i < arr.length; i++) {
       var element = arr[i];
-      if (predicate(element)) {
+      if (predicate(element, i)) {
         return element;
       }
     }
