@@ -91,7 +91,9 @@ public @interface ConfigProperty {
    */
   String CODE_TYPE = "CODE_TYPE";
 
-  // FIXME mvi: from aho without text
+  /**
+   * Class&lt;? extends ICodeRow&lt;CODE_ID&gt;&gt;
+   */
   String CODE_ROW = "CODE_ROW";
   /**
    * int
