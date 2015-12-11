@@ -15,17 +15,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests for {@link ProcessingStatus}
  */
 public class ProcessingStatusTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ProcessingStatusTest.class);
 
   private IProcessingStatus m_infoStatus;
   private IProcessingStatus m_warningStatus;
@@ -111,37 +106,6 @@ public class ProcessingStatusTest {
     assertContainsExceptionStrings(exceptionMessage, psString);
     assertFalse(psString.contains(innerStatusMessage));
     assertTrue(psString.contains("INFO"));
-  }
-
-  @Test
-  @Ignore("This test is used only for verifying how exceptions are formatted using toString(), printStackTrace() and a logger instance.")
-  public void testExceptionFormatting() {
-    printException("NullPointer", new NullPointerException("npe message text"));
-    ProcessingException processingException = new ProcessingException(new ProcessingStatus("pe message text", IStatus.OK));
-    printException("simple ProcessingException", processingException);
-    ProcessingException wrappingProcessingException = new ProcessingException("wrapping Processing Exception message", processingException).withTitle("wrapping PE Title");
-    printException("wrapped ProcessingException", wrappingProcessingException);
-    wrappingProcessingException
-        .withContextInfo("a", "1234")
-        .withContextInfo("b", "foo");
-    processingException
-        .withContextInfo("foo", "bar")
-        .withContextInfo("status", "interrupted");
-    printException("wrapped ProcessingException with status", wrappingProcessingException);
-  }
-
-  private void printException(String msg, Throwable t) {
-    System.err.println("\n\n\n==============");
-    System.err.println("formatting " + msg);
-    System.err.println("==============");
-    System.err.println("Sys.err.println(t)");
-    System.err.println(t);
-    System.err.println("-------");
-    System.err.println("t.printStackTrace()");
-    t.printStackTrace();
-    System.err.println("-------");
-    System.err.println("LOG.error(\"logger message\", t)");
-    LOG.error("logger message", t);
   }
 
   private void assertContainsStatusStrings(final int code, final String psString) {

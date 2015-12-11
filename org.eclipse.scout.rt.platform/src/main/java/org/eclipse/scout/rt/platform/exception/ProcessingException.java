@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.exception;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -55,14 +54,14 @@ public class ProcessingException extends PlatformException {
    */
   public ProcessingException(final String message, final Object... args) {
     super(message, args);
-    m_status = new ProcessingStatus(null, super.getMessage(), this, 0, IProcessingStatus.ERROR);
+    m_status = new ProcessingStatus(null, super.getDisplayMessage(), this, 0, IProcessingStatus.ERROR);
   }
 
   /**
    * Creates a {@link ProcessingException} based on the given {@link IProcessingStatus}.
    */
   public ProcessingException(final IProcessingStatus status) {
-    super(status.getMessage(), status.getException());
+    super(status.getBody(), status.getException());
     withStatus(status);
   }
 
@@ -123,36 +122,11 @@ public class ProcessingException extends PlatformException {
     return this;
   }
 
-  /**
-   * Returns the bare message without severity, code or context messages. This method should be used to show the
-   * exception to the user.
-   *
-   * @since 5.2
-   */
-  public String getDisplayMessage() {
-    return super.getMessage();
-  }
-
   @Override
-  public String getMessage() {
-    // custom getMessage method to get the same results from pe.toString(), pe.printStackTrace() and using a logger
-    final List<String> infos = new ArrayList<>();
-
-    // status
-    infos.add(String.format("severity=%s", m_status.getSeverityName()));
-    if (m_status.getCode() != 0) {
-      infos.add(String.format("code=%s", m_status.getCode()));
-    }
-
-    // context-infos
-    final String contextInfos = StringUtility.join(", ", getContextInfos());
-    if (StringUtility.hasText(contextInfos)) {
-      infos.add(String.format("context={%s}", contextInfos));
-    }
-
-    // message
-    final String msg = m_status.getMessage();
-    return String.format("%s [%s]", StringUtility.hasText(msg) ? msg : "<empty>", StringUtility.join(", ", infos));
+  protected String getAdditionalContextInfos() {
+    return StringUtility.join(", ",
+        String.format("severity=%s", m_status.getSeverityName()),
+        m_status.getCode() == 0 ? null : String.format("code=%s", m_status.getCode()));
   }
 
   /**

@@ -124,8 +124,8 @@ public class PlaceholderException extends Exception {
     }
 
     final String message;
-    if (processingStatus != null && processingStatus.getMessage() != null) {
-      message = processingStatus.getMessage();
+    if (processingStatus != null && processingStatus.getBody() != null) {
+      message = processingStatus.getBody();
     }
     else {
       message = throwable.getMessage();

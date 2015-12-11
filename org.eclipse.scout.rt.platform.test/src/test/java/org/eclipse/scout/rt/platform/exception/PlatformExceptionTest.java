@@ -16,9 +16,15 @@ import static org.junit.Assert.assertSame;
 
 import java.util.Arrays;
 
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlatformExceptionTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PlatformExceptionTest.class);
 
   @Test
   public void testMessageWithArgs() {
@@ -93,5 +99,52 @@ public class PlatformExceptionTest {
         .withContextInfo("key3", "value 3");
 
     assertEquals(Arrays.asList("key1=value 1", "key2=value 2", "key3=value 3"), exception.getContextInfos());
+  }
+
+  @Test
+  @Ignore("This test is used only for verifying how exceptions are formatted using toString(), printStackTrace() and a logger instance.")
+  public void testExceptionFormatting() {
+    printException("NullPointer", new NullPointerException("npe message text"));
+
+    // platform exception
+    PlatformException platformException = new PlatformException("platform exception test");
+    printException("simple PlatformException", platformException);
+
+    // platform exception with context infos
+    platformException
+        .withContextInfo("a", "1234")
+        .withContextInfo("replacement", "value-{}", "1234");
+    printException("simple PlatformException with context infos", platformException);
+
+    // processing exception
+    ProcessingException processingException = new ProcessingException(new ProcessingStatus("pe message text", IStatus.OK));
+    printException("simple ProcessingException", processingException);
+
+    // processing exception with title
+    ProcessingException wrappingProcessingException = new ProcessingException("wrapping Processing Exception message", processingException).withTitle("wrapping PE Title");
+    printException("wrapped ProcessingException", wrappingProcessingException);
+
+    // with context infos
+    wrappingProcessingException
+        .withContextInfo("a", "1234")
+        .withContextInfo("b", "foo");
+    processingException
+        .withContextInfo("foo", "bar")
+        .withContextInfo("status", "interrupted");
+    printException("wrapped ProcessingException with status", wrappingProcessingException);
+  }
+
+  private void printException(String msg, Throwable t) {
+    System.err.println("\n\n\n==============");
+    System.err.println("formatting " + msg);
+    System.err.println("==============");
+    System.err.println("Sys.err.println(t)");
+    System.err.println(t);
+    System.err.println("-------");
+    System.err.println("t.printStackTrace()");
+    t.printStackTrace();
+    System.err.println("-------");
+    System.err.println("LOG.error(\"logger message\", t)");
+    LOG.error("logger message", t);
   }
 }

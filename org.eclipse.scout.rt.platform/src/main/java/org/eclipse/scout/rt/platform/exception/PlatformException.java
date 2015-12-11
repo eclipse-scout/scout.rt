@@ -11,13 +11,9 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import java.io.Serializable;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.Subject;
-
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -56,9 +52,6 @@ public class PlatformException extends RuntimeException implements Serializable 
    */
   public PlatformException(final String message, final Object... args) {
     super(MessageFormatter.arrayFormat(message, args).getMessage(), MessageFormatter.arrayFormat(message, args).getThrowable());
-
-    // Associate the current user with this exception.
-    this.withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
   }
 
   /**
@@ -119,5 +112,31 @@ public class PlatformException extends RuntimeException implements Serializable 
    */
   public void consume() {
     m_consumed = true;
+  }
+
+  /**
+   * Returns the bare message without context messages. This method should be used to show the exception to the user.
+   */
+  public String getDisplayMessage() {
+    return super.getMessage();
+  }
+
+  @Override
+  public String getMessage() {
+    final String msg = super.getMessage();
+    final String formattedMessage = StringUtility.hasText(msg) ? msg : "<empty>";
+
+    String contextInfos = StringUtility.join(", ", getAdditionalContextInfos(), StringUtility.join(", ", getContextInfos()));
+    if (StringUtility.isNullOrEmpty(contextInfos)) {
+      return formattedMessage;
+    }
+    return String.format("%s [%s]", formattedMessage, contextInfos);
+  }
+
+  /**
+   * @return Returns additional context information available on this exception.
+   */
+  protected String getAdditionalContextInfos() {
+    return null;
   }
 }

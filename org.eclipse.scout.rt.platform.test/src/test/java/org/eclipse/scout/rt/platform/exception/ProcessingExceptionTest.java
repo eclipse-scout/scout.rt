@@ -94,7 +94,7 @@ public class ProcessingExceptionTest {
     assertFalse(exText.contains(m_title));
     assertTrue(exText.contains(m_body));
     assertFalse(exText.contains("VetoException"));
-    assertTrue(exText.contains("{key1=value1, key2=value2}"));
+    assertTrue(exText.contains("key1=value1, key2=value2"));
   }
 
   @Test
