@@ -454,6 +454,16 @@ public final class SecurityUtility {
   }
 
   /**
+   * Generates a new base64 encoded key pair and prints it on standard out.
+   */
+  public static void main(String[] args) {
+    KeyPairBytes keyPair = generateKeyPair();
+    System.out.format("base64 encoded key pair:\n  priavte key: %s\n  public key:  %s\n",
+        Base64Utility.encode(keyPair.getPrivateKey()),
+        Base64Utility.encode(keyPair.getPublicKey()));
+  }
+
+  /**
    * Public and private key bytes.
    */
   public static final class KeyPairBytes {
