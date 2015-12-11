@@ -53,7 +53,7 @@ public class FinalValue<VALUE> {
    */
   public void set(final VALUE value) {
     synchronized (m_lock) {
-      Assertions.assertFalse(m_initialized, "%s can only be set once.", getClass().getSimpleName());
+      Assertions.assertFalse(m_initialized, "{} can only be set once.", getClass().getSimpleName());
       setIfAbsent(value);
     }
   }

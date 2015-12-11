@@ -75,7 +75,7 @@ public class Mutex implements IMutex {
 
   @Override
   public void acquire(final IFuture<?> mutexTask, final QueuePosition queuePosition) {
-    Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected=%s, actual=%s]", this, mutexTask.getJobInput().getMutex());
+    Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected={}, actual={}]", this, mutexTask.getJobInput().getMutex());
 
     final Object acquisitionLock = new Object();
     final AtomicBoolean waitingForMutex = new AtomicBoolean(true);
@@ -115,7 +115,7 @@ public class Mutex implements IMutex {
 
   @Override
   public boolean compete(final IFuture<?> mutexTask, final QueuePosition queuePosition, final IMutexAcquiredCallback mutexAcquiredCallback) {
-    Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected=%s, actual=%s]", this, mutexTask.getJobInput().getMutex());
+    Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected={}, actual={}]", this, mutexTask.getJobInput().getMutex());
 
     boolean mutexFree;
     m_writeLock.lock();
@@ -154,8 +154,8 @@ public class Mutex implements IMutex {
 
   @Override
   public void release(final IFuture<?> mutexTask) {
-    Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected=%s, actual=%s]", this, mutexTask.getJobInput().getMutex());
-    Assertions.assertSame(mutexTask, m_mutexOwner, "Task does not own the mutex  [mutexOwner=%s, task=%s]", m_mutexOwner, mutexTask);
+    Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected={}, actual={}]", this, mutexTask.getJobInput().getMutex());
+    Assertions.assertSame(mutexTask, m_mutexOwner, "Task does not own the mutex  [mutexOwner={}, task={}]", m_mutexOwner, mutexTask);
 
     final AcquisitionTask acquisitionTask;
 

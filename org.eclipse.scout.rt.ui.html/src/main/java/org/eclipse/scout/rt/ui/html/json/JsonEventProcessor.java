@@ -31,7 +31,7 @@ public class JsonEventProcessor {
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
-    Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread=%s, request=%s, response=%s]",
+    Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread={}, request={}, response={}]",
         Thread.currentThread().getName(), request, response);
     for (final JsonEvent event : request.getEvents()) {
       processEvent(event, response);

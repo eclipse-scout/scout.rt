@@ -121,7 +121,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     m_serviceClazz = resolveServiceClass();
     m_portTypeClazz = resolvePortClass();
     m_webServiceClientAnnotation =
-        Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '%s' annotation on webservice [service=%s]", AbstractJaxWsClient.class.getSimpleName(), m_serviceClazz.getName());
+        Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '{}' annotation on webservice [service={}]", AbstractJaxWsClient.class.getSimpleName(), m_serviceClazz.getName());
   }
 
   @PostConstruct
@@ -132,7 +132,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     m_connectTimeout = CONFIG.getPropertyValue(getConfiguredConnectTimeoutProperty());
     m_readTimeout = CONFIG.getPropertyValue(getConfiguredReadTimeoutProperty());
 
-    m_wsdlLocation = resolveWsdlUrl(Assertions.assertNotNullOrEmpty(m_webServiceClientAnnotation.wsdlLocation(), "Missing 'wsdlLocation' on %s annotation. Use argument 'wsdlLocation' when generating webservice stub. [service=%s]",
+    m_wsdlLocation = resolveWsdlUrl(Assertions.assertNotNullOrEmpty(m_webServiceClientAnnotation.wsdlLocation(), "Missing 'wsdlLocation' on {} annotation. Use argument 'wsdlLocation' when generating webservice stub. [service={}]",
         WebServiceClient.class.getSimpleName(), m_serviceClazz.getName()));
     m_targetNamespace = m_webServiceClientAnnotation.targetNamespace();
     m_serviceName = m_webServiceClientAnnotation.name();
@@ -266,7 +266,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   protected URL resolveWsdlUrl(final String location) {
     // ensure root relative path, so that the WSDL file is not looked for in this class's location.
     final String wsdlLocation = location.startsWith("/") ? location : "/" + location;
-    return Assertions.assertNotNull(getClass().getResource(wsdlLocation), "Failed to locate WSDL file [wsdlLocation=%s, service=%s]", wsdlLocation, m_serviceClazz.getName());
+    return Assertions.assertNotNull(getClass().getResource(wsdlLocation), "Failed to locate WSDL file [wsdlLocation={}, service={}]", wsdlLocation, m_serviceClazz.getName());
   }
 
   /**
@@ -280,7 +280,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
       candidate = ((Class<?>) candidate).getGenericSuperclass();
     }
 
-    Assertions.assertTrue(candidate instanceof ParameterizedType, "Unexpected: no parameterized type found in super hierarchy of %s", getClass().getName());
+    Assertions.assertTrue(candidate instanceof ParameterizedType, "Unexpected: no parameterized type found in super hierarchy of {}", getClass().getName());
 
     @SuppressWarnings("unchecked")
     final Class<T>[] types = TypeCastUtility.castValue(((ParameterizedType) candidate).getActualTypeArguments(), Class[].class);

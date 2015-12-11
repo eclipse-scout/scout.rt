@@ -17,7 +17,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +43,7 @@ public class AssertionsTest {
   public void testInstanceCustomMessage() {
     expectedEx.expect(AssertionException.class);
     expectedEx.expectMessage("custom arg1");
-    Assertions.assertInstance(new Object(), String.class, "custom %s", "arg1");
+    Assertions.assertInstance(new Object(), String.class, "custom {}", "arg1");
   }
 
   @Test
@@ -266,7 +265,7 @@ public class AssertionsTest {
 
     // 2. Test with message with message arguments
     try {
-      Assertions.fail("failure [%s, %s]", "A", "B");
+      Assertions.fail("failure [{}, {}]", "A", "B");
       fail();
     }
     catch (AssertionException e) {
@@ -284,7 +283,7 @@ public class AssertionsTest {
 
     // 4. Test with message and null argument
     try {
-      Assertions.fail("failure %s", (Object) null);
+      Assertions.fail("failure {}", (Object) null);
       fail();
     }
     catch (AssertionException e) {

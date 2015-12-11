@@ -368,7 +368,7 @@ public class ClientNotificationRegistry {
   }
 
   public void putTransactional(ClientNotificationMessage message) {
-    ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
+    ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification {}", message);
     try {
       ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
       if (txMember == null) {

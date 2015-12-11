@@ -94,7 +94,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   @Override
   public IMessageBox withDisplayParent(IDisplayParent displayParent) {
-    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because message box is already showing [messageBox=%s]", this);
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because message box is already showing [messageBox={}]", this);
 
     if (displayParent == null) {
       displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);

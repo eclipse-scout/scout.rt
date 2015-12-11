@@ -2697,7 +2697,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setModal(boolean modal) {
-    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'modal' cannot be changed because Form is already showing [form=%s]", this);
+    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'modal' cannot be changed because Form is already showing [form={}]", this);
     m_modal.set(modal, true);
   }
 
@@ -2723,7 +2723,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setDisplayHint(int displayHint) {
-    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form=%s]", this);
+    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form={}]", this);
 
     switch (displayHint) {
       case DISPLAY_HINT_DIALOG:

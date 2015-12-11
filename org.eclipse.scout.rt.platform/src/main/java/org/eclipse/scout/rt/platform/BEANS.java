@@ -38,7 +38,7 @@ public final class BEANS {
    *           When no instance is available or when multiple instances are registered.
    */
   public static <T> T get(Class<T> beanClazz) {
-    return Assertions.assertNotNull(opt(beanClazz), "no instance found for query: %s", beanClazz);
+    return Assertions.assertNotNull(opt(beanClazz), "no instance found for query: {}", beanClazz);
   }
 
   /**

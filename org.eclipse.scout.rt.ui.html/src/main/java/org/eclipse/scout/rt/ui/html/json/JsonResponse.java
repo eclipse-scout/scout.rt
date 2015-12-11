@@ -189,7 +189,7 @@ public class JsonResponse {
   }
 
   public void assignSequenceNo(Long sequenceNo) {
-    Assertions.assertNull(m_sequenceNo, "SequenceNo cannot be changed once it has been assigned (existing value=%d, new value=%d)", m_sequenceNo, sequenceNo);
+    Assertions.assertNull(m_sequenceNo, "SequenceNo cannot be changed once it has been assigned (existing value={}, new value={})", m_sequenceNo, sequenceNo);
     m_sequenceNo = sequenceNo;
   }
 

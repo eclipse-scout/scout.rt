@@ -203,7 +203,7 @@ public class BeanManagerImplementor implements IBeanManager {
   public <T> IBean<T> getBean(Class<T> beanClazz) {
     IBean<T> result = optBean(beanClazz);
     if (result == null) {
-      return Assertions.fail("no instances found for query: %s", beanClazz);
+      return Assertions.fail("no instances found for query: {}", beanClazz);
     }
     return result;
   }
@@ -219,7 +219,7 @@ public class BeanManagerImplementor implements IBeanManager {
       return null;
     }
     else {
-      return Assertions.fail("multiple instances found for query: %s %s", beanClazz, list);
+      return Assertions.fail("multiple instances found for query: {} {}", beanClazz, list);
     }
   }
 

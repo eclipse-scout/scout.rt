@@ -57,7 +57,7 @@ public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> 
       case MANDATORY:
         return mandatory(m_callerTransaction);
       default:
-        return Assertions.fail("Unsupported transaction scope [%s]", m_transactionScope);
+        return Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
     }
   }
 

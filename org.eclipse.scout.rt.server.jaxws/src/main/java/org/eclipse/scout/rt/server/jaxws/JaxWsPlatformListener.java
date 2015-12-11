@@ -57,7 +57,7 @@ public class JaxWsPlatformListener implements IPlatformListener {
 
     try {
       final Class<?> jaxwsImplementorClazz = Class.forName(jaxwsImplementor);
-      Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(jaxwsImplementorClazz), "Implementor class must be of type '%s'.", JaxWsImplementorSpecifics.class.getName());
+      Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(jaxwsImplementorClazz), "Implementor class must be of type '{}'.", JaxWsImplementorSpecifics.class.getName());
 
       beanManager.unregisterClass(jaxwsImplementorClazz); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
       beanManager.registerBean(new BeanMetaData(jaxwsImplementorClazz).withReplace(true));

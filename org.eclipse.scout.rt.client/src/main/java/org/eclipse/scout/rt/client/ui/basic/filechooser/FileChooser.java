@@ -72,7 +72,7 @@ public class FileChooser implements IFileChooser {
 
   @Override
   public void setDisplayParent(IDisplayParent displayParent) {
-    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because FileChooser is already showing [fileChooser=%s]", this);
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because FileChooser is already showing [fileChooser={}]", this);
 
     if (displayParent == null) {
       displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);

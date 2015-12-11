@@ -100,7 +100,7 @@ public class ServerSessionProvider {
       return (SESSION) serverSession;
     }
     catch (final ClassCastException e) {
-      throw new ProcessingException(String.format("Wrong session class [actual=%s]", serverSession.getClass().getName()), e);
+      throw new ProcessingException("Wrong session class [actual={}]", new Object[]{serverSession.getClass().getName()}, e);
     }
   }
 }

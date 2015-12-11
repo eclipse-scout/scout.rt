@@ -175,7 +175,7 @@ class DonePromise<RESULT> {
    * @see Future#get(long, TimeUnit)
    */
   public RESULT get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout=%s]", timeout);
+    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
 
     m_lock.lockInterruptibly();
     try {

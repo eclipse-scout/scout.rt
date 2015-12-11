@@ -380,7 +380,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // job already in 'done'-state.
     }
 
-    Assertions.assertNotSame(currentMutex, getMutex(), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex=%s]", currentMutex);
+    Assertions.assertNotSame(currentMutex, getMutex(), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex={}]", currentMutex);
   }
 
   /**

@@ -54,7 +54,7 @@ public class ClientRunContextStatement extends Statement {
   private void evaluateWithClientRunContext() throws Throwable {
     final Subject currentSubject = Subject.getSubject(AccessController.getContext());
     if (currentSubject == null) {
-      Assertions.fail("Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
+      Assertions.fail("Subject must not be null. Use the annotation '{}' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
     }
 
     final IBean clientSessionBean = BEANS.getBeanManager().registerBean(new BeanMetaData(m_clientSessionAnnotation.value()).withOrder(-Long.MAX_VALUE));

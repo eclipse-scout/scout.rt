@@ -88,7 +88,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
         value = m_resolver.resolve(key);
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException(String.format("Failed resolving key: %s", key), e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving key: {}", key, e));
       }
       if (value != null) {
         if (m_atomicInsertion) {

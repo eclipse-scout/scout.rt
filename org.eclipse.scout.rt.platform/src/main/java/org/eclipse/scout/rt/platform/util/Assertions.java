@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+
 /**
  * Helper class to ensure the application's assumptions about expected values.
  *
@@ -40,9 +42,9 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return the given value if <code>null</code>.
    * @throws AssertionException
    *           if the given value is not <code>null</code>.
@@ -73,9 +75,9 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return the given value if not <code>null</code>.
    * @throws AssertionException
    *           if the given value is <code>null</code>.
@@ -112,9 +114,9 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return the given value if not <code>null</code> or <code>empty</code>.
    * @throws AssertionException
    *           if the given value is <code>null</code> or <code>empty</code>.
@@ -145,9 +147,9 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return always <code>true</code>.
    * @throws AssertionException
    *           if the given value is <code>false</code>.
@@ -178,9 +180,9 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return always <code>false</code>.
    * @throws AssertionException
    *           if the given value is <code>true</code>.
@@ -204,7 +206,7 @@ public final class Assertions {
    *           if <code>value1</code> is not equals with <code>value2</code>.
    */
   public static <T> T assertEquals(final T value1, final Object value2) {
-    return assertEquals(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+    return assertEquals(value1, value2, "expected value1 to be equals with value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -215,9 +217,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if equals with <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not equals with <code>value2</code>.
@@ -241,7 +243,7 @@ public final class Assertions {
    *           if <code>value1</code> is equals with <code>value2</code>.
    */
   public static <T> T assertNotEquals(final T value1, final Object value2) {
-    return assertNotEquals(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+    return assertNotEquals(value1, value2, "expected value1 to be equals with value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -252,9 +254,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if not equals with <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is equals with <code>value2</code>.
@@ -278,7 +280,7 @@ public final class Assertions {
    *           if <code>value1</code> is not same as <code>value2</code>.
    */
   public static <T> T assertSame(final T value1, final Object value2) {
-    return assertSame(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+    return assertSame(value1, value2, "expected value1 to be equals with value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -289,9 +291,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if same as <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not same as <code>value2</code>.
@@ -315,7 +317,7 @@ public final class Assertions {
    *           if <code>value1</code> is same as <code>value2</code>.
    */
   public static <T> T assertNotSame(final T value1, final Object value2) {
-    return assertNotSame(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+    return assertNotSame(value1, value2, "expected value1 to be equals with value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -326,9 +328,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if not same as <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is same as <code>value2</code>.
@@ -352,7 +354,7 @@ public final class Assertions {
    *           if <code>value1</code> is not equal <code>value2</code>.
    */
   public static <T extends Comparable<T>> T assertEqual(final T value1, final T value2) {
-    return assertEqual(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+    return assertEqual(value1, value2, "expected value1 to be equals with value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -363,9 +365,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if equal <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not equal <code>value2</code>.
@@ -389,7 +391,7 @@ public final class Assertions {
    *           if <code>value1</code> is not greater <code>value2</code>.
    */
   public static <T extends Comparable<T>> T assertGreater(final T value1, final T value2) {
-    return assertGreater(value1, value2, "expected value1 to be '>' value2 [value1=%s, value2=%s]", value1, value2);
+    return assertGreater(value1, value2, "expected value1 to be '>' value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -400,9 +402,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if greater <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not greater <code>value2</code>.
@@ -426,7 +428,7 @@ public final class Assertions {
    *           if <code>value1</code> is not greater or equals <code>value2</code>.
    */
   public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, final T value2) {
-    return assertGreaterOrEqual(value1, value2, "expected value1 to be '>=' value2 [value1=%s, value2=%s]", value1, value2);
+    return assertGreaterOrEqual(value1, value2, "expected value1 to be '>=' value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -437,9 +439,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if greater or equal <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not greater or equal <code>value2</code>.
@@ -463,7 +465,7 @@ public final class Assertions {
    *           if <code>value1</code> is not less <code>value2</code>.
    */
   public static <T extends Comparable<T>> T assertLess(final T value1, final T value2) {
-    return assertLess(value1, value2, "expected value1 to be '<' value2 [value1=%s, value2=%s]", value1, value2);
+    return assertLess(value1, value2, "expected value1 to be '<' value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -474,9 +476,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if less <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not less <code>value2</code>.
@@ -500,7 +502,7 @@ public final class Assertions {
    *           if <code>value1</code> is not less or equal <code>value2</code>.
    */
   public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, final T value2) {
-    return assertLessOrEqual(value1, value2, "expected value1 to be '<=' value2 [value1=%s, value2=%s]", value1, value2);
+    return assertLessOrEqual(value1, value2, "expected value1 to be '<=' value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
@@ -511,9 +513,9 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          arguments to be used in the message.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>value1</code> if less or equal <code>value2</code>.
    * @throws AssertionException
    *           if <code>value1</code> is not less or equal <code>value2</code>.
@@ -541,7 +543,7 @@ public final class Assertions {
    *           if <code>instance</code> is not an instance of <code>clazz</code>
    */
   public static <T> T assertInstance(final T value, final Class<?> clazz) {
-    return assertInstance(value, clazz, "expected 'value' to be an instance of 'class' [value=%s, class=%s]", value, clazz);
+    return assertInstance(value, clazz, "expected 'value' to be an instance of 'class' [value={}, class={}]", value, clazz);
   }
 
   /**
@@ -551,6 +553,10 @@ public final class Assertions {
    *          instance to be tested.
    * @param clazz
    *          class to be tested against.
+   * @param msg
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
+   * @param msgArgs
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    * @return <code>instance</code>, if it is an instance of <code>clazz</code>
    * @throws AssertionException
    *           if <code>instance</code> is not an instance of <code>clazz</code>
@@ -566,25 +572,24 @@ public final class Assertions {
    * To always throw an {@code AssertionException}.
    *
    * @param msg
-   *          the message describing the assertion.
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          message arguments to be referenced in the given message by <code>%s</code>.
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public static <T> T fail(final String msg, final Object... msgArgs) {
     final String message = (msg != null ? String.format(msg, msgArgs) : "n/a");
-    throw new AssertionException(String.format("Assertion error: %s", message));
+    throw new AssertionException("Assertion error: " + message, msgArgs);
   }
 
   /**
    * Indicates an assertion error about the application's assumptions about expected values.
    */
-  public static class AssertionException extends RuntimeException {
+  public static class AssertionException extends PlatformException {
 
     private static final long serialVersionUID = 1L;
 
     public AssertionException(final String msg, final Object... msgArgs) {
-      super(String.format(msg, msgArgs));
+      super(msg, msgArgs);
     }
   }
-
 }

@@ -46,7 +46,7 @@ public class JsonRequest {
    */
   public JsonRequest(JSONObject request) {
     final RequestType requestType = RequestType.valueOf(request);
-    Assertions.assertTrue(RequestType.PING_REQUEST.equals(requestType) || request.has(PROP_UI_SESSION_ID), "Missing property '%s' in request %s", PROP_UI_SESSION_ID, request);
+    Assertions.assertTrue(RequestType.PING_REQUEST.equals(requestType) || request.has(PROP_UI_SESSION_ID), "Missing property '{}' in request {}", PROP_UI_SESSION_ID, request);
 
     m_requestType = requestType;
     m_request = request;

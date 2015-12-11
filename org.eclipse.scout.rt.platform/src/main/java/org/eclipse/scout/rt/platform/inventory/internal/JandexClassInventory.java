@@ -47,7 +47,7 @@ public class JandexClassInventory implements IClassInventory {
   @Override
   public Set<IClassInfo> getKnownAnnotatedTypes(Class<?> annotation) {
     Assertions.assertNotNull(annotation);
-    Assertions.assertTrue(annotation.isAnnotation(), "given class is not an annotation: %s", annotation);
+    Assertions.assertTrue(annotation.isAnnotation(), "given class is not an annotation: {}", annotation);
     Collection<AnnotationInstance> annotationInstances = m_index.getAnnotations(DotName.createSimple(annotation.getName()));
     return convertAnnotationInstance(annotationInstances);
   }

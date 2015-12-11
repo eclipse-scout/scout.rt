@@ -180,7 +180,7 @@ public class FutureSet {
    *           if the wait timed out.
    */
   public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
-    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout=%s]", timeout);
+    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
 
     // Wait until all Futures matching the filter are 'done' or the deadline is passed.
     m_writeLock.lockInterruptibly();

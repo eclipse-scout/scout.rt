@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
@@ -491,7 +491,7 @@ public class CsvHelper {
         return f.parseObject(text.trim());
       }
       catch (ParseException e) {
-        throw new ProcessingException(String.format("Cannot parse '%s' using format '%s'", text, f), e);
+        throw new ProcessingException("Cannot parse '{}' using format '{}'", text, f, e);
       }
     }
     else {

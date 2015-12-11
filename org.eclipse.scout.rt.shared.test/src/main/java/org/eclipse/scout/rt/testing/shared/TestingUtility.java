@@ -86,7 +86,7 @@ public final class TestingUtility {
       return null;
     }
     boolean isMock = Mockito.mockingDetails(beanData.getBeanClazz()).isMock();
-    Assertions.assertFalse(isMock && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]",
+    Assertions.assertFalse(isMock && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock={}]",
         beanData.getBeanClazz());
     if (beanData.getBeanAnnotation(Order.class) == null) {
       beanData.withOrder(TESTING_BEAN_ORDER);

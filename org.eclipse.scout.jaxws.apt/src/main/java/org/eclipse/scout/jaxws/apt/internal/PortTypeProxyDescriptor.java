@@ -57,7 +57,7 @@ public class PortTypeProxyDescriptor {
   public PortTypeProxyDescriptor(final Element portTypeProxyClazz, final TypeElement portTypeInterface, final ProcessingEnvironment env) {
     m_portTypeInterface = portTypeInterface;
     m_declaringType = (TypeElement) env.getTypeUtils().asElement(portTypeProxyClazz.asType());
-    m_annotation = Assertions.assertNotNull(portTypeProxyClazz.getAnnotation(JaxWsPortTypeProxy.class), "Unexpected: Annotation '%s' not found [class=%s],", JaxWsPortTypeProxy.class.getName(), portTypeProxyClazz);
+    m_annotation = Assertions.assertNotNull(portTypeProxyClazz.getAnnotation(JaxWsPortTypeProxy.class), "Unexpected: Annotation '{}' not found [class={}],", JaxWsPortTypeProxy.class.getName(), portTypeProxyClazz);
     m_siblingAnnotations = new ArrayList<>();
     m_env = env;
 
@@ -71,7 +71,7 @@ public class PortTypeProxyDescriptor {
       }
     }
 
-    m_annotationMirror = Assertions.assertNotNull(descriptorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '%s' not found,", JaxWsPortTypeProxy.class.getName());
+    m_annotationMirror = Assertions.assertNotNull(descriptorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '{}' not found,", JaxWsPortTypeProxy.class.getName());
   }
 
   public TypeElement getPortTypeInterface() {
