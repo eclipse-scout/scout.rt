@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -49,6 +48,7 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
@@ -134,6 +134,9 @@ public class InvocationContextTest {
 
   @Test
   public void testWithException() {
+    // Unregister JUnit exception handler
+    BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
+
     final Holder<ITransaction> currentTransaction = new Holder<>();
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
@@ -176,8 +179,10 @@ public class InvocationContextTest {
           }
         }
       });
+
+      fail("RuntimeException expected");
     }
-    catch (ProcessingException e) {
+    catch (RuntimeException e) {
       // NOOP
     }
 

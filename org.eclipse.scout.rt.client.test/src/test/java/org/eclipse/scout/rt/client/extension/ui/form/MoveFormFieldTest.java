@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsage
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -224,7 +223,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     assertAbstractTemplateFieldsBox(form.getTemplateUsageBox(), false);
   }
 
-  @Test(expected = ProcessingException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testSingleTemplateUsageFormMoveTemplateFieldOutOfTemplate() throws Exception {
     BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, SingleTemplateUsageForm.MainBox.class);
     new SingleTemplateUsageForm();
@@ -430,7 +429,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     assertClasses(secondTemplateBox.getBottomFieldsBox().getFields(), TopStringField.class, BottomStringField.class);
   }
 
-  @Test(expected = ProcessingException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testMultiTemplateUsageFormMoveTopStringFieldOutOfContainer() throws Exception {
     BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, MultiTemplateUsageForm.MainBox.class);
     new MultiTemplateUsageForm();

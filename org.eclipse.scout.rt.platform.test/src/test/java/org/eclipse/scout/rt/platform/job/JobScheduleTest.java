@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -191,10 +192,9 @@ public class JobScheduleTest {
 
     try {
       future.awaitDoneAndGet();
-      fail("Exception expected");
+      fail("PlatformException expected");
     }
-    catch (RuntimeException e) {
-      assertTrue(e instanceof ProcessingException);
+    catch (PlatformException e) {
       assertSame(exception, e.getCause());
       assertTrue(future.isDone());
     }
@@ -216,10 +216,9 @@ public class JobScheduleTest {
 
     try {
       future.awaitDoneAndGet();
-      fail("Exception expected");
+      fail("PlatformException expected");
     }
-    catch (RuntimeException e) {
-      assertTrue(e instanceof ProcessingException);
+    catch (PlatformException e) {
       assertSame(exception, e.getCause());
       assertTrue(future.isDone());
     }

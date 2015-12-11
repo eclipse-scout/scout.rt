@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -45,16 +45,7 @@ public class JobExceptionTranslationTest {
       }
     }, Jobs.newInput());
 
-    // Test with default translator (ProcessingExceptionTranslator)
-    try {
-      future.awaitDoneAndGet();
-      fail();
-    }
-    catch (ProcessingException e) {
-      assertSame(error, e.getCause());
-    }
-
-    // Test with default translator (ExceptionTranslator)
+    // Test with default translator (DefaultExceptionTranslator)
     try {
       future.awaitDoneAndGet(DefaultExceptionTranslator.class);
       fail();
@@ -63,10 +54,10 @@ public class JobExceptionTranslationTest {
       assertSame(error, e);
     }
 
-    // Test with default translator (RuntimeExceptionTranslator)
+    // Test with default translator (DefaultRuntimeExceptionTranslator)
     try {
       future.awaitDoneAndGet();
-      fail();
+      fail("PlatformException excpected");
     }
     catch (RuntimeException e) {
       assertSame(error, e.getCause());
@@ -85,31 +76,22 @@ public class JobExceptionTranslationTest {
       }
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
-    // Test with default translator (ProcessingExceptionTranslator)
+    // Test with default translator (DefaultRuntimeExceptionTranslator)
     try {
       future.awaitDoneAndGet();
-      fail();
+      fail("PlatformException excpected");
     }
-    catch (ProcessingException e) {
+    catch (PlatformException e) {
       assertSame(error, e.getCause());
     }
 
-    // Test with default translator (ExceptionTranslator)
+    // Test with default translator (DefaultRuntimeExceptionTranslator)
     try {
       future.awaitDoneAndGet(DefaultExceptionTranslator.class);
       fail();
     }
     catch (Exception e) {
       assertSame(error, e);
-    }
-
-    // Test with default translator (RuntimeExceptionTranslator)
-    try {
-      future.awaitDoneAndGet();
-      fail();
-    }
-    catch (RuntimeException e) {
-      assertSame(error, e.getCause());
     }
   }
 }
