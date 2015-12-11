@@ -164,7 +164,21 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
       acceptByFields = normKey <= this.numberRange.to;
     }
   } else if (this.column.type === 'date' && this.dateRange) {
-
+    var fromValue, toValue,
+      keyValue = key.valueOf();
+    if (this.dateRange.from) {
+      fromValue = scout.dates.parseJsonDate(this.dateRange.from).valueOf();
+    }
+    if (this.dateRange.to) {
+      toValue = scout.dates.parseJsonDate(this.dateRange.to).valueOf();
+    }
+    if (fromValue && toValue) {
+      acceptByFields = keyValue >= fromValue && keyValue <= toValue;
+    } else if (fromValue) {
+      acceptByFields = keyValue >= fromValue;
+    } else if (toValue) {
+      acceptByFields = keyValue <= toValue;
+    }
   }
 
   return acceptByTable && acceptByFields;
@@ -172,13 +186,14 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
 
 scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
   $.log.debug('(ColumnUserFilter#updateFilterFields) filterType=' + event.filterType + ' text=' + event.text);
+  var from, to;
   if (event.filterType === 'text') {
     this.freeText = event.text.trim();
   } else if (event.filterType === 'number') {
     // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
     // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
-    var from = this._toNumber(event.from),
-      to = this._toNumber(event.to);
+    from = this._toNumber(event.from),
+    to = this._toNumber(event.to);
     if (from === null && to === null) {
       this.numberRange = null;
     } else {
@@ -188,11 +203,16 @@ scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
       };
     }
   } else if (event.filterType === 'date') {
-    // FIXME AWE: (filter) rename Range.js to DateRange.js impl. new Range?
-    this.dateRange = {
-        from: this._toDate(event.from),
-        to: this._toDate(event.to)
+    from = this._toDate(event.from),
+    to = this._toDate(event.to);
+    if (from === null && to === null) {
+      this.dateRange = null;
+    } else {
+      this.dateRange = {
+        from: from,
+        to: to
       };
+    }
   } else {
     throw new Error('unknown filter type');
   }
@@ -213,8 +233,9 @@ scout.ColumnUserFilter.prototype._toNumber = function(numberString) {
   return number;
 };
 
+// FIXME AWE: (filter) convert to date here (not in calculate), also convert to string when we send the filter-event to the server
 scout.ColumnUserFilter.prototype._toDate = function(dateString) {
-  return dateString; // FIXME AWE: impl.
+  return dateString || null;
 };
 
 scout.ColumnUserFilter.prototype.filterActive = function() {

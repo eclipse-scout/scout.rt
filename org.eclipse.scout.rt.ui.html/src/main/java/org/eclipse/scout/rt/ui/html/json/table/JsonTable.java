@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -759,8 +760,17 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
       JSONObject dateRange = data.optJSONObject("dateRange");
       if (dateRange != null) {
-        // FIXME AWE: (filter) how to create a valid date here?
-        filter.setDateRange(new Range<Date>(null, null));
+        String from = dateRange.optString("from");
+        if ("null".equals(from) || "".equals(from)) {
+          from = null;
+        }
+        Date fromDate = from == null ? null : toDate(from);
+        String to = dateRange.optString("to");
+        if ("null".equals(to) || "".equals(to)) {
+          to = null;
+        }
+        Date toDate = to == null ? null : toDate(to);
+        filter.setDateRange(new Range<Date>(fromDate, toDate));
       }
 
       return filter;
@@ -772,6 +782,10 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       return filter;
     }
     return null;
+  }
+
+  private Date toDate(String dateString) { // FIXME AWE: (filter) fix this poor-mans solution and use JsonDate, property date-format
+    return DateUtility.parse(dateString, "y-M-d");
   }
 
   protected IUserFilterState getFilterState(JSONObject data) {

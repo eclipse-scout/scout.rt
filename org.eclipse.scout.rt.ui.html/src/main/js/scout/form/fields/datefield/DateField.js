@@ -763,9 +763,12 @@ scout.DateField.prototype._syncToServer = function() {
       invalidTimeText: this.errorStatus.invalidTimeText
     });
   } else {
-    this._send('timestampChanged', {
+    var event = {
       timestamp: this.timestamp
-    });
+    };
+    this._send('timestampChanged', event);
+    // FIXME AWE: (filter) improv. trigger/send in date-field , sendAndTrigger method
+    this.trigger('timestampChanged', event);
   }
 };
 

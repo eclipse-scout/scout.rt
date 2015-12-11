@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
+import java.util.Date;
+
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,15 +50,15 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
       json.put("freeText", getFilterState().getFreeText());
     }
     else if ("number".equals(colummType)) {
-      json.put("numberRange", toJson(getFilterState().getNumberRange()));
+      json.put("numberRange", numberRangeToJson(getFilterState().getNumberRange()));
     }
     else if ("date".equals(colummType)) {
-      json.put("dateRange", toJson(getFilterState().getDateRange()));
+      json.put("dateRange", dateRangeToJson(getFilterState().getDateRange()));
     }
     return json;
   }
 
-  protected JSONObject toJson(Range<?> range) {
+  protected JSONObject numberRangeToJson(Range<Number> range) {
     if (range == null) {
       return null;
     }
@@ -63,6 +66,20 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
     json.put("from", range.getFrom());
     json.put("to", range.getTo());
     return json;
+  }
+
+  protected JSONObject dateRangeToJson(Range<Date> range) {
+    if (range == null) {
+      return null;
+    }
+    JSONObject json = new JSONObject();
+    json.put("from", formatDate(range.getFrom()));
+    json.put("to", formatDate(range.getTo()));
+    return json;
+  }
+
+  protected String formatDate(Date date) { // FIXME AWE: (filter) user JsonDate (see DateField)
+    return DateUtility.format(date, "y-M-dd");
   }
 
   @Override

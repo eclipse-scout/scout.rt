@@ -42,13 +42,13 @@ scout.FilterFieldsGroupBox.prototype._render = function($parent) {
 };
 
 scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
-  var from, to;
-  if (this.filter.numberRange) {
-    from = this.filter.numberRange.from;
-    to = this.filter.numberRange.to;
-  }
-  this._addField('NumberField', 'ui.from', 0, this._toNumberString(from), this._updateNumberFilter);
-  this._addField('NumberField', 'ui.to', 1, this._toNumberString(to), this._updateNumberFilter);
+  var fromField = this._addField('NumberField', 'ui.from', 0);
+  fromField.displayText = this._toNumberString(this.filter.numberRange ? this.filter.numberRange.from : null);
+  fromField.on('displayTextChanged', this._updateNumberFilter.bind(this));
+
+  var toField = this._addField('NumberField', 'ui.to', 1);
+  toField.displayText = this._toNumberString(this.filter.numberRange ? this.filter.numberRange.to : null);
+  toField.on('displayTextChanged', this._updateNumberFilter.bind(this));
 };
 
 scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {
@@ -59,11 +59,6 @@ scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {
   });
 };
 
-scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
-  this._addField('DateField', 'ui.from', 0, this.filter.dateRange.from, this._updateDateFilter);
-  this._addField('DateField', 'ui.to', 1, this.filter.dateRange.to, this._updateDateFilter);
-};
-
 scout.FilterFieldsGroupBox.prototype._toNumberString = function(number) {
   if (number === null || number === undefined) { // not for 0
     return '';
@@ -72,20 +67,30 @@ scout.FilterFieldsGroupBox.prototype._toNumberString = function(number) {
   }
 };
 
+scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
+  // FIXME AWE: (filter) throw away range object and use separate properties instead
+  var fromField = this._addField('DateField', 'ui.from', 0);
+  fromField.timestamp = this.filter.dateRange ? this.filter.dateRange.from : null;
+  fromField.on('timestampChanged', this._updateDateFilter.bind(this));
+
+  var toField = this._addField('DateField', 'ui.to', 1);
+  toField.timestamp = this.filter.dateRange ? this.filter.dateRange.to : null;
+  toField.on('timestampChanged', this._updateDateFilter.bind(this));
+};
+
 scout.FilterFieldsGroupBox.prototype._updateDateFilter = function(event) {
   this.trigger('filterUpdated', {
     filterType: 'date',
-    from: this.fields[0].displayText,
-    to: this.fields[1].displayText
+    from: this.fields[0].timestamp,
+    to: this.fields[1].timestamp
   });
 };
 
 // FIXME AWE: (filter) es braucht wahrscheinlich auch eine validierung? z.B. from muss kleiner sein als to
-scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, gridY, displayText, onDisplayTextChanged) {
+scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, gridY) {
   var field = scout.create(objectType, {
     parent: this,
     label: this.session.text(text),
-    displayText: displayText, // FIXME AWE: (filter) use setValue() here
     statusVisible: false,
     labelWidthInPixel: 50,
     maxLength: 100,
@@ -93,8 +98,8 @@ scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, grid
       y: gridY
     }
   });
-  field.on('displayTextChanged', onDisplayTextChanged.bind(this));
   this.fields.push(field);
+  return field;
 };
 
 scout.FilterFieldsGroupBox.prototype._addFreeTextField = function() {
