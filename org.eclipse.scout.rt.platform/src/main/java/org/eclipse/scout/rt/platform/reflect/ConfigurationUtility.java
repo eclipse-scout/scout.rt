@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.reflect;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -22,11 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -190,19 +189,9 @@ public final class ConfigurationUtility {
         return innerClass.newInstance();
       }
     }
-    catch (InvocationTargetException ite) {
-      Throwable t = ite.getCause();
-      while (t != null) {
-        if (t instanceof PlatformException) {
-          throw ((PlatformException) t)
-              .withContextInfo("innerClass", innerClass);
-        }
-        t = t.getCause();
-      }
-      throw new ProcessingException("Failed to create instance of '{}'.", innerClass, ite.getCause());
-    }
-    catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-      throw new ProcessingException("Failed to create instance of '{}'.", innerClass, e);
+    catch (ReflectiveOperationException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("innerClass", innerClass);
     }
   }
 

@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
@@ -96,11 +97,11 @@ class TableHolderInput implements IBindInput {
       try {
         value = m_getterMethod.invoke(m_table, new Object[]{new Integer(m_filteredRowIndices[m_batchIndex])});
       }
-      catch (IllegalAccessException | InvocationTargetException e) {
-        throw new ProcessingException("unexpected exception", e);
+      catch (ReflectiveOperationException e) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
       }
     }
-    //
+
     if (m_target.isPlainValue()) {
       m_target.setReplaceToken(sqlStyle.toPlainText(value));
       return null;

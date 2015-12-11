@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.platform.holders;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 
 /**
  * @param <T>
@@ -42,11 +44,8 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
     try {
       ret = m_clazz.newInstance();
     }
-    catch (InstantiationException e) {
-      throw new UndeclaredThrowableException(e, "BeanArrayHolder: cannot instantiate " + m_clazz.toString());
-    }
-    catch (IllegalAccessException e) {
-      throw new UndeclaredThrowableException(e, "BeanArrayHolder: cannot instantiate " + m_clazz.toString());
+    catch (ReflectiveOperationException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
     m_list.add(ret);
     m_stateList.put(ret, IBeanArrayHolder.State.NON_CHANGED);

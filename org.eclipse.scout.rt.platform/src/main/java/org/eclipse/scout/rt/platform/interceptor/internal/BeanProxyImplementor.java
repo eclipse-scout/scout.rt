@@ -17,8 +17,9 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
@@ -110,14 +111,7 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
           throw new ProcessingException("argument mismatch", e);
         }
         catch (InvocationTargetException e) {
-          Throwable t = e.getTargetException();
-          if (t instanceof ProcessingException) {
-            throw (ProcessingException) t;
-          }
-          if (t instanceof PlatformException) {
-            throw (PlatformException) t;
-          }
-          throw new ProcessingException("unexpected", t);
+          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
         }
       }
     };

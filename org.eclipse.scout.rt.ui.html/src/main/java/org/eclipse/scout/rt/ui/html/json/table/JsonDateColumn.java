@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +18,8 @@ import java.util.Locale;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -47,8 +48,8 @@ public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<
       SimpleDateFormat dateFormat = (SimpleDateFormat) method.invoke(getColumn());
       json.put("format", dateFormat.toPattern()); //Don't use toLocalizedPattern, it translates the chars ('d' to 't' for german).
     }
-    catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new UiException("", e);
+    catch (ReflectiveOperationException e) {
+      throw new UiException("Failed to create JSON from 'date column'", BEANS.get(DefaultExceptionTranslator.class).unwrap(e));
     }
     finally {
       NlsLocale.set(oldLocale);

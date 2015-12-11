@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -100,8 +101,8 @@ class TableHolderOutput implements IBindOutput {
       Object castValue = TypeCastUtility.castValue(value, m_beanType);
       m_setterMethod.invoke(m_holder, new Object[]{m_batchIndex, castValue});
     }
-    catch (IllegalAccessException | InvocationTargetException e) {
-      throw new ProcessingException("unexpected exception", e);
+    catch (ReflectiveOperationException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
 
