@@ -42,7 +42,7 @@ scout.Table = function(model) {
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
-  this.viewRangeSize = 25;
+  this.viewRangeSize = 50;
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
@@ -79,10 +79,11 @@ scout.Table.prototype._init = function(model) {
   this._syncFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
-  this._calculateValuesForBackgroundEffect();
   if (this._filterCount() > 0) {
     this._applyFilters(this.rows);
   }
+  this._calculateValuesForBackgroundEffect();
+  this._group();
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -268,7 +269,7 @@ scout.Table.prototype._render = function($parent) {
   this._calculateRowBorderWidth();
   this._updateRowWidth();
   this._updateRowHeight();
-  this._renderViewRangeForRowIndex(0);
+  this._renderViewport();
 
   //----- inline methods: --------
 
@@ -486,6 +487,11 @@ scout.Table.prototype._cellTooltipText = function($cell) {
 };
 
 scout.Table.prototype.reload = function() {
+  if (!this.hasReloadHandler) {
+    return;
+  }
+  this._removeRows();
+  this._renderFiller();
   this._sendReload();
 };
 
@@ -545,7 +551,7 @@ scout.Table.prototype.updateScrollbars = function() {
   scout.scrollbars.update(this.$data);
 };
 
-scout.Table.prototype._sort = function() {
+scout.Table.prototype._sort = function(animateAggregateRows) {
   var column, sortIndex,
     sortColumns = [];
 
@@ -563,16 +569,30 @@ scout.Table.prototype._sort = function() {
   if (!clientSideSortingPossible) {
     return false;
   }
-
+  this.clearAggregateRows(animateAggregateRows);
   if (!sortColumns.length) {
-    // no sort column defined. nop
+    // no sort column defined.
     return true;
   }
 
+  this._sortImpl(sortColumns);
+
+  this._filteredRowsDirty = true; // order has been changed
+  this._triggerRowOrderChanged();
+  this._group(animateAggregateRows);
+  if (this.rendered) {
+    this._renderRowOrderChanges();
+  }
+
+  // Sort was possible -> return true
+  return true;
+};
+
+scout.Table.prototype._sortImpl = function(sortColumns) {
   // compare rows
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
-      column = sortColumns[s];
+      var column = sortColumns[s];
       var valueA = this.cellValue(column, row1);
       var valueB = this.cellValue(column, row2);
       var direction = column.sortActive && column.sortAscending ? -1 : 1;
@@ -588,10 +608,6 @@ scout.Table.prototype._sort = function() {
     return 0;
   }
   this.rows.sort(compare.bind(this));
-  this._filteredRowsDirty = true; // order has been changed
-
-  //Sort was possible -> return true
-  return true;
 };
 
 // initialize comparators
@@ -675,7 +691,7 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   if (this.header) {
     this.header.onSortingChanged();
   }
-  sorted = this._sort();
+  sorted = this._sort(animateAggregateRows);
 
   data = {
     columnId: column.id,
@@ -685,15 +701,10 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   };
   if (sorted) {
     this._send('rowsSorted', data);
-    this._triggerRowOrderChanged();
-    this.clearAggregateRows(animateAggregateRows);
-    if (this.rendered) {
-      this._renderRowOrderChanges();
-    }
-    this._group();
   } else {
     // Delegate sorting to server when it is not possible on client side
     this._send('sortRows', data);
+    // hint to animate the aggregate after the row order changed event
     this._animateAggregateRows = animateAggregateRows;
   }
 };
@@ -742,7 +753,6 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
   }
 
   if (!multiSort) {
-
     groupColCount = this._groupedColumns() ? this._groupedColumns().length : 0;
     sortColCount = 0;
     this.columns.forEach(function(c) {
@@ -1047,13 +1057,6 @@ scout.Table.prototype._renderRowsInRange = function(range) {
   });
 
   this._installRows($rows);
-
-  // notify
-  this._triggerRowsSelected();
-
-  // When all blocks are rendered, render the aggregate rows
-  // Grouping cannot be done in init() because row filter only works with rendered rows -> needs to be done always when rows get rendered
-  this._group(); // //FIXME CGU move filter and group to init
   this._renderAggregateRows();
   this._renderBackgroundEffect();
   if ($.log.isTraceEnabled()) {
@@ -1103,9 +1106,23 @@ scout.Table.prototype._removeRowsInRange = function(range) {
   }
 };
 
+scout.Table.prototype._removeAllRows = function() {
+  this.$rows().each(function(i, elem) {
+    var $row = $(elem),
+      row = $row.data('row');
+    $row.remove();
+    row.$row = null;
+  }.bind(this));
+  this.viewRangeRendered = new scout.Range(0, 0);
+};
+
 scout.Table.prototype._removeRows = function(rows) {
   rows = rows || this.rows;
   rows = scout.arrays.ensure(rows);
+  if (rows.length === this.rows.length) {
+    this._removeAllRows();
+    return;
+  }
   rows.forEach(function(row) {
     var $row = row.$row,
       rowIndex = this.rows.indexOf(row);
@@ -1113,22 +1130,26 @@ scout.Table.prototype._removeRows = function(rows) {
     if (rowIndex === -1) {
       throw new Error('Row not found, cannot remove $row');
     }
-
+    // if row is not rendered but its rowindex is inside the view range -> inconsistency
+    if (!row.$row && this.viewRangeRendered.contains(rowIndex) && !row.$row) {
+        throw new Error('Inconsistency found while removing row. Row is not but inside rendered view range. RowIndex: ' + rowIndex);
+      }
+    // if row is rendered but its rowindex is not inside the view range -> inconsistency
+    if (row.$row && !this.viewRangeRendered.contains(rowIndex)) {
+      throw new Error('Inconsistency found while removing row. Row is rendered but not inside rendered view range. RowIndex: ' + rowIndex);
+    }
     if (row.$row) {
       $row.remove();
       row.$row = null;
     }
-
-    if (rowIndex === this.viewRangeRendered.from && rowIndex === this.viewRangeRendered.to) {
-      this.viewRangeRendered.from = -1;
-      this.viewRangeRendered.to = -1;
-    } else if (rowIndex < this.viewRangeRendered.from ) {
-      this.viewRangeRendered.from--;
-      this.viewRangeRendered.to--;
-    } else if (rowIndex === this.viewRangeRendered.from) {
-      this.viewRangeRendered.from++;
-    } else if (rowIndex <= this.viewRangeRendered.to) {
-      this.viewRangeRendered.to--;
+    // Adjust view range if row is inside or before range
+    if (this.viewRangeRendered.contains(rowIndex) || rowIndex < this.viewRangeRendered.from) {
+      if (rowIndex < this.viewRangeRendered.from ) {
+        this.viewRangeRendered.from--;
+        this.viewRangeRendered.to--;
+      } else if (rowIndex <= this.viewRangeRendered.to) {
+        this.viewRangeRendered.to--;
+      }
     }
   }.bind(this));
 };
@@ -1391,15 +1412,7 @@ scout.Table.prototype._sendAppLinkAction = function(columnId, ref) {
 };
 
 scout.Table.prototype._sendReload = function() {
-  if (this.hasReloadHandler) {
-    this.$data.empty();
-    // scoll bar must be (re)installed after all content has been removed (because also scrollbars are removed)..
-    scout.scrollbars.install(this.$data, {
-      parent: this,
-      axis: 'both'
-    });
-    this._send('reload');
-  }
+  this._send('reload');
 };
 
 scout.Table.prototype._sendExportToClipboard = function() {
@@ -1719,7 +1732,7 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   if (this.header) {
     this.header.onSortingChanged();
   }
-  sorted = this._sort();
+  sorted = this._sort(true);
 
   data = {
     columnId: column.id,
@@ -1729,12 +1742,6 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   };
   if (sorted) {
     this._send('rowsGrouped', data);
-    this._triggerRowOrderChanged();
-    this.clearAggregateRows(true);
-    if (this.rendered) {
-      this._renderRowOrderChanges();
-    }
-    this._group(true);
   } else {
     // Delegate sorting to server when it is not possible on client side
     this._send('groupRows', data);
@@ -1795,6 +1802,9 @@ scout.Table.prototype._renderRowChecked = function(row) {
   if (!this.checkable) {
     return;
   }
+  if (!row.$row) {
+    return;
+  }
   var $styleElem;
   if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     $styleElem = row.$row;
@@ -1847,7 +1857,7 @@ scout.Table.prototype._insertRow = function(row) {
   this._insertRows([row]);
 };
 
-scout.Table.prototype._insertRows = function(rows) {
+scout.Table.prototype._insertRows = function(rows, fromServer) {
   var filterChanged = false,
     newHiddenRows = [];
 
@@ -1860,6 +1870,11 @@ scout.Table.prototype._insertRows = function(rows) {
 
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
+  fromServer = scout.nvl(fromServer, false);
+  if (!fromServer) {
+    // If event comes from server, there will be a row order changed event as well -> no sorting necessary
+    this._sort();
+  }
 
   // Update HTML
   if (this.rendered) {
@@ -1886,7 +1901,6 @@ scout.Table.prototype._deleteRow = function(row) {
 scout.Table.prototype._deleteRows = function(rows) {
   var invalidate, i, filterChanged;
 
-  this.deselectRows(rows, false);
   rows.forEach(function(row) {
     // Update HTML
     if (this.rendered) {
@@ -1913,15 +1927,53 @@ scout.Table.prototype._deleteRows = function(rows) {
     }
   }.bind(this));
 
+  this.deselectRows(rows, false);
   if (filterChanged) {
     this._rowsFiltered();
   }
   this._group();
   this._updateBackgroundEffect();
   this._triggerRowsDeleted(rows);
+
   if (invalidate) {
+    this._renderFiller();
     this._renderViewport();
     this._renderEmptyData();
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.Table.prototype._deleteAllRows = function() {
+  var filterChanged = this._filteredRows.length > 0;
+
+  // Update HTML
+  if (this.rendered) {
+    // Cancel cell editing
+    if (this.cellEditorPopup) {
+      this.cellEditorPopup.cancelEdit();
+    }
+
+    this.selectionHandler.clearLastSelectedRowMarker();
+    this._removeRows();
+  }
+
+  // Update model
+  this.rows = [];
+  this.rowsMap = {};
+  this.selectRows([], false);
+  this._filteredRows = [];
+
+  if (filterChanged) {
+    this._rowsFiltered();
+  }
+  this._group();
+  this._updateBackgroundEffect();
+  this._triggerAllRowsDeleted();
+
+  // Update HTML
+  if (this.rendered) {
+    this._renderFiller();
+    this._renderViewport();
     this.invalidateLayoutTree();
   }
 };
@@ -1988,6 +2040,7 @@ scout.Table.prototype._updateRows = function(rows) {
   if (filterChanged) {
     this._rowsFiltered(newHiddenRows);
   }
+  this._group();
   this._updateBackgroundEffect();
 };
 
@@ -1998,39 +2051,6 @@ scout.Table.prototype._removeTooltipsForRow = function(row) {
       this.tooltips.splice(i, 1);
     }
   }
-};
-
-scout.Table.prototype._deleteAllRows = function() {
-  var filterChanged = this._filteredRows.length > 0;
-
-  // Update HTML
-  if (this.rendered) {
-    // Cancel cell editing
-    if (this.cellEditorPopup) {
-      this.cellEditorPopup.cancelEdit();
-    }
-
-    this.selectionHandler.clearLastSelectedRowMarker();
-    this._removeRows();
-  }
-
-  // Update model
-  this.rows = [];
-  this.rowsMap = {};
-  this.selectRows([], false);
-  this._filteredRows = [];
-
-  if (filterChanged) {
-    this._rowsFiltered();
-  }
-
-  // Update HTML
-  if (this.rendered) {
-    this._renderViewport();
-    this.invalidateLayoutTree();
-  }
-
-  this._triggerAllRowsDeleted();
 };
 
 scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
@@ -2059,25 +2079,7 @@ scout.Table.prototype.scrollPageDown = function() {
 
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   scout.scrollbars.scrollTop(this.$data, scrollTop);
-  var viewRange;
-//  var viewport = this._viewportInfo();
-//  if (viewport.lastRow) {
-//
-//  }
-
-//  if (scrollTop > this.scrollTop) {
-//    viewRange = {
-//      from: Math.min(this.rows.length - 1, this.viewRangeRendered.from + 1),
-//      to: Math.min(this.rows.length - 1, this.viewRangeRendered.to + 1)
-//    };
-//  } else {
-//    viewRange = {
-//      from: Math.max(this.viewRangeRendered.from - 1, 0),
-//      to: Math.max(this.viewRangeRendered.to - 1, 0)
-//    };
-//  }
-//  this._renderViewRange(viewRange);
-//  this.scrollTop = scrollTop;
+  this.scrollTop = scrollTop;
 
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   this._renderViewport();
@@ -3052,9 +3054,11 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
 };
 
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
-  var viewRange = new scout.Range();
-  viewRange.from = Math.max(rowIndex - this.viewRangeSize, 0);
-  viewRange.to = Math.min(rowIndex + this.viewRangeSize, this.rows.length);
+  var viewRange = new scout.Range(),
+    halfRange = this.viewRangeSize / 2;
+
+  viewRange.from = Math.max(rowIndex - halfRange, 0);
+  viewRange.to = Math.min(rowIndex + halfRange, this.rows.length);
   return viewRange;
 };
 
@@ -3067,9 +3071,9 @@ scout.Table.prototype._renderViewport = function() {
 };
 
 scout.Table.prototype._rerenderViewport = function() {
-  var newViewRange = this._calculateCurrentViewRange();
   this._removeRows();
-  this._renderViewRange(newViewRange);
+  this._removeAggregateRows();
+  this._renderViewport();
 };
 
 scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
@@ -3095,37 +3099,60 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     this._renderRowsInRange(range);
   }.bind(this));
 
+  // check if at least last and first row in range got correctly rendered
+  if (this.viewRangeRendered.size > 0) {
+    var firstRow = this.rows[this.viewRangeRendered.from].$row;
+    var lastRow = this.rows[this.viewRangeRendered.to].$row;
+    if (!firstRow.$row || !lastRow.$row) {
+      throw new Error('Rows not rendered as expected. ' + this.viewRangeRendered + '. First: ' + firstRow.$row + '. Last: ' + lastRow.$row);
+    }
+  }
+
   this._renderFiller();
   this.$data[0].scrollTop = scrollTop;
+  this.renderSelection();
   this.invalidateLayoutTree();
   this.viewRangeDirty = false;
 };
 
 scout.Table.prototype._renderFiller = function() {
+  var fakeRowStyle;
   if (!this.$fillBefore) {
     this.$fillBefore = this.$data.prependDiv('table-data-fill');
+    this._applyFillerStyle(this.$fillBefore);
   }
 
-  //var fillBeforeHeight = this.viewRangeRendered.from * this.rowHeight;
-  var fillBeforeHeight = this._calculateFillerHeight(0, this.viewRangeRendered.from - 1);
+  var fillBeforeHeight = this._calculateFillerHeight(new scout.Range(0, this.viewRangeRendered.from));
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.cssWidth(this.rowWidth);
   $.log.trace('FillBefore height: ' + fillBeforeHeight);
 
   if (!this.$fillAfter) {
     this.$fillAfter = this.$data.appendDiv('table-data-fill');
+    this._applyFillerStyle(this.$fillAfter);
   }
 
-  //var fillAfterHeight = (this.rows.length - (this.viewRangeRendered.to + 1)) * this.rowHeight;
-  var fillAfterHeight = this._calculateFillerHeight(this.viewRangeRendered.to + 1, this.rows.length - 1);
+  var fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.rows.length));
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.trace('FillAfter height: ' + fillAfterHeight);
 };
 
-scout.Table.prototype._calculateFillerHeight = function(from, to) {
+scout.Table.prototype._applyFillerStyle = function($filler) {
+  var lineColor = $filler.css('background-color');
+  // In order to get a 1px border we need to get the right value in percentage for the linear gradient
+  var lineWidth = ((1 - (1 / this.rowHeight)) * 100).toFixed(2) + '%';
+
+  $filler.css({
+    background: 'linear-gradient(to bottom, transparent, transparent '+ lineWidth + ', ' + lineColor + ' ' + lineWidth + ', ' + lineColor + ')',
+    backgroundSize: '100% ' + this.rowHeight + 'px',
+    backgroundColor: null
+  });
+};
+
+scout.Table.prototype._calculateFillerHeight = function(range) {
   var totalHeight = 0;
-  for (var i = from; i <= to; i++) {
+  for (var i = range.from; i < range.to; i++) {
     var row = this.rows[i],
       height = this.rowHeight;
 
@@ -3214,7 +3241,7 @@ scout.Table.prototype._findLastRowInViewport = function(startRowIndex, viewportB
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
-  this._insertRows(rows);
+  this._insertRows(rows, true);
 };
 
 scout.Table.prototype._onRowsDeleted = function(rowIds) {

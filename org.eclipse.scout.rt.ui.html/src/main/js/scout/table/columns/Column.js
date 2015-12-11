@@ -369,7 +369,6 @@ scout.Column.prototype.updateBackgroundEffect = function() {
 
 scout.Column.prototype._resolveBackgroundEffectFunc = function() {
   var effect = this.backgroundEffect;
-  // TODO [5.2] bsh: CRU Don't use hardcoded colors (or make them customizable)
   if (effect === 'colorGradient1') {
     return this._colorGradient1.bind(this);
   }

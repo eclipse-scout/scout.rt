@@ -94,6 +94,10 @@ scout.Range.prototype.size = function(other) {
   return this.to - this.from;
 };
 
+scout.Range.prototype.contains = function(value) {
+  return this.from <= value && value < this.to;
+};
+
 scout.Range.prototype.toString = function() {
   return 'scout.Range[' +
     'from=' + (this.from === null ? 'null' : this.from) +

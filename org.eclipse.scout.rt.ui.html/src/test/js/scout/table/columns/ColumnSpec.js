@@ -303,7 +303,23 @@ describe("Column", function() {
     });
 
     it("considers view range -> only colors rendered cells", function() {
-      //FIXME CGU implement
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var table = helper.createTable(model);
+      var column0 = table.columns[0];
+      table.viewRangeSize = 4;
+      table.render(session.$entryPoint);
+
+      table.setColumnBackgroundEffect(column0, 'colorGradient1');
+      expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+      expect(table.rows[2].$row).toBeFalsy();
+
+      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 3));
+      table._renderViewport();
+
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+      expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
     });
 
     it("updates colors if row gets deleted", function() {
