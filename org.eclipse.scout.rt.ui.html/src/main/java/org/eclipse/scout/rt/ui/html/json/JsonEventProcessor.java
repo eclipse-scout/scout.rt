@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
@@ -48,12 +49,14 @@ public class JsonEventProcessor {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Handling event '{}' for adapter with ID {}", event.getType(), event.getTarget());
       }
+
       jsonAdapter.handleUiEvent(event);
       jsonAdapter.cleanUpEventFilters();
     }
-    catch (RuntimeException e) {
-      LOG.error("Error while handling event '{}' for adapter {}", event.getType(), jsonAdapter, e);
-      throw e;
+    catch (PlatformException e) {
+      throw e
+          .withContextInfo("ui.event", event.getType())
+          .withContextInfo("ui.adapter", jsonAdapter);
     }
   }
 }

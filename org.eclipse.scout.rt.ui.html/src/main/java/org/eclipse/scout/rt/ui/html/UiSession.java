@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -643,7 +644,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           .withName("Transforming response to JSON")
           .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
-      return BEANS.get(UiJobs.class).awaitAndGet(future);
+      try {
+        return BEANS.get(UiJobs.class).awaitAndGet(future);
+      }
+      catch (InterruptedException | CancellationException e) {
+        future.cancel(true);
+        return null;
+      }
     }
     finally {
       m_currentHttpContext.clear();
@@ -696,7 +703,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       final IFuture<JSONObject> future = ModelJobs.schedule(new P_ResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
           .withName("Transforming response to JSON")
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
-      return BEANS.get(UiJobs.class).awaitAndGet(future);
+      try {
+        return BEANS.get(UiJobs.class).awaitAndGet(future);
+      }
+      catch (InterruptedException | CancellationException e) {
+        future.cancel(true);
+        return null;
+      }
     }
     finally {
       m_currentHttpContext.clear();

@@ -81,17 +81,17 @@ public class UiJobs {
   }
 
   /**
-   * Waits until the given {@link IFuture} is in 'done' state, or requires 'user interaction'. If the job cannot be
-   * awaited because the current thread is interrupted, or because the job is cancelled, or because the job did not
-   * complete within the maximal timeout, the respective exception is propagated to the caller. Upon job completion, the
-   * method returns with the job's result or its exception.
+   * Waits until the given {@link IFuture} is in 'done' state to return its result, or requires 'user interaction'. If
+   * the job cannot be awaited because the current thread is interrupted, or because the job is cancelled, or because
+   * the job did not complete within the maximal timeout, the respective exception is propagated to the caller. Upon job
+   * completion, the method returns with the job's result or its exception.
    * <p>
    * The hint {@link ModelJobs#EXECUTION_HINT_UI_INTERACTION_REQUIRED} indicates, whether a job requires 'user
    * interaction'.
    *
    * @param future
    *          the {@link IFuture} to wait until 'done' or requiring 'user interaction'.
-   * @return the job's result
+   * @return the job's result, or <code>null</code> if requires 'user interaction'.
    * @throws CancellationException
    *           if the job is cancelled.
    * @throws InterruptedException
