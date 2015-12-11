@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Access controller to always continue filter-chain with a fixed user as set in system property 'user.name', and is
  * only enabled when running in development mode.
- * 
+ *
  * @since 5.2
  */
 @Bean
@@ -51,7 +51,7 @@ public class DevelopmentAccessController implements IAccessController {
   @Override
   public boolean handle(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
     if (m_config.isEnabled() && m_warningLogged.compareAndSet(false, true)) {
-      LOG.warn("+++ Development access control with user  {}", m_config.getUsername());
+      LOG.warn("+++ Development access control with user {}", m_config.getUsername());
     }
     return m_anonymousAccessController.handle(request, response, chain);
   }
