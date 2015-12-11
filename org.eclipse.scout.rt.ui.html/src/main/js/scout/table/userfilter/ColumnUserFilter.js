@@ -24,8 +24,10 @@ scout.ColumnUserFilter = function() {
 
   // FIXME AWE: split this class into Text-, Number- and Date-ColumnUserFilter, use Range object
   this.freeText;
-  this.numberRange;
-  this.dateRange;
+  this.numberFrom;
+  this.numberTo;
+  this.dateFrom;
+  this.dateTo;
 };
 scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
@@ -112,9 +114,11 @@ scout.ColumnUserFilter.prototype.createAddFilterEventData = function() {
   if (this.column.type === 'text') {
     data.freeText = this.freeText;
   } else if (this.column.type === 'number') {
-    data.numberRange = this.numberRange;
+    data.numberFrom = this.numberFrom;
+    data.numberTo = this.numberTo;
   } else if (this.column.type === 'date') {
-    data.dateRange = this.dateRange;
+    data.dateFrom = this.dateFrom;
+    data.dateTo = this.dateTo;
   }
 
   return data;
@@ -148,37 +152,43 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
     normKey = this.xAxis.format(normKey);
   }
 
-  if (this.selectedValues.length) {
+  if (this.tableFilterActive()) {
     acceptByTable = this.selectedValues.indexOf(normKey) > -1;
   }
 
-  if (this.column.type === 'text' &&  this.freeText) {
-    // FIXME AWE (filter) use cellTextForTextFilter
-    acceptByFields = normKey.toLowerCase().indexOf(this.freeText.toLowerCase()) > -1;
-  } else if (this.column.type === 'number' && this.numberRange) {
-    if (this.numberRange.from && this.numberRange.to) { // FIXME AWE (filter) does not work for 0, must check for null
-      acceptByFields = normKey >= this.numberRange.from && normKey <= this.numberRange.to;
-    } else if (this.numberRange.from) {
-      acceptByFields = normKey >= this.numberRange.from;
-    } else if (this.numberRange.to) {
-      acceptByFields = normKey <= this.numberRange.to;
+  if (this.fieldsFilterActive()) {
+    if (this.column.type === 'text') {
+      // FIXME AWE (filter) use cellTextForTextFilter
+      acceptByFields = normKey.toLowerCase().indexOf(this.freeText.toLowerCase()) > -1;
+    } else if (this.column.type === 'number') {
+      var
+        hasFrom = scout.objects.isNumber(this.numberFrom),
+        hasTo = scout.objects.isNumber(this.numberTo);
+      if (hasFrom && hasTo) {
+        acceptByFields = normKey >= this.numberFrom && normKey <= this.numberTo;
+      } else if (hasFrom) {
+        acceptByFields = normKey >= this.numberFrom;
+      } else if (hasTo) {
+        acceptByFields = normKey <= this.numberTo;
+      }
+    } else if (this.column.type === 'date') {
+      var fromValue, toValue,
+        keyValue = key.valueOf();
+      if (this.dateFrom) {
+        fromValue = scout.dates.parseJsonDate(this.dateFrom).valueOf();
+      }
+      if (this.dateTo) {
+        toValue = scout.dates.parseJsonDate(this.dateTo).valueOf();
+      }
+      if (fromValue && toValue) {
+        acceptByFields = keyValue >= fromValue && keyValue <= toValue;
+      } else if (fromValue) {
+        acceptByFields = keyValue >= fromValue;
+      } else if (toValue) {
+        acceptByFields = keyValue <= toValue;
+      }
     }
-  } else if (this.column.type === 'date' && this.dateRange) {
-    var fromValue, toValue,
-      keyValue = key.valueOf();
-    if (this.dateRange.from) {
-      fromValue = scout.dates.parseJsonDate(this.dateRange.from).valueOf();
-    }
-    if (this.dateRange.to) {
-      toValue = scout.dates.parseJsonDate(this.dateRange.to).valueOf();
-    }
-    if (fromValue && toValue) {
-      acceptByFields = keyValue >= fromValue && keyValue <= toValue;
-    } else if (fromValue) {
-      acceptByFields = keyValue >= fromValue;
-    } else if (toValue) {
-      acceptByFields = keyValue <= toValue;
-    }
+
   }
 
   return acceptByTable && acceptByFields;
@@ -192,27 +202,11 @@ scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
   } else if (event.filterType === 'number') {
     // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
     // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
-    from = this._toNumber(event.from),
-    to = this._toNumber(event.to);
-    if (from === null && to === null) {
-      this.numberRange = null;
-    } else {
-      this.numberRange = {
-        from: from,
-        to: to
-      };
-    }
+    this.numberFrom = this._toNumber(event.from),
+    this.numberTo = this._toNumber(event.to);
   } else if (event.filterType === 'date') {
-    from = this._toDate(event.from),
-    to = this._toDate(event.to);
-    if (from === null && to === null) {
-      this.dateRange = null;
-    } else {
-      this.dateRange = {
-        from: from,
-        to: to
-      };
-    }
+    this.dateFrom = this._toDate(event.from),
+    this.dateTo = this._toDate(event.to);
   } else {
     throw new Error('unknown filter type');
   }
@@ -239,5 +233,19 @@ scout.ColumnUserFilter.prototype._toDate = function(dateString) {
 };
 
 scout.ColumnUserFilter.prototype.filterActive = function() {
-  return this.selectedValues.length > 0 || this.freeText || this.numberRange || this.dateRange;
+  return this.tableFilterActive() || this.fieldsFilterActive();
+};
+
+scout.ColumnUserFilter.prototype.tableFilterActive = function() {
+  return this.selectedValues.length > 0;
+};
+
+scout.ColumnUserFilter.prototype.fieldsFilterActive = function() {
+  if (this.column.type === 'text') {
+    return scout.strings.hasText(this.freeText);
+  } else if (this.column.type === 'number') {
+    return scout.objects.isNumber(this.numberFrom) || scout.objects.isNumber(this.numberTo);
+  } else if (this.column.type === 'date') {
+    return this.dateFrom || this.dateTo;
+  }
 };

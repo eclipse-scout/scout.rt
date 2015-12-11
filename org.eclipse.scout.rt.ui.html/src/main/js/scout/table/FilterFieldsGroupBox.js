@@ -43,12 +43,16 @@ scout.FilterFieldsGroupBox.prototype._render = function($parent) {
 
 scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
   var fromField = this._addField('NumberField', 'ui.from', 0);
-  fromField.displayText = this._toNumberString(this.filter.numberRange ? this.filter.numberRange.from : null);
+  fromField.displayText = _toNumberString(this.filter.numberFrom);
   fromField.on('displayTextChanged', this._updateNumberFilter.bind(this));
 
   var toField = this._addField('NumberField', 'ui.to', 1);
-  toField.displayText = this._toNumberString(this.filter.numberRange ? this.filter.numberRange.to : null);
+  toField.displayText = _toNumberString(this.filter.numberTo);
   toField.on('displayTextChanged', this._updateNumberFilter.bind(this));
+
+  function _toNumberString(number) {
+    return scout.objects.isNumber(number) ? number.toString() : '';
+  }
 };
 
 scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {
@@ -59,23 +63,18 @@ scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {
   });
 };
 
-scout.FilterFieldsGroupBox.prototype._toNumberString = function(number) {
-  if (number === null || number === undefined) { // not for 0
-    return '';
-  } else {
-    return number.toString();
-  }
-};
-
 scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
-  // FIXME AWE: (filter) throw away range object and use separate properties instead
   var fromField = this._addField('DateField', 'ui.from', 0);
-  fromField.timestamp = this.filter.dateRange ? this.filter.dateRange.from : null;
+  fromField.timestamp = _toDateString(this.filter.dateFrom);
   fromField.on('timestampChanged', this._updateDateFilter.bind(this));
 
   var toField = this._addField('DateField', 'ui.to', 1);
-  toField.timestamp = this.filter.dateRange ? this.filter.dateRange.to : null;
+  toField.timestamp = _toDateString(this.filter.dateTo);
   toField.on('timestampChanged', this._updateDateFilter.bind(this));
+
+  function _toDateString(date) {
+    return date || '';
+  }
 };
 
 scout.FilterFieldsGroupBox.prototype._updateDateFilter = function(event) {
@@ -86,7 +85,10 @@ scout.FilterFieldsGroupBox.prototype._updateDateFilter = function(event) {
   });
 };
 
-// FIXME AWE: (filter) es braucht wahrscheinlich auch eine validierung? z.B. from muss kleiner sein als to
+// FIXME AWE: (filter) es braucht wahrscheinlich auch eine range-validierung? z.B. from muss kleiner sein als to
+// Prüfen ob wir eine sequence-box dafür verwenden wollen und dafür eine client-seitige validierung impl., diese
+// geschieht heute auf dem UI server. Evtl. wäre auch ein from/to validator für beliebige felder sinnvoll (auch
+// ausserhalb einer sequence-box)
 scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, gridY) {
   var field = scout.create(objectType, {
     parent: this,

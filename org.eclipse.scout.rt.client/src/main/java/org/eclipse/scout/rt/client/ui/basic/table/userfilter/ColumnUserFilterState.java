@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 
@@ -19,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ColumnUserFilterState extends AbstractUserFilterState implements IUserFilterState {
@@ -30,8 +30,10 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   private String m_columnId;
   private Set<Object> m_selectedValues;
   private String m_freeText;
-  private Range<Number> m_numberRange;
-  private Range<Date> m_dateRange;
+  private BigDecimal m_numberFrom;
+  private BigDecimal m_numberTo;
+  private Date m_dateFrom;
+  private Date m_dateTo;
 
   public ColumnUserFilterState(IColumn<String> column) {
     setColumn(column);
@@ -63,20 +65,36 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
     m_freeText = freeText;
   }
 
-  public Range<Number> getNumberRange() {
-    return m_numberRange;
+  public BigDecimal getNumberFrom() {
+    return m_numberFrom;
   }
 
-  public void setNumberRange(Range<Number> numberRange) {
-    m_numberRange = numberRange;
+  public void setNumberFrom(BigDecimal numberFrom) {
+    m_numberFrom = numberFrom;
   }
 
-  public Range<Date> getDateRange() {
-    return m_dateRange;
+  public BigDecimal getNumberTo() {
+    return m_numberTo;
   }
 
-  public void setDateRange(Range<Date> dateRange) {
-    m_dateRange = dateRange;
+  public void setNumberTo(BigDecimal numberTo) {
+    m_numberTo = numberTo;
+  }
+
+  public Date getDateFrom() {
+    return m_dateFrom;
+  }
+
+  public void setDateFrom(Date dateFrom) {
+    m_dateFrom = dateFrom;
+  }
+
+  public Date getDateTo() {
+    return m_dateTo;
+  }
+
+  public void setDateTo(Date dateTo) {
+    m_dateTo = dateTo;
   }
 
   @Override

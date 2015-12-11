@@ -64,8 +64,23 @@ scout.objects = {
     return (typeof obj === 'object' && !Array.isArray(obj));
   },
 
+  /**
+   * Returns true if:
+   * - obj is not undefined or null
+   * - obj not isNaN
+   * - obj isFinite
+   *
+   * This method is handy in cases where you want to check if a number is set. Since you cannot write:
+   *   if (myNumber) { ...
+   *
+   * Because when myNumber === 0 would also resolve to false. In that case use instead:
+   *   if (isNumber(myNumber)) { ...
+   *
+   * @param obj
+   * @returns {Boolean}
+   */
   isNumber: function(obj) {
-    return !isNaN(obj) && isFinite(obj);
+    return obj !== null && !isNaN(obj) && isFinite(obj);
   },
 
   /**

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -48,7 +49,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
@@ -738,41 +738,17 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
       // FIXME AWE: (filter) split into separate classes / per type
       // move model/json-adapter creation to JsonXxxColumn class, static method?
-      String freeText = data.optString("freeText");
-      if (freeText != null) {
-        filter.setFreeText(freeText);
+      if ("text".equals(getColumnType(column))) {
+        filter.setFreeText(data.optString("freeText"));
       }
-
-      JSONObject numberRange = data.optJSONObject("numberRange");
-      if (numberRange != null) {
-        String from = numberRange.optString("from");
-        if ("null".equals(from) || "".equals(from)) {
-          from = null;
-        }
-        Integer fromValue = from == null ? null : Integer.parseInt(from);
-        String to = numberRange.optString("to");
-        if ("null".equals(to) || "".equals(to)) {
-          to = null;
-        }
-        Integer toValue = to == null ? null : Integer.parseInt(to);
-        filter.setNumberRange(new Range<Number>(fromValue, toValue));
+      else if ("number".equals(getColumnType(column))) {
+        filter.setNumberFrom(toBigDecimal(data.optString("numberFrom")));
+        filter.setNumberTo(toBigDecimal(data.optString("numberTo")));
       }
-
-      JSONObject dateRange = data.optJSONObject("dateRange");
-      if (dateRange != null) {
-        String from = dateRange.optString("from");
-        if ("null".equals(from) || "".equals(from)) {
-          from = null;
-        }
-        Date fromDate = from == null ? null : toDate(from);
-        String to = dateRange.optString("to");
-        if ("null".equals(to) || "".equals(to)) {
-          to = null;
-        }
-        Date toDate = to == null ? null : toDate(to);
-        filter.setDateRange(new Range<Date>(fromDate, toDate));
+      else if ("date".equals(getColumnType(column))) {
+        filter.setDateFrom(toDate(data.optString("dateFrom")));
+        filter.setDateTo(toDate(data.optString("dateTo")));
       }
-
       return filter;
     }
     else if ("text".equals(filterType)) {
@@ -784,7 +760,17 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return null;
   }
 
+  private BigDecimal toBigDecimal(String numberString) {
+    if (StringUtility.isNullOrEmpty(numberString)) {
+      return null;
+    }
+    return new BigDecimal(numberString);
+  }
+
   private Date toDate(String dateString) { // FIXME AWE: (filter) fix this poor-mans solution and use JsonDate, property date-format
+    if (StringUtility.isNullOrEmpty(dateString)) {
+      return null;
+    }
     return DateUtility.parse(dateString, "y-M-d");
   }
 

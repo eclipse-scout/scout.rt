@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
-import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONArray;
@@ -45,40 +45,34 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
     IColumn modelColumn = filterState.getColumn();
     json.put("column", jsonTable.getColumnId(modelColumn));
     json.put("selectedValues", new JSONArray(filterState.getSelectedValues()));
+
     String colummType = jsonTable.getColumnType(modelColumn);
     if ("text".equals(colummType)) {
       json.put("freeText", getFilterState().getFreeText());
     }
     else if ("number".equals(colummType)) {
-      json.put("numberRange", numberRangeToJson(getFilterState().getNumberRange()));
+      json.put("numberFrom", numberToJson(getFilterState().getNumberFrom()));
+      json.put("numberTo", numberToJson(getFilterState().getNumberTo()));
     }
     else if ("date".equals(colummType)) {
-      json.put("dateRange", dateRangeToJson(getFilterState().getDateRange()));
+      json.put("dateFrom", dateToJson(getFilterState().getDateFrom()));
+      json.put("dateTo", dateToJson(getFilterState().getDateTo()));
     }
     return json;
   }
 
-  protected JSONObject numberRangeToJson(Range<Number> range) {
-    if (range == null) {
+  protected String numberToJson(BigDecimal number) {
+    if (number == null) {
       return null;
     }
-    JSONObject json = new JSONObject();
-    json.put("from", range.getFrom());
-    json.put("to", range.getTo());
-    return json;
+    return number.toString();
   }
 
-  protected JSONObject dateRangeToJson(Range<Date> range) {
-    if (range == null) {
+  // FIXME AWE: (filter) user JsonDate (see DateField)
+  protected String dateToJson(Date date) {
+    if (date == null) {
       return null;
     }
-    JSONObject json = new JSONObject();
-    json.put("from", formatDate(range.getFrom()));
-    json.put("to", formatDate(range.getTo()));
-    return json;
-  }
-
-  protected String formatDate(Date date) { // FIXME AWE: (filter) user JsonDate (see DateField)
     return DateUtility.format(date, "y-M-dd");
   }
 
